@@ -4,15 +4,15 @@
 #![recursion_limit = "1024"]
 #![cfg_attr(feature = "clippy", feature(plugin))]
 #![cfg_attr(feature = "clippy", plugin(clippy))]
-#![warn(missing_docs)]
+// #![warn(missing_docs)]
 #[macro_use]
 extern crate error_chain;
+extern crate num;
 
-mod errors {
-    error_chain!{}
-}
-
-use errors::*;
+pub mod result;
+/// Simulated Annealing
+pub mod sa;
+mod errors;
 
 /// Trait for forward operators
 pub trait ArgminOperator {}
