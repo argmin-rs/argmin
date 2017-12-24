@@ -9,16 +9,18 @@
 extern crate error_chain;
 extern crate num;
 
-pub mod result;
-/// Simulated Annealing
-pub mod sa;
-mod errors;
-
 /// Trait for forward operators
 pub trait ArgminOperator {}
 
 /// Trait for cost functions
 pub trait ArgminCost {}
+
+pub mod result;
+pub mod parameter;
+pub mod testfunctions;
+/// Simulated Annealing
+pub mod sa;
+mod errors;
 
 #[cfg(test)]
 mod tests {
