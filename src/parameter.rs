@@ -1,9 +1,9 @@
-pub trait ArgminParameter {
-    fn modify(&mut self) -> &mut Self;
+pub trait ArgminParameter<T: Clone> {
+    fn modify(&mut self) -> T;
 }
 
-impl ArgminParameter for Vec<f64> {
-    fn modify(&mut self) -> &mut Self {
-        self
+impl<T: Clone> ArgminParameter<T> for T {
+    fn modify(&mut self) -> T {
+        self.clone()
     }
 }
