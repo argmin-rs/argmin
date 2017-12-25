@@ -4,14 +4,20 @@
 use errors::*;
 use result::ArgminResult;
 use parameter::ArgminParameter;
-use std::fmt::Display;
-// use num::{Num, NumCast};
+use std::fmt::{Debug, Display};
+use rand;
+use rand::distributions::{IndependentSample, Range};
+use num::{Float, FromPrimitive, NumCast};
 
 /// Simulated Annealing struct (duh)
-pub struct SimulatedAnnealing<'a, T: ArgminParameter<T> + Clone + 'a, U: PartialOrd + Display + 'a>
-{
+pub struct SimulatedAnnealing<
+    'a,
+    T: ArgminParameter<T> + Debug + Clone + 'a,
+    // U: Num + NumCast + Float + PartialOrd + Display + 'a,
+    U: Float + FromPrimitive + Display + 'a,
+> {
     /// Initial temperature
-    pub init_temp: f64,
+    pub init_temp: U,
     /// Maximum number of iterations
     pub max_iters: u64,
     /// Initial parameter vector
@@ -25,17 +31,21 @@ pub struct SimulatedAnnealing<'a, T: ArgminParameter<T> + Clone + 'a, U: Partial
     pub constraint: &'a Fn(&T) -> bool,
 }
 
-impl<'a, T: ArgminParameter<T> + Clone + 'a, U: PartialOrd + Display + 'a>
-    SimulatedAnnealing<'a, T, U> {
+impl<
+    'a,
+    T: ArgminParameter<T> + Debug + Clone + 'a,
+    // U: Num + NumCast + Float + PartialOrd + Display + 'a,
+    U: Float + FromPrimitive + Display + 'a,
+> SimulatedAnnealing<'a, T, U> {
     pub fn new(
-        init_temp: f64,
+        init_temp: U,
         max_iters: u64,
         init_param: T,
         cost_function: &'a Fn(&T) -> U,
         lower_bound: T,
         upper_bound: T,
     ) -> Result<Self> {
-        if init_temp <= 0f64 {
+        if init_temp <= FromPrimitive::from_f64(0_f64).unwrap() {
             Err(
                 ErrorKind::InvalidParameter("SimulatedAnnealing: Temperature must be > 0.".into())
                     .into(),
@@ -48,42 +58,51 @@ impl<'a, T: ArgminParameter<T> + Clone + 'a, U: PartialOrd + Display + 'a>
                 cost_function: cost_function,
                 lower_bound: lower_bound,
                 upper_bound: upper_bound,
-                constraint: &|_x| true,
+                constraint: &|_x: &T| true,
             })
         }
     }
-
-    // pub fn lower_bound(&mut self, lower_bound: T) -> &mut Self {
-    //     self.lower_bound = lower_bound;
-    //     self
-    // }
-    //
-    // pub fn upper_bound(&mut self, upper_bound: T) -> &mut Self {
-    //     self.upper_bound = upper_bound;
-    //     self
-    // }
 
     pub fn constraint(&mut self, constraint: &'a Fn(&T) -> bool) -> &mut Self {
         self.constraint = constraint;
         self
     }
 
+    fn accept(&self, temp: U, prev_cost: U, next_cost: U) -> bool {
+        let step = Range::new(0.0, 1.0);
+        let mut rng = rand::thread_rng();
+        let prob: U = NumCast::from(step.ind_sample(&mut rng)).unwrap();
+        let _1: U = NumCast::from(1_f64).unwrap();
+        (next_cost < prev_cost) || (_1 / (_1 + ((next_cost - prev_cost) / temp).exp()) > prob)
+    }
+
     /// Run simulated annealing solver
     pub fn run(&self) -> Result<ArgminResult<T, U>> {
         let mut param = self.init_param.clone();
         let mut cost = (self.cost_function)(&param);
-        let mut _temp = self.init_temp;
+        let mut temp = self.init_temp;
+        let mut param_best = self.init_param.clone();
+        let mut cost_best = cost;
         for i in 0..self.max_iters {
-            _temp /= i as f64;
-            let param_new = param.modify(&self.lower_bound, &self.upper_bound, &self.constraint);
+            let mut param_new = param.clone();
+            for _ in 0..((temp.floor()).to_u64().unwrap() + 1) {
+                param_new =
+                    param_new.modify(&self.lower_bound, &self.upper_bound, &self.constraint);
+            }
             let new_cost = (self.cost_function)(&param_new);
             // println!("iter: {}; cost: {}", i, new_cost);
-            if new_cost < cost {
+            if self.accept(temp, cost, new_cost) {
+                // println!("{} {} {:?}", i, temp, param_new);
                 cost = new_cost;
                 param = param_new;
+                if cost < cost_best {
+                    cost_best = cost;
+                    param_best = param.clone();
+                }
             }
+            temp = self.init_temp / FromPrimitive::from_f64((i + 1) as f64).unwrap();
         }
-        let res = ArgminResult::new(param, cost, self.max_iters);
+        let res = ArgminResult::new(param_best, cost_best, self.max_iters);
         Ok(res)
     }
 }
