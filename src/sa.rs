@@ -16,7 +16,7 @@ pub struct SimulatedAnnealing<
     U: Float + FromPrimitive + Display + 'a,
 > {
     /// Initial temperature
-    pub init_temp: U,
+    pub init_temp: f64,
     /// Maximum number of iterations
     pub max_iters: u64,
     /// Initial parameter vector
@@ -33,7 +33,7 @@ pub struct SimulatedAnnealing<
 impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + Display + 'a>
     SimulatedAnnealing<'a, T, U> {
     pub fn new(
-        init_temp: U,
+        init_temp: f64,
         max_iters: u64,
         init_param: T,
         cost_function: &'a Fn(&T) -> U,
@@ -63,12 +63,17 @@ impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + 
         self
     }
 
-    fn accept(&self, temp: U, prev_cost: U, next_cost: U) -> bool {
+    fn accept(&self, temp: f64, prev_cost: U, next_cost: U) -> bool {
         let step = Range::new(0.0, 1.0);
         let mut rng = rand::thread_rng();
-        let prob: U = NumCast::from(step.ind_sample(&mut rng)).unwrap();
+        let prob: f64 = step.ind_sample(&mut rng);
         let _1: U = NumCast::from(1_f64).unwrap();
-        (next_cost < prev_cost) || (_1 / (_1 + ((next_cost - prev_cost) / temp).exp()) > prob)
+        (next_cost < prev_cost)
+            || (1_f64 / (1_f64 + ((next_cost - prev_cost).to_f64().unwrap() / temp).exp()) > prob)
+    }
+
+    fn update_temperature(&self, iter: u64) -> f64 {
+        self.init_temp / ((iter + 1) as f64)
     }
 
     /// Run simulated annealing solver
@@ -80,7 +85,7 @@ impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + 
         let mut cost_best = cost;
         for i in 0..self.max_iters {
             let mut param_new = param.clone();
-            for _ in 0..((temp.floor()).to_u64().unwrap() + 1) {
+            for _ in 0..((temp.floor() as u64) + 1) {
                 param_new =
                     param_new.modify(&self.lower_bound, &self.upper_bound, &self.constraint);
             }
@@ -94,7 +99,8 @@ impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + 
                     param_best = param.clone();
                 }
             }
-            temp = self.init_temp / FromPrimitive::from_f64((i + 1) as f64).unwrap();
+            temp = self.update_temperature(i);
+            // temp = self.init_temp / FromPrimitive::from_f64((i + 1) as f64).unwrap();
         }
         let res = ArgminResult::new(param_best, cost_best, self.max_iters);
         Ok(res)
