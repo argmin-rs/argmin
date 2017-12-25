@@ -13,7 +13,6 @@ use num::{Float, FromPrimitive, NumCast};
 pub struct SimulatedAnnealing<
     'a,
     T: ArgminParameter<T> + Debug + Clone + 'a,
-    // U: Num + NumCast + Float + PartialOrd + Display + 'a,
     U: Float + FromPrimitive + Display + 'a,
 > {
     /// Initial temperature
@@ -31,12 +30,8 @@ pub struct SimulatedAnnealing<
     pub constraint: &'a Fn(&T) -> bool,
 }
 
-impl<
-    'a,
-    T: ArgminParameter<T> + Debug + Clone + 'a,
-    // U: Num + NumCast + Float + PartialOrd + Display + 'a,
-    U: Float + FromPrimitive + Display + 'a,
-> SimulatedAnnealing<'a, T, U> {
+impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + Display + 'a>
+    SimulatedAnnealing<'a, T, U> {
     pub fn new(
         init_temp: U,
         max_iters: u64,
@@ -90,7 +85,6 @@ impl<
                     param_new.modify(&self.lower_bound, &self.upper_bound, &self.constraint);
             }
             let new_cost = (self.cost_function)(&param_new);
-            // println!("iter: {}; cost: {}", i, new_cost);
             if self.accept(temp, cost, new_cost) {
                 // println!("{} {} {:?}", i, temp, param_new);
                 cost = new_cost;
