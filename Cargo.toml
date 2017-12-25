@@ -16,6 +16,7 @@ categories = ["science"]
 clippy = {version = "*", optional = true}
 error-chain = "*"
 num = "*"
+rand = "*"
 
 [features]
 default = []

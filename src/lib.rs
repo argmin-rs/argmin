@@ -8,6 +8,7 @@
 #[macro_use]
 extern crate error_chain;
 extern crate num;
+extern crate rand;
 
 /// Trait for forward operators
 pub trait ArgminOperator {}

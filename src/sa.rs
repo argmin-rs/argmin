@@ -4,10 +4,12 @@
 use errors::*;
 use result::ArgminResult;
 use parameter::ArgminParameter;
+use std::fmt::Display;
 // use num::{Num, NumCast};
 
 /// Simulated Annealing struct (duh)
-pub struct SimulatedAnnealing<'a, T: ArgminParameter<T> + Clone + 'a, U: Ord + 'a> {
+pub struct SimulatedAnnealing<'a, T: ArgminParameter<T> + Clone + 'a, U: PartialOrd + Display + 'a>
+{
     /// Initial temperature
     pub init_temp: f64,
     /// Maximum number of iterations
@@ -17,18 +19,21 @@ pub struct SimulatedAnnealing<'a, T: ArgminParameter<T> + Clone + 'a, U: Ord + '
     /// cost function
     pub cost_function: &'a Fn(&T) -> U,
     /// lower and upper bound. currently same type as init_param, could be changed in the future.
-    pub lower_bound: Option<T>,
-    pub upper_bound: Option<T>,
+    pub lower_bound: T,
+    pub upper_bound: T,
     /// (non)linear constraint which is `true` if a parameter vector lies within the bounds
-    pub constraint: Option<&'a Fn(&T) -> bool>,
+    pub constraint: &'a Fn(&T) -> bool,
 }
 
-impl<'a, T: ArgminParameter<T> + Clone + 'a, U: Ord + 'a> SimulatedAnnealing<'a, T, U> {
+impl<'a, T: ArgminParameter<T> + Clone + 'a, U: PartialOrd + Display + 'a>
+    SimulatedAnnealing<'a, T, U> {
     pub fn new(
         init_temp: f64,
         max_iters: u64,
         init_param: T,
         cost_function: &'a Fn(&T) -> U,
+        lower_bound: T,
+        upper_bound: T,
     ) -> Result<Self> {
         if init_temp <= 0f64 {
             Err(
@@ -41,25 +46,25 @@ impl<'a, T: ArgminParameter<T> + Clone + 'a, U: Ord + 'a> SimulatedAnnealing<'a,
                 max_iters: max_iters,
                 init_param: init_param,
                 cost_function: cost_function,
-                lower_bound: None,
-                upper_bound: None,
-                constraint: None,
+                lower_bound: lower_bound,
+                upper_bound: upper_bound,
+                constraint: &|_x| true,
             })
         }
     }
 
-    pub fn lower_bound(&mut self, lower_bound: T) -> &mut Self {
-        self.lower_bound = Some(lower_bound);
-        self
-    }
-
-    pub fn upper_bound(&mut self, upper_bound: T) -> &mut Self {
-        self.upper_bound = Some(upper_bound);
-        self
-    }
+    // pub fn lower_bound(&mut self, lower_bound: T) -> &mut Self {
+    //     self.lower_bound = lower_bound;
+    //     self
+    // }
+    //
+    // pub fn upper_bound(&mut self, upper_bound: T) -> &mut Self {
+    //     self.upper_bound = upper_bound;
+    //     self
+    // }
 
     pub fn constraint(&mut self, constraint: &'a Fn(&T) -> bool) -> &mut Self {
-        self.constraint = Some(constraint);
+        self.constraint = constraint;
         self
     }
 
@@ -67,11 +72,12 @@ impl<'a, T: ArgminParameter<T> + Clone + 'a, U: Ord + 'a> SimulatedAnnealing<'a,
     pub fn run(&self) -> Result<ArgminResult<T, U>> {
         let mut param = self.init_param.clone();
         let mut cost = (self.cost_function)(&param);
-        let mut temp = self.init_temp;
+        let mut _temp = self.init_temp;
         for i in 0..self.max_iters {
-            temp /= i as f64;
+            _temp /= i as f64;
             let param_new = param.modify(&self.lower_bound, &self.upper_bound, &self.constraint);
             let new_cost = (self.cost_function)(&param_new);
+            // println!("iter: {}; cost: {}", i, new_cost);
             if new_cost < cost {
                 cost = new_cost;
                 param = param_new;
