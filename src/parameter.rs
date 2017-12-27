@@ -1,7 +1,19 @@
 use rand;
 use rand::distributions::{IndependentSample, Range};
 
+/// This trait needs to be implemented for every parameter fed into the solvers.
+/// This is highly *UNSTABLE* and will change in the future.
 pub trait ArgminParameter<T: Clone> {
+    /// Defines a modification of the parameter vector.
+    ///
+    /// The parameters:
+    ///
+    /// `&self`: reference to the object of type `T`
+    /// `lower_bound`: Lower bound of the parameter vector. Same type as parameter vector (`T`)
+    /// `upper_bound`: Upper bound of the parameter vector. Same type as parameter vector (`T`)
+    /// `constraint`: Additional (non)linear constraint whith the signature `&Fn(&T) -> bool`. The
+    /// provided function takes a parameter as input and returns `true` if the parameter vector
+    /// satisfies the constraints and `false` otherwise.
     fn modify(&self, &T, &T, &Fn(&T) -> bool) -> T;
 }
 

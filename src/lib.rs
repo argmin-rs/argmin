@@ -16,11 +16,19 @@ pub trait ArgminOperator {}
 /// Trait for cost functions
 pub trait ArgminCost {}
 
+/// Definition of the return type of the solvers
 pub mod result;
+
+/// Traits for implementing parameter vectors
 pub mod parameter;
+
+/// A set of test functions like Rosenbrock's function and so on.
 pub mod testfunctions;
+
 /// Simulated Annealing
 pub mod sa;
+
+/// Errors using `error-chain`
 mod errors;
 
 #[cfg(test)]
