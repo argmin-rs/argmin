@@ -22,6 +22,9 @@ pub mod result;
 /// Traits for implementing parameter vectors
 pub mod parameter;
 
+// TODO: Trait aliases, once they are fully implemented
+// trait ParameterVector<T> = parameter::ArgminParameter<T> + std::fmt::Debug + Clone;
+
 /// Problem formulation
 pub mod problem;
 
