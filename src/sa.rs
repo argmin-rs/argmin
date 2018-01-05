@@ -9,7 +9,6 @@ use result::ArgminResult;
 use parameter::ArgminParameter;
 use rand;
 use rand::distributions::{IndependentSample, Range};
-use num::{FromPrimitive, NumCast};
 use ArgminCostValue;
 
 /// Definition of build in temperature functions for Simulated Annealing.
@@ -37,8 +36,7 @@ pub enum SATempFunc {
 }
 
 /// Simulated Annealing struct (duh)
-pub struct SimulatedAnnealing<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> {
-    pub problem: Problem<'a, T, U>,
+pub struct SimulatedAnnealing<'a> {
     /// Initial temperature
     pub init_temp: f64,
     /// Maximum number of iterations
@@ -49,7 +47,7 @@ pub struct SimulatedAnnealing<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue
     pub custom_temp_func: Option<&'a Fn(f64, u64) -> f64>,
 }
 
-impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> SimulatedAnnealing<'a, T, U> {
+impl<'a> SimulatedAnnealing<'a> {
     /// Constructor
     ///
     /// Returns an `SimulatedAnnealing` struct where all entries of the struct are set according to
@@ -62,15 +60,14 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> SimulatedAnnealing
     /// `problem`: problem definition
     /// `init_tmep`: Initial temperature
     /// `max_iters`: Maximum number of iterations
-    pub fn new(problem: Problem<'a, T, U>, init_temp: f64, max_iters: u64) -> Result<Self> {
-        if init_temp <= FromPrimitive::from_f64(0_f64).unwrap() {
+    pub fn new(init_temp: f64, max_iters: u64) -> Result<Self> {
+        if init_temp <= 0_f64 {
             Err(
                 ErrorKind::InvalidParameter("SimulatedAnnealing: Temperature must be > 0.".into())
                     .into(),
             )
         } else {
             Ok(SimulatedAnnealing {
-                problem: problem,
                 init_temp: init_temp,
                 max_iters: max_iters,
                 temp_func: SATempFunc::TemperatureFast,
@@ -106,13 +103,11 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> SimulatedAnnealing
     ///     `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
     ///
     /// which will always be between 0 and 0.5.
-    fn accept(&self, temp: f64, prev_cost: U, next_cost: U) -> bool {
+    fn accept(&self, temp: f64, prev_cost: f64, next_cost: f64) -> bool {
         let step = Range::new(0.0, 1.0);
         let mut rng = rand::thread_rng();
         let prob: f64 = step.ind_sample(&mut rng);
-        let _1: U = NumCast::from(1_f64).unwrap();
-        (next_cost < prev_cost)
-            || (1_f64 / (1_f64 + ((next_cost - prev_cost).to_f64().unwrap() / temp).exp()) > prob)
+        (next_cost < prev_cost) || (1_f64 / (1_f64 + ((next_cost - prev_cost) / temp).exp()) > prob)
     }
 
     /// Update the temperature based on the current iteration number.
@@ -141,11 +136,15 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> SimulatedAnnealing
     }
 
     /// Run simulated annealing solver
-    pub fn run(&self, init_param: &T) -> Result<ArgminResult<T, U>> {
+    pub fn run<T, U>(&self, problem: &Problem<T, U>, init_param: &T) -> Result<ArgminResult<T, U>>
+    where
+        T: ArgminParameter<T>,
+        U: ArgminCostValue,
+    {
         let mut param = init_param.clone();
 
         // Evaluate cost function of starting point
-        let mut cost = (self.problem.cost_function)(&param);
+        let mut cost = (problem.cost_function)(&param);
 
         // Initialize temperature
         let mut temp = self.init_temp;
@@ -161,18 +160,18 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> SimulatedAnnealing
             let mut param_new = param.clone();
             for _ in 0..((temp.floor() as u64) + 1) {
                 param_new = param_new.modify(
-                    &self.problem.lower_bound,
-                    &self.problem.upper_bound,
-                    &self.problem.constraint,
+                    &problem.lower_bound,
+                    &problem.upper_bound,
+                    &problem.constraint,
                 );
             }
 
             // Evaluate cost function with new parameter vector
-            let new_cost = (self.problem.cost_function)(&param_new);
+            let new_cost = (problem.cost_function)(&param_new);
 
             // Decide whether new parameter vector should be accepted.
             // If no, move on with old parameter vector.
-            if self.accept(temp, cost, new_cost) {
+            if self.accept(temp, cost.to_f64().unwrap(), new_cost.to_f64().unwrap()) {
                 // println!("{} {} {:?}", i, temp, param_new);
                 // If yes, update the parameter vector for the next iteration.
                 cost = new_cost;
