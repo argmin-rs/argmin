@@ -43,8 +43,6 @@ pub struct SimulatedAnnealing<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue
     pub init_temp: f64,
     /// Maximum number of iterations
     pub max_iters: u64,
-    /// Initial parameter vector
-    pub init_param: T,
     /// which temperature function?
     pub temp_func: SATempFunc,
     /// Custom temperature function
@@ -64,13 +62,7 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> SimulatedAnnealing
     /// `problem`: problem definition
     /// `init_tmep`: Initial temperature
     /// `max_iters`: Maximum number of iterations
-    /// `init_param`: Initial parameter vector
-    pub fn new(
-        problem: Problem<'a, T, U>,
-        init_temp: f64,
-        max_iters: u64,
-        init_param: T,
-    ) -> Result<Self> {
+    pub fn new(problem: Problem<'a, T, U>, init_temp: f64, max_iters: u64) -> Result<Self> {
         if init_temp <= FromPrimitive::from_f64(0_f64).unwrap() {
             Err(
                 ErrorKind::InvalidParameter("SimulatedAnnealing: Temperature must be > 0.".into())
@@ -81,7 +73,6 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> SimulatedAnnealing
                 problem: problem,
                 init_temp: init_temp,
                 max_iters: max_iters,
-                init_param: init_param,
                 temp_func: SATempFunc::TemperatureFast,
                 custom_temp_func: None,
             })
@@ -150,8 +141,8 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> SimulatedAnnealing
     }
 
     /// Run simulated annealing solver
-    pub fn run(&self) -> Result<ArgminResult<T, U>> {
-        let mut param = self.init_param.clone();
+    pub fn run(&self, init_param: &T) -> Result<ArgminResult<T, U>> {
+        let mut param = init_param.clone();
 
         // Evaluate cost function of starting point
         let mut cost = (self.problem.cost_function)(&param);
@@ -160,7 +151,7 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> SimulatedAnnealing
         let mut temp = self.init_temp;
 
         // Set first best solution to initial parameter vector
-        let mut param_best = self.init_param.clone();
+        let mut param_best = init_param.clone();
         let mut cost_best = cost;
 
         // Start annealing

@@ -12,8 +12,8 @@ fn main() {
 
     let prob = Problem::new(&cost, lower_bound, upper_bound);
 
-    let mut solver = SimulatedAnnealing::new(prob, 10.0, 10_000_000, init_param).unwrap();
+    let mut solver = SimulatedAnnealing::new(prob, 10.0, 10_000_000).unwrap();
     solver.temp_func(SATempFunc::Exponential(0.8));
 
-    println!("{:?}", solver.run().unwrap());
+    println!("{:?}", solver.run(&init_param).unwrap());
 }
