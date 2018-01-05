@@ -7,10 +7,10 @@ use errors::*;
 use problem::Problem;
 use result::ArgminResult;
 use parameter::ArgminParameter;
-use std::fmt::{Debug, Display};
 use rand;
 use rand::distributions::{IndependentSample, Range};
-use num::{Float, FromPrimitive, NumCast};
+use num::{FromPrimitive, NumCast};
+use ArgminCostValue;
 
 /// Definition of build in temperature functions for Simulated Annealing.
 ///
@@ -37,11 +37,7 @@ pub enum SATempFunc {
 }
 
 /// Simulated Annealing struct (duh)
-pub struct SimulatedAnnealing<
-    'a,
-    T: ArgminParameter<T> + Debug + Clone + 'a,
-    U: Float + FromPrimitive + Display + 'a,
-> {
+pub struct SimulatedAnnealing<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> {
     pub problem: Problem<'a, T, U>,
     /// Initial temperature
     pub init_temp: f64,
@@ -55,8 +51,7 @@ pub struct SimulatedAnnealing<
     pub custom_temp_func: Option<&'a Fn(f64, u64) -> f64>,
 }
 
-impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + Display + 'a>
-    SimulatedAnnealing<'a, T, U> {
+impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> SimulatedAnnealing<'a, T, U> {
     /// Constructor
     ///
     /// Returns an `SimulatedAnnealing` struct where all entries of the struct are set according to

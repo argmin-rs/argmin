@@ -1,9 +1,10 @@
+use std::fmt::Debug;
 use rand;
 use rand::distributions::{IndependentSample, Range};
 
 /// This trait needs to be implemented for every parameter fed into the solvers.
 /// This is highly *UNSTABLE* and will change in the future.
-pub trait ArgminParameter<T: Clone> {
+pub trait ArgminParameter<T: Clone>: Clone + Debug {
     /// Defines a modification of the parameter vector.
     ///
     /// The parameters:

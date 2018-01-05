@@ -1,14 +1,9 @@
 /// TODO DOCUMENTATION
 ///
-use std::fmt::{Debug, Display};
-use num::{Float, FromPrimitive};
 use parameter::ArgminParameter;
+use ArgminCostValue;
 
-pub struct Problem<
-    'a,
-    T: ArgminParameter<T> + Debug + Clone + 'a,
-    U: Float + FromPrimitive + Display + 'a,
-> {
+pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> {
     pub cost_function: &'a Fn(&T) -> U,
     pub gradient: Option<&'a Fn(&T) -> T>,
     /// lower bound of the parameter vector
@@ -19,8 +14,7 @@ pub struct Problem<
     pub constraint: &'a Fn(&T) -> bool,
 }
 
-impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + Display + 'a>
-    Problem<'a, T, U> {
+impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> Problem<'a, T, U> {
     pub fn new(cost_function: &'a Fn(&T) -> U, lower_bound: T, upper_bound: T) -> Self {
         Problem {
             cost_function: cost_function,

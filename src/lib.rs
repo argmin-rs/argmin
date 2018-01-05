@@ -16,14 +16,20 @@ pub trait ArgminOperator {}
 /// Trait for cost functions
 pub trait ArgminCost {}
 
+/// Trait for cost function values
+/// TODO: Do this with trait aliases once they work in rust.
+pub trait ArgminCostValue: num::Float + num::FromPrimitive + PartialOrd {}
+impl<T> ArgminCostValue for T
+where
+    T: num::Float + num::FromPrimitive + PartialOrd,
+{
+}
+
 /// Definition of the return type of the solvers
 pub mod result;
 
 /// Traits for implementing parameter vectors
 pub mod parameter;
-
-// TODO: Trait aliases, once they are fully implemented
-// trait ParameterVector<T> = parameter::ArgminParameter<T> + std::fmt::Debug + Clone;
 
 /// Problem formulation
 pub mod problem;
