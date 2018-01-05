@@ -28,8 +28,8 @@ pub enum SATempFunc {
     TemperatureFast,
     /// `t_i = t_init / ln(i)`
     Boltzmann,
-    /// `t_i = t_init * 0.95^i`
-    Exponential,
+    /// `t_i = t_init * x^i`
+    Exponential(f64),
     /// User-provided temperature function. See `SimulatedAnnealing::custom_temp_func()` for
     /// details.
     Custom,
@@ -159,7 +159,15 @@ impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + 
         match self.temp_func {
             SATempFunc::TemperatureFast => Ok(self.init_temp / ((iter + 1) as f64)),
             SATempFunc::Boltzmann => Ok(self.init_temp / ((iter + 1) as f64).ln()),
-            SATempFunc::Exponential => Ok(self.init_temp * 0.95.powf((iter + 1) as f64)),
+            SATempFunc::Exponential(x) => if x < 1_f64 && x > 0_f64 {
+                Ok(self.init_temp * x.powf((iter + 1) as f64))
+            } else {
+                Err(ErrorKind::InvalidParameter(
+                    "SimulatedAnnealing: Parameter for exponential \
+                     temperature update function needs to be >0 and <1."
+                        .into(),
+                ).into())
+            },
             SATempFunc::Custom => match self.custom_temp_func {
                 Some(func) => Ok(func(self.init_temp, iter)),
                 None => Err(ErrorKind::InvalidParameter(
