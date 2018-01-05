@@ -51,9 +51,8 @@ impl<'a> SimulatedAnnealing<'a> {
     /// Constructor
     ///
     /// Returns an `SimulatedAnnealing` struct where all entries of the struct are set according to
-    /// the parameters provided, apart from `constraint`, `temp_func` and `custom_temp_func` which
-    /// are set to default values (`&|_x| true`, `SATempFunc::TemperatureFast` and `None`,
-    /// respectively.
+    /// the parameters provided, apart from  `temp_func` and `custom_temp_func` which are set to
+    /// default values (`SATempFunc::TemperatureFast` and `None`, respectively).
     ///
     /// Parameters:
     ///
@@ -135,7 +134,7 @@ impl<'a> SimulatedAnnealing<'a> {
         }
     }
 
-    /// Run simulated annealing solver
+    /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.
     pub fn run<T, U>(&self, problem: &Problem<T, U>, init_param: &T) -> Result<ArgminResult<T, U>>
     where
         T: ArgminParameter<T>,

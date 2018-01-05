@@ -1,11 +1,6 @@
 /// `ArgminResult`
 ///
 /// TODO
-///
-/// * [ ] It needs to be possible to create any other Solver struct from an `ArgminResult` struct
-///       by calling `bla.to_sa()` or something.
-///       Or, instead, every solver could have a function `Solver::from_result()`. That way it is
-///       easy to chain different solvers to each other. (Like SA first, then gradient descent).
 use parameter::ArgminParameter;
 
 /// Return struct for all solvers.

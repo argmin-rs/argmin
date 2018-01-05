@@ -1,3 +1,5 @@
+/// TODO DOCUMENTATION
+///
 use std::fmt::Debug;
 use rand;
 use rand::distributions::{IndependentSample, Range};
