@@ -22,11 +22,17 @@ pub mod result;
 /// Traits for implementing parameter vectors
 pub mod parameter;
 
+/// Problem formulation
+pub mod problem;
+
 /// A set of test functions like Rosenbrock's function and so on.
 pub mod testfunctions;
 
 /// Simulated Annealing
 pub mod sa;
+
+/// Gradient Descent
+// pub mod gradientdescent;
 
 /// Errors using `error-chain`
 mod errors;

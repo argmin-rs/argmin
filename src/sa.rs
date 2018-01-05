@@ -4,6 +4,7 @@
 /// * [ ] Exponential temperature function should take a parameter
 /// * [ ] Early stopping criterions
 use errors::*;
+use problem::Problem;
 use result::ArgminResult;
 use parameter::ArgminParameter;
 use std::fmt::{Debug, Display};
@@ -41,20 +42,13 @@ pub struct SimulatedAnnealing<
     T: ArgminParameter<T> + Debug + Clone + 'a,
     U: Float + FromPrimitive + Display + 'a,
 > {
+    pub problem: Problem<'a, T, U>,
     /// Initial temperature
     pub init_temp: f64,
     /// Maximum number of iterations
     pub max_iters: u64,
     /// Initial parameter vector
     pub init_param: T,
-    /// cost function
-    pub cost_function: &'a Fn(&T) -> U,
-    /// lower bound. currently same type as init_param, could be changed in the future.
-    pub lower_bound: T,
-    /// upper bound. currently same type as init_param, could be changed in the future.
-    pub upper_bound: T,
-    /// (non)linear constraint which is `true` if a parameter vector lies within the bounds
-    pub constraint: &'a Fn(&T) -> bool,
     /// which temperature function?
     pub temp_func: SATempFunc,
     /// Custom temperature function
@@ -72,19 +66,15 @@ impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + 
     ///
     /// Parameters:
     ///
+    /// `problem`: problem definition
     /// `init_tmep`: Initial temperature
     /// `max_iters`: Maximum number of iterations
     /// `init_param`: Initial parameter vector
-    /// `cost_function`: cost/fitness function
-    /// `lower_bound`: lower bound on the parameter vector
-    /// `upper_bound`: uppre bound on the parameter vector
     pub fn new(
+        problem: Problem<'a, T, U>,
         init_temp: f64,
         max_iters: u64,
         init_param: T,
-        cost_function: &'a Fn(&T) -> U,
-        lower_bound: T,
-        upper_bound: T,
     ) -> Result<Self> {
         if init_temp <= FromPrimitive::from_f64(0_f64).unwrap() {
             Err(
@@ -93,27 +83,14 @@ impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + 
             )
         } else {
             Ok(SimulatedAnnealing {
+                problem: problem,
                 init_temp: init_temp,
                 max_iters: max_iters,
                 init_param: init_param,
-                cost_function: cost_function,
-                lower_bound: lower_bound,
-                upper_bound: upper_bound,
-                constraint: &|_x: &T| true,
                 temp_func: SATempFunc::TemperatureFast,
                 custom_temp_func: None,
             })
         }
-    }
-
-    /// Provide additional (non) linear constraint.
-    ///
-    /// The function has to have the signature `&Fn(&T) -> bool` where `T` is the type of
-    /// the parameter vector. The function returns `true` if all constraints are satisfied and
-    /// `false` otherwise.
-    pub fn constraint(&mut self, constraint: &'a Fn(&T) -> bool) -> &mut Self {
-        self.constraint = constraint;
-        self
     }
 
     /// Change temperature function to one of the options in `SATempFunc`.
@@ -182,7 +159,7 @@ impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + 
         let mut param = self.init_param.clone();
 
         // Evaluate cost function of starting point
-        let mut cost = (self.cost_function)(&param);
+        let mut cost = (self.problem.cost_function)(&param);
 
         // Initialize temperature
         let mut temp = self.init_temp;
@@ -197,12 +174,15 @@ impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + 
             // to the current temperature
             let mut param_new = param.clone();
             for _ in 0..((temp.floor() as u64) + 1) {
-                param_new =
-                    param_new.modify(&self.lower_bound, &self.upper_bound, &self.constraint);
+                param_new = param_new.modify(
+                    &self.problem.lower_bound,
+                    &self.problem.upper_bound,
+                    &self.problem.constraint,
+                );
             }
 
             // Evaluate cost function with new parameter vector
-            let new_cost = (self.cost_function)(&param_new);
+            let new_cost = (self.problem.cost_function)(&param_new);
 
             // Decide whether new parameter vector should be accepted.
             // If no, move on with old parameter vector.
