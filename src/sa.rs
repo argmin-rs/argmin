@@ -180,29 +180,50 @@ impl<'a, T: ArgminParameter<T> + Debug + Clone + 'a, U: Float + FromPrimitive + 
     /// Run simulated annealing solver
     pub fn run(&self) -> Result<ArgminResult<T, U>> {
         let mut param = self.init_param.clone();
+
+        // Evaluate cost function of starting point
         let mut cost = (self.cost_function)(&param);
+
+        // Initialize temperature
         let mut temp = self.init_temp;
+
+        // Set first best solution to initial parameter vector
         let mut param_best = self.init_param.clone();
         let mut cost_best = cost;
+
+        // Start annealing
         for i in 0..self.max_iters {
+            // Start off with current parameter vector and mutate it with the mutation proportional
+            // to the current temperature
             let mut param_new = param.clone();
             for _ in 0..((temp.floor() as u64) + 1) {
                 param_new =
                     param_new.modify(&self.lower_bound, &self.upper_bound, &self.constraint);
             }
+
+            // Evaluate cost function with new parameter vector
             let new_cost = (self.cost_function)(&param_new);
+
+            // Decide whether new parameter vector should be accepted.
+            // If no, move on with old parameter vector.
             if self.accept(temp, cost, new_cost) {
                 // println!("{} {} {:?}", i, temp, param_new);
+                // If yes, update the parameter vector for the next iteration.
                 cost = new_cost;
                 param = param_new;
+
+                // In case the new solution is better than the current best, update best as well.
                 if cost < cost_best {
                     cost_best = cost;
                     param_best = param.clone();
                 }
             }
+
+            // Update temperature for next iteration.
             temp = self.update_temperature(i)?;
         }
-        let res = ArgminResult::new(param_best, cost_best, self.max_iters);
-        Ok(res)
+
+        // Return the result.
+        Ok(ArgminResult::new(param_best, cost_best, self.max_iters))
     }
 }
