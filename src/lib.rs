@@ -10,12 +10,6 @@ extern crate error_chain;
 extern crate num;
 extern crate rand;
 
-/// Trait for forward operators
-pub trait ArgminOperator {}
-
-/// Trait for cost functions
-pub trait ArgminCost {}
-
 /// Trait for cost function values
 /// TODO: Do this with trait aliases once they work in rust.
 pub trait ArgminCostValue: num::Float + num::FromPrimitive + PartialOrd {}
