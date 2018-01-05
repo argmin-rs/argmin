@@ -1,5 +1,6 @@
 /// TODO DOCUMENTATION
 ///
+use errors::*;
 use parameter::ArgminParameter;
 use ArgminCostValue;
 
@@ -28,12 +29,12 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> Problem<'a, T, U> 
     /// `cost_function`: Reference to a cost function
     /// `lower_bound`: lower bound for the parameter vector
     /// `upper_bound`: upper bound for the parameter vector
-    pub fn new(cost_function: &'a Fn(&T) -> U, lower_bound: T, upper_bound: T) -> Self {
+    pub fn new(cost_function: &'a Fn(&T) -> U, lower_bound: &T, upper_bound: &T) -> Self {
         Problem {
             cost_function: cost_function,
             gradient: None,
-            lower_bound: lower_bound,
-            upper_bound: upper_bound,
+            lower_bound: lower_bound.clone(),
+            upper_bound: upper_bound.clone(),
             constraint: &|_x: &T| true,
         }
     }
@@ -55,5 +56,12 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> Problem<'a, T, U> 
     pub fn constraint(&mut self, constraint: &'a Fn(&T) -> bool) -> &mut Self {
         self.constraint = constraint;
         self
+    }
+
+    /// Create a random parameter vector
+    ///
+    /// The parameter vector satisfies the `lower_bound` and `upper_bound`.
+    pub fn random_param(&self) -> Result<T> {
+        Ok(T::random(&self.lower_bound, &self.upper_bound)?)
     }
 }

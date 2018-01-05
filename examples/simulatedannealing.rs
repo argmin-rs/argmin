@@ -12,17 +12,16 @@ fn main() {
     let upper_bound: Vec<f64> = vec![2.0, 3.0];
 
     // Set up problem
-    let prob = Problem::new(&cost, lower_bound, upper_bound);
+    let prob = Problem::new(&cost, &lower_bound, &upper_bound);
 
     // Set up simulated annealing solver
     let mut solver = SimulatedAnnealing::new(10.0, 10_000_000).unwrap();
     solver.temp_func(SATempFunc::Exponential(0.8));
 
     // definie inital parameter vector
-    let init_param: Vec<f64> = vec![-1.0, 2.0];
+    // let init_param: Vec<f64> = vec![-1.0, 2.0];
 
-    // run optimization
-    let result = solver.run(&prob, &init_param).unwrap();
+    let result = solver.run(&prob, &prob.random_param().unwrap()).unwrap();
 
     // print result
     println!("{:?}", result);
