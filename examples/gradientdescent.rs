@@ -17,8 +17,8 @@ fn run() -> Result<(), Box<std::error::Error>> {
     prob.gradient(&gradient);
 
     // Set up GradientDecent solver
-    let mut solver = GradientDescent::new(0.001);
-    solver.max_iters(10_000_000);
+    let mut solver = GradientDescent::new();
+    solver.max_iters(10);
 
     // definie inital parameter vector
     // let init_param: Vec<f64> = vec![-1.0, 2.0];
