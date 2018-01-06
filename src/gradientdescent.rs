@@ -8,8 +8,17 @@ use result::ArgminResult;
 // use parameter::ArgminParameter;
 // use ArgminCostValue;
 
+/// Gradient Descent gamma update method
+///
+/// Missing:
+///   * Line search
 pub enum GDGammaUpdate {
+    /// Constant gamma
     Constant(f64),
+    /// Gamma updated according to TODO
+    /// Apparently this only works if the cost function is convex and the derivative of the cost
+    /// function is Lipschitz.
+    /// TODO: More detailed description (formula)
     BarzilaiBorwein,
 }
 
@@ -69,9 +78,6 @@ impl GradientDescent {
                     top += (cur_param[idx] - prev_param[idx]) * grad_diff;
                     bottom += grad_diff.powf(2.0);
                 }
-                // if bottom == 0.0 {
-                //     bottom = 0.00001;
-                // }
                 top / bottom
             }
         }
@@ -87,35 +93,50 @@ impl GradientDescent {
         let mut param = init_param.to_owned();
         let mut prev_step_size;
         let gradient = problem.gradient.unwrap();
-        let mut cur_grad = vec![0.0, 0.0];
+        // let mut cur_grad = vec![0.0, 0.0];
+        let mut cur_grad = (gradient)(&param);
         let mut gamma = match self.gamma {
             GDGammaUpdate::Constant(g) => g,
-            GDGammaUpdate::BarzilaiBorwein => 0.0000001,
+            GDGammaUpdate::BarzilaiBorwein => 0.0001,
         };
 
         loop {
             let prev_param = param.clone();
             let prev_grad = cur_grad.clone();
-            cur_grad = (gradient)(&prev_param);
 
+            // Move to next point
             for i in 0..param.len() {
                 param[i] -= cur_grad[i] * gamma;
             }
 
-            prev_step_size = ((param[0] - prev_param[0]).powf(2.0)
-                + (param[1] - prev_param[1]).powf(2.0))
-                .sqrt();
+            // Stop if maximum number of iterations is reached
             idx += 1;
             if idx >= self.max_iters {
                 break;
             }
+
+            // Stop if current solution is good enough
+            // This checks whether the current move has been smaller than `self.precision`
+            prev_step_size = ((param[0] - prev_param[0]).powf(2.0)
+                + (param[1] - prev_param[1]).powf(2.0))
+                .sqrt();
             if prev_step_size < self.precision {
                 break;
             }
+
+            // Calculate next gradient
+            cur_grad = (gradient)(&param);
+
+            // Update gamma
             gamma = self.update_gamma(&param, &prev_param, &cur_grad, &prev_grad);
-            println!("{}", gamma);
         }
         let fin_cost = (problem.cost_function)(&param);
         Ok(ArgminResult::new(param, fin_cost, idx))
+    }
+}
+
+impl Default for GradientDescent {
+    fn default() -> Self {
+        Self::new()
     }
 }
