@@ -25,7 +25,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
     // solver.gamma_update(GDGammaUpdate::Constant(0.0001));
     solver.gamma_update(GDGammaUpdate::BarzilaiBorwein);
 
-    // definie inital parameter vector
+    // define inital parameter vector
     // let init_param: Vec<f64> = vec![-1.5, 2.0];
 
     let result = solver.run(&prob, &prob.random_param()?)?;
