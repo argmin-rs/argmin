@@ -37,6 +37,9 @@ pub mod sa;
 /// Gradient Descent
 pub mod gradientdescent;
 
+/// Nelder Mead method
+pub mod neldermead;
+
 /// Errors using `error-chain`
 mod errors;
 
