@@ -1,7 +1,6 @@
 /// TODO
 ///
 /// * [ ] Different acceptance functions
-/// * [ ] Exponential temperature function should take a parameter
 /// * [ ] Early stopping criterions
 use errors::*;
 use problem::Problem;

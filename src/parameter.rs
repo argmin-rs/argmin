@@ -1,5 +1,6 @@
 /// TODO DOCUMENTATION
 ///
+use std;
 use errors::*;
 use std::fmt::Debug;
 use rand;

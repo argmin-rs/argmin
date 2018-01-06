@@ -15,7 +15,7 @@ extern crate rand;
 pub trait ArgminCostValue: num::Float + num::FromPrimitive + PartialOrd {}
 impl<T> ArgminCostValue for T
 where
-    T: num::Float + num::FromPrimitive + PartialOrd,
+    T: num::Float + num::FromPrimitive + num::Num + PartialOrd,
 {
 }
 
@@ -35,7 +35,7 @@ pub mod testfunctions;
 pub mod sa;
 
 /// Gradient Descent
-// pub mod gradientdescent;
+pub mod gradientdescent;
 
 /// Errors using `error-chain`
 mod errors;
