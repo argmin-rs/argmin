@@ -31,6 +31,9 @@ pub mod problem;
 /// A set of test functions like Rosenbrock's function and so on.
 pub mod testfunctions;
 
+/// Backtracking line search
+pub mod backtracking;
+
 /// Simulated Annealing
 pub mod sa;
 
