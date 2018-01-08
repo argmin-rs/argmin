@@ -5,6 +5,7 @@ use std;
 use errors::*;
 use problem::Problem;
 use result::ArgminResult;
+use backtracking;
 // use parameter::ArgminParameter;
 // use ArgminCostValue;
 
@@ -12,7 +13,7 @@ use result::ArgminResult;
 ///
 /// Missing:
 ///   * Line search
-pub enum GDGammaUpdate {
+pub enum GDGammaUpdate<'a> {
     /// Constant gamma
     Constant(f64),
     /// Gamma updated according to TODO
@@ -20,19 +21,21 @@ pub enum GDGammaUpdate {
     /// function is Lipschitz.
     /// TODO: More detailed description (formula)
     BarzilaiBorwein,
+    /// Backtracking line search
+    BacktrackingLineSearch(backtracking::BacktrackingLineSearch<'a>),
 }
 
 /// Gradient Descent struct (duh)
-pub struct GradientDescent {
+pub struct GradientDescent<'a> {
     /// step size
-    gamma: GDGammaUpdate,
+    gamma: GDGammaUpdate<'a>,
     /// Maximum number of iterations
     max_iters: u64,
     /// Precision
     precision: f64,
 }
 
-impl GradientDescent {
+impl<'a> GradientDescent<'a> {
     /// Return a GradientDescent struct
     pub fn new() -> Self {
         GradientDescent {
@@ -43,7 +46,7 @@ impl GradientDescent {
     }
 
     /// Set gradient descent gamma update method
-    pub fn gamma_update(&mut self, gamma_update_method: GDGammaUpdate) -> &mut Self {
+    pub fn gamma_update(&mut self, gamma_update_method: GDGammaUpdate<'a>) -> &mut Self {
         self.gamma = gamma_update_method;
         self
     }
@@ -78,7 +81,17 @@ impl GradientDescent {
                     top += (cur_param[idx] - prev_param[idx]) * grad_diff;
                     bottom += grad_diff.powf(2.0);
                 }
+                println!("{}", top / bottom);
                 top / bottom
+            }
+            GDGammaUpdate::BacktrackingLineSearch(ref bls) => {
+                let result = bls.run(
+                    &(cur_grad.iter().map(|x| -x).collect::<Vec<f64>>()),
+                    // &cur_grad,
+                    &cur_param,
+                ).unwrap();
+                println!("{:?}", result);
+                result.0
             }
         }
     }
@@ -98,6 +111,7 @@ impl GradientDescent {
         let mut gamma = match self.gamma {
             GDGammaUpdate::Constant(g) => g,
             GDGammaUpdate::BarzilaiBorwein => 0.0001,
+            GDGammaUpdate::BacktrackingLineSearch(_) => 0.0001,
         };
 
         loop {
@@ -135,7 +149,7 @@ impl GradientDescent {
     }
 }
 
-impl Default for GradientDescent {
+impl<'a> Default for GradientDescent<'a> {
     fn default() -> Self {
         Self::new()
     }
