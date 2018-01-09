@@ -81,16 +81,13 @@ impl<'a> GradientDescent<'a> {
                     top += (cur_param[idx] - prev_param[idx]) * grad_diff;
                     bottom += grad_diff.powf(2.0);
                 }
-                println!("{}", top / bottom);
                 top / bottom
             }
             GDGammaUpdate::BacktrackingLineSearch(ref bls) => {
                 let result = bls.run(
                     &(cur_grad.iter().map(|x| -x).collect::<Vec<f64>>()),
-                    // &cur_grad,
                     &cur_param,
                 ).unwrap();
-                println!("{:?}", result);
                 result.0
             }
         }

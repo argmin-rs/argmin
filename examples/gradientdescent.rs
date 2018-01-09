@@ -22,7 +22,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     // Set up GradientDecent solver
     let mut solver = GradientDescent::new();
-    solver.max_iters(15);
+    solver.max_iters(10_000);
     // solver.gamma_update(GDGammaUpdate::Constant(0.0001));
     solver.gamma_update(GDGammaUpdate::BarzilaiBorwein);
 
@@ -36,11 +36,12 @@ fn run() -> Result<(), Box<std::error::Error>> {
     println!("{:?}", result);
 
     let mut solver = GradientDescent::new();
-    solver.max_iters(15);
+    solver.max_iters(10_000);
 
-    solver.gamma_update(GDGammaUpdate::BacktrackingLineSearch(
-        BacktrackingLineSearch::new(&cost, &gradient),
-    ));
+    let mut linesearch = BacktrackingLineSearch::new(&cost, &gradient);
+    linesearch.alpha(1.0);
+
+    solver.gamma_update(GDGammaUpdate::BacktrackingLineSearch(linesearch));
 
     // let result = solver.run(&prob, &prob.random_param()?)?;
     let result = solver.run(&prob, &init_param)?;

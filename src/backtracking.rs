@@ -20,6 +20,8 @@ pub struct BacktrackingLineSearch<'a> {
     cost_function: &'a Fn(&Vec<f64>) -> f64,
     /// Gradient
     gradient: &'a Fn(&Vec<f64>) -> Vec<f64>,
+    /// Starting distance to the current point:
+    alpha: f64,
     /// Maximum number of iterations
     max_iters: u64,
     /// Parameter `tau`
@@ -40,10 +42,17 @@ impl<'a> BacktrackingLineSearch<'a> {
         BacktrackingLineSearch {
             cost_function: cost_function,
             gradient: gradient,
+            alpha: 1.0,
             max_iters: 100,
             tau: 0.5,
             c: 0.5,
         }
+    }
+
+    /// Set the maximum distance from the starting point
+    pub fn alpha(&mut self, alpha: f64) -> &mut Self {
+        self.alpha = alpha;
+        self
     }
 
     /// Set the maximum number of iterations
@@ -75,13 +84,17 @@ impl<'a> BacktrackingLineSearch<'a> {
     }
 
     /// Run backtracking line search
+    ///
+    /// `p` is the search direction. Take care about whether you need it to be a unit vector or
+    /// not! `p` will not be normalized!
     pub fn run(&self, p: &[f64], x: &[f64]) -> Result<(f64, u64, TerminationReason)> {
         // TODO:
         // * generics
 
         // ensure that p is a unit vector
-        let p_mag: f64 = p.iter().map(|a| a.powf(2.0)).sum::<f64>().sqrt();
-        let p: Vec<f64> = p.iter().map(|a| a / p_mag).collect();
+        // Update: We're not doing this anymore
+        // let p_mag: f64 = p.iter().map(|a| a.powf(2.0)).sum::<f64>().sqrt();
+        // let p: Vec<f64> = p.iter().map(|a| a / p_mag).collect();
 
         // compute m
         let m: f64 = p.iter()
@@ -93,8 +106,7 @@ impl<'a> BacktrackingLineSearch<'a> {
         let fx = (self.cost_function)(&(x.to_owned()));
         let termination_reason;
         let mut idx = 0;
-        // should this be a parameter?
-        let mut alpha = 10.0;
+        let mut alpha = self.alpha;
         loop {
             let param = p.iter().zip(x.iter()).map(|(a, b)| b + alpha * a).collect();
             if fx - (self.cost_function)(&param) >= alpha * t {
