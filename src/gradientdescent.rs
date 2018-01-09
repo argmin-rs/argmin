@@ -86,7 +86,7 @@ impl<'a> GradientDescent<'a> {
             GDGammaUpdate::BacktrackingLineSearch(ref bls) => {
                 let result = bls.run(
                     &(cur_grad.iter().map(|x| -x).collect::<Vec<f64>>()),
-                    &cur_param,
+                    cur_param,
                 ).unwrap();
                 result.0
             }
@@ -107,8 +107,7 @@ impl<'a> GradientDescent<'a> {
         let mut cur_grad = (gradient)(&param);
         let mut gamma = match self.gamma {
             GDGammaUpdate::Constant(g) => g,
-            GDGammaUpdate::BarzilaiBorwein => 0.0001,
-            GDGammaUpdate::BacktrackingLineSearch(_) => 0.0001,
+            GDGammaUpdate::BarzilaiBorwein | GDGammaUpdate::BacktrackingLineSearch(_) => 0.0001,
         };
 
         loop {
