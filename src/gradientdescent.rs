@@ -34,11 +34,11 @@ pub struct GradientDescent<'a> {
     /// Precision
     precision: f64,
     /// current state
-    state: Option<&'a GradientDescentState<'a>>,
+    state: GradientDescentState<'a>,
 }
 
 struct GradientDescentState<'a> {
-    problem: &'a Problem<'a, Vec<f64>, f64>,
+    problem: Option<&'a Problem<'a, Vec<f64>, f64>>,
     prev_param: Vec<f64>,
     param: Vec<f64>,
     iter: u64,
@@ -48,6 +48,21 @@ struct GradientDescentState<'a> {
     cur_grad: Vec<f64>,
 }
 
+impl<'a> GradientDescentState<'a> {
+    pub fn new() -> Self {
+        GradientDescentState {
+            problem: None,
+            prev_param: vec![0_f64; 1],
+            param: vec![0_f64; 1],
+            iter: 0_u64,
+            prev_gamma: 0_f64,
+            gamma: 0_f64,
+            prev_grad: vec![0_f64; 1],
+            cur_grad: vec![0_f64; 1],
+        }
+    }
+}
+
 impl<'a> GradientDescent<'a> {
     /// Return a GradientDescent struct
     pub fn new() -> Self {
@@ -55,7 +70,7 @@ impl<'a> GradientDescent<'a> {
             gamma: GDGammaUpdate::BarzilaiBorwein,
             max_iters: std::u64::MAX,
             precision: 0.00000001,
-            state: None,
+            state: GradientDescentState::new(),
         }
     }
 
@@ -114,24 +129,17 @@ impl<'a> GradientDescent<'a> {
                 let mut grad_diff: f64;
                 let mut top: f64 = 0.0;
                 let mut bottom: f64 = 0.0;
-                for idx in 0..self.state.unwrap().cur_grad.len() {
-                    grad_diff =
-                        self.state.unwrap().cur_grad[idx] - self.state.unwrap().prev_grad[idx];
-                    top += (self.state.unwrap().param[idx] - self.state.unwrap().prev_param[idx])
-                        * grad_diff;
+                for idx in 0..self.state.cur_grad.len() {
+                    grad_diff = self.state.cur_grad[idx] - self.state.prev_grad[idx];
+                    top += (self.state.param[idx] - self.state.prev_param[idx]) * grad_diff;
                     bottom += grad_diff.powf(2.0);
                 }
                 top / bottom
             }
             GDGammaUpdate::BacktrackingLineSearch(ref bls) => {
                 let result = bls.run(
-                    &(self.state
-                        .unwrap()
-                        .cur_grad
-                        .iter()
-                        .map(|x| -x)
-                        .collect::<Vec<f64>>()),
-                    &self.state.unwrap().param,
+                    &(self.state.cur_grad.iter().map(|x| -x).collect::<Vec<f64>>()),
+                    &self.state.param,
                 ).unwrap();
                 result.0
             }
@@ -144,8 +152,8 @@ impl<'a> GradientDescent<'a> {
         // problem: Problem<Vec<f64>, f64>,
         init_param: &[f64],
     ) -> Result<()> {
-        let state = GradientDescentState {
-            problem: problem,
+        self.state = GradientDescentState {
+            problem: Some(problem),
             prev_param: vec![0_f64; init_param.len()],
             param: init_param.to_owned(),
             iter: 0_u64,
@@ -157,26 +165,24 @@ impl<'a> GradientDescent<'a> {
             prev_grad: vec![0_f64; init_param.len()],
             cur_grad: (problem.gradient.unwrap())(&init_param.to_owned()),
         };
-        self.state = Some(&state);
         Ok(())
     }
 
     pub fn next(&mut self) {
-        let mut state = self.state.unwrap();
-        let gradient = self.state.unwrap().problem.gradient.unwrap();
+        let gradient = self.state.problem.unwrap().gradient.unwrap();
+        let state = &mut self.state;
         state.iter += 1;
     }
 
     fn terminate(&self) -> bool {
         // use zip here...
-        let prev_step_size = ((self.state.unwrap().param[0] - self.state.unwrap().prev_param[0])
-            .powf(2.0)
-            + (self.state.unwrap().param[1] - self.state.unwrap().prev_param[1]).powf(2.0))
+        let prev_step_size = ((self.state.param[0] - self.state.prev_param[0]).powf(2.0)
+            + (self.state.param[1] - self.state.prev_param[1]).powf(2.0))
             .sqrt();
         if prev_step_size < self.precision {
             return true;
         }
-        if self.state.unwrap().iter >= self.max_iters {
+        if self.state.iter >= self.max_iters {
             return true;
         }
         false
@@ -197,11 +203,11 @@ impl<'a> GradientDescent<'a> {
             }
             self.update_gamma2();
         }
-        let fin_cost = (problem.cost_function)(&self.state.unwrap().param);
+        let fin_cost = (problem.cost_function)(&self.state.param);
         Ok(ArgminResult::new(
-            self.state.unwrap().param.to_vec(),
+            self.state.param.to_vec(),
             fin_cost,
-            self.state.unwrap().iter,
+            self.state.iter,
         ))
     }
 
