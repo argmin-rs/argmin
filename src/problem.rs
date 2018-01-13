@@ -5,6 +5,7 @@ use parameter::ArgminParameter;
 use ArgminCostValue;
 
 /// This struct hold all information that describes the optimization problem.
+#[derive(Clone)]
 pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> {
     /// reference to a function which computes the cost/fitness for a given parameter vector
     pub cost_function: &'a Fn(&T) -> U,
