@@ -48,6 +48,19 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     // print result
     println!("{:?}", result);
+
+    // Manually solve it
+    let mut solver = GradientDescent::new();
+    solver.init(&prob, &init_param)?;
+
+    loop {
+        let par = solver.next_iter();
+        // println!("{:?}", par);
+        if par.1 >= result.iters {
+            break;
+        };
+    }
+
     Ok(())
 }
 

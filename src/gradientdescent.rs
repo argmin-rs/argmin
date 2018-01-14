@@ -6,13 +6,8 @@ use errors::*;
 use problem::Problem;
 use result::ArgminResult;
 use backtracking;
-// use parameter::ArgminParameter;
-// use ArgminCostValue;
 
 /// Gradient Descent gamma update method
-///
-/// Missing:
-///   * Line search
 pub enum GDGammaUpdate<'a> {
     /// Constant gamma
     Constant(f64),
@@ -37,18 +32,28 @@ pub struct GradientDescent<'a> {
     state: GradientDescentState<'a>,
 }
 
+/// Indicates the current state of the Gradient Descent method.
 struct GradientDescentState<'a> {
+    /// Reference to the problem. This is an Option<_> because it is initialized as `None`
     problem: Option<&'a Problem<'a, Vec<f64>, f64>>,
+    /// Previous parameter vector
     prev_param: Vec<f64>,
+    /// Current parameter vector
     param: Vec<f64>,
+    /// Current number of iteration
     iter: u64,
+    /// Previous gamma
     prev_gamma: f64,
+    /// Current gamma
     gamma: f64,
+    /// Previous gradient
     prev_grad: Vec<f64>,
+    /// Current gradient
     cur_grad: Vec<f64>,
 }
 
 impl<'a> GradientDescentState<'a> {
+    /// Constructor for `GradientDescentState`
     pub fn new() -> Self {
         GradientDescentState {
             problem: None,
@@ -92,38 +97,10 @@ impl<'a> GradientDescent<'a> {
         self
     }
 
-    fn update_gamma(
-        &self,
-        cur_param: &[f64],
-        prev_param: &[f64],
-        cur_grad: &[f64],
-        prev_grad: &[f64],
-    ) -> f64 {
-        match self.gamma {
-            GDGammaUpdate::Constant(g) => g,
-            GDGammaUpdate::BarzilaiBorwein => {
-                let mut grad_diff: f64;
-                let mut top: f64 = 0.0;
-                let mut bottom: f64 = 0.0;
-                for idx in 0..cur_grad.len() {
-                    grad_diff = cur_grad[idx] - prev_grad[idx];
-                    top += (cur_param[idx] - prev_param[idx]) * grad_diff;
-                    bottom += grad_diff.powf(2.0);
-                }
-                top / bottom
-            }
-            GDGammaUpdate::BacktrackingLineSearch(ref bls) => {
-                let result = bls.run(
-                    &(cur_grad.iter().map(|x| -x).collect::<Vec<f64>>()),
-                    cur_param,
-                ).unwrap();
-                result.0
-            }
-        }
-    }
-
-    fn update_gamma2(&self) -> f64 {
-        match self.gamma {
+    /// Update gamma
+    fn update_gamma(&mut self) {
+        self.state.prev_gamma = self.state.gamma;
+        self.state.gamma = match self.gamma {
             GDGammaUpdate::Constant(g) => g,
             GDGammaUpdate::BarzilaiBorwein => {
                 let mut grad_diff: f64;
@@ -143,13 +120,13 @@ impl<'a> GradientDescent<'a> {
                 ).unwrap();
                 result.0
             }
-        }
+        };
     }
 
+    /// Initialize with a given problem and a starting point
     pub fn init(
         &mut self,
         problem: &'a Problem<'a, Vec<f64>, f64>,
-        // problem: Problem<Vec<f64>, f64>,
         init_param: &[f64],
     ) -> Result<()> {
         self.state = GradientDescentState {
@@ -168,17 +145,34 @@ impl<'a> GradientDescent<'a> {
         Ok(())
     }
 
-    pub fn next(&mut self) {
+    /// Compute next point
+    pub fn next_iter(&mut self) -> (Vec<f64>, u64) {
         let gradient = self.state.problem.unwrap().gradient.unwrap();
-        let state = &mut self.state;
-        state.iter += 1;
+        // let state = &mut self.state;
+        self.state.prev_param = self.state.param.clone();
+        self.state.prev_grad = self.state.cur_grad.clone();
+
+        // Move to next point
+        for i in 0..self.state.param.len() {
+            self.state.param[i] -= self.state.cur_grad[i] * self.state.gamma;
+        }
+
+        // Calculate next gradient
+        self.state.cur_grad = (gradient)(&self.state.param);
+
+        // Update gamma
+        self.update_gamma();
+        self.state.iter += 1;
+        (self.state.param.clone(), self.state.iter)
     }
 
+    /// Indicates whether any of the stopping criteria are met
     fn terminate(&self) -> bool {
         // use zip here...
         let prev_step_size = ((self.state.param[0] - self.state.prev_param[0]).powf(2.0)
             + (self.state.param[1] - self.state.prev_param[1]).powf(2.0))
             .sqrt();
+
         if prev_step_size < self.precision {
             return true;
         }
@@ -188,20 +182,20 @@ impl<'a> GradientDescent<'a> {
         false
     }
 
-    pub fn run2(
+    /// Run gradient descent method
+    pub fn run(
         &mut self,
         problem: &'a Problem<'a, Vec<f64>, f64>,
         init_param: &[f64],
     ) -> Result<ArgminResult<Vec<f64>, f64>> {
         // initialize
-        self.init(problem, init_param);
+        self.init(problem, init_param)?;
 
         loop {
-            self.next();
+            self.next_iter();
             if self.terminate() {
                 break;
             }
-            self.update_gamma2();
         }
         let fin_cost = (problem.cost_function)(&self.state.param);
         Ok(ArgminResult::new(
@@ -209,57 +203,6 @@ impl<'a> GradientDescent<'a> {
             fin_cost,
             self.state.iter,
         ))
-    }
-
-    /// Run gradient descent method
-    pub fn run(
-        &self,
-        problem: &Problem<Vec<f64>, f64>,
-        init_param: &[f64],
-    ) -> Result<ArgminResult<Vec<f64>, f64>> {
-        let mut idx = 0;
-        let mut param = init_param.to_owned();
-        let mut prev_step_size;
-        let gradient = problem.gradient.unwrap();
-        // let mut cur_grad = vec![0.0, 0.0];
-        let mut cur_grad = (gradient)(&param);
-        let mut gamma = match self.gamma {
-            GDGammaUpdate::Constant(g) => g,
-            GDGammaUpdate::BarzilaiBorwein | GDGammaUpdate::BacktrackingLineSearch(_) => 0.0001,
-        };
-
-        loop {
-            let prev_param = param.clone();
-            let prev_grad = cur_grad.clone();
-
-            // Move to next point
-            for i in 0..param.len() {
-                param[i] -= cur_grad[i] * gamma;
-            }
-
-            // Stop if maximum number of iterations is reached
-            idx += 1;
-            if idx >= self.max_iters {
-                break;
-            }
-
-            // Stop if current solution is good enough
-            // This checks whether the current move has been smaller than `self.precision`
-            prev_step_size = ((param[0] - prev_param[0]).powf(2.0)
-                + (param[1] - prev_param[1]).powf(2.0))
-                .sqrt();
-            if prev_step_size < self.precision {
-                break;
-            }
-
-            // Calculate next gradient
-            cur_grad = (gradient)(&param);
-
-            // Update gamma
-            gamma = self.update_gamma(&param, &prev_param, &cur_grad, &prev_grad);
-        }
-        let fin_cost = (problem.cost_function)(&param);
-        Ok(ArgminResult::new(param, fin_cost, idx))
     }
 }
 
