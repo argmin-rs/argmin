@@ -16,15 +16,21 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let upper_bound: Vec<f64> = vec![2.0, 3.0];
 
     // Set up problem
-    let mut prob = Problem::new(&cost, &lower_bound, &upper_bound);
-    // prob.gradient(&gradient);
+    let prob = Problem::new(&cost, &lower_bound, &upper_bound);
 
     // Set up GradientDecent solver
     let mut solver = NelderMead::new();
     solver.max_iters(10_000);
 
+    // let init_params = vec![
+    //     prob.random_param()?,
+    //     prob.random_param()?,
+    //     prob.random_param()?,
+    // ];
+    let init_params = vec![vec![0.0, 0.1], vec![2.0, 1.5], vec![2.0, -1.0]];
+
     // solver.init(&prob)?;
-    let result = solver.run(&prob)?;
+    let result = solver.run(&prob, &init_params)?;
 
     // print result
     println!("{:?}", result);
