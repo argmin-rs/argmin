@@ -30,10 +30,10 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let init_param: Vec<f64> = vec![1.5, 1.5];
 
     // let result = solver.run(&prob, &prob.random_param()?)?;
-    let result = solver.run(&prob, &init_param)?;
+    let result1 = solver.run(&prob, &init_param)?;
 
     // print result
-    println!("{:?}", result);
+    println!("{:?}", result1);
 
     let mut solver = GradientDescent::new();
     solver.max_iters(10_000);
@@ -44,10 +44,10 @@ fn run() -> Result<(), Box<std::error::Error>> {
     solver.gamma_update(GDGammaUpdate::BacktrackingLineSearch(linesearch));
 
     // let result = solver.run(&prob, &prob.random_param()?)?;
-    let result = solver.run(&prob, &init_param)?;
+    let result2 = solver.run(&prob, &init_param)?;
 
     // print result
-    println!("{:?}", result);
+    println!("{:?}", result2);
 
     // Manually solve it
     let mut solver = GradientDescent::new();
@@ -55,8 +55,8 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     loop {
         let par = solver.next_iter();
-        // println!("{:?}", par);
-        if par.1 >= result.iters {
+        println!("{:?}", par);
+        if par.1 >= result1.iters {
             break;
         };
     }
