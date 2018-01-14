@@ -116,8 +116,7 @@ impl<'a> NelderMead<'a> {
                 .map(|(a, b)| a + b)
                 .collect();
         }
-        x0 = x0.iter().map(|a| a / (num_param as f64)).collect();
-        x0
+        x0.iter().map(|a| a / (num_param as f64)).collect()
     }
 
     fn reflect(&self, x0: &[f64], x: &[f64]) -> Vec<f64> {
@@ -160,21 +159,19 @@ impl<'a> NelderMead<'a> {
     /// Compute next iteration
     pub fn next_iter(&mut self) -> Result<ArgminResult<Vec<f64>, f64>> {
         self.sort_param_vecs();
-        println!("{:?}", self.state.param_vecs.first().unwrap());
+        let num_param = self.state.param_vecs[0].param.len();
         let x0 = self.calculate_centroid();
-        let xr = self.reflect(&x0, &self.state.param_vecs[0].param);
+        let xr = self.reflect(&x0, &self.state.param_vecs.last().unwrap().param);
         let xr_cost = (self.state.problem.unwrap().cost_function)(&xr);
-        if xr_cost < self.state.param_vecs.last().unwrap().cost
+        if xr_cost < self.state.param_vecs[num_param - 2].cost
             && xr_cost >= self.state.param_vecs[0].cost
         {
             // reflection
-            // println!("reflection");
             self.state.param_vecs.last_mut().unwrap().param = xr;
             self.state.param_vecs.last_mut().unwrap().cost = xr_cost;
         } else if xr_cost < self.state.param_vecs[0].cost {
             // expansion
-            // println!("expansion");
-            let xe = self.expand(&x0, &self.state.param_vecs[0].param);
+            let xe = self.expand(&x0, &xr);
             let xe_cost = (self.state.problem.unwrap().cost_function)(&xe);
             if xe_cost < xr_cost {
                 self.state.param_vecs.last_mut().unwrap().param = xe;
@@ -183,9 +180,8 @@ impl<'a> NelderMead<'a> {
                 self.state.param_vecs.last_mut().unwrap().param = xr;
                 self.state.param_vecs.last_mut().unwrap().cost = xr_cost;
             }
-        } else if xr_cost >= self.state.param_vecs[self.state.param_vecs.len() - 1].cost {
+        } else if xr_cost >= self.state.param_vecs[num_param - 2].cost {
             // contraction
-            // println!("contraction");
             let xc = self.contract(&x0, &self.state.param_vecs.last().unwrap().param);
             let xc_cost = (self.state.problem.unwrap().cost_function)(&xc);
             if xc_cost < self.state.param_vecs.last().unwrap().cost {
@@ -193,7 +189,6 @@ impl<'a> NelderMead<'a> {
                 self.state.param_vecs.last_mut().unwrap().cost = xc_cost;
             }
         } else {
-            // println!("shrink");
             self.shrink()
         }
 

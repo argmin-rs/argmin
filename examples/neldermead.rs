@@ -20,7 +20,8 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     // Set up GradientDecent solver
     let mut solver = NelderMead::new();
-    solver.max_iters(10_000);
+    // solver.max_iters(50);
+    solver.max_iters(100);
 
     // let init_params = vec![
     //     prob.random_param()?,
