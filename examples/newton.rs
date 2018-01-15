@@ -31,8 +31,6 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     // Set up Newton solver
     let mut solver = Newton::new();
-    // Set the maximum number of iterations to 10000
-    solver.max_iters(10_000);
 
     // define inital parameter vector
     // `Problem` allows to create random parameter vectors which satisfies `lower_bound` and
@@ -46,9 +44,9 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     let mut par;
     loop {
-        par = solver.next_iter();
-        // println!("{:?}", par);
-        if par.1 >= 100 {
+        par = solver.next_iter()?;
+        println!("{:?}", par);
+        if par.iters >= 10 {
             break;
         };
     }

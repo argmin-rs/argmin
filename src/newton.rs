@@ -68,9 +68,28 @@ impl<'a> Newton<'a> {
     }
 
     /// Compute next point
-    pub fn next_iter(&mut self) -> (Vec<f64>, u64) {
+    pub fn next_iter(&mut self) -> Result<ArgminResult<Vec<f64>, f64>> {
         // TODO: Move to next point
-        (vec![0.0, 0.0], 0)
+        // x_{n+1} = x_n - \gamma [Hf(x_n)]^-1 \nabla f(x_n)
+        // The following is just preliminary
+        let h = (self.state.problem.unwrap().hessian.unwrap())(&self.state.param);
+        let g = (self.state.problem.unwrap().gradient.unwrap())(&self.state.param);
+        let h_det = h[0] * h[3] - h[1] * h[2];
+        let mut h_inv = vec![];
+        h_inv.push(h[3] / h_det);
+        h_inv.push(-h[1] / h_det);
+        h_inv.push(-h[2] / h_det);
+        h_inv.push(h[0] / h_det);
+        let mut xn1 = vec![];
+        xn1.push(self.state.param[0] - self.gamma * (h_inv[0] * g[0] + h_inv[1] * g[1]));
+        xn1.push(self.state.param[1] - self.gamma * (h_inv[2] * g[0] + h_inv[3] * g[1]));
+        self.state.param = xn1;
+        self.state.iter += 1;
+        Ok(ArgminResult::new(
+            self.state.param.clone(),
+            -1.0,
+            self.state.iter,
+        ))
     }
 
     /// Indicates whether any of the stopping criteria are met
@@ -88,7 +107,7 @@ impl<'a> Newton<'a> {
         self.init(problem, init_param)?;
 
         loop {
-            self.next_iter();
+            self.next_iter()?;
             if self.terminate() {
                 break;
             }

@@ -5,6 +5,7 @@
 //! * Stopping criterions which can be stacked, also return the reason why a computation terminated
 //! * keep track of cost function values
 //! * count the number of cost function / gradient evaluations and return them
+//! * redesign how lower and upper bound are dealt with. making them optional should be better.
 #![recursion_limit = "1024"]
 #![cfg_attr(feature = "clippy", feature(plugin))]
 #![cfg_attr(feature = "clippy", plugin(clippy))]
