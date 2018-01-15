@@ -12,6 +12,9 @@ pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> {
     /// optional reference to a function which provides the gradient at a given point in parameter
     /// space
     pub gradient: Option<&'a Fn(&T) -> T>,
+    /// optional reference to a function which provides the Hessian at a given point in parameter
+    /// space
+    pub hessian: Option<&'a Fn(&T) -> T>,
     /// lower bound of the parameter vector
     pub lower_bound: T,
     /// upper bound of the parameter vector
@@ -34,6 +37,7 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> Problem<'a, T, U> 
         Problem {
             cost_function: cost_function,
             gradient: None,
+            hessian: None,
             lower_bound: lower_bound.clone(),
             upper_bound: upper_bound.clone(),
             constraint: &|_x: &T| true,
@@ -46,6 +50,15 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> Problem<'a, T, U> 
     /// the parameter vector. The function returns the gradient for a given parameter vector.
     pub fn gradient(&mut self, gradient: &'a Fn(&T) -> T) -> &mut Self {
         self.gradient = Some(gradient);
+        self
+    }
+
+    /// Provide the Hessian
+    ///
+    /// The function has to have the signature `&Fn(&T) -> T` where `T` is the type of
+    /// the parameter vector. The function returns the gradient for a given parameter vector.
+    pub fn hessian(&mut self, hessian: &'a Fn(&T) -> T) -> &mut Self {
+        self.hessian = Some(hessian);
         self
     }
 
