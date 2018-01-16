@@ -12,6 +12,8 @@
 #![warn(missing_docs)]
 #[macro_use]
 extern crate error_chain;
+extern crate ndarray;
+extern crate ndarray_linalg;
 extern crate num;
 extern crate rand;
 

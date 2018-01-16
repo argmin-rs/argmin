@@ -6,7 +6,7 @@ use ArgminCostValue;
 
 /// This struct hold all information that describes the optimization problem.
 #[derive(Clone)]
-pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> {
+pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a, V: 'a> {
     /// reference to a function which computes the cost/fitness for a given parameter vector
     pub cost_function: &'a Fn(&T) -> U,
     /// optional reference to a function which provides the gradient at a given point in parameter
@@ -14,7 +14,7 @@ pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> {
     pub gradient: Option<&'a Fn(&T) -> T>,
     /// optional reference to a function which provides the Hessian at a given point in parameter
     /// space
-    pub hessian: Option<&'a Fn(&T) -> T>,
+    pub hessian: Option<&'a Fn(&T) -> V>,
     /// lower bound of the parameter vector
     pub lower_bound: T,
     /// upper bound of the parameter vector
@@ -23,7 +23,7 @@ pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> {
     pub constraint: &'a Fn(&T) -> bool,
 }
 
-impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> Problem<'a, T, U> {
+impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T, U, V> {
     /// Create a new `Problem` struct.
     ///
     /// The field `gradient` is automatically set to `None`, but can be manually set by the
@@ -57,7 +57,7 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a> Problem<'a, T, U> 
     ///
     /// The function has to have the signature `&Fn(&T) -> T` where `T` is the type of
     /// the parameter vector. The function returns the gradient for a given parameter vector.
-    pub fn hessian(&mut self, hessian: &'a Fn(&T) -> T) -> &mut Self {
+    pub fn hessian(&mut self, hessian: &'a Fn(&T) -> V) -> &mut Self {
         self.hessian = Some(hessian);
         self
     }

@@ -35,7 +35,7 @@ pub struct GradientDescent<'a> {
 /// Indicates the current state of the Gradient Descent method.
 struct GradientDescentState<'a> {
     /// Reference to the problem. This is an Option<_> because it is initialized as `None`
-    problem: Option<&'a Problem<'a, Vec<f64>, f64>>,
+    problem: Option<&'a Problem<'a, Vec<f64>, f64, Vec<f64>>>,
     /// Previous parameter vector
     prev_param: Vec<f64>,
     /// Current parameter vector
@@ -126,7 +126,7 @@ impl<'a> GradientDescent<'a> {
     /// Initialize with a given problem and a starting point
     pub fn init(
         &mut self,
-        problem: &'a Problem<'a, Vec<f64>, f64>,
+        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
         init_param: &[f64],
     ) -> Result<()> {
         self.state = GradientDescentState {
@@ -185,7 +185,7 @@ impl<'a> GradientDescent<'a> {
     /// Run gradient descent method
     pub fn run(
         &mut self,
-        problem: &'a Problem<'a, Vec<f64>, f64>,
+        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
         init_param: &[f64],
     ) -> Result<ArgminResult<Vec<f64>, f64>> {
         // initialize

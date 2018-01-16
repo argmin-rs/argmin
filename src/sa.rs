@@ -134,7 +134,11 @@ impl<'a> SimulatedAnnealing<'a> {
     }
 
     /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.
-    pub fn run<T, U>(&self, problem: &Problem<T, U>, init_param: &T) -> Result<ArgminResult<T, U>>
+    pub fn run<T, U>(
+        &self,
+        problem: &Problem<T, U, U>,
+        init_param: &T,
+    ) -> Result<ArgminResult<T, U>>
     where
         T: ArgminParameter<T>,
         U: ArgminCostValue,

@@ -2,7 +2,7 @@
 name = "argmin"
 version = "0.0.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
-license = "MIT/Apache-2.0"
+license = "MIT OR Apache-2.0"
 description = "Optimization algorithms"
 documentation = "https://stefan-k.github.io/rust/argmin/"
 homepage = "https://github.com/stefan-k/argmin-rs"
@@ -17,6 +17,9 @@ clippy = {version = "*", optional = true}
 error-chain = "*"
 num = "*"
 rand = "*"
+ndarray = "*"
+#ndarray-linalg = { version = "*", default-features = openblas }
+ndarray-linalg = { version = "*", features = ["openblas"] }
 
 [features]
 default = []

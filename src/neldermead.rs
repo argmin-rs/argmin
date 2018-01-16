@@ -29,7 +29,7 @@ struct NelderMeadParam {
 }
 
 struct NelderMeadState<'a> {
-    problem: Option<&'a Problem<'a, Vec<f64>, f64>>,
+    problem: Option<&'a Problem<'a, Vec<f64>, f64, Vec<f64>>>,
     param_vecs: Vec<NelderMeadParam>,
     iter: u64,
 }
@@ -92,7 +92,7 @@ impl<'a> NelderMead<'a> {
     /// initialization with predefined parameter vectors
     pub fn init(
         &mut self,
-        problem: &'a Problem<'a, Vec<f64>, f64>,
+        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
         param_vecs: &[Vec<f64>],
     ) -> Result<()> {
         self.state.problem = Some(problem);
@@ -212,7 +212,7 @@ impl<'a> NelderMead<'a> {
     /// Run Nelder Mead optimization
     pub fn run(
         &mut self,
-        problem: &'a Problem<'a, Vec<f64>, f64>,
+        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
         param_vecs: &[Vec<f64>],
     ) -> Result<ArgminResult<Vec<f64>, f64>> {
         self.init(problem, &param_vecs.to_owned())?;

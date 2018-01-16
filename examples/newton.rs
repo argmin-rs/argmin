@@ -1,24 +1,33 @@
 #![allow(unused_imports)]
 extern crate argmin;
+extern crate ndarray;
+use ndarray::{Array1, Array2};
+use ndarray::prelude::*;
 use argmin::problem::Problem;
 use argmin::newton::Newton;
-use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, rosenbrock_hessian, sphere,
+use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, rosenbrock_derivative_nd,
+                            rosenbrock_hessian, rosenbrock_hessian_nd, rosenbrock_nd, sphere,
                             sphere_derivative};
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function
     // Choose either `Rosenbrock` or `Sphere` function.
-    let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64).unwrap() };
-    let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64).unwrap() };
-    let hessian = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_hessian(x, 1_f64, 100_f64).unwrap() };
+    // let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64).unwrap() };
+    // let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64).unwrap() };
+    // let hessian = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_hessian(x, 1_f64, 100_f64).unwrap() };
+    // using ndarray
+    let cost = |x: &Array1<f64>| -> f64 { rosenbrock_nd(x, 1_f64, 100_f64) };
+    let gradient =
+        |x: &Array1<f64>| -> Array<f64, _> { rosenbrock_derivative_nd(x, 1_f64, 100_f64) };
+    let hessian = |x: &Array1<f64>| -> Array<f64, _> { rosenbrock_hessian_nd(x, 1_f64, 100_f64) };
     // let cost = |x: &Vec<f64>| -> f64 { sphere(x).unwrap() };
     // let gradient = |x: &Vec<f64>| -> Vec<f64> { sphere_derivative(x).unwrap() };
 
     // Define bounds
     // Note: Gradient Descent currently does not enforce these bounds which is why we can set them
     // to -1000 and +1000
-    let lower_bound: Vec<f64> = vec![-1000.0, -1000.0];
-    let upper_bound: Vec<f64> = vec![1000.0, 1000.0];
+    let lower_bound: Array1<f64> = Array1::from_vec(vec![-1000.0, -1000.0]);
+    let upper_bound: Array1<f64> = Array1::from_vec(vec![1000.0, 1000.0]);
     // Unfortunately, setting them to +/- Infinity does not work (yet)
     // let lower_bound: Vec<f64> = vec![std::f64::NEG_INFINITY, std::f64::NEG_INFINITY];
     // let upper_bound: Vec<f64> = vec![std::f64::INFINITY, std::f64::INFINITY];
@@ -35,8 +44,8 @@ fn run() -> Result<(), Box<std::error::Error>> {
     // define inital parameter vector
     // `Problem` allows to create random parameter vectors which satisfies `lower_bound` and
     // `upper_bound`.
-    let init_param: Vec<f64> = prob.random_param()?;
-    // let init_param: Vec<f64> = vec![1.5, 1.5];
+    // let init_param: Array1<f64> = prob.random_param()?;
+    let init_param: Array1<f64> = Array1::from_vec(vec![1.5, 1.5]);
     println!("{:?}", init_param);
 
     // Manually solve it

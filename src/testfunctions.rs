@@ -1,4 +1,5 @@
 use errors::*;
+use ndarray::{Array1, Array2};
 /// Rosenbrock test function
 ///
 /// Parameters are usually: `a = 1` and `b = 100`
@@ -31,6 +32,40 @@ pub fn rosenbrock_hessian(param: &[f64], _a: f64, b: f64) -> Result<Vec<f64>> {
     // d/dydy
     out.push(2.0 * b);
     Ok(out)
+}
+
+/// Rosenbrock test function, taking ndarray
+///
+/// Parameters are usually: `a = 1` and `b = 100`
+/// TODO: make this multidimensional
+pub fn rosenbrock_nd(param: &Array1<f64>, a: f64, b: f64) -> f64 {
+    (a - param[0]).powf(2.0) + b * (param[1] - param[0].powf(2.0)).powf(2.0)
+}
+
+/// Derivative of 2D Rosenbrock function, returning an ndarray
+pub fn rosenbrock_derivative_nd(param: &Array1<f64>, a: f64, b: f64) -> Array1<f64> {
+    let x = param[0];
+    let y = param[1];
+    let mut out = Array1::zeros(2);
+    out[[0]] = -2.0 * a + 4.0 * b * x.powf(3.0) - 4.0 * b * x * y + 2.0 * x;
+    out[[1]] = 2.0 * b * (y - x.powf(2.0));
+    out
+}
+
+/// Hessian of 2D Rosenbrock function, returning an ndarray
+pub fn rosenbrock_hessian_nd(param: &Array1<f64>, _a: f64, b: f64) -> Array2<f64> {
+    let x = param[0];
+    let y = param[1];
+    let mut out = Array2::zeros((2, 2));
+    // d/dxdx
+    out[[0, 0]] = 12.0 * b * x.powf(2.0) - 4.0 * b * y + 2.0;
+    // d/dxdy
+    out[[0, 1]] = -4.0 * b * x;
+    // d/dydx
+    out[[1, 0]] = -4.0 * b * x;
+    // d/dydy
+    out[[1, 1]] = 2.0 * b;
+    out
 }
 
 /// Sphere test function
