@@ -73,11 +73,9 @@ impl<'a> Newton<'a> {
     pub fn next_iter(&mut self) -> Result<ArgminResult<Array1<f64>, f64>> {
         // TODO: Move to next point
         // x_{n+1} = x_n - \gamma [Hf(x_n)]^-1 \nabla f(x_n)
-        let h = (self.state.problem.unwrap().hessian.unwrap())(&self.state.param);
         let g = (self.state.problem.unwrap().gradient.unwrap())(&self.state.param);
-        let h_inv = h.inv()?;
-        // self.state.param = self.state.param.clone() - self.gamma * h_inv * g.t();
-        self.state.param = self.state.param.clone() - self.gamma * h_inv.dot(&g.t());
+        let h_inv = (self.state.problem.unwrap().hessian.unwrap())(&self.state.param).inv()?;
+        self.state.param = self.state.param.clone() - self.gamma * h_inv.dot(&g);
         self.state.iter += 1;
         Ok(ArgminResult::new(
             self.state.param.clone(),
