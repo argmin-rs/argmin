@@ -1,4 +1,4 @@
-/// Gradient Descent
+/// Newton method
 ///
 /// TODO
 use std;
@@ -7,10 +7,8 @@ use problem::Problem;
 use result::ArgminResult;
 use ndarray::{Array1, Array2};
 use ndarray_linalg::Inverse;
-use ndarray_linalg::convert::transpose_data;
-use ndarray_linalg::*;
 
-/// Gradient Descent struct (duh)
+/// Newton method struct (duh)
 pub struct Newton<'a> {
     /// step size
     gamma: f64,
@@ -20,7 +18,7 @@ pub struct Newton<'a> {
     state: NewtonState<'a>,
 }
 
-/// Indicates the current state of the Newton
+/// Indicates the current state of the Newton method
 struct NewtonState<'a> {
     /// Reference to the problem. This is an Option<_> because it is initialized as `None`
     problem: Option<&'a Problem<'a, Array1<f64>, f64, Array2<f64>>>,
@@ -31,7 +29,7 @@ struct NewtonState<'a> {
 }
 
 impl<'a> NewtonState<'a> {
-    /// Constructor for `GradientDescentState`
+    /// Constructor for `NewtonState`
     pub fn new() -> Self {
         NewtonState {
             problem: None,
@@ -42,7 +40,7 @@ impl<'a> NewtonState<'a> {
 }
 
 impl<'a> Newton<'a> {
-    /// Return a GradientDescent struct
+    /// Return a `Newton` struct
     pub fn new() -> Self {
         Newton {
             gamma: 1.0,
@@ -93,7 +91,7 @@ impl<'a> Newton<'a> {
         false
     }
 
-    /// Run gradient descent method
+    /// Run Newton method
     pub fn run(
         &mut self,
         problem: &'a Problem<'a, Array1<f64>, f64, Array2<f64>>,
