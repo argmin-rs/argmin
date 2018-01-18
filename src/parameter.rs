@@ -98,18 +98,23 @@ impl ArgminParameter<Array1<f64>> for Array1<f64> {
     }
 
     fn random(lower_bound: &Array1<f64>, upper_bound: &Array1<f64>) -> Result<Array1<f64>> {
-        unimplemented!()
-        // let mut out: Array1<f64> = Array1::from_vec(vec![]);
-        // let mut rng = rand::thread_rng();
-        // for elem in lower_bound.iter().zip(upper_bound.iter()) {
-        //     if elem.0 >= elem.1 {
-        //         return Err(ErrorKind::InvalidParameter(
-        //             "Parameter: lower_bound must be lower than upper_bound.".into(),
-        //         ).into());
-        //     }
-        //     let range = Range::new(*elem.0, *elem.1);
-        //     out.push(range.ind_sample(&mut rng));
-        // }
-        // Ok(out)
+        // unimplemented!()
+        let mut rng = rand::thread_rng();
+        let out: Array1<f64> = lower_bound
+            .iter()
+            .zip(upper_bound.iter())
+            .map(|(a, b)| {
+                if a >= b {
+                    panic!("Parameter: lower_bound must be lower than upper_bound.");
+                    // Unfortunately the following doesnt work here!
+                    // return Err(ErrorKind::InvalidParameter(
+                    //     "Parameter: lower_bound must be lower than upper_bound.".into(),
+                    // ).into());
+                }
+                let range = Range::new(*a, *b);
+                range.ind_sample(&mut rng)
+            })
+            .collect();
+        Ok(out)
     }
 }
