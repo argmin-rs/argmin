@@ -17,6 +17,11 @@ extern crate ndarray_linalg;
 extern crate num;
 extern crate rand;
 
+use parameter::ArgminParameter;
+use result::ArgminResult;
+use problem::Problem;
+use errors::*;
+
 /// Trait for cost function values
 /// TODO: Do this with trait aliases once they work in rust.
 pub trait ArgminCostValue: num::Float + num::FromPrimitive + PartialOrd {}
@@ -24,6 +29,18 @@ impl<T> ArgminCostValue for T
 where
     T: num::Float + num::FromPrimitive + num::Num + PartialOrd,
 {
+}
+
+/// Trait every solve needs to implement (in the future)
+pub trait ArgminSolver<'a, T: Clone + ArgminParameter<T>, U: ArgminCostValue, V> {
+    /// Initializes the solver and sets the state to its initial state
+    fn init(&mut self, &'a Problem<'a, T, U, V>, &T);
+    /// Moves forward by a single iteration
+    fn next_iter(&mut self) -> Result<ArgminResult<T, U>>;
+    /// Run initialization and iterations at once
+    fn run(&mut self, &'a Problem<'a, T, U, V>, &T) -> Result<ArgminResult<T, U>>;
+    /// Handles the stopping criteria
+    fn terminate(&self) -> bool;
 }
 
 /// Definition of the return type of the solvers
