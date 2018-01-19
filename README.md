@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/stefan-k/argmin-rs.svg?branch=master)](https://travis-ci.org/stefan-k/argmin-rs)
+
 # argmin-rs
 
 Optimization toolbox written in Rust. Not even remotely stable yet.
