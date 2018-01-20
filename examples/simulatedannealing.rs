@@ -5,7 +5,7 @@ use argmin::testfunctions::rosenbrock;
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function
-    let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64).unwrap() };
+    let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64) };
 
     // Define bounds
     let lower_bound: Vec<f64> = vec![-1.5, -0.5];

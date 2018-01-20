@@ -6,8 +6,8 @@ use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, sphere, sphere_de
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function
-    let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64).unwrap() };
-    // let cost = |x: &Vec<f64>| -> f64 { sphere(x).unwrap() };
+    let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64) };
+    // let cost = |x: &Vec<f64>| -> f64 { sphere(x) };
 
     // Define bounds
     // Bounds are not satisfied yet.

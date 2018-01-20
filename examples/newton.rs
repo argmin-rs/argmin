@@ -12,16 +12,16 @@ use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, rosenbrock_deriva
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function
     // Choose either `Rosenbrock` or `Sphere` function.
-    // let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64).unwrap() };
-    // let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64).unwrap() };
-    // let hessian = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_hessian(x, 1_f64, 100_f64).unwrap() };
+    // let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64) };
+    // let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64) };
+    // let hessian = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_hessian(x, 1_f64, 100_f64) };
     // using ndarray
     let cost = |x: &Array1<f64>| -> f64 { rosenbrock_nd(x, 1_f64, 100_f64) };
     let gradient =
         |x: &Array1<f64>| -> Array<f64, _> { rosenbrock_derivative_nd(x, 1_f64, 100_f64) };
     let hessian = |x: &Array1<f64>| -> Array<f64, _> { rosenbrock_hessian_nd(x, 1_f64, 100_f64) };
-    // let cost = |x: &Vec<f64>| -> f64 { sphere(x).unwrap() };
-    // let gradient = |x: &Vec<f64>| -> Vec<f64> { sphere_derivative(x).unwrap() };
+    // let cost = |x: &Vec<f64>| -> f64 { sphere(x) };
+    // let gradient = |x: &Vec<f64>| -> Vec<f64> { sphere_derivative(x) };
 
     // Define bounds
     // Note: Gradient Descent currently does not enforce these bounds which is why we can set them

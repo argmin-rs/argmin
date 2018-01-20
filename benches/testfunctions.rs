@@ -1,5 +1,4 @@
 #![feature(test)]
-#![feature(macro_rules)]
 #![feature(concat_idents)]
 
 extern crate argmin;
@@ -47,5 +46,4 @@ mod tests {
 
     make_bench!(sphere(&vec![-43.0, 53.0]));
     make_bench!(sphere_derivative(&vec![-43.0, 53.0]));
-
 }
