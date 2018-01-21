@@ -9,6 +9,7 @@ use parameter::ArgminParameter;
 use rand;
 use rand::distributions::{IndependentSample, Range};
 use ArgminCostValue;
+use num::{Float, FromPrimitive};
 
 /// Definition of build in temperature functions for Simulated Annealing.
 ///
@@ -35,7 +36,11 @@ pub enum SATempFunc {
 }
 
 /// Simulated Annealing struct (duh)
-pub struct SimulatedAnnealing<'a> {
+pub struct SimulatedAnnealing<'a, T, U>
+where
+    T: ArgminParameter<T> + 'a,
+    U: Float + FromPrimitive + 'a,
+{
     /// Initial temperature
     pub init_temp: f64,
     /// Maximum number of iterations
@@ -44,9 +49,51 @@ pub struct SimulatedAnnealing<'a> {
     pub temp_func: SATempFunc,
     /// Custom temperature function
     pub custom_temp_func: Option<&'a Fn(f64, u64) -> f64>,
+    /// Current state of solver
+    pub state: Option<SimulatedAnnealingState<'a, T, U>>,
 }
 
-impl<'a> SimulatedAnnealing<'a> {
+/// State of the simulated annealing solver
+pub struct SimulatedAnnealingState<'a, T, U>
+where
+    T: ArgminParameter<T> + 'a,
+    U: Float + FromPrimitive + 'a,
+{
+    /// Reference to the problem.
+    problem: &'a Problem<'a, T, U, U>,
+    /// Current number of iteration
+    param: T,
+    /// Current number of iteration
+    iter: u64,
+    /// current temperature
+    cur_temp: f64,
+    /// previous cost
+    prev_cost: U,
+    /// best parameter
+    best_param: T,
+    /// corresponding best cost
+    best_cost: U,
+}
+
+// impl<'a, T, U> SimulatedAnnealingState<'a, T, U>
+// where
+//     T: ArgminParameter<T> + 'a,
+//     U: Float + FromPrimitive + 'a,
+// {
+//     pub fn new() -> SimulatedAnnealingState<'a, T, U> {
+//         SimulatedAnnealingState {
+//             problem: None,
+//             param: T::zero(),
+//             iter: 0,
+//         }
+//     }
+// }
+
+impl<'a, T, U> SimulatedAnnealing<'a, T, U>
+where
+    T: ArgminParameter<T>,
+    U: Float + FromPrimitive,
+{
     /// Constructor
     ///
     /// Returns an `SimulatedAnnealing` struct where all entries of the struct are set according to
@@ -70,8 +117,71 @@ impl<'a> SimulatedAnnealing<'a> {
                 max_iters: max_iters,
                 temp_func: SATempFunc::TemperatureFast,
                 custom_temp_func: None,
+                // state: SimulatedAnnealingState::new(),
+                state: None,
             })
         }
+    }
+
+    /// Initialize with a given problem and a starting point
+    pub fn init(&mut self, problem: &'a Problem<'a, T, U, U>, init_param: &T) -> Result<()> {
+        let prev_cost = (problem.cost_function)(init_param);
+        self.state = Some(SimulatedAnnealingState {
+            problem: problem,
+            param: init_param.to_owned(),
+            iter: 0_u64,
+            cur_temp: self.init_temp,
+            prev_cost: prev_cost,
+            best_param: init_param.to_owned(),
+            best_cost: prev_cost,
+        });
+        Ok(())
+    }
+
+    /// Compute next point
+    pub fn next_iter(&mut self) -> Result<ArgminResult<T, U>> {
+        // Damn you, borrow checker...
+
+        let mut param_new = self.state.as_mut().unwrap().param.clone();
+        for _ in 0..((self.state.as_mut().unwrap().cur_temp.floor() as u64) + 1) {
+            param_new = param_new.modify(
+                &self.state.as_mut().unwrap().problem.lower_bound,
+                &self.state.as_mut().unwrap().problem.upper_bound,
+                &self.state.as_mut().unwrap().problem.constraint,
+            );
+        }
+
+        // Evaluate cost function with new parameter vector
+        let new_cost = (self.state.as_mut().unwrap().problem.cost_function)(&param_new);
+
+        // Decide whether new parameter vector should be accepted.
+        // If no, move on with old parameter vector.
+        if accept(
+            self.state.as_mut().unwrap().cur_temp,
+            self.state.as_mut().unwrap().prev_cost.to_f64().unwrap(),
+            new_cost.to_f64().unwrap(),
+        ) {
+            // If yes, update the parameter vector for the next iteration.
+            self.state.as_mut().unwrap().prev_cost = new_cost;
+            self.state.as_mut().unwrap().param = param_new.clone();
+
+            // In case the new solution is better than the current best, update best as well.
+            if new_cost < self.state.as_mut().unwrap().best_cost {
+                self.state.as_mut().unwrap().best_cost = new_cost;
+                self.state.as_mut().unwrap().best_param = param_new;
+            }
+        }
+
+        // Update temperature for next iteration.
+        let cur_iter = self.state.as_mut().unwrap().iter;
+        // self.state.as_mut().unwrap().cur_temp = self.update_temperature(self.state.unwrap().iter)?;
+        self.state.as_mut().unwrap().cur_temp = self.update_temperature(cur_iter)?;
+        self.state.as_mut().unwrap().iter += 1;
+        Ok(ArgminResult::new(
+            self.state.as_mut().unwrap().param.clone(),
+            self.state.as_mut().unwrap().best_cost,
+            self.state.as_mut().unwrap().iter,
+        ))
     }
 
     /// Change temperature function to one of the options in `SATempFunc`.
@@ -91,21 +201,6 @@ impl<'a> SimulatedAnnealing<'a> {
         self.temp_func = SATempFunc::Custom;
         self.custom_temp_func = Some(func);
         self
-    }
-
-    /// Acceptance function
-    ///
-    /// Any solution where `next_cost < prev_cost` will be accepted. Whenever a new solution is
-    /// worse than the previous one, the acceptance probability is calculated as:
-    ///
-    ///     `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
-    ///
-    /// which will always be between 0 and 0.5.
-    fn accept(&self, temp: f64, prev_cost: f64, next_cost: f64) -> bool {
-        let step = Range::new(0.0, 1.0);
-        let mut rng = rand::thread_rng();
-        let prob: f64 = step.ind_sample(&mut rng);
-        (next_cost < prev_cost) || (1_f64 / (1_f64 + ((next_cost - prev_cost) / temp).exp()) > prob)
     }
 
     /// Update the temperature based on the current iteration number.
@@ -133,64 +228,44 @@ impl<'a> SimulatedAnnealing<'a> {
         }
     }
 
+    fn terminate(&mut self) -> bool {
+        self.state.as_mut().unwrap().iter >= self.max_iters
+    }
+
     /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.
-    pub fn run<T, U>(
-        &self,
-        problem: &Problem<T, U, U>,
+    pub fn run(
+        &mut self,
+        problem: &'a Problem<'a, T, U, U>,
         init_param: &T,
     ) -> Result<ArgminResult<T, U>>
     where
         T: ArgminParameter<T>,
         U: ArgminCostValue,
     {
-        let mut param = init_param.clone();
-
-        // Evaluate cost function of starting point
-        let mut cost = (problem.cost_function)(&param);
-
-        // Initialize temperature
-        let mut temp = self.init_temp;
-
-        // Set first best solution to initial parameter vector
-        let mut param_best = init_param.clone();
-        let mut cost_best = cost;
-
-        // Start annealing
-        for i in 0..self.max_iters {
-            // Start off with current parameter vector and mutate it with the mutation proportional
-            // to the current temperature
-            let mut param_new = param.clone();
-            for _ in 0..((temp.floor() as u64) + 1) {
-                param_new = param_new.modify(
-                    &problem.lower_bound,
-                    &problem.upper_bound,
-                    &problem.constraint,
-                );
+        self.init(problem, init_param)?;
+        let mut out;
+        loop {
+            out = self.next_iter()?;
+            if self.terminate() {
+                break;
             }
-
-            // Evaluate cost function with new parameter vector
-            let new_cost = (problem.cost_function)(&param_new);
-
-            // Decide whether new parameter vector should be accepted.
-            // If no, move on with old parameter vector.
-            if self.accept(temp, cost.to_f64().unwrap(), new_cost.to_f64().unwrap()) {
-                // println!("{} {} {:?}", i, temp, param_new);
-                // If yes, update the parameter vector for the next iteration.
-                cost = new_cost;
-                param = param_new;
-
-                // In case the new solution is better than the current best, update best as well.
-                if cost < cost_best {
-                    cost_best = cost;
-                    param_best = param.clone();
-                }
-            }
-
-            // Update temperature for next iteration.
-            temp = self.update_temperature(i)?;
         }
-
-        // Return the result.
-        Ok(ArgminResult::new(param_best, cost_best, self.max_iters))
+        Ok(out)
     }
+}
+
+/// Acceptance function
+///
+/// Any solution where `next_cost < prev_cost` will be accepted. Whenever a new solution is
+/// worse than the previous one, the acceptance probability is calculated as:
+///
+///     `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
+///
+/// which will always be between 0 and 0.5.
+// fn accept(&self, temp: f64, prev_cost: f64, next_cost: f64) -> bool {
+fn accept(temp: f64, prev_cost: f64, next_cost: f64) -> bool {
+    let step = Range::new(0.0, 1.0);
+    let mut rng = rand::thread_rng();
+    let prob: f64 = step.ind_sample(&mut rng);
+    (next_cost < prev_cost) || (1_f64 / (1_f64 + ((next_cost - prev_cost) / temp).exp()) > prob)
 }

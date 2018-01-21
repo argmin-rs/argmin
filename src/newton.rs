@@ -22,7 +22,7 @@ pub struct Newton<'a> {
 struct NewtonState<'a> {
     /// Reference to the problem. This is an Option<_> because it is initialized as `None`
     problem: Option<&'a Problem<'a, Array1<f64>, f64, Array2<f64>>>,
-    /// Current number of iteration
+    /// Current parameter vector
     param: Array1<f64>,
     /// Current number of iteration
     iter: u64,

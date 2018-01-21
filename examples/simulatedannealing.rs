@@ -15,7 +15,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let prob = Problem::new(&cost, &lower_bound, &upper_bound);
 
     // Set up simulated annealing solver
-    let mut solver = SimulatedAnnealing::new(10.0, 10_000_000)?;
+    let mut solver = SimulatedAnnealing::new(10.0, 1_000_000)?;
     solver.temp_func(SATempFunc::Exponential(0.8));
 
     // definie inital parameter vector
