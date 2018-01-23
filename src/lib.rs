@@ -32,7 +32,12 @@ where
 }
 
 /// Trait every solve needs to implement (in the future)
-pub trait ArgminSolver<'a, T: Clone + ArgminParameter<T>, U: ArgminCostValue, V> {
+pub trait ArgminSolver<
+    'a,
+    T: Clone + ArgminParameter<T>,
+    U: ArgminCostValue + std::default::Default,
+    V,
+> {
     /// Initializes the solver and sets the state to its initial state
     fn init(&mut self, &'a Problem<'a, T, U, V>, &T);
     /// Moves forward by a single iteration

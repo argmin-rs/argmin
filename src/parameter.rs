@@ -2,13 +2,14 @@
 ///
 use errors::*;
 use std::fmt::Debug;
+use std::default::Default;
 use rand;
 use rand::distributions::{IndependentSample, Range};
 use ndarray::Array1;
 
 /// This trait needs to be implemented for every parameter fed into the solvers.
 /// This is highly *UNSTABLE* and will change in the future.
-pub trait ArgminParameter<T: Clone>: Clone + Debug {
+pub trait ArgminParameter<T: Clone>: Clone + Default + Debug {
     /// Defines a modification of the parameter vector.
     ///
     /// The parameters:

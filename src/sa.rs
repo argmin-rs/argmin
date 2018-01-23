@@ -8,6 +8,7 @@ use result::ArgminResult;
 use parameter::ArgminParameter;
 use rand;
 use rand::distributions::{IndependentSample, Range};
+// use ArgminSolver;
 use ArgminCostValue;
 use num::{Float, FromPrimitive};
 
@@ -123,67 +124,6 @@ where
         }
     }
 
-    /// Initialize with a given problem and a starting point
-    pub fn init(&mut self, problem: &'a Problem<'a, T, U, U>, init_param: &T) -> Result<()> {
-        let prev_cost = (problem.cost_function)(init_param);
-        self.state = Some(SimulatedAnnealingState {
-            problem: problem,
-            param: init_param.to_owned(),
-            iter: 0_u64,
-            cur_temp: self.init_temp,
-            prev_cost: prev_cost,
-            best_param: init_param.to_owned(),
-            best_cost: prev_cost,
-        });
-        Ok(())
-    }
-
-    /// Compute next point
-    pub fn next_iter(&mut self) -> Result<ArgminResult<T, U>> {
-        // Damn you, borrow checker...
-
-        let mut param_new = self.state.as_mut().unwrap().param.clone();
-        for _ in 0..((self.state.as_mut().unwrap().cur_temp.floor() as u64) + 1) {
-            param_new = param_new.modify(
-                &self.state.as_mut().unwrap().problem.lower_bound,
-                &self.state.as_mut().unwrap().problem.upper_bound,
-                &self.state.as_mut().unwrap().problem.constraint,
-            );
-        }
-
-        // Evaluate cost function with new parameter vector
-        let new_cost = (self.state.as_mut().unwrap().problem.cost_function)(&param_new);
-
-        // Decide whether new parameter vector should be accepted.
-        // If no, move on with old parameter vector.
-        if accept(
-            self.state.as_mut().unwrap().cur_temp,
-            self.state.as_mut().unwrap().prev_cost.to_f64().unwrap(),
-            new_cost.to_f64().unwrap(),
-        ) {
-            // If yes, update the parameter vector for the next iteration.
-            self.state.as_mut().unwrap().prev_cost = new_cost;
-            self.state.as_mut().unwrap().param = param_new.clone();
-
-            // In case the new solution is better than the current best, update best as well.
-            if new_cost < self.state.as_mut().unwrap().best_cost {
-                self.state.as_mut().unwrap().best_cost = new_cost;
-                self.state.as_mut().unwrap().best_param = param_new;
-            }
-        }
-
-        // Update temperature for next iteration.
-        let cur_iter = self.state.as_mut().unwrap().iter;
-        // self.state.as_mut().unwrap().cur_temp = self.update_temperature(self.state.unwrap().iter)?;
-        self.state.as_mut().unwrap().cur_temp = self.update_temperature(cur_iter)?;
-        self.state.as_mut().unwrap().iter += 1;
-        Ok(ArgminResult::new(
-            self.state.as_mut().unwrap().param.clone(),
-            self.state.as_mut().unwrap().best_cost,
-            self.state.as_mut().unwrap().iter,
-        ))
-    }
-
     /// Change temperature function to one of the options in `SATempFunc`.
     ///
     /// This will overwrite any custom temperature functions provided by `custom_temp_func()`.
@@ -202,6 +142,133 @@ where
         self.custom_temp_func = Some(func);
         self
     }
+
+    /// Initialize with a given problem and a starting point
+    pub fn init(&mut self, problem: &'a Problem<'a, T, U, U>, init_param: &T) -> Result<()> {
+        let prev_cost = (problem.cost_function)(init_param);
+        self.state = Some(SimulatedAnnealingState {
+            problem: problem,
+            param: init_param.to_owned(),
+            iter: 0_u64,
+            cur_temp: self.init_temp,
+            prev_cost: prev_cost,
+            best_param: init_param.to_owned(),
+            best_cost: prev_cost,
+        });
+        Ok(())
+    }
+
+    /// Compute next point
+    pub fn next_iter(&mut self) -> Result<ArgminResult<T, U>> {
+        // Damn you, borrow checker...
+        let state = match self.state {
+            Some(ref mut a) => a,
+            None => panic!("bla"),
+        };
+
+        let mut param_new = state.param.clone();
+        for _ in 0..((state.cur_temp.floor() as u64) + 1) {
+            param_new = param_new.modify(
+                &state.problem.lower_bound,
+                &state.problem.upper_bound,
+                &state.problem.constraint,
+            );
+        }
+
+        // Evaluate cost function with new parameter vector
+        let new_cost = (state.problem.cost_function)(&param_new);
+
+        // Decide whether new parameter vector should be accepted.
+        // If no, move on with old parameter vector.
+        if accept(
+            state.cur_temp,
+            state.prev_cost.to_f64().unwrap(),
+            new_cost.to_f64().unwrap(),
+        ) {
+            // if self.accept(new_cost.to_f64().unwrap()) {
+            // If yes, update the parameter vector for the next iteration.
+            state.prev_cost = new_cost;
+            state.param = param_new.clone();
+
+            // In case the new solution is better than the current best, update best as well.
+            if new_cost < state.best_cost {
+                state.best_cost = new_cost;
+                state.best_param = param_new;
+            }
+        }
+
+        // Update temperature for next iteration.
+        let cur_iter = state.iter;
+        // self.state.as_mut().unwrap().cur_temp = self.update_temperature(self.state.unwrap().iter)?;
+        state.cur_temp = self.update_temperature(cur_iter)?;
+        state.iter += 1;
+        Ok(ArgminResult::new(
+            state.param.clone(),
+            state.best_cost,
+            state.iter,
+        ))
+
+        // let mut param_new = self.state.as_mut().unwrap().param.clone();
+        // for _ in 0..((self.state.as_mut().unwrap().cur_temp.floor() as u64) + 1) {
+        //     param_new = param_new.modify(
+        //         &self.state.as_mut().unwrap().problem.lower_bound,
+        //         &self.state.as_mut().unwrap().problem.upper_bound,
+        //         &self.state.as_mut().unwrap().problem.constraint,
+        //     );
+        // }
+        //
+        // // Evaluate cost function with new parameter vector
+        // let new_cost = (self.state.as_mut().unwrap().problem.cost_function)(&param_new);
+        //
+        // // Decide whether new parameter vector should be accepted.
+        // // If no, move on with old parameter vector.
+        // if accept(
+        //     self.state.as_mut().unwrap().cur_temp,
+        //     self.state.as_mut().unwrap().prev_cost.to_f64().unwrap(),
+        //     new_cost.to_f64().unwrap(),
+        // ) {
+        //     // if self.accept(new_cost.to_f64().unwrap()) {
+        //     // If yes, update the parameter vector for the next iteration.
+        //     self.state.as_mut().unwrap().prev_cost = new_cost;
+        //     self.state.as_mut().unwrap().param = param_new.clone();
+        //
+        //     // In case the new solution is better than the current best, update best as well.
+        //     if new_cost < self.state.as_mut().unwrap().best_cost {
+        //         self.state.as_mut().unwrap().best_cost = new_cost;
+        //         self.state.as_mut().unwrap().best_param = param_new;
+        //     }
+        // }
+        //
+        // // Update temperature for next iteration.
+        // let cur_iter = self.state.as_mut().unwrap().iter;
+        // // self.state.as_mut().unwrap().cur_temp = self.update_temperature(self.state.unwrap().iter)?;
+        // self.state.as_mut().unwrap().cur_temp = self.update_temperature(cur_iter)?;
+        // self.state.as_mut().unwrap().iter += 1;
+        // Ok(ArgminResult::new(
+        //     self.state.as_mut().unwrap().param.clone(),
+        //     self.state.as_mut().unwrap().best_cost,
+        //     self.state.as_mut().unwrap().iter,
+        // ))
+    }
+
+    /// Acceptance function
+    ///
+    /// Any solution where `next_cost < prev_cost` will be accepted. Whenever a new solution is
+    /// worse than the previous one, the acceptance probability is calculated as:
+    ///
+    ///     `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
+    ///
+    /// which will always be between 0 and 0.5.
+    // fn accept(&self, temp: f64, prev_cost: f64, next_cost: f64) -> bool {
+    // fn accept(&self, temp: f64, prev_cost: f64, next_cost: f64) -> bool {
+    // fn accept(&self, next_cost: f64) -> bool {
+    //     let temp = self.state.unwrap().cur_temp.clone();
+    //     let prev_cost = self.state.unwrap().prev_cost.to_f64().unwrap();
+    //     let step = Range::new(0.0, 1.0);
+    //     let mut rng = rand::thread_rng();
+    //     let prob: f64 = step.ind_sample(&mut rng);
+    //     (next_cost < prev_cost) || (1_f64 / (1_f64 + ((next_cost - prev_cost) / temp).exp()) > prob)
+    // }
 
     /// Update the temperature based on the current iteration number.
     ///
@@ -262,7 +329,6 @@ where
 ///     `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
 ///
 /// which will always be between 0 and 0.5.
-// fn accept(&self, temp: f64, prev_cost: f64, next_cost: f64) -> bool {
 fn accept(temp: f64, prev_cost: f64, next_cost: f64) -> bool {
     let step = Range::new(0.0, 1.0);
     let mut rng = rand::thread_rng();

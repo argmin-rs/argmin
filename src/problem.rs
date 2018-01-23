@@ -3,9 +3,11 @@
 use errors::*;
 use parameter::ArgminParameter;
 use ArgminCostValue;
+// use std::default::Default;
 
 /// This struct hold all information that describes the optimization problem.
 #[derive(Clone)]
+// pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + Default + 'a, V: 'a> {
 pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a, V: 'a> {
     /// reference to a function which computes the cost/fitness for a given parameter vector
     pub cost_function: &'a Fn(&T) -> U,
@@ -22,6 +24,21 @@ pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a, V: '
     /// (non)linear constraint which is `true` if a parameter vector lies within the bounds
     pub constraint: &'a Fn(&T) -> bool,
 }
+
+// impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + Default + 'a, V: 'a> Default
+//     for Problem<'a, T, U, V>
+// {
+//     fn default() -> Self {
+//         Problem {
+//             cost_function: &|_x: &T| -> U { U::default() },
+//             gradient: None,
+//             hessian: None,
+//             lower_bound: T::default(),
+//             upper_bound: T::default(),
+//             constraint: &|_x: &T| -> bool { true },
+//         }
+//     }
+// }
 
 impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T, U, V> {
     /// Create a new `Problem` struct.
