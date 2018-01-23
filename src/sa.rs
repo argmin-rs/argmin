@@ -160,11 +160,7 @@ where
 
     /// Compute next point
     pub fn next_iter(&mut self) -> Result<ArgminResult<T, U>> {
-        // Damn you, borrow checker...
-        let state = match self.state {
-            Some(ref mut a) => a,
-            None => panic!("bla"),
-        };
+        let mut state = self.state.take().unwrap();
 
         let mut param_new = state.param.clone();
         for _ in 0..((state.cur_temp.floor() as u64) + 1) {
@@ -199,56 +195,11 @@ where
 
         // Update temperature for next iteration.
         let cur_iter = state.iter;
-        // self.state.as_mut().unwrap().cur_temp = self.update_temperature(self.state.unwrap().iter)?;
         state.cur_temp = self.update_temperature(cur_iter)?;
         state.iter += 1;
-        Ok(ArgminResult::new(
-            state.param.clone(),
-            state.best_cost,
-            state.iter,
-        ))
-
-        // let mut param_new = self.state.as_mut().unwrap().param.clone();
-        // for _ in 0..((self.state.as_mut().unwrap().cur_temp.floor() as u64) + 1) {
-        //     param_new = param_new.modify(
-        //         &self.state.as_mut().unwrap().problem.lower_bound,
-        //         &self.state.as_mut().unwrap().problem.upper_bound,
-        //         &self.state.as_mut().unwrap().problem.constraint,
-        //     );
-        // }
-        //
-        // // Evaluate cost function with new parameter vector
-        // let new_cost = (self.state.as_mut().unwrap().problem.cost_function)(&param_new);
-        //
-        // // Decide whether new parameter vector should be accepted.
-        // // If no, move on with old parameter vector.
-        // if accept(
-        //     self.state.as_mut().unwrap().cur_temp,
-        //     self.state.as_mut().unwrap().prev_cost.to_f64().unwrap(),
-        //     new_cost.to_f64().unwrap(),
-        // ) {
-        //     // if self.accept(new_cost.to_f64().unwrap()) {
-        //     // If yes, update the parameter vector for the next iteration.
-        //     self.state.as_mut().unwrap().prev_cost = new_cost;
-        //     self.state.as_mut().unwrap().param = param_new.clone();
-        //
-        //     // In case the new solution is better than the current best, update best as well.
-        //     if new_cost < self.state.as_mut().unwrap().best_cost {
-        //         self.state.as_mut().unwrap().best_cost = new_cost;
-        //         self.state.as_mut().unwrap().best_param = param_new;
-        //     }
-        // }
-        //
-        // // Update temperature for next iteration.
-        // let cur_iter = self.state.as_mut().unwrap().iter;
-        // // self.state.as_mut().unwrap().cur_temp = self.update_temperature(self.state.unwrap().iter)?;
-        // self.state.as_mut().unwrap().cur_temp = self.update_temperature(cur_iter)?;
-        // self.state.as_mut().unwrap().iter += 1;
-        // Ok(ArgminResult::new(
-        //     self.state.as_mut().unwrap().param.clone(),
-        //     self.state.as_mut().unwrap().best_cost,
-        //     self.state.as_mut().unwrap().iter,
-        // ))
+        let out = ArgminResult::new(state.param.clone(), state.best_cost, state.iter);
+        self.state = Some(state);
+        Ok(out)
     }
 
     /// Acceptance function
