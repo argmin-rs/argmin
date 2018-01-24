@@ -33,7 +33,7 @@ impl<'a> NewtonState<'a> {
     pub fn new() -> Self {
         NewtonState {
             problem: None,
-            param: Array1::from_vec(vec![0.0]),
+            param: Array1::default(1),
             iter: 0_u64,
         }
     }
