@@ -24,10 +24,12 @@ use errors::*;
 
 /// Trait for cost function values
 /// TODO: Do this with trait aliases once they work in rust.
-pub trait ArgminCostValue: num::Float + num::FromPrimitive + PartialOrd {}
+pub trait ArgminCostValue
+    : num::Float + num::FromPrimitive + std::default::Default + PartialOrd {
+}
 impl<T> ArgminCostValue for T
 where
-    T: num::Float + num::FromPrimitive + num::Num + PartialOrd,
+    T: num::Float + num::FromPrimitive + num::Num + std::default::Default + PartialOrd,
 {
 }
 
