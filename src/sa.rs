@@ -10,7 +10,7 @@ use rand;
 use rand::distributions::{IndependentSample, Range};
 // use ArgminSolver;
 use ArgminCostValue;
-use num::{Float, FromPrimitive};
+use num::Float;
 
 /// Definition of build in temperature functions for Simulated Annealing.
 ///
@@ -40,7 +40,7 @@ pub enum SATempFunc {
 pub struct SimulatedAnnealing<'a, T, U>
 where
     T: ArgminParameter<T> + 'a,
-    U: Float + FromPrimitive + 'a,
+    U: ArgminCostValue + 'a,
 {
     /// Initial temperature
     pub init_temp: f64,
@@ -58,7 +58,7 @@ where
 pub struct SimulatedAnnealingState<'a, T, U>
 where
     T: ArgminParameter<T> + 'a,
-    U: Float + FromPrimitive + 'a,
+    U: ArgminCostValue + 'a,
 {
     /// Reference to the problem.
     problem: &'a Problem<'a, T, U, U>,
@@ -79,7 +79,7 @@ where
 // impl<'a, T, U> SimulatedAnnealingState<'a, T, U>
 // where
 //     T: ArgminParameter<T> + 'a,
-//     U: Float + FromPrimitive + 'a,
+//     U: ArgminCostValue + 'a,
 // {
 //     pub fn new() -> SimulatedAnnealingState<'a, T, U> {
 //         SimulatedAnnealingState {
@@ -93,7 +93,7 @@ where
 impl<'a, T, U> SimulatedAnnealing<'a, T, U>
 where
     T: ArgminParameter<T>,
-    U: Float + FromPrimitive,
+    U: ArgminCostValue,
 {
     /// Constructor
     ///
