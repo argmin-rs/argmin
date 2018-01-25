@@ -9,17 +9,16 @@ use ndarray::Array1;
 
 /// This trait needs to be implemented for every parameter fed into the solvers.
 /// This is highly *UNSTABLE* and will change in the future.
-// pub trait ArgminParameter<T: Clone>: Clone + Default + Debug {
 pub trait ArgminParameter: Clone + Default + Debug {
     /// Defines a modification of the parameter vector.
     ///
     /// The parameters:
     ///
-    /// `&self`: reference to the object of type `T`
-    /// `lower_bound`: Lower bound of the parameter vector. Same type as parameter vector (`T`)
-    /// `upper_bound`: Upper bound of the parameter vector. Same type as parameter vector (`T`)
-    /// `constraint`: Additional (non)linear constraint whith the signature `&Fn(&T) -> bool`. The
-    /// provided function takes a parameter as input and returns `true` if the parameter vector
+    /// `&self`: reference to the object of type `Self`
+    /// `lower_bound`: Lower bound of the parameter vector. Same type as parameter vector (`Self`)
+    /// `upper_bound`: Upper bound of the parameter vector. Same type as parameter vector (`Self`)
+    /// `constraint`: Additional (non)linear constraint whith the signature `&Fn(&Self) -> bool`.
+    /// The provided function takes a parameter as input and returns `true` if the parameter vector
     /// satisfies the constraints and `false` otherwise.
     fn modify(&self, &Self, &Self, &Fn(&Self) -> bool) -> Self;
 
@@ -29,7 +28,6 @@ pub trait ArgminParameter: Clone + Default + Debug {
     fn random(&Self, &Self) -> Result<Self>;
 }
 
-// impl ArgminParameter<Vec<f64>> for Vec<f64> {
 impl ArgminParameter for Vec<f64> {
     fn modify(
         &self,
@@ -73,7 +71,6 @@ impl ArgminParameter for Vec<f64> {
     }
 }
 
-// impl ArgminParameter<Array1<f64>> for Array1<f64> {
 impl ArgminParameter for Array1<f64> {
     fn modify(
         &self,
