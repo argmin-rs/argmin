@@ -159,6 +159,7 @@ where
 
     /// Compute next point
     pub fn next_iter(&mut self) -> Result<ArgminResult<T, U>> {
+        // Taking the state avoids fights with the borrow checker.
         let mut state = self.state.take().unwrap();
 
         let mut param_new = state.param.clone();
@@ -175,12 +176,7 @@ where
 
         // Decide whether new parameter vector should be accepted.
         // If no, move on with old parameter vector.
-        if accept(
-            state.cur_temp,
-            state.prev_cost.to_f64().unwrap(),
-            new_cost.to_f64().unwrap(),
-        ) {
-            // if self.accept(new_cost.to_f64().unwrap()) {
+        if self.accept(&state, new_cost.to_f64().unwrap()) {
             // If yes, update the parameter vector for the next iteration.
             state.prev_cost = new_cost;
             state.param = param_new.clone();
@@ -209,16 +205,14 @@ where
     ///     `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
     ///
     /// which will always be between 0 and 0.5.
-    // fn accept(&self, temp: f64, prev_cost: f64, next_cost: f64) -> bool {
-    // fn accept(&self, temp: f64, prev_cost: f64, next_cost: f64) -> bool {
-    // fn accept(&self, next_cost: f64) -> bool {
-    //     let temp = self.state.unwrap().cur_temp.clone();
-    //     let prev_cost = self.state.unwrap().prev_cost.to_f64().unwrap();
-    //     let step = Range::new(0.0, 1.0);
-    //     let mut rng = rand::thread_rng();
-    //     let prob: f64 = step.ind_sample(&mut rng);
-    //     (next_cost < prev_cost) || (1_f64 / (1_f64 + ((next_cost - prev_cost) / temp).exp()) > prob)
-    // }
+    fn accept(&self, state: &SimulatedAnnealingState<T, U>, next_cost: f64) -> bool {
+        let prev_cost = state.prev_cost.to_f64().unwrap();
+        let step = Range::new(0.0, 1.0);
+        let mut rng = rand::thread_rng();
+        let prob: f64 = step.ind_sample(&mut rng);
+        (next_cost < prev_cost)
+            || (1_f64 / (1_f64 + ((next_cost - prev_cost) / state.cur_temp).exp()) > prob)
+    }
 
     /// Update the temperature based on the current iteration number.
     ///
@@ -269,19 +263,4 @@ where
         }
         Ok(out)
     }
-}
-
-/// Acceptance function
-///
-/// Any solution where `next_cost < prev_cost` will be accepted. Whenever a new solution is
-/// worse than the previous one, the acceptance probability is calculated as:
-///
-///     `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
-///
-/// which will always be between 0 and 0.5.
-fn accept(temp: f64, prev_cost: f64, next_cost: f64) -> bool {
-    let step = Range::new(0.0, 1.0);
-    let mut rng = rand::thread_rng();
-    let prob: f64 = step.ind_sample(&mut rng);
-    (next_cost < prev_cost) || (1_f64 / (1_f64 + ((next_cost - prev_cost) / temp).exp()) > prob)
 }
