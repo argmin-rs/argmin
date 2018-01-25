@@ -8,8 +8,7 @@ use ArgminCostValue;
 
 /// This struct hold all information that describes the optimization problem.
 #[derive(Clone)]
-// pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + Default + 'a, V: 'a> {
-pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a, V: 'a> {
+pub struct Problem<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> {
     /// reference to a function which computes the cost/fitness for a given parameter vector
     pub cost_function: &'a Fn(&T) -> U,
     /// optional reference to a function which provides the gradient at a given point in parameter
@@ -28,22 +27,7 @@ pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a, V: '
     _marker: PhantomData<&'a V>,
 }
 
-// impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + Default + 'a, V: 'a> Default
-//     for Problem<'a, T, U, V>
-// {
-//     fn default() -> Self {
-//         Problem {
-//             cost_function: &|_x: &T| -> U { U::default() },
-//             gradient: None,
-//             hessian: None,
-//             lower_bound: T::default(),
-//             upper_bound: T::default(),
-//             constraint: &|_x: &T| -> bool { true },
-//         }
-//     }
-// }
-
-impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T, U, V> {
+impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T, U, V> {
     /// Create a new `Problem` struct.
     ///
     /// The field `gradient` is automatically set to `None`, but can be manually set by the

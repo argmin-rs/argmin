@@ -39,7 +39,7 @@ pub enum SATempFunc {
 /// Simulated Annealing struct (duh)
 pub struct SimulatedAnnealing<'a, T, U, V = U>
 where
-    T: ArgminParameter<T> + 'a,
+    T: ArgminParameter + 'a,
     U: ArgminCostValue + 'a,
     V: 'a,
 {
@@ -58,7 +58,7 @@ where
 /// State of the simulated annealing solver
 pub struct SimulatedAnnealingState<'a, T, U, V>
 where
-    T: ArgminParameter<T> + 'a,
+    T: ArgminParameter + 'a,
     U: ArgminCostValue + 'a,
     V: 'a,
 {
@@ -82,7 +82,7 @@ where
 
 // impl<'a, T, U> SimulatedAnnealingState<'a, T, U>
 // where
-//     T: ArgminParameter<T> + 'a,
+//     T: ArgminParameter + 'a,
 //     U: ArgminCostValue + 'a,
 // {
 //     pub fn new() -> SimulatedAnnealingState<'a, T, U> {
@@ -96,7 +96,7 @@ where
 
 impl<'a, T, U, V> SimulatedAnnealing<'a, T, U, V>
 where
-    T: ArgminParameter<T>,
+    T: ArgminParameter,
     U: ArgminCostValue,
     V: 'a,
 {
@@ -192,7 +192,7 @@ where
 
 impl<'a, T, U, V> ArgminSolver<'a> for SimulatedAnnealing<'a, T, U, V>
 where
-    T: ArgminParameter<T> + 'a,
+    T: ArgminParameter + 'a,
     U: ArgminCostValue + 'a,
     V: 'a,
 {
@@ -262,7 +262,7 @@ where
         init_param: &T,
     ) -> Result<ArgminResult<T, U>>
     where
-        T: ArgminParameter<T>,
+        T: ArgminParameter,
         U: ArgminCostValue,
     {
         self.init(problem, init_param)?;

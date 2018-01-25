@@ -5,7 +5,7 @@ use parameter::ArgminParameter;
 
 /// Return struct for all solvers.
 #[derive(Debug)]
-pub struct ArgminResult<T: ArgminParameter<T> + Clone, U: PartialOrd> {
+pub struct ArgminResult<T: ArgminParameter + Clone, U: PartialOrd> {
     /// Final parameter vector
     pub param: T,
     /// Final cost value
@@ -14,7 +14,7 @@ pub struct ArgminResult<T: ArgminParameter<T> + Clone, U: PartialOrd> {
     pub iters: u64,
 }
 
-impl<T: ArgminParameter<T> + Clone, U: PartialOrd> ArgminResult<T, U> {
+impl<T: ArgminParameter + Clone, U: PartialOrd> ArgminResult<T, U> {
     /// Constructor
     ///
     /// `param`: Final (best) parameter vector

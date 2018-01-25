@@ -36,7 +36,8 @@ where
 /// Trait every solve needs to implement (in the future)
 pub trait ArgminSolver<'a> {
     /// Parameter vector
-    type A: ArgminParameter<Self::A>;
+    // type A: ArgminParameter<Self::A>;
+    type A: ArgminParameter;
     /// Cost value
     type B: ArgminCostValue;
     /// Hessian
