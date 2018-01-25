@@ -2,15 +2,14 @@
 ///
 /// * [ ] Different acceptance functions
 /// * [ ] Early stopping criterions
+use rand;
+use rand::distributions::{IndependentSample, Range};
 use errors::*;
 use problem::Problem;
 use result::ArgminResult;
 use parameter::ArgminParameter;
-use rand;
-use rand::distributions::{IndependentSample, Range};
 // use ArgminSolver;
 use ArgminCostValue;
-use num::Float;
 
 /// Definition of build in temperature functions for Simulated Annealing.
 ///
