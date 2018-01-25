@@ -2,13 +2,14 @@
 ///
 /// * [ ] Different acceptance functions
 /// * [ ] Early stopping criterions
+use std;
 use rand;
 use rand::distributions::{IndependentSample, Range};
 use errors::*;
 use problem::Problem;
 use result::ArgminResult;
 use parameter::ArgminParameter;
-// use ArgminSolver;
+use ArgminSolver;
 use ArgminCostValue;
 
 /// Definition of build in temperature functions for Simulated Annealing.
@@ -36,10 +37,11 @@ pub enum SATempFunc {
 }
 
 /// Simulated Annealing struct (duh)
-pub struct SimulatedAnnealing<'a, T, U>
+pub struct SimulatedAnnealing<'a, T, U, V = U>
 where
     T: ArgminParameter<T> + 'a,
     U: ArgminCostValue + 'a,
+    V: 'a,
 {
     /// Initial temperature
     pub init_temp: f64,
@@ -50,17 +52,18 @@ where
     /// Custom temperature function
     pub custom_temp_func: Option<&'a Fn(f64, u64) -> f64>,
     /// Current state of solver
-    pub state: Option<SimulatedAnnealingState<'a, T, U>>,
+    pub state: Option<SimulatedAnnealingState<'a, T, U, V>>,
 }
 
 /// State of the simulated annealing solver
-pub struct SimulatedAnnealingState<'a, T, U>
+pub struct SimulatedAnnealingState<'a, T, U, V>
 where
     T: ArgminParameter<T> + 'a,
     U: ArgminCostValue + 'a,
+    V: 'a,
 {
     /// Reference to the problem.
-    problem: &'a Problem<'a, T, U, U>,
+    problem: &'a Problem<'a, T, U, V>,
     /// Current number of iteration
     param: T,
     /// Current number of iteration
@@ -73,6 +76,8 @@ where
     best_param: T,
     /// corresponding best cost
     best_cost: U,
+    /// We don't really need V
+    _marker: std::marker::PhantomData<V>,
 }
 
 // impl<'a, T, U> SimulatedAnnealingState<'a, T, U>
@@ -89,10 +94,11 @@ where
 //     }
 // }
 
-impl<'a, T, U> SimulatedAnnealing<'a, T, U>
+impl<'a, T, U, V> SimulatedAnnealing<'a, T, U, V>
 where
     T: ArgminParameter<T>,
     U: ArgminCostValue,
+    V: 'a,
 {
     /// Constructor
     ///
@@ -142,8 +148,56 @@ where
         self
     }
 
+    /// Acceptance function
+    ///
+    /// Any solution where `next_cost < prev_cost` will be accepted. Whenever a new solution is
+    /// worse than the previous one, the acceptance probability is calculated as:
+    ///
+    ///     `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
+    ///
+    /// which will always be between 0 and 0.5.
+    fn accept(&self, state: &SimulatedAnnealingState<T, U, V>, next_cost: f64) -> bool {
+        let prev_cost = state.prev_cost.to_f64().unwrap();
+        let step = Range::new(0.0, 1.0);
+        let mut rng = rand::thread_rng();
+        let prob: f64 = step.ind_sample(&mut rng);
+        (next_cost < prev_cost)
+            || (1_f64 / (1_f64 + ((next_cost - prev_cost) / state.cur_temp).exp()) > prob)
+    }
+    /// Update the temperature based on the current iteration number.
+    ///
+    /// Updates are performed based on specific update functions. See `SATempFunc` for details.
+    fn update_temperature(&self, iter: u64) -> Result<f64> {
+        match self.temp_func {
+            SATempFunc::TemperatureFast => Ok(self.init_temp / ((iter + 1) as f64)),
+            SATempFunc::Boltzmann => Ok(self.init_temp / ((iter + 1) as f64).ln()),
+            SATempFunc::Exponential(x) => if x < 1_f64 && x > 0_f64 {
+                Ok(self.init_temp * x.powf((iter + 1) as f64))
+            } else {
+                Err(ErrorKind::InvalidParameter(
+                    "SimulatedAnnealing: Parameter for exponential \
+                     temperature update function needs to be >0 and <1."
+                        .into(),
+                ).into())
+            },
+            SATempFunc::Custom => match self.custom_temp_func {
+                Some(func) => Ok(func(self.init_temp, iter)),
+                None => Err(ErrorKind::InvalidParameter(
+                    "SimulatedAnnealing: No custom temperature update function provided.".into(),
+                ).into()),
+            },
+        }
+    }
+}
+
+impl<'a, T, U, V> ArgminSolver<'a, T, U, V> for SimulatedAnnealing<'a, T, U, V>
+where
+    T: ArgminParameter<T> + 'a,
+    U: ArgminCostValue + 'a,
+    V: 'a,
+{
     /// Initialize with a given problem and a starting point
-    pub fn init(&mut self, problem: &'a Problem<'a, T, U, U>, init_param: &T) -> Result<()> {
+    fn init(&mut self, problem: &'a Problem<'a, T, U, V>, init_param: &T) -> Result<()> {
         let prev_cost = (problem.cost_function)(init_param);
         self.state = Some(SimulatedAnnealingState {
             problem: problem,
@@ -153,12 +207,13 @@ where
             prev_cost: prev_cost,
             best_param: init_param.to_owned(),
             best_cost: prev_cost,
+            _marker: std::marker::PhantomData,
         });
         Ok(())
     }
 
     /// Compute next point
-    pub fn next_iter(&mut self) -> Result<ArgminResult<T, U>> {
+    fn next_iter(&mut self) -> Result<ArgminResult<T, U>> {
         // Taking the state avoids fights with the borrow checker.
         let mut state = self.state.take().unwrap();
 
@@ -197,56 +252,10 @@ where
         Ok(out)
     }
 
-    /// Acceptance function
-    ///
-    /// Any solution where `next_cost < prev_cost` will be accepted. Whenever a new solution is
-    /// worse than the previous one, the acceptance probability is calculated as:
-    ///
-    ///     `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
-    ///
-    /// which will always be between 0 and 0.5.
-    fn accept(&self, state: &SimulatedAnnealingState<T, U>, next_cost: f64) -> bool {
-        let prev_cost = state.prev_cost.to_f64().unwrap();
-        let step = Range::new(0.0, 1.0);
-        let mut rng = rand::thread_rng();
-        let prob: f64 = step.ind_sample(&mut rng);
-        (next_cost < prev_cost)
-            || (1_f64 / (1_f64 + ((next_cost - prev_cost) / state.cur_temp).exp()) > prob)
-    }
-
-    /// Update the temperature based on the current iteration number.
-    ///
-    /// Updates are performed based on specific update functions. See `SATempFunc` for details.
-    fn update_temperature(&self, iter: u64) -> Result<f64> {
-        match self.temp_func {
-            SATempFunc::TemperatureFast => Ok(self.init_temp / ((iter + 1) as f64)),
-            SATempFunc::Boltzmann => Ok(self.init_temp / ((iter + 1) as f64).ln()),
-            SATempFunc::Exponential(x) => if x < 1_f64 && x > 0_f64 {
-                Ok(self.init_temp * x.powf((iter + 1) as f64))
-            } else {
-                Err(ErrorKind::InvalidParameter(
-                    "SimulatedAnnealing: Parameter for exponential \
-                     temperature update function needs to be >0 and <1."
-                        .into(),
-                ).into())
-            },
-            SATempFunc::Custom => match self.custom_temp_func {
-                Some(func) => Ok(func(self.init_temp, iter)),
-                None => Err(ErrorKind::InvalidParameter(
-                    "SimulatedAnnealing: No custom temperature update function provided.".into(),
-                ).into()),
-            },
-        }
-    }
-
-    fn terminate(&mut self) -> bool {
-        self.state.as_mut().unwrap().iter >= self.max_iters
-    }
-
     /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.
-    pub fn run(
+    fn run(
         &mut self,
-        problem: &'a Problem<'a, T, U, U>,
+        problem: &'a Problem<'a, T, U, V>,
         init_param: &T,
     ) -> Result<ArgminResult<T, U>>
     where
@@ -262,5 +271,10 @@ where
             }
         }
         Ok(out)
+    }
+
+    /// Stopping criterions
+    fn terminate(&self) -> bool {
+        self.state.as_ref().unwrap().iter >= self.max_iters
     }
 }

@@ -38,10 +38,10 @@ pub trait ArgminSolver<
     'a,
     T: Clone + ArgminParameter<T>,
     U: ArgminCostValue + std::default::Default,
-    V,
+    V = f64,
 > {
     /// Initializes the solver and sets the state to its initial state
-    fn init(&mut self, &'a Problem<'a, T, U, V>, &T);
+    fn init(&mut self, &'a Problem<'a, T, U, V>, &T) -> Result<()>;
     /// Moves forward by a single iteration
     fn next_iter(&mut self) -> Result<ArgminResult<T, U>>;
     /// Run initialization and iterations at once

@@ -1,5 +1,6 @@
 /// TODO DOCUMENTATION
 ///
+use std::marker::PhantomData;
 use errors::*;
 use parameter::ArgminParameter;
 use ArgminCostValue;
@@ -23,6 +24,8 @@ pub struct Problem<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a, V: '
     pub upper_bound: T,
     /// (non)linear constraint which is `true` if a parameter vector lies within the bounds
     pub constraint: &'a Fn(&T) -> bool,
+    /// We don't really need V
+    _marker: PhantomData<&'a V>,
 }
 
 // impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + Default + 'a, V: 'a> Default
@@ -58,6 +61,7 @@ impl<'a, T: ArgminParameter<T> + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a,
             lower_bound: lower_bound.clone(),
             upper_bound: upper_bound.clone(),
             constraint: &|_x: &T| true,
+            _marker: PhantomData,
         }
     }
 

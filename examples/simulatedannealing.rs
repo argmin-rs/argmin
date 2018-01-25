@@ -1,4 +1,5 @@
 extern crate argmin;
+use argmin::ArgminSolver;
 use argmin::problem::Problem;
 use argmin::sa::{SATempFunc, SimulatedAnnealing};
 use argmin::testfunctions::rosenbrock;
@@ -12,7 +13,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let upper_bound: Vec<f64> = vec![2.0, 3.0];
 
     // Set up problem
-    let prob = Problem::new(&cost, &lower_bound, &upper_bound);
+    let prob: Problem<_, _, f64> = Problem::new(&cost, &lower_bound, &upper_bound);
 
     // Set up simulated annealing solver
     let mut solver = SimulatedAnnealing::new(10.0, 1_000_000)?;
