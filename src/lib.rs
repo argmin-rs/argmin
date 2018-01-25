@@ -34,18 +34,27 @@ where
 }
 
 /// Trait every solve needs to implement (in the future)
-pub trait ArgminSolver<
-    'a,
-    T: Clone + ArgminParameter<T>,
-    U: ArgminCostValue + std::default::Default,
-    V = f64,
-> {
+pub trait ArgminSolver<'a> {
+    /// Parameter vector
+    type A: ArgminParameter<Self::A>;
+    /// Cost value
+    type B: ArgminCostValue;
+    /// Hessian
+    type C;
+
     /// Initializes the solver and sets the state to its initial state
-    fn init(&mut self, &'a Problem<'a, T, U, V>, &T) -> Result<()>;
+    fn init(&mut self, &'a Problem<'a, Self::A, Self::B, Self::C>, &Self::A) -> Result<()>;
+
     /// Moves forward by a single iteration
-    fn next_iter(&mut self) -> Result<ArgminResult<T, U>>;
+    fn next_iter(&mut self) -> Result<ArgminResult<Self::A, Self::B>>;
+
     /// Run initialization and iterations at once
-    fn run(&mut self, &'a Problem<'a, T, U, V>, &T) -> Result<ArgminResult<T, U>>;
+    fn run(
+        &mut self,
+        &'a Problem<'a, Self::A, Self::B, Self::C>,
+        &Self::A,
+    ) -> Result<ArgminResult<Self::A, Self::B>>;
+
     /// Handles the stopping criteria
     fn terminate(&self) -> bool;
 }

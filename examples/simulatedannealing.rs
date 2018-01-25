@@ -14,6 +14,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     // Set up problem
     let prob: Problem<_, _, f64> = Problem::new(&cost, &lower_bound, &upper_bound);
+    // let prob: Problem = Problem::new(&cost, &lower_bound, &upper_bound);
 
     // Set up simulated annealing solver
     let mut solver = SimulatedAnnealing::new(10.0, 1_000_000)?;

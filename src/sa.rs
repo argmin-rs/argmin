@@ -190,12 +190,15 @@ where
     }
 }
 
-impl<'a, T, U, V> ArgminSolver<'a, T, U, V> for SimulatedAnnealing<'a, T, U, V>
+impl<'a, T, U, V> ArgminSolver<'a> for SimulatedAnnealing<'a, T, U, V>
 where
     T: ArgminParameter<T> + 'a,
     U: ArgminCostValue + 'a,
     V: 'a,
 {
+    type A = T;
+    type B = U;
+    type C = V;
     /// Initialize with a given problem and a starting point
     fn init(&mut self, problem: &'a Problem<'a, T, U, V>, init_param: &T) -> Result<()> {
         let prev_cost = (problem.cost_function)(init_param);
