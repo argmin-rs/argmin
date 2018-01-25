@@ -76,23 +76,7 @@ where
     best_param: T,
     /// corresponding best cost
     best_cost: U,
-    /// We don't really need V
-    _marker: std::marker::PhantomData<V>,
 }
-
-// impl<'a, T, U> SimulatedAnnealingState<'a, T, U>
-// where
-//     T: ArgminParameter + 'a,
-//     U: ArgminCostValue + 'a,
-// {
-//     pub fn new() -> SimulatedAnnealingState<'a, T, U> {
-//         SimulatedAnnealingState {
-//             problem: None,
-//             param: T::zero(),
-//             iter: 0,
-//         }
-//     }
-// }
 
 impl<'a, T, U, V> SimulatedAnnealing<'a, T, U, V>
 where
@@ -123,7 +107,6 @@ where
                 max_iters: max_iters,
                 temp_func: SATempFunc::TemperatureFast,
                 custom_temp_func: None,
-                // state: SimulatedAnnealingState::new(),
                 state: None,
             })
         }
@@ -210,7 +193,6 @@ where
             prev_cost: prev_cost,
             best_param: init_param.to_owned(),
             best_cost: prev_cost,
-            _marker: std::marker::PhantomData,
         });
         Ok(())
     }
