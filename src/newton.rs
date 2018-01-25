@@ -2,11 +2,12 @@
 ///
 /// TODO
 use std;
+use ndarray::{Array1, Array2};
+use ndarray_linalg::Inverse;
 use errors::*;
 use problem::Problem;
 use result::ArgminResult;
-use ndarray::{Array1, Array2};
-use ndarray_linalg::Inverse;
+use ArgminSolver;
 
 /// Newton method struct (duh)
 pub struct Newton<'a> {
@@ -54,9 +55,15 @@ impl<'a> Newton<'a> {
         self.max_iters = max_iters;
         self
     }
+}
+
+impl<'a> ArgminSolver<'a> for Newton<'a> {
+    type A = Array1<f64>;
+    type B = f64;
+    type C = Array2<f64>;
 
     /// Initialize with a given problem and a starting point
-    pub fn init(
+    fn init(
         &mut self,
         problem: &'a Problem<'a, Array1<f64>, f64, Array2<f64>>,
         init_param: &Array1<f64>,
@@ -70,7 +77,7 @@ impl<'a> Newton<'a> {
     }
 
     /// Compute next point
-    pub fn next_iter(&mut self) -> Result<ArgminResult<Array1<f64>, f64>> {
+    fn next_iter(&mut self) -> Result<ArgminResult<Array1<f64>, f64>> {
         // TODO: Move to next point
         // x_{n+1} = x_n - \gamma [Hf(x_n)]^-1 \nabla f(x_n)
         let g = (self.state.problem.unwrap().gradient.unwrap())(&self.state.param);
@@ -90,11 +97,11 @@ impl<'a> Newton<'a> {
     }
 
     /// Run Newton method
-    pub fn run(
+    fn run(
         &mut self,
         problem: &'a Problem<'a, Array1<f64>, f64, Array2<f64>>,
         init_param: &Array1<f64>,
-    ) -> Result<ArgminResult<Vec<f64>, f64>> {
+    ) -> Result<ArgminResult<Array1<f64>, f64>> {
         // initialize
         self.init(problem, init_param)?;
 
@@ -106,7 +113,7 @@ impl<'a> Newton<'a> {
         }
         let fin_cost = (problem.cost_function)(&self.state.param);
         Ok(ArgminResult::new(
-            self.state.param.to_vec(),
+            self.state.param.clone(),
             fin_cost,
             self.state.iter,
         ))

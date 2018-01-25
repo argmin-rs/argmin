@@ -3,6 +3,7 @@ extern crate argmin;
 extern crate ndarray;
 use ndarray::{Array1, Array2};
 use ndarray::prelude::*;
+use argmin::ArgminSolver;
 use argmin::problem::Problem;
 use argmin::newton::Newton;
 use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, rosenbrock_derivative_nd,
