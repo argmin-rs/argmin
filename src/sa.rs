@@ -2,7 +2,6 @@
 ///
 /// * [ ] Different acceptance functions
 /// * [ ] Early stopping criterions
-use std;
 use rand;
 use rand::distributions::{IndependentSample, Range};
 use errors::*;
