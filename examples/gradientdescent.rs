@@ -40,8 +40,8 @@ fn run() -> Result<(), Box<std::error::Error>> {
     // define inital parameter vector
     // `Problem` allows to create random parameter vectors which satisfies `lower_bound` and
     // `upper_bound`.
-    let init_param: Vec<f64> = prob.random_param()?;
-    // let init_param: Vec<f64> = vec![1.5, 1.5];
+    // let init_param: Vec<f64> = prob.random_param()?;
+    let init_param: Vec<f64> = vec![1.5, 1.5];
     println!("{:?}", init_param);
 
     // Actually run the solver on the problem.
