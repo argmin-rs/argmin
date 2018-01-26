@@ -5,6 +5,7 @@ extern crate ndarray;
 extern crate test;
 use ndarray::Array1;
 use ndarray::prelude::*;
+use argmin::ArgminSolver;
 use argmin::problem::Problem;
 use argmin::newton::Newton;
 use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_hessian_nd, rosenbrock_nd};
