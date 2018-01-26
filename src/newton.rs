@@ -61,6 +61,7 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
     type A = Array1<f64>;
     type B = f64;
     type C = Array2<f64>;
+    type D = Array1<f64>;
 
     /// Initialize with a given problem and a starting point
     fn init(

@@ -1,5 +1,6 @@
 #![allow(unused_imports)]
 extern crate argmin;
+use argmin::ArgminSolver;
 use argmin::problem::Problem;
 use argmin::neldermead::NelderMead;
 use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, sphere, sphere_derivative};

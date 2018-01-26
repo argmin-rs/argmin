@@ -5,6 +5,7 @@ use std;
 use errors::*;
 use problem::Problem;
 use result::ArgminResult;
+use ArgminSolver;
 
 /// Nelder Mead method
 pub struct NelderMead<'a> {
@@ -89,23 +90,6 @@ impl<'a> NelderMead<'a> {
         });
     }
 
-    /// initialization with predefined parameter vectors
-    pub fn init(
-        &mut self,
-        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
-        param_vecs: &[Vec<f64>],
-    ) -> Result<()> {
-        self.state.problem = Some(problem);
-        for param in param_vecs.iter() {
-            self.state.param_vecs.push(NelderMeadParam {
-                param: param.to_vec(),
-                cost: (problem.cost_function)(param),
-            });
-        }
-        self.sort_param_vecs();
-        Ok(())
-    }
-
     /// Calculate centroid of all but the worst vectors
     fn calculate_centroid(&self) -> Vec<f64> {
         let num_param = self.state.param_vecs.len() - 1;
@@ -155,9 +139,33 @@ impl<'a> NelderMead<'a> {
                 (self.state.problem.unwrap().cost_function)(&self.state.param_vecs[idx].param);
         }
     }
+}
+
+impl<'a> ArgminSolver<'a> for NelderMead<'a> {
+    type A = Vec<f64>;
+    type B = f64;
+    type C = Vec<f64>;
+    type D = Vec<Vec<f64>>;
+
+    /// initialization with predefined parameter vectors
+    fn init(
+        &mut self,
+        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
+        param_vecs: &Vec<Vec<f64>>,
+    ) -> Result<()> {
+        self.state.problem = Some(problem);
+        for param in param_vecs.iter() {
+            self.state.param_vecs.push(NelderMeadParam {
+                param: param.to_vec(),
+                cost: (problem.cost_function)(param),
+            });
+        }
+        self.sort_param_vecs();
+        Ok(())
+    }
 
     /// Compute next iteration
-    pub fn next_iter(&mut self) -> Result<ArgminResult<Vec<f64>, f64>> {
+    fn next_iter(&mut self) -> Result<ArgminResult<Vec<f64>, f64>> {
         self.sort_param_vecs();
         let num_param = self.state.param_vecs[0].param.len();
         let x0 = self.calculate_centroid();
@@ -200,7 +208,7 @@ impl<'a> NelderMead<'a> {
     }
 
     /// Stopping criterions
-    fn terminate(&mut self) -> bool {
+    fn terminate(&self) -> bool {
         // if self.state.iter >= self.max_iters {
         //     return true;
         // } else {
@@ -210,10 +218,10 @@ impl<'a> NelderMead<'a> {
     }
 
     /// Run Nelder Mead optimization
-    pub fn run(
+    fn run(
         &mut self,
         problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
-        param_vecs: &[Vec<f64>],
+        param_vecs: &Vec<Vec<f64>>,
     ) -> Result<ArgminResult<Vec<f64>, f64>> {
         self.init(problem, &param_vecs.to_owned())?;
         let mut out;

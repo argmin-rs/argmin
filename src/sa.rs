@@ -181,6 +181,8 @@ where
     type A = T;
     type B = U;
     type C = V;
+    type D = T;
+
     /// Initialize with a given problem and a starting point
     fn init(&mut self, problem: &'a Problem<'a, T, U, V>, init_param: &T) -> Result<()> {
         let prev_cost = (problem.cost_function)(init_param);

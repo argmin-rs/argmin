@@ -42,9 +42,11 @@ pub trait ArgminSolver<'a> {
     type B: ArgminCostValue;
     /// Hessian
     type C;
+    /// Initial parameter(s)
+    type D;
 
     /// Initializes the solver and sets the state to its initial state
-    fn init(&mut self, &'a Problem<'a, Self::A, Self::B, Self::C>, &Self::A) -> Result<()>;
+    fn init(&mut self, &'a Problem<'a, Self::A, Self::B, Self::C>, &Self::D) -> Result<()>;
 
     /// Moves forward by a single iteration
     fn next_iter(&mut self) -> Result<ArgminResult<Self::A, Self::B>>;
@@ -53,7 +55,7 @@ pub trait ArgminSolver<'a> {
     fn run(
         &mut self,
         &'a Problem<'a, Self::A, Self::B, Self::C>,
-        &Self::A,
+        &Self::D,
     ) -> Result<ArgminResult<Self::A, Self::B>>;
 
     /// Handles the stopping criteria
