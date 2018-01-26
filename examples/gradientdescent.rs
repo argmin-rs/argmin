@@ -8,10 +8,10 @@ use argmin::backtracking::BacktrackingLineSearch;
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function
     // Choose either `Rosenbrock` or `Sphere` function.
-    let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64).unwrap() };
-    let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64).unwrap() };
-    // let cost = |x: &Vec<f64>| -> f64 { sphere(x).unwrap() };
-    // let gradient = |x: &Vec<f64>| -> Vec<f64> { sphere_derivative(x).unwrap() };
+    let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64) };
+    let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64) };
+    // let cost = |x: &Vec<f64>| -> f64 { sphere(x) };
+    // let gradient = |x: &Vec<f64>| -> Vec<f64> { sphere_derivative(x) };
 
     // Define bounds
     // Note: Gradient Descent currently does not enforce these bounds which is why we can set them

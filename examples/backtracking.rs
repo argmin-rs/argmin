@@ -6,10 +6,10 @@ use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, sphere, sphere_de
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function
-    let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64).unwrap() };
-    let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64).unwrap() };
-    // let cost = |x: &Vec<f64>| -> f64 { sphere(x).unwrap() };
-    // let gradient = |x: &Vec<f64>| -> Vec<f64> { sphere_derivative(x).unwrap() };
+    let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64) };
+    let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64) };
+    // let cost = |x: &Vec<f64>| -> f64 { sphere(x) };
+    // let gradient = |x: &Vec<f64>| -> Vec<f64> { sphere_derivative(x) };
 
     // Set up GradientDecent solver
     let solver = BacktrackingLineSearch::new(&cost, &gradient);
