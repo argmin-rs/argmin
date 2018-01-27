@@ -229,9 +229,6 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
                 break;
             }
         }
-        // self.sort_param_vecs();
-        // let param = self.state.param_vecs[0].clone();
-        // Ok(ArgminResult::new(param.param, param.cost, self.state.iter))
         Ok(out)
     }
 }

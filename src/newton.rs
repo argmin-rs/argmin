@@ -103,18 +103,16 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
         // initialize
         self.init(problem, init_param)?;
 
+        let mut out;
         loop {
-            self.next_iter()?;
+            out = self.next_iter()?;
             if self.terminate() {
                 break;
             }
         }
         let fin_cost = (problem.cost_function)(&self.state.param);
-        Ok(ArgminResult::new(
-            self.state.param.clone(),
-            fin_cost,
-            self.state.iter,
-        ))
+        out.cost = fin_cost;
+        Ok(out)
     }
 }
 
