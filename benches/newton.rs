@@ -1,4 +1,5 @@
 #![feature(test)]
+#![allow(unused_imports)]
 
 extern crate argmin;
 extern crate ndarray;
