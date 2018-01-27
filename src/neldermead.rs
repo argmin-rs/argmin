@@ -146,13 +146,10 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
     type B = f64;
     type C = Vec<f64>;
     type D = Vec<Vec<f64>>;
+    type E = Problem<'a, Vec<f64>, f64, Vec<f64>>;
 
     /// initialization with predefined parameter vectors
-    fn init(
-        &mut self,
-        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
-        param_vecs: &Vec<Vec<f64>>,
-    ) -> Result<()> {
+    fn init(&mut self, problem: &'a Self::E, param_vecs: &Vec<Vec<f64>>) -> Result<()> {
         self.state.problem = Some(problem);
         for param in param_vecs.iter() {
             self.state.param_vecs.push(NelderMeadParam {
@@ -220,7 +217,7 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
     /// Run Nelder Mead optimization
     fn run(
         &mut self,
-        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
+        problem: &'a Self::E,
         param_vecs: &Vec<Vec<f64>>,
     ) -> Result<ArgminResult<Vec<f64>, f64>> {
         self.init(problem, &param_vecs.to_owned())?;

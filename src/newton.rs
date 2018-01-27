@@ -62,13 +62,10 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
     type B = f64;
     type C = Array2<f64>;
     type D = Array1<f64>;
+    type E = Problem<'a, Array1<f64>, f64, Array2<f64>>;
 
     /// Initialize with a given problem and a starting point
-    fn init(
-        &mut self,
-        problem: &'a Problem<'a, Array1<f64>, f64, Array2<f64>>,
-        init_param: &Array1<f64>,
-    ) -> Result<()> {
+    fn init(&mut self, problem: &'a Self::E, init_param: &Array1<f64>) -> Result<()> {
         self.state = NewtonState {
             problem: Some(problem),
             param: init_param.to_owned(),
@@ -100,7 +97,7 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
     /// Run Newton method
     fn run(
         &mut self,
-        problem: &'a Problem<'a, Array1<f64>, f64, Array2<f64>>,
+        problem: &'a Self::E,
         init_param: &Array1<f64>,
     ) -> Result<ArgminResult<Array1<f64>, f64>> {
         // initialize

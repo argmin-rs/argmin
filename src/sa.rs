@@ -182,9 +182,10 @@ where
     type B = U;
     type C = V;
     type D = T;
+    type E = Problem<'a, T, U, V>;
 
     /// Initialize with a given problem and a starting point
-    fn init(&mut self, problem: &'a Problem<'a, T, U, V>, init_param: &T) -> Result<()> {
+    fn init(&mut self, problem: &'a Self::E, init_param: &T) -> Result<()> {
         let prev_cost = (problem.cost_function)(init_param);
         self.state = Some(SimulatedAnnealingState {
             problem: problem,
@@ -239,11 +240,7 @@ where
     }
 
     /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.
-    fn run(
-        &mut self,
-        problem: &'a Problem<'a, T, U, V>,
-        init_param: &T,
-    ) -> Result<ArgminResult<T, U>>
+    fn run(&mut self, problem: &'a Self::E, init_param: &T) -> Result<ArgminResult<T, U>>
     where
         T: ArgminParameter,
         U: ArgminCostValue,

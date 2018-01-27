@@ -44,9 +44,12 @@ pub trait ArgminSolver<'a> {
     type C;
     /// Initial parameter(s)
     type D;
+    /// Type of Problem (TODO: Trait!)
+    type E;
 
     /// Initializes the solver and sets the state to its initial state
-    fn init(&mut self, &'a Problem<'a, Self::A, Self::B, Self::C>, &Self::D) -> Result<()>;
+    // fn init(&mut self, &'a Problem<'a, Self::A, Self::B, Self::C>, &Self::D) -> Result<()>;
+    fn init(&mut self, &'a Self::E, &Self::D) -> Result<()>;
 
     /// Moves forward by a single iteration
     fn next_iter(&mut self) -> Result<ArgminResult<Self::A, Self::B>>;
