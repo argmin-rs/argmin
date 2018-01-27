@@ -74,6 +74,9 @@ pub mod parameter;
 /// Problem formulation
 pub mod problem;
 
+/// Operator
+pub mod operator;
+
 /// A set of test functions like Rosenbrock's function and so on.
 pub mod testfunctions;
 
