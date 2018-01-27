@@ -93,7 +93,7 @@ impl<'a> ArgminSolver<'a> for Landweber<'a> {
 
     /// Indicates whether any of the stopping criteria are met
     fn terminate(&self) -> bool {
-        false
+        self.state.iter >= self.max_iters
     }
 
     /// Run Landweber method
