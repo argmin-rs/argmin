@@ -22,7 +22,6 @@ use num::ToPrimitive;
 use errors::*;
 use parameter::ArgminParameter;
 use result::ArgminResult;
-use problem::Problem;
 
 /// Trait for cost function values
 /// TODO: Do this with trait aliases once they work in rust.
@@ -55,11 +54,7 @@ pub trait ArgminSolver<'a> {
     fn next_iter(&mut self) -> Result<ArgminResult<Self::A, Self::B>>;
 
     /// Run initialization and iterations at once
-    fn run(
-        &mut self,
-        &'a Problem<'a, Self::A, Self::B, Self::C>,
-        &Self::D,
-    ) -> Result<ArgminResult<Self::A, Self::B>>;
+    fn run(&mut self, &'a Self::E, &Self::D) -> Result<ArgminResult<Self::A, Self::B>>;
 
     /// Handles the stopping criteria
     fn terminate(&self) -> bool;
@@ -94,6 +89,9 @@ pub mod neldermead;
 
 /// Newton method
 pub mod newton;
+
+/// Landweber algorithm
+pub mod landweber;
 
 /// Errors using `error-chain`
 mod errors;
