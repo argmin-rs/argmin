@@ -4,6 +4,7 @@ use argmin::problem::Problem;
 use argmin::gradientdescent::{GDGammaUpdate, GradientDescent};
 use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, sphere, sphere_derivative};
 use argmin::backtracking::BacktrackingLineSearch;
+use argmin::ArgminSolver;
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function
@@ -73,9 +74,9 @@ fn run() -> Result<(), Box<std::error::Error>> {
     solver.init(&prob, &init_param)?;
 
     loop {
-        let par = solver.next_iter();
+        let par = solver.next_iter()?;
         // println!("{:?}", par);
-        if par.1 >= result1.iters {
+        if par.iters >= result1.iters {
             break;
         };
     }

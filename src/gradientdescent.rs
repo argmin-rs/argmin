@@ -6,6 +6,7 @@ use errors::*;
 use problem::Problem;
 use result::ArgminResult;
 use backtracking;
+use ArgminSolver;
 
 /// Gradient Descent gamma update method
 pub enum GDGammaUpdate<'a> {
@@ -122,12 +123,20 @@ impl<'a> GradientDescent<'a> {
             }
         };
     }
+}
+
+impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
+    type A = Vec<f64>;
+    type B = f64;
+    type C = Vec<f64>;
+    type D = Vec<f64>;
+    type E = Problem<'a, Vec<f64>, f64, Vec<f64>>;
 
     /// Initialize with a given problem and a starting point
-    pub fn init(
+    fn init(
         &mut self,
         problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
-        init_param: &[f64],
+        init_param: &Vec<f64>,
     ) -> Result<()> {
         self.state = GradientDescentState {
             problem: Some(problem),
@@ -146,7 +155,7 @@ impl<'a> GradientDescent<'a> {
     }
 
     /// Compute next point
-    pub fn next_iter(&mut self) -> (Vec<f64>, u64) {
+    fn next_iter(&mut self) -> Result<ArgminResult<Vec<f64>, f64>> {
         let gradient = self.state.problem.unwrap().gradient.unwrap();
         // let state = &mut self.state;
         self.state.prev_param = self.state.param.clone();
@@ -163,7 +172,11 @@ impl<'a> GradientDescent<'a> {
         // Update gamma
         self.update_gamma();
         self.state.iter += 1;
-        (self.state.param.clone(), self.state.iter)
+        Ok(ArgminResult::new(
+            self.state.param.clone(),
+            -1.0,
+            self.state.iter,
+        ))
     }
 
     /// Indicates whether any of the stopping criteria are met
@@ -183,26 +196,24 @@ impl<'a> GradientDescent<'a> {
     }
 
     /// Run gradient descent method
-    pub fn run(
+    fn run(
         &mut self,
         problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
-        init_param: &[f64],
+        init_param: &Vec<f64>,
     ) -> Result<ArgminResult<Vec<f64>, f64>> {
         // initialize
         self.init(problem, init_param)?;
 
+        let mut out;
         loop {
-            self.next_iter();
+            out = self.next_iter()?;
             if self.terminate() {
                 break;
             }
         }
         let fin_cost = (problem.cost_function)(&self.state.param);
-        Ok(ArgminResult::new(
-            self.state.param.to_vec(),
-            fin_cost,
-            self.state.iter,
-        ))
+        out.cost = fin_cost;
+        Ok(out)
     }
 }
 
