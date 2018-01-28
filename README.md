@@ -4,6 +4,8 @@
 
 Optimization toolbox written in Rust. Not even remotely stable yet.
 
+The [Documentation](https://stefan-k.github.io/argmin-rs/) is also still in a very early stage.
+
 ## License
 
 Licensed under either of
