@@ -28,7 +28,7 @@ cp -r ../target/doc/* .
 touch .nojekyll
 cat <<EOF > index.html
 <!doctype html>
-<meta http-eqiv="refresh" content="0; ./argmin/">
+<meta http-equiv="refresh" content="0; ./argmin/">
 EOF
 
 # add and commit all
