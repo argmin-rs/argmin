@@ -15,7 +15,7 @@ use operator::ArgminOperator;
 use result::ArgminResult;
 use ArgminSolver;
 
-/// Newton method struct (duh)
+/// Landweber algorithm struct (duh)
 pub struct Landweber<'a> {
     /// relaxation factor
     /// must satisfy 0 < omega < 2/sigma_1^2 where sigma_1 is the largest singular value of the
@@ -49,7 +49,7 @@ impl<'a> LandweberState<'a> {
 }
 
 impl<'a> Landweber<'a> {
-    /// Return a `Newton` struct
+    /// Return a `Landweber` struct
     pub fn new(omega: f64) -> Self {
         Landweber {
             omega: omega,
