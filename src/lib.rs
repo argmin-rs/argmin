@@ -100,6 +100,9 @@ pub mod newton;
 /// Landweber algorithm
 pub mod landweber;
 
+/// Conjugate Gradient method
+pub mod cg;
+
 /// Errors using `error-chain`
 mod errors;
 
