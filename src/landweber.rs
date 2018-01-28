@@ -24,13 +24,13 @@ pub struct Landweber<'a> {
     /// Maximum number of iterations
     max_iters: u64,
     /// current state
-    state: LandweberState<'a>,
+    state: Option<LandweberState<'a>>,
 }
 
 /// Indicates the current state of the Landweber algorithm
 struct LandweberState<'a> {
     /// Reference to the problem. This is an Option<_> because it is initialized as `None`
-    operator: Option<&'a ArgminOperator<'a>>,
+    operator: &'a ArgminOperator<'a>,
     /// Current parameter vector
     param: Array1<f64>,
     /// Current number of iteration
@@ -39,10 +39,10 @@ struct LandweberState<'a> {
 
 impl<'a> LandweberState<'a> {
     /// Constructor for `LandweberState`
-    pub fn new() -> Self {
+    pub fn new(operator: &'a ArgminOperator<'a>, param: Array1<f64>) -> Self {
         LandweberState {
-            operator: None,
-            param: Array1::default(1),
+            operator: operator,
+            param: param,
             iter: 0_u64,
         }
     }
@@ -54,7 +54,7 @@ impl<'a> Landweber<'a> {
         Landweber {
             omega: omega,
             max_iters: std::u64::MAX,
-            state: LandweberState::new(),
+            state: None,
         }
     }
 
@@ -74,33 +74,26 @@ impl<'a> ArgminSolver<'a> for Landweber<'a> {
 
     /// Initialize with a given problem and a starting point
     fn init(&mut self, operator: &'a Self::E, init_param: &Array1<f64>) -> Result<()> {
-        self.state = LandweberState {
-            operator: Some(operator),
-            param: init_param.to_owned(),
-            iter: 0_u64,
-        };
+        self.state = Some(LandweberState::new(operator, init_param.clone()));
         Ok(())
     }
 
     /// Compute next point
     fn next_iter(&mut self) -> Result<ArgminResult<Array1<f64>, f64>> {
-        // TODO: Move to next point
-        let prev_param = self.state.param.clone();
-        let diff = self.state.operator.unwrap().apply(&prev_param) - self.state.operator.unwrap().y;
-        self.state.param =
-            prev_param - self.omega * self.state.operator.unwrap().apply_transpose(&diff);
-        self.state.iter += 1;
+        let mut state = self.state.take().unwrap();
+        let prev_param = state.param.clone();
+        let diff = state.operator.apply(&prev_param) - state.operator.y;
+        state.param = state.param - self.omega * state.operator.apply_transpose(&diff);
+        state.iter += 1;
         let norm: f64 = diff.iter().map(|a| a.powf(2.0)).sum::<f64>().sqrt();
-        Ok(ArgminResult::new(
-            self.state.param.clone(),
-            norm,
-            self.state.iter,
-        ))
+        let out = ArgminResult::new(state.param.clone(), norm, state.iter);
+        self.state = Some(state);
+        Ok(out)
     }
 
     /// Indicates whether any of the stopping criteria are met
     fn terminate(&self) -> bool {
-        self.state.iter >= self.max_iters
+        self.state.as_ref().unwrap().iter >= self.max_iters
     }
 
     /// Run Landweber method
