@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 
+# Make doc
+cargo doc --no-deps
+
 # Make temporary folder
 rm -rf .doc_tmp
 mkdir .doc_tmp
@@ -17,9 +20,16 @@ git checkout -b gh-pages
 # pull stuff
 git pull origin gh-pages
 
+# cleanup old stuff
+rm -rf *
+
 # copy documentation
-cp -r ../target/doc/argmin/* .
+cp -r ../target/doc/* .
 touch .nojekyll
+cat <<EOF > index.html
+<!doctype html>
+<meta http-eqiv="refresh" content="0; ./argmin/">
+EOF
 
 # add and commit all
 git add -f --all .
