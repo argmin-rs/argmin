@@ -23,13 +23,13 @@ pub struct Newton<'a> {
     /// Maximum number of iterations
     max_iters: u64,
     /// current state
-    state: NewtonState<'a>,
+    state: Option<NewtonState<'a>>,
 }
 
 /// Indicates the current state of the Newton method
 struct NewtonState<'a> {
     /// Reference to the problem. This is an Option<_> because it is initialized as `None`
-    problem: Option<&'a Problem<'a, Array1<f64>, f64, Array2<f64>>>,
+    problem: &'a Problem<'a, Array1<f64>, f64, Array2<f64>>,
     /// Current parameter vector
     param: Array1<f64>,
     /// Current number of iteration
@@ -38,10 +38,13 @@ struct NewtonState<'a> {
 
 impl<'a> NewtonState<'a> {
     /// Constructor for `NewtonState`
-    pub fn new() -> Self {
+    pub fn new(
+        problem: &'a Problem<'a, Array1<f64>, f64, Array2<f64>>,
+        param: Array1<f64>,
+    ) -> Self {
         NewtonState {
-            problem: None,
-            param: Array1::default(1),
+            problem: problem,
+            param: param,
             iter: 0_u64,
         }
     }
@@ -53,7 +56,7 @@ impl<'a> Newton<'a> {
         Newton {
             gamma: 1.0,
             max_iters: std::u64::MAX,
-            state: NewtonState::new(),
+            state: None,
         }
     }
 
@@ -73,11 +76,7 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
 
     /// Initialize with a given problem and a starting point
     fn init(&mut self, problem: &'a Self::E, init_param: &Array1<f64>) -> Result<()> {
-        self.state = NewtonState {
-            problem: Some(problem),
-            param: init_param.to_owned(),
-            iter: 0_u64,
-        };
+        self.state = Some(NewtonState::new(problem, init_param.clone()));
         Ok(())
     }
 
@@ -85,15 +84,14 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
     fn next_iter(&mut self) -> Result<ArgminResult<Array1<f64>, f64>> {
         // TODO: Move to next point
         // x_{n+1} = x_n - \gamma [Hf(x_n)]^-1 \nabla f(x_n)
-        let g = (self.state.problem.unwrap().gradient.unwrap())(&self.state.param);
-        let h_inv = (self.state.problem.unwrap().hessian.unwrap())(&self.state.param).inv()?;
-        self.state.param = self.state.param.clone() - self.gamma * h_inv.dot(&g);
-        self.state.iter += 1;
-        Ok(ArgminResult::new(
-            self.state.param.clone(),
-            -1.0,
-            self.state.iter,
-        ))
+        let mut state = self.state.take().unwrap();
+        let g = (state.problem.gradient.unwrap())(&state.param);
+        let h_inv = (state.problem.hessian.unwrap())(&state.param).inv()?;
+        state.param = state.param - self.gamma * h_inv.dot(&g);
+        state.iter += 1;
+        let out = ArgminResult::new(state.param.clone(), std::f64::NAN, state.iter);
+        self.state = Some(state);
+        Ok(out)
     }
 
     /// Indicates whether any of the stopping criteria are met
@@ -117,8 +115,6 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
                 break;
             }
         }
-        let fin_cost = (problem.cost_function)(&self.state.param);
-        out.cost = fin_cost;
         Ok(out)
     }
 }
