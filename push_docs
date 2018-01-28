@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+
+# Make temporary folder
+rm -rf .doc_tmp
+mkdir .doc_tmp
+cd .doc_tmp
+
+# initialize git repository
+git init
+
+# add remote
+git remote add origin git@github.com:stefan-k/argmin-rs.git
+
+# checkout gh-pages
+git checkout -b gh-pages
+
+# pull stuff
+git pull origin gh-pages
+
+# copy documentation
+cp -r ../target/doc/argmin/* .
+touch .nojekyll
+
+# add and commit all
+git add -f --all .
+git add -f --all .*
+git commit -m 'Semiautomatic update of documentation'
+
+# push
+git push -f origin gh-pages
+
+# remove temporary directory
+cd ..
+rm -rf .doc_tmp

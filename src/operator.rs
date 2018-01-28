@@ -31,7 +31,7 @@ impl<'a> ArgminOperator<'a> {
         self.operator.dot(x)
     }
 
-    /// Application of the transpose of the operator (A^T*x)
+    /// Application of the transpose of the operator (A^T * x)
     pub fn apply_transpose(&self, x: &Array1<f64>) -> Array1<f64> {
         self.operator.t().dot(x)
     }
