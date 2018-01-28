@@ -12,7 +12,7 @@ use ndarray::{Array1, Array2};
 /// ArgminOperator
 pub struct ArgminOperator<'a> {
     /// Operator (for now a simple 2D matrix)
-    operator: &'a Array2<f64>,
+    pub operator: &'a Array2<f64>,
     /// y of Ax = y
     pub y: &'a Array1<f64>,
 }

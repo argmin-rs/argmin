@@ -80,7 +80,10 @@ impl<'a> ArgminSolver<'a> for ConjugateGradient<'a> {
 
     /// Initialize with a given problem and a starting point
     fn init(&mut self, operator: &'a Self::E, init_param: &Array1<f64>) -> Result<()> {
-        let r = operator.y - &operator.apply(init_param);
+        let mut r = operator.y - &operator.apply(init_param);
+        if !operator.operator.is_square() {
+            r = operator.apply_transpose(&r);
+        }
         let p = r.clone();
         self.state = Some(ConjugateGradientState::new(
             operator,
@@ -94,7 +97,10 @@ impl<'a> ArgminSolver<'a> for ConjugateGradient<'a> {
     /// Compute next point
     fn next_iter(&mut self) -> Result<ArgminResult<Array1<f64>, f64>> {
         let mut state = self.state.take().unwrap();
-        let ap = state.operator.apply(&state.p);
+        let mut ap = state.operator.apply(&state.p);
+        if !state.operator.operator.is_square() {
+            ap = state.operator.apply_transpose(&ap);
+        }
         let rtr = state.r.iter().map(|a| a.powf(2.0)).sum::<f64>();
         let alpha: f64 = rtr
             / state
