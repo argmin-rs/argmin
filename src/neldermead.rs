@@ -27,7 +27,7 @@ pub struct NelderMead<'a> {
     /// sigma
     sigma: f64,
     /// current state
-    state: NelderMeadState<'a>,
+    state: Option<NelderMeadState<'a>>,
 }
 
 #[derive(Clone, Debug)]
@@ -37,9 +37,23 @@ struct NelderMeadParam {
 }
 
 struct NelderMeadState<'a> {
-    problem: Option<&'a Problem<'a, Vec<f64>, f64, Vec<f64>>>,
+    problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
     param_vecs: Vec<NelderMeadParam>,
     iter: u64,
+}
+
+impl<'a> NelderMeadState<'a> {
+    /// Constructor
+    pub fn new(
+        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
+        param_vecs: Vec<NelderMeadParam>,
+    ) -> Self {
+        NelderMeadState {
+            problem: problem,
+            param_vecs: param_vecs,
+            iter: 0_u64,
+        }
+    }
 }
 
 impl<'a> NelderMead<'a> {
@@ -51,11 +65,7 @@ impl<'a> NelderMead<'a> {
             gamma: 2.0,
             rho: 0.5,
             sigma: 0.5,
-            state: NelderMeadState {
-                problem: None,
-                param_vecs: vec![],
-                iter: 0_u64,
-            },
+            state: None,
         }
     }
 
@@ -89,8 +99,8 @@ impl<'a> NelderMead<'a> {
         self
     }
 
-    fn sort_param_vecs(&mut self) {
-        self.state.param_vecs.sort_by(|a, b| {
+    fn sort_param_vecs(&mut self, state: &mut NelderMeadState) {
+        state.param_vecs.sort_by(|a, b| {
             a.cost
                 .partial_cmp(&b.cost)
                 .unwrap_or(std::cmp::Ordering::Equal)
@@ -98,12 +108,12 @@ impl<'a> NelderMead<'a> {
     }
 
     /// Calculate centroid of all but the worst vectors
-    fn calculate_centroid(&self) -> Vec<f64> {
-        let num_param = self.state.param_vecs.len() - 1;
-        let mut x0: Vec<f64> = self.state.param_vecs[0].clone().param;
+    fn calculate_centroid(&self, state: &NelderMeadState) -> Vec<f64> {
+        let num_param = state.param_vecs.len() - 1;
+        let mut x0: Vec<f64> = state.param_vecs[0].clone().param;
         for idx in 1..num_param {
             x0 = x0.iter()
-                .zip(self.state.param_vecs[idx].param.iter())
+                .zip(state.param_vecs[idx].param.iter())
                 .map(|(a, b)| a + b)
                 .collect();
         }
@@ -131,19 +141,19 @@ impl<'a> NelderMead<'a> {
             .collect()
     }
 
-    fn shrink(&mut self) {
-        for idx in 1..self.state.param_vecs.len() {
-            self.state.param_vecs[idx].param = self.state
+    fn shrink(&mut self, state: &mut NelderMeadState) {
+        for idx in 1..state.param_vecs.len() {
+            state.param_vecs[idx].param = state
                 .param_vecs
                 .first()
                 .unwrap()
                 .param
                 .iter()
-                .zip(self.state.param_vecs[idx].param.iter())
+                .zip(state.param_vecs[idx].param.iter())
                 .map(|(a, b)| a + self.sigma * (b - a))
                 .collect();
-            self.state.param_vecs[idx].cost =
-                (self.state.problem.unwrap().cost_function)(&self.state.param_vecs[idx].param);
+            state.param_vecs[idx].cost =
+                (state.problem.cost_function)(&state.param_vecs[idx].param);
         }
     }
 }
@@ -157,58 +167,61 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
 
     /// initialization with predefined parameter vectors
     fn init(&mut self, problem: &'a Self::E, param_vecs: &Vec<Vec<f64>>) -> Result<()> {
-        self.state.problem = Some(problem);
+        let mut params: Vec<NelderMeadParam> = vec![];
         for param in param_vecs.iter() {
-            self.state.param_vecs.push(NelderMeadParam {
+            params.push(NelderMeadParam {
                 param: param.to_vec(),
                 cost: (problem.cost_function)(param),
             });
         }
-        self.sort_param_vecs();
+        let mut state = NelderMeadState::new(problem, params);
+        self.sort_param_vecs(&mut state);
+        self.state = Some(state);
         Ok(())
     }
 
     /// Compute next iteration
     fn next_iter(&mut self) -> Result<ArgminResult<Vec<f64>, f64>> {
-        self.sort_param_vecs();
-        let num_param = self.state.param_vecs[0].param.len();
-        let x0 = self.calculate_centroid();
-        let xr = self.reflect(&x0, &self.state.param_vecs.last().unwrap().param);
-        let xr_cost = (self.state.problem.unwrap().cost_function)(&xr);
-        if xr_cost < self.state.param_vecs[num_param - 2].cost
-            && xr_cost >= self.state.param_vecs[0].cost
-        {
+        let mut state = self.state.take().unwrap();
+        self.sort_param_vecs(&mut state);
+        let num_param = state.param_vecs[0].param.len();
+        let x0 = self.calculate_centroid(&state);
+        let xr = self.reflect(&x0, &state.param_vecs.last().unwrap().param);
+        let xr_cost = (state.problem.cost_function)(&xr);
+        if xr_cost < state.param_vecs[num_param - 2].cost && xr_cost >= state.param_vecs[0].cost {
             // reflection
-            self.state.param_vecs.last_mut().unwrap().param = xr;
-            self.state.param_vecs.last_mut().unwrap().cost = xr_cost;
-        } else if xr_cost < self.state.param_vecs[0].cost {
+            state.param_vecs.last_mut().unwrap().param = xr;
+            state.param_vecs.last_mut().unwrap().cost = xr_cost;
+        } else if xr_cost < state.param_vecs[0].cost {
             // expansion
             let xe = self.expand(&x0, &xr);
-            let xe_cost = (self.state.problem.unwrap().cost_function)(&xe);
+            let xe_cost = (state.problem.cost_function)(&xe);
             if xe_cost < xr_cost {
-                self.state.param_vecs.last_mut().unwrap().param = xe;
-                self.state.param_vecs.last_mut().unwrap().cost = xe_cost;
+                state.param_vecs.last_mut().unwrap().param = xe;
+                state.param_vecs.last_mut().unwrap().cost = xe_cost;
             } else {
-                self.state.param_vecs.last_mut().unwrap().param = xr;
-                self.state.param_vecs.last_mut().unwrap().cost = xr_cost;
+                state.param_vecs.last_mut().unwrap().param = xr;
+                state.param_vecs.last_mut().unwrap().cost = xr_cost;
             }
-        } else if xr_cost >= self.state.param_vecs[num_param - 2].cost {
+        } else if xr_cost >= state.param_vecs[num_param - 2].cost {
             // contraction
-            let xc = self.contract(&x0, &self.state.param_vecs.last().unwrap().param);
-            let xc_cost = (self.state.problem.unwrap().cost_function)(&xc);
-            if xc_cost < self.state.param_vecs.last().unwrap().cost {
-                self.state.param_vecs.last_mut().unwrap().param = xc;
-                self.state.param_vecs.last_mut().unwrap().cost = xc_cost;
+            let xc = self.contract(&x0, &state.param_vecs.last().unwrap().param);
+            let xc_cost = (state.problem.cost_function)(&xc);
+            if xc_cost < state.param_vecs.last().unwrap().cost {
+                state.param_vecs.last_mut().unwrap().param = xc;
+                state.param_vecs.last_mut().unwrap().cost = xc_cost;
             }
         } else {
-            self.shrink()
+            self.shrink(&mut state)
         }
 
-        self.state.iter += 1;
+        state.iter += 1;
 
-        self.sort_param_vecs();
-        let param = self.state.param_vecs[0].clone();
-        Ok(ArgminResult::new(param.param, param.cost, self.state.iter))
+        self.sort_param_vecs(&mut state);
+        let param = state.param_vecs[0].clone();
+        let out = ArgminResult::new(param.param, param.cost, state.iter);
+        self.state = Some(state);
+        Ok(out)
     }
 
     /// Stopping criterions
@@ -218,7 +231,7 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
         // } else {
         //     return false;
         // }
-        self.state.iter >= self.max_iters
+        self.state.as_ref().unwrap().iter >= self.max_iters
     }
 
     /// Run Nelder Mead optimization
