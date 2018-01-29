@@ -9,7 +9,7 @@
 ///
 use ndarray::{Array1, Array2};
 
-/// ArgminOperator
+/// `ArgminOperator`
 pub struct ArgminOperator<'a> {
     /// Operator (for now a simple 2D matrix)
     pub operator: &'a Array2<f64>,
