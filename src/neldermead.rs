@@ -235,22 +235,7 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
     }
 
     /// Run Nelder Mead optimization
-    fn run(
-        &mut self,
-        problem: &'a Self::E,
-        param_vecs: &Vec<Vec<f64>>,
-    ) -> Result<ArgminResult<Vec<f64>, f64>> {
-        self.init(problem, &param_vecs.to_owned())?;
-        let mut out;
-
-        loop {
-            out = self.next_iter()?;
-            if self.terminate() {
-                break;
-            }
-        }
-        Ok(out)
-    }
+    make_run!(Self::E, Self::D, Self::A, Self::B);
 }
 
 impl<'a> Default for NelderMead<'a> {

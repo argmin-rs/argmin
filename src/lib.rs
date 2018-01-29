@@ -24,6 +24,10 @@ extern crate ndarray_linalg;
 extern crate num;
 extern crate rand;
 
+/// Macros
+#[macro_use]
+pub mod macros;
+
 use std::default::Default;
 use num::ToPrimitive;
 use errors::*;

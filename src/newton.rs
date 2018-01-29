@@ -100,23 +100,7 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
     }
 
     /// Run Newton method
-    fn run(
-        &mut self,
-        problem: &'a Self::E,
-        init_param: &Array1<f64>,
-    ) -> Result<ArgminResult<Array1<f64>, f64>> {
-        // initialize
-        self.init(problem, init_param)?;
-
-        let mut out;
-        loop {
-            out = self.next_iter()?;
-            if self.terminate() {
-                break;
-            }
-        }
-        Ok(out)
-    }
+    make_run!(Self::E, Self::D, Self::A, Self::B);
 }
 
 impl<'a> Default for Newton<'a> {

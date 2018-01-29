@@ -97,23 +97,7 @@ impl<'a> ArgminSolver<'a> for Landweber<'a> {
     }
 
     /// Run Landweber method
-    fn run(
-        &mut self,
-        operator: &'a Self::E,
-        init_param: &Array1<f64>,
-    ) -> Result<ArgminResult<Array1<f64>, f64>> {
-        // initialize
-        self.init(operator, init_param)?;
-
-        let mut res;
-        loop {
-            res = self.next_iter()?;
-            if self.terminate() {
-                break;
-            }
-        }
-        Ok(res)
-    }
+    make_run!(Self::E, Self::D, Self::A, Self::B);
 }
 
 impl<'a> Default for Landweber<'a> {

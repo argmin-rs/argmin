@@ -246,25 +246,11 @@ where
         Ok(out)
     }
 
-    /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.
-    fn run(&mut self, problem: &'a Self::E, init_param: &T) -> Result<ArgminResult<T, U>>
-    where
-        T: ArgminParameter,
-        U: ArgminCostValue,
-    {
-        self.init(problem, init_param)?;
-        let mut out;
-        loop {
-            out = self.next_iter()?;
-            if self.terminate() {
-                break;
-            }
-        }
-        Ok(out)
-    }
-
     /// Stopping criterions
     fn terminate(&self) -> bool {
         self.state.as_ref().unwrap().iter >= self.max_iters
     }
+
+    /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.
+    make_run!(Self::E, Self::D, Self::A, Self::B);
 }
