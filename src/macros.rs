@@ -8,12 +8,12 @@
 /// This macro generates the `run` function for every solver which implements `ArgminSolver`.
 #[macro_export]
 macro_rules! make_run {
-    ( $E:ty, $D:ty, $A:ty, $B:ty ) => {
+    ( $ProblemDefinition:ty, $StartingPoints:ty, $Parameter:ty, $CostValue:ty ) => {
         fn run(
             &mut self,
-            operator: &'a $E,
-            init_param: &$D,
-        ) -> Result<ArgminResult<$A, $B>> {
+            operator: &'a $ProblemDefinition,
+            init_param: &$StartingPoints,
+        ) -> Result<ArgminResult<$Parameter, $CostValue>> {
             self.init(operator, init_param)?;
 
             let mut res;

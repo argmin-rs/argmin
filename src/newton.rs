@@ -68,20 +68,24 @@ impl<'a> Newton<'a> {
 }
 
 impl<'a> ArgminSolver<'a> for Newton<'a> {
-    type A = Array1<f64>;
-    type B = f64;
-    type C = Array2<f64>;
-    type D = Array1<f64>;
-    type E = Problem<'a, Array1<f64>, f64, Array2<f64>>;
+    type Parameter = Array1<f64>;
+    type CostValue = f64;
+    type Hessian = Array2<f64>;
+    type StartingPoints = Self::Parameter;
+    type ProblemDefinition = Problem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// Initialize with a given problem and a starting point
-    fn init(&mut self, problem: &'a Self::E, init_param: &Array1<f64>) -> Result<()> {
+    fn init(
+        &mut self,
+        problem: &'a Self::ProblemDefinition,
+        init_param: &Self::StartingPoints,
+    ) -> Result<()> {
         self.state = Some(NewtonState::new(problem, init_param.clone()));
         Ok(())
     }
 
     /// Compute next point
-    fn next_iter(&mut self) -> Result<ArgminResult<Array1<f64>, f64>> {
+    fn next_iter(&mut self) -> Result<ArgminResult<Self::Parameter, Self::CostValue>> {
         // TODO: Move to next point
         // x_{n+1} = x_n - \gamma [Hf(x_n)]^-1 \nabla f(x_n)
         let mut state = self.state.take().unwrap();
@@ -100,7 +104,12 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
     }
 
     /// Run Newton method
-    make_run!(Self::E, Self::D, Self::A, Self::B);
+    make_run!(
+        Self::ProblemDefinition,
+        Self::StartingPoints,
+        Self::Parameter,
+        Self::CostValue
+    );
 }
 
 impl<'a> Default for Newton<'a> {

@@ -159,14 +159,18 @@ impl<'a> NelderMead<'a> {
 }
 
 impl<'a> ArgminSolver<'a> for NelderMead<'a> {
-    type A = Vec<f64>;
-    type B = f64;
-    type C = Vec<f64>;
-    type D = Vec<Vec<f64>>;
-    type E = Problem<'a, Vec<f64>, f64, Vec<f64>>;
+    type Parameter = Vec<f64>;
+    type CostValue = f64;
+    type Hessian = Vec<f64>;
+    type StartingPoints = Vec<Self::Parameter>;
+    type ProblemDefinition = Problem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// initialization with predefined parameter vectors
-    fn init(&mut self, problem: &'a Self::E, param_vecs: &Vec<Vec<f64>>) -> Result<()> {
+    fn init(
+        &mut self,
+        problem: &'a Self::ProblemDefinition,
+        param_vecs: &Self::StartingPoints,
+    ) -> Result<()> {
         let mut params: Vec<NelderMeadParam> = vec![];
         for param in param_vecs.iter() {
             params.push(NelderMeadParam {
@@ -181,7 +185,7 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
     }
 
     /// Compute next iteration
-    fn next_iter(&mut self) -> Result<ArgminResult<Vec<f64>, f64>> {
+    fn next_iter(&mut self) -> Result<ArgminResult<Self::Parameter, Self::CostValue>> {
         let mut state = self.state.take().unwrap();
         self.sort_param_vecs(&mut state);
         let num_param = state.param_vecs[0].param.len();
@@ -235,7 +239,12 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
     }
 
     /// Run Nelder Mead optimization
-    make_run!(Self::E, Self::D, Self::A, Self::B);
+    make_run!(
+        Self::ProblemDefinition,
+        Self::StartingPoints,
+        Self::Parameter,
+        Self::CostValue
+    );
 }
 
 impl<'a> Default for NelderMead<'a> {

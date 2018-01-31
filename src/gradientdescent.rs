@@ -133,17 +133,17 @@ impl<'a> GradientDescent<'a> {
 }
 
 impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
-    type A = Vec<f64>;
-    type B = f64;
-    type C = Vec<f64>;
-    type D = Vec<f64>;
-    type E = Problem<'a, Vec<f64>, f64, Vec<f64>>;
+    type Parameter = Vec<f64>;
+    type CostValue = f64;
+    type Hessian = Vec<f64>;
+    type StartingPoints = Vec<f64>;
+    type ProblemDefinition = Problem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// Initialize with a given problem and a starting point
     fn init(
         &mut self,
-        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
-        init_param: &Vec<f64>,
+        problem: &'a Self::ProblemDefinition,
+        init_param: &Self::StartingPoints,
     ) -> Result<()> {
         self.state = GradientDescentState {
             problem: Some(problem),
@@ -162,7 +162,7 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
     }
 
     /// Compute next point
-    fn next_iter(&mut self) -> Result<ArgminResult<Vec<f64>, f64>> {
+    fn next_iter(&mut self) -> Result<ArgminResult<Self::Parameter, Self::CostValue>> {
         let gradient = self.state.problem.unwrap().gradient.unwrap();
         // let state = &mut self.state;
         self.state.prev_param = self.state.param.clone();
@@ -205,9 +205,9 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
     /// Run gradient descent method
     fn run(
         &mut self,
-        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
-        init_param: &Vec<f64>,
-    ) -> Result<ArgminResult<Vec<f64>, f64>> {
+        problem: &'a Self::ProblemDefinition,
+        init_param: &Self::StartingPoints,
+    ) -> Result<ArgminResult<Self::Parameter, Self::CostValue>> {
         // initialize
         self.init(problem, init_param)?;
 

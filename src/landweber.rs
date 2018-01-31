@@ -66,20 +66,24 @@ impl<'a> Landweber<'a> {
 }
 
 impl<'a> ArgminSolver<'a> for Landweber<'a> {
-    type A = Array1<f64>;
-    type B = f64;
-    type C = Array2<f64>;
-    type D = Array1<f64>;
-    type E = ArgminOperator<'a>;
+    type Parameter = Array1<f64>;
+    type CostValue = f64;
+    type Hessian = Array2<f64>;
+    type StartingPoints = Self::Parameter;
+    type ProblemDefinition = ArgminOperator<'a>;
 
     /// Initialize with a given problem and a starting point
-    fn init(&mut self, operator: &'a Self::E, init_param: &Array1<f64>) -> Result<()> {
+    fn init(
+        &mut self,
+        operator: &'a Self::ProblemDefinition,
+        init_param: &Self::StartingPoints,
+    ) -> Result<()> {
         self.state = Some(LandweberState::new(operator, init_param.clone()));
         Ok(())
     }
 
     /// Compute next point
-    fn next_iter(&mut self) -> Result<ArgminResult<Array1<f64>, f64>> {
+    fn next_iter(&mut self) -> Result<ArgminResult<Self::Parameter, Self::CostValue>> {
         let mut state = self.state.take().unwrap();
         let prev_param = state.param.clone();
         let diff = state.operator.apply(&prev_param) - state.operator.y;
@@ -97,7 +101,12 @@ impl<'a> ArgminSolver<'a> for Landweber<'a> {
     }
 
     /// Run Landweber method
-    make_run!(Self::E, Self::D, Self::A, Self::B);
+    make_run!(
+        Self::ProblemDefinition,
+        Self::StartingPoints,
+        Self::Parameter,
+        Self::CostValue
+    );
 }
 
 impl<'a> Default for Landweber<'a> {

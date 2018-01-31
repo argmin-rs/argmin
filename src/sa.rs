@@ -185,14 +185,18 @@ where
     U: ArgminCostValue + 'a,
     V: 'a,
 {
-    type A = T;
-    type B = U;
-    type C = V;
-    type D = T;
-    type E = Problem<'a, T, U, V>;
+    type Parameter = T;
+    type CostValue = U;
+    type Hessian = V;
+    type StartingPoints = T;
+    type ProblemDefinition = Problem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// Initialize with a given problem and a starting point
-    fn init(&mut self, problem: &'a Self::E, init_param: &T) -> Result<()> {
+    fn init(
+        &mut self,
+        problem: &'a Self::ProblemDefinition,
+        init_param: &Self::StartingPoints,
+    ) -> Result<()> {
         let prev_cost = (problem.cost_function)(init_param);
         self.state = Some(SimulatedAnnealingState {
             problem: problem,
@@ -207,7 +211,7 @@ where
     }
 
     /// Compute next point
-    fn next_iter(&mut self) -> Result<ArgminResult<T, U>> {
+    fn next_iter(&mut self) -> Result<ArgminResult<Self::Parameter, Self::CostValue>> {
         // Taking the state avoids fights with the borrow checker.
         let mut state = self.state.take().unwrap();
 
@@ -252,5 +256,10 @@ where
     }
 
     /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.
-    make_run!(Self::E, Self::D, Self::A, Self::B);
+    make_run!(
+        Self::ProblemDefinition,
+        Self::StartingPoints,
+        Self::Parameter,
+        Self::CostValue
+    );
 }
