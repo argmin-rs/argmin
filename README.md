@@ -2,7 +2,7 @@
 
 # argmin-rs
 
-Optimization toolbox written in Rust. Not even remotely stable yet.
+A work-in-progress optimization toolbox written in Rust. Not stable yet.
 
 The [Documentation](https://stefan-k.github.io/argmin-rs/argmin/) is also still in a very early stage.
 
