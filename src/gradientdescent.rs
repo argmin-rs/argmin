@@ -181,7 +181,7 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
         self.state.iter += 1;
         Ok(ArgminResult::new(
             self.state.param.clone(),
-            -1.0,
+            std::f64::NAN,
             self.state.iter,
         ))
     }
@@ -203,25 +203,12 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
     }
 
     /// Run gradient descent method
-    fn run(
-        &mut self,
-        problem: &'a Self::ProblemDefinition,
-        init_param: &Self::StartingPoints,
-    ) -> Result<ArgminResult<Self::Parameter, Self::CostValue>> {
-        // initialize
-        self.init(problem, init_param)?;
-
-        let mut out;
-        loop {
-            out = self.next_iter()?;
-            if self.terminate() {
-                break;
-            }
-        }
-        let fin_cost = (problem.cost_function)(&self.state.param);
-        out.cost = fin_cost;
-        Ok(out)
-    }
+    make_run!(
+        Self::ProblemDefinition,
+        Self::StartingPoints,
+        Self::Parameter,
+        Self::CostValue
+    );
 }
 
 impl<'a> Default for GradientDescent<'a> {
