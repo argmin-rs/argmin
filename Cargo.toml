@@ -1,6 +1,6 @@
 [package]
 name = "argmin"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "WIP optimization toolbox for Rust"
@@ -17,20 +17,20 @@ exclude = [
 ]
 
 [dependencies]
-clippy = {version = "*", optional = true}
-error-chain = "*"
-num = "*"
-rand = "*"
-ndarray = "*"
-ndarray-linalg = { version = "*", features = ["openblas"] }
+# clippy = {version = "*", optional = true}
+# error-chain = "*"
+# num = "*"
+# rand = "*"
+# ndarray = "*"
+# ndarray-linalg = { version = "*", features = ["openblas"] }
 
-# clippy = {version = "0.0.184", optional = true}
-# error-chain = "0.11.0"
-# num = "0.1.41"
-# rand = "0.4.2"
-# ndarray = "0.11.1"
-# #ndarray-linalg = { version = "*", default-features = openblas }
-# ndarray-linalg = { version = "0.9.0", features = ["openblas"] }
+clippy = {version = "0.0.184", optional = true}
+error-chain = "0.11.0"
+num = "0.1.41"
+rand = "0.4.2"
+ndarray = "0.11.1"
+#ndarray-linalg = { version = "*", default-features = openblas }
+ndarray-linalg = { version = "0.9.0", features = ["openblas"] }
 
 [features]
 default = []
