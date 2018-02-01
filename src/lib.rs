@@ -97,7 +97,7 @@ pub mod backtracking;
 pub mod sa;
 
 /// Gradient Descent
-pub mod gradientdescent;
+// pub mod gradientdescent;
 
 /// Nelder Mead method
 pub mod neldermead;

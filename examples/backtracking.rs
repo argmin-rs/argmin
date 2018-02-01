@@ -7,14 +7,19 @@
 
 #![allow(unused_imports)]
 extern crate argmin;
+extern crate ndarray;
+use ndarray::Array1;
 use argmin::problem::Problem;
 use argmin::backtracking::BacktrackingLineSearch;
-use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, sphere, sphere_derivative};
+use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, rosenbrock_derivative_nd,
+                            rosenbrock_nd, sphere, sphere_derivative};
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function
-    let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64) };
-    let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64) };
+    // let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64) };
+    // let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64) };
+    let cost = |x: &Array1<f64>| -> f64 { rosenbrock_nd(x, 1_f64, 100_f64) };
+    let gradient = |x: &Array1<f64>| -> Array1<f64> { rosenbrock_derivative_nd(x, 1_f64, 100_f64) };
     // let cost = |x: &Vec<f64>| -> f64 { sphere(x) };
     // let gradient = |x: &Vec<f64>| -> Vec<f64> { sphere_derivative(x) };
 
@@ -22,10 +27,10 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let solver = BacktrackingLineSearch::new(&cost, &gradient);
     // solver.max_iters(10_000);
 
-    let x = vec![4.1, 3.0];
+    let x = Array1::from_vec(vec![4.1, 3.0]);
     let p = gradient(&x);
 
-    let result = solver.run(&(p.iter().map(|x| -x).collect::<Vec<f64>>()), &x)?;
+    let result = solver.run(&(-p), &x)?;
 
     // print result
     println!("{:?}", result);
