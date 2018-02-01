@@ -6,6 +6,18 @@ A work-in-progress optimization toolbox written in Rust. Not stable yet.
 
 The [Documentation](https://stefan-k.github.io/argmin-rs/argmin/) is also still in a very early stage.
 
+
+## Algorithms
+
+- [X] Backtracking line search
+- [X] Conjugate Gradient method
+- [X] Gradient Descent
+- [X] Landweber algorithm
+- [X] Nelder-Mead method
+- [X] Newton Method
+- [X] Simulated Annealing
+
+
 ## License
 
 Licensed under either of
