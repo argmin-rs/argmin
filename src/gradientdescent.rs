@@ -9,6 +9,7 @@
 ///
 /// TODO
 use std;
+use ndarray::Array1;
 use errors::*;
 use problem::Problem;
 use result::ArgminResult;
@@ -43,11 +44,11 @@ pub struct GradientDescent<'a> {
 /// Indicates the current state of the Gradient Descent method.
 struct GradientDescentState<'a> {
     /// Reference to the problem. This is an Option<_> because it is initialized as `None`
-    problem: Option<&'a Problem<'a, Vec<f64>, f64, Vec<f64>>>,
+    problem: Option<&'a Problem<'a, Array1<f64>, f64, Array1<f64>>>,
     /// Previous parameter vector
-    prev_param: Vec<f64>,
+    prev_param: Array1<f64>,
     /// Current parameter vector
-    param: Vec<f64>,
+    param: Array1<f64>,
     /// Current number of iteration
     iter: u64,
     /// Previous gamma
@@ -55,9 +56,9 @@ struct GradientDescentState<'a> {
     /// Current gamma
     gamma: f64,
     /// Previous gradient
-    prev_grad: Vec<f64>,
+    prev_grad: Array1<f64>,
     /// Current gradient
-    cur_grad: Vec<f64>,
+    cur_grad: Array1<f64>,
 }
 
 impl<'a> GradientDescentState<'a> {
@@ -65,13 +66,13 @@ impl<'a> GradientDescentState<'a> {
     pub fn new() -> Self {
         GradientDescentState {
             problem: None,
-            prev_param: vec![0_f64; 1],
-            param: vec![0_f64; 1],
+            prev_param: Array1::from_vec(vec![0_f64; 1]),
+            param: Array1::from_vec(vec![0_f64; 1]),
             iter: 0_u64,
             prev_gamma: 0_f64,
             gamma: 0_f64,
-            prev_grad: vec![0_f64; 1],
-            cur_grad: vec![0_f64; 1],
+            prev_grad: Array1::from_vec(vec![0_f64; 1]),
+            cur_grad: Array1::from_vec(vec![0_f64; 1]),
         }
     }
 }
@@ -122,10 +123,8 @@ impl<'a> GradientDescent<'a> {
                 top / bottom
             }
             GDGammaUpdate::BacktrackingLineSearch(ref bls) => {
-                let result = bls.run(
-                    &(self.state.cur_grad.iter().map(|x| -x).collect::<Vec<f64>>()),
-                    &self.state.param,
-                ).unwrap();
+                let result = bls.run(&(-self.state.cur_grad.clone()), &self.state.param)
+                    .unwrap();
                 result.0
             }
         };
@@ -133,10 +132,10 @@ impl<'a> GradientDescent<'a> {
 }
 
 impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
-    type Parameter = Vec<f64>;
+    type Parameter = Array1<f64>;
     type CostValue = f64;
-    type Hessian = Vec<f64>;
-    type StartingPoints = Vec<f64>;
+    type Hessian = Array1<f64>;
+    type StartingPoints = Array1<f64>;
     type ProblemDefinition = Problem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// Initialize with a given problem and a starting point
@@ -147,7 +146,7 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
     ) -> Result<()> {
         self.state = GradientDescentState {
             problem: Some(problem),
-            prev_param: vec![0_f64; init_param.len()],
+            prev_param: Array1::from_vec(vec![0_f64; init_param.len()]),
             param: init_param.to_owned(),
             iter: 0_u64,
             prev_gamma: 0_f64,
@@ -155,7 +154,7 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
                 GDGammaUpdate::Constant(g) => g,
                 GDGammaUpdate::BarzilaiBorwein | GDGammaUpdate::BacktrackingLineSearch(_) => 0.0001,
             },
-            prev_grad: vec![0_f64; init_param.len()],
+            prev_grad: Array1::from_vec(vec![0_f64; init_param.len()]),
             cur_grad: (problem.gradient.unwrap())(&init_param.to_owned()),
         };
         Ok(())
