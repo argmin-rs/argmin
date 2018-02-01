@@ -96,27 +96,15 @@ impl<'a> BacktrackingLineSearch<'a> {
     /// `p` is the search direction. Take care about whether you need it to be a unit vector or
     /// not! `p` will not be normalized!
     pub fn run(&self, p: &Array1<f64>, x: &Array1<f64>) -> Result<(f64, u64, TerminationReason)> {
-        // ensure that p is a unit vector
-        // Update: We're not doing this anymore
-        // let p_mag: f64 = p.iter().map(|a| a.powf(2.0)).sum::<f64>().sqrt();
-        // let p: Vec<f64> = p.iter().map(|a| a / p_mag).collect();
-
         // compute m
         let m: f64 = p.t().dot(&((self.gradient)(x)));
-        // let m: f64 = p.iter()
-        //     .zip((self.gradient)(&(x.to_owned())).iter())
-        //     .map(|(a, b)| a * b)
-        //     .sum();
 
         let t = -self.c * m;
-        // let t = -self.c.dot(&m);
-        // let fx = (self.cost_function)(&(x.to_owned()));
         let fx = (self.cost_function)(x);
         let termination_reason;
         let mut idx = 0;
         let mut alpha = self.alpha;
         loop {
-            // let param = p.iter().zip(x.iter()).map(|(a, b)| b + alpha * a).collect();
             let param = x + &(alpha * p);
             if fx - (self.cost_function)(&param) >= alpha * t {
                 termination_reason = TerminationReason::Converged;
