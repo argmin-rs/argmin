@@ -35,6 +35,8 @@ struct LandweberState<'a> {
     param: Array1<f64>,
     /// Current number of iteration
     iter: u64,
+    /// Current l2 norm of difference
+    norm: f64,
 }
 
 impl<'a> LandweberState<'a> {
@@ -44,6 +46,7 @@ impl<'a> LandweberState<'a> {
             operator: operator,
             param: param,
             iter: 0_u64,
+            norm: std::f64::NAN,
         }
     }
 }
@@ -89,8 +92,8 @@ impl<'a> ArgminSolver<'a> for Landweber<'a> {
         let diff = state.operator.apply(&prev_param) - state.operator.y;
         state.param = state.param - self.omega * state.operator.apply_transpose(&diff);
         state.iter += 1;
-        let norm: f64 = diff.iter().map(|a| a.powf(2.0)).sum::<f64>().sqrt();
-        let out = ArgminResult::new(state.param.clone(), norm, state.iter);
+        state.norm = diff.iter().map(|a| a.powf(2.0)).sum::<f64>().sqrt();
+        let out = ArgminResult::new(state.param.clone(), state.norm, state.iter);
         self.state = Some(state);
         Ok(out)
     }
@@ -98,6 +101,7 @@ impl<'a> ArgminSolver<'a> for Landweber<'a> {
     /// Indicates whether any of the stopping criteria are met
     fn terminate(&self) -> bool {
         self.state.as_ref().unwrap().iter >= self.max_iters
+            || self.state.as_ref().unwrap().norm < self.state.as_ref().unwrap().operator.target_cost
     }
 
     /// Run Landweber method

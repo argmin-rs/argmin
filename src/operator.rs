@@ -7,6 +7,7 @@
 
 /// TODO DOCUMENTATION
 ///
+use std;
 use ndarray::{Array1, Array2};
 
 /// `ArgminOperator`
@@ -15,6 +16,8 @@ pub struct ArgminOperator<'a> {
     pub operator: &'a Array2<f64>,
     /// y of Ax = y
     pub y: &'a Array1<f64>,
+    /// Target cost function value for stopping criterions
+    pub target_cost: f64,
 }
 
 impl<'a> ArgminOperator<'a> {
@@ -23,7 +26,16 @@ impl<'a> ArgminOperator<'a> {
         ArgminOperator {
             operator: operator,
             y: y,
+            target_cost: std::f64::MIN,
         }
+    }
+
+    /// Set target cost function value
+    ///
+    /// If the optimization reaches this value, it will be stopped.
+    pub fn target_cost(&mut self, target_cost: f64) -> &mut Self {
+        self.target_cost = target_cost;
+        self
     }
 
     /// Forward application of the operator (A*x)

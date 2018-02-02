@@ -19,7 +19,8 @@ fn run() -> Result<(), Box<std::error::Error>> {
     // Set up problem
     let A = arr2(&[[4., 1.], [1., 3.]]);
     let y = arr1(&[1., 2.]);
-    let prob = ArgminOperator::new(&A, &y);
+    let mut prob = ArgminOperator::new(&A, &y);
+    prob.target_cost(0.01);
 
     // Set up Newton solver
     let mut solver = Landweber::new(0.01);
@@ -32,7 +33,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
     loop {
         par = solver.next_iter()?;
         // println!("{:?}", par);
-        if par.iters >= 1000 {
+        if solver.terminate() {
             break;
         };
     }
