@@ -48,6 +48,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     // Set up Newton solver
     let mut solver = Newton::new();
+    solver.max_iters(10);
 
     // define inital parameter vector
     // `Problem` allows to create random parameter vectors which satisfies `lower_bound` and
@@ -63,11 +64,16 @@ fn run() -> Result<(), Box<std::error::Error>> {
     loop {
         par = solver.next_iter()?;
         println!("{:?}", par);
-        if par.iters >= 10 {
+        if solver.terminate() {
             break;
         };
     }
 
+    // run it from scratch using the `run` method
+    let mut solver = Newton::new();
+    solver.max_iters(10);
+    solver.init(&prob, &init_param)?;
+    par = solver.run(&prob, &init_param)?;
     println!("{:?}", par);
 
     Ok(())

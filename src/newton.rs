@@ -100,7 +100,7 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
 
     /// Indicates whether any of the stopping criteria are met
     fn terminate(&self) -> bool {
-        false
+        self.state.as_ref().unwrap().iter >= self.max_iters
     }
 
     /// Run Newton method
