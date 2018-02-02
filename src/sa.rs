@@ -253,6 +253,8 @@ where
     /// Stopping criterions
     fn terminate(&self) -> bool {
         self.state.as_ref().unwrap().iter >= self.max_iters
+            || self.state.as_ref().unwrap().best_cost
+                < self.state.as_ref().unwrap().problem.target_cost
     }
 
     /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.

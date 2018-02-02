@@ -27,6 +27,8 @@ pub struct Problem<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> 
     pub upper_bound: T,
     /// (non)linear constraint which is `true` if a parameter vector lies within the bounds
     pub constraint: &'a Fn(&T) -> bool,
+    /// Target cost function value. The optimization will stop once this value is reached.
+    pub target_cost: U,
 }
 
 impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T, U, V> {
@@ -47,6 +49,7 @@ impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T,
             lower_bound: lower_bound.clone(),
             upper_bound: upper_bound.clone(),
             constraint: &|_x: &T| true,
+            target_cost: U::min_value(),
         }
     }
 
@@ -75,6 +78,14 @@ impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T,
     /// `false` otherwise.
     pub fn constraint(&mut self, constraint: &'a Fn(&T) -> bool) -> &mut Self {
         self.constraint = constraint;
+        self
+    }
+
+    /// Set target cost function value
+    ///
+    /// If the optimization reaches this value, it will be stopped.
+    pub fn target_cost(&mut self, target_cost: U) -> &mut Self {
+        self.target_cost = target_cost;
         self
     }
 

@@ -20,11 +20,12 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let upper_bound: Vec<f64> = vec![2.0, 3.0];
 
     // Set up problem
-    let prob: Problem<_, _, f64> = Problem::new(&cost, &lower_bound, &upper_bound);
+    let mut prob: Problem<_, _, f64> = Problem::new(&cost, &lower_bound, &upper_bound);
     // let prob: Problem = Problem::new(&cost, &lower_bound, &upper_bound);
+    prob.target_cost(0.01);
 
     // Set up simulated annealing solver
-    let mut solver = SimulatedAnnealing::new(10.0, 1_000_000)?;
+    let mut solver = SimulatedAnnealing::new(10.0, 1_000_000_000)?;
     solver.temp_func(SATempFunc::Exponential(0.8));
 
     // definie inital parameter vector

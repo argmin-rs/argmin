@@ -29,17 +29,17 @@ extern crate rand;
 pub mod macros;
 
 use std::default::Default;
-use num::ToPrimitive;
+use num::{Bounded, ToPrimitive};
 use errors::*;
 use parameter::ArgminParameter;
 use result::ArgminResult;
 
 /// Trait for cost function values
 /// TODO: Do this with trait aliases once they work in rust.
-pub trait ArgminCostValue: ToPrimitive + Copy + Default + PartialOrd {}
+pub trait ArgminCostValue: Bounded + ToPrimitive + Copy + Default + PartialOrd {}
 impl<T> ArgminCostValue for T
 where
-    T: ToPrimitive + Copy + Default + PartialOrd,
+    T: Bounded + ToPrimitive + Copy + Default + PartialOrd,
 {
 }
 
