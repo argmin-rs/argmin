@@ -23,7 +23,8 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let upper_bound: Vec<f64> = vec![2.0, 3.0];
 
     // Set up problem
-    let prob = Problem::new(&cost, &lower_bound, &upper_bound);
+    let mut prob = Problem::new(&cost, &lower_bound, &upper_bound);
+    prob.target_cost(0.01);
 
     // Set up GradientDecent solver
     let mut solver = NelderMead::new();

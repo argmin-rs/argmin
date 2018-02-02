@@ -236,6 +236,8 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
         //     return false;
         // }
         self.state.as_ref().unwrap().iter >= self.max_iters
+            || self.state.as_ref().unwrap().param_vecs[0].cost
+                < self.state.as_ref().unwrap().problem.target_cost
     }
 
     /// Run Nelder Mead optimization
