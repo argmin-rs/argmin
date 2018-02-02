@@ -35,6 +35,8 @@ struct ConjugateGradientState<'a> {
     r: Array1<f64>,
     /// Current number of iteration
     iter: u64,
+    /// Current l2 norm of difference
+    norm: f64,
 }
 
 impl<'a> ConjugateGradientState<'a> {
@@ -51,6 +53,7 @@ impl<'a> ConjugateGradientState<'a> {
             p: p,
             r: r,
             iter: 0_u64,
+            norm: std::f64::NAN,
         }
     }
 }
@@ -118,8 +121,8 @@ impl<'a> ArgminSolver<'a> for ConjugateGradient<'a> {
         let beta: f64 = state.r.iter().map(|a| a.powf(2.0)).sum::<f64>() / rtr;
         state.p = beta * &state.p + &state.r;
         state.iter += 1;
-        let norm: f64 = state.r.iter().map(|a| a.powf(2.0)).sum::<f64>().sqrt();
-        let out = ArgminResult::new(state.param.clone(), norm, state.iter);
+        state.norm = state.r.iter().map(|a| a.powf(2.0)).sum::<f64>().sqrt();
+        let out = ArgminResult::new(state.param.clone(), state.norm, state.iter);
         self.state = Some(state);
         Ok(out)
     }
@@ -127,6 +130,7 @@ impl<'a> ArgminSolver<'a> for ConjugateGradient<'a> {
     /// Indicates whether any of the stopping criteria are met
     fn terminate(&self) -> bool {
         self.state.as_ref().unwrap().iter >= self.max_iters
+            || self.state.as_ref().unwrap().norm < self.state.as_ref().unwrap().operator.target_cost
     }
 
     /// Run Conjugate Gradient method
