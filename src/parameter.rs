@@ -74,7 +74,7 @@ macro_rules! modify_one_parameter {
     }
 }
 
-/// Implement ArgminParameter
+/// Implement `ArgminParameter`
 macro_rules! implement_argmin_parameter {
     ($param:ty, $element:ty) => {
         impl ArgminParameter for $param {

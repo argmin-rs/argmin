@@ -218,7 +218,7 @@ where
         // initialize with an already modified parameter vector (we want at least one modification
         // anyways)
         let mut param_new = state.param.modify().0;
-        for _ in 0..((state.cur_temp.floor() as u64)) {
+        for _ in 0..(state.cur_temp.floor() as u64) {
             param_new = param_new.modify().0;
             param_new = match (&state.problem.lower_bound, &state.problem.upper_bound) {
                 (&Some(ref l), &Some(ref u)) => {
