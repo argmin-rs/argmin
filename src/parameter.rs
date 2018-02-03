@@ -7,7 +7,6 @@
 
 /// TODO DOCUMENTATION
 ///
-use errors::*;
 use std::fmt::Debug;
 use std::default::Default;
 use rand;
@@ -33,6 +32,26 @@ pub trait ArgminParameter: Clone + Default + Debug {
     ///
     /// The resulting parameter vector satisfies `lower_bound`, `upper_bound`.
     fn random(&Self, &Self) -> Self;
+}
+
+macro_rules! random_vec_iter {
+    ($type:ty) => {
+        fn random(lower_bound: &$type, upper_bound: &$type) -> $type {
+            let mut rng = rand::thread_rng();
+            let out: $type = lower_bound
+                .iter()
+                .zip(upper_bound.iter())
+                .map(|(l, u)| {
+                    if l >= u {
+                        panic!("Parameter: lower_bound must be lower than upper_bound.");
+                    }
+                    let range = Range::new(*l, *u);
+                    range.ind_sample(&mut rng)
+                })
+                .collect();
+            out
+        }
+    }
 }
 
 impl ArgminParameter for Vec<f64> {
@@ -62,21 +81,7 @@ impl ArgminParameter for Vec<f64> {
         param
     }
 
-    fn random(lower_bound: &Vec<f64>, upper_bound: &Vec<f64>) -> Vec<f64> {
-        let mut rng = rand::thread_rng();
-        let out: Vec<f64> = lower_bound
-            .iter()
-            .zip(upper_bound.iter())
-            .map(|(l, u)| {
-                if l >= u {
-                    panic!("Parameter: lower_bound must be lower than upper_bound.");
-                }
-                let range = Range::new(*l, *u);
-                range.ind_sample(&mut rng)
-            })
-            .collect();
-        out
-    }
+    random_vec_iter!(Vec<f64>);
 }
 
 impl ArgminParameter for Array1<f64> {
@@ -106,19 +111,5 @@ impl ArgminParameter for Array1<f64> {
         param
     }
 
-    fn random(lower_bound: &Array1<f64>, upper_bound: &Array1<f64>) -> Array1<f64> {
-        let mut rng = rand::thread_rng();
-        let out: Array1<f64> = lower_bound
-            .iter()
-            .zip(upper_bound.iter())
-            .map(|(l, u)| {
-                if l >= u {
-                    panic!("Parameter: lower_bound must be lower than upper_bound.");
-                }
-                let range = Range::new(*l, *u);
-                range.ind_sample(&mut rng)
-            })
-            .collect();
-        out
-    }
+    random_vec_iter!(Array1<f64>);
 }
