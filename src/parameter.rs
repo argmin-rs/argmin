@@ -65,13 +65,13 @@ impl ArgminParameter for Vec<f64> {
     fn random(lower_bound: &Vec<f64>, upper_bound: &Vec<f64>) -> Result<Vec<f64>> {
         let mut out = vec![];
         let mut rng = rand::thread_rng();
-        for elem in lower_bound.iter().zip(upper_bound.iter()) {
-            if elem.0 >= elem.1 {
+        for (l, u) in lower_bound.iter().zip(upper_bound.iter()) {
+            if l >= u {
                 return Err(ErrorKind::InvalidParameter(
                     "Parameter: lower_bound must be lower than upper_bound.".into(),
                 ).into());
             }
-            let range = Range::new(*elem.0, *elem.1);
+            let range = Range::new(*l, *u);
             out.push(range.ind_sample(&mut rng));
         }
         Ok(out)
