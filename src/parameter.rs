@@ -32,7 +32,7 @@ pub trait ArgminParameter: Clone + Default + Debug {
     /// Returns a completely random parameter vector
     ///
     /// The resulting parameter vector satisfies `lower_bound`, `upper_bound`.
-    fn random(&Self, &Self) -> Result<Self>;
+    fn random(&Self, &Self) -> Self;
 }
 
 impl ArgminParameter for Vec<f64> {
@@ -62,19 +62,20 @@ impl ArgminParameter for Vec<f64> {
         param
     }
 
-    fn random(lower_bound: &Vec<f64>, upper_bound: &Vec<f64>) -> Result<Vec<f64>> {
-        let mut out = vec![];
+    fn random(lower_bound: &Vec<f64>, upper_bound: &Vec<f64>) -> Vec<f64> {
         let mut rng = rand::thread_rng();
-        for (l, u) in lower_bound.iter().zip(upper_bound.iter()) {
-            if l >= u {
-                return Err(ErrorKind::InvalidParameter(
-                    "Parameter: lower_bound must be lower than upper_bound.".into(),
-                ).into());
-            }
-            let range = Range::new(*l, *u);
-            out.push(range.ind_sample(&mut rng));
-        }
-        Ok(out)
+        let out: Vec<f64> = lower_bound
+            .iter()
+            .zip(upper_bound.iter())
+            .map(|(l, u)| {
+                if l >= u {
+                    panic!("Parameter: lower_bound must be lower than upper_bound.");
+                }
+                let range = Range::new(*l, *u);
+                range.ind_sample(&mut rng)
+            })
+            .collect();
+        out
     }
 }
 
@@ -105,23 +106,19 @@ impl ArgminParameter for Array1<f64> {
         param
     }
 
-    fn random(lower_bound: &Array1<f64>, upper_bound: &Array1<f64>) -> Result<Array1<f64>> {
+    fn random(lower_bound: &Array1<f64>, upper_bound: &Array1<f64>) -> Array1<f64> {
         let mut rng = rand::thread_rng();
         let out: Array1<f64> = lower_bound
             .iter()
             .zip(upper_bound.iter())
-            .map(|(a, b)| {
-                if a >= b {
+            .map(|(l, u)| {
+                if l >= u {
                     panic!("Parameter: lower_bound must be lower than upper_bound.");
-                    // Unfortunately the following doesnt work here!
-                    // return Err(ErrorKind::InvalidParameter(
-                    //     "Parameter: lower_bound must be lower than upper_bound.".into(),
-                    // ).into());
                 }
-                let range = Range::new(*a, *b);
+                let range = Range::new(*l, *u);
                 range.ind_sample(&mut rng)
             })
             .collect();
-        Ok(out)
+        out
     }
 }
