@@ -5,23 +5,16 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#![allow(unused_imports)]
 extern crate argmin;
 extern crate ndarray;
 use ndarray::Array1;
-use argmin::problem::Problem;
 use argmin::backtracking::BacktrackingLineSearch;
-use argmin::testfunctions::{rosenbrock, rosenbrock_derivative, rosenbrock_derivative_nd,
-                            rosenbrock_nd, sphere, sphere_derivative};
+use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_nd};
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function
-    // let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64) };
-    // let gradient = |x: &Vec<f64>| -> Vec<f64> { rosenbrock_derivative(x, 1_f64, 100_f64) };
     let cost = |x: &Array1<f64>| -> f64 { rosenbrock_nd(x, 1_f64, 100_f64) };
     let gradient = |x: &Array1<f64>| -> Array1<f64> { rosenbrock_derivative_nd(x, 1_f64, 100_f64) };
-    // let cost = |x: &Vec<f64>| -> f64 { sphere(x) };
-    // let gradient = |x: &Vec<f64>| -> Vec<f64> { sphere_derivative(x) };
 
     // Set up GradientDecent solver
     let solver = BacktrackingLineSearch::new(&cost, &gradient);

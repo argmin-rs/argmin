@@ -218,8 +218,8 @@ where
         let mut param_new = state.param.clone();
         for _ in 0..((state.cur_temp.floor() as u64) + 1) {
             param_new = param_new.modify(
-                &state.problem.lower_bound,
-                &state.problem.upper_bound,
+                &state.problem.lower_bound.as_ref().unwrap(),
+                &state.problem.upper_bound.as_ref().unwrap(),
                 &state.problem.constraint,
             );
         }

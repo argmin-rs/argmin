@@ -5,12 +5,10 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#![allow(unused_imports)]
 #![allow(non_snake_case)]
 extern crate argmin;
 extern crate ndarray;
 use ndarray::{arr1, arr2};
-use ndarray::prelude::*;
 use argmin::ArgminSolver;
 use argmin::operator::ArgminOperator;
 use argmin::landweber::Landweber;

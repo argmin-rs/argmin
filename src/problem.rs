@@ -22,9 +22,9 @@ pub struct Problem<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> 
     /// space
     pub hessian: Option<&'a Fn(&T) -> V>,
     /// lower bound of the parameter vector
-    pub lower_bound: T,
+    pub lower_bound: Option<T>,
     /// upper bound of the parameter vector
-    pub upper_bound: T,
+    pub upper_bound: Option<T>,
     /// (non)linear constraint which is `true` if a parameter vector lies within the bounds
     pub constraint: &'a Fn(&T) -> bool,
     /// Target cost function value. The optimization will stop once this value is reached.
@@ -39,18 +39,26 @@ impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T,
     /// evaluates to `true` everywhere. This can be overwritten with the `constraint` function.
     ///
     /// `cost_function`: Reference to a cost function
-    /// `lower_bound`: lower bound for the parameter vector
-    /// `upper_bound`: upper bound for the parameter vector
-    pub fn new(cost_function: &'a Fn(&T) -> U, lower_bound: &T, upper_bound: &T) -> Self {
+    pub fn new(cost_function: &'a Fn(&T) -> U) -> Self {
         Problem {
             cost_function: cost_function,
             gradient: None,
             hessian: None,
-            lower_bound: lower_bound.clone(),
-            upper_bound: upper_bound.clone(),
+            lower_bound: None,
+            upper_bound: None,
             constraint: &|_x: &T| true,
             target_cost: U::min_value(),
         }
+    }
+
+    /// Set lower and upper bounds
+    ///
+    /// `lower_bound`: lower bound for the parameter vector
+    /// `upper_bound`: upper bound for the parameter vector
+    pub fn bounds(&mut self, lower_bound: &T, upper_bound: &T) -> &mut Self {
+        self.lower_bound = Some(lower_bound.clone());
+        self.upper_bound = Some(upper_bound.clone());
+        self
     }
 
     /// Provide the gradient
@@ -93,6 +101,9 @@ impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T,
     ///
     /// The parameter vector satisfies the `lower_bound` and `upper_bound`.
     pub fn random_param(&self) -> Result<T> {
-        Ok(T::random(&self.lower_bound, &self.upper_bound)?)
+        Ok(T::random(
+            &self.lower_bound.as_ref().unwrap(),
+            &self.upper_bound.as_ref().unwrap(),
+        )?)
     }
 }
