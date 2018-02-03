@@ -30,6 +30,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     // definie inital parameter vector
     let init_param: Vec<f64> = vec![0.0, 0.0];
+    // let init_param: Vec<f64> = prob.random_param()?;
 
     let result = solver.run(&prob, &init_param)?;
 

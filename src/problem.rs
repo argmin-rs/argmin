@@ -101,9 +101,11 @@ impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T,
     ///
     /// The parameter vector satisfies the `lower_bound` and `upper_bound`.
     pub fn random_param(&self) -> Result<T> {
-        Ok(T::random(
-            &self.lower_bound.as_ref().unwrap(),
-            &self.upper_bound.as_ref().unwrap(),
-        )?)
+        match (self.lower_bound.as_ref(), self.upper_bound.as_ref()) {
+            (Some(l), Some(u)) => Ok(T::random(&l, &u)?),
+            _ => Err(ErrorKind::InvalidParameter(
+                "Parameter: lower_bound and upper_bound must be provided.".into(),
+            ).into()),
+        }
     }
 }
