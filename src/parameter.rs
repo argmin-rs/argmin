@@ -106,7 +106,6 @@ impl ArgminParameter for Array1<f64> {
     }
 
     fn random(lower_bound: &Array1<f64>, upper_bound: &Array1<f64>) -> Result<Array1<f64>> {
-        // unimplemented!()
         let mut rng = rand::thread_rng();
         let out: Array1<f64> = lower_bound
             .iter()
