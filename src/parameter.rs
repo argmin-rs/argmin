@@ -8,25 +8,29 @@
 /// TODO DOCUMENTATION
 ///
 use std::fmt::Debug;
+use std::cmp::PartialOrd;
 use std::default::Default;
+use std::ops::{Index, IndexMut};
 use rand;
 use rand::distributions::{IndependentSample, Range};
 use ndarray::Array1;
 
 /// This trait needs to be implemented for every parameter fed into the solvers.
 /// This is highly *UNSTABLE* and will change in the future.
-pub trait ArgminParameter: Clone + Default + Debug {
-    /// Defines a modification of the parameter vector.
+pub trait ArgminParameter
+    : Clone
+    + Default
+    + Debug
+    + Index<usize, Output = <Self as ArgminParameter>::Element>
+    + IndexMut<usize> {
+    /// Type of a single element of the parameter vector
+    type Element: PartialOrd + Clone;
+    /// Defines a single modification of the parameter vector.
     ///
     /// The parameters:
     ///
     /// `&self`: reference to the object of type `Self`
-    /// `lower_bound`: Lower bound of the parameter vector. Same type as parameter vector (`Self`)
-    /// `upper_bound`: Upper bound of the parameter vector. Same type as parameter vector (`Self`)
-    /// `constraint`: Additional (non)linear constraint whith the signature `&Fn(&Self) -> bool`.
-    /// The provided function takes a parameter as input and returns `true` if the parameter vector
-    /// satisfies the constraints and `false` otherwise.
-    fn modify(&self, &Self, &Self, &Fn(&Self) -> bool) -> Self;
+    fn modify(&self) -> (Self, usize);
 
     /// Returns a completely random parameter vector
     ///
@@ -34,6 +38,7 @@ pub trait ArgminParameter: Clone + Default + Debug {
     fn random(&Self, &Self) -> Self;
 }
 
+/// Create a random parameter vector within lower and upper bound.
 macro_rules! random_vec_iter {
     ($type:ty) => {
         fn random(lower_bound: &$type, upper_bound: &$type) -> $type {
@@ -54,62 +59,33 @@ macro_rules! random_vec_iter {
     }
 }
 
-impl ArgminParameter for Vec<f64> {
-    fn modify(
-        &self,
-        lower_bound: &Vec<f64>,
-        upper_bound: &Vec<f64>,
-        constraint: &Fn(&Vec<f64>) -> bool,
-    ) -> Vec<f64> {
-        let step = Range::new(0, self.len());
-        let range = Range::new(-1.0_f64, 1.0_f64);
-        let mut rng = rand::thread_rng();
-        let mut param = self.clone();
-        loop {
-            let idx = step.ind_sample(&mut rng);
+/// Modify one parameter of the parameter vector
+macro_rules! modify_one_parameter {
+    () => {
+        fn modify(&self) -> (Self, usize) {
+            let pos = Range::new(0, self.len());
+            let range = Range::new(-1.0, 1.0);
+            let mut rng = rand::thread_rng();
+            let mut param = self.clone();
+            let idx = pos.ind_sample(&mut rng);
             param[idx] = self[idx] + range.ind_sample(&mut rng);
-            if param[idx] < lower_bound[idx] {
-                param[idx] = lower_bound[idx];
-            }
-            if param[idx] > upper_bound[idx] {
-                param[idx] = upper_bound[idx];
-            }
-            if constraint(&param) {
-                break;
-            }
+            (param, idx)
         }
-        param
     }
-
-    random_vec_iter!(Vec<f64>);
 }
 
-impl ArgminParameter for Array1<f64> {
-    fn modify(
-        &self,
-        lower_bound: &Array1<f64>,
-        upper_bound: &Array1<f64>,
-        constraint: &Fn(&Array1<f64>) -> bool,
-    ) -> Array1<f64> {
-        let step = Range::new(0, self.len());
-        let range = Range::new(-1.0_f64, 1.0_f64);
-        let mut rng = rand::thread_rng();
-        let mut param = self.clone();
-        loop {
-            let idx = step.ind_sample(&mut rng);
-            param[idx] = self[idx] + range.ind_sample(&mut rng);
-            if param[idx] < lower_bound[idx] {
-                param[idx] = lower_bound[idx];
-            }
-            if param[idx] > upper_bound[idx] {
-                param[idx] = upper_bound[idx];
-            }
-            if constraint(&param) {
-                break;
-            }
+/// Implement ArgminParameter
+macro_rules! implement_argmin_parameter {
+    ($param:ty, $element:ty) => {
+        impl ArgminParameter for $param {
+            type Element = $element;
+            modify_one_parameter!();
+            random_vec_iter!($param);
         }
-        param
     }
-
-    random_vec_iter!(Array1<f64>);
 }
+
+implement_argmin_parameter!(Vec<f64>, f64);
+implement_argmin_parameter!(Vec<f32>, f32);
+implement_argmin_parameter!(Array1<f64>, f64);
+implement_argmin_parameter!(Array1<f32>, f32);

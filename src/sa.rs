@@ -215,13 +215,24 @@ where
         // Taking the state avoids fights with the borrow checker.
         let mut state = self.state.take().unwrap();
 
-        let mut param_new = state.param.clone();
-        for _ in 0..((state.cur_temp.floor() as u64) + 1) {
-            param_new = param_new.modify(
-                &state.problem.lower_bound.as_ref().unwrap(),
-                &state.problem.upper_bound.as_ref().unwrap(),
-                &state.problem.constraint,
-            );
+        // initialize with an already modified parameter vector (we want at least one modification
+        // anyways)
+        let mut param_new = state.param.modify().0;
+        for _ in 0..((state.cur_temp.floor() as u64)) {
+            param_new = param_new.modify().0;
+            param_new = match (&state.problem.lower_bound, &state.problem.upper_bound) {
+                (&Some(ref l), &Some(ref u)) => {
+                    let (mut tmp, idx) = param_new.modify();
+                    if tmp[idx] < l[idx] {
+                        tmp[idx] = l[idx].clone();
+                    }
+                    if tmp[idx] > u[idx] {
+                        tmp[idx] = u[idx].clone();
+                    }
+                    tmp
+                }
+                _ => param_new.modify().0,
+            }
         }
 
         // Evaluate cost function with new parameter vector

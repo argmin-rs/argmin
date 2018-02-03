@@ -29,8 +29,8 @@ fn run() -> Result<(), Box<std::error::Error>> {
     solver.temp_func(SATempFunc::Exponential(0.8));
 
     // definie inital parameter vector
-    // let init_param: Vec<f64> = vec![0.0, 0.0];
-    let init_param: Vec<f64> = prob.random_param()?;
+    let init_param: Vec<f64> = vec![0.0, 0.0];
+    // let init_param: Vec<f64> = prob.random_param()?;
 
     let result = solver.run(&prob, &init_param)?;
 
