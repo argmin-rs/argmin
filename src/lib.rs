@@ -26,7 +26,7 @@ extern crate rand;
 
 /// Macros
 #[macro_use]
-mod macros;
+pub mod macros;
 
 use std::default::Default;
 use num::{Bounded, ToPrimitive};
