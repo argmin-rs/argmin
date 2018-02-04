@@ -8,9 +8,8 @@
 extern crate argmin;
 extern crate ndarray;
 use ndarray::{Array1, Array2};
-use argmin::ArgminSolver;
-use argmin::problem::Problem;
-use argmin::newton::Newton;
+use argmin::prelude::*;
+use argmin::{Newton, Problem};
 use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_hessian_nd, rosenbrock_nd};
 
 fn run() -> Result<(), Box<std::error::Error>> {

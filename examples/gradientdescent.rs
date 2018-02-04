@@ -8,11 +8,9 @@
 extern crate argmin;
 extern crate ndarray;
 use ndarray::Array1;
-use argmin::problem::Problem;
-use argmin::gradientdescent::{GDGammaUpdate, GradientDescent};
+use argmin::prelude::*;
+use argmin::{BacktrackingLineSearch, GDGammaUpdate, GradientDescent, Problem};
 use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_nd};
-use argmin::backtracking::BacktrackingLineSearch;
-use argmin::ArgminSolver;
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function

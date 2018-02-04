@@ -11,9 +11,9 @@
 use std;
 use ndarray::{Array1, Array2};
 use errors::*;
+use prelude::*;
 use operator::ArgminOperator;
 use result::ArgminResult;
-use ArgminSolver;
 
 /// Landweber algorithm struct (duh)
 pub struct Landweber<'a> {

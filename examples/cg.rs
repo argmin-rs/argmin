@@ -9,9 +9,8 @@
 extern crate argmin;
 extern crate ndarray;
 use ndarray::{arr1, arr2};
-use argmin::ArgminSolver;
-use argmin::operator::ArgminOperator;
-use argmin::cg::ConjugateGradient;
+use argmin::prelude::*;
+use argmin::{ArgminOperator, ConjugateGradient};
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Set up problem

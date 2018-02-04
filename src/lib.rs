@@ -32,7 +32,6 @@ use std::default::Default;
 use num::{Bounded, ToPrimitive};
 use errors::*;
 use parameter::ArgminParameter;
-use result::ArgminResult;
 
 /// Trait for cost function values
 /// TODO: Do this with trait aliases once they work in rust.
@@ -75,6 +74,9 @@ pub trait ArgminSolver<'a> {
     fn terminate(&self) -> bool;
 }
 
+/// Definition of all relevant traits
+pub mod prelude;
+
 /// Definition of the return type of the solvers
 pub mod result;
 
@@ -113,6 +115,20 @@ pub mod cg;
 
 /// Errors using `error-chain`
 mod errors;
+
+/// Bring some structs into scope to make them easier to access
+pub use problem::Problem;
+pub use operator::ArgminOperator;
+pub use result::ArgminResult;
+pub use sa::SimulatedAnnealing;
+pub use sa::SATempFunc;
+pub use newton::Newton;
+pub use cg::ConjugateGradient;
+pub use gradientdescent::GradientDescent;
+pub use gradientdescent::GDGammaUpdate;
+pub use backtracking::BacktrackingLineSearch;
+pub use landweber::Landweber;
+pub use neldermead::NelderMead;
 
 #[cfg(test)]
 mod tests {

@@ -11,10 +11,10 @@
 use std;
 use ndarray::Array1;
 use errors::*;
+use prelude::*;
 use problem::Problem;
 use result::ArgminResult;
-use backtracking;
-use ArgminSolver;
+use backtracking::BacktrackingLineSearch;
 
 /// Gradient Descent gamma update method
 pub enum GDGammaUpdate<'a> {
@@ -26,7 +26,7 @@ pub enum GDGammaUpdate<'a> {
     /// TODO: More detailed description (formula)
     BarzilaiBorwein,
     /// Backtracking line search
-    BacktrackingLineSearch(backtracking::BacktrackingLineSearch<'a>),
+    BacktrackingLineSearch(BacktrackingLineSearch<'a>),
 }
 
 /// Gradient Descent struct (duh)

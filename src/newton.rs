@@ -12,9 +12,9 @@ use std;
 use ndarray::{Array1, Array2};
 use ndarray_linalg::Inverse;
 use errors::*;
+use prelude::*;
 use problem::Problem;
 use result::ArgminResult;
-use ArgminSolver;
 
 /// Newton method struct (duh)
 pub struct Newton<'a> {

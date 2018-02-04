@@ -14,9 +14,7 @@ use rand::distributions::{IndependentSample, Range};
 use errors::*;
 use problem::Problem;
 use result::ArgminResult;
-use parameter::ArgminParameter;
-use ArgminSolver;
-use ArgminCostValue;
+use prelude::*;
 
 /// Definition of build in temperature functions for Simulated Annealing.
 ///

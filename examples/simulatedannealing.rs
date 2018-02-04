@@ -6,9 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
-use argmin::ArgminSolver;
-use argmin::problem::Problem;
-use argmin::sa::{SATempFunc, SimulatedAnnealing};
+use argmin::prelude::*;
+use argmin::{Problem, SATempFunc, SimulatedAnnealing};
 use argmin::testfunctions::rosenbrock;
 
 fn run() -> Result<(), Box<std::error::Error>> {

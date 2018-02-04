@@ -9,9 +9,8 @@
 extern crate argmin;
 extern crate ndarray;
 use ndarray::{arr1, arr2};
-use argmin::ArgminSolver;
-use argmin::operator::ArgminOperator;
-use argmin::landweber::Landweber;
+use argmin::prelude::*;
+use argmin::{ArgminOperator, Landweber};
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Set up problem

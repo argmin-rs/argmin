@@ -10,9 +10,9 @@
 /// TODO
 use std;
 use errors::*;
+use prelude::*;
 use problem::Problem;
 use result::ArgminResult;
-use ArgminSolver;
 
 /// Nelder Mead method
 pub struct NelderMead<'a> {

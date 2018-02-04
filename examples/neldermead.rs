@@ -6,9 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
-use argmin::ArgminSolver;
-use argmin::problem::Problem;
-use argmin::neldermead::NelderMead;
+use argmin::prelude::*;
+use argmin::{NelderMead, Problem};
 use argmin::testfunctions::rosenbrock;
 
 fn run() -> Result<(), Box<std::error::Error>> {
