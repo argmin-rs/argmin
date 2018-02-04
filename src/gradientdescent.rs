@@ -13,7 +13,7 @@ use std;
 use ndarray::Array1;
 use errors::*;
 use prelude::*;
-use problem::Problem;
+use problem::ArgminProblem;
 use result::ArgminResult;
 use backtracking::BacktrackingLineSearch;
 
@@ -45,7 +45,7 @@ pub struct GradientDescent<'a> {
 /// Indicates the current state of the Gradient Descent method.
 struct GradientDescentState<'a> {
     /// Reference to the problem. This is an Option<_> because it is initialized as `None`
-    problem: Option<&'a Problem<'a, Array1<f64>, f64, Array1<f64>>>,
+    problem: Option<&'a ArgminProblem<'a, Array1<f64>, f64, Array1<f64>>>,
     /// Previous parameter vector
     prev_param: Array1<f64>,
     /// Current parameter vector
@@ -137,7 +137,7 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
     type CostValue = f64;
     type Hessian = Array1<f64>;
     type StartingPoints = Array1<f64>;
-    type ProblemDefinition = Problem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
+    type ProblemDefinition = ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// Initialize with a given problem and a starting point
     fn init(

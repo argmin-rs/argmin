@@ -117,7 +117,7 @@ pub mod cg;
 mod errors;
 
 /// Bring some structs into scope to make them easier to access
-pub use problem::Problem;
+pub use problem::ArgminProblem;
 pub use operator::ArgminOperator;
 pub use result::ArgminResult;
 pub use sa::SimulatedAnnealing;

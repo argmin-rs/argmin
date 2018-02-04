@@ -13,7 +13,7 @@ use prelude::*;
 use parameter::ArgminParameter;
 
 /// This struct hold all information that describes the optimization problem.
-pub struct Problem<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> {
+pub struct ArgminProblem<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> {
     /// reference to a function which computes the cost/fitness for a given parameter vector
     pub cost_function: &'a Fn(&T) -> U,
     /// optional reference to a function which provides the gradient at a given point in parameter
@@ -32,8 +32,8 @@ pub struct Problem<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> 
     pub target_cost: U,
 }
 
-impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T, U, V> {
-    /// Create a new `Problem` struct.
+impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> ArgminProblem<'a, T, U, V> {
+    /// Create a new `ArgminProblem` struct.
     ///
     /// The field `gradient` is automatically set to `None`, but can be manually set by the
     /// `gradient` function. The (non) linear constraint `constraint` is set to a closure which
@@ -41,7 +41,7 @@ impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Problem<'a, T,
     ///
     /// `cost_function`: Reference to a cost function
     pub fn new(cost_function: &'a Fn(&T) -> U) -> Self {
-        Problem {
+        ArgminProblem {
             cost_function: cost_function,
             gradient: None,
             hessian: None,

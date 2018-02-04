@@ -13,7 +13,7 @@
 use rand;
 use rand::distributions::{IndependentSample, Range};
 use errors::*;
-use problem::Problem;
+use problem::ArgminProblem;
 use result::ArgminResult;
 use prelude::*;
 
@@ -68,7 +68,7 @@ where
     V: 'a,
 {
     /// Reference to the problem.
-    problem: &'a Problem<'a, T, U, V>,
+    problem: &'a ArgminProblem<'a, T, U, V>,
     /// Current number of iteration
     param: T,
     /// Current number of iteration
@@ -188,7 +188,7 @@ where
     type CostValue = U;
     type Hessian = V;
     type StartingPoints = T;
-    type ProblemDefinition = Problem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
+    type ProblemDefinition = ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// Initialize with a given problem and a starting point
     fn init(

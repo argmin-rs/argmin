@@ -9,7 +9,7 @@ extern crate argmin;
 extern crate ndarray;
 use ndarray::Array1;
 use argmin::prelude::*;
-use argmin::{BacktrackingLineSearch, GDGammaUpdate, GradientDescent, Problem};
+use argmin::{ArgminProblem, BacktrackingLineSearch, GDGammaUpdate, GradientDescent};
 use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_nd};
 
 fn run() -> Result<(), Box<std::error::Error>> {
@@ -19,7 +19,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     // Set up problem
     // The problem requires a cost function, lower and upper bounds and takes an optional gradient.
-    let mut prob = Problem::new(&cost);
+    let mut prob = ArgminProblem::new(&cost);
     prob.gradient(&gradient);
 
     // Set up GradientDecent solver

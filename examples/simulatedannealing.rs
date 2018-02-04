@@ -7,7 +7,7 @@
 
 extern crate argmin;
 use argmin::prelude::*;
-use argmin::{Problem, SATempFunc, SimulatedAnnealing};
+use argmin::{ArgminProblem, SATempFunc, SimulatedAnnealing};
 use argmin::testfunctions::rosenbrock;
 
 fn run() -> Result<(), Box<std::error::Error>> {
@@ -19,7 +19,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let upper_bound: Vec<f64> = vec![2.0, 3.0];
 
     // Set up problem
-    let mut prob: Problem<_, _, f64> = Problem::new(&cost);
+    let mut prob: ArgminProblem<_, _, f64> = ArgminProblem::new(&cost);
     prob.bounds(&lower_bound, &upper_bound);
     prob.target_cost(0.01);
 

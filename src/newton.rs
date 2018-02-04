@@ -14,7 +14,7 @@ use ndarray::{Array1, Array2};
 use ndarray_linalg::Inverse;
 use errors::*;
 use prelude::*;
-use problem::Problem;
+use problem::ArgminProblem;
 use result::ArgminResult;
 
 /// Newton method struct (duh)
@@ -30,7 +30,7 @@ pub struct Newton<'a> {
 /// Indicates the current state of the Newton method
 struct NewtonState<'a> {
     /// Reference to the problem. This is an Option<_> because it is initialized as `None`
-    problem: &'a Problem<'a, Array1<f64>, f64, Array2<f64>>,
+    problem: &'a ArgminProblem<'a, Array1<f64>, f64, Array2<f64>>,
     /// Current parameter vector
     param: Array1<f64>,
     /// Current number of iteration
@@ -40,7 +40,7 @@ struct NewtonState<'a> {
 impl<'a> NewtonState<'a> {
     /// Constructor for `NewtonState`
     pub fn new(
-        problem: &'a Problem<'a, Array1<f64>, f64, Array2<f64>>,
+        problem: &'a ArgminProblem<'a, Array1<f64>, f64, Array2<f64>>,
         param: Array1<f64>,
     ) -> Self {
         NewtonState {
@@ -73,7 +73,7 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
     type CostValue = f64;
     type Hessian = Array2<f64>;
     type StartingPoints = Self::Parameter;
-    type ProblemDefinition = Problem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
+    type ProblemDefinition = ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// Initialize with a given problem and a starting point
     fn init(

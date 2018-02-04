@@ -12,7 +12,7 @@
 use std;
 use errors::*;
 use prelude::*;
-use problem::Problem;
+use problem::ArgminProblem;
 use result::ArgminResult;
 
 /// Nelder Mead method
@@ -38,7 +38,7 @@ struct NelderMeadParam {
 }
 
 struct NelderMeadState<'a> {
-    problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
+    problem: &'a ArgminProblem<'a, Vec<f64>, f64, Vec<f64>>,
     param_vecs: Vec<NelderMeadParam>,
     iter: u64,
 }
@@ -46,7 +46,7 @@ struct NelderMeadState<'a> {
 impl<'a> NelderMeadState<'a> {
     /// Constructor
     pub fn new(
-        problem: &'a Problem<'a, Vec<f64>, f64, Vec<f64>>,
+        problem: &'a ArgminProblem<'a, Vec<f64>, f64, Vec<f64>>,
         param_vecs: Vec<NelderMeadParam>,
     ) -> Self {
         NelderMeadState {
@@ -164,7 +164,7 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
     type CostValue = f64;
     type Hessian = Vec<f64>;
     type StartingPoints = Vec<Self::Parameter>;
-    type ProblemDefinition = Problem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
+    type ProblemDefinition = ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// initialization with predefined parameter vectors
     fn init(

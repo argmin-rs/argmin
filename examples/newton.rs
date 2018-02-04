@@ -9,7 +9,7 @@ extern crate argmin;
 extern crate ndarray;
 use ndarray::{Array1, Array2};
 use argmin::prelude::*;
-use argmin::{Newton, Problem};
+use argmin::{ArgminProblem, Newton};
 use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_hessian_nd, rosenbrock_nd};
 
 fn run() -> Result<(), Box<std::error::Error>> {
@@ -21,7 +21,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     // Set up problem
     // The problem requires a cost function, gradient and hessian.
-    let mut prob = Problem::new(&cost);
+    let mut prob = ArgminProblem::new(&cost);
     prob.gradient(&gradient);
     prob.hessian(&hessian);
 

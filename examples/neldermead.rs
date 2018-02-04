@@ -7,7 +7,7 @@
 
 extern crate argmin;
 use argmin::prelude::*;
-use argmin::{NelderMead, Problem};
+use argmin::{ArgminProblem, NelderMead};
 use argmin::testfunctions::rosenbrock;
 
 fn run() -> Result<(), Box<std::error::Error>> {
@@ -15,7 +15,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64) };
 
     // Set up problem
-    let mut prob = Problem::new(&cost);
+    let mut prob = ArgminProblem::new(&cost);
     prob.target_cost(0.01);
 
     // Set up GradientDecent solver
