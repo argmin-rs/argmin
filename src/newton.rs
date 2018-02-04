@@ -5,9 +5,10 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-/// Newton method
-///
-/// TODO
+//! Newton method
+//!
+//! TODO
+
 use std;
 use ndarray::{Array1, Array2};
 use ndarray_linalg::Inverse;

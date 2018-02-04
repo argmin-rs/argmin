@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+//! TODO Documentation
+
 error_chain!{
     foreign_links {
         NdarrayLinalg(::ndarray_linalg::error::LinalgError);

@@ -5,11 +5,12 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-/// TODO DOCUMENTATION
-///
+//! TODO DOCUMENTATION
+//!
+
 use errors::*;
+use prelude::*;
 use parameter::ArgminParameter;
-use ArgminCostValue;
 
 /// This struct hold all information that describes the optimization problem.
 pub struct Problem<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> {

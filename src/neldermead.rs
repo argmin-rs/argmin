@@ -5,9 +5,10 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-/// Nelder-Mead method
-///
-/// TODO
+//! Nelder-Mead method
+//!
+//! TODO
+
 use std;
 use errors::*;
 use prelude::*;

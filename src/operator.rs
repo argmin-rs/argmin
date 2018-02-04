@@ -5,8 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-/// TODO DOCUMENTATION
-///
+//! TODO DOCUMENTATION
+//!
+
 use std;
 use ndarray::{Array1, Array2};
 

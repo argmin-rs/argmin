@@ -5,10 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-/// TODO
-///
-/// * [ ] Different acceptance functions
-/// * [ ] Early stopping criterions
+//! TODO
+//!
+//! * [ ] Different acceptance functions
+//! * [ ] Early stopping criterions
+
 use rand;
 use rand::distributions::{IndependentSample, Range};
 use errors::*;

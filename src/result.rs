@@ -5,9 +5,10 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-/// `ArgminResult`
-///
-/// TODO
+//! `ArgminResult`
+//!
+//! TODO Documentation
+
 use parameter::ArgminParameter;
 use ArgminCostValue;
 
