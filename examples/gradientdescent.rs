@@ -68,7 +68,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
     loop {
         par = solver.next_iter()?;
         // println!("{:?}", par);
-        if par.iters >= result1.iters {
+        if par.terminated {
             break;
         };
     }

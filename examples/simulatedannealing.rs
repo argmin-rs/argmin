@@ -35,6 +35,18 @@ fn run() -> Result<(), Box<std::error::Error>> {
 
     // print result
     println!("{:?}", result);
+
+    // solve it manually
+    solver.init(&prob, &init_param)?;
+    let mut res;
+    loop {
+        res = solver.next_iter()?;
+        if res.terminated {
+            break;
+        }
+    }
+    println!("{:?}", res);
+
     Ok(())
 }
 

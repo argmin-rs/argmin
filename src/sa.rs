@@ -13,9 +13,10 @@
 use rand;
 use rand::distributions::{IndependentSample, Range};
 use errors::*;
+use prelude::*;
 use problem::ArgminProblem;
 use result::ArgminResult;
-use prelude::*;
+use termination::TerminationReason;
 
 /// Definition of build in temperature functions for Simulated Annealing.
 ///
@@ -41,7 +42,7 @@ pub enum SATempFunc {
     Custom,
 }
 
-/// Simulated Annealing struct (duh)
+/// Simulated Annealing struct
 pub struct SimulatedAnnealing<'a, T, U, V = U>
 where
     T: ArgminParameter + 'a,
@@ -255,16 +256,22 @@ where
         let cur_iter = state.iter;
         state.cur_temp = self.update_temperature(cur_iter)?;
         state.iter += 1;
-        let out = ArgminResult::new(state.param.clone(), state.best_cost, state.iter);
+        let mut out = ArgminResult::new(state.param.clone(), state.best_cost, state.iter);
         self.state = Some(state);
+        out.set_termination_reason(self.terminate());
         Ok(out)
     }
 
     /// Stopping criterions
-    fn terminate(&self) -> bool {
-        self.state.as_ref().unwrap().iter >= self.max_iters
-            || self.state.as_ref().unwrap().best_cost
-                < self.state.as_ref().unwrap().problem.target_cost
+    fn terminate(&self) -> TerminationReason {
+        if self.state.as_ref().unwrap().iter >= self.max_iters {
+            return TerminationReason::MaxItersReached;
+        }
+        if self.state.as_ref().unwrap().best_cost < self.state.as_ref().unwrap().problem.target_cost
+        {
+            return TerminationReason::TargetCostReached;
+        }
+        TerminationReason::NotTerminated
     }
 
     /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.

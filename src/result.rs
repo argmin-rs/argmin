@@ -11,6 +11,7 @@
 
 use parameter::ArgminParameter;
 use ArgminCostValue;
+use termination::TerminationReason;
 
 /// Return struct for all solvers.
 #[derive(Debug)]
@@ -21,6 +22,10 @@ pub struct ArgminResult<T: ArgminParameter, U: ArgminCostValue> {
     pub cost: U,
     /// Number of iterations
     pub iters: u64,
+    /// Indicated whether it terminated or not
+    pub terminated: bool,
+    /// Reason of termination
+    pub termination_reason: TerminationReason,
 }
 
 impl<T: ArgminParameter, U: ArgminCostValue> ArgminResult<T, U> {
@@ -30,6 +35,26 @@ impl<T: ArgminParameter, U: ArgminCostValue> ArgminResult<T, U> {
     /// `cost`: Final (best) cost function value
     /// `iters`: Number of iterations
     pub fn new(param: T, cost: U, iters: u64) -> Self {
-        ArgminResult { param, cost, iters }
+        ArgminResult {
+            param: param,
+            cost: cost,
+            iters: iters,
+            terminated: false,
+            termination_reason: TerminationReason::NotTerminated,
+        }
+    }
+
+    /// Set the termination reason
+    ///
+    /// In case of `NotTerminated`, the field `terminated` is set to `false` and `true` otherwise.
+    ///
+    /// `termination_reason`: Termination reason of type `TerminationReason`
+    pub fn set_termination_reason(&mut self, termination_reason: TerminationReason) -> &mut Self {
+        self.termination_reason = termination_reason;
+        self.terminated = match self.termination_reason {
+            TerminationReason::NotTerminated => false,
+            _ => true,
+        };
+        self
     }
 }

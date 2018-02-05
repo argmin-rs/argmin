@@ -16,6 +16,7 @@ use errors::*;
 use prelude::*;
 use problem::ArgminProblem;
 use result::ArgminResult;
+use termination::TerminationReason;
 
 /// Newton method struct (duh)
 pub struct Newton<'a> {
@@ -94,14 +95,18 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
         let h_inv = (state.problem.hessian.unwrap())(&state.param).inv()?;
         state.param = state.param - self.gamma * h_inv.dot(&g);
         state.iter += 1;
-        let out = ArgminResult::new(state.param.clone(), std::f64::NAN, state.iter);
+        let mut out = ArgminResult::new(state.param.clone(), std::f64::NAN, state.iter);
         self.state = Some(state);
+        out.set_termination_reason(self.terminate());
         Ok(out)
     }
 
     /// Indicates whether any of the stopping criteria are met
-    fn terminate(&self) -> bool {
-        self.state.as_ref().unwrap().iter >= self.max_iters
+    fn terminate(&self) -> TerminationReason {
+        if self.state.as_ref().unwrap().iter >= self.max_iters {
+            return TerminationReason::MaxItersReached;
+        }
+        TerminationReason::NotTerminated
     }
 
     /// Run Newton method

@@ -16,6 +16,7 @@ use prelude::*;
 use problem::ArgminProblem;
 use result::ArgminResult;
 use backtracking::BacktrackingLineSearch;
+use termination::TerminationReason;
 
 /// Gradient Descent gamma update method
 pub enum GDGammaUpdate<'a> {
@@ -179,27 +180,25 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
         // Update gamma
         self.update_gamma();
         self.state.iter += 1;
-        Ok(ArgminResult::new(
-            self.state.param.clone(),
-            std::f64::NAN,
-            self.state.iter,
-        ))
+        let mut out = ArgminResult::new(self.state.param.clone(), std::f64::NAN, self.state.iter);
+        out.set_termination_reason(self.terminate());
+        Ok(out)
     }
 
     /// Indicates whether any of the stopping criteria are met
-    fn terminate(&self) -> bool {
+    fn terminate(&self) -> TerminationReason {
         // use zip here...
         let prev_step_size = ((self.state.param[0] - self.state.prev_param[0]).powf(2.0)
             + (self.state.param[1] - self.state.prev_param[1]).powf(2.0))
             .sqrt();
 
         if prev_step_size < self.precision {
-            return true;
+            return TerminationReason::TargetPrecisionReached;
         }
         if self.state.iter >= self.max_iters {
-            return true;
+            return TerminationReason::MaxItersReached;
         }
-        false
+        TerminationReason::NotTerminated
     }
 
     /// Run gradient descent method

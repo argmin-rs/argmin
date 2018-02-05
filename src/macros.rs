@@ -21,7 +21,7 @@ macro_rules! make_run {
             let mut res;
             loop {
                 res = self.next_iter()?;
-                if self.terminate() {
+                if res.terminated {
                     break;
                 }
             }

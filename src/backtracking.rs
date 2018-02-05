@@ -11,17 +11,18 @@
 
 use errors::*;
 use ndarray::Array1;
+use termination::TerminationReason;
 
-/// Reasons why it stopped -- shouldnt be here probably
-#[derive(Debug)]
-pub enum TerminationReason {
-    /// Maximum number of iterations reached
-    MaxNumberIterations,
-    /// It converged before reaching the maximum number of iterations.
-    Converged,
-    /// dont know
-    Unkown,
-}
+// /// Reasons why it stopped -- shouldnt be here probably
+// #[derive(Debug)]
+// pub enum TerminationReason {
+//     /// Maximum number of iterations reached
+//     MaxNumberIterations,
+//     /// It converged before reaching the maximum number of iterations.
+//     Converged,
+//     /// dont know
+//     Unkown,
+// }
 
 /// Backtracking Line Search
 pub struct BacktrackingLineSearch<'a> {
@@ -108,11 +109,11 @@ impl<'a> BacktrackingLineSearch<'a> {
         loop {
             let param = x + &(alpha * p);
             if fx - (self.cost_function)(&param) >= alpha * t {
-                termination_reason = TerminationReason::Converged;
+                termination_reason = TerminationReason::TargetCostReached;
                 break;
             }
             if idx > self.max_iters {
-                termination_reason = TerminationReason::MaxNumberIterations;
+                termination_reason = TerminationReason::MaxItersReached;
                 break;
             }
             idx += 1;

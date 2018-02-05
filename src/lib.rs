@@ -71,7 +71,7 @@ pub trait ArgminSolver<'a> {
     ) -> Result<ArgminResult<Self::Parameter, Self::CostValue>>;
 
     /// Handles the stopping criteria
-    fn terminate(&self) -> bool;
+    fn terminate(&self) -> TerminationReason;
 }
 
 /// Definition of all relevant traits
@@ -88,6 +88,9 @@ pub mod problem;
 
 /// Operator
 pub mod operator;
+
+/// Termination reasons
+pub mod termination;
 
 /// A set of test functions like Rosenbrock's function and so on.
 pub mod testfunctions;
@@ -129,6 +132,7 @@ pub use gradientdescent::GDGammaUpdate;
 pub use backtracking::BacktrackingLineSearch;
 pub use landweber::Landweber;
 pub use neldermead::NelderMead;
+pub use termination::TerminationReason;
 
 #[cfg(test)]
 mod tests {

@@ -30,9 +30,9 @@ fn run() -> Result<(), Box<std::error::Error>> {
     loop {
         par = solver.next_iter()?;
         // println!("{:?}", par);
-        if solver.terminate() {
+        if par.terminated {
             break;
-        };
+        }
     }
 
     println!("{:?}", par);

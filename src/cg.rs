@@ -15,6 +15,7 @@ use errors::*;
 use prelude::*;
 use operator::ArgminOperator;
 use result::ArgminResult;
+use termination::TerminationReason;
 
 /// Conjugate Gradient method struct (duh)
 pub struct ConjugateGradient<'a> {
@@ -123,15 +124,21 @@ impl<'a> ArgminSolver<'a> for ConjugateGradient<'a> {
         state.p = beta * &state.p + &state.r;
         state.iter += 1;
         state.norm = state.r.iter().map(|a| a.powf(2.0)).sum::<f64>().sqrt();
-        let out = ArgminResult::new(state.param.clone(), state.norm, state.iter);
+        let mut out = ArgminResult::new(state.param.clone(), state.norm, state.iter);
         self.state = Some(state);
+        out.set_termination_reason(self.terminate());
         Ok(out)
     }
 
     /// Indicates whether any of the stopping criteria are met
-    fn terminate(&self) -> bool {
-        self.state.as_ref().unwrap().iter >= self.max_iters
-            || self.state.as_ref().unwrap().norm < self.state.as_ref().unwrap().operator.target_cost
+    fn terminate(&self) -> TerminationReason {
+        if self.state.as_ref().unwrap().iter >= self.max_iters {
+            return TerminationReason::MaxItersReached;
+        }
+        if self.state.as_ref().unwrap().norm < self.state.as_ref().unwrap().operator.target_cost {
+            return TerminationReason::TargetCostReached;
+        }
+        TerminationReason::NotTerminated
     }
 
     /// Run Conjugate Gradient method

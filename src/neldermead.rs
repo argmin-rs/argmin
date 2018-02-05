@@ -14,6 +14,7 @@ use errors::*;
 use prelude::*;
 use problem::ArgminProblem;
 use result::ArgminResult;
+use termination::TerminationReason;
 
 /// Nelder Mead method
 pub struct NelderMead<'a> {
@@ -224,21 +225,23 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
 
         self.sort_param_vecs(&mut state);
         let param = state.param_vecs[0].clone();
-        let out = ArgminResult::new(param.param, param.cost, state.iter);
+        let mut out = ArgminResult::new(param.param, param.cost, state.iter);
         self.state = Some(state);
+        out.set_termination_reason(self.terminate());
         Ok(out)
     }
 
     /// Stopping criterions
-    fn terminate(&self) -> bool {
-        // if self.state.iter >= self.max_iters {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
-        self.state.as_ref().unwrap().iter >= self.max_iters
-            || self.state.as_ref().unwrap().param_vecs[0].cost
-                < self.state.as_ref().unwrap().problem.target_cost
+    fn terminate(&self) -> TerminationReason {
+        if self.state.as_ref().unwrap().iter >= self.max_iters {
+            return TerminationReason::MaxItersReached;
+        }
+        if self.state.as_ref().unwrap().param_vecs[0].cost
+            < self.state.as_ref().unwrap().problem.target_cost
+        {
+            return TerminationReason::TargetCostReached;
+        }
+        TerminationReason::NotTerminated
     }
 
     /// Run Nelder Mead optimization
