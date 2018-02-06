@@ -1,6 +1,6 @@
 [package]
 name = "argmin"
-version = "0.0.6"
+version = "0.0.7"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "WIP optimization toolbox for Rust"
