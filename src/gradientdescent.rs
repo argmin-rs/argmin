@@ -61,6 +61,8 @@ struct GradientDescentState<'a> {
     prev_grad: Array1<f64>,
     /// Current gradient
     cur_grad: Array1<f64>,
+    /// Previous step size
+    prev_step_size: f64,
 }
 
 impl<'a> GradientDescentState<'a> {
@@ -75,6 +77,7 @@ impl<'a> GradientDescentState<'a> {
             gamma: 0_f64,
             prev_grad: Array1::from_vec(vec![0_f64; 1]),
             cur_grad: Array1::from_vec(vec![0_f64; 1]),
+            prev_step_size: std::f64::NAN,
         }
     }
 }
@@ -158,6 +161,7 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
             },
             prev_grad: Array1::from_vec(vec![0_f64; init_param.len()]),
             cur_grad: (problem.gradient.unwrap())(&init_param.to_owned()),
+            prev_step_size: std::f64::NAN,
         };
         Ok(())
     }
@@ -179,6 +183,9 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
 
         // Update gamma
         self.update_gamma();
+        self.state.prev_step_size = ((self.state.param[0] - self.state.prev_param[0]).powf(2.0)
+            + (self.state.param[1] - self.state.prev_param[1]).powf(2.0))
+            .sqrt();
         self.state.iter += 1;
         let mut out = ArgminResult::new(self.state.param.clone(), std::f64::NAN, self.state.iter);
         out.set_termination_reason(self.terminate());
@@ -186,20 +193,10 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
     }
 
     /// Indicates whether any of the stopping criteria are met
-    fn terminate(&self) -> TerminationReason {
-        // use zip here...
-        let prev_step_size = ((self.state.param[0] - self.state.prev_param[0]).powf(2.0)
-            + (self.state.param[1] - self.state.prev_param[1]).powf(2.0))
-            .sqrt();
-
-        if prev_step_size < self.precision {
-            return TerminationReason::TargetPrecisionReached;
-        }
-        if self.state.iter >= self.max_iters {
-            return TerminationReason::MaxItersReached;
-        }
-        TerminationReason::NotTerminated
-    }
+    make_terminate!(self,
+        self.state.iter >= self.max_iters, TerminationReason::MaxItersReached;
+        self.state.prev_step_size <= self.precision, TerminationReason::TargetPrecisionReached;
+    );
 
     /// Run gradient descent method
     make_run!(

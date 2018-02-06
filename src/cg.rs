@@ -131,15 +131,10 @@ impl<'a> ArgminSolver<'a> for ConjugateGradient<'a> {
     }
 
     /// Indicates whether any of the stopping criteria are met
-    fn terminate(&self) -> TerminationReason {
-        if self.state.as_ref().unwrap().iter >= self.max_iters {
-            return TerminationReason::MaxItersReached;
-        }
-        if self.state.as_ref().unwrap().norm < self.state.as_ref().unwrap().operator.target_cost {
-            return TerminationReason::TargetCostReached;
-        }
-        TerminationReason::NotTerminated
-    }
+    make_terminate!(self,
+        self.state.as_ref().unwrap().iter >= self.max_iters, TerminationReason::MaxItersReached;
+        self.state.as_ref().unwrap().norm <= self.state.as_ref().unwrap().operator.target_cost, TerminationReason::TargetCostReached;
+    );
 
     /// Run Conjugate Gradient method
     make_run!(

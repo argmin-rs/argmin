@@ -232,17 +232,10 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
     }
 
     /// Stopping criterions
-    fn terminate(&self) -> TerminationReason {
-        if self.state.as_ref().unwrap().iter >= self.max_iters {
-            return TerminationReason::MaxItersReached;
-        }
-        if self.state.as_ref().unwrap().param_vecs[0].cost
-            < self.state.as_ref().unwrap().problem.target_cost
-        {
-            return TerminationReason::TargetCostReached;
-        }
-        TerminationReason::NotTerminated
-    }
+    make_terminate!(self,
+        self.state.as_ref().unwrap().iter >= self.max_iters, TerminationReason::MaxItersReached;
+        self.state.as_ref().unwrap().param_vecs[0].cost <= self.state.as_ref().unwrap().problem.target_cost, TerminationReason::TargetCostReached;
+    );
 
     /// Run Nelder Mead optimization
     make_run!(

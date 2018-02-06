@@ -263,16 +263,10 @@ where
     }
 
     /// Stopping criterions
-    fn terminate(&self) -> TerminationReason {
-        if self.state.as_ref().unwrap().iter >= self.max_iters {
-            return TerminationReason::MaxItersReached;
-        }
-        if self.state.as_ref().unwrap().best_cost < self.state.as_ref().unwrap().problem.target_cost
-        {
-            return TerminationReason::TargetCostReached;
-        }
-        TerminationReason::NotTerminated
-    }
+    make_terminate!(self,
+        self.state.as_ref().unwrap().iter >= self.max_iters, TerminationReason::MaxItersReached;
+        self.state.as_ref().unwrap().best_cost <= self.state.as_ref().unwrap().problem.target_cost, TerminationReason::TargetCostReached;
+    );
 
     /// Run simulated annealing solver on problem `problem` with initial parameter `init_param`.
     make_run!(

@@ -17,6 +17,7 @@
 #![cfg_attr(feature = "clippy", feature(plugin))]
 #![cfg_attr(feature = "clippy", plugin(clippy))]
 #![warn(missing_docs)]
+#![feature(trace_macros)]
 #[macro_use]
 extern crate error_chain;
 extern crate ndarray;

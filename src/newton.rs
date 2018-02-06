@@ -102,12 +102,9 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
     }
 
     /// Indicates whether any of the stopping criteria are met
-    fn terminate(&self) -> TerminationReason {
-        if self.state.as_ref().unwrap().iter >= self.max_iters {
-            return TerminationReason::MaxItersReached;
-        }
-        TerminationReason::NotTerminated
-    }
+    make_terminate!(self,
+        self.state.as_ref().unwrap().iter >= self.max_iters, TerminationReason::MaxItersReached;
+    );
 
     /// Run Newton method
     make_run!(
