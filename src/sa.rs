@@ -142,7 +142,7 @@ where
     /// Any solution where `next_cost < prev_cost` will be accepted. Whenever a new solution is
     /// worse than the previous one, the acceptance probability is calculated as:
     ///
-    ///     `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
+    /// `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
     ///
     /// which will always be between 0 and 0.5.
     fn accept(&self, state: &SimulatedAnnealingState<T, U, V>, next_cost: f64) -> bool {
