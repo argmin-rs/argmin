@@ -135,10 +135,10 @@ pub use landweber::Landweber;
 pub use neldermead::NelderMead;
 pub use termination::TerminationReason;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     #[test]
+//     fn it_works() {
+//         assert_eq!(2 + 2, 4);
+//     }
+// }
