@@ -7,6 +7,7 @@
 
 //! TODO Documentation
 
+use std::iter:Sum;
 use ndarray::{Array1, Array2};
 use num::{Float, FromPrimitive};
 
@@ -94,11 +95,13 @@ pub fn rosenbrock_hessian_nd<T: Float + FromPrimitive>(
 }
 
 /// Sphere test function
-pub fn sphere(param: &[f64]) -> f64 {
-    param.iter().map(|x| x.powf(2.0)).sum()
+pub fn sphere<T: Float + FromPrimitive + Sum>(param: &[T]) -> T {
+    let num2 = T::from_f64(2.0).unwrap();
+    param.iter().map(|x| x.powf(num2)).sum()
 }
 
 /// Derivative of sphere test function
-pub fn sphere_derivative(param: &[f64]) -> Vec<f64> {
-    param.iter().map(|x| 2.0 * x).collect()
+pub fn sphere_derivative<T: Float + FromPrimitive>(param: &[T]) -> Vec<T> {
+    let num2 = T::from_f64(2.0).unwrap();
+    param.iter().map(|x| num2 * *x).collect()
 }
