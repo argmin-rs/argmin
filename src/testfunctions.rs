@@ -8,6 +8,7 @@
 //! TODO Documentation
 
 use ndarray::{Array1, Array2};
+use num::{Float, FromPrimitive};
 
 /// Rosenbrock test function
 ///
@@ -47,33 +48,48 @@ pub fn rosenbrock_hessian(param: &[f64], _a: f64, b: f64) -> Vec<f64> {
 ///
 /// Parameters are usually: `a = 1` and `b = 100`
 /// TODO: make this multidimensional
-pub fn rosenbrock_nd(param: &Array1<f64>, a: f64, b: f64) -> f64 {
-    (a - param[0]).powf(2.0) + b * (param[1] - param[0].powf(2.0)).powf(2.0)
+pub fn rosenbrock_nd<T: Float + FromPrimitive>(param: &Array1<T>, a: T, b: T) -> T {
+    let num2 = T::from_f64(2.0).unwrap();
+    (a - param[0]).powf(num2) + b * (param[1] - param[0].powf(num2)).powf(num2)
 }
 
 /// Derivative of 2D Rosenbrock function, returning an ndarray
-pub fn rosenbrock_derivative_nd(param: &Array1<f64>, a: f64, b: f64) -> Array1<f64> {
+pub fn rosenbrock_derivative_nd<T: Float + FromPrimitive>(
+    param: &Array1<T>,
+    a: T,
+    b: T,
+) -> Array1<T> {
+    let num2 = T::from_f64(2.0).unwrap();
+    let num3 = T::from_f64(3.0).unwrap();
+    let num4 = T::from_f64(4.0).unwrap();
     let x = param[0];
     let y = param[1];
     let mut out = Array1::zeros(2);
-    out[[0]] = -2.0 * a + 4.0 * b * x.powf(3.0) - 4.0 * b * x * y + 2.0 * x;
-    out[[1]] = 2.0 * b * (y - x.powf(2.0));
+    out[[0]] = -num2 * a + num4 * b * x.powf(num3) - num4 * b * x * y + num2 * x;
+    out[[1]] = num2 * b * (y - x.powf(num2));
     out
 }
 
 /// Hessian of 2D Rosenbrock function, returning an ndarray
-pub fn rosenbrock_hessian_nd(param: &Array1<f64>, _a: f64, b: f64) -> Array2<f64> {
+pub fn rosenbrock_hessian_nd<T: Float + FromPrimitive>(
+    param: &Array1<T>,
+    _a: T,
+    b: T,
+) -> Array2<T> {
+    let num2 = T::from_f64(2.0).unwrap();
+    let num4 = T::from_f64(4.0).unwrap();
+    let num12 = T::from_f64(12.0).unwrap();
     let x = param[0];
     let y = param[1];
     let mut out = Array2::zeros((2, 2));
     // d/dxdx
-    out[[0, 0]] = 12.0 * b * x.powf(2.0) - 4.0 * b * y + 2.0;
+    out[[0, 0]] = num12 * b * x.powf(num2) - num4 * b * y + num2;
     // d/dxdy
-    out[[0, 1]] = -4.0 * b * x;
+    out[[0, 1]] = -num4 * b * x;
     // d/dydx
-    out[[1, 0]] = -4.0 * b * x;
+    out[[1, 0]] = -num4 * b * x;
     // d/dydy
-    out[[1, 1]] = 2.0 * b;
+    out[[1, 1]] = num2 * b;
     out
 }
 
