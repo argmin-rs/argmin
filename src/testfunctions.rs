@@ -7,7 +7,7 @@
 
 //! TODO Documentation
 
-use std::iter:Sum;
+use std::iter::Sum;
 use ndarray::{Array1, Array2};
 use num::{Float, FromPrimitive};
 
@@ -15,33 +15,40 @@ use num::{Float, FromPrimitive};
 ///
 /// Parameters are usually: `a = 1` and `b = 100`
 /// TODO: make this multidimensional
-pub fn rosenbrock(param: &[f64], a: f64, b: f64) -> f64 {
-    (a - param[0]).powf(2.0) + b * (param[1] - param[0].powf(2.0)).powf(2.0)
+pub fn rosenbrock<T: Float + FromPrimitive>(param: &[T], a: T, b: T) -> T {
+    let num2 = T::from_f64(2.0).unwrap();
+    (a - param[0]).powf(num2) + b * (param[1] - param[0].powf(num2)).powf(num2)
 }
 
 /// Derivative of 2D Rosenbrock function
-pub fn rosenbrock_derivative(param: &[f64], a: f64, b: f64) -> Vec<f64> {
+pub fn rosenbrock_derivative<T: Float + FromPrimitive>(param: &[T], a: T, b: T) -> Vec<T> {
+    let num2 = T::from_f64(2.0).unwrap();
+    let num3 = T::from_f64(3.0).unwrap();
+    let num4 = T::from_f64(4.0).unwrap();
     let x = param[0];
     let y = param[1];
     let mut out = vec![];
-    out.push(-2.0 * a + 4.0 * b * x.powf(3.0) - 4.0 * b * x * y + 2.0 * x);
-    out.push(2.0 * b * (y - x.powf(2.0)));
+    out.push(-num2 * a + num4 * b * x.powf(num3) - num4 * b * x * y + num2 * x);
+    out.push(num2 * b * (y - x.powf(num2)));
     out
 }
 
 /// Hessian of 2D Rosenbrock function
-pub fn rosenbrock_hessian(param: &[f64], _a: f64, b: f64) -> Vec<f64> {
+pub fn rosenbrock_hessian<T: Float + FromPrimitive>(param: &[T], _a: T, b: T) -> Vec<T> {
+    let num2 = T::from_f64(2.0).unwrap();
+    let num4 = T::from_f64(4.0).unwrap();
+    let num12 = T::from_f64(12.0).unwrap();
     let x = param[0];
     let y = param[1];
     let mut out = vec![];
     // d/dxdx
-    out.push(12.0 * b * x.powf(2.0) - 4.0 * b * y + 2.0);
+    out.push(num12 * b * x.powf(num2) - num4 * b * y + num2);
     // d/dxdy
-    out.push(-4.0 * b * x);
+    out.push(-num4 * b * x);
     // d/dydx
-    out.push(-4.0 * b * x);
+    out.push(-num4 * b * x);
     // d/dydy
-    out.push(2.0 * b);
+    out.push(num2 * b);
     out
 }
 
@@ -104,4 +111,42 @@ pub fn sphere<T: Float + FromPrimitive + Sum>(param: &[T]) -> T {
 pub fn sphere_derivative<T: Float + FromPrimitive>(param: &[T]) -> Vec<T> {
     let num2 = T::from_f64(2.0).unwrap();
     param.iter().map(|x| num2 * *x).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ndarray::arr1;
+
+    #[test]
+    fn compare_rosenbrock_funcs() {
+        assert_eq!(
+            rosenbrock(&vec![1.0_f32, 1.0_f32], 1.0, 100.0),
+            rosenbrock_nd(&arr1(&[1.0, 1.0]), 1.0, 100.0)
+        );
+    }
+
+    #[test]
+    fn rosenbrock_optimum_f32() {
+        assert_eq!(rosenbrock(&vec![1.0_f32, 1.0_f32], 1.0, 100.0), 0.0);
+    }
+
+    #[test]
+    fn rosenbrock_optimum_f64() {
+        assert_eq!(rosenbrock(&vec![1.0, 1.0], 1.0, 100.0), 0.0);
+    }
+
+    #[test]
+    fn rosenbrock_nd_optimum_f64() {
+        assert_eq!(rosenbrock_nd(&arr1(&[1.0, 1.0]), 1.0, 100.0), 0.0);
+    }
+
+    #[test]
+    fn rosenbrock_nd_optimum_f32() {
+        assert_eq!(
+            rosenbrock_nd(&arr1(&[1.0_f32, 1.0_f32]), 1.0_f32, 100.0_f32),
+            0.0_f32
+        );
+    }
+
 }
