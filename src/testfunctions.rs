@@ -116,103 +116,112 @@ pub fn sphere_derivative<T: Float + FromPrimitive>(param: &[T]) -> Vec<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std;
     use ndarray::arr1;
 
     #[test]
-    fn compare_rosenbrock_funcs() {
-        assert_eq!(
-            rosenbrock(&vec![1.0, 1.0], 1.0, 100.0),
-            rosenbrock_nd(&arr1(&[1.0, 1.0]), 1.0, 100.0)
+    fn test_compare_rosenbrock_funcs() {
+        assert!(
+            (rosenbrock(&[1.0, 1.0], 1.0, 100.0) - rosenbrock_nd(&arr1(&[1.0, 1.0]), 1.0, 100.0))
+                .abs() < std::f64::EPSILON
         );
-        assert_eq!(
-            rosenbrock(&vec![1.5, -0.9], 1.0, 100.0),
-            rosenbrock_nd(&arr1(&[1.5, -0.9]), 1.0, 100.0)
+        assert!(
+            (rosenbrock(&[1.5, -0.9], 1.0, 100.0) - rosenbrock_nd(&arr1(&[1.5, -0.9]), 1.0, 100.0))
+                .abs() < std::f64::EPSILON
         );
-        assert_eq!(
-            rosenbrock(&vec![1.5_f32, -0.9_f32], 1.0_f32, 100.0_f32),
-            rosenbrock_nd(&arr1(&[1.5_f32, -0.9_f32]), 1.0_f32, 100.0_f32)
+        assert!(
+            (rosenbrock(&[1.5_f32, -0.9_f32], 1.0_f32, 100.0_f32)
+                - rosenbrock_nd(&arr1(&[1.5_f32, -0.9_f32]), 1.0_f32, 100.0_f32))
+                .abs() < std::f32::EPSILON
         );
-        assert_eq!(
-            rosenbrock(&vec![-10.5, 23.4], 1.0, 100.0),
-            rosenbrock_nd(&arr1(&[-10.5, 23.4]), 1.0, 100.0)
-        );
-    }
-
-    #[test]
-    fn compare_rosenbrock_derivative_funcs() {
-        assert_eq!(
-            rosenbrock_derivative(&vec![1.0, 1.0], 1.0, 100.0),
-            rosenbrock_derivative_nd(&arr1(&[1.0, 1.0]), 1.0, 100.0).to_vec()
-        );
-        assert_eq!(
-            rosenbrock_derivative(&vec![1.5, -0.9], 1.0, 100.0),
-            rosenbrock_derivative_nd(&arr1(&[1.5, -0.9]), 1.0, 100.0).to_vec()
-        );
-        assert_eq!(
-            rosenbrock_derivative(&vec![1.5_f32, -0.9_f32], 1.0_f32, 100.0_f32),
-            rosenbrock_derivative_nd(&arr1(&[1.5_f32, -0.9_f32]), 1.0_f32, 100.0_f32).to_vec()
-        );
-        assert_eq!(
-            rosenbrock_derivative(&vec![-10.5, 23.4], 1.0, 100.0),
-            rosenbrock_derivative_nd(&arr1(&[-10.5, 23.4]), 1.0, 100.0).to_vec()
+        assert!(
+            (rosenbrock(&[-10.5, 23.4], 1.0, 100.0)
+                - rosenbrock_nd(&arr1(&[-10.5, 23.4]), 1.0, 100.0))
+                .abs() < std::f64::EPSILON
         );
     }
 
     #[test]
-    fn rosenbrock_optimum() {
-        assert_eq!(rosenbrock(&vec![1.0_f32, 1.0_f32], 1.0, 100.0), 0.0);
-        assert_eq!(rosenbrock(&vec![1.0, 1.0], 1.0, 100.0), 0.0);
+    fn test_compare_rosenbrock_derivative_funcs() {
+        let inputs = vec![vec![1.0, 1.0], vec![1.5, -0.9], vec![-10.5, 23.4]];
+        for input in &inputs {
+            let diff: Vec<f64> = rosenbrock_derivative(input, 1.0, 100.0)
+                .iter()
+                .zip(
+                    rosenbrock_derivative_nd(&arr1(input), 1.0, 100.0)
+                        .to_vec()
+                        .iter(),
+                )
+                .map(|(a, b): (&f64, &f64)| (a - b).abs())
+                .collect();
+            for elem in diff {
+                assert!(elem < std::f64::EPSILON);
+            }
+        }
+        // f32
+        let inputs = vec![
+            vec![1.0_f32, 1.0_f32],
+            vec![1.5_f32, -0.9_f32],
+            vec![-10.5_f32, 23.4_f32],
+        ];
+        for input in &inputs {
+            let diff: Vec<f32> = rosenbrock_derivative(input, 1.0, 100.0)
+                .iter()
+                .zip(
+                    rosenbrock_derivative_nd(&arr1(input), 1.0, 100.0)
+                        .to_vec()
+                        .iter(),
+                )
+                .map(|(a, b): (&f32, &f32)| (a - b).abs())
+                .collect();
+            for elem in diff {
+                assert!(elem < std::f32::EPSILON);
+            }
+        }
     }
 
     #[test]
-    fn rosenbrock_nd_optimum() {
-        assert_eq!(rosenbrock_nd(&arr1(&[1.0, 1.0]), 1.0, 100.0), 0.0);
-        assert_eq!(
-            rosenbrock_nd(&arr1(&[1.0_f32, 1.0_f32]), 1.0_f32, 100.0_f32),
-            0.0_f32
+    fn test_rosenbrock_optimum() {
+        assert!(rosenbrock(&[1.0_f32, 1.0_f32], 1.0, 100.0).abs() < std::f32::EPSILON);
+        assert!(rosenbrock(&[1.0, 1.0], 1.0, 100.0).abs() < std::f64::EPSILON);
+    }
+
+    #[test]
+    fn test_rosenbrock_nd_optimum() {
+        assert!(rosenbrock_nd(&arr1(&[1.0, 1.0]), 1.0, 100.0).abs() < std::f64::EPSILON);
+        assert!(
+            rosenbrock_nd(&arr1(&[1.0_f32, 1.0_f32]), 1.0_f32, 100.0_f32).abs() < std::f32::EPSILON
         );
     }
 
     #[test]
-    fn rosenbrock_derivative_f32() {
-        assert_eq!(
-            rosenbrock_derivative(&vec![1.0_f32, 1.0_f32], 1.0, 100.0),
-            vec![0.0, 0.0]
-        );
+    fn test_rosenbrock_derivative() {
+        let res: Vec<f64> = rosenbrock_derivative(&[1.0, 1.0], 1.0, 100.0);
+        for elem in &res {
+            assert!((elem - 0.0).abs() < std::f64::EPSILON);
+        }
+        let res: Vec<f32> = rosenbrock_derivative(&[1.0_f32, 1.0_f32], 1.0_f32, 100.0_f32);
+        for elem in &res {
+            assert!((elem - 0.0).abs() < std::f32::EPSILON);
+        }
     }
 
     #[test]
-    fn rosenbrock_derivative_f64() {
-        assert_eq!(
-            rosenbrock_derivative(&vec![1.0, 1.0], 1.0, 100.0),
-            vec![0.0, 0.0]
-        );
+    fn test_rosenbrock_nd_derivative() {
+        let res: Array1<f64> = rosenbrock_derivative_nd(&arr1(&[1.0, 1.0]), 1.0, 100.0);
+        for elem in res.iter() {
+            assert!((elem - 0.0).abs() < std::f64::EPSILON);
+        }
+        let res: Array1<f32> =
+            rosenbrock_derivative_nd(&arr1(&[1.0_f32, 1.0_f32]), 1.0_f32, 100.0_f32);
+        for elem in res.iter() {
+            assert!((elem - 0.0).abs() < std::f32::EPSILON);
+        }
     }
 
     #[test]
-    fn rosenbrock_nd_derivative_f64() {
-        assert_eq!(
-            rosenbrock_derivative_nd(&arr1(&[1.0, 1.0]), 1.0, 100.0),
-            arr1(&[0.0, 0.0])
-        );
+    fn test_sphere_optimum() {
+        assert!(sphere(&[0.0_f32, 0.0_f32]).abs() < std::f32::EPSILON);
+        assert!(sphere(&[0.0_f64, 0.0_f64]).abs() < std::f64::EPSILON);
     }
-
-    #[test]
-    fn rosenbrock_nd_derivative_f32() {
-        assert_eq!(
-            rosenbrock_derivative_nd(&arr1(&[1.0_f32, 1.0_f32]), 1.0_f32, 100.0_f32),
-            arr1(&[0.0, 0.0])
-        );
-    }
-
-    #[test]
-    fn sphere_optimum_f32() {
-        assert_eq!(sphere(&vec![0.0_f32, 0.0_f32]), 0.0);
-    }
-
-    #[test]
-    fn sphere_optimum_f64() {
-        assert_eq!(sphere(&vec![0.0_f64, 0.0_f64]), 0.0);
-    }
-
 }
