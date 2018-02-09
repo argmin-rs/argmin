@@ -46,7 +46,6 @@ where
 /// Trait every solve needs to implement (in the future)
 pub trait ArgminSolver<'a> {
     /// Parameter vector
-    // type A: ArgminParameter<Self::A>;
     type Parameter: ArgminParameter;
     /// Cost value
     type CostValue: ArgminCostValue;
@@ -54,12 +53,12 @@ pub trait ArgminSolver<'a> {
     type Hessian;
     /// Initial parameter(s)
     type StartingPoints;
-    /// Type of Problem (TODO: Trait!)
+    /// Type of Problem
     type ProblemDefinition;
 
     /// Initializes the solver and sets the state to its initial state
-    // fn init(&mut self, &'a Problem<'a, Self::A, Self::B, Self::C>, &Self::D) -> Result<()>;
-    fn init(&mut self, &'a Self::ProblemDefinition, &Self::StartingPoints) -> Result<()>;
+    // fn init(&mut self, &'a Self::ProblemDefinition, &Self::StartingPoints) -> Result<()>;
+    fn init(&mut self, Self::ProblemDefinition, &Self::StartingPoints) -> Result<()>;
 
     /// Moves forward by a single iteration
     fn next_iter(&mut self) -> Result<ArgminResult<Self::Parameter, Self::CostValue>>;
@@ -67,7 +66,8 @@ pub trait ArgminSolver<'a> {
     /// Run initialization and iterations at once
     fn run(
         &mut self,
-        &'a Self::ProblemDefinition,
+        // &'a Self::ProblemDefinition,
+        Self::ProblemDefinition,
         &Self::StartingPoints,
     ) -> Result<ArgminResult<Self::Parameter, Self::CostValue>>;
 
