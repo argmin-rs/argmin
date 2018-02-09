@@ -127,10 +127,10 @@ impl<'a> GradientDescent<'a> {
                 }
                 top / bottom
             }
-            GDGammaUpdate::BacktrackingLineSearch(ref bls) => {
-                let result = bls.run(&(-self.state.cur_grad.clone()), &self.state.param)
+            GDGammaUpdate::BacktrackingLineSearch(ref mut bls) => {
+                let result = bls.run(-self.state.cur_grad.clone(), &self.state.param)
                     .unwrap();
-                result.0
+                result.param[0]
             }
         };
     }
@@ -141,12 +141,12 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
     type CostValue = f64;
     type Hessian = Array1<f64>;
     type StartingPoints = Array1<f64>;
-    type ProblemDefinition = ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
+    type ProblemDefinition = &'a ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// Initialize with a given problem and a starting point
     fn init(
         &mut self,
-        problem: &'a Self::ProblemDefinition,
+        problem: Self::ProblemDefinition,
         init_param: &Self::StartingPoints,
     ) -> Result<()> {
         self.state = GradientDescentState {

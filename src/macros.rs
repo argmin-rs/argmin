@@ -13,7 +13,7 @@ macro_rules! make_run {
     ( $ProblemDefinition:ty, $StartingPoints:ty, $Parameter:ty, $CostValue:ty ) => {
         fn run(
             &mut self,
-            operator: &'a $ProblemDefinition,
+            operator: $ProblemDefinition,
             init_param: &$StartingPoints,
         ) -> Result<ArgminResult<$Parameter, $CostValue>> {
             self.init(operator, init_param)?;

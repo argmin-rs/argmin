@@ -75,12 +75,12 @@ impl<'a> ArgminSolver<'a> for Landweber<'a> {
     type CostValue = f64;
     type Hessian = Array2<f64>;
     type StartingPoints = Self::Parameter;
-    type ProblemDefinition = ArgminOperator<'a>;
+    type ProblemDefinition = &'a ArgminOperator<'a>;
 
     /// Initialize with a given problem and a starting point
     fn init(
         &mut self,
-        operator: &'a Self::ProblemDefinition,
+        operator: Self::ProblemDefinition,
         init_param: &Self::StartingPoints,
     ) -> Result<()> {
         self.state = Some(LandweberState::new(operator, init_param.clone()));

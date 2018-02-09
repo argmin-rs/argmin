@@ -189,12 +189,12 @@ where
     type CostValue = U;
     type Hessian = V;
     type StartingPoints = T;
-    type ProblemDefinition = ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
+    type ProblemDefinition = &'a ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// Initialize with a given problem and a starting point
     fn init(
         &mut self,
-        problem: &'a Self::ProblemDefinition,
+        problem: Self::ProblemDefinition,
         init_param: &Self::StartingPoints,
     ) -> Result<()> {
         let prev_cost = (problem.cost_function)(init_param);

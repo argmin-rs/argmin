@@ -165,12 +165,12 @@ impl<'a> ArgminSolver<'a> for NelderMead<'a> {
     type CostValue = f64;
     type Hessian = Vec<f64>;
     type StartingPoints = Vec<Self::Parameter>;
-    type ProblemDefinition = ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
+    type ProblemDefinition = &'a ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// initialization with predefined parameter vectors
     fn init(
         &mut self,
-        problem: &'a Self::ProblemDefinition,
+        problem: Self::ProblemDefinition,
         param_vecs: &Self::StartingPoints,
     ) -> Result<()> {
         let mut params: Vec<NelderMeadParam> = vec![];

@@ -74,12 +74,12 @@ impl<'a> ArgminSolver<'a> for Newton<'a> {
     type CostValue = f64;
     type Hessian = Array2<f64>;
     type StartingPoints = Self::Parameter;
-    type ProblemDefinition = ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
+    type ProblemDefinition = &'a ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
     /// Initialize with a given problem and a starting point
     fn init(
         &mut self,
-        problem: &'a Self::ProblemDefinition,
+        problem: Self::ProblemDefinition,
         init_param: &Self::StartingPoints,
     ) -> Result<()> {
         self.state = Some(NewtonState::new(problem, init_param.clone()));
