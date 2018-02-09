@@ -8,8 +8,9 @@
 extern crate argmin;
 extern crate ndarray;
 use ndarray::Array1;
-use argmin::backtracking::BacktrackingLineSearch;
+use argmin::BacktrackingLineSearch;
 use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_nd};
+use argmin::ArgminSolver;
 
 fn run() -> Result<(), Box<std::error::Error>> {
     // Define cost function
@@ -17,13 +18,13 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let gradient = |x: &Array1<f64>| -> Array1<f64> { rosenbrock_derivative_nd(x, 1_f64, 100_f64) };
 
     // Set up GradientDecent solver
-    let solver = BacktrackingLineSearch::new(&cost, &gradient);
+    let mut solver = BacktrackingLineSearch::new(&cost, &gradient);
     // solver.max_iters(10_000);
 
     let x = Array1::from_vec(vec![4.1, 3.0]);
     let p = gradient(&x);
 
-    let result = solver.run(&(-p), &x)?;
+    let result = solver.run(-p, &x)?;
 
     // print result
     println!("{:?}", result);

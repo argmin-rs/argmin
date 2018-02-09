@@ -9,20 +9,12 @@
 //!
 //! TODO
 
+use std;
 use errors::*;
-use ndarray::Array1;
+use ndarray::{Array1, arr1};
+use ArgminSolver;
+use result::ArgminResult;
 use termination::TerminationReason;
-
-// /// Reasons why it stopped -- shouldnt be here probably
-// #[derive(Debug)]
-// pub enum TerminationReason {
-//     /// Maximum number of iterations reached
-//     MaxNumberIterations,
-//     /// It converged before reaching the maximum number of iterations.
-//     Converged,
-//     /// dont know
-//     Unkown,
-// }
 
 /// Backtracking Line Search
 pub struct BacktrackingLineSearch<'a> {
@@ -38,6 +30,26 @@ pub struct BacktrackingLineSearch<'a> {
     tau: f64,
     /// Parameter `c`
     c: f64,
+    /// Current state
+    state: Option<BacktrackingLineSearchState>,
+}
+
+/// Current state of the backtracking line search algorithm
+pub struct BacktrackingLineSearchState {
+    /// Search direction
+    p: Array1<f64>,
+    /// Starting point
+    x: Array1<f64>,
+    /// Current cost value
+    cost: f64,
+    /// t (TODO)
+    t: f64,
+    /// Cost function value at starting point
+    fx: f64,
+    /// Current number of iteration
+    iter: u64,
+    /// Current alpha
+    alpha: f64,
 }
 
 impl<'a> BacktrackingLineSearch<'a> {
@@ -56,6 +68,7 @@ impl<'a> BacktrackingLineSearch<'a> {
             max_iters: 100,
             tau: 0.5,
             c: 0.5,
+            state: None,
         }
     }
 
@@ -92,33 +105,52 @@ impl<'a> BacktrackingLineSearch<'a> {
         self.tau = tau;
         Ok(self)
     }
+}
 
-    /// Run backtracking line search
-    ///
-    /// `p` is the search direction. Take care about whether you need it to be a unit vector or
-    /// not! `p` will not be normalized!
-    pub fn run(&self, p: &Array1<f64>, x: &Array1<f64>) -> Result<(f64, u64, TerminationReason)> {
-        // compute m
+impl<'a> ArgminSolver<'a> for BacktrackingLineSearch<'a> {
+    type Parameter = Array1<f64>;
+    type CostValue = f64;
+    type Hessian = Array1<f64>;
+    type StartingPoints = Array1<f64>;
+    type ProblemDefinition = Array1<f64>;
+
+    fn init(&mut self, p: Self::ProblemDefinition, x: &Self::StartingPoints) -> Result<()> {
         let m: f64 = p.t().dot(&((self.gradient)(x)));
-
-        let t = -self.c * m;
-        let fx = (self.cost_function)(x);
-        let termination_reason;
-        let mut idx = 0;
-        let mut alpha = self.alpha;
-        loop {
-            let param = x + &(alpha * p);
-            if fx - (self.cost_function)(&param) >= alpha * t {
-                termination_reason = TerminationReason::TargetCostReached;
-                break;
-            }
-            if idx > self.max_iters {
-                termination_reason = TerminationReason::MaxItersReached;
-                break;
-            }
-            idx += 1;
-            alpha *= self.tau;
-        }
-        Ok((alpha, idx, termination_reason))
+        self.state = Some(BacktrackingLineSearchState {
+            cost: std::f64::NAN,
+            p: p,
+            x: x.to_owned(),
+            t: -self.c * m,
+            fx: (self.cost_function)(x),
+            iter: 0,
+            alpha: self.alpha,
+        });
+        Ok(())
     }
+
+    fn next_iter(&mut self) -> Result<ArgminResult<Self::Parameter, Self::CostValue>> {
+        let mut state = self.state.take().unwrap();
+        let param = &state.x + &(state.alpha * &state.p);
+        state.cost = (self.cost_function)(&param);
+        state.iter += 1;
+        state.alpha *= self.tau;
+        let mut out = ArgminResult::new(arr1(&[state.alpha]), std::f64::NAN, state.iter);
+        self.state = Some(state);
+        out.set_termination_reason(self.terminate());
+        Ok(out)
+    }
+
+    /// Indicates whether any of the stopping criteria are met
+    make_terminate!(self,
+        self.state.as_ref().unwrap().iter >= self.max_iters, TerminationReason::MaxItersReached;
+        self.state.as_ref().unwrap().fx - self.state.as_ref().unwrap().cost >= self.state.as_ref().unwrap().alpha * self.state.as_ref().unwrap().t, TerminationReason::TargetCostReached; 
+    );
+
+    /// Run gradient descent method
+    make_run!(
+        Self::ProblemDefinition,
+        Self::StartingPoints,
+        Self::Parameter,
+        Self::CostValue
+    );
 }
