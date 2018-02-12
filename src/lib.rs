@@ -54,7 +54,7 @@ pub trait ArgminSolver<'a> {
     /// Initial parameter(s)
     type StartingPoints;
     /// Type of Problem
-    type ProblemDefinition;
+    type ProblemDefinition: Clone;
 
     /// Initializes the solver and sets the state to its initial state
     // fn init(&mut self, &'a Self::ProblemDefinition, &Self::StartingPoints) -> Result<()>;
@@ -114,6 +114,9 @@ pub mod newton;
 /// Landweber algorithm
 pub mod landweber;
 
+/// Start several optimization problems at once.
+pub mod multistart;
+
 /// Conjugate Gradient method
 pub mod cg;
 
@@ -133,6 +136,7 @@ pub use gradientdescent::GDGammaUpdate;
 pub use backtracking::BacktrackingLineSearch;
 pub use landweber::Landweber;
 pub use neldermead::NelderMead;
+pub use multistart::MultiStart;
 pub use termination::TerminationReason;
 
 // #[cfg(test)]
