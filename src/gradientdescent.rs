@@ -46,7 +46,7 @@ pub struct GradientDescent<'a> {
 /// Indicates the current state of the Gradient Descent method.
 struct GradientDescentState<'a> {
     /// Reference to the problem. This is an Option<_> because it is initialized as `None`
-    problem: Option<&'a ArgminProblem<'a, Array1<f64>, f64, Array1<f64>>>,
+    problem: Option<&'a ArgminProblem<'a, Array1<f64>, f64, ()>>,
     /// Previous parameter vector
     prev_param: Array1<f64>,
     /// Current parameter vector
@@ -139,7 +139,7 @@ impl<'a> GradientDescent<'a> {
 impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
     type Parameter = Array1<f64>;
     type CostValue = f64;
-    type Hessian = Array1<f64>;
+    type Hessian = ();
     type StartingPoints = Array1<f64>;
     type ProblemDefinition = &'a ArgminProblem<'a, Self::Parameter, Self::CostValue, Self::Hessian>;
 
