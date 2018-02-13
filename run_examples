@@ -1,0 +1,8 @@
+cargo run --features clippy --example backtracking
+cargo run --features clippy --example cg
+cargo run --features clippy --example gradientdescent
+cargo run --features clippy --example landweber
+cargo run --features clippy --example multistart
+cargo run --features clippy --example neldermead
+cargo run --features clippy --example newton
+cargo run --features clippy --example simulatedannealing
