@@ -20,6 +20,8 @@
 #![feature(trace_macros)]
 #[macro_use]
 extern crate error_chain;
+extern crate futures;
+extern crate futures_cpupool;
 extern crate ndarray;
 extern crate ndarray_linalg;
 extern crate num;
@@ -30,16 +32,19 @@ extern crate rand;
 pub mod macros;
 
 use std::default::Default;
+use std::fmt::Debug;
 use num::{Bounded, ToPrimitive};
 use errors::*;
 use parameter::ArgminParameter;
 
 /// Trait for cost function values
 /// TODO: Do this with trait aliases once they work in rust.
-pub trait ArgminCostValue: Bounded + ToPrimitive + Copy + Default + PartialOrd {}
+pub trait ArgminCostValue
+    : Bounded + ToPrimitive + Copy + Debug + Default + PartialOrd + Send + Sync {
+}
 impl<T> ArgminCostValue for T
 where
-    T: Bounded + ToPrimitive + Copy + Default + PartialOrd,
+    T: Bounded + ToPrimitive + Copy + Debug + Default + PartialOrd + Send + Sync,
 {
 }
 
@@ -52,9 +57,9 @@ pub trait ArgminSolver<'a> {
     /// Hessian
     type Hessian;
     /// Initial parameter(s)
-    type StartingPoints;
+    type StartingPoints: Send + Sync;
     /// Type of Problem
-    type ProblemDefinition: Clone;
+    type ProblemDefinition: Clone + Send;
 
     /// Initializes the solver and sets the state to its initial state
     // fn init(&mut self, &'a Self::ProblemDefinition, &Self::StartingPoints) -> Result<()>;

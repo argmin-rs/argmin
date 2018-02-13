@@ -111,3 +111,12 @@ impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> ArgminProblem<
         }
     }
 }
+
+unsafe impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Send
+    for ArgminProblem<'a, T, U, V>
+{
+}
+unsafe impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> Sync
+    for ArgminProblem<'a, T, U, V>
+{
+}

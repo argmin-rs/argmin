@@ -14,7 +14,7 @@ use ArgminCostValue;
 use termination::TerminationReason;
 
 /// Return struct for all solvers.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ArgminResult<T: ArgminParameter, U: ArgminCostValue> {
     /// Final parameter vector
     pub param: T,
@@ -58,3 +58,6 @@ impl<T: ArgminParameter, U: ArgminCostValue> ArgminResult<T, U> {
         self
     }
 }
+
+unsafe impl<T: ArgminParameter, U: ArgminCostValue> Send for ArgminResult<T, U> {}
+unsafe impl<T: ArgminParameter, U: ArgminCostValue> Sync for ArgminResult<T, U> {}

@@ -43,7 +43,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
         .push(solver2, &prob, init_param2)
         .push(solver3, &prob, init_param3);
 
-    let res = multi_start.run();
+    let res = multi_start.run_parallel();
 
     for r in res {
         println!("{:?}", r);

@@ -276,3 +276,18 @@ where
         Self::CostValue
     );
 }
+
+unsafe impl<'a, T, U, V> Send for SimulatedAnnealing<'a, T, U, V>
+where
+    T: ArgminParameter + 'a,
+    U: ArgminCostValue + 'a,
+    V: 'a,
+{
+}
+unsafe impl<'a, T, U, V> Sync for SimulatedAnnealing<'a, T, U, V>
+where
+    T: ArgminParameter + 'a,
+    U: ArgminCostValue + 'a,
+    V: 'a,
+{
+}

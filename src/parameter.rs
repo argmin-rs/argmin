@@ -21,6 +21,8 @@ use ndarray::Array1;
 pub trait ArgminParameter
     : Clone
     + Default
+    + Send
+    + Sync
     + Debug
     + Index<usize, Output = <Self as ArgminParameter>::Element>
     + IndexMut<usize> {

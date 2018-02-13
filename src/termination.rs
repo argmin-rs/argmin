@@ -8,7 +8,7 @@
 //! TODO Documentation
 
 /// Indicates why the optimization algorithm stopped
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TerminationReason {
     /// Maximum number of iterations reached
     MaxItersReached,

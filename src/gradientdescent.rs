@@ -212,3 +212,6 @@ impl<'a> Default for GradientDescent<'a> {
         Self::new()
     }
 }
+
+unsafe impl<'a> Send for GradientDescent<'a> {}
+unsafe impl<'a> Sync for GradientDescent<'a> {}

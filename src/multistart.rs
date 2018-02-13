@@ -7,8 +7,13 @@
 
 //! Multi-Start (TODO)
 
+use futures::Future;
+use futures::prelude::*;
+use futures_cpupool::{CpuFuture, CpuPool};
 use ArgminSolver;
 use ArgminResult;
+use parameter::ArgminParameter;
+use ArgminCostValue;
 
 /// Starts several optimization problems at once
 pub struct MultiStart<'a, A>
@@ -21,11 +26,29 @@ where
     problems: Vec<<A as ArgminSolver<'a>>::ProblemDefinition>,
     /// Correspondin vector of initial parameters
     init_params: Vec<<A as ArgminSolver<'a>>::StartingPoints>,
+    /// CPU pool
+    pool: CpuPool,
+}
+
+impl<'a, A, B> Future for ArgminResult<A, B>
+where
+    A: ArgminParameter,
+    B: ArgminCostValue,
+{
+    type Item = ArgminResult<A, B>;
+    // type Error = Box<std::error::Error>;
+    type Error = ();
+
+    fn poll(&mut self) -> Result<Async<Self::Item>, Self::Error> {
+        Ok(Async::Ready(self.clone()))
+    }
 }
 
 impl<'a, A> MultiStart<'a, A>
 where
-    A: ArgminSolver<'a>,
+    A: ArgminSolver<'a> + Send,
+    <A as ArgminSolver<'a>>::Parameter: 'static,
+    <A as ArgminSolver<'a>>::CostValue: 'static,
 {
     /// Create a new empty instance of `MultiStart`
     pub fn new() -> Self {
@@ -33,6 +56,7 @@ where
             solvers: vec![],
             problems: vec![],
             init_params: vec![],
+            pool: CpuPool::new(4),
         }
     }
 
@@ -59,13 +83,27 @@ where
             .map(|((s, p), i)| s.run(p, i).unwrap())
             .collect()
     }
-}
 
-impl<'a, A> Default for MultiStart<'a, A>
-where
-    A: ArgminSolver<'a>,
-{
-    fn default() -> Self {
-        Self::new()
+    /// Run solvers in parallel
+    pub fn run_parallel(&mut self) -> Vec<ArgminResult<A::Parameter, A::CostValue>> {
+        let pool = self.pool.clone();
+        let runs: Vec<CpuFuture<_, _>> = self.solvers
+            .iter_mut()
+            .zip(self.problems.clone().into_iter())
+            .zip(self.init_params.iter())
+            .map(|((s, p), i)| pool.spawn(s.run(p, i).unwrap()))
+            .collect();
+        runs.into_iter().map(|a| a.wait().unwrap()).collect()
     }
 }
+
+// impl<'a, A> Default for MultiStart<'a, A>
+// where
+//     A: ArgminSolver<'a> + Send,
+//     <A as ArgminSolver<'a>>::Parameter: 'static,
+//     <A as ArgminSolver<'a>>::CostValue: 'static,
+// {
+//     fn default() -> Self {
+//         Self::new()
+//     }
+// }
