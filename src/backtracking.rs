@@ -7,7 +7,54 @@
 
 //! Backtracking Line Search
 //!
-//! TODO
+//! The backtracking line search algorithm computes the maximum distance to move along a certain
+//! search direction. It moves backwards starting from a large step size by iteratively shrinking
+//! the step size by a factor `tau \in (0,1)` . The search stops as soon as the Armijo-Goldstein
+//! condition with the control parameter `c \in (0,1)` is met.
+//!
+//! The algorithm requires a starting point `x` and a search direction `p`. It then searches  along
+//! the search direction with a step size `alpha`. It moves backwards from a large starting step
+//! size, hence the name "backtracking".
+//!
+//! This implementation is initialized by providing a `cost_function` and a `gradient` to the
+//! constructor.
+//! The optimization is then run by providing the `run` function with a starting point `x` and a
+//! search direction `p`.
+//!
+//!
+//! ```
+//! extern crate argmin;
+//! extern crate ndarray;
+//!
+//! use ndarray::Array1;
+//!
+//! // Get BacktrackingLineSearchState and Rosenbrock cost functions into scope
+//! use argmin::BacktrackingLineSearch;
+//! use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_nd};
+//!
+//! // ArgminSolver trait is needed as well.
+//! use argmin::ArgminSolver;
+//!
+//! // Wrap cost function and gradient in closures
+//! let cost = |x: &Array1<f64>| -> f64 { rosenbrock_nd(x, 1_f64, 100_f64) };
+//! let gradient = |x: &Array1<f64>| -> Array1<f64> { rosenbrock_derivative_nd(x, 1_f64, 100_f64) };
+//!
+//! // Initialize the solver with `&cost` and `&gradient`
+//! let mut solver = BacktrackingLineSearch::new(&cost, &gradient);
+//!
+//! // Define starting point `x` and search direction `p`
+//! let x = Array1::from_vec(vec![4.1, 3.0]);
+//! let p = gradient(&x);
+//!
+//! // Run solver
+//! let result = solver.run(-p, &x).unwrap();
+//! ```
+//!
+//! The parameters `tau` and `c` are set to 0.5 by default and can be adapted with the methods
+//! `tau` and `c`.
+//!
+//! Detailed information is available on
+//! [Wikipedia](https://en.wikipedia.org/wiki/Backtracking_line_search).
 
 use std;
 use errors::*;
