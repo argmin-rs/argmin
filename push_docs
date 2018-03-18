@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 # Make doc
+cargo clean
 cargo doc --no-deps
 
 # Make temporary folder
