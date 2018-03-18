@@ -24,9 +24,9 @@ exclude = [
 # ndarray = "*"
 # ndarray-linalg = { version = "*", features = ["openblas"] }
 
-clippy = {version = "0.0.186", optional = true}
+clippy = {version = "0.0.188", optional = true}
 error-chain = "0.11.0"
-num = "0.1.41"
+num = "0.1.42"
 rand = "0.4.2"
 ndarray = "0.11.1"
 #ndarray-linalg = { version = "*", default-features = openblas }
