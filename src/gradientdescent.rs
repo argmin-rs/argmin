@@ -7,7 +7,86 @@
 
 //! Gradient Descent
 //!
-//! TODO
+//! Gradient Descent is a first-order iterative minimization algorithm. The algorithm moves along a
+//! given downhill direction with the step-size proportional to the gradient. It will converge to a
+//! local minimum.
+//!
+//! The step-size can be chosen based on different schemes:
+//!
+//! 1) `GDGammaUpdate::Constant`: The negative of a the gradient at a given point is
+//!    multiplied by a constant factor. This method may not converge.
+//! 2) `GDGammaUpdate::BarzilaiBorwein`: Under the assumption that the function is convex and the
+//!    deriviative of the function is Lipschitz, this method guarantees convergence to a local
+//!    minimum. (TODO: Formula)
+//! 3) `GDGammaUpdate::BacktrackingLineSearch`: Finds an optimal distance along the direction of
+//!    the gradient based on an given optimality criterion. See
+//!    [BacktrackingLineSearch](backtracking::BacktrackingLineSearch).
+//!
+//! # Example
+//!
+//! ```rust
+//! extern crate argmin;
+//! extern crate ndarray;
+//! use ndarray::Array1;
+//! use argmin::prelude::*;
+//! use argmin::{ArgminProblem, BacktrackingLineSearch, GDGammaUpdate, GradientDescent};
+//! use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_nd};
+//!
+//! // Define cost function
+//! let cost = |x: &Array1<f64>| -> f64 { rosenbrock_nd(x, 1_f64, 100_f64) };
+//! let gradient = |x: &Array1<f64>| -> Array1<f64> { rosenbrock_derivative_nd(x, 1_f64, 100_f64) };
+//!
+//! // Set up the problem
+//! let mut prob = ArgminProblem::new(&cost);
+//! prob.gradient(&gradient);
+//!
+//! // Set up GradientDecent solver
+//! let mut solver = GradientDescent::new();
+//!
+//! // Set the maximum number of iterations to 10000
+//! solver.max_iters(10_000);
+//!
+//! // Choose one of the following methods:
+//!
+//! // `GDGammaUpdate::Constant`
+//! // solver.gamma_update(GDGammaUpdate::Constant(0.0001));
+//!
+//! // `GDGammaUpdate::BarzilaiBorwein`
+//! solver.gamma_update(GDGammaUpdate::BarzilaiBorwein);
+//!
+//! // `GDGammaUpdate::BacktrackingLineSearch`
+//! // let mut linesearch = BacktrackingLineSearch::new(&cost, &gradient);
+//! // linesearch.alpha(1.0);
+//! // solver.gamma_update(GDGammaUpdate::BacktrackingLineSearch(linesearch));
+//!
+//! // define inital parameter vector
+//! let init_param: Array1<f64> = Array1::from_vec(vec![1.5, 1.5]);
+//! println!("{:?}", init_param);
+//!
+//! // Actually run the solver on the problem.
+//! let result = solver.run(&prob, &init_param).unwrap();
+//!
+//! // print result
+//! println!("{:?}", result);
+//!
+//! // The `run` method takes care of the iterations and the stopping criteria; however, if you
+//! // require access to the intermediate results, the iterations can be performed manually:
+//!
+//! let mut solver = GradientDescent::new();
+//! solver.init(&prob, &init_param).unwrap();
+//! solver.max_iters(10_000);
+//! solver.gamma_update(GDGammaUpdate::BarzilaiBorwein);
+//!
+//! let mut par;
+//! loop {
+//!     par = solver.next_iter().unwrap();
+//!     if par.terminated {
+//!         break;
+//!     };
+//! }
+//!
+//! println!("{:?}", par);
+//! ```
 
 use std;
 use ndarray::Array1;
@@ -31,7 +110,7 @@ pub enum GDGammaUpdate<'a> {
     BacktrackingLineSearch(BacktrackingLineSearch<'a>),
 }
 
-/// Gradient Descent struct (duh)
+/// Gradient Descent
 pub struct GradientDescent<'a> {
     /// step size
     gamma: GDGammaUpdate<'a>,
@@ -43,7 +122,7 @@ pub struct GradientDescent<'a> {
     state: GradientDescentState<'a>,
 }
 
-/// Indicates the current state of the Gradient Descent method.
+/// Keeps track of the state of the Gradient Descent method.
 struct GradientDescentState<'a> {
     /// Reference to the problem. This is an Option<_> because it is initialized as `None`
     problem: Option<&'a ArgminProblem<'a, Array1<f64>, f64, ()>>,
@@ -169,7 +248,6 @@ impl<'a> ArgminSolver<'a> for GradientDescent<'a> {
     /// Compute next point
     fn next_iter(&mut self) -> Result<ArgminResult<Self::Parameter, Self::CostValue>> {
         let gradient = self.state.problem.unwrap().gradient.unwrap();
-        // let state = &mut self.state;
         self.state.prev_param = self.state.param.clone();
         self.state.prev_grad = self.state.cur_grad.clone();
 
