@@ -7,7 +7,7 @@
 
 //! Multi-Start (TODO)
 
-#![allow(new_without_default)]
+#![cfg_attr(feature = "cargo-clippy", allow(new_without_default))]
 use futures::Future;
 use futures::prelude::*;
 use futures_cpupool::{CpuFuture, CpuPool};
@@ -97,14 +97,3 @@ where
         runs.into_iter().map(|a| a.wait().unwrap()).collect()
     }
 }
-
-// impl<'a, A> Default for MultiStart<'a, A>
-// where
-//     A: ArgminSolver<'a> + Send,
-//     <A as ArgminSolver<'a>>::Parameter: 'static,
-//     <A as ArgminSolver<'a>>::CostValue: 'static,
-// {
-//     fn default() -> Self {
-//         Self::new()
-//     }
-// }
