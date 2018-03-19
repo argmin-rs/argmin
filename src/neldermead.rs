@@ -5,9 +5,53 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Nelder-Mead method
+//! # Nelder-Mead method
 //!
-//! TODO
+//! The Nelder-Mead method a heuristic search method for nonlinear optimization problems which does
+//! not require derivatives.
+//!
+//! The method is based on simplices which consist of n+1 vertices for an optimization problem with
+//! n dimensions.
+//! The function to be optimized is evaluated at all vertices. Based on these cost function values
+//! the behaviour of the cost function is extrapolated in order to find the next point to be
+//! evaluated.
+//!
+//! The following actions are possible:
+//!
+//! 1) Reflection: (Parameter `alpha`, default `1`)
+//! 2) Expansion: (Parameter `gamma`, default `2`)
+//! 3) Contraction: (Parameter `rho`, default `0.5`)
+//! 4) Shrink: (Parameter `sigma`, default `0.5`)
+//!
+//! TODO: More information as soon as rustdoc allows math.
+//!
+//! The initial simplex needs to be chosen carefully.
+//!
+//! # Example
+//! ```rust
+//! extern crate argmin;
+//! use argmin::prelude::*;
+//! use argmin::{ArgminProblem, NelderMead};
+//! use argmin::testfunctions::rosenbrock;
+//!
+//! // Define cost function
+//! let cost = |x: &Vec<f64>| -> f64 { rosenbrock(x, 1_f64, 100_f64) };
+//!
+//! // Set up problem
+//! let mut prob = ArgminProblem::new(&cost);
+//! prob.target_cost(0.01);
+//!
+//! // Set up GradientDecent solver
+//! let mut solver = NelderMead::new();
+//! solver.max_iters(100);
+//!
+//! // Choose the starting points.
+//! let init_params = vec![vec![0.0, 0.1], vec![2.0, 1.5], vec![2.0, -1.0]];
+//!
+//! let result = solver.run(&prob, &init_params).unwrap();
+//!
+//! println!("{:?}", result);
+//! ```
 
 use std;
 use errors::*;
