@@ -7,7 +7,7 @@
 
 //! Multi-Start (TODO)
 
-#![cfg_attr(feature = "cargo-clippy", allow(new_without_default))]
+#![cfg_attr(feature = "clippy", allow(new_without_default))]
 use futures::Future;
 use futures::prelude::*;
 use futures_cpupool::{CpuFuture, CpuPool};
