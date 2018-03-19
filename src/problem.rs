@@ -43,7 +43,7 @@ impl<'a, T: ArgminParameter + 'a, U: ArgminCostValue + 'a, V: 'a> ArgminProblem<
     /// `cost_function`: Reference to a cost function
     pub fn new(cost_function: &'a Fn(&T) -> U) -> Self {
         ArgminProblem {
-            cost_function: cost_function,
+            cost_function,
             gradient: None,
             hessian: None,
             lower_bound: None,

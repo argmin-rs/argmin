@@ -36,9 +36,9 @@ impl<T: ArgminParameter, U: ArgminCostValue> ArgminResult<T, U> {
     /// `iters`: Number of iterations
     pub fn new(param: T, cost: U, iters: u64) -> Self {
         ArgminResult {
-            param: param,
-            cost: cost,
-            iters: iters,
+            param,
+            cost,
+            iters,
             terminated: false,
             termination_reason: TerminationReason::NotTerminated,
         }

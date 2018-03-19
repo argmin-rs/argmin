@@ -109,8 +109,8 @@ where
             )
         } else {
             Ok(SimulatedAnnealing {
-                init_temp: init_temp,
-                max_iters: max_iters,
+                init_temp,
+                max_iters,
                 temp_func: SATempFunc::TemperatureFast,
                 custom_temp_func: None,
                 state: None,
@@ -199,11 +199,11 @@ where
     ) -> Result<()> {
         let prev_cost = (problem.cost_function)(init_param);
         self.state = Some(SimulatedAnnealingState {
-            problem: problem,
+            problem,
             param: init_param.to_owned(),
             iter: 0_u64,
             cur_temp: self.init_temp,
-            prev_cost: prev_cost,
+            prev_cost,
             best_param: init_param.to_owned(),
             best_cost: prev_cost,
         });

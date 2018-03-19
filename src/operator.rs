@@ -25,8 +25,8 @@ impl<'a> ArgminOperator<'a> {
     /// Constructor
     pub fn new(operator: &'a Array2<f64>, y: &'a Array1<f64>) -> Self {
         ArgminOperator {
-            operator: operator,
-            y: y,
+            operator,
+            y,
             target_cost: std::f64::MIN,
         }
     }

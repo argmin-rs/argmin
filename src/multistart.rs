@@ -7,6 +7,7 @@
 
 //! Multi-Start (TODO)
 
+#![allow(new_without_default)]
 use futures::Future;
 use futures::prelude::*;
 use futures_cpupool::{CpuFuture, CpuPool};

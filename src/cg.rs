@@ -50,10 +50,10 @@ impl<'a> ConjugateGradientState<'a> {
         r: Array1<f64>,
     ) -> Self {
         ConjugateGradientState {
-            operator: operator,
-            param: param,
-            p: p,
-            r: r,
+            operator,
+            param,
+            p,
+            r,
             iter: 0_u64,
             norm: std::f64::NAN,
         }
@@ -111,13 +111,12 @@ impl<'a> ArgminSolver<'a> for ConjugateGradient<'a> {
             ap = state.operator.apply_transpose(&ap);
         }
         let rtr = state.r.iter().map(|a| a.powf(2.0)).sum::<f64>();
-        let alpha: f64 = rtr
-            / state
-                .p
-                .iter()
-                .zip(ap.iter())
-                .map(|(a, b)| a * b)
-                .sum::<f64>();
+        let alpha: f64 = rtr / state
+            .p
+            .iter()
+            .zip(ap.iter())
+            .map(|(a, b)| a * b)
+            .sum::<f64>();
         state.param = state.param + alpha * &state.p;
         state.r = state.r - alpha * &ap;
         let beta: f64 = state.r.iter().map(|a| a.powf(2.0)).sum::<f64>() / rtr;

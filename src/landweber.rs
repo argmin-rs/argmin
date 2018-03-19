@@ -45,8 +45,8 @@ impl<'a> LandweberState<'a> {
     /// Constructor for `LandweberState`
     pub fn new(operator: &'a ArgminOperator<'a>, param: Array1<f64>) -> Self {
         LandweberState {
-            operator: operator,
-            param: param,
+            operator,
+            param,
             iter: 0_u64,
             norm: std::f64::NAN,
         }
@@ -57,7 +57,7 @@ impl<'a> Landweber<'a> {
     /// Return a `Landweber` struct
     pub fn new(omega: f64) -> Self {
         Landweber {
-            omega: omega,
+            omega,
             max_iters: std::u64::MAX,
             state: None,
         }

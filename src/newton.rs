@@ -45,8 +45,8 @@ impl<'a> NewtonState<'a> {
         param: Array1<f64>,
     ) -> Self {
         NewtonState {
-            problem: problem,
-            param: param,
+            problem,
+            param,
             iter: 0_u64,
         }
     }

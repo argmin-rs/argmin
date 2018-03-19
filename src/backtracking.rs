@@ -109,8 +109,8 @@ impl<'a> BacktrackingLineSearch<'a> {
         gradient: &'a Fn(&Array1<f64>) -> Array1<f64>,
     ) -> Self {
         BacktrackingLineSearch {
-            cost_function: cost_function,
-            gradient: gradient,
+            cost_function,
+            gradient,
             alpha: 1.0,
             max_iters: 100,
             tau: 0.5,
@@ -165,7 +165,7 @@ impl<'a> ArgminSolver<'a> for BacktrackingLineSearch<'a> {
         let m: f64 = p.t().dot(&((self.gradient)(x)));
         self.state = Some(BacktrackingLineSearchState {
             cost: std::f64::NAN,
-            p: p,
+            p,
             x: x.to_owned(),
             t: -self.c * m,
             fx: (self.cost_function)(x),

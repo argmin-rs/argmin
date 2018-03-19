@@ -51,8 +51,8 @@ impl<'a> NelderMeadState<'a> {
         param_vecs: Vec<NelderMeadParam>,
     ) -> Self {
         NelderMeadState {
-            problem: problem,
-            param_vecs: param_vecs,
+            problem,
+            param_vecs,
             iter: 0_u64,
         }
     }

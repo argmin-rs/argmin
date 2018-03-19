@@ -20,7 +20,7 @@
 //!    minimum. (TODO: Formula)
 //! 3) `GDGammaUpdate::BacktrackingLineSearch`: Finds an optimal distance along the direction of
 //!    the gradient based on an given optimality criterion. See
-//!    [BacktrackingLineSearch](backtracking::BacktrackingLineSearch).
+//!    [`BacktrackingLineSearch`](backtracking::BacktrackingLineSearch).
 //!
 //! # Example
 //!
@@ -167,7 +167,7 @@ impl<'a> GradientDescent<'a> {
         GradientDescent {
             gamma: GDGammaUpdate::BarzilaiBorwein,
             max_iters: std::u64::MAX,
-            precision: 0.00000001,
+            precision: 0.000_000_01,
             state: GradientDescentState::new(),
         }
     }
