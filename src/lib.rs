@@ -39,8 +39,9 @@ use parameter::ArgminParameter;
 
 /// Trait for cost function values
 /// TODO: Do this with trait aliases once they work in rust.
-pub trait ArgminCostValue
-    : Bounded + ToPrimitive + Copy + Debug + Default + PartialOrd + Send + Sync {
+pub trait ArgminCostValue:
+    Bounded + ToPrimitive + Copy + Debug + Default + PartialOrd + Send + Sync
+{
 }
 impl<T> ArgminCostValue for T
 where
@@ -110,7 +111,7 @@ pub mod sa;
 /// Gradient Descent
 pub mod gradientdescent;
 
-/// Nelder Mead method
+/// Nelder-Mead method
 pub mod neldermead;
 
 /// Newton method
