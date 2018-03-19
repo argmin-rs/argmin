@@ -18,14 +18,15 @@ use ndarray::Array1;
 
 /// This trait needs to be implemented for every parameter fed into the solvers.
 /// This is highly *UNSTABLE* and will change in the future.
-pub trait ArgminParameter
-    : Clone
+pub trait ArgminParameter:
+    Clone
     + Default
     + Send
     + Sync
     + Debug
     + Index<usize, Output = <Self as ArgminParameter>::Element>
-    + IndexMut<usize> {
+    + IndexMut<usize>
+{
     /// Type of a single element of the parameter vector
     type Element: PartialOrd + Clone;
     /// Defines a single modification of the parameter vector.
@@ -43,7 +44,7 @@ pub trait ArgminParameter
 
 /// Create a random parameter vector within lower and upper bound.
 macro_rules! random_vec_iter {
-    ($type:ty) => {
+    ($type: ty) => {
         fn random(lower_bound: &$type, upper_bound: &$type) -> $type {
             let mut rng = rand::thread_rng();
             let out: $type = lower_bound
@@ -59,7 +60,7 @@ macro_rules! random_vec_iter {
                 .collect();
             out
         }
-    }
+    };
 }
 
 /// Modify one parameter of the parameter vector
@@ -79,13 +80,13 @@ macro_rules! modify_one_parameter {
 
 /// Implement `ArgminParameter`
 macro_rules! implement_argmin_parameter {
-    ($param:ty, $element:ty) => {
+    ($param: ty, $element: ty) => {
         impl ArgminParameter for $param {
             type Element = $element;
             modify_one_parameter!();
             random_vec_iter!($param);
         }
-    }
+    };
 }
 
 implement_argmin_parameter!(Vec<f64>, f64);
