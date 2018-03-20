@@ -5,8 +5,16 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! TODO DOCUMENTATION
+//! # `ArgminParameter`
 //!
+//! This module provides the `ArgminParameter` trait which every parameter vector fed into an
+//! solver must implement.
+//!
+//! This trait is so far implemented for:
+//! * `Vec<f64>`
+//! * `Vec<f32>`
+//! * `ndarray::Array1<f64>`
+//! * `ndarray::Array1<f32>`
 
 use std::fmt::Debug;
 use std::cmp::PartialOrd;
