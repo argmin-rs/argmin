@@ -5,9 +5,40 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Conjugate Gradient method
+//! # Conjugate Gradient (CG) method
 //!
-//! TODO
+//! The CG method is an algorithm to solve linear systems where the matrix is symmetric and
+//! positive-definite.
+//!
+//! Detailed information is available on
+//! [Wikipedia](https://en.wikipedia.org/wiki/Conjugate_gradient_method).
+//!
+//! # Example
+//!
+//! ```rust
+//! extern crate argmin;
+//! extern crate ndarray;
+//! use ndarray::{arr1, arr2};
+//! use argmin::prelude::*;
+//! use argmin::{ArgminOperator, ConjugateGradient};
+//!
+//! // Set up problem
+//! let A = arr2(&[[4., 1.], [1., 3.]]);
+//! let y = arr1(&[1., 2.]);
+//! let mut prob = ArgminOperator::new(&A, &y);
+//! prob.target_cost(0.01);
+//!
+//! // Set up Newton solver
+//! let mut solver = ConjugateGradient::new();
+//!
+//! // Initialize the solver
+//! let init_param = arr1(&[0., 0.]);
+//!
+//! // Run solver
+//! let result = solver.run(&prob, &init_param).unwrap();
+//!
+//! println!("{:?}", result);
+//! ```
 
 use std;
 use ndarray::{Array1, Array2};
@@ -17,7 +48,7 @@ use operator::ArgminOperator;
 use result::ArgminResult;
 use termination::TerminationReason;
 
-/// Conjugate Gradient method struct (duh)
+/// Conjugate Gradient method
 pub struct ConjugateGradient<'a> {
     /// Maximum number of iterations
     max_iters: u64,
