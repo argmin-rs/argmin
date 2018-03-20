@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Get all relevant traits into scope
+//! # Re-export of all relevant traits
 //!
 //! Put `argmin::prelude::*` on top of your code to get all relevant traits into scope.
 
