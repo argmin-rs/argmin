@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Gets common traits into scope
+//! # Get all relevant traits into scope
 //!
 //! Put `argmin::prelude::*` on top of your code to get all relevant traits into scope.
 
