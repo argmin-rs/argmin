@@ -5,8 +5,10 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! TODO DOCUMENTATION
+//! # `ArgminOperator`
 //!
+//! `ArgminOperator` stores relevant information for systems of linear equations which are written
+//! as `y = Ax`.
 
 use std;
 use ndarray::{Array1, Array2};
