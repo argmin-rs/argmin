@@ -5,7 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Multi-Start (TODO)
+//! # Multi-Start
+//!
+//! *Work in progress:* The idea is to be able to start many optimizations at once and have them run
+//! in parallel. Ideally, the kind of solver should be irrelevant. However, I'm fighting with the
+//! type system a bit...
 
 #![cfg_attr(feature = "clippy", allow(new_without_default))]
 use futures::Future;
