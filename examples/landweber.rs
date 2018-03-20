@@ -19,7 +19,7 @@ fn run() -> Result<(), Box<std::error::Error>> {
     let mut prob = ArgminOperator::new(&A, &y);
     prob.target_cost(0.01);
 
-    // Set up Newton solver
+    // Set up Landweber solver
     let mut solver = Landweber::new(0.01);
 
     // Initialize the solver
