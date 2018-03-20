@@ -5,9 +5,53 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Landweber algorithm
+//! # Landweber algorithm
 //!
-//! TODO
+//! The Landweber algorithm or Landweber iteration can be used to solve ill-posed linear inverse
+//! problems of the form `y = Ax`. It regularizes the problem in case `A` is singular and/or there
+//! is noise in the data. It solves the following minimization problem:
+//!
+//! `min_x { 1/2 || Ax - y ||^2_2 }`
+//!
+//! The update steps are given as:
+//!
+//! `x_{k+1} = x_k - \omega A^H (A x_k - y)`
+//!
+//! The parameter `\omega` is a relaxation factor and has to satisfiy `0 < \omega < 2/\sigma_1^2`
+//! where `\sigma_1` is the largest singular value of `A`.
+//!
+//! The Landweber method is known to become unstable in later iterations, therefore iterations
+//! should be stopped.
+//!
+//! Detailed information is available on
+//! [Wikipedia](https://en.wikipedia.org/wiki/Landweber_iteration).
+//!
+//! # Example
+//!
+//! ```rust
+//! extern crate argmin;
+//! extern crate ndarray;
+//! use ndarray::{arr1, arr2};
+//! use argmin::prelude::*;
+//! use argmin::{ArgminOperator, Landweber};
+//!
+//! // Set up problem
+//! let A = arr2(&[[4., 1.], [1., 3.]]);
+//! let y = arr1(&[1., 2.]);
+//! let mut prob = ArgminOperator::new(&A, &y);
+//! prob.target_cost(0.01);
+//!
+//! // Set up Landweber solver
+//! let mut solver = Landweber::new(0.01);
+//!
+//! // Initial parameter vector
+//! let init_param = arr1(&[0., 0.]);
+//!
+//! // Run solver
+//! let result = solver.run(&prob, &init_param).unwrap();
+//!
+//! println!("{:?}", result);
+//! ```
 
 use std;
 use ndarray::{Array1, Array2};
