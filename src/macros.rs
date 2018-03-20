@@ -5,7 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! TODO Documentation
+//! # Macros
+//!
+//! Macros to generate the `run` and `terminate` methods of the solvers.
 
 /// This macro generates the `run` function for every solver which implements `ArgminSolver`.
 #[macro_export]
