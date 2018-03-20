@@ -5,9 +5,50 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Newton method
+//! # Newton method
 //!
-//! TODO
+//! Newton's method approximates a function `f(x)` by a quadratic function around `x_i`. The
+//! minimum of that quadratic function is then used as the point to move to. This can be relaxed by
+//! a parameter `\gamma \in (0,1)`.
+//! The method requires the first and second derivative of the function `f(x)`.
+//!
+//! Detailed information is available on
+//! [Wikipedia](https://en.wikipedia.org/wiki/Newton%27s_method_in_optimization).
+//!
+//! # Example
+//!
+//! ```rust
+//! extern crate argmin;
+//! extern crate ndarray;
+//! use ndarray::{Array1, Array2};
+//! use argmin::prelude::*;
+//! use argmin::{ArgminProblem, Newton};
+//! use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_hessian_nd, rosenbrock_nd};
+//!
+//! // Define cost function
+//! let cost = |x: &Array1<f64>| -> f64 { rosenbrock_nd(x, 1_f64, 100_f64) };
+//! let gradient = |x: &Array1<f64>| -> Array1<f64> { rosenbrock_derivative_nd(x, 1_f64, 100_f64) };
+//! let hessian = |x: &Array1<f64>| -> Array2<f64> { rosenbrock_hessian_nd(x, 1_f64, 100_f64) };
+//!
+//! // Set up problem
+//! // The problem requires a cost function, gradient and hessian.
+//! let mut prob = ArgminProblem::new(&cost);
+//! prob.gradient(&gradient);
+//! prob.hessian(&hessian);
+//!
+//! // Set up Newton solver
+//! let mut solver = Newton::new();
+//! solver.max_iters(10);
+//!
+//! // define inital parameter vector
+//! let init_param: Array1<f64> = Array1::from_vec(vec![1.5, 1.5]);
+//!
+//! // Run the solver
+//! solver.init(&prob, &init_param).unwrap();
+//! let result = solver.run(&prob, &init_param).unwrap();
+//!
+//! println!("{:?}", result);
+//! ```
 
 use std;
 use ndarray::{Array1, Array2};
@@ -18,7 +59,7 @@ use problem::ArgminProblem;
 use result::ArgminResult;
 use termination::TerminationReason;
 
-/// Newton method struct (duh)
+/// Newton method
 pub struct Newton<'a> {
     /// step size
     gamma: f64,
