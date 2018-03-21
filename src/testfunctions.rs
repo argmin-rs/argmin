@@ -5,7 +5,12 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! TODO Documentation
+//! # Test functions
+//!
+//! Test functions to test optimization algorithms.
+//!
+//! * Rosenbrock
+//! * Sphere
 
 use std::iter::Sum;
 use ndarray::{Array1, Array2};
