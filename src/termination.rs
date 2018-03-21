@@ -5,7 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! TODO Documentation
+//! # Termination
+//!
+//! Defines reasons for termination.
 
 /// Indicates why the optimization algorithm stopped
 #[derive(Debug, Clone)]
