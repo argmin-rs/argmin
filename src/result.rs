@@ -5,9 +5,10 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! `ArgminResult`
+//! # `ArgminResult`
 //!
-//! TODO Documentation
+//! Return type of the solvers. Includes the final parameter vector, the final cost, the number of
+//! iterations, whether it terminated and the reason of termination.
 
 use parameter::ArgminParameter;
 use ArgminCostValue;
