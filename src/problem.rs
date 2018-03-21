@@ -5,8 +5,31 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! TODO DOCUMENTATION
+//! # `ArgminProblem`
 //!
+//! Struct which holds all information necessary to describe an optimization problem.
+//!
+//! # Example
+//!
+//! ```rust
+//! extern crate argmin;
+//! extern crate ndarray;
+//! use ndarray::{Array1, Array2};
+//! use argmin::prelude::*;
+//! use argmin::ArgminProblem;
+//! use argmin::testfunctions::{rosenbrock_derivative_nd, rosenbrock_hessian_nd, rosenbrock_nd};
+//!
+//! // Define cost function
+//! let cost = |x: &Array1<f64>| -> f64 { rosenbrock_nd(x, 1_f64, 100_f64) };
+//! let gradient = |x: &Array1<f64>| -> Array1<f64> { rosenbrock_derivative_nd(x, 1_f64, 100_f64) };
+//! let hessian = |x: &Array1<f64>| -> Array2<f64> { rosenbrock_hessian_nd(x, 1_f64, 100_f64) };
+//!
+//! // Set up problem
+//! // The problem requires a cost function, gradient and hessian.
+//! let mut prob = ArgminProblem::new(&cost);
+//! prob.gradient(&gradient);
+//! prob.hessian(&hessian);
+//! ```
 
 use errors::*;
 use prelude::*;
