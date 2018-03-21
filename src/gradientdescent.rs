@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Gradient Descent
+//! # Gradient Descent
 //!
 //! Gradient Descent is a first-order iterative minimization algorithm. The algorithm moves along a
 //! given downhill direction with the step-size proportional to the gradient. It will converge to a

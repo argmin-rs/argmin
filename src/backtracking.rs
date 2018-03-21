@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Backtracking Line Search
+//! # Backtracking Line Search
 //!
 //! The backtracking line search algorithm computes the maximum distance to move along a certain
 //! search direction. It moves backwards starting from a large step size by iteratively shrinking
@@ -21,6 +21,10 @@
 //! The optimization is then run by providing the `run` function with a starting point `x` and a
 //! search direction `p`.
 //!
+//! Detailed information is available on
+//! [Wikipedia](https://en.wikipedia.org/wiki/Backtracking_line_search).
+//!
+//! # Example
 //!
 //! ```
 //! extern crate argmin;
@@ -52,9 +56,6 @@
 //!
 //! The parameters `tau` and `c` are set to 0.5 by default and can be adapted with the methods
 //! `tau` and `c`.
-//!
-//! Detailed information is available on
-//! [Wikipedia](https://en.wikipedia.org/wiki/Backtracking_line_search).
 
 use std;
 use errors::*;
