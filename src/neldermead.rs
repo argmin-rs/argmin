@@ -103,7 +103,7 @@ impl<'a> NelderMeadState<'a> {
 }
 
 impl<'a> NelderMead<'a> {
-    /// Return a GradientDescent struct
+    /// Return a NelderMead struct
     pub fn new() -> Self {
         NelderMead {
             max_iters: std::u64::MAX,
