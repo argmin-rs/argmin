@@ -1,6 +1,6 @@
 [package]
 name = "argmin"
-version = "0.0.10"
+version = "0.0.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "WIP optimization toolbox for Rust"
@@ -17,25 +17,15 @@ exclude = [
 ]
 
 [dependencies]
-# clippy = {version = "*", optional = true}
-# error-chain = "*"
-# num = "*"
-# rand = "*"
 # ndarray = "*"
 # ndarray-linalg = { version = "*", features = ["openblas"] }
+# argmin_simulatedannealing = { git = "https://github.com/argmin-rs/argmin-simulatedannealing.git" }
+argmin_core = { path = "../argmin-core" }
+argmin_simulatedannealing = { path = "../argmin-simulatedannealing" }
 
-clippy = {version = "0.0.188", optional = true}
-error-chain = "0.11.0"
-num = "0.1.42"
-rand = "0.4.2"
-ndarray = "0.11.1"
-#ndarray-linalg = { version = "*", default-features = openblas }
-ndarray-linalg = { version = "0.9.0", features = ["openblas"] }
-futures = "0.1.18"
-futures-cpupool = "0.1.8"
 
 [features]
 default = []
 
 [badges]
-travis-ci = { repository = "stefan-k/argmin-rs", branch = "master" }
+travis-ci = { repository = "argmin-rs/argmin", branch = "master" }

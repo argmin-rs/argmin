@@ -9,6 +9,5 @@
 //!
 //! Put `argmin::prelude::*` on top of your code to get all relevant traits into scope.
 
-pub use ArgminSolver;
-pub use ArgminCostValue;
-pub use parameter::ArgminParameter;
+pub use argmin_core::ArgminSolver;
+pub use argmin_simulatedannealing::SimulatedAnnealing;

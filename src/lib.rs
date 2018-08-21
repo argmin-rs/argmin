@@ -8,142 +8,14 @@
 //! Optimizaton toolbox
 //!
 //! TODOs
-//!
-//! * Stopping criterions which can be stacked, also return the reason why a computation terminated
-//! * keep track of cost function values
-//! * count the number of cost function / gradient evaluations and return them
 
-#![recursion_limit = "1024"]
-#![cfg_attr(feature = "clippy", feature(plugin))]
-#![cfg_attr(feature = "clippy", plugin(clippy))]
 #![warn(missing_docs)]
-#![feature(trace_macros)]
-#[macro_use]
-extern crate error_chain;
-extern crate futures;
-extern crate futures_cpupool;
-extern crate ndarray;
-extern crate ndarray_linalg;
-extern crate num;
-extern crate rand;
 
-/// Macros
-#[macro_use]
-pub mod macros;
-
-use std::default::Default;
-use std::fmt::Debug;
-use num::{Bounded, ToPrimitive};
-use errors::*;
-use parameter::ArgminParameter;
-
-/// Trait for cost function values
-/// TODO: Do this with trait aliases once they work in rust.
-pub trait ArgminCostValue:
-    Bounded + ToPrimitive + Copy + Debug + Default + PartialOrd + Send + Sync
-{
-}
-impl<T> ArgminCostValue for T
-where
-    T: Bounded + ToPrimitive + Copy + Debug + Default + PartialOrd + Send + Sync,
-{
-}
-
-/// Trait every solve needs to implement (in the future)
-pub trait ArgminSolver<'a> {
-    /// Parameter vector
-    type Parameter: ArgminParameter;
-    /// Cost value
-    type CostValue: ArgminCostValue;
-    /// Hessian
-    type Hessian;
-    /// Initial parameter(s)
-    type StartingPoints: Send + Sync;
-    /// Type of Problem
-    type ProblemDefinition: Clone + Send;
-
-    /// Initializes the solver and sets the state to its initial state
-    // fn init(&mut self, &'a Self::ProblemDefinition, &Self::StartingPoints) -> Result<()>;
-    fn init(&mut self, Self::ProblemDefinition, &Self::StartingPoints) -> Result<()>;
-
-    /// Moves forward by a single iteration
-    fn next_iter(&mut self) -> Result<ArgminResult<Self::Parameter, Self::CostValue>>;
-
-    /// Run initialization and iterations at once
-    fn run(
-        &mut self,
-        // &'a Self::ProblemDefinition,
-        Self::ProblemDefinition,
-        &Self::StartingPoints,
-    ) -> Result<ArgminResult<Self::Parameter, Self::CostValue>>;
-
-    /// Handles the stopping criteria
-    fn terminate(&self) -> TerminationReason;
-}
+extern crate argmin_core;
+extern crate argmin_simulatedannealing;
 
 /// Definition of all relevant traits
 pub mod prelude;
-
-/// Definition of the return type of the solvers
-pub mod result;
-
-/// Traits for implementing parameter vectors
-pub mod parameter;
-
-/// Problem formulation
-pub mod problem;
-
-/// Operator
-pub mod operator;
-
-/// Termination reasons
-pub mod termination;
-
-/// A set of test functions like Rosenbrock's function and so on.
-pub mod testfunctions;
-
-/// Backtracking line search
-pub mod backtracking;
-
-/// Simulated Annealing
-pub mod sa;
-
-/// Gradient Descent
-pub mod gradientdescent;
-
-/// Nelder-Mead method
-pub mod neldermead;
-
-/// Newton method
-pub mod newton;
-
-/// Landweber algorithm
-pub mod landweber;
-
-/// Start several optimization problems at once.
-pub mod multistart;
-
-/// Conjugate Gradient method
-pub mod cg;
-
-/// Errors using `error-chain`
-mod errors;
-
-/// Bring some structs into scope to make them easier to access
-pub use problem::ArgminProblem;
-pub use operator::ArgminOperator;
-pub use result::ArgminResult;
-pub use sa::SimulatedAnnealing;
-pub use sa::SATempFunc;
-pub use newton::Newton;
-pub use cg::ConjugateGradient;
-pub use gradientdescent::GradientDescent;
-pub use gradientdescent::GDGammaUpdate;
-pub use backtracking::BacktrackingLineSearch;
-pub use landweber::Landweber;
-pub use neldermead::NelderMead;
-pub use multistart::MultiStart;
-pub use termination::TerminationReason;
 
 // #[cfg(test)]
 // mod tests {
