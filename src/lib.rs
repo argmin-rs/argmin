@@ -11,6 +11,7 @@
 
 #![warn(missing_docs)]
 
+extern crate argmin_conjugategradient;
 extern crate argmin_core;
 extern crate argmin_simulatedannealing;
 

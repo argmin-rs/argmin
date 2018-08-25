@@ -22,6 +22,7 @@ exclude = [
 # argmin_simulatedannealing = { git = "https://github.com/argmin-rs/argmin-simulatedannealing.git" }
 argmin_core = { path = "../argmin-core" }
 argmin_simulatedannealing = { path = "../argmin-simulatedannealing" }
+argmin_conjugategradient = { path = "../argmin-conjugategradient" }
 
 
 [features]
