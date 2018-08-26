@@ -11,4 +11,5 @@
 
 pub use argmin_conjugategradient::ConjugateGradient;
 pub use argmin_core::*;
+pub use argmin_linesearch::*;
 pub use argmin_simulatedannealing::{SATempFunc, SimulatedAnnealing};

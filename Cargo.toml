@@ -23,6 +23,7 @@ exclude = [
 argmin_core = { path = "../argmin-core" }
 argmin_simulatedannealing = { path = "../argmin-simulatedannealing" }
 argmin_conjugategradient = { path = "../argmin-conjugategradient" }
+argmin_linesearch = { path = "../argmin-linesearch" }
 
 
 [features]
