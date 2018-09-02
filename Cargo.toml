@@ -17,13 +17,11 @@ exclude = [
 ]
 
 [dependencies]
-# ndarray = "*"
-# ndarray-linalg = { version = "*", features = ["openblas"] }
-# argmin_simulatedannealing = { git = "https://github.com/argmin-rs/argmin-simulatedannealing.git" }
 argmin_core = { path = "../argmin-core" }
 argmin_simulatedannealing = { path = "../argmin-simulatedannealing" }
 argmin_conjugategradient = { path = "../argmin-conjugategradient" }
 argmin_linesearch = { path = "../argmin-linesearch" }
+argmin_gradientdescent = { path = "../argmin-gradientdescent" }
 
 
 [features]
