@@ -5,8 +5,12 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Re-export of all relevant traits
-//!
-//! Put `argmin::prelude::*` on top of your code to get all relevant traits into scope.
+//! Argmin Line search methods
 
-pub use argmin_core::*;
+/// backtracking algorithm
+pub mod backtracking;
+/// acceptance conditions
+pub mod condition;
+
+pub use self::backtracking::*;
+pub use self::condition::*;

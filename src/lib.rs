@@ -10,20 +10,26 @@
 //! TODOs
 
 #![warn(missing_docs)]
+#![feature(custom_attribute)]
+#![feature(unrestricted_attribute_tokens)]
+#![allow(unused_attributes)]
 
-extern crate argmin_conjugategradient;
+#[macro_use]
 extern crate argmin_core;
-extern crate argmin_gradientdescent;
-extern crate argmin_linesearch;
-extern crate argmin_simulatedannealing;
+#[macro_use]
+extern crate argmin_derive;
+extern crate argmin_testfunctions;
+extern crate rand;
 
 /// Definition of all relevant traits
 pub mod prelude;
 
-// #[cfg(test)]
-// mod tests {
-//     #[test]
-//     fn it_works() {
-//         assert_eq!(2 + 2, 4);
-//     }
-// }
+/// solvers
+pub mod solver;
+
+use argmin_core::*;
+
+/// testfunctions
+pub mod testfunctions {
+    pub use argmin_testfunctions::*;
+}

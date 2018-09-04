@@ -18,10 +18,11 @@ exclude = [
 
 [dependencies]
 argmin_core = { path = "../argmin-core" }
-argmin_simulatedannealing = { path = "../argmin-simulatedannealing" }
-argmin_conjugategradient = { path = "../argmin-conjugategradient" }
+argmin_derive = { path = "../argmin-derive" }
 argmin_linesearch = { path = "../argmin-linesearch" }
 argmin_gradientdescent = { path = "../argmin-gradientdescent" }
+argmin_testfunctions = { path = "../argmin-testfunctions" }
+rand = "*"
 
 
 [features]

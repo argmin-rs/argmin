@@ -5,8 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Re-export of all relevant traits
-//!
-//! Put `argmin::prelude::*` on top of your code to get all relevant traits into scope.
-
-pub use argmin_core::*;
+pub mod conjugategradient;
+pub mod gradientdescent;
+pub mod linesearch;
+pub mod simulatedannealing;
