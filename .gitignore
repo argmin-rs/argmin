@@ -3,3 +3,4 @@ Cargo.lock
 src/.*.swp
 target/
 target/*
+*.log

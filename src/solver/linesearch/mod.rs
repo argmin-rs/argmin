@@ -11,6 +11,9 @@
 pub mod backtracking;
 /// acceptance conditions
 pub mod condition;
+/// More-Thuente line search algorithm
+pub mod morethuente;
 
 pub use self::backtracking::*;
 pub use self::condition::*;
+pub use self::morethuente::*;
