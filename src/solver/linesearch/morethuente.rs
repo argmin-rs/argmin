@@ -9,6 +9,9 @@
 //!
 //! TODO: Proper documentation.
 //!
+//! This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
+//! http://www.cs.umd.edu/users/oleary/software/
+//!
 // //!
 // //! # Example
 // //!
@@ -18,6 +21,19 @@
 
 use prelude::*;
 use std;
+
+#[derive(Default)]
+struct Step {
+    pub x: f64,
+    pub fx: f64,
+    pub gx: f64,
+}
+
+impl Step {
+    pub fn new(x: f64, fx: f64, gx: f64) -> Self {
+        Step { x, fx, gx }
+    }
+}
 
 /// More-Thuente Line Search
 #[derive(ArgminSolver)]
@@ -30,20 +46,36 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
 {
+    /// initial parameter vector (builder)
+    init_param_b: Option<T>,
+    /// initial cost (builder)
+    init_cost_b: Option<f64>,
+    /// initial gradient (builder)
+    init_grad_b: Option<T>,
+    /// Search direction (builder)
+    search_direction_b: Option<T>,
     /// initial parameter vector
-    init_param: Option<T>,
+    init_param: T,
     /// initial cost
-    init_cost: Option<f64>,
+    init_cost: f64,
     /// initial gradient
-    init_grad: Option<T>,
+    init_grad: T,
     /// Search direction
-    search_direction: Option<T>,
+    search_direction: T,
     /// Search direction in 1D
     sd: f64,
-    /// mu
-    mu: f64,
-    /// delta
-    delta: f64,
+    /// c1
+    c1: f64,
+    /// c2
+    c2: f64,
+    /// xtrapf?
+    xtrapf: f64,
+    /// width of interval
+    width: f64,
+    /// width of what?
+    width1: f64,
+    /// xtol
+    xtol: f64,
     /// alpha
     alpha: f64,
     /// alpha_l
@@ -54,6 +86,18 @@ where
     alpha_min: f64,
     /// alpha_max
     alpha_max: f64,
+    /// best step
+    best_step: Step,
+    /// endpoint
+    endpoint: Step,
+    /// current step
+    cur_step: Step,
+    /// bracketed
+    brackt: bool,
+    /// stage1
+    stage1: bool,
+    /// infoc
+    infoc: bool,
     /// base
     base: ArgminBase<T, f64>,
 }
@@ -76,31 +120,45 @@ where
     /// `mu`: todo
     pub fn new(operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>) -> Self {
         MoreThuenteLineSearch {
-            init_param: None,
-            init_cost: None,
-            init_grad: None,
-            search_direction: None,
+            init_param_b: None,
+            init_cost_b: None,
+            init_grad_b: None,
+            search_direction_b: None,
+            init_param: T::default(),
+            init_cost: std::f64::INFINITY,
+            init_grad: T::default(),
+            search_direction: T::default(),
             sd: 0.0,
-            mu: 0.9,
-            delta: 1.1,
+            c1: 1e-4,
+            c2: 0.9,
+            xtrapf: 4.0,
+            width: std::f64::NAN,
+            width1: std::f64::NAN,
+            xtol: 1e-5,
             alpha: 1.0,
             alpha_l: 0.0,
             alpha_u: std::f64::INFINITY,
             alpha_min: 0.0,
             alpha_max: std::f64::INFINITY,
+            best_step: Step::default(),
+            endpoint: Step::default(),
+            cur_step: Step::default(),
+            brackt: false,
+            stage1: true,
+            infoc: true,
             base: ArgminBase::new(operator, T::default()),
         }
     }
 
     /// Set search direction
     pub fn set_search_direction(&mut self, search_direction: T) -> &mut Self {
-        self.search_direction = Some(search_direction);
+        self.search_direction_b = Some(search_direction);
         self
     }
 
     /// Set initial parameter
     pub fn set_initial_parameter(&mut self, param: T) -> &mut Self {
-        self.init_param = Some(param.clone());
+        self.init_param_b = Some(param.clone());
         self.base.set_cur_param(param);
         self
     }
@@ -112,26 +170,31 @@ where
     }
 
     /// Set mu
-    pub fn set_mu(&mut self, mu: f64) -> Result<&mut Self, Error> {
-        if mu <= 0.0 || mu >= 1.0 {
+    pub fn set_c(&mut self, c1: f64, c2: f64) -> Result<&mut Self, Error> {
+        if c1 <= 0.0 || c1 >= c2 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "MoreThuenteLineSearch: Parameter mu must be in (0, 1).".to_string(),
+                parameter: "MoreThuenteLineSearch: Parameter c1 must be in (0, c2).".to_string(),
             }.into());
         }
-        self.mu = mu;
-        Ok(self)
-    }
-
-    /// Set delta
-    pub fn set_delta(&mut self, delta: f64) -> Result<&mut Self, Error> {
-        if delta <= 0.0 || delta >= 1.0 {
+        if c2 <= c1 || c2 >= 1.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "MoreThuenteLineSearch: Parameter delta must >1.".to_string(),
+                parameter: "MoreThuenteLineSearch: Parameter c2 must be in (c1, 1).".to_string(),
             }.into());
         }
-        self.delta = delta;
+        self.c1 = c1;
+        self.c2 = c2;
         Ok(self)
     }
+    // /// Set delta
+    // pub fn set_delta(&mut self, delta: f64) -> Result<&mut Self, Error> {
+    //     if delta <= 0.0 || delta >= 1.0 {
+    //         return Err(ArgminError::InvalidParameter {
+    //             parameter: "MoreThuenteLineSearch: Parameter delta must >1.".to_string(),
+    //         }.into());
+    //     }
+    //     self.delta = delta;
+    //     Ok(self)
+    // }
 
     /// Set initial alpha value
     pub fn set_initial_alpha(&mut self, alpha: f64) -> Result<&mut Self, Error> {
@@ -168,27 +231,27 @@ where
 
     /// Set initial cost function value
     pub fn set_initial_cost(&mut self, init_cost: f64) -> &mut Self {
-        self.init_cost = Some(init_cost);
+        self.init_cost_b = Some(init_cost);
         self
     }
 
     /// Set initial gradient
     pub fn set_initial_gradient(&mut self, init_grad: T) -> &mut Self {
-        self.init_grad = Some(init_grad);
+        self.init_grad_b = Some(init_grad);
         self
     }
 
     /// Calculate initial cost function value
     pub fn calc_inital_cost(&mut self) -> Result<&mut Self, Error> {
         let tmp = self.base.cur_param();
-        self.init_cost = Some(self.apply(&tmp)?);
+        self.init_cost_b = Some(self.apply(&tmp)?);
         Ok(self)
     }
 
     /// Calculate initial cost function value
     pub fn calc_inital_gradient(&mut self) -> Result<&mut Self, Error> {
         let tmp = self.base.cur_param();
-        self.init_grad = Some(self.gradient(&tmp)?);
+        self.init_grad_b = Some(self.gradient(&tmp)?);
         Ok(self)
     }
 
@@ -225,49 +288,118 @@ where
     type OperatorOutput = f64;
 
     fn init(&mut self) -> Result<(), Error> {
-        match self.init_param {
+        self.init_param = match self.init_param_b {
             None => {
                 return Err(ArgminError::NotInitialized {
                     text: "MoreThuenteLineSearch: Initial parameter not initialized. Call `set_initial_parameter`.".to_string(),
                 }.into());
             }
-            _ => (),
-        }
+            Some(ref x) => x.clone(),
+        };
 
-        match self.init_cost {
+        self.init_cost = match self.init_cost_b {
             None => {
                 return Err(ArgminError::NotInitialized {
                     text: "MoreThuenteLineSearch: Initial cost not computed. Call `set_initial_cost` or `calc_inital_cost`.".to_string(),
                 }.into());
             }
-            _ => (),
-        }
+            Some(ref x) => x.clone(),
+        };
 
-        match self.init_grad {
+        self.init_grad = match self.init_grad_b {
             None => {
                 return Err(ArgminError::NotInitialized {
                     text: "MoreThuenteLineSearch: Initial gradient not computed. Call `set_initial_grad` or `calc_inital_grad`.".to_string(),
                 }.into());
             }
-            _ => (),
-        }
+            Some(ref x) => x.clone(),
+        };
 
-        match self.search_direction {
+        self.search_direction = match self.search_direction_b {
             None => {
                 return Err(ArgminError::NotInitialized {
                     text: "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`.".to_string(),
                 }.into());
             }
-            _ => (),
+            Some(ref x) => x.clone(),
+        };
+
+        self.sd = self.init_grad.dot(self.search_direction.clone());
+
+        // compute search direction in 1D
+        if self.sd >= 0.0 {
+            return Err(ArgminError::ConditionViolated {
+                text: "MoreThuenteLineSearch: Search direction must be a descent direction."
+                    .to_string(),
+            }.into());
         }
 
-        self.sd = (self.init_grad.as_ref().unwrap().clone())
-            .dot(self.search_direction.as_ref().unwrap().clone());
+        self.width = self.alpha_max - self.alpha_min;
+        self.width1 = 2.0 * self.width;
+
+        self.best_step = Step::new(0.0, self.init_cost, self.sd);
+        self.endpoint = Step::new(0.0, self.init_cost, self.sd);
 
         Ok(())
     }
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+        let dgtest = self.c1 * self.sd;
+
+        // set the minimum and maximum steps to correspond to the present interval of uncertainty
+        if self.brackt {
+            self.alpha_min = self.alpha_l.min(self.alpha_u);
+            self.alpha_max = self.alpha_l.max(self.alpha_u);
+        } else {
+            self.alpha_min = self.alpha;
+            self.alpha_max = self.cur_step.x + self.xtrapf * (self.alpha - self.alpha_l);
+        }
+
+        // alpha needs to be within bounds
+        self.alpha = self.alpha.max(self.alpha_min);
+        self.alpha = self.alpha.min(self.alpha_max);
+
+        // If an unusual termination is to occur then let alpha be the lowest point obtained so
+        // far.
+        if (self.brackt && (self.alpha <= self.alpha_min || self.alpha >= self.alpha_max))
+            || (self.brackt && (self.alpha_max - self.alpha_min) <= self.xtol * self.alpha_max)
+        {
+            self.alpha = self.best_step.x;
+        }
+
+        // Evaluate the function and gradient at new alpha and compute the directional derivative
+        let new_param = self
+            .init_param
+            .scaled_add(self.alpha, self.search_direction.clone());
+        let new_cost = self.apply(&new_param)?;
+        let new_grad = self.gradient(&new_param)?;
+        self.base.set_cur_cost(new_cost);
+        self.base.set_cur_param(new_param);
+        let dg = self.search_direction.dot(new_grad);
+        let ftest1 = self.base.cur_cost() + self.alpha * dgtest;
+
+        // Calling terminate here myself
+        // self.terminate();
+        // if self.base.terminated() {
+        //     let out = ArgminIterationData::new(new_param, cur_cost);
+        //     return Ok(out);
+        // }
+
+        if self.stage1 && self.base.cur_cost() <= ftest1 && dg >= self.c1.min(self.c2) * self.sd {
+            self.stage1 = false;
+        }
+
+        if self.stage1 && self.base.cur_cost() <= self.init_cost && self.base.cur_cost() > ftest1 {
+            unimplemented!();
+        } else {
+            unimplemented!();
+        }
+
+        if self.brackt {
+            unimplemented!();
+        }
+
+        unimplemented!()
         // let new_param = self
         //     .init_param
         //     .scaled_add(self.alpha, self.search_direction.clone());
@@ -305,7 +437,5 @@ where
         //
         // let out = ArgminIterationData::new(new_param, cur_cost);
         // Ok(out)
-
-        unimplemented!()
     }
 }
