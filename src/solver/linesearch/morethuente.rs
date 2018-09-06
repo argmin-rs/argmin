@@ -252,7 +252,7 @@ where
             self.alpha_max
         };
 
-        unimplemented!()
+        unimplemented!();
 
         let out = ArgminIterationData::new(new_param, cur_cost);
         Ok(out)
