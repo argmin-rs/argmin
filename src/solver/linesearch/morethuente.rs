@@ -22,7 +22,7 @@
 use prelude::*;
 use std;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 struct Step {
     pub x: f64,
     pub fx: f64,
@@ -438,4 +438,183 @@ where
         // let out = ArgminIterationData::new(new_param, cur_cost);
         // Ok(out)
     }
+}
+
+fn cstep(
+    stx: Step,
+    sty: Step,
+    stp: Step,
+    brackt: bool,
+    stpmin: f64,
+    stpmax: f64,
+) -> (Step, Step, Step, bool, f64, f64) {
+    let mut info: i8 = 0;
+    let mut bound: bool = false;
+    let mut stpf: f64 = 0.0;
+    let mut stpc: f64 = 0.0;
+    let mut stpq: f64 = 0.0;
+    let mut brackt = brackt;
+
+    // check inputs
+    if (brackt && (stp.x <= stx.x.min(sty.x) || stp.x >= stx.x.max(sty.x)))
+        || stx.gx * (stp.x - stx.x) >= 0.0
+        || stpmax < stpmin
+    {
+        panic!("wut");
+    }
+
+    // determine if the derivatives have opposite sign
+    let sgnd = stp.gx * (stx.gx / stx.gx.abs());
+
+    if stp.fx > stx.fx {
+        // First case. A higher function value. The minimum is bracketed. If the cubic step is closer to
+        // stx.x than the quadratic step, the cubic step is taken, else the average of the cubic and
+        // the quadratic steps is taken.
+        info = 1;
+        bound = true;
+        let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        let tmp = vec![theta, stx.gx, stp.gx];
+        let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        let mut gamma = s * ((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s)).sqrt();
+        if stp.x < stx.x {
+            gamma = -gamma;
+        }
+
+        let p = (gamma - stx.gx) + theta;
+        let q = ((gamma - stx.gx) + gamma) + stp.gx;
+        let r = p / q;
+        stpc = stx.x + r * (stp.x - stx.x);
+        stpq = stx.x
+            + ((stx.gx / ((stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx)) / 2.0) * (stp.x - stx.x);
+        if (stpc - stx.x).abs() < (stpq - stx.x).abs() {
+            stpf = stpc;
+        } else {
+            stpf = stpc + (stpq - stpc) / 2.0;
+        }
+        brackt = true;
+    } else if sgnd < 0.0 {
+        // Second case. A lower function value and derivatives of opposite sign. The minimum is
+        // bracketed. If the cubic step is closer to stx.x than the quadtratic (secant) step, the
+        // cubic step is taken, else the quadratic step is taken.
+        info = 2;
+        bound = false;
+        let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        let tmp = vec![theta, stx.gx, stp.gx];
+        let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        let mut gamma = s * ((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s)).sqrt();
+        if stp.x > stx.x {
+            gamma = -gamma;
+        }
+        let p = (gamma - stp.gx) + theta;
+        let q = ((gamma - stp.gx) + gamma) + stx.gx;
+        let r = p / q;
+        stpc = stp.x + r * (stx.x - stp.x);
+        stpq = stp.x + (stp.gx / (stp.gx - stx.gx)) * (stx.x - stp.x);
+        if (stpc - stp.x).abs() > (stpq - stp.x).abs() {
+            stpf = stpc;
+        } else {
+            stpf = stpq;
+        }
+        brackt = true;
+    } else if stp.gx.abs() < stx.gx.abs() {
+        // Third case. A lower function value, derivatives of the same sign, and the magnitude of
+        // the derivative decreases. The cubic step is only used if the cubic tends to infinity in
+        // the direction of the step or if the minimum of the cubic is beyond stp.x. Otherwise the
+        // cubic step is defined to be either stpmin or stpmax. The quadtratic (secant) step is
+        // also computed and if the minimum is bracketed then the step closest to stx.x is taken,
+        // else the step farthest away is taken.
+        info = 3;
+        bound = true;
+        let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        let tmp = vec![theta, stx.gx, stp.gx];
+        let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        // the case gamma == 0 only arises if the cubic does not tend to infinity in the direction
+        // of the step.
+
+        let mut gamma = s * 0.0f64
+            .max((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s))
+            .sqrt();
+        if stp.x > stx.x {
+            gamma = -gamma;
+        }
+
+        let p = (gamma - stp.gx) + theta;
+        let q = (gamma + (stx.gx - stp.gx)) + gamma;
+        let r = p / q;
+        if r < 0.0 && gamma != 0.0 {
+            stpc = stp.x + r * (stx.x - stp.x);
+        } else if stp.x > stx.x {
+            stpc = stpmax;
+        } else {
+            stpc = stpmin;
+        }
+        stpq = stp.x + (stp.gx / (stp.gx - stx.gx)) * (stx.x - stp.x);
+        if brackt {
+            if (stp.x - stpc).abs() < (stp.x - stpq).abs() {
+                stpf = stpc;
+            } else {
+                stpf = stpq;
+            }
+        } else {
+            if (stp.x - stpc).abs() > (stp.x - stpq).abs() {
+                stpf = stpc;
+            } else {
+                stpf = stpq;
+            }
+        }
+    } else {
+        // Fourth case. A lower function value, derivatives of the same sign, and the magnitued of
+        // the derivative does not decrease. If the minimum is not bracketed, the step is either
+        // stpmin or stpmax, else the cubic step is taken.
+        info = 4;
+        bound = false;
+        if brackt {
+            let theta = 3.0 * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
+            let tmp = vec![theta, sty.gx, stp.gx];
+            let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+            let mut gamma = s * ((theta / s).powi(2) - (sty.gx / s) * (stp.gx / s)).sqrt();
+            if stp.x > sty.x {
+                gamma = -gamma;
+            }
+            let p = (gamma - stp.gx) + theta;
+            let q = ((gamma - stp.gx) + gamma) + sty.gx;
+            let r = p / q;
+            stpc = stp.x + r * (sty.x - stp.x);
+            stpf = stpc;
+        } else if stp.x > stx.x {
+            stpf = stpmax;
+        } else {
+            stpf = stpmin;
+        }
+    }
+    // Update the interval of uncertainty. This update does not depend on the new step or the case
+    // analysis above.
+
+    let mut stx_o = stx.clone();
+    let mut sty_o = sty.clone();
+    let mut stp_o = stp.clone();
+    if stp.fx > stx.fx {
+        sty_o = Step::new(stp.x, stp.fx, stp.gx);
+    } else {
+        if sgnd < 0.0 {
+            sty_o = Step::new(stx.x, stx.fx, stx.gx);
+        }
+        stx_o = Step::new(stp.x, stp.fx, stp.gx);
+    }
+
+    // compute the new step and safeguard it.
+
+    stpf = stpmax.min(stpf);
+    stpf = stpmin.max(stpf);
+
+    stp_o.x = stpf;
+    if brackt && bound {
+        if sty_o.x > stx_o.x {
+            stp_o.x = stp.x.min(stx.x + 0.66 * (sty_o.x - stx_o.x));
+        } else {
+            stp_o.x = stp.x.max(stx.x + 0.66 * (sty_o.x - stx_o.x));
+        }
+    }
+
+    (stx_o, sty_o, stp_o, brackt, stpmin, stpmax)
 }
