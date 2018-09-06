@@ -31,13 +31,15 @@ where
         + ArgminScaledSub<T, f64>,
 {
     /// initial parameter vector
-    init_param: T,
+    init_param: Option<T>,
     /// initial cost
-    init_cost: f64,
+    init_cost: Option<f64>,
     /// initial gradient
-    init_grad: T,
+    init_grad: Option<T>,
     /// Search direction
-    search_direction: T,
+    search_direction: Option<T>,
+    /// Search direction in 1D
+    sd: f64,
     /// mu
     mu: f64,
     /// delta
@@ -74,10 +76,11 @@ where
     /// `mu`: todo
     pub fn new(operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>) -> Self {
         MoreThuenteLineSearch {
-            init_param: T::default(),
-            init_cost: std::f64::INFINITY,
-            init_grad: T::default(),
-            search_direction: T::default(),
+            init_param: None,
+            init_cost: None,
+            init_grad: None,
+            search_direction: None,
+            sd: 0.0,
             mu: 0.9,
             delta: 1.1,
             alpha: 1.0,
@@ -91,13 +94,13 @@ where
 
     /// Set search direction
     pub fn set_search_direction(&mut self, search_direction: T) -> &mut Self {
-        self.search_direction = search_direction;
+        self.search_direction = Some(search_direction);
         self
     }
 
     /// Set initial parameter
     pub fn set_initial_parameter(&mut self, param: T) -> &mut Self {
-        self.init_param = param.clone();
+        self.init_param = Some(param.clone());
         self.base.set_cur_param(param);
         self
     }
@@ -147,6 +150,11 @@ where
         alpha_min: f64,
         alpha_max: f64,
     ) -> Result<&mut Self, Error> {
+        if alpha_min < 0.0 {
+            return Err(ArgminError::InvalidParameter {
+                parameter: "MoreThuenteLineSearch: alpha_min must be >= 0.0.".to_string(),
+            }.into());
+        }
         if alpha_max <= alpha_min {
             return Err(ArgminError::InvalidParameter {
                 parameter: "MoreThuenteLineSearch: alpha_min must be smaller than alpha_max."
@@ -160,48 +168,48 @@ where
 
     /// Set initial cost function value
     pub fn set_initial_cost(&mut self, init_cost: f64) -> &mut Self {
-        self.init_cost = init_cost;
+        self.init_cost = Some(init_cost);
         self
     }
 
     /// Set initial gradient
     pub fn set_initial_gradient(&mut self, init_grad: T) -> &mut Self {
-        self.init_grad = init_grad;
+        self.init_grad = Some(init_grad);
         self
     }
 
     /// Calculate initial cost function value
     pub fn calc_inital_cost(&mut self) -> Result<&mut Self, Error> {
         let tmp = self.base.cur_param();
-        self.init_cost = self.apply(&tmp)?;
+        self.init_cost = Some(self.apply(&tmp)?);
         Ok(self)
     }
 
     /// Calculate initial cost function value
     pub fn calc_inital_gradient(&mut self) -> Result<&mut Self, Error> {
         let tmp = self.base.cur_param();
-        self.init_grad = self.gradient(&tmp)?;
+        self.init_grad = Some(self.gradient(&tmp)?);
         Ok(self)
     }
 
-    fn psi(&mut self, alpha: f64) -> Result<f64, Error> {
-        let new_param = self
-            .init_param
-            .scaled_add(alpha, self.search_direction.clone());
-        Ok(self.apply(&new_param)?
-            - self.init_cost
-            - self.mu * alpha * self.init_grad.dot(self.search_direction.clone()))
-    }
+    // fn psi(&mut self, alpha: f64) -> Result<f64, Error> {
+    //     let new_param = self
+    //         .init_param
+    //         .scaled_add(alpha, self.search_direction.clone());
+    //     Ok(self.apply(&new_param)?
+    //         - self.init_cost
+    //         - self.mu * alpha * self.init_grad.dot(self.search_direction.clone()))
+    // }
 
-    fn psi_deriv(&mut self, alpha: f64) -> Result<f64, Error> {
-        let new_param = self
-            .init_param
-            .scaled_add(alpha, self.search_direction.clone());
-        Ok(self
-            .gradient(&new_param)?
-            .dot(self.search_direction.clone())
-            - self.mu * self.init_grad.dot(self.search_direction.clone()))
-    }
+    // fn psi_deriv(&mut self, alpha: f64) -> Result<f64, Error> {
+    //     let new_param = self
+    //         .init_param
+    //         .scaled_add(alpha, self.search_direction.clone());
+    //     Ok(self
+    //         .gradient(&new_param)?
+    //         .dot(self.search_direction.clone())
+    //         - self.mu * self.init_grad.dot(self.search_direction.clone()))
+    // }
 }
 
 impl<T> ArgminNextIter for MoreThuenteLineSearch<T>
@@ -216,45 +224,88 @@ where
     type Parameters = T;
     type OperatorOutput = f64;
 
+    fn init(&mut self) -> Result<(), Error> {
+        match self.init_param {
+            None => {
+                return Err(ArgminError::NotInitialized {
+                    text: "MoreThuenteLineSearch: Initial parameter not initialized. Call `set_initial_parameter`.".to_string(),
+                }.into());
+            }
+            _ => (),
+        }
+
+        match self.init_cost {
+            None => {
+                return Err(ArgminError::NotInitialized {
+                    text: "MoreThuenteLineSearch: Initial cost not computed. Call `set_initial_cost` or `calc_inital_cost`.".to_string(),
+                }.into());
+            }
+            _ => (),
+        }
+
+        match self.init_grad {
+            None => {
+                return Err(ArgminError::NotInitialized {
+                    text: "MoreThuenteLineSearch: Initial gradient not computed. Call `set_initial_grad` or `calc_inital_grad`.".to_string(),
+                }.into());
+            }
+            _ => (),
+        }
+
+        match self.search_direction {
+            None => {
+                return Err(ArgminError::NotInitialized {
+                    text: "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`.".to_string(),
+                }.into());
+            }
+            _ => (),
+        }
+
+        self.sd = (self.init_grad.as_ref().unwrap().clone())
+            .dot(self.search_direction.as_ref().unwrap().clone());
+
+        Ok(())
+    }
+
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
-        let new_param = self
-            .init_param
-            .scaled_add(self.alpha, self.search_direction.clone());
-        let cur_cost = self.apply(&new_param)?;
+        // let new_param = self
+        //     .init_param
+        //     .scaled_add(self.alpha, self.search_direction.clone());
+        // let cur_cost = self.apply(&new_param)?;
+        //
+        // let alpha = self.alpha;
+        // let alpha_l = self.alpha_l;
+        // let alpha_u = self.alpha_u;
+        // let psi_a = self.psi(alpha)?;
+        // let psi_al = self.psi(alpha_l)?;
+        // let d_psi_a = self.psi_deriv(alpha)? * (alpha_l - alpha);
+        //
+        // // Case U1:
+        // if psi_a > psi_al {
+        //     self.alpha_l = alpha_l;
+        //     self.alpha_u = alpha;
+        // }
+        // // Case U2
+        // if psi_a <= psi_al && d_psi_a > 0.0 {
+        //     self.alpha_l = alpha;
+        //     self.alpha_u = alpha_u;
+        // }
+        // // Case U3
+        // if psi_a <= psi_al && d_psi_a < 0.0 {
+        //     self.alpha_l = alpha;
+        //     self.alpha_u = alpha_l;
+        // }
+        //
+        // let alpha_candidate = self.alpha + self.delta * (self.alpha - self.alpha_l);
+        // self.alpha = if alpha_candidate < self.alpha_max {
+        //     alpha_candidate
+        // } else {
+        //     self.alpha_max
+        // };
+        //
+        // let out = ArgminIterationData::new(new_param, cur_cost);
+        // Ok(out)
 
-        let alpha = self.alpha;
-        let alpha_l = self.alpha_l;
-        let alpha_u = self.alpha_u;
-        let psi_a = self.psi(alpha)?;
-        let psi_al = self.psi(alpha_l)?;
-        let d_psi_a = self.psi_deriv(alpha)? * (alpha_l - alpha);
-
-        // Case U1:
-        if psi_a > psi_al {
-            self.alpha_l = alpha_l;
-            self.alpha_u = alpha;
-        }
-        // Case U2
-        if psi_a <= psi_al && d_psi_a > 0.0 {
-            self.alpha_l = alpha;
-            self.alpha_u = alpha_u;
-        }
-        // Case U3
-        if psi_a <= psi_al && d_psi_a < 0.0 {
-            self.alpha_l = alpha;
-            self.alpha_u = alpha_l;
-        }
-
-        let alpha_candidate = self.alpha + self.delta * (self.alpha - self.alpha_l);
-        self.alpha = if alpha_candidate < self.alpha_max {
-            alpha_candidate
-        } else {
-            self.alpha_max
-        };
-
-        unimplemented!();
-
-        let out = ArgminIterationData::new(new_param, cur_cost);
-        Ok(out)
+        unimplemented!()
     }
 }
