@@ -40,11 +40,10 @@ fn run() -> Result<(), Error> {
     // Set up Line Search method
     let iters = 100;
     let mut solver = MoreThuenteLineSearch::new(Box::new(operator));
-    // BacktrackingLineSearch::new(Box::new(operator), vec![-1.0, 0.0], init_param, 0.9)?;
 
     solver.set_search_direction(vec![-1.0, 0.0]);
     solver.set_initial_parameter(init_param);
-    solver.set_mu(0.9)?;
+    solver.set_initial_alpha(2.0)?;
     solver.calc_inital_cost()?;
     solver.calc_inital_gradient()?;
     // solver.set_initial_alpha(1.0)?;

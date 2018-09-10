@@ -49,7 +49,7 @@ where
     /// initial parameter vector (builder)
     init_param_b: Option<T>,
     /// initial cost (builder)
-    init_cost_b: Option<f64>,
+    finit_b: Option<f64>,
     /// initial gradient (builder)
     init_grad_b: Option<T>,
     /// Search direction (builder)
@@ -57,17 +57,19 @@ where
     /// initial parameter vector
     init_param: T,
     /// initial cost
-    init_cost: f64,
+    finit: f64,
     /// initial gradient
     init_grad: T,
     /// Search direction
     search_direction: T,
     /// Search direction in 1D
-    sd: f64,
+    dginit: f64,
+    /// dgtest
+    dgtest: f64,
     /// c1
-    c1: f64,
+    ftol: f64,
     /// c2
-    c2: f64,
+    gtol: f64,
     /// xtrapf?
     xtrapf: f64,
     /// width of interval
@@ -78,20 +80,16 @@ where
     xtol: f64,
     /// alpha
     alpha: f64,
-    /// alpha_l
-    alpha_l: f64,
-    /// alpha_u
-    alpha_u: f64,
-    /// alpha_min
-    alpha_min: f64,
-    /// alpha_max
-    alpha_max: f64,
-    /// best step
-    best_step: Step,
-    /// endpoint
-    endpoint: Step,
+    /// stpmin
+    stmin: f64,
+    /// stpmax
+    stmax: f64,
     /// current step
-    cur_step: Step,
+    stp: Step,
+    /// stx
+    stx: Step,
+    /// sty
+    sty: Step,
     /// bracketed
     brackt: bool,
     /// stage1
@@ -121,28 +119,27 @@ where
     pub fn new(operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>) -> Self {
         MoreThuenteLineSearch {
             init_param_b: None,
-            init_cost_b: None,
+            finit_b: None,
             init_grad_b: None,
             search_direction_b: None,
             init_param: T::default(),
-            init_cost: std::f64::INFINITY,
+            finit: std::f64::INFINITY,
             init_grad: T::default(),
             search_direction: T::default(),
-            sd: 0.0,
-            c1: 1e-4,
-            c2: 0.9,
+            dginit: 0.0,
+            dgtest: 0.0,
+            ftol: 1e-4,
+            gtol: 0.9,
             xtrapf: 4.0,
             width: std::f64::NAN,
             width1: std::f64::NAN,
             xtol: 1e-5,
             alpha: 1.0,
-            alpha_l: 0.0,
-            alpha_u: std::f64::INFINITY,
-            alpha_min: 0.0,
-            alpha_max: std::f64::INFINITY,
-            best_step: Step::default(),
-            endpoint: Step::default(),
-            cur_step: Step::default(),
+            stmin: 0.0,
+            stmax: std::f64::INFINITY,
+            stp: Step::default(),
+            stx: Step::default(),
+            sty: Step::default(),
             brackt: false,
             stage1: true,
             infoc: true,
@@ -181,20 +178,10 @@ where
                 parameter: "MoreThuenteLineSearch: Parameter c2 must be in (c1, 1).".to_string(),
             }.into());
         }
-        self.c1 = c1;
-        self.c2 = c2;
+        self.ftol = c1;
+        self.gtol = c2;
         Ok(self)
     }
-    // /// Set delta
-    // pub fn set_delta(&mut self, delta: f64) -> Result<&mut Self, Error> {
-    //     if delta <= 0.0 || delta >= 1.0 {
-    //         return Err(ArgminError::InvalidParameter {
-    //             parameter: "MoreThuenteLineSearch: Parameter delta must >1.".to_string(),
-    //         }.into());
-    //     }
-    //     self.delta = delta;
-    //     Ok(self)
-    // }
 
     /// Set initial alpha value
     pub fn set_initial_alpha(&mut self, alpha: f64) -> Result<&mut Self, Error> {
@@ -224,14 +211,14 @@ where
                     .to_string(),
             }.into());
         }
-        self.alpha_min = alpha_min;
-        self.alpha_max = alpha_max;
+        self.stmin = alpha_min;
+        self.stmax = alpha_max;
         Ok(self)
     }
 
     /// Set initial cost function value
     pub fn set_initial_cost(&mut self, init_cost: f64) -> &mut Self {
-        self.init_cost_b = Some(init_cost);
+        self.finit_b = Some(init_cost);
         self
     }
 
@@ -244,7 +231,7 @@ where
     /// Calculate initial cost function value
     pub fn calc_inital_cost(&mut self) -> Result<&mut Self, Error> {
         let tmp = self.base.cur_param();
-        self.init_cost_b = Some(self.apply(&tmp)?);
+        self.finit_b = Some(self.apply(&tmp)?);
         Ok(self)
     }
 
@@ -254,25 +241,6 @@ where
         self.init_grad_b = Some(self.gradient(&tmp)?);
         Ok(self)
     }
-
-    // fn psi(&mut self, alpha: f64) -> Result<f64, Error> {
-    //     let new_param = self
-    //         .init_param
-    //         .scaled_add(alpha, self.search_direction.clone());
-    //     Ok(self.apply(&new_param)?
-    //         - self.init_cost
-    //         - self.mu * alpha * self.init_grad.dot(self.search_direction.clone()))
-    // }
-
-    // fn psi_deriv(&mut self, alpha: f64) -> Result<f64, Error> {
-    //     let new_param = self
-    //         .init_param
-    //         .scaled_add(alpha, self.search_direction.clone());
-    //     Ok(self
-    //         .gradient(&new_param)?
-    //         .dot(self.search_direction.clone())
-    //         - self.mu * self.init_grad.dot(self.search_direction.clone()))
-    // }
 }
 
 impl<T> ArgminNextIter for MoreThuenteLineSearch<T>
@@ -297,7 +265,7 @@ where
             Some(ref x) => x.clone(),
         };
 
-        self.init_cost = match self.init_cost_b {
+        self.finit = match self.finit_b {
             None => {
                 return Err(ArgminError::NotInitialized {
                     text: "MoreThuenteLineSearch: Initial cost not computed. Call `set_initial_cost` or `calc_inital_cost`.".to_string(),
@@ -324,59 +292,61 @@ where
             Some(ref x) => x.clone(),
         };
 
-        self.sd = self.init_grad.dot(self.search_direction.clone());
+        self.dginit = self.init_grad.dot(self.search_direction.clone());
 
         // compute search direction in 1D
-        if self.sd >= 0.0 {
+        if self.dginit >= 0.0 {
             return Err(ArgminError::ConditionViolated {
                 text: "MoreThuenteLineSearch: Search direction must be a descent direction."
                     .to_string(),
             }.into());
         }
 
-        self.width = self.alpha_max - self.alpha_min;
+        self.dgtest = self.ftol * self.dginit;
+        self.width = self.stmax - self.stmin;
         self.width1 = 2.0 * self.width;
 
-        self.best_step = Step::new(0.0, self.init_cost, self.sd);
-        self.endpoint = Step::new(0.0, self.init_cost, self.sd);
+        self.stp = Step::new(self.alpha, std::f64::NAN, std::f64::NAN);
+        self.stx = Step::new(0.0, self.finit, self.dginit);
+        self.sty = Step::new(0.0, self.finit, self.dginit);
 
         Ok(())
     }
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
-        let dgtest = self.c1 * self.sd;
-
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         if self.brackt {
-            self.alpha_min = self.alpha_l.min(self.alpha_u);
-            self.alpha_max = self.alpha_l.max(self.alpha_u);
+            self.stmin = self.stx.x.min(self.sty.x);
+            self.stmax = self.stx.x.max(self.sty.x);
         } else {
-            self.alpha_min = self.alpha;
-            self.alpha_max = self.cur_step.x + self.xtrapf * (self.alpha - self.alpha_l);
+            self.stmin = self.stx.x;
+            self.stmax = self.stp.x + self.xtrapf * (self.stp.x - self.stx.x);
         }
 
         // alpha needs to be within bounds
-        self.alpha = self.alpha.max(self.alpha_min);
-        self.alpha = self.alpha.min(self.alpha_max);
+        self.stp.x = self.stp.x.max(self.stmin);
+        self.stp.x = self.stp.x.min(self.stmax);
 
         // If an unusual termination is to occur then let alpha be the lowest point obtained so
         // far.
-        if (self.brackt && (self.alpha <= self.alpha_min || self.alpha >= self.alpha_max))
-            || (self.brackt && (self.alpha_max - self.alpha_min) <= self.xtol * self.alpha_max)
+        if (self.brackt && (self.stp.x <= self.stmin || self.stp.x >= self.stmax))
+            || (self.brackt && (self.stmax - self.stmin) <= self.xtol * self.stmax)
         {
-            self.alpha = self.best_step.x;
+            self.stp.x = self.stx.x;
         }
 
-        // Evaluate the function and gradient at new alpha and compute the directional derivative
+        // Evaluate the function and gradient at new stp.x and compute the directional derivative
+        //
         let new_param = self
             .init_param
-            .scaled_add(self.alpha, self.search_direction.clone());
+            .scaled_add(self.stp.x, self.search_direction.clone());
         let new_cost = self.apply(&new_param)?;
         let new_grad = self.gradient(&new_param)?;
         self.base.set_cur_cost(new_cost);
         self.base.set_cur_param(new_param);
+        self.stx.fx = new_cost;
         let dg = self.search_direction.dot(new_grad);
-        let ftest1 = self.base.cur_cost() + self.alpha * dgtest;
+        let ftest1 = self.finit + self.stp.x * self.dgtest;
 
         // Calling terminate here myself
         // self.terminate();
@@ -385,58 +355,61 @@ where
         //     return Ok(out);
         // }
 
-        if self.stage1 && self.base.cur_cost() <= ftest1 && dg >= self.c1.min(self.c2) * self.sd {
+        if self.stage1
+            && self.base.cur_cost() <= ftest1
+            && dg >= self.ftol.min(self.gtol) * self.dginit
+        {
             self.stage1 = false;
         }
 
-        if self.stage1 && self.base.cur_cost() <= self.init_cost && self.base.cur_cost() > ftest1 {
-            unimplemented!();
+        if self.stage1 && self.base.cur_cost() <= self.finit && self.base.cur_cost() > ftest1 {
+            let fm = self.base.cur_cost() - self.stp.x * self.dgtest;
+            let fxm = self.stx.fx - self.stx.x * self.dgtest;
+            let fym = self.sty.fx - self.sty.x * self.dgtest;
+            let dgm = dg - self.dgtest;
+            let dgxm = self.stx.gx - self.dgtest;
+            let dgym = self.sty.gx - self.dgtest;
+
+            let (stx1, sty1, stp1, brackt1, _stmin, _stmax) = cstep(
+                Step::new(self.stx.x, fxm, dgxm),
+                Step::new(self.sty.x, fym, dgym),
+                Step::new(self.stp.x, fm, dgm),
+                self.brackt,
+                self.stmin,
+                self.stmax,
+            );
+
+            self.stx.fx = stx1.fx + stx1.x * self.dgtest;
+            self.sty.fx = sty1.fx + sty1.x * self.dgtest;
+            self.stx.gx = stx1.gx + self.dgtest;
+            self.sty.gx = sty1.gx + self.dgtest;
+            self.brackt = brackt1;
+            self.stp = stp1;
         } else {
-            unimplemented!();
+            let (stx1, sty1, stp1, brackt1, _stmin, _stmax) = cstep(
+                self.stx.clone(),
+                self.sty.clone(),
+                self.stp.clone(),
+                self.brackt,
+                self.stmin,
+                self.stmax,
+            );
+            self.stx = stx1;
+            self.sty = sty1;
+            self.stp = stp1;
+            self.brackt = brackt1;
         }
 
         if self.brackt {
-            unimplemented!();
+            if (self.sty.x - self.stx.x).abs() >= 0.66 * self.width1 {
+                self.stp.x = self.stx.x + 0.5 * (self.sty.x - self.stx.x);
+            }
+            self.width1 = self.width;
+            self.width = (self.sty.x - self.stx.x).abs();
         }
 
-        unimplemented!()
-        // let new_param = self
-        //     .init_param
-        //     .scaled_add(self.alpha, self.search_direction.clone());
-        // let cur_cost = self.apply(&new_param)?;
-        //
-        // let alpha = self.alpha;
-        // let alpha_l = self.alpha_l;
-        // let alpha_u = self.alpha_u;
-        // let psi_a = self.psi(alpha)?;
-        // let psi_al = self.psi(alpha_l)?;
-        // let d_psi_a = self.psi_deriv(alpha)? * (alpha_l - alpha);
-        //
-        // // Case U1:
-        // if psi_a > psi_al {
-        //     self.alpha_l = alpha_l;
-        //     self.alpha_u = alpha;
-        // }
-        // // Case U2
-        // if psi_a <= psi_al && d_psi_a > 0.0 {
-        //     self.alpha_l = alpha;
-        //     self.alpha_u = alpha_u;
-        // }
-        // // Case U3
-        // if psi_a <= psi_al && d_psi_a < 0.0 {
-        //     self.alpha_l = alpha;
-        //     self.alpha_u = alpha_l;
-        // }
-        //
-        // let alpha_candidate = self.alpha + self.delta * (self.alpha - self.alpha_l);
-        // self.alpha = if alpha_candidate < self.alpha_max {
-        //     alpha_candidate
-        // } else {
-        //     self.alpha_max
-        // };
-        //
-        // let out = ArgminIterationData::new(new_param, cur_cost);
-        // Ok(out)
+        let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());
+        Ok(out)
     }
 }
 
@@ -448,11 +421,11 @@ fn cstep(
     stpmin: f64,
     stpmax: f64,
 ) -> (Step, Step, Step, bool, f64, f64) {
-    let mut info: i8 = 0;
-    let mut bound: bool = false;
-    let mut stpf: f64 = 0.0;
-    let mut stpc: f64 = 0.0;
-    let mut stpq: f64 = 0.0;
+    // let mut info: i8 = 0;
+    let bound: bool;
+    let mut stpf: f64;
+    let stpc: f64;
+    let stpq: f64;
     let mut brackt = brackt;
 
     // check inputs
@@ -460,7 +433,7 @@ fn cstep(
         || stx.gx * (stp.x - stx.x) >= 0.0
         || stpmax < stpmin
     {
-        panic!("wut");
+        return (stx, sty, stp, brackt, stpmin, stpmax);
     }
 
     // determine if the derivatives have opposite sign
@@ -470,7 +443,7 @@ fn cstep(
         // First case. A higher function value. The minimum is bracketed. If the cubic step is closer to
         // stx.x than the quadratic step, the cubic step is taken, else the average of the cubic and
         // the quadratic steps is taken.
-        info = 1;
+        // info = 1;
         bound = true;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
@@ -496,7 +469,7 @@ fn cstep(
         // Second case. A lower function value and derivatives of opposite sign. The minimum is
         // bracketed. If the cubic step is closer to stx.x than the quadtratic (secant) step, the
         // cubic step is taken, else the quadratic step is taken.
-        info = 2;
+        // info = 2;
         bound = false;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
@@ -523,7 +496,7 @@ fn cstep(
         // cubic step is defined to be either stpmin or stpmax. The quadtratic (secant) step is
         // also computed and if the minimum is bracketed then the step closest to stx.x is taken,
         // else the step farthest away is taken.
-        info = 3;
+        // info = 3;
         bound = true;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
@@ -566,7 +539,7 @@ fn cstep(
         // Fourth case. A lower function value, derivatives of the same sign, and the magnitued of
         // the derivative does not decrease. If the minimum is not bracketed, the step is either
         // stpmin or stpmax, else the cubic step is taken.
-        info = 4;
+        // info = 4;
         bound = false;
         if brackt {
             let theta = 3.0 * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
