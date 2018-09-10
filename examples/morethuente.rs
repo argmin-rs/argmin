@@ -33,17 +33,17 @@ impl ArgminOperator for MyProblem {
 
 fn run() -> Result<(), Error> {
     // definie inital parameter vector
-    let init_param: Vec<f64> = vec![1.0, 0.0];
+    let init_param: Vec<f64> = vec![2.0, 0.0];
 
     let operator = MyProblem {};
 
     // Set up Line Search method
-    let iters = 100;
+    let iters = 20;
     let mut solver = MoreThuenteLineSearch::new(Box::new(operator));
 
     solver.set_search_direction(vec![-1.0, 0.0]);
     solver.set_initial_parameter(init_param);
-    solver.set_initial_alpha(2.0)?;
+    solver.set_initial_alpha(5.0)?;
     solver.calc_inital_cost()?;
     solver.calc_inital_gradient()?;
     // solver.set_initial_alpha(1.0)?;

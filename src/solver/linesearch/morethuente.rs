@@ -40,6 +40,7 @@ impl Step {
 pub struct MoreThuenteLineSearch<T>
 where
     T: std::default::Default
+        + std::fmt::Debug
         + Clone
         + ArgminSub<T>
         + ArgminDot<T, f64>
@@ -95,7 +96,7 @@ where
     /// stage1
     stage1: bool,
     /// infoc
-    infoc: bool,
+    infoc: usize,
     /// base
     base: ArgminBase<T, f64>,
 }
@@ -103,6 +104,7 @@ where
 impl<T> MoreThuenteLineSearch<T>
 where
     T: std::default::Default
+        + std::fmt::Debug
         + Clone
         + ArgminSub<T>
         + ArgminDot<T, f64>
@@ -133,7 +135,7 @@ where
             xtrapf: 4.0,
             width: std::f64::NAN,
             width1: std::f64::NAN,
-            xtol: 1e-5,
+            xtol: 0.1,
             alpha: 1.0,
             stmin: 0.0,
             stmax: std::f64::INFINITY,
@@ -142,7 +144,7 @@ where
             sty: Step::default(),
             brackt: false,
             stage1: true,
-            infoc: true,
+            infoc: 1,
             base: ArgminBase::new(operator, T::default()),
         }
     }
@@ -246,6 +248,7 @@ where
 impl<T> ArgminNextIter for MoreThuenteLineSearch<T>
 where
     T: std::default::Default
+        + std::fmt::Debug
         + Clone
         + ArgminSub<T>
         + ArgminDot<T, f64>
@@ -336,10 +339,10 @@ where
         }
 
         // Evaluate the function and gradient at new stp.x and compute the directional derivative
-        //
         let new_param = self
             .init_param
             .scaled_add(self.stp.x, self.search_direction.clone());
+        println!("{:?}: {:?}", self.stp.x, new_param);
         let new_cost = self.apply(&new_param)?;
         let new_grad = self.gradient(&new_param)?;
         self.base.set_cur_cost(new_cost);
@@ -348,12 +351,36 @@ where
         let dg = self.search_direction.dot(new_grad);
         let ftest1 = self.finit + self.stp.x * self.dgtest;
 
-        // Calling terminate here myself
-        // self.terminate();
-        // if self.base.terminated() {
-        //     let out = ArgminIterationData::new(new_param, cur_cost);
-        //     return Ok(out);
-        // }
+        let mut info = 0;
+        if (self.brackt && (self.stp.x <= self.stmin || self.stp.x >= self.stmax))
+            || self.infoc == 0
+        {
+            info = 6;
+        }
+
+        if self.stp.x == self.stmax && self.base.cur_cost() <= ftest1 && dg <= self.dgtest {
+            info = 5;
+        }
+
+        if self.stp.x == self.stmin && (self.base.cur_cost() > ftest1 || dg >= self.dgtest) {
+            info = 4;
+        }
+
+        if self.brackt && self.stmax - self.stmin <= self.xtol * self.stmax {
+            info = 2;
+        }
+
+        if self.base.cur_cost() <= ftest1 && dg.abs() <= self.gtol * (-self.dginit) {
+            info = 1;
+        }
+
+        if info != 0 {
+            println!("info: {}", info);
+            self.base
+                .set_termination_reason(TerminationReason::LineSearchConditionMet);
+            let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());
+            return Ok(out);
+        }
 
         if self.stage1
             && self.base.cur_cost() <= ftest1
@@ -370,7 +397,7 @@ where
             let dgxm = self.stx.gx - self.dgtest;
             let dgym = self.sty.gx - self.dgtest;
 
-            let (stx1, sty1, stp1, brackt1, _stmin, _stmax) = cstep(
+            let (stx1, sty1, stp1, brackt1, _stmin, _stmax, infoc) = cstep(
                 Step::new(self.stx.x, fxm, dgxm),
                 Step::new(self.sty.x, fym, dgym),
                 Step::new(self.stp.x, fm, dgm),
@@ -385,8 +412,9 @@ where
             self.sty.gx = sty1.gx + self.dgtest;
             self.brackt = brackt1;
             self.stp = stp1;
+            self.infoc = infoc;
         } else {
-            let (stx1, sty1, stp1, brackt1, _stmin, _stmax) = cstep(
+            let (stx1, sty1, stp1, brackt1, _stmin, _stmax, infoc) = cstep(
                 self.stx.clone(),
                 self.sty.clone(),
                 self.stp.clone(),
@@ -398,6 +426,7 @@ where
             self.sty = sty1;
             self.stp = stp1;
             self.brackt = brackt1;
+            self.infoc = infoc;
         }
 
         if self.brackt {
@@ -420,8 +449,8 @@ fn cstep(
     brackt: bool,
     stpmin: f64,
     stpmax: f64,
-) -> (Step, Step, Step, bool, f64, f64) {
-    // let mut info: i8 = 0;
+) -> (Step, Step, Step, bool, f64, f64, usize) {
+    let info: usize;
     let bound: bool;
     let mut stpf: f64;
     let stpc: f64;
@@ -433,7 +462,7 @@ fn cstep(
         || stx.gx * (stp.x - stx.x) >= 0.0
         || stpmax < stpmin
     {
-        return (stx, sty, stp, brackt, stpmin, stpmax);
+        return (stx, sty, stp, brackt, stpmin, stpmax, 0);
     }
 
     // determine if the derivatives have opposite sign
@@ -443,7 +472,7 @@ fn cstep(
         // First case. A higher function value. The minimum is bracketed. If the cubic step is closer to
         // stx.x than the quadratic step, the cubic step is taken, else the average of the cubic and
         // the quadratic steps is taken.
-        // info = 1;
+        info = 1;
         bound = true;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
@@ -469,7 +498,7 @@ fn cstep(
         // Second case. A lower function value and derivatives of opposite sign. The minimum is
         // bracketed. If the cubic step is closer to stx.x than the quadtratic (secant) step, the
         // cubic step is taken, else the quadratic step is taken.
-        // info = 2;
+        info = 2;
         bound = false;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
@@ -496,7 +525,7 @@ fn cstep(
         // cubic step is defined to be either stpmin or stpmax. The quadtratic (secant) step is
         // also computed and if the minimum is bracketed then the step closest to stx.x is taken,
         // else the step farthest away is taken.
-        // info = 3;
+        info = 3;
         bound = true;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
@@ -539,7 +568,7 @@ fn cstep(
         // Fourth case. A lower function value, derivatives of the same sign, and the magnitued of
         // the derivative does not decrease. If the minimum is not bracketed, the step is either
         // stpmin or stpmax, else the cubic step is taken.
-        // info = 4;
+        info = 4;
         bound = false;
         if brackt {
             let theta = 3.0 * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
@@ -589,5 +618,5 @@ fn cstep(
         }
     }
 
-    (stx_o, sty_o, stp_o, brackt, stpmin, stpmax)
+    (stx_o, sty_o, stp_o, brackt, stpmin, stpmax, info)
 }
