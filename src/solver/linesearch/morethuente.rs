@@ -350,6 +350,8 @@ where
         self.stx.fx = new_cost;
         let dg = self.search_direction.dot(new_grad);
         let ftest1 = self.finit + self.stp.x * self.dgtest;
+        self.stp.fx = new_cost;
+        self.stp.gx = dg;
 
         let mut info = 0;
         if (self.brackt && (self.stp.x <= self.stmin || self.stp.x >= self.stmax))
@@ -450,7 +452,7 @@ fn cstep(
     stpmin: f64,
     stpmax: f64,
 ) -> (Step, Step, Step, bool, f64, f64, usize) {
-    let info: usize;
+    let mut info: usize = 0;
     let bound: bool;
     let mut stpf: f64;
     let stpc: f64;
@@ -462,7 +464,7 @@ fn cstep(
         || stx.gx * (stp.x - stx.x) >= 0.0
         || stpmax < stpmin
     {
-        return (stx, sty, stp, brackt, stpmin, stpmax, 0);
+        return (stx, sty, stp, brackt, stpmin, stpmax, info);
     }
 
     // determine if the derivatives have opposite sign

@@ -43,7 +43,7 @@ fn run() -> Result<(), Error> {
 
     solver.set_search_direction(vec![-1.0, 0.0]);
     solver.set_initial_parameter(init_param);
-    solver.set_initial_alpha(5.0)?;
+    solver.set_initial_alpha(1.0)?;
     solver.calc_inital_cost()?;
     solver.calc_inital_gradient()?;
     // solver.set_initial_alpha(1.0)?;
