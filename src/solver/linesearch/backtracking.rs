@@ -83,19 +83,6 @@ where
         }
     }
 
-    /// Set search direction
-    pub fn set_search_direction(&mut self, search_direction: T) -> &mut Self {
-        self.search_direction = search_direction;
-        self
-    }
-
-    /// Set initial parameter
-    pub fn set_initial_parameter(&mut self, param: T) -> &mut Self {
-        self.init_param = param.clone();
-        self.base.set_cur_param(param);
-        self
-    }
-
     /// set current gradient value
     pub fn set_cur_grad(&mut self, grad: T) -> &mut Self {
         self.base.set_cur_grad(grad);
@@ -120,43 +107,6 @@ where
         self
     }
 
-    /// Set initial alpha value
-    pub fn set_initial_alpha(&mut self, alpha: f64) -> Result<&mut Self, Error> {
-        if alpha <= 0.0 {
-            return Err(ArgminError::InvalidParameter {
-                parameter: "LineSearch: Inital alpha must be > 0.".to_string(),
-            }.into());
-        }
-        self.alpha = alpha;
-        Ok(self)
-    }
-
-    /// Set initial cost function value
-    pub fn set_initial_cost(&mut self, init_cost: f64) -> &mut Self {
-        self.init_cost = init_cost;
-        self
-    }
-
-    /// Set initial gradient
-    pub fn set_initial_gradient(&mut self, init_grad: T) -> &mut Self {
-        self.init_grad = init_grad;
-        self
-    }
-
-    /// Calculate initial cost function value
-    pub fn calc_inital_cost(&mut self) -> Result<&mut Self, Error> {
-        let tmp = self.base.cur_param();
-        self.init_cost = self.apply(&tmp)?;
-        Ok(self)
-    }
-
-    /// Calculate initial cost function value
-    pub fn calc_inital_gradient(&mut self) -> Result<&mut Self, Error> {
-        let tmp = self.base.cur_param();
-        self.init_grad = self.gradient(&tmp)?;
-        Ok(self)
-    }
-
     fn eval_condition(&self) -> bool {
         self.condition.eval(
             self.base.cur_cost(),
@@ -166,6 +116,65 @@ where
             self.search_direction.clone(),
             self.alpha,
         )
+    }
+}
+
+impl<T> ArgminLineSearch for BacktrackingLineSearch<T>
+where
+    T: std::default::Default
+        + Clone
+        + ArgminSub<T>
+        + ArgminDot<T, f64>
+        + ArgminScaledAdd<T, f64>
+        + ArgminScaledSub<T, f64>,
+    BacktrackingLineSearch<T>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+{
+    type Parameters = T;
+
+    /// Set search direction
+    fn set_search_direction(&mut self, search_direction: T) {
+        self.search_direction = search_direction;
+    }
+
+    /// Set initial parameter
+    fn set_initial_parameter(&mut self, param: T) {
+        self.init_param = param.clone();
+        self.base.set_cur_param(param);
+    }
+
+    /// Set initial alpha value
+    fn set_initial_alpha(&mut self, alpha: f64) -> Result<(), Error> {
+        if alpha <= 0.0 {
+            return Err(ArgminError::InvalidParameter {
+                parameter: "LineSearch: Inital alpha must be > 0.".to_string(),
+            }.into());
+        }
+        self.alpha = alpha;
+        Ok(())
+    }
+
+    /// Set initial cost function value
+    fn set_initial_cost(&mut self, init_cost: f64) {
+        self.init_cost = init_cost;
+    }
+
+    /// Set initial gradient
+    fn set_initial_gradient(&mut self, init_grad: T) {
+        self.init_grad = init_grad;
+    }
+
+    /// Calculate initial cost function value
+    fn calc_initial_cost(&mut self) -> Result<(), Error> {
+        let tmp = self.base.cur_param();
+        self.init_cost = self.apply(&tmp)?;
+        Ok(())
+    }
+
+    /// Calculate initial cost function value
+    fn calc_initial_gradient(&mut self) -> Result<(), Error> {
+        let tmp = self.base.cur_param();
+        self.init_grad = self.gradient(&tmp)?;
+        Ok(())
     }
 }
 
