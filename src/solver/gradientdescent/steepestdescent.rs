@@ -11,7 +11,7 @@ use prelude::*;
 use std;
 use std::default::Default;
 
-use solver::linesearch::BacktrackingLineSearch;
+// use solver::linesearch::BacktrackingLineSearch;
 
 /// Template
 #[derive(ArgminSolver)]
@@ -27,7 +27,7 @@ where
         + ArgminScaledSub<T, f64>,
 {
     /// line search
-    linesearch: BacktrackingLineSearch<T>,
+    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64>>,
     /// Base stuff
     base: ArgminBase<T, f64>,
 }
@@ -47,9 +47,10 @@ where
     pub fn new(
         cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>,
         init_param: T,
+        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64>>,
     ) -> Result<Self, Error> {
         Ok(SteepestDescent {
-            linesearch: BacktrackingLineSearch::new(cost_function.clone()),
+            linesearch: linesearch,
             base: ArgminBase::new(cost_function, init_param),
         })
     }
@@ -80,25 +81,17 @@ where
 
         let norm = new_grad.norm();
 
-        self.linesearch.set_max_iters(100);
         self.linesearch.set_initial_parameter(param_new);
         self.linesearch.set_initial_gradient(new_grad.clone());
+        self.linesearch.set_initial_cost(new_cost);
         self.linesearch
             .set_search_direction(new_grad.scale(-1.0 / norm));
-        self.linesearch.set_initial_cost(new_cost);
-        self.linesearch.set_initial_alpha(1.0)?;
-        self.linesearch.set_rho(0.5)?;
 
         self.linesearch.run_fast()?;
 
         let param_new = self.linesearch.result().param;
 
         let out = ArgminIterationData::new(param_new, new_cost);
-        // no KV necessary anymore
-        // out.add_kv(make_kv!(
-        //         "i" => self.base.cur_iter();
-        //         "cost" => self.base.cur_cost();
-        //     ));
         Ok(out)
     }
 }
