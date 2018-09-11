@@ -315,6 +315,9 @@ where
             }.into());
         }
 
+        self.stage1 = true;
+        self.brackt = false;
+
         self.dgtest = self.ftol * self.dginit;
         self.width = self.stpmax - self.stpmin;
         self.width1 = 2.0 * self.width;
@@ -339,14 +342,9 @@ where
             stmax = self.stp.x + self.xtrapf * (self.stp.x - self.stx.x);
         }
 
-        // println!(
-        //     "{}: {}, {}, {}, {}",
-        //     self.brackt, self.stpmax, self.stpmin, stmax, stmin
-        // );
         // alpha needs to be within bounds
         self.stp.x = self.stp.x.max(self.stpmin);
         self.stp.x = self.stp.x.min(self.stpmax);
-        // println!("{}", self.stp.x);
 
         // If an unusual termination is to occur then let alpha be the lowest point obtained so
         // far.
@@ -361,7 +359,6 @@ where
         let new_param = self
             .init_param
             .scaled_add(self.stp.x, self.search_direction.clone());
-        // println!("{:?}", new_param);
         self.f = self.apply(&new_param)?;
         let new_grad = self.gradient(&new_param)?;
         self.base.set_cur_cost(self.f);
@@ -395,10 +392,6 @@ where
         }
 
         if info != 0 {
-            println!(
-                "{}, {}, {}, {}, {}",
-                info, self.stpmax, self.stpmin, stmax, stmin
-            );
             self.base
                 .set_termination_reason(TerminationReason::LineSearchConditionMet);
             let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());
@@ -531,7 +524,6 @@ fn cstep(
         bound = false;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
-        // println!("{:?}", tmp);
         let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
         let mut gamma = s * ((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s)).sqrt();
         if stp.x > stx.x {

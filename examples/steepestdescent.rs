@@ -39,15 +39,17 @@ fn run() -> Result<(), Error> {
     let cost = MyProblem {};
 
     // definie inital parameter vector
-    let init_param: Vec<f64> = vec![1.2, 1.2];
-    // let init_param: Vec<f64> = vec![-1.2, 1.0];
+    // let init_param: Vec<f64> = vec![1.2, 1.2];
+    let init_param: Vec<f64> = vec![-1.2, 1.0];
 
     let mut linesearch = MoreThuenteLineSearch::new(Box::new(cost.clone()));
     // let mut linesearch = BacktrackingLineSearch::new(Box::new(cost.clone()));
     linesearch.set_initial_alpha(1.0)?;
-    linesearch.set_max_iters(2);
+    // linesearch.set_initial_alpha(10.0)?;
+    linesearch.set_max_iters(10);
+    // linesearch.set_rho(0.5);
 
-    let iters = 10;
+    let iters = 10000;
     let mut solver = SteepestDescent::new(Box::new(cost), init_param, Box::new(linesearch))?;
     solver.set_max_iters(iters);
     solver.add_logger(ArgminSlogLogger::term_noblock());
