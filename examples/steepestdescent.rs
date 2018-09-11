@@ -15,6 +15,8 @@ extern crate argmin;
 extern crate argmin_derive;
 use argmin::prelude::*;
 use argmin::solver::gradientdescent::*;
+// use argmin::solver::linesearch::BacktrackingLineSearch;
+use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
 fn rosenbrock(x: &Vec<f64>) -> f64 {
@@ -37,11 +39,16 @@ fn run() -> Result<(), Error> {
     let cost = MyProblem {};
 
     // definie inital parameter vector
-    // let init_param: Vec<f64> = vec![1.2, 1.2];
-    let init_param: Vec<f64> = vec![-1.2, 1.0];
+    let init_param: Vec<f64> = vec![1.2, 1.2];
+    // let init_param: Vec<f64> = vec![-1.2, 1.0];
 
-    let iters = 10000;
-    let mut solver = SteepestDescent::new(Box::new(cost), init_param)?;
+    let mut linesearch = MoreThuenteLineSearch::new(Box::new(cost.clone()));
+    // let mut linesearch = BacktrackingLineSearch::new(Box::new(cost.clone()));
+    linesearch.set_initial_alpha(1.0)?;
+    linesearch.set_max_iters(100);
+
+    let iters = 10;
+    let mut solver = SteepestDescent::new(Box::new(cost), init_param, Box::new(linesearch))?;
     solver.set_max_iters(iters);
     solver.add_logger(ArgminSlogLogger::term());
 
