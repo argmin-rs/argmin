@@ -129,8 +129,6 @@ where
         + ArgminScaledSub<T, f64>,
     BacktrackingLineSearch<T>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
-    type Parameters = T;
-
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: T) {
         self.search_direction = search_direction;
