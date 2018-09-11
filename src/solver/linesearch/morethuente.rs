@@ -41,6 +41,7 @@ pub struct MoreThuenteLineSearch<T>
 where
     T: std::default::Default
         + Clone
+        + std::fmt::Debug
         + ArgminSub<T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -90,6 +91,8 @@ where
     stx: Step,
     /// sty
     sty: Step,
+    /// f
+    f: f64,
     /// bracketed
     brackt: bool,
     /// stage1
@@ -104,6 +107,7 @@ impl<T> MoreThuenteLineSearch<T>
 where
     T: std::default::Default
         + Clone
+        + std::fmt::Debug
         + ArgminSub<T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -140,6 +144,7 @@ where
             stp: Step::default(),
             stx: Step::default(),
             sty: Step::default(),
+            f: std::f64::NAN,
             brackt: false,
             stage1: true,
             infoc: 1,
@@ -197,6 +202,7 @@ impl<T> ArgminLineSearch for MoreThuenteLineSearch<T>
 where
     T: std::default::Default
         + Clone
+        + std::fmt::Debug
         + ArgminSub<T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -253,6 +259,7 @@ impl<T> ArgminNextIter for MoreThuenteLineSearch<T>
 where
     T: std::default::Default
         + Clone
+        + std::fmt::Debug
         + ArgminSub<T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -311,6 +318,7 @@ where
         self.dgtest = self.ftol * self.dginit;
         self.width = self.stpmax - self.stpmin;
         self.width1 = 2.0 * self.width;
+        self.f = self.finit;
 
         self.stp = Step::new(self.alpha, std::f64::NAN, std::f64::NAN);
         self.stx = Step::new(0.0, self.finit, self.dginit);
@@ -331,7 +339,10 @@ where
             stmax = self.stp.x + self.xtrapf * (self.stp.x - self.stx.x);
         }
 
-        println!(" {}, {}, {}, {}", self.stpmax, self.stpmin, stmax, stmin);
+        // println!(
+        //     "{}: {}, {}, {}, {}",
+        //     self.brackt, self.stpmax, self.stpmin, stmax, stmin
+        // );
         // alpha needs to be within bounds
         self.stp.x = self.stp.x.max(self.stpmin);
         self.stp.x = self.stp.x.min(self.stpmax);
@@ -341,36 +352,37 @@ where
         // far.
         if (self.brackt && (self.stp.x <= stmin || self.stp.x >= stmax))
             || (self.brackt && (stmax - stmin) <= self.xtol * stmax)
+            || self.infoc == 0
         {
             self.stp.x = self.stx.x;
         }
-        // println!("{}, {}", stmax, stmin);
 
         // Evaluate the function and gradient at new stp.x and compute the directional derivative
         let new_param = self
             .init_param
             .scaled_add(self.stp.x, self.search_direction.clone());
-        let new_cost = self.apply(&new_param)?;
+        // println!("{:?}", new_param);
+        self.f = self.apply(&new_param)?;
         let new_grad = self.gradient(&new_param)?;
-        self.base.set_cur_cost(new_cost);
+        self.base.set_cur_cost(self.f);
         self.base.set_cur_param(new_param);
         self.base.set_cur_grad(new_grad.clone());
         // self.stx.fx = new_cost;
         let dg = self.search_direction.dot(new_grad);
         let ftest1 = self.finit + self.stp.x * self.dgtest;
-        self.stp.fx = new_cost;
-        self.stp.gx = dg;
+        // self.stp.fx = new_cost;
+        // self.stp.gx = dg;
 
         let mut info = 0;
         if (self.brackt && (self.stp.x <= stmin || self.stp.x >= stmax)) || self.infoc == 0 {
             info = 6;
         }
 
-        if self.stp.x == self.stpmax && self.base.cur_cost() <= ftest1 && dg <= self.dgtest {
+        if self.stp.x == self.stpmax && self.f <= ftest1 && dg <= self.dgtest {
             info = 5;
         }
 
-        if self.stp.x == self.stpmin && (self.base.cur_cost() > ftest1 || dg >= self.dgtest) {
+        if self.stp.x == self.stpmin && (self.f > ftest1 || dg >= self.dgtest) {
             info = 4;
         }
 
@@ -378,30 +390,27 @@ where
             info = 2;
         }
 
-        if self.base.cur_cost() <= ftest1 && dg.abs() <= self.gtol * (-self.dginit) {
+        if self.f <= ftest1 && dg.abs() <= self.gtol * (-self.dginit) {
             info = 1;
         }
 
         if info != 0 {
-            // println!(
-            //     "{}, {}, {}, {}, {}",
-            //     info, self.stpmax, self.stpmin, stmax, stmin
-            // );
+            println!(
+                "{}, {}, {}, {}, {}",
+                info, self.stpmax, self.stpmin, stmax, stmin
+            );
             self.base
                 .set_termination_reason(TerminationReason::LineSearchConditionMet);
             let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());
             return Ok(out);
         }
 
-        if self.stage1
-            && self.base.cur_cost() <= ftest1
-            && dg >= self.ftol.min(self.gtol) * self.dginit
-        {
+        if self.stage1 && self.f <= ftest1 && dg >= self.ftol.min(self.gtol) * self.dginit {
             self.stage1 = false;
         }
 
-        if self.stage1 && self.base.cur_cost() <= self.finit && self.base.cur_cost() > ftest1 {
-            let fm = self.base.cur_cost() - self.stp.x * self.dgtest;
+        if self.stage1 && self.f <= self.stp.fx && self.f > ftest1 {
+            let fm = self.f - self.stp.x * self.dgtest;
             let fxm = self.stx.fx - self.stx.x * self.dgtest;
             let fym = self.sty.fx - self.sty.x * self.dgtest;
             let dgm = dg - self.dgtest;
@@ -417,10 +426,13 @@ where
                 stmax,
             );
 
-            self.stx.fx = stx1.fx + stx1.x * self.dgtest;
-            self.sty.fx = sty1.fx + sty1.x * self.dgtest;
-            self.stx.gx = stx1.gx + self.dgtest;
-            self.sty.gx = sty1.gx + self.dgtest;
+            self.stx.x = stx1.x;
+            self.sty.x = sty1.x;
+            self.stp.x = stp1.x;
+            self.stx.fx = self.stx.fx + stx1.x * self.dgtest;
+            self.sty.fx = self.sty.fx + sty1.x * self.dgtest;
+            self.stx.gx = self.stx.gx + self.dgtest;
+            self.sty.gx = self.sty.gx + self.dgtest;
             self.brackt = brackt1;
             self.stp = stp1;
             self.infoc = infoc;
@@ -428,7 +440,7 @@ where
             let (stx1, sty1, stp1, brackt1, _stmin, _stmax, infoc) = cstep(
                 self.stx.clone(),
                 self.sty.clone(),
-                self.stp.clone(),
+                Step::new(self.stp.x, self.f, dg),
                 self.brackt,
                 stmin,
                 stmax,
@@ -436,6 +448,8 @@ where
             self.stx = stx1;
             self.sty = sty1;
             self.stp = stp1;
+            self.f = self.stp.fx;
+            // dg = self.stp.gx;
             self.brackt = brackt1;
             self.infoc = infoc;
         }
@@ -517,6 +531,7 @@ fn cstep(
         bound = false;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
+        // println!("{:?}", tmp);
         let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
         let mut gamma = s * ((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s)).sqrt();
         if stp.x > stx.x {
@@ -610,13 +625,13 @@ fn cstep(
     let mut stx_o = stx.clone();
     let mut sty_o = sty.clone();
     let mut stp_o = stp.clone();
-    if stp.fx > stx.fx {
-        sty_o = Step::new(stp.x, stp.fx, stp.gx);
+    if stp_o.fx > stx_o.fx {
+        sty_o = Step::new(stp_o.x, stp_o.fx, stp_o.gx);
     } else {
         if sgnd < 0.0 {
-            sty_o = Step::new(stx.x, stx.fx, stx.gx);
+            sty_o = Step::new(stx_o.x, stx_o.fx, stx_o.gx);
         }
-        stx_o = Step::new(stp.x, stp.fx, stp.gx);
+        stx_o = Step::new(stp_o.x, stp_o.fx, stp_o.gx);
     }
 
     // compute the new step and safeguard it.
@@ -627,9 +642,9 @@ fn cstep(
     stp_o.x = stpf;
     if brackt && bound {
         if sty_o.x > stx_o.x {
-            stp_o.x = stp.x.min(stx.x + 0.66 * (sty_o.x - stx_o.x));
+            stp_o.x = stp_o.x.min(stx_o.x + 0.66 * (sty_o.x - stx_o.x));
         } else {
-            stp_o.x = stp.x.max(stx.x + 0.66 * (sty_o.x - stx_o.x));
+            stp_o.x = stp_o.x.max(stx_o.x + 0.66 * (sty_o.x - stx_o.x));
         }
     }
 
