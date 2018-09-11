@@ -202,8 +202,6 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
 {
-    type Parameters = T;
-
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: T) {
         self.search_direction_b = Some(search_direction);
@@ -442,7 +440,11 @@ where
             self.width = (self.sty.x - self.stx.x).abs();
         }
 
-        let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());
+        // let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());
+        let new_param = self
+            .init_param
+            .scaled_add(self.stp.x, self.search_direction.clone());
+        let out = ArgminIterationData::new(new_param, self.stp.fx);
         Ok(out)
     }
 }
