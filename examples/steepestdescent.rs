@@ -45,12 +45,12 @@ fn run() -> Result<(), Error> {
     let mut linesearch = MoreThuenteLineSearch::new(Box::new(cost.clone()));
     // let mut linesearch = BacktrackingLineSearch::new(Box::new(cost.clone()));
     linesearch.set_initial_alpha(1.0)?;
-    linesearch.set_max_iters(100);
+    linesearch.set_max_iters(2);
 
     let iters = 10;
     let mut solver = SteepestDescent::new(Box::new(cost), init_param, Box::new(linesearch))?;
     solver.set_max_iters(iters);
-    solver.add_logger(ArgminSlogLogger::term());
+    solver.add_logger(ArgminSlogLogger::term_noblock());
 
     solver.run()?;
 

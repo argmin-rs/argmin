@@ -19,6 +19,7 @@ pub struct SteepestDescent<T>
 where
     T: Clone
         + Default
+        + std::fmt::Debug
         + ArgminScale<f64>
         + ArgminSub<T>
         + ArgminNorm<f64>
@@ -36,6 +37,7 @@ impl<T> SteepestDescent<T>
 where
     T: Clone
         + Default
+        + std::fmt::Debug
         + ArgminScale<f64>
         + ArgminSub<T>
         + ArgminNorm<f64>
@@ -60,6 +62,7 @@ impl<T> ArgminNextIter for SteepestDescent<T>
 where
     T: Clone
         + Default
+        + std::fmt::Debug
         + ArgminScale<f64>
         + ArgminSub<T>
         + ArgminNorm<f64>

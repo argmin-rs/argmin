@@ -81,9 +81,9 @@ where
     /// alpha
     alpha: f64,
     /// stpmin
-    stmin: f64,
+    stpmin: f64,
     /// stpmax
-    stmax: f64,
+    stpmax: f64,
     /// current step
     stp: Step,
     /// stx
@@ -133,10 +133,10 @@ where
             xtrapf: 4.0,
             width: std::f64::NAN,
             width1: std::f64::NAN,
-            xtol: 0.1,
+            xtol: 1e-10,
             alpha: 1.0,
-            stmin: 0.0,
-            stmax: std::f64::INFINITY,
+            stpmin: 1e-15,
+            stpmax: std::f64::INFINITY,
             stp: Step::default(),
             stx: Step::default(),
             sty: Step::default(),
@@ -187,8 +187,8 @@ where
                     .to_string(),
             }.into());
         }
-        self.stmin = alpha_min;
-        self.stmax = alpha_max;
+        self.stpmin = alpha_min;
+        self.stpmax = alpha_max;
         Ok(self)
     }
 }
@@ -309,7 +309,7 @@ where
         }
 
         self.dgtest = self.ftol * self.dginit;
-        self.width = self.stmax - self.stmin;
+        self.width = self.stpmax - self.stpmin;
         self.width1 = 2.0 * self.width;
 
         self.stp = Step::new(self.alpha, std::f64::NAN, std::f64::NAN);
@@ -321,25 +321,30 @@ where
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
+        let stmin;
+        let stmax;
         if self.brackt {
-            self.stmin = self.stx.x.min(self.sty.x);
-            self.stmax = self.stx.x.max(self.sty.x);
+            stmin = self.stx.x.min(self.sty.x);
+            stmax = self.stx.x.max(self.sty.x);
         } else {
-            self.stmin = self.stx.x;
-            self.stmax = self.stp.x + self.xtrapf * (self.stp.x - self.stx.x);
+            stmin = self.stx.x;
+            stmax = self.stp.x + self.xtrapf * (self.stp.x - self.stx.x);
         }
 
+        println!(" {}, {}, {}, {}", self.stpmax, self.stpmin, stmax, stmin);
         // alpha needs to be within bounds
-        self.stp.x = self.stp.x.max(self.stmin);
-        self.stp.x = self.stp.x.min(self.stmax);
+        self.stp.x = self.stp.x.max(self.stpmin);
+        self.stp.x = self.stp.x.min(self.stpmax);
+        // println!("{}", self.stp.x);
 
         // If an unusual termination is to occur then let alpha be the lowest point obtained so
         // far.
-        if (self.brackt && (self.stp.x <= self.stmin || self.stp.x >= self.stmax))
-            || (self.brackt && (self.stmax - self.stmin) <= self.xtol * self.stmax)
+        if (self.brackt && (self.stp.x <= stmin || self.stp.x >= stmax))
+            || (self.brackt && (stmax - stmin) <= self.xtol * stmax)
         {
             self.stp.x = self.stx.x;
         }
+        // println!("{}, {}", stmax, stmin);
 
         // Evaluate the function and gradient at new stp.x and compute the directional derivative
         let new_param = self
@@ -349,28 +354,27 @@ where
         let new_grad = self.gradient(&new_param)?;
         self.base.set_cur_cost(new_cost);
         self.base.set_cur_param(new_param);
-        self.stx.fx = new_cost;
+        self.base.set_cur_grad(new_grad.clone());
+        // self.stx.fx = new_cost;
         let dg = self.search_direction.dot(new_grad);
         let ftest1 = self.finit + self.stp.x * self.dgtest;
         self.stp.fx = new_cost;
         self.stp.gx = dg;
 
         let mut info = 0;
-        if (self.brackt && (self.stp.x <= self.stmin || self.stp.x >= self.stmax))
-            || self.infoc == 0
-        {
+        if (self.brackt && (self.stp.x <= stmin || self.stp.x >= stmax)) || self.infoc == 0 {
             info = 6;
         }
 
-        if self.stp.x == self.stmax && self.base.cur_cost() <= ftest1 && dg <= self.dgtest {
+        if self.stp.x == self.stpmax && self.base.cur_cost() <= ftest1 && dg <= self.dgtest {
             info = 5;
         }
 
-        if self.stp.x == self.stmin && (self.base.cur_cost() > ftest1 || dg >= self.dgtest) {
+        if self.stp.x == self.stpmin && (self.base.cur_cost() > ftest1 || dg >= self.dgtest) {
             info = 4;
         }
 
-        if self.brackt && self.stmax - self.stmin <= self.xtol * self.stmax {
+        if self.brackt && stmax - stmin <= self.xtol * stmax {
             info = 2;
         }
 
@@ -379,6 +383,10 @@ where
         }
 
         if info != 0 {
+            // println!(
+            //     "{}, {}, {}, {}, {}",
+            //     info, self.stpmax, self.stpmin, stmax, stmin
+            // );
             self.base
                 .set_termination_reason(TerminationReason::LineSearchConditionMet);
             let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());
@@ -405,8 +413,8 @@ where
                 Step::new(self.sty.x, fym, dgym),
                 Step::new(self.stp.x, fm, dgm),
                 self.brackt,
-                self.stmin,
-                self.stmax,
+                stmin,
+                stmax,
             );
 
             self.stx.fx = stx1.fx + stx1.x * self.dgtest;
@@ -422,8 +430,8 @@ where
                 self.sty.clone(),
                 self.stp.clone(),
                 self.brackt,
-                self.stmin,
-                self.stmax,
+                stmin,
+                stmax,
             );
             self.stx = stx1;
             self.sty = sty1;
