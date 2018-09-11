@@ -40,7 +40,6 @@ impl Step {
 pub struct MoreThuenteLineSearch<T>
 where
     T: std::default::Default
-        + std::fmt::Debug
         + Clone
         + ArgminSub<T>
         + ArgminDot<T, f64>
@@ -104,7 +103,6 @@ where
 impl<T> MoreThuenteLineSearch<T>
 where
     T: std::default::Default
-        + std::fmt::Debug
         + Clone
         + ArgminSub<T>
         + ArgminDot<T, f64>
@@ -149,19 +147,6 @@ where
         }
     }
 
-    /// Set search direction
-    pub fn set_search_direction(&mut self, search_direction: T) -> &mut Self {
-        self.search_direction_b = Some(search_direction);
-        self
-    }
-
-    /// Set initial parameter
-    pub fn set_initial_parameter(&mut self, param: T) -> &mut Self {
-        self.init_param_b = Some(param.clone());
-        self.base.set_cur_param(param);
-        self
-    }
-
     /// set current gradient value
     pub fn set_cur_grad(&mut self, grad: T) -> &mut Self {
         self.base.set_cur_grad(grad);
@@ -182,17 +167,6 @@ where
         }
         self.ftol = c1;
         self.gtol = c2;
-        Ok(self)
-    }
-
-    /// Set initial alpha value
-    pub fn set_initial_alpha(&mut self, alpha: f64) -> Result<&mut Self, Error> {
-        if alpha <= 0.0 {
-            return Err(ArgminError::InvalidParameter {
-                parameter: "MoreThuenteLineSearch: Inital alpha must be > 0.".to_string(),
-            }.into());
-        }
-        self.alpha = alpha;
         Ok(self)
     }
 
@@ -217,38 +191,69 @@ where
         self.stmax = alpha_max;
         Ok(self)
     }
+}
+
+impl<T> ArgminLineSearch for MoreThuenteLineSearch<T>
+where
+    T: std::default::Default
+        + Clone
+        + ArgminSub<T>
+        + ArgminDot<T, f64>
+        + ArgminScaledAdd<T, f64>
+        + ArgminScaledSub<T, f64>,
+{
+    type Parameters = T;
+
+    /// Set search direction
+    fn set_search_direction(&mut self, search_direction: T) {
+        self.search_direction_b = Some(search_direction);
+    }
+
+    /// Set initial parameter
+    fn set_initial_parameter(&mut self, param: T) {
+        self.init_param_b = Some(param.clone());
+        self.base.set_cur_param(param);
+    }
 
     /// Set initial cost function value
-    pub fn set_initial_cost(&mut self, init_cost: f64) -> &mut Self {
+    fn set_initial_cost(&mut self, init_cost: f64) {
         self.finit_b = Some(init_cost);
-        self
     }
 
     /// Set initial gradient
-    pub fn set_initial_gradient(&mut self, init_grad: T) -> &mut Self {
+    fn set_initial_gradient(&mut self, init_grad: T) {
         self.init_grad_b = Some(init_grad);
-        self
     }
 
     /// Calculate initial cost function value
-    pub fn calc_inital_cost(&mut self) -> Result<&mut Self, Error> {
+    fn calc_initial_cost(&mut self) -> Result<(), Error> {
         let tmp = self.base.cur_param();
         self.finit_b = Some(self.apply(&tmp)?);
-        Ok(self)
+        Ok(())
     }
 
     /// Calculate initial cost function value
-    pub fn calc_inital_gradient(&mut self) -> Result<&mut Self, Error> {
+    fn calc_initial_gradient(&mut self) -> Result<(), Error> {
         let tmp = self.base.cur_param();
         self.init_grad_b = Some(self.gradient(&tmp)?);
-        Ok(self)
+        Ok(())
+    }
+
+    /// Set initial alpha value
+    fn set_initial_alpha(&mut self, alpha: f64) -> Result<(), Error> {
+        if alpha <= 0.0 {
+            return Err(ArgminError::InvalidParameter {
+                parameter: "MoreThuenteLineSearch: Initial alpha must be > 0.".to_string(),
+            }.into());
+        }
+        self.alpha = alpha;
+        Ok(())
     }
 }
 
 impl<T> ArgminNextIter for MoreThuenteLineSearch<T>
 where
     T: std::default::Default
-        + std::fmt::Debug
         + Clone
         + ArgminSub<T>
         + ArgminDot<T, f64>
@@ -342,7 +347,6 @@ where
         let new_param = self
             .init_param
             .scaled_add(self.stp.x, self.search_direction.clone());
-        println!("{:?}: {:?}", self.stp.x, new_param);
         let new_cost = self.apply(&new_param)?;
         let new_grad = self.gradient(&new_param)?;
         self.base.set_cur_cost(new_cost);
@@ -377,7 +381,6 @@ where
         }
 
         if info != 0 {
-            println!("info: {}", info);
             self.base
                 .set_termination_reason(TerminationReason::LineSearchConditionMet);
             let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());
