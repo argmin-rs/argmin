@@ -164,7 +164,7 @@ where
         self
     }
 
-    /// Set mu
+    /// Set c1 and c2 where 0 < c1 < c2 < 1.
     pub fn set_c(&mut self, c1: f64, c2: f64) -> Result<&mut Self, Error> {
         if c1 <= 0.0 || c1 >= c2 {
             return Err(ArgminError::InvalidParameter {
