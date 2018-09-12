@@ -124,8 +124,7 @@ where
     ///
     /// Parameters:
     ///
-    /// `cost_function`: cost function
-    /// `mu`: todo
+    /// `operator`: operator
     pub fn new(operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>) -> Self {
         MoreThuenteLineSearch {
             init_param_b: None,
@@ -261,6 +260,22 @@ where
     }
 }
 
+macro_rules! check_param {
+    ($param:expr, $msg:expr, $error:ident) => {
+        match $param {
+            None => {
+                return Err(ArgminError::$error {
+                    text: $msg.to_string(),
+                }.into());
+            }
+            Some(ref x) => x.clone(),
+        }
+    };
+    ($param:expr, $msg:expr) => {
+        check_param!($param, $msg, NotInitialized);
+    };
+}
+
 impl<T> ArgminNextIter for MoreThuenteLineSearch<T>
 where
     T: std::default::Default
@@ -275,41 +290,25 @@ where
     type OperatorOutput = f64;
 
     fn init(&mut self) -> Result<(), Error> {
-        self.init_param = match self.init_param_b {
-            None => {
-                return Err(ArgminError::NotInitialized {
-                    text: "MoreThuenteLineSearch: Initial parameter not initialized. Call `set_initial_parameter`.".to_string(),
-                }.into());
-            }
-            Some(ref x) => x.clone(),
-        };
+        self.init_param = check_param!(
+            self.init_param_b,
+            "MoreThuenteLineSearch: Initial parameter not initialized. Call `set_initial_parameter`."
+        );
 
-        self.finit = match self.finit_b {
-            None => {
-                return Err(ArgminError::NotInitialized {
-                    text: "MoreThuenteLineSearch: Initial cost not computed. Call `set_initial_cost` or `calc_inital_cost`.".to_string(),
-                }.into());
-            }
-            Some(ref x) => x.clone(),
-        };
+        self.finit = check_param!(
+            self.finit_b,
+            "MoreThuenteLineSearch: Initial cost not computed. Call `set_initial_cost` or `calc_inital_cost`."
+        );
 
-        self.init_grad = match self.init_grad_b {
-            None => {
-                return Err(ArgminError::NotInitialized {
-                    text: "MoreThuenteLineSearch: Initial gradient not computed. Call `set_initial_grad` or `calc_inital_grad`.".to_string(),
-                }.into());
-            }
-            Some(ref x) => x.clone(),
-        };
+        self.init_grad = check_param!(
+            self.init_grad_b,
+            "MoreThuenteLineSearch: Initial gradient not computed. Call `set_initial_grad` or `calc_inital_grad`."
+        );
 
-        self.search_direction = match self.search_direction_b {
-            None => {
-                return Err(ArgminError::NotInitialized {
-                    text: "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`.".to_string(),
-                }.into());
-            }
-            Some(ref x) => x.clone(),
-        };
+        self.search_direction = check_param!(
+            self.search_direction_b,
+            "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
+        );
 
         self.dginit = self.init_grad.dot(self.search_direction.clone());
 
