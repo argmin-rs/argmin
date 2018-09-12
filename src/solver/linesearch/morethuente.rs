@@ -260,22 +260,6 @@ where
     }
 }
 
-macro_rules! check_param {
-    ($param:expr, $msg:expr, $error:ident) => {
-        match $param {
-            None => {
-                return Err(ArgminError::$error {
-                    text: $msg.to_string(),
-                }.into());
-            }
-            Some(ref x) => x.clone(),
-        }
-    };
-    ($param:expr, $msg:expr) => {
-        check_param!($param, $msg, NotInitialized);
-    };
-}
-
 impl<T> ArgminNextIter for MoreThuenteLineSearch<T>
 where
     T: std::default::Default
