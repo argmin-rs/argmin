@@ -11,6 +11,8 @@
 pub mod backtracking;
 /// acceptance conditions
 pub mod condition;
+/// Hager-Zhang line search algorithm
+pub mod hagerzhang;
 /// More-Thuente line search algorithm
 pub mod morethuente;
 
