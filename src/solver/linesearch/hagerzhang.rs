@@ -25,6 +25,9 @@ use prelude::*;
 use std;
 
 /// More-Thuente Line Search
+///
+/// Parameters for interval:
+///   a_x, a_f, a_g, b_x, b_f, b_g
 #[derive(ArgminSolver)]
 pub struct HagerZhangLineSearch<T>
 where
