@@ -92,9 +92,9 @@ where
 
         self.linesearch.run_fast()?;
 
-        let param_new = self.linesearch.result().param;
+        let linesearch_result = self.linesearch.result();
 
-        let out = ArgminIterationData::new(param_new, new_cost);
+        let out = ArgminIterationData::new(linesearch_result.param, linesearch_result.cost);
         Ok(out)
     }
 }
