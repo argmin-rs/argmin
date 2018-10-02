@@ -24,11 +24,14 @@
 use prelude::*;
 use std;
 
-/// More-Thuente Line Search
+/// Hager-Zhang Line Search
 ///
 /// Parameters for interval:
 ///   a_x, a_f, a_g, b_x, b_f, b_g
 #[derive(ArgminSolver)]
+#[stop("self.best_f - self.finit < self.delta * self.best_x * self.dginit" => LineSearchConditionMet)]
+#[stop("self.best_g > self.sigma * self.dginit" => LineSearchConditionMet)]
+#[stop("(2.0*self.delta - 1.0)*self.dginit >= self.best_g && self.best_g >= self.sigma * self.dginit && self.best_f <= self.finit + self.epsilon_k" => LineSearchConditionMet)]
 pub struct HagerZhangLineSearch<T>
 where
     T: std::default::Default
@@ -72,6 +75,12 @@ where
     c_f: f64,
     /// phi'(c)
     c_g: f64,
+    /// best x
+    best_x: f64,
+    /// best function value
+    best_f: f64,
+    /// best slope
+    best_g: f64,
     /// initial parameter vector (builder)
     init_param_b: Option<T>,
     /// initial cost (builder)
@@ -88,6 +97,8 @@ where
     init_grad: T,
     /// Search direction (builder)
     search_direction: T,
+    /// Search direction in 1D
+    dginit: f64,
     /// base
     base: ArgminBase<T, f64>,
 }
@@ -112,20 +123,23 @@ where
         HagerZhangLineSearch {
             delta: 0.1,
             sigma: 0.9,
-            epsilon: 10e-6,
+            epsilon: 1e-6,
             epsilon_k: std::f64::NAN,
             theta: 0.5,
             gamma: 0.66,
             eta: 0.01,
-            a_x: std::f64::NAN,
+            a_x: 0.0,
             a_f: std::f64::NAN,
             a_g: std::f64::NAN,
-            b_x: std::f64::NAN,
+            b_x: 100.0,
             b_f: std::f64::NAN,
             b_g: std::f64::NAN,
-            c_x: std::f64::NAN,
+            c_x: 1.0,
             c_f: std::f64::NAN,
             c_g: std::f64::NAN,
+            best_x: 0.0,
+            best_f: std::f64::INFINITY,
+            best_g: std::f64::NAN,
             init_param_b: None,
             finit_b: None,
             init_grad_b: None,
@@ -133,6 +147,7 @@ where
             init_param: T::default(),
             init_grad: T::default(),
             search_direction: T::default(),
+            dginit: std::f64::NAN,
             finit: std::f64::INFINITY,
             base: ArgminBase::new(operator, T::default()),
         }
@@ -258,24 +273,20 @@ where
         }
 
         // U2
-        if c_g < 0.0 && c_g <= self.finit + self.epsilon_k {
+        if c_g < 0.0 && c_f <= self.finit + self.epsilon_k {
             return Ok(((c_x, c_f, c_g), (b_x, b_f, b_g)));
         }
 
         // U3
-        if c_g < 0.0 && c_g > self.finit + self.epsilon_k {
+        if c_g < 0.0 && c_f > self.finit + self.epsilon_k {
             let mut ah_x = a_x;
             let mut ah_f = a_f;
             let mut ah_g = a_g;
             let mut bh_x = c_x;
             loop {
                 let d_x = (1.0 - self.theta) * ah_x + self.theta * bh_x;
-                let tmp = self
-                    .init_param
-                    .scaled_add(d_x, self.search_direction.clone());
-                let d_f = self.apply(&tmp)?;
-                let grad = self.gradient(&tmp)?;
-                let d_g = self.search_direction.dot(grad);
+                let d_f = self.calc(d_x)?;
+                let d_g = self.calc_grad(d_x)?;
                 if d_g >= 0.0 {
                     return Ok(((ah_x, ah_f, ah_g), (d_x, d_f, d_g)));
                 }
@@ -290,6 +301,7 @@ where
             }
         }
 
+        // return Ok(((a_x, a_f, a_g), (b_x, b_f, b_g)));
         return Err(ArgminError::InvalidParameter {
             parameter: "HagerZhangLineSearch: Reached unreachable point in `update` method."
                 .to_string(),
@@ -310,12 +322,8 @@ where
     ) -> Result<((f64, f64, f64), (f64, f64, f64)), Error> {
         // S1
         let c_x = self.secant(a_x, a_g, b_x, b_g);
-        let tmp = self
-            .init_param
-            .scaled_add(c_x, self.search_direction.clone());
-        let c_f = self.apply(&tmp)?;
-        let grad = self.gradient(&tmp)?;
-        let c_g = self.search_direction.dot(grad);
+        let c_f = self.calc(c_x)?;
+        let c_g = self.calc_grad(c_x)?;
 
         let ((aa_x, aa_f, aa_g), (bb_x, bb_f, bb_g)) =
             self.update((a_x, a_f, a_g), (b_x, b_f, b_g), (c_x, c_f, c_g))?;
@@ -334,12 +342,8 @@ where
 
         // S4
         if c_x == aa_x || c_x == bb_x {
-            let tmp = self
-                .init_param
-                .scaled_add(c_bar_x, self.search_direction.clone());
-            let c_bar_f = self.apply(&tmp)?;
-            let grad = self.gradient(&tmp)?;
-            let c_bar_g = self.search_direction.dot(grad);
+            let c_bar_f = self.calc(c_bar_x)?;
+            let c_bar_g = self.calc_grad(c_bar_x)?;
 
             let (a_bar, b_bar) = self.update(
                 (aa_x, aa_f, aa_g),
@@ -350,12 +354,41 @@ where
         } else {
             return Ok(((aa_x, aa_f, aa_g), (bb_x, bb_f, bb_g)));
         }
+    }
 
-        return Err(ArgminError::InvalidParameter {
-            parameter: "HagerZhangLineSearch: Reached unreachable point in `secant` method."
-                .to_string(),
+    fn calc(&mut self, alpha: f64) -> Result<f64, Error> {
+        let tmp = self
+            .init_param
+            .scaled_add(alpha, self.search_direction.clone());
+        self.apply(&tmp)
+    }
+
+    fn calc_grad(&mut self, alpha: f64) -> Result<f64, Error> {
+        let tmp = self
+            .init_param
+            .scaled_add(alpha, self.search_direction.clone());
+        let grad = self.gradient(&tmp)?;
+        Ok(self.search_direction.dot(grad))
+    }
+
+    fn set_best(&mut self) {
+        if self.a_f < self.b_f && self.a_f < self.c_f {
+            self.best_x = self.a_x;
+            self.best_f = self.a_f;
+            self.best_g = self.a_g;
         }
-        .into());
+
+        if self.b_f < self.a_f && self.b_f < self.c_f {
+            self.best_x = self.b_x;
+            self.best_f = self.b_f;
+            self.best_g = self.b_g;
+        }
+
+        if self.c_f < self.a_f && self.c_f < self.b_f {
+            self.best_x = self.c_x;
+            self.best_f = self.c_f;
+            self.best_g = self.c_g;
+        }
     }
 }
 
@@ -406,14 +439,8 @@ where
 
     /// Set initial alpha value
     fn set_initial_alpha(&mut self, alpha: f64) -> Result<(), Error> {
-        // if alpha <= 0.0 {
-        //     return Err(ArgminError::InvalidParameter {
-        //         parameter: "MoreThuenteLineSearch: Initial alpha must be > 0.".to_string(),
-        //     }.into());
-        // }
-        // self.alpha = alpha;
-        // Ok(())
-        unimplemented!()
+        self.c_x = alpha;
+        Ok(())
     }
 }
 
@@ -458,12 +485,76 @@ where
             "HagerZhangLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
 
+        self.a_x = 0.0;
+        self.b_x = 100.0;
+        self.c_x = 1.0;
+
+        let at = self.a_x;
+        self.a_f = self.calc(at)?;
+        self.a_g = self.calc_grad(at)?;
+        let bt = self.b_x;
+        self.b_f = self.calc(bt)?;
+        self.b_g = self.calc_grad(bt)?;
+        let ct = self.c_x;
+        self.c_f = self.calc(ct)?;
+        self.c_g = self.calc_grad(ct)?;
+
+        self.epsilon_k = self.epsilon * self.finit.abs();
+
+        self.dginit = self.init_grad.dot(self.search_direction.clone());
+
+        self.set_best();
+        let new_param = self
+            .init_param
+            .scaled_add(self.best_x, self.search_direction.clone());
+        self.base.set_best_param(new_param);
+        self.base.set_best_cost(self.best_f);
+
         Ok(())
     }
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
-        // let out = ArgminIterationData::new(new_param, self.stp.fx);
-        // Ok(out)
-        unimplemented!()
+        // L1
+        let aa = (self.a_x, self.a_f, self.a_g);
+        let bb = (self.b_x, self.b_f, self.b_g);
+        let ((mut at_x, mut at_f, mut at_g), (mut bt_x, mut bt_f, mut bt_g)) =
+            self.secant2(aa, bb)?;
+
+        // L2
+        if bt_x - at_x > self.gamma * (self.b_x - self.a_x) {
+            let c_x = (at_x + bt_x) / 2.0;
+            let tmp = self
+                .init_param
+                .scaled_add(c_x, self.search_direction.clone());
+            let c_f = self.apply(&tmp)?;
+            let grad = self.gradient(&tmp)?;
+            let c_g = self.search_direction.dot(grad);
+            let ((an_x, an_f, an_g), (bn_x, bn_f, bn_g)) =
+                self.update((at_x, at_f, at_g), (bt_x, bt_f, bt_g), (c_x, c_f, c_g))?;
+            at_x = an_x;
+            at_f = an_f;
+            at_g = an_g;
+            bt_x = bn_x;
+            bt_f = bn_f;
+            bt_g = bn_g;
+        }
+
+        // L3
+        self.a_x = at_x;
+        self.a_f = at_f;
+        self.a_g = at_g;
+        self.b_x = bt_x;
+        self.b_f = bt_f;
+        self.b_g = bt_g;
+
+        // println!("fuck {} {} {} {} {} {}", at_x, at_f, at_g, bt_x, bt_f, bt_g);
+
+        self.set_best();
+        let new_param = self
+            .init_param
+            .scaled_add(self.best_x, self.search_direction.clone());
+        let out = ArgminIterationData::new(new_param, self.best_f);
+        Ok(out)
+        // unimplemented!()
     }
 }
