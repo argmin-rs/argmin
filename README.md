@@ -1,10 +1,10 @@
-[![Build Status](https://travis-ci.org/stefan-k/argmin-rs.svg?branch=master)](https://travis-ci.org/stefan-k/argmin-rs)
+[![Build Status](https://travis-ci.org/argmin-rs/argmin.svg?branch=master)](https://travis-ci.org/argmin-rs/argmin)
 
 # argmin-rs
 
 A work-in-progress optimization toolbox written in Rust. Not stable yet.
 
-The [Documentation](https://stefan-k.github.io/argmin-rs/argmin/) is also still in a very early stage.
+The [Documentation](https://argmin-rs.github.io/argmin/argmin/) is also still in a very early stage.
 
 
 ## Algorithms
