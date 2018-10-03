@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["steepestdescent","Argmin Steepest Descent"]]});

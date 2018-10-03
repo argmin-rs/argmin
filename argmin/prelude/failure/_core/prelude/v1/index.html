@@ -1,0 +1,221 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `v1` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, v1"><title>argmin::prelude::failure::_core::prelude::v1 - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../../light.css" id="themeStyle"><script src="../../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module v1</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../../index.html'>argmin</a>::<wbr><a href='../../../../index.html'>prelude</a>::<wbr><a href='../../../index.html'>failure</a>::<wbr><a href='../../index.html'>_core</a>::<wbr><a href='../index.html'>prelude</a></p><script>window.sidebarCurrent = {name: 'v1', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../../settings.html"><img src="../../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.4.0'>1.4.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/prelude/mod.rs.html#15' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../../index.html'>argmin</a>::<wbr><a href='../../../../index.html'>prelude</a>::<wbr><a href='../../../index.html'>failure</a>::<wbr><a href='../../index.html'>_core</a>::<wbr><a href='../index.html'>prelude</a>::<wbr><a class="mod" href=''>v1</a></span></h1><div class='docblock'><p>The core prelude</p>
+<p>This module is intended for users of libcore which do not link to libstd as
+well. This module is imported by default when <code>#![no_std]</code> is used in the
+same manner as the standard library's prelude.</p>
+</div><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Option.html"
+                                  title='enum argmin::prelude::failure::_core::prelude::v1::Option'>Option</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>Option</code> type. See <a href="index.html">the module level documentation</a> for more.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Result.html"
+                                  title='enum argmin::prelude::failure::_core::prelude::v1::Result'>Result</a></td>
+                           <td class='docblock-short'>
+                                <p><code>Result</code> is a type that represents either success (<a href="enum.Result.html#variant.Ok"><code>Ok</code></a>) or failure (<a href="enum.Result.html#variant.Err"><code>Err</code></a>).</p>
+
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AsMut.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::AsMut'>AsMut</a></td>
+                           <td class='docblock-short'>
+                                <p>A cheap, mutable reference-to-mutable reference conversion.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AsRef.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::AsRef'>AsRef</a></td>
+                           <td class='docblock-short'>
+                                <p>A cheap reference-to-reference conversion. Used to convert a value to a
+reference value within generic code.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Clone.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Clone'>Clone</a></td>
+                           <td class='docblock-short'>
+                                <p>A common trait for the ability to explicitly duplicate an object.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Copy.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Copy'>Copy</a></td>
+                           <td class='docblock-short'>
+                                <p>Types whose values can be duplicated simply by copying bits.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Default.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Default'>Default</a></td>
+                           <td class='docblock-short'>
+                                <p>A trait for giving a type a useful default value.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.DoubleEndedIterator.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::DoubleEndedIterator'>DoubleEndedIterator</a></td>
+                           <td class='docblock-short'>
+                                <p>An iterator able to yield elements from both ends.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Drop.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Drop'>Drop</a></td>
+                           <td class='docblock-short'>
+                                <p>Used to run some code when a value goes out of scope.
+This is sometimes called a 'destructor'.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Eq.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Eq'>Eq</a></td>
+                           <td class='docblock-short'>
+                                <p>Trait for equality comparisons which are <a href="https://en.wikipedia.org/wiki/Equivalence_relation">equivalence relations</a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.ExactSizeIterator.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::ExactSizeIterator'>ExactSizeIterator</a></td>
+                           <td class='docblock-short'>
+                                <p>An iterator that knows its exact length.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Extend.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Extend'>Extend</a></td>
+                           <td class='docblock-short'>
+                                <p>Extend a collection with the contents of an iterator.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Fn.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Fn'>Fn</a></td>
+                           <td class='docblock-short'>
+                                <p>The version of the call operator that takes an immutable receiver.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.FnMut.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::FnMut'>FnMut</a></td>
+                           <td class='docblock-short'>
+                                <p>The version of the call operator that takes a mutable receiver.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.FnOnce.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::FnOnce'>FnOnce</a></td>
+                           <td class='docblock-short'>
+                                <p>The version of the call operator that takes a by-value receiver.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.From.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::From'>From</a></td>
+                           <td class='docblock-short'>
+                                <p>Simple and safe type conversions in to <code>Self</code>. It is the reciprocal of
+<code>Into</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Into.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Into'>Into</a></td>
+                           <td class='docblock-short'>
+                                <p>A conversion that consumes <code>self</code>, which may or may not be expensive. The
+reciprocal of <a href="trait.From.html"><code>From</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.IntoIterator.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::IntoIterator'>IntoIterator</a></td>
+                           <td class='docblock-short'>
+                                <p>Conversion into an <code>Iterator</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Iterator.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Iterator'>Iterator</a></td>
+                           <td class='docblock-short'>
+                                <p>An interface for dealing with iterators.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Ord.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Ord'>Ord</a></td>
+                           <td class='docblock-short'>
+                                <p>Trait for types that form a <a href="https://en.wikipedia.org/wiki/Total_order">total order</a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.PartialEq.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::PartialEq'>PartialEq</a></td>
+                           <td class='docblock-short'>
+                                <p>Trait for equality comparisons which are <a href="http://en.wikipedia.org/wiki/Partial_equivalence_relation">partial equivalence
+relations</a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.PartialOrd.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::PartialOrd'>PartialOrd</a></td>
+                           <td class='docblock-short'>
+                                <p>Trait for values that can be compared for a sort-order.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Send.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Send'>Send</a></td>
+                           <td class='docblock-short'>
+                                <p>Types that can be transferred across thread boundaries.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Sized.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Sized'>Sized</a></td>
+                           <td class='docblock-short'>
+                                <p>Types with a constant size known at compile time.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Sync.html"
+                                  title='trait argmin::prelude::failure::_core::prelude::v1::Sync'>Sync</a></td>
+                           <td class='docblock-short'>
+                                <p>Types for which it is safe to share references between threads.</p>
+
+                           </td>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.drop.html"
+                                  title='fn argmin::prelude::failure::_core::prelude::v1::drop'>drop</a></td>
+                           <td class='docblock-short'>
+                                <p>Disposes of a value.</p>
+
+                           </td>
+                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../../";window.currentCrate = "argmin";</script><script src="../../../../../../aliases.js"></script><script src="../../../../../../main.js"></script><script defer src="../../../../../../search-index.js"></script></body></html>

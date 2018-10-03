@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["backtracking","backtracking algorithm # Line search methods"],["condition","acceptance conditions"],["hagerzhang","Hager-Zhang line search algorithm # Hager-Zang line search algorithm"],["morethuente","More-Thuente line search algorithm # More-Thuente line search algorithm"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Future","A future represents an asychronous computation."]]});

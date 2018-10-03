@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["prelude","Definition of all relevant traits # Re-export of all relevant traits"],["solver","solvers"],["testfunctions","testfunctions"]]});

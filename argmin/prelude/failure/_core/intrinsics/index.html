@@ -1,0 +1,1894 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `intrinsics` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, intrinsics"><title>argmin::prelude::failure::_core::intrinsics - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module intrinsics</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'intrinsics', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version '></span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#175' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>intrinsics</a></span></h1><div class='stability'><div class='stab unstable'><details><summary><span class=microscope>🔬</span> This is a nightly-only experimental API.  (<code>core_intrinsics</code>)</summary><p>intrinsics are unlikely to ever be stabilized, instead they should be used through stabilized interfaces in the rest of the standard library</p>
+</details></div></div><div class='docblock'><p>rustc compiler intrinsics.</p>
+<p>The corresponding definitions are in librustc_codegen_llvm/intrinsic.rs.</p>
+<h1 id="volatiles" class="section-header"><a href="#volatiles">Volatiles</a></h1>
+<p>The volatile intrinsics provide operations intended to act on I/O
+memory, which are guaranteed to not be reordered by the compiler
+across other volatile intrinsics. See the LLVM documentation on
+[<a href="http://llvm.org/docs/LangRef.html#volatile-memory-accesses">volatile</a>].</p>
+<h1 id="atomics" class="section-header"><a href="#atomics">Atomics</a></h1>
+<p>The atomic intrinsics provide common atomic operations on machine
+words, with multiple possible memory orderings. They obey the same
+semantics as C++11. See the LLVM documentation on [<a href="http://llvm.org/docs/Atomics.html">atomics</a>].</p>
+<p>A quick refresher on memory ordering:</p>
+<ul>
+<li>Acquire - a barrier for acquiring a lock. Subsequent reads and writes
+take place after the barrier.</li>
+<li>Release - a barrier for releasing a lock. Preceding reads and writes
+take place before the barrier.</li>
+<li>Sequentially consistent - sequentially consistent operations are
+guaranteed to happen in order. This is the standard mode for working
+with atomic types and is equivalent to Java's <code>volatile</code>.</li>
+</ul>
+</div><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.copy.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::copy'>copy</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Copies <code>count * size_of::&lt;T&gt;()</code> bytes from <code>src</code> to <code>dst</code>. The source
+and destination may overlap.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.copy_nonoverlapping.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::copy_nonoverlapping'>copy_nonoverlapping</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Copies <code>count * size_of::&lt;T&gt;()</code> bytes from <code>src</code> to <code>dst</code>. The source
+and destination must <em>not</em> overlap.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.drop_in_place.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::drop_in_place'>drop_in_place</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Executes the destructor (if any) of the pointed-to value.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.transmute.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::transmute'>transmute</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Reinterprets the bits of a value of one type as another type.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.write_bytes.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::write_bytes'>write_bytes</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Sets <code>count * size_of::&lt;T&gt;()</code> bytes of memory starting at <code>dst</code> to
+<code>val</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.abort.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::abort'>abort</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Aborts the execution of the process.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.add_with_overflow.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::add_with_overflow'>add_with_overflow</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Performs checked integer addition.
+The stabilized versions of this intrinsic are available on the integer
+primitives via the <code>overflowing_add</code> method. For example,
+<a href="../../std/primitive.u32.html#method.overflowing_add"><code>std::u32::overflowing_add</code></a></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.arith_offset.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::arith_offset'>arith_offset</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Calculates the offset from a pointer, potentially wrapping.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.assume.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::assume'>assume</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Informs the optimizer that a condition is always true.
+If the condition is false, the behavior is undefined.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_and.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_and'>atomic_and</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise and with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_and</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_and"><code>AtomicBool::fetch_and</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_and_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_and_acq'>atomic_and_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise and with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_and</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_and"><code>AtomicBool::fetch_and</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_and_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_and_acqrel'>atomic_and_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise and with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_and</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_and"><code>AtomicBool::fetch_and</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_and_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_and_rel'>atomic_and_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise and with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_and</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Release</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_and"><code>AtomicBool::fetch_and</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_and_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_and_relaxed'>atomic_and_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise and with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_and</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_and"><code>AtomicBool::fetch_and</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchg.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchg'>atomic_cxchg</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as both the <code>success</code> and <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange"><code>AtomicBool::compare_exchange</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchg_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchg_acq'>atomic_cxchg_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as both the <code>success</code> and <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange"><code>AtomicBool::compare_exchange</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchg_acq_failrelaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchg_acq_failrelaxed'>atomic_cxchg_acq_failrelaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange"><code>AtomicBool::compare_exchange</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchg_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchg_acqrel'>atomic_cxchg_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange"><code>AtomicBool::compare_exchange</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchg_acqrel_failrelaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchg_acqrel_failrelaxed'>atomic_cxchg_acqrel_failrelaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange"><code>AtomicBool::compare_exchange</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchg_failacq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchg_failacq'>atomic_cxchg_failacq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange"><code>AtomicBool::compare_exchange</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchg_failrelaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchg_failrelaxed'>atomic_cxchg_failrelaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange"><code>AtomicBool::compare_exchange</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchg_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchg_rel'>atomic_cxchg_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Release</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange"><code>AtomicBool::compare_exchange</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchg_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchg_relaxed'>atomic_cxchg_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as both the <code>success</code> and <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange"><code>AtomicBool::compare_exchange</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchgweak.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchgweak'>atomic_cxchgweak</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange_weak</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as both the <code>success</code> and <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange_weak"><code>AtomicBool::compare_exchange_weak</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchgweak_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchgweak_acq'>atomic_cxchgweak_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange_weak</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as both the <code>success</code> and <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange_weak"><code>AtomicBool::compare_exchange_weak</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchgweak_acq_failrelaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchgweak_acq_failrelaxed'>atomic_cxchgweak_acq_failrelaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange_weak</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange_weak"><code>AtomicBool::compare_exchange_weak</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchgweak_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchgweak_acqrel'>atomic_cxchgweak_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange_weak</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange_weak"><code>AtomicBool::compare_exchange_weak</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchgweak_acqrel_failrelaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchgweak_acqrel_failrelaxed'>atomic_cxchgweak_acqrel_failrelaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange_weak</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange_weak"><code>AtomicBool::compare_exchange_weak</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchgweak_failacq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchgweak_failacq'>atomic_cxchgweak_failacq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange_weak</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange_weak"><code>AtomicBool::compare_exchange_weak</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchgweak_failrelaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchgweak_failrelaxed'>atomic_cxchgweak_failrelaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange_weak</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange_weak"><code>AtomicBool::compare_exchange_weak</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchgweak_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchgweak_rel'>atomic_cxchgweak_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange_weak</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Release</code></a>
+as the <code>success</code> and
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange_weak"><code>AtomicBool::compare_exchange_weak</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_cxchgweak_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_cxchgweak_relaxed'>atomic_cxchgweak_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores a value if the current value is the same as the <code>old</code> value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>compare_exchange_weak</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as both the <code>success</code> and <code>failure</code> parameters. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.compare_exchange_weak"><code>AtomicBool::compare_exchange_weak</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_fence.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_fence'>atomic_fence</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_fence_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_fence_acq'>atomic_fence_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_fence_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_fence_acqrel'>atomic_fence_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_fence_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_fence_rel'>atomic_fence_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_load.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_load'>atomic_load</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Loads the current value of the pointer.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>load</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.load"><code>AtomicBool::load</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_load_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_load_acq'>atomic_load_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Loads the current value of the pointer.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>load</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.load"><code>AtomicBool::load</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_load_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_load_relaxed'>atomic_load_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Loads the current value of the pointer.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>load</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.load"><code>AtomicBool::load</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_load_unordered.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_load_unordered'>atomic_load_unordered</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_max.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_max'>atomic_max</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_max_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_max_acq'>atomic_max_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_max_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_max_acqrel'>atomic_max_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_max_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_max_rel'>atomic_max_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_max_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_max_relaxed'>atomic_max_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_min.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_min'>atomic_min</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_min_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_min_acq'>atomic_min_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_min_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_min_acqrel'>atomic_min_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_min_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_min_rel'>atomic_min_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_min_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_min_relaxed'>atomic_min_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_nand.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_nand'>atomic_nand</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise nand with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic::AtomicBool</code> type via the <code>fetch_nand</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_nand"><code>AtomicBool::fetch_nand</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_nand_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_nand_acq'>atomic_nand_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise nand with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic::AtomicBool</code> type via the <code>fetch_nand</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_nand"><code>AtomicBool::fetch_nand</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_nand_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_nand_acqrel'>atomic_nand_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise nand with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic::AtomicBool</code> type via the <code>fetch_nand</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_nand"><code>AtomicBool::fetch_nand</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_nand_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_nand_rel'>atomic_nand_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise nand with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic::AtomicBool</code> type via the <code>fetch_nand</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Release</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_nand"><code>AtomicBool::fetch_nand</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_nand_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_nand_relaxed'>atomic_nand_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise nand with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic::AtomicBool</code> type via the <code>fetch_nand</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_nand"><code>AtomicBool::fetch_nand</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_or.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_or'>atomic_or</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise or with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_or</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_or"><code>AtomicBool::fetch_or</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_or_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_or_acq'>atomic_or_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise or with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_or</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_or"><code>AtomicBool::fetch_or</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_or_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_or_acqrel'>atomic_or_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise or with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_or</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_or"><code>AtomicBool::fetch_or</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_or_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_or_rel'>atomic_or_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise or with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_or</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Release</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_or"><code>AtomicBool::fetch_or</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_or_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_or_relaxed'>atomic_or_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise or with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_or</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_or"><code>AtomicBool::fetch_or</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_singlethreadfence.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_singlethreadfence'>atomic_singlethreadfence</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>A compiler-only memory barrier.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_singlethreadfence_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_singlethreadfence_acq'>atomic_singlethreadfence_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_singlethreadfence_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_singlethreadfence_acqrel'>atomic_singlethreadfence_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_singlethreadfence_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_singlethreadfence_rel'>atomic_singlethreadfence_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_store.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_store'>atomic_store</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores the value at the specified memory location.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>store</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.store"><code>AtomicBool::store</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_store_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_store_rel'>atomic_store_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores the value at the specified memory location.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>store</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Release</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.store"><code>AtomicBool::store</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_store_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_store_relaxed'>atomic_store_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores the value at the specified memory location.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>store</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.store"><code>AtomicBool::store</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_store_unordered.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_store_unordered'>atomic_store_unordered</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_umax.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_umax'>atomic_umax</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_umax_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_umax_acq'>atomic_umax_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_umax_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_umax_acqrel'>atomic_umax_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_umax_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_umax_rel'>atomic_umax_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_umax_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_umax_relaxed'>atomic_umax_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_umin.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_umin'>atomic_umin</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_umin_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_umin_acq'>atomic_umin_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_umin_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_umin_acqrel'>atomic_umin_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_umin_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_umin_rel'>atomic_umin_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_umin_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_umin_relaxed'>atomic_umin_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xadd.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xadd'>atomic_xadd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Add to the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_add</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicIsize.html#method.fetch_add"><code>AtomicIsize::fetch_add</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xadd_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xadd_acq'>atomic_xadd_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Add to the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_add</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicIsize.html#method.fetch_add"><code>AtomicIsize::fetch_add</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xadd_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xadd_acqrel'>atomic_xadd_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Add to the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_add</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicIsize.html#method.fetch_add"><code>AtomicIsize::fetch_add</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xadd_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xadd_rel'>atomic_xadd_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Add to the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_add</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Release</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicIsize.html#method.fetch_add"><code>AtomicIsize::fetch_add</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xadd_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xadd_relaxed'>atomic_xadd_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Add to the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_add</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicIsize.html#method.fetch_add"><code>AtomicIsize::fetch_add</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xchg.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xchg'>atomic_xchg</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores the value at the specified memory location, returning the old value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>swap</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.swap"><code>AtomicBool::swap</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xchg_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xchg_acq'>atomic_xchg_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores the value at the specified memory location, returning the old value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>swap</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.swap"><code>AtomicBool::swap</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xchg_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xchg_acqrel'>atomic_xchg_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores the value at the specified memory location, returning the old value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>swap</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.swap"><code>AtomicBool::swap</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xchg_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xchg_rel'>atomic_xchg_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores the value at the specified memory location, returning the old value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>swap</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Release</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.swap"><code>AtomicBool::swap</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xchg_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xchg_relaxed'>atomic_xchg_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Stores the value at the specified memory location, returning the old value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>swap</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.swap"><code>AtomicBool::swap</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xor.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xor'>atomic_xor</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise xor with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_xor</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_xor"><code>AtomicBool::fetch_xor</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xor_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xor_acq'>atomic_xor_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise xor with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_xor</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_xor"><code>AtomicBool::fetch_xor</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xor_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xor_acqrel'>atomic_xor_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise xor with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_xor</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_xor"><code>AtomicBool::fetch_xor</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xor_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xor_rel'>atomic_xor_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise xor with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_xor</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Release</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_xor"><code>AtomicBool::fetch_xor</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xor_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xor_relaxed'>atomic_xor_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Bitwise xor with the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_xor</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicBool.html#method.fetch_xor"><code>AtomicBool::fetch_xor</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xsub.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xsub'>atomic_xsub</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Subtract from the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_sub</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::SeqCst</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicIsize.html#method.fetch_sub"><code>AtomicIsize::fetch_sub</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xsub_acq.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xsub_acq'>atomic_xsub_acq</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Subtract from the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_sub</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Acquire</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicIsize.html#method.fetch_sub"><code>AtomicIsize::fetch_sub</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xsub_acqrel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xsub_acqrel'>atomic_xsub_acqrel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Subtract from the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_sub</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::AcqRel</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicIsize.html#method.fetch_sub"><code>AtomicIsize::fetch_sub</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xsub_rel.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xsub_rel'>atomic_xsub_rel</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Subtract from the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_sub</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Release</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicIsize.html#method.fetch_sub"><code>AtomicIsize::fetch_sub</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.atomic_xsub_relaxed.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::atomic_xsub_relaxed'>atomic_xsub_relaxed</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Subtract from the current value, returning the previous value.
+The stabilized version of this intrinsic is available on the
+<code>std::sync::atomic</code> types via the <code>fetch_sub</code> method by passing
+<a href="../../std/sync/atomic/enum.Ordering.html"><code>Ordering::Relaxed</code></a>
+as the <code>order</code>. For example,
+<a href="../../std/sync/atomic/struct.AtomicIsize.html#method.fetch_sub"><code>AtomicIsize::fetch_sub</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.bitreverse.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::bitreverse'>bitreverse</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Reverses the bits in an integer type <code>T</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.breakpoint.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::breakpoint'>breakpoint</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Executes a breakpoint trap, for inspection by a debugger.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.bswap.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::bswap'>bswap</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Reverses the bytes in an integer type <code>T</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.ceilf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::ceilf32'>ceilf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the smallest integer greater than or equal to an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.ceilf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::ceilf64'>ceilf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the smallest integer greater than or equal to an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.copysignf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::copysignf32'>copysignf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Copies the sign from <code>y</code> to <code>x</code> for <code>f32</code> values.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.copysignf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::copysignf64'>copysignf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Copies the sign from <code>y</code> to <code>x</code> for <code>f64</code> values.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.cosf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::cosf32'>cosf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the cosine of an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.cosf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::cosf64'>cosf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the cosine of an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.ctlz.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::ctlz'>ctlz</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the number of leading unset bits (zeroes) in an integer type <code>T</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.ctlz_nonzero.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::ctlz_nonzero'>ctlz_nonzero</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Like <code>ctlz</code>, but extra-unsafe as it returns <code>undef</code> when
+given an <code>x</code> with value <code>0</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.ctpop.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::ctpop'>ctpop</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the number of bits set in an integer type <code>T</code></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.cttz.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::cttz'>cttz</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the number of trailing unset bits (zeroes) in an integer type <code>T</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.cttz_nonzero.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::cttz_nonzero'>cttz_nonzero</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Like <code>cttz</code>, but extra-unsafe as it returns <code>undef</code> when
+given an <code>x</code> with value <code>0</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.discriminant_value.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::discriminant_value'>discriminant_value</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the value of the discriminant for the variant in 'v',
+cast to a <code>u64</code>; if <code>T</code> has no discriminant, returns 0.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.exact_div.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::exact_div'>exact_div</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Performs an exact division, resulting in undefined behavior where
+<code>x % y != 0</code> or <code>y == 0</code> or <code>x == T::min_value() &amp;&amp; y == -1</code></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.exp2f32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::exp2f32'>exp2f32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns 2 raised to the power of an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.exp2f64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::exp2f64'>exp2f64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns 2 raised to the power of an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.expf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::expf32'>expf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the exponential of an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.expf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::expf64'>expf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the exponential of an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.fabsf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::fabsf32'>fabsf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the absolute value of an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.fabsf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::fabsf64'>fabsf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the absolute value of an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.fadd_fast.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::fadd_fast'>fadd_fast</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Float addition that allows optimizations based on algebraic rules.
+May assume inputs are finite.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.fdiv_fast.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::fdiv_fast'>fdiv_fast</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Float division that allows optimizations based on algebraic rules.
+May assume inputs are finite.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.floorf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::floorf32'>floorf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the largest integer less than or equal to an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.floorf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::floorf64'>floorf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the largest integer less than or equal to an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.fmaf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::fmaf32'>fmaf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns <code>a * b + c</code> for <code>f32</code> values.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.fmaf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::fmaf64'>fmaf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns <code>a * b + c</code> for <code>f64</code> values.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.fmul_fast.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::fmul_fast'>fmul_fast</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Float multiplication that allows optimizations based on algebraic rules.
+May assume inputs are finite.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.frem_fast.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::frem_fast'>frem_fast</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Float remainder that allows optimizations based on algebraic rules.
+May assume inputs are finite.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.fsub_fast.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::fsub_fast'>fsub_fast</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Float subtraction that allows optimizations based on algebraic rules.
+May assume inputs are finite.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.init.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::init'>init</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Creates a value initialized to zero.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.likely.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::likely'>likely</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Hints to the compiler that branch condition is likely to be true.
+Returns the value passed to it.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.log10f32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::log10f32'>log10f32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the base 10 logarithm of an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.log10f64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::log10f64'>log10f64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the base 10 logarithm of an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.log2f32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::log2f32'>log2f32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the base 2 logarithm of an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.log2f64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::log2f64'>log2f64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the base 2 logarithm of an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.logf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::logf32'>logf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the natural logarithm of an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.logf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::logf64'>logf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the natural logarithm of an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.min_align_of.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::min_align_of'>min_align_of</a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.min_align_of_val.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::min_align_of_val'>min_align_of_val</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.move_val_init.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::move_val_init'>move_val_init</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Moves a value to an uninitialized memory location.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.mul_with_overflow.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::mul_with_overflow'>mul_with_overflow</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Performs checked integer multiplication
+The stabilized versions of this intrinsic are available on the integer
+primitives via the <code>overflowing_mul</code> method. For example,
+<a href="../../std/primitive.u32.html#method.overflowing_mul"><code>std::u32::overflowing_mul</code></a></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.nearbyintf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::nearbyintf32'>nearbyintf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the nearest integer to an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.nearbyintf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::nearbyintf64'>nearbyintf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the nearest integer to an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.needs_drop.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::needs_drop'>needs_drop</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns <code>true</code> if the actual type given as <code>T</code> requires drop
+glue; returns <code>false</code> if the actual type provided for <code>T</code>
+implements <code>Copy</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.nontemporal_store.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::nontemporal_store'>nontemporal_store</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Emits a <code>!nontemporal</code> store according to LLVM (see their docs).
+Probably will never become stable.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.offset.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::offset'>offset</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Calculates the offset from a pointer.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.overflowing_add.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::overflowing_add'>overflowing_add</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns (a + b) mod 2<sup>N</sup>, where N is the width of T in bits.
+The stabilized versions of this intrinsic are available on the integer
+primitives via the <code>wrapping_add</code> method. For example,
+<a href="../../std/primitive.u32.html#method.wrapping_add"><code>std::u32::wrapping_add</code></a></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.overflowing_mul.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::overflowing_mul'>overflowing_mul</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns (a * b) mod 2<sup>N</sup>, where N is the width of T in bits.
+The stabilized versions of this intrinsic are available on the integer
+primitives via the <code>wrapping_mul</code> method. For example,
+<a href="../../std/primitive.u32.html#method.wrapping_mul"><code>std::u32::wrapping_mul</code></a></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.overflowing_sub.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::overflowing_sub'>overflowing_sub</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns (a - b) mod 2<sup>N</sup>, where N is the width of T in bits.
+The stabilized versions of this intrinsic are available on the integer
+primitives via the <code>wrapping_sub</code> method. For example,
+<a href="../../std/primitive.u32.html#method.wrapping_sub"><code>std::u32::wrapping_sub</code></a></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.powf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::powf32'>powf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Raises an <code>f32</code> to an <code>f32</code> power.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.powf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::powf64'>powf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Raises an <code>f64</code> to an <code>f64</code> power.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.powif32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::powif32'>powif32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Raises an <code>f32</code> to an integer power.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.powif64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::powif64'>powif64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Raises an <code>f64</code> to an integer power.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.pref_align_of.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::pref_align_of'>pref_align_of</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] 
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.prefetch_read_data.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::prefetch_read_data'>prefetch_read_data</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>The <code>prefetch</code> intrinsic is a hint to the code generator to insert a prefetch instruction
+if supported; otherwise, it is a noop.
+Prefetches have no effect on the behavior of the program but can change its performance
+characteristics.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.prefetch_read_instruction.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::prefetch_read_instruction'>prefetch_read_instruction</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>The <code>prefetch</code> intrinsic is a hint to the code generator to insert a prefetch instruction
+if supported; otherwise, it is a noop.
+Prefetches have no effect on the behavior of the program but can change its performance
+characteristics.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.prefetch_write_data.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::prefetch_write_data'>prefetch_write_data</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>The <code>prefetch</code> intrinsic is a hint to the code generator to insert a prefetch instruction
+if supported; otherwise, it is a noop.
+Prefetches have no effect on the behavior of the program but can change its performance
+characteristics.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.prefetch_write_instruction.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::prefetch_write_instruction'>prefetch_write_instruction</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>The <code>prefetch</code> intrinsic is a hint to the code generator to insert a prefetch instruction
+if supported; otherwise, it is a noop.
+Prefetches have no effect on the behavior of the program but can change its performance
+characteristics.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.rintf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::rintf32'>rintf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the nearest integer to an <code>f32</code>. May raise an inexact floating-point exception
+if the argument is not an integer.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.rintf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::rintf64'>rintf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the nearest integer to an <code>f64</code>. May raise an inexact floating-point exception
+if the argument is not an integer.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.roundf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::roundf32'>roundf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the nearest integer to an <code>f32</code>. Rounds half-way cases away from zero.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.roundf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::roundf64'>roundf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the nearest integer to an <code>f64</code>. Rounds half-way cases away from zero.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.rustc_peek.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::rustc_peek'>rustc_peek</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Magic intrinsic that derives its meaning from attributes
+attached to the function.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.sinf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::sinf32'>sinf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the sine of an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.sinf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::sinf64'>sinf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the sine of an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.size_of.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::size_of'>size_of</a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>The size of a type in bytes.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.size_of_val.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::size_of_val'>size_of_val</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>The size of the referenced value in bytes.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.sqrtf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::sqrtf32'>sqrtf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the square root of an <code>f32</code></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.sqrtf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::sqrtf64'>sqrtf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the square root of an <code>f64</code></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.sub_with_overflow.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::sub_with_overflow'>sub_with_overflow</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Performs checked integer subtraction
+The stabilized versions of this intrinsic are available on the integer
+primitives via the <code>overflowing_sub</code> method. For example,
+<a href="../../std/primitive.u32.html#method.overflowing_sub"><code>std::u32::overflowing_sub</code></a></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.truncf32.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::truncf32'>truncf32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the integer part of an <code>f32</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.truncf64.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::truncf64'>truncf64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the integer part of an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.try.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::try'>try</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Rust's &quot;try catch&quot; construct which invokes the function pointer <code>f</code> with
+the data pointer <code>data</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.type_id.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::type_id'>type_id</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Gets an identifier which is globally unique to the specified type. This
+function will return the same value for a type regardless of whichever
+crate it is invoked in.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.type_name.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::type_name'>type_name</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Gets a static string slice containing the name of a type.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.unaligned_volatile_load.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::unaligned_volatile_load'>unaligned_volatile_load</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Perform a volatile load from the <code>src</code> pointer
+The pointer is not required to be aligned.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.unaligned_volatile_store.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::unaligned_volatile_store'>unaligned_volatile_store</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Perform a volatile store to the <code>dst</code> pointer.
+The pointer is not required to be aligned.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.unchecked_div.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::unchecked_div'>unchecked_div</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Performs an unchecked division, resulting in undefined behavior
+where y = 0 or x = <code>T::min_value()</code> and y = -1</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.unchecked_rem.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::unchecked_rem'>unchecked_rem</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Returns the remainder of an unchecked division, resulting in
+undefined behavior where y = 0 or x = <code>T::min_value()</code> and y = -1</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.unchecked_shl.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::unchecked_shl'>unchecked_shl</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Performs an unchecked left shift, resulting in undefined behavior when
+y &lt; 0 or y &gt;= N, where N is the width of T in bits.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.unchecked_shr.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::unchecked_shr'>unchecked_shr</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Performs an unchecked right shift, resulting in undefined behavior when
+y &lt; 0 or y &gt;= N, where N is the width of T in bits.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.uninit.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::uninit'>uninit</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Creates an uninitialized value.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.unlikely.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::unlikely'>unlikely</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Hints to the compiler that branch condition is likely to be false.
+Returns the value passed to it.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.unreachable.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::unreachable'>unreachable</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Tells LLVM that this point in the code is not reachable, enabling
+further optimizations.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.volatile_copy_memory.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::volatile_copy_memory'>volatile_copy_memory</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Equivalent to the appropriate <code>llvm.memmove.p0i8.0i8.*</code> intrinsic, with
+a size of <code>count</code> * <code>size_of::&lt;T&gt;()</code> and an alignment of
+<code>min_align_of::&lt;T&gt;()</code></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.volatile_copy_nonoverlapping_memory.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::volatile_copy_nonoverlapping_memory'>volatile_copy_nonoverlapping_memory</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Equivalent to the appropriate <code>llvm.memcpy.p0i8.0i8.*</code> intrinsic, with
+a size of <code>count</code> * <code>size_of::&lt;T&gt;()</code> and an alignment of
+<code>min_align_of::&lt;T&gt;()</code></p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.volatile_load.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::volatile_load'>volatile_load</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Perform a volatile load from the <code>src</code> pointer.
+The stabilized version of this intrinsic is
+<a href="../../std/ptr/fn.read_volatile.html"><code>std::ptr::read_volatile</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.volatile_set_memory.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::volatile_set_memory'>volatile_set_memory</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Equivalent to the appropriate <code>llvm.memset.p0i8.*</code> intrinsic, with a
+size of <code>count</code> * <code>size_of::&lt;T&gt;()</code> and an alignment of
+<code>min_align_of::&lt;T&gt;()</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn.volatile_store.html"
+                                  title='fn argmin::prelude::failure::_core::intrinsics::volatile_store'>volatile_store</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] <p>Perform a volatile store to the <code>dst</code> pointer.
+The stabilized version of this intrinsic is
+<a href="../../std/ptr/fn.write_volatile.html"><code>std::ptr::write_volatile</code></a>.</p>
+
+                           </td>
+                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../";window.currentCrate = "argmin";</script><script src="../../../../../aliases.js"></script><script src="../../../../../main.js"></script><script defer src="../../../../../search-index.js"></script></body></html>

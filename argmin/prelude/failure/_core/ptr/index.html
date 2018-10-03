@@ -1,0 +1,156 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `ptr` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, ptr"><title>argmin::prelude::failure::_core::ptr - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module ptr</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'ptr', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.0.0'>1.0.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#177' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>ptr</a></span></h1><div class='docblock'><p>Manually manage memory through raw pointers.</p>
+<p><em><a href="../../std/primitive.pointer.html">See also the pointer primitive types</a>.</em></p>
+<h1 id="safety" class="section-header"><a href="#safety">Safety</a></h1>
+<p>Many functions in this module take raw pointers as arguments and read from
+or write to them. For this to be safe, these pointers must be <em>valid</em>.
+Whether a pointer is valid depends on the operation it is used for
+(read or write), and the extent of the memory that is accessed (i.e.,
+how many bytes are read/written). Most functions use <code>*mut T</code> and <code>*const T</code>
+to access only a single value, in which case the documentation omits the size
+and implicitly assumes it to be <code>size_of::&lt;T&gt;()</code> bytes.</p>
+<p>The precise rules for validity are not determined yet.  The guarantees that are
+provided at this point are very minimal:</p>
+<ul>
+<li>A <a href="./fn.null.html">null</a> pointer is <em>never</em> valid, not even for accesses of <a href="../../nomicon/exotic-sizes.html#zero-sized-types-zsts">size zero</a>.</li>
+<li>All pointers (except for the null pointer) are valid for all operations of
+<a href="../../nomicon/exotic-sizes.html#zero-sized-types-zsts">size zero</a>.</li>
+<li>All accesses performed by functions in this module are <em>non-atomic</em> in the sense
+of <a href="../../std/sync/atomic/index.html">atomic operations</a> used to synchronize between threads. This means it is
+undefined behavior to perform two concurrent accesses to the same location from different
+threads unless both accesses only read from memory. Notice that this explicitly
+includes <a href="./fn.read_volatile.html"><code>read_volatile</code></a> and <a href="./fn.write_volatile.html"><code>write_volatile</code></a>: Volatile accesses cannot
+be used for inter-thread synchronization.</li>
+<li>The result of casting a reference to a pointer is valid for as long as the
+underlying object is live and no reference (just raw pointers) is used to
+access the same memory.</li>
+</ul>
+<p>These axioms, along with careful use of <a href="../../std/primitive.pointer.html#method.offset"><code>offset</code></a> for pointer arithmentic,
+are enough to correctly implement many useful things in unsafe code. Stronger guarantees
+will be provided eventually, as the <a href="../../nomicon/aliasing.html">aliasing</a> rules are being determined. For more
+information, see the <a href="../../book/second-edition/ch19-01-unsafe-rust.html#dereferencing-a-raw-pointer">book</a> as well as the section in the reference devoted
+to <a href="../../reference/behavior-considered-undefined.html">undefined behavior</a>.</p>
+<h2 id="alignment" class="section-header"><a href="#alignment">Alignment</a></h2>
+<p>Valid raw pointers as defined above are not necessarily properly aligned (where
+&quot;proper&quot; alignment is defined by the pointee type, i.e., <code>*const T</code> must be
+aligned to <code>mem::align_of::&lt;T&gt;()</code>). However, most functions require their
+arguments to be properly aligned, and will explicitly state
+this requirement in their documentation. Notable exceptions to this are
+<a href="./fn.read_unaligned.html"><code>read_unaligned</code></a> and <a href="./fn.write_unaligned.html"><code>write_unaligned</code></a>.</p>
+<p>When a function requires proper alignment, it does so even if the access
+has size 0, i.e., even if memory is not actually touched. Consider using
+<a href="./struct.NonNull.html#method.dangling"><code>NonNull::dangling</code></a> in such cases.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.NonNull.html"
+                                  title='struct argmin::prelude::failure::_core::ptr::NonNull'>NonNull</a></td>
+                           <td class='docblock-short'>
+                                <p><code>*mut T</code> but non-zero and covariant.</p>
+
+                           </td>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.eq.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::eq'>eq</a></td>
+                           <td class='docblock-short'>
+                                <p>Compare raw pointers for equality.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.null.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::null'>null</a></td>
+                           <td class='docblock-short'>
+                                <p>Creates a null raw pointer.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.null_mut.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::null_mut'>null_mut</a></td>
+                           <td class='docblock-short'>
+                                <p>Creates a null mutable raw pointer.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.read.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::read'>read</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Reads the value from <code>src</code> without moving it. This leaves the
+memory in <code>src</code> unchanged.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.read_unaligned.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::read_unaligned'>read_unaligned</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Reads the value from <code>src</code> without moving it. This leaves the
+memory in <code>src</code> unchanged.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.read_volatile.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::read_volatile'>read_volatile</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Performs a volatile read of the value from <code>src</code> without moving it. This
+leaves the memory in <code>src</code> unchanged.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.replace.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::replace'>replace</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Moves <code>src</code> into the pointed <code>dst</code>, returning the previous <code>dst</code> value.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.swap.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::swap'>swap</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Swaps the values at two mutable locations of the same type, without
+deinitializing either.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.swap_nonoverlapping.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::swap_nonoverlapping'>swap_nonoverlapping</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Swaps <code>count * size_of::&lt;T&gt;()</code> bytes between the two regions of memory
+beginning at <code>x</code> and <code>y</code>. The two regions must <em>not</em> overlap.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.write.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::write'>write</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Overwrites a memory location with the given value without reading or
+dropping the old value.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.write_unaligned.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::write_unaligned'>write_unaligned</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Overwrites a memory location with the given value without reading or
+dropping the old value.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.write_volatile.html"
+                                  title='fn argmin::prelude::failure::_core::ptr::write_volatile'>write_volatile</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                                <p>Performs a volatile write of a memory location with the given value without
+reading or dropping the old value.</p>
+
+                           </td>
+                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../";window.currentCrate = "argmin";</script><script src="../../../../../aliases.js"></script><script src="../../../../../main.js"></script><script defer src="../../../../../search-index.js"></script></body></html>

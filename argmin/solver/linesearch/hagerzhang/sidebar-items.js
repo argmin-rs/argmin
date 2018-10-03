@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["HagerZhangLineSearch","Hager-Zhang Line Search"]]});

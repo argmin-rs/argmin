@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["memchr","Return the first index matching the byte `x` in `text`."],["memrchr","Return the last index matching the byte `x` in `text`."]]});
