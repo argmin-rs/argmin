@@ -13,7 +13,7 @@ cd .doc_tmp
 git init
 
 # add remote
-git remote add origin git@github.com:stefan-k/argmin-rs.git
+git remote add origin git@github.com:argmin-rs/argmin.git
 
 # checkout gh-pages
 git checkout -b gh-pages
