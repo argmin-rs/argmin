@@ -1,6 +1,6 @@
 [package]
 name = "argmin"
-version = "0.0.0"
+version = "0.1.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "WIP optimization toolbox for Rust"
@@ -17,10 +17,13 @@ exclude = [
 ]
 
 [dependencies]
-argmin_core = { path = "../argmin-core" }
-argmin_derive = { path = "../argmin-derive" }
-argmin_testfunctions = { path = "../argmin-testfunctions" }
-rand = "*"
+# argmin_core = { path = "../argmin-core" }
+# argmin_codegen = { path = "../argmin-codegen" }
+# argmin_testfunctions = { path = "../argmin-testfunctions" }
+argmin_core = "0.1.0"
+argmin_codegen = "0.1.0"
+argmin_testfunctions = "0.1.0"
+rand = "0.5.5"
 
 
 [features]

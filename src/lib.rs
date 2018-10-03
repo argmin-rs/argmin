@@ -17,7 +17,7 @@
 #[macro_use]
 extern crate argmin_core;
 #[macro_use]
-extern crate argmin_derive;
+extern crate argmin_codegen;
 extern crate argmin_testfunctions;
 extern crate rand;
 
