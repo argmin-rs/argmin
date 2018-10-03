@@ -9,12 +9,12 @@ The [Documentation](https://stefan-k.github.io/argmin-rs/argmin/) is also still 
 
 ## Algorithms
 
-- [X] Backtracking line search
+- Linesearches
+  - [X] Backtracking line search
+  - [X] More-Thuente line search
+  - [X] Hager-Zhang line search
+- [X] Steepest Descent
 - [X] Conjugate Gradient method
-- [X] Gradient Descent
-- [X] Landweber algorithm
-- [X] Nelder-Mead method
-- [X] Newton Method
 - [X] Simulated Annealing
 
 
