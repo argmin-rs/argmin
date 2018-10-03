@@ -25,9 +25,6 @@ use prelude::*;
 use std;
 
 /// Hager-Zhang Line Search
-///
-/// Parameters for interval:
-///   a_x, a_f, a_g, b_x, b_f, b_g
 #[derive(ArgminSolver)]
 #[stop("self.best_f - self.finit < self.delta * self.best_x * self.dginit" => LineSearchConditionMet)]
 #[stop("self.best_g > self.sigma * self.dginit" => LineSearchConditionMet)]
@@ -57,18 +54,24 @@ where
     gamma: f64,
     /// eta: (0, infinity), used in the lower bound for beta_k^N
     eta: f64,
+    /// initial a
+    a_x_init: f64,
     /// a
     a_x: f64,
     /// phi(a)
     a_f: f64,
     /// phi'(a)
     a_g: f64,
+    /// initial b
+    b_x_init: f64,
     /// b
     b_x: f64,
     /// phi(b)
     b_f: f64,
     /// phi'(b)
     b_g: f64,
+    /// initial c
+    c_x_init: f64,
     /// c
     c_x: f64,
     /// phi(c)
@@ -128,13 +131,16 @@ where
             theta: 0.5,
             gamma: 0.66,
             eta: 0.01,
-            a_x: 0.0,
+            a_x_init: 0.0,
+            a_x: std::f64::NAN,
             a_f: std::f64::NAN,
             a_g: std::f64::NAN,
-            b_x: 100.0,
+            b_x_init: 100.0,
+            b_x: std::f64::NAN,
             b_f: std::f64::NAN,
             b_g: std::f64::NAN,
-            c_x: 1.0,
+            c_x_init: 1.0,
+            c_x: std::f64::NAN,
             c_f: std::f64::NAN,
             c_g: std::f64::NAN,
             best_x: 0.0,
@@ -252,6 +258,30 @@ where
             .into());
         }
         self.eta = eta;
+        Ok(self)
+    }
+
+    /// set alpha limits
+    pub fn set_alpha_min_max(
+        &mut self,
+        alpha_min: f64,
+        alpha_max: f64,
+    ) -> Result<&mut Self, Error> {
+        if alpha_min < 0.0 {
+            return Err(ArgminError::InvalidParameter {
+                parameter: "HagerZhangLineSearch: alpha_min must be >= 0.0.".to_string(),
+            }
+            .into());
+        }
+        if alpha_max <= alpha_min {
+            return Err(ArgminError::InvalidParameter {
+                parameter: "HagerZhangLineSearch: alpha_min must be smaller than alpha_max."
+                    .to_string(),
+            }
+            .into());
+        }
+        self.a_x_init = alpha_min;
+        self.b_x_init = alpha_max;
         Ok(self)
     }
 
@@ -439,7 +469,7 @@ where
 
     /// Set initial alpha value
     fn set_initial_alpha(&mut self, alpha: f64) -> Result<(), Error> {
-        self.c_x = alpha;
+        self.c_x_init = alpha;
         Ok(())
     }
 }
@@ -485,9 +515,9 @@ where
             "HagerZhangLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
 
-        self.a_x = 0.0;
-        self.b_x = 100.0;
-        self.c_x = 1.0;
+        self.a_x = self.a_x_init;
+        self.b_x = self.b_x_init;
+        self.c_x = self.c_x_init;
 
         let at = self.a_x;
         self.a_f = self.calc(at)?;
@@ -547,14 +577,11 @@ where
         self.b_f = bt_f;
         self.b_g = bt_g;
 
-        // println!("fuck {} {} {} {} {} {}", at_x, at_f, at_g, bt_x, bt_f, bt_g);
-
         self.set_best();
         let new_param = self
             .init_param
             .scaled_add(self.best_x, self.search_direction.clone());
         let out = ArgminIterationData::new(new_param, self.best_f);
         Ok(out)
-        // unimplemented!()
     }
 }
