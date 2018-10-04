@@ -5,8 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-pub mod conjugategradient;
-pub mod gradientdescent;
-pub mod linesearch;
-pub mod simulatedannealing;
-pub mod trustregion;
+//! Argmin Trust region methods
+
+/// Cauchy Point
+pub mod cauchypoint;
+
+pub use self::cauchypoint::*;
