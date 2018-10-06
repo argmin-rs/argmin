@@ -7,7 +7,7 @@
 
 //! # More-Thuente line search algorithm
 //!
-//! TODO: Proper documentation.
+//! TODO: Proper documentation. Apparently it is missing stopping criteria!
 //!
 //! This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
 //! http://www.cs.umd.edu/users/oleary/software/

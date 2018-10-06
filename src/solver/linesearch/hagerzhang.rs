@@ -7,6 +7,7 @@
 
 //! # Hager-Zang line search algorithm
 //!
+//! TODO: Not all stoping criteria implemented
 //!
 //! ## Reference
 //!
