@@ -9,5 +9,13 @@
 
 /// Cauchy Point
 pub mod cauchypoint;
+/// Trust region solver
+pub mod trustregion;
 
 pub use self::cauchypoint::*;
+pub use self::trustregion::*;
+
+/// Computes reduction ratio
+pub fn reduction_ratio(fxk: f64, fxkpk: f64, mk0: f64, mkpk: f64) -> f64 {
+    (fxk - fxkpk) / (mk0 - mkpk)
+}
