@@ -8,6 +8,7 @@
 //! # Argmin Steepest Descent
 
 use prelude::*;
+use solver::linesearch::HagerZhangLineSearch;
 use std;
 use std::default::Default;
 
@@ -15,9 +16,10 @@ use std::default::Default;
 
 /// Template
 #[derive(ArgminSolver)]
-pub struct SteepestDescent<T, H>
+pub struct SteepestDescent<'a, T, H>
 where
-    T: Clone
+    T: 'a
+        + Clone
         + Default
         + std::fmt::Debug
         + ArgminScale<f64>
@@ -26,17 +28,18 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    H: Clone + Default,
+    H: 'a + Clone + Default,
 {
     /// line search
-    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     /// Base stuff
     base: ArgminBase<T, f64, H>,
 }
 
-impl<T, H> SteepestDescent<T, H>
+impl<'a, T, H> SteepestDescent<'a, T, H>
 where
-    T: Clone
+    T: 'a
+        + Clone
         + Default
         + std::fmt::Debug
         + ArgminScale<f64>
@@ -45,24 +48,34 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    H: Clone + Default,
+    H: 'a + Clone + Default,
 {
     /// Constructor
     pub fn new(
         cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
         init_param: T,
-        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H>>,
     ) -> Result<Self, Error> {
+        let linesearch = HagerZhangLineSearch::new(cost_function.clone());
         Ok(SteepestDescent {
-            linesearch: linesearch,
+            linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),
         })
     }
+
+    /// Specify line search method
+    pub fn set_linesearch(
+        &mut self,
+        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+    ) -> &mut Self {
+        self.linesearch = linesearch;
+        self
+    }
 }
 
-impl<T, H> ArgminNextIter for SteepestDescent<T, H>
+impl<'a, T, H> ArgminNextIter for SteepestDescent<'a, T, H>
 where
-    T: Clone
+    T: 'a
+        + Clone
         + Default
         + std::fmt::Debug
         + ArgminScale<f64>
@@ -71,7 +84,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    H: Clone + Default,
+    H: 'a + Clone + Default,
 {
     type Parameters = T;
     type OperatorOutput = f64;
