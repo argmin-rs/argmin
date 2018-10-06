@@ -23,7 +23,7 @@ use std;
 /// Backtracking Line Search
 #[derive(ArgminSolver)]
 #[stop("self.eval_condition()" => LineSearchConditionMet)]
-pub struct BacktrackingLineSearch<T>
+pub struct BacktrackingLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -31,6 +31,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + std::default::Default,
 {
     /// initial parameter vector
     init_param: T,
@@ -47,10 +48,10 @@ where
     /// alpha
     alpha: f64,
     /// base
-    base: ArgminBase<T, f64>,
+    base: ArgminBase<T, f64, H>,
 }
 
-impl<T> BacktrackingLineSearch<T>
+impl<T, H> BacktrackingLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -58,7 +59,8 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    BacktrackingLineSearch<T>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    H: Clone + std::default::Default,
+    BacktrackingLineSearch<T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
     /// Constructor
     ///
@@ -66,7 +68,9 @@ where
     ///
     /// `cost_function`: cost function
     /// `rho`: todo
-    pub fn new(operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>) -> Self {
+    pub fn new(
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+    ) -> Self {
         // let cond = ArmijoCondition::new(0.0001).unwrap();
         // let cond = WolfeCondition::new(0.0001, 0.9).unwrap();
         let cond = StrongWolfeCondition::new(0.0001, 0.9).unwrap();
@@ -95,7 +99,8 @@ where
             return Err(ArgminError::InvalidParameter {
                 parameter: "BacktrackingLineSearch: Contraction factor rho must be in (0, 1)."
                     .to_string(),
-            }.into());
+            }
+            .into());
         }
         self.rho = rho;
         Ok(self)
@@ -119,7 +124,7 @@ where
     }
 }
 
-impl<T> ArgminLineSearch for BacktrackingLineSearch<T>
+impl<T, H> ArgminLineSearch for BacktrackingLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -127,7 +132,8 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    BacktrackingLineSearch<T>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    H: Clone + std::default::Default,
+    BacktrackingLineSearch<T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: T) {
@@ -145,7 +151,8 @@ where
         if alpha <= 0.0 {
             return Err(ArgminError::InvalidParameter {
                 parameter: "LineSearch: Inital alpha must be > 0.".to_string(),
-            }.into());
+            }
+            .into());
         }
         self.alpha = alpha;
         Ok(())
@@ -176,7 +183,7 @@ where
     }
 }
 
-impl<T> ArgminNextIter for BacktrackingLineSearch<T>
+impl<T, H> ArgminNextIter for BacktrackingLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -184,9 +191,11 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + std::default::Default,
 {
     type Parameters = T;
     type OperatorOutput = f64;
+    type Hessian = H;
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let new_param = self

@@ -26,7 +26,7 @@ use std::default::Default;
 
 /// Conjugate Gradient struct
 #[derive(ArgminSolver)]
-pub struct ConjugateGradient<T>
+pub struct ConjugateGradient<T, H>
 where
     T: Clone
         + Default
@@ -34,6 +34,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + Default,
 {
     /// residual
     r: T,
@@ -44,10 +45,10 @@ where
     /// beta
     beta: f64,
     /// base
-    base: ArgminBase<T, T>,
+    base: ArgminBase<T, T, H>,
 }
 
-impl<T> ConjugateGradient<T>
+impl<T, H> ConjugateGradient<T, H>
 where
     T: Clone
         + Default
@@ -55,6 +56,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + Default,
 {
     /// Constructor
     ///
@@ -63,7 +65,7 @@ where
     /// `cost_function`: cost function
     /// `init_param`: Initial parameter vector
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = T>>,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = H>>,
         b: T,
         init_param: T,
     ) -> Result<Self, Error> {
@@ -79,7 +81,7 @@ where
     }
 }
 
-impl<T> ArgminNextIter for ConjugateGradient<T>
+impl<T, H> ArgminNextIter for ConjugateGradient<T, H>
 where
     T: Clone
         + Default
@@ -87,9 +89,11 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + Default,
 {
     type Parameters = T;
     type OperatorOutput = T;
+    type Hessian = H;
 
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {

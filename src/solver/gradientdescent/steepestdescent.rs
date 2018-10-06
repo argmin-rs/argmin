@@ -15,7 +15,7 @@ use std::default::Default;
 
 /// Template
 #[derive(ArgminSolver)]
-pub struct SteepestDescent<T>
+pub struct SteepestDescent<T, H>
 where
     T: Clone
         + Default
@@ -26,14 +26,15 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + Default,
 {
     /// line search
-    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64>>,
+    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H>>,
     /// Base stuff
-    base: ArgminBase<T, f64>,
+    base: ArgminBase<T, f64, H>,
 }
 
-impl<T> SteepestDescent<T>
+impl<T, H> SteepestDescent<T, H>
 where
     T: Clone
         + Default
@@ -44,12 +45,13 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + Default,
 {
     /// Constructor
     pub fn new(
-        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>,
+        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
         init_param: T,
-        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64>>,
+        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H>>,
     ) -> Result<Self, Error> {
         Ok(SteepestDescent {
             linesearch: linesearch,
@@ -58,7 +60,7 @@ where
     }
 }
 
-impl<T> ArgminNextIter for SteepestDescent<T>
+impl<T, H> ArgminNextIter for SteepestDescent<T, H>
 where
     T: Clone
         + Default
@@ -69,9 +71,11 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + Default,
 {
     type Parameters = T;
     type OperatorOutput = f64;
+    type Hessian = H;
 
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {

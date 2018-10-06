@@ -58,9 +58,10 @@ pub enum SATempFunc {
 #[log("reanneal_fixed" => "self.reanneal_fixed")]
 #[log("reanneal_accepted" => "self.reanneal_accepted")]
 #[log("reanneal_best" => "self.reanneal_best")]
-pub struct SimulatedAnnealing<T>
+pub struct SimulatedAnnealing<T, H>
 where
     T: Clone + Default,
+    H: Clone + Default,
 {
     /// Initial temperature
     init_temp: f64,
@@ -96,12 +97,13 @@ where
     /// random number generator
     rng: rand::ThreadRng,
     /// base
-    base: ArgminBase<T, f64>,
+    base: ArgminBase<T, f64, H>,
 }
 
-impl<T> SimulatedAnnealing<T>
+impl<T, H> SimulatedAnnealing<T, H>
 where
     T: Clone + Default,
+    H: Clone + Default,
 {
     /// Constructor
     ///
@@ -111,7 +113,7 @@ where
     /// `init_param`: Initial parameter vector
     /// `init_temp`: Initial temperature
     pub fn new(
-        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>,
+        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
         init_param: T,
         init_temp: f64,
     ) -> Result<Self, Error> {
@@ -119,7 +121,8 @@ where
         if init_temp <= 0_f64 {
             Err(ArgminError::InvalidParameter {
                 parameter: "initial temperature".to_string(),
-            }.into())
+            }
+            .into())
         } else {
             Ok(SimulatedAnnealing {
                 init_temp: init_temp,
@@ -269,12 +272,14 @@ where
     }
 }
 
-impl<T> ArgminNextIter for SimulatedAnnealing<T>
+impl<T, H> ArgminNextIter for SimulatedAnnealing<T, H>
 where
     T: Clone + Default,
+    H: Clone + Default,
 {
     type Parameters = T;
     type OperatorOutput = f64;
+    type Hessian = H;
 
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {

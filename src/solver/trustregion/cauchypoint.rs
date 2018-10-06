@@ -24,33 +24,33 @@ use std;
 
 /// Cauchy Point
 #[derive(ArgminSolver)]
-pub struct CauchyPoint<T, U>
+pub struct CauchyPoint<T, H>
 where
     T: Clone
         + std::default::Default
         + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, U>
+        + ArgminWeightedDot<T, f64, H>
         + ArgminNorm<f64>
         + ArgminScaledAdd<T, f64>,
-    U: Clone,
+    H: Clone + std::default::Default,
 {
     /// Radius
     radius: f64,
     /// Hessian
-    b: U,
+    b: H,
     /// base
-    base: ArgminBase<T, f64>,
+    base: ArgminBase<T, f64, H>,
 }
 
-impl<T, U> CauchyPoint<T, U>
+impl<T, H> CauchyPoint<T, H>
 where
     T: Clone
         + std::default::Default
         + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, U>
+        + ArgminWeightedDot<T, f64, H>
         + ArgminNorm<f64>
         + ArgminScaledAdd<T, f64>,
-    U: Clone,
+    H: Clone + std::default::Default,
 {
     /// Constructor
     ///
@@ -58,11 +58,11 @@ where
     ///
     /// `operator`: operator
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
         radius: f64,
         param: T,
         grad: T,
-        hessian: U,
+        hessian: H,
     ) -> Self {
         let mut base = ArgminBase::new(operator, T::default());
         base.set_cur_param(param);
@@ -75,18 +75,19 @@ where
     }
 }
 
-impl<T, U> ArgminNextIter for CauchyPoint<T, U>
+impl<T, H> ArgminNextIter for CauchyPoint<T, H>
 where
     T: Clone
         + std::default::Default
         + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, U>
+        + ArgminWeightedDot<T, f64, H>
         + ArgminNorm<f64>
         + ArgminScaledAdd<T, f64>,
-    U: Clone,
+    H: Clone + std::default::Default,
 {
     type Parameters = T;
     type OperatorOutput = f64;
+    type Hessian = H;
 
     fn init(&mut self) -> Result<(), Error> {
         // This is not an iterative method.

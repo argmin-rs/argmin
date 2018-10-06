@@ -43,7 +43,7 @@ impl Step {
 
 /// More-Thuente Line Search
 #[derive(ArgminSolver)]
-pub struct MoreThuenteLineSearch<T>
+pub struct MoreThuenteLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -52,6 +52,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + std::default::Default,
 {
     /// initial parameter vector (builder)
     init_param_b: Option<T>,
@@ -106,10 +107,10 @@ where
     /// infoc
     infoc: usize,
     /// base
-    base: ArgminBase<T, f64>,
+    base: ArgminBase<T, f64, H>,
 }
 
-impl<T> MoreThuenteLineSearch<T>
+impl<T, H> MoreThuenteLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -118,14 +119,17 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    MoreThuenteLineSearch<T>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    H: Clone + std::default::Default,
+    MoreThuenteLineSearch<T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>) -> Self {
+    pub fn new(
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+    ) -> Self {
         MoreThuenteLineSearch {
             init_param_b: None,
             finit_b: None,
@@ -168,12 +172,14 @@ where
         if c1 <= 0.0 || c1 >= c2 {
             return Err(ArgminError::InvalidParameter {
                 parameter: "MoreThuenteLineSearch: Parameter c1 must be in (0, c2).".to_string(),
-            }.into());
+            }
+            .into());
         }
         if c2 <= c1 || c2 >= 1.0 {
             return Err(ArgminError::InvalidParameter {
                 parameter: "MoreThuenteLineSearch: Parameter c2 must be in (c1, 1).".to_string(),
-            }.into());
+            }
+            .into());
         }
         self.ftol = c1;
         self.gtol = c2;
@@ -189,13 +195,15 @@ where
         if alpha_min < 0.0 {
             return Err(ArgminError::InvalidParameter {
                 parameter: "MoreThuenteLineSearch: alpha_min must be >= 0.0.".to_string(),
-            }.into());
+            }
+            .into());
         }
         if alpha_max <= alpha_min {
             return Err(ArgminError::InvalidParameter {
                 parameter: "MoreThuenteLineSearch: alpha_min must be smaller than alpha_max."
                     .to_string(),
-            }.into());
+            }
+            .into());
         }
         self.stpmin = alpha_min;
         self.stpmax = alpha_max;
@@ -203,7 +211,7 @@ where
     }
 }
 
-impl<T> ArgminLineSearch for MoreThuenteLineSearch<T>
+impl<T, H> ArgminLineSearch for MoreThuenteLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -212,6 +220,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + std::default::Default,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: T) {
@@ -253,14 +262,15 @@ where
         if alpha <= 0.0 {
             return Err(ArgminError::InvalidParameter {
                 parameter: "MoreThuenteLineSearch: Initial alpha must be > 0.".to_string(),
-            }.into());
+            }
+            .into());
         }
         self.alpha = alpha;
         Ok(())
     }
 }
 
-impl<T> ArgminNextIter for MoreThuenteLineSearch<T>
+impl<T, H> ArgminNextIter for MoreThuenteLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -269,9 +279,11 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + std::default::Default,
 {
     type Parameters = T;
     type OperatorOutput = f64;
+    type Hessian = H;
 
     fn init(&mut self) -> Result<(), Error> {
         self.init_param = check_param!(
@@ -301,7 +313,8 @@ where
             return Err(ArgminError::ConditionViolated {
                 text: "MoreThuenteLineSearch: Search direction must be a descent direction."
                     .to_string(),
-            }.into());
+            }
+            .into());
         }
 
         self.stage1 = true;

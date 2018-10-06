@@ -29,7 +29,7 @@ use std;
 #[stop("self.best_f - self.finit < self.delta * self.best_x * self.dginit" => LineSearchConditionMet)]
 #[stop("self.best_g > self.sigma * self.dginit" => LineSearchConditionMet)]
 #[stop("(2.0*self.delta - 1.0)*self.dginit >= self.best_g && self.best_g >= self.sigma * self.dginit && self.best_f <= self.finit + self.epsilon_k" => LineSearchConditionMet)]
-pub struct HagerZhangLineSearch<T>
+pub struct HagerZhangLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -38,6 +38,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + std::default::Default,
 {
     /// delta: (0, 0.5), used in the Wolve conditions
     delta: f64,
@@ -103,10 +104,10 @@ where
     /// Search direction in 1D
     dginit: f64,
     /// base
-    base: ArgminBase<T, f64>,
+    base: ArgminBase<T, f64, H>,
 }
 
-impl<T> HagerZhangLineSearch<T>
+impl<T, H> HagerZhangLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -115,14 +116,17 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    HagerZhangLineSearch<T>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    H: Clone + std::default::Default,
+    HagerZhangLineSearch<T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64>>) -> Self {
+    pub fn new(
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+    ) -> Self {
         HagerZhangLineSearch {
             delta: 0.1,
             sigma: 0.9,
@@ -422,7 +426,7 @@ where
     }
 }
 
-impl<T> ArgminLineSearch for HagerZhangLineSearch<T>
+impl<T, H> ArgminLineSearch for HagerZhangLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -431,6 +435,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + std::default::Default,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: T) {
@@ -474,7 +479,7 @@ where
     }
 }
 
-impl<T> ArgminNextIter for HagerZhangLineSearch<T>
+impl<T, H> ArgminNextIter for HagerZhangLineSearch<T, H>
 where
     T: std::default::Default
         + Clone
@@ -483,9 +488,11 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
+    H: Clone + std::default::Default,
 {
     type Parameters = T;
     type OperatorOutput = f64;
+    type Hessian = H;
 
     fn init(&mut self) -> Result<(), Error> {
         if self.sigma < self.delta {
