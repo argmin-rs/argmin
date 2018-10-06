@@ -31,13 +31,11 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminNorm<f64>
-        + ArgminScaledAdd<T, f64>,
+        + ArgminScale<f64>,
     H: Clone + std::default::Default,
 {
     /// Radius
     radius: f64,
-    /// Hessian
-    b: H,
     /// base
     base: ArgminBase<T, f64, H>,
 }
@@ -49,7 +47,7 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminNorm<f64>
-        + ArgminScaledAdd<T, f64>,
+        + ArgminScale<f64>,
     H: Clone + std::default::Default,
 {
     /// Constructor
@@ -59,17 +57,10 @@ where
     /// `operator`: operator
     pub fn new(
         operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
-        radius: f64,
-        param: T,
-        grad: T,
-        hessian: H,
     ) -> Self {
-        let mut base = ArgminBase::new(operator, T::default());
-        base.set_cur_param(param);
-        base.set_cur_grad(grad);
+        let base = ArgminBase::new(operator, T::default());
         CauchyPoint {
-            radius: radius,
-            b: hessian,
+            radius: std::f64::NAN,
             base: base,
         }
     }
@@ -82,7 +73,7 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminNorm<f64>
-        + ArgminScaledAdd<T, f64>,
+        + ArgminScale<f64>,
     H: Clone + std::default::Default,
 {
     type Parameters = T;
@@ -90,6 +81,7 @@ where
     type Hessian = H;
 
     fn init(&mut self) -> Result<(), Error> {
+        self.base.reset();
         // This is not an iterative method.
         self.set_max_iters(1);
         Ok(())
@@ -98,18 +90,42 @@ where
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let grad = self.base.cur_grad();
         let grad_norm = grad.norm();
-        let wdp = grad.weighted_dot(self.b.clone(), grad.clone());
+        let wdp = grad.weighted_dot(self.base.cur_hessian().clone(), grad.clone());
         let tau: f64 = if wdp <= 0.0 {
             1.0
         } else {
             1.0f64.min(grad_norm.powi(3) / (self.radius * wdp))
         };
 
-        let new_param = self
-            .base
-            .cur_param()
-            .scaled_add(-tau * self.radius / grad_norm, grad.clone());
-        let out = ArgminIterationData::new(new_param, std::f64::NAN);
+        let new_param = grad.scale(-tau * self.radius / grad_norm);
+        let out = ArgminIterationData::new(new_param, 0.0);
         Ok(out)
+    }
+}
+
+impl<T, H> ArgminTrustRegion for CauchyPoint<T, H>
+where
+    T: Clone
+        + std::default::Default
+        + std::fmt::Debug
+        + ArgminWeightedDot<T, f64, H>
+        + ArgminNorm<f64>
+        + ArgminScale<f64>,
+    H: Clone + std::default::Default,
+{
+    // fn set_initial_parameter(&mut self, param: T) {
+    //     self.base.set_cur_param(param);
+    // }
+
+    fn set_radius(&mut self, radius: f64) {
+        self.radius = radius;
+    }
+
+    fn set_grad(&mut self, grad: T) {
+        self.base.set_cur_grad(grad);
+    }
+
+    fn set_hessian(&mut self, hessian: H) {
+        self.base.set_cur_hessian(hessian);
     }
 }
