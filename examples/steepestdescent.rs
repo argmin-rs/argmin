@@ -12,7 +12,7 @@
 #[macro_use]
 extern crate argmin;
 #[macro_use]
-extern crate argmin_derive;
+extern crate argmin_codegen;
 use argmin::prelude::*;
 use argmin::solver::gradientdescent::*;
 // use argmin::solver::linesearch::BacktrackingLineSearch;
