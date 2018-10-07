@@ -321,6 +321,11 @@
 <span id="321">321</span>
 <span id="322">322</span>
 <span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -382,9 +387,10 @@
 <span class="attribute">#[<span class="ident">log</span>(<span class="string">&quot;reanneal_fixed&quot;</span> <span class="op">=&gt;</span> <span class="string">&quot;self.reanneal_fixed&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">log</span>(<span class="string">&quot;reanneal_accepted&quot;</span> <span class="op">=&gt;</span> <span class="string">&quot;self.reanneal_accepted&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">log</span>(<span class="string">&quot;reanneal_best&quot;</span> <span class="op">=&gt;</span> <span class="string">&quot;self.reanneal_best&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
+    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
     <span class="doccomment">/// Initial temperature</span>
     <span class="ident">init_temp</span>: <span class="ident">f64</span>,
@@ -420,12 +426,13 @@
     <span class="doccomment">/// random number generator</span>
     <span class="ident">rng</span>: <span class="ident">rand</span>::<span class="ident">ThreadRng</span>,
     <span class="doccomment">/// base</span>
-    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">H</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
+    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
     <span class="doccomment">/// Constructor</span>
     <span class="doccomment">///</span>
@@ -435,7 +442,7 @@
     <span class="doccomment">/// `init_param`: Initial parameter vector</span>
     <span class="doccomment">/// `init_temp`: Initial temperature</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">cost_function</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;&gt;</span>,
+        <span class="ident">cost_function</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">init_param</span>: <span class="ident">T</span>,
         <span class="ident">init_temp</span>: <span class="ident">f64</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
@@ -443,7 +450,8 @@
         <span class="kw">if</span> <span class="ident">init_temp</span> <span class="op">&lt;=</span> <span class="number">0_f64</span> {
             <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">parameter</span>: <span class="string">&quot;initial temperature&quot;</span>.<span class="ident">to_string</span>(),
-            }.<span class="ident">into</span>())
+            }
+            .<span class="ident">into</span>())
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">SimulatedAnnealing</span> {
                 <span class="ident">init_temp</span>: <span class="ident">init_temp</span>,
@@ -593,12 +601,14 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ArgminNextIter</span> <span class="kw">for</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">ArgminNextIter</span> <span class="kw">for</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
+    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
     <span class="kw">type</span> <span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>;
     <span class="kw">type</span> <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>;
+    <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span>;
 
     <span class="doccomment">/// Perform one iteration of SA algorithm</span>
     <span class="kw">fn</span> <span class="ident">next_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterationData</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["reduction_ratio","Computes reduction ratio"]],"mod":[["cauchypoint","Cauchy Point # Cauchy point"],["trustregion","Trust region solver # Trust region solver"]]});

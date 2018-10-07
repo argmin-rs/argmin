@@ -112,6 +112,10 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -141,7 +145,7 @@
 
 <span class="doccomment">/// Conjugate Gradient struct</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConjugateGradient</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConjugateGradient</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">Default</span>
@@ -149,6 +153,7 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
     <span class="doccomment">/// residual</span>
     <span class="ident">r</span>: <span class="ident">T</span>,
@@ -159,10 +164,10 @@
     <span class="doccomment">/// beta</span>
     <span class="ident">beta</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// base</span>
-    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ConjugateGradient</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">ConjugateGradient</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">Default</span>
@@ -170,6 +175,7 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
     <span class="doccomment">/// Constructor</span>
     <span class="doccomment">///</span>
@@ -178,7 +184,7 @@
     <span class="doccomment">/// `cost_function`: cost function</span>
     <span class="doccomment">/// `init_param`: Initial parameter vector</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;&gt;</span>,
+        <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;&gt;</span>,
         <span class="ident">b</span>: <span class="ident">T</span>,
         <span class="ident">init_param</span>: <span class="ident">T</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
@@ -194,7 +200,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ArgminNextIter</span> <span class="kw">for</span> <span class="ident">ConjugateGradient</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">ArgminNextIter</span> <span class="kw">for</span> <span class="ident">ConjugateGradient</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">Default</span>
@@ -202,9 +208,11 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
     <span class="kw">type</span> <span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>;
     <span class="kw">type</span> <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">T</span>;
+    <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span>;
 
     <span class="doccomment">/// Perform one iteration of SA algorithm</span>
     <span class="kw">fn</span> <span class="ident">next_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterationData</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {

@@ -11,14 +11,6 @@
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.__m128i.html"
-                                  title='struct argmin::prelude::failure::_core::arch::x86_64::__m128i'>__m128i</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64</div>] <p>128-bit wide integer vector type, x86-specific</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="struct" href="struct.__m128d.html"
                                   title='struct argmin::prelude::failure::_core::arch::x86_64::__m128d'>__m128d</a></td>
                            <td class='docblock-short'>
@@ -35,10 +27,18 @@
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.__m256.html"
-                                  title='struct argmin::prelude::failure::_core::arch::x86_64::__m256'>__m256</a></td>
+                           <td><a class="struct" href="struct.__m128i.html"
+                                  title='struct argmin::prelude::failure::_core::arch::x86_64::__m128i'>__m128i</a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64</div>] <p>256-bit wide set of eight <code>f32</code> types, x86-specific</p>
+                               [<div class='stab portability'>x86-64</div>] <p>128-bit wide integer vector type, x86-specific</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.__m256d.html"
+                                  title='struct argmin::prelude::failure::_core::arch::x86_64::__m256d'>__m256d</a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64</div>] <p>256-bit wide set of four <code>f64</code> types, x86-specific</p>
 
                            </td>
                        </tr>
@@ -51,10 +51,10 @@
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.__m256d.html"
-                                  title='struct argmin::prelude::failure::_core::arch::x86_64::__m256d'>__m256d</a></td>
+                           <td><a class="struct" href="struct.__m256.html"
+                                  title='struct argmin::prelude::failure::_core::arch::x86_64::__m256'>__m256</a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64</div>] <p>256-bit wide set of four <code>f64</code> types, x86-specific</p>
+                               [<div class='stab portability'>x86-64</div>] <p>256-bit wide set of eight <code>f32</code> types, x86-specific</p>
 
                            </td>
                        </tr>
@@ -1181,204 +1181,29 @@ that bit.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_shuffle_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_shuffle_ps'>_mm256_shuffle_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_cmp_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cmp_ps'>_mm256_cmp_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle single-precision (32-bit) floating-point elements in <code>a</code> within
-128-bit lanes using the control in <code>imm8</code>.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed single-precision (32-bit) floating-point
+elements in <code>a</code> and <code>b</code> based on the comparison operand
+specified by <code>imm8</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_setr_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setr_pd'>_mm256_setr_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_setzero_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setzero_ps'>_mm256_setzero_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed double-precision (64-bit) floating-point elements in returned
-vector with the supplied values in reverse order.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return vector of type __m256 with all elements set to zero.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_maskload_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_maskload_pd'>_mm256_maskload_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_broadcastss_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_broadcastss_ps'>_mm256_broadcastss_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Load packed double-precision (64-bit) floating-point elements from memory
-into result using <code>mask</code> (elements are zeroed out when the high bit of the
-corresponding element is not set).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_load_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_load_pd'>_mm256_load_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Load 256-bits (composed of 4 packed double-precision (64-bit)
-floating-point elements) from memory into result.
-<code>mem_addr</code> must be aligned on a 32-byte boundary or a
-general-protection exception may be generated.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_load_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_load_ps'>_mm256_load_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Load 256-bits (composed of 8 packed single-precision (32-bit)
-floating-point elements) from memory into result.
-<code>mem_addr</code> must be aligned on a 32-byte boundary or a
-general-protection exception may be generated.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_add_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_add_pd'>_mm256_add_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Add packed double-precision (64-bit) floating-point elements
-in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_dp_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_dp_ps'>_mm256_dp_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Conditionally multiply the packed single-precision (32-bit) floating-point
-elements in <code>a</code> and <code>b</code> using the high 4 bits in <code>imm8</code>,
-sum the four products, and conditionally return the sum
-using the low 4 bits of <code>imm8</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_store_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_store_pd'>_mm256_store_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Store 256-bits (composed of 4 packed double-precision (64-bit)
-floating-point elements) from <code>a</code> into memory.
-<code>mem_addr</code> must be aligned on a 32-byte boundary or a
-general-protection exception may be generated.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_andnot_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_andnot_ps'>_mm256_andnot_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise NOT of packed single-precision (32-bit) floating-point
-elements in <code>a</code>
-and then AND with <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_xor_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_xor_pd'>_mm256_xor_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise XOR of packed double-precision (64-bit) floating-point
-elements in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_sqrt_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_sqrt_ps'>_mm256_sqrt_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return the square root of packed single-precision (32-bit) floating point
-elements in <code>a</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_hsub_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_hsub_pd'>_mm256_hsub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Horizontal subtraction of adjacent pairs in the two packed vectors
-of 4 64-bit floating points <code>a</code> and <code>b</code>.
-In the result, sums of elements from <code>a</code> are returned in even locations,
-while sums of elements from <code>b</code> are returned in odd locations.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_rcp_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_rcp_ps'>_mm256_rcp_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the approximate reciprocal of packed single-precision (32-bit)
-floating-point elements in <code>a</code>, and return the results. The maximum
-relative error for this approximation is less than 1.5*2^-12.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_round_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_round_ps'>_mm256_round_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed single-precision (32-bit) floating point elements in <code>a</code>
-according to the flag <code>b</code>. The value of <code>b</code> may be as follows:</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fnmadd_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fnmadd_ps'>_mm256_fnmadd_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed single-precision (32-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and add the negated intermediate result to packed elements in <code>c</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_permutevar_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permutevar_ps'>_mm256_permutevar_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle single-precision (32-bit) floating-point elements in <code>a</code>
-within 128-bit lanes using the control in <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_ceil_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_ceil_ps'>_mm256_ceil_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed single-precision (32-bit) floating point elements in <code>a</code>
-toward positive infinity.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_sub_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_sub_pd'>_mm256_sub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Subtract packed double-precision (64-bit) floating-point elements in <code>b</code>
-from packed elements in <code>a</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_zeroupper.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_zeroupper'>_mm256_zeroupper</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Zero the upper 128 bits of all YMM registers;
-the lower 128-bits of the registers are unmodified.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_unpacklo_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_unpacklo_pd'>_mm256_unpacklo_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Unpack and interleave double-precision (64-bit) floating-point elements
-from the low half of each 128-bit lane in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_setr_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setr_ps'>_mm256_setr_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed single-precision (32-bit) floating-point elements in returned
-vector with the supplied values in reverse order.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx2</code></div>] <p>Broadcast the low single-precision (32-bit) floating-point element
+from <code>a</code> to all elements of the 256-bit returned value.</p>
 
                            </td>
                        </tr>
@@ -1388,197 +1213,6 @@ vector with the supplied values in reverse order.</p>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Alternatively add and subtract packed single-precision (32-bit)
 floating-point elements in <code>a</code> to/from packed elements in <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_moveldup_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_moveldup_ps'>_mm256_moveldup_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Duplicate even-indexed single-precision (32-bit) floating-point elements
-from <code>a</code>, and return the results.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_max_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_max_ps'>_mm256_max_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed single-precision (32-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and return packed maximum values</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_xor_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_xor_ps'>_mm256_xor_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise XOR of packed single-precision (32-bit) floating-point
-elements in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_unpacklo_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_unpacklo_ps'>_mm256_unpacklo_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Unpack and interleave single-precision (32-bit) floating-point elements
-from the low half of each 128-bit lane in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_blendv_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_blendv_pd'>_mm256_blendv_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Blend packed double-precision (64-bit) floating-point elements from
-<code>a</code> and <code>b</code> using <code>c</code> as a mask.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_testnzc_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_testnzc_pd'>_mm256_testnzc_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of 256 bits (representing double-precision (64-bit)
-floating-point elements) in <code>a</code> and <code>b</code>, producing an intermediate 256-bit
-value, and set <code>ZF</code> to 1 if the sign bit of each 64-bit element in the
-intermediate value is zero, otherwise set <code>ZF</code> to 0. Compute the bitwise
-NOT of <code>a</code> and then AND with <code>b</code>, producing an intermediate value, and set
-<code>CF</code> to 1 if the sign bit of each 64-bit element in the intermediate value
-is zero, otherwise set <code>CF</code> to 0. Return 1 if both the <code>ZF</code> and <code>CF</code> values
-are zero, otherwise return 0.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_hsub_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_hsub_ps'>_mm256_hsub_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Horizontal subtraction of adjacent pairs in the two packed vectors
-of 8 32-bit floating points <code>a</code> and <code>b</code>.
-In the result, sums of elements from <code>a</code> are returned in locations of
-indices 0, 1, 4, 5; while sums of elements from <code>b</code> are locations
-2, 3, 6, 7.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_or_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_or_ps'>_mm256_or_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise OR packed single-precision (32-bit) floating-point
-elements in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_testc_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_testc_pd'>_mm256_testc_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of 256 bits (representing double-precision (64-bit)
-floating-point elements) in <code>a</code> and <code>b</code>, producing an intermediate 256-bit
-value, and set <code>ZF</code> to 1 if the sign bit of each 64-bit element in the
-intermediate value is zero, otherwise set <code>ZF</code> to 0. Compute the bitwise
-NOT of <code>a</code> and then AND with <code>b</code>, producing an intermediate value, and set
-<code>CF</code> to 1 if the sign bit of each 64-bit element in the intermediate value
-is zero, otherwise set <code>CF</code> to 0. Return the <code>CF</code> value.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_max_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_max_pd'>_mm256_max_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed double-precision (64-bit) floating-point elements
-in <code>a</code> and <code>b</code>, and return packed maximum values</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_and_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_and_ps'>_mm256_and_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of packed single-precision (32-bit) floating-point
-elements in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_blend_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_blend_ps'>_mm256_blend_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Blend packed single-precision (32-bit) floating-point elements from
-<code>a</code> and <code>b</code> using control mask <code>imm8</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_zeroall.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_zeroall'>_mm256_zeroall</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Zero the contents of all XMM or YMM registers.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fmaddsub_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmaddsub_pd'>_mm256_fmaddsub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and alternatively add and subtract packed elements in <code>c</code> to/from
-the intermediate result.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_set_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set_pd'>_mm256_set_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed double-precision (64-bit) floating-point elements in returned
-vector with the supplied values.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_testnzc_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_testnzc_ps'>_mm256_testnzc_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of 256 bits (representing single-precision (32-bit)
-floating-point elements) in <code>a</code> and <code>b</code>, producing an intermediate 256-bit
-value, and set <code>ZF</code> to 1 if the sign bit of each 32-bit element in the
-intermediate value is zero, otherwise set <code>ZF</code> to 0. Compute the bitwise
-NOT of <code>a</code> and then AND with <code>b</code>, producing an intermediate value, and set
-<code>CF</code> to 1 if the sign bit of each 32-bit element in the intermediate value
-is zero, otherwise set <code>CF</code> to 0. Return 1 if both the <code>ZF</code> and <code>CF</code> values
-are zero, otherwise return 0.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_permute_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permute_pd'>_mm256_permute_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle double-precision (64-bit) floating-point elements in <code>a</code>
-within 128-bit lanes using the control in <code>imm8</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_ceil_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_ceil_pd'>_mm256_ceil_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed double-precision (64-bit) floating point elements in <code>a</code>
-toward positive infinity.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_mul_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_mul_pd'>_mm256_mul_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Add packed double-precision (64-bit) floating-point elements
-in <code>a</code> and <code>b</code>.</p>
 
                            </td>
                        </tr>
@@ -1597,147 +1231,6 @@ is zero, otherwise set <code>CF</code> to 0. Return the <code>ZF</code> value.</
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fnmadd_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fnmadd_pd'>_mm256_fnmadd_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and add the negated intermediate result to packed elements in <code>c</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_maskload_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_maskload_ps'>_mm256_maskload_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Load packed single-precision (32-bit) floating-point elements from memory
-into result using <code>mask</code> (elements are zeroed out when the high bit of the
-corresponding element is not set).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_stream_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_stream_ps'>_mm256_stream_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Moves single-precision floating point values from a 256-bit vector
-of <code>[8 x float]</code> to a 32-byte aligned memory location. To minimize
-caching, the data is flagged as non-temporal (unlikely to be used again
-soon).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_storeu_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_storeu_ps'>_mm256_storeu_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Store 256-bits (composed of 8 packed single-precision (32-bit)
-floating-point elements) from <code>a</code> into memory.
-<code>mem_addr</code> does not need to be aligned on any particular boundary.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_or_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_or_pd'>_mm256_or_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise OR packed double-precision (64-bit) floating-point
-elements in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_testz_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_testz_ps'>_mm256_testz_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of 256 bits (representing single-precision (32-bit)
-floating-point elements) in <code>a</code> and <code>b</code>, producing an intermediate 256-bit
-value, and set <code>ZF</code> to 1 if the sign bit of each 32-bit element in the
-intermediate value is zero, otherwise set <code>ZF</code> to 0. Compute the bitwise
-NOT of <code>a</code> and then AND with <code>b</code>, producing an intermediate value, and set
-<code>CF</code> to 1 if the sign bit of each 32-bit element in the intermediate value
-is zero, otherwise set <code>CF</code> to 0. Return the <code>ZF</code> value.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_cmp_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cmp_ps'>_mm256_cmp_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed single-precision (32-bit) floating-point
-elements in <code>a</code> and <code>b</code> based on the comparison operand
-specified by <code>imm8</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_cvtps_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cvtps_pd'>_mm256_cvtps_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Convert packed single-precision (32-bit) floating-point elements in <code>a</code>
-to packed double-precision (64-bit) floating-point elements.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_set_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set_ps'>_mm256_set_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed single-precision (32-bit) floating-point elements in returned
-vector with the supplied values.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_and_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_and_pd'>_mm256_and_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of a packed double-precision (64-bit)
-floating-point elements
-in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_testc_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_testc_ps'>_mm256_testc_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of 256 bits (representing single-precision (32-bit)
-floating-point elements) in <code>a</code> and <code>b</code>, producing an intermediate 256-bit
-value, and set <code>ZF</code> to 1 if the sign bit of each 32-bit element in the
-intermediate value is zero, otherwise set <code>ZF</code> to 0. Compute the bitwise
-NOT of <code>a</code> and then AND with <code>b</code>, producing an intermediate value, and set
-<code>CF</code> to 1 if the sign bit of each 32-bit element in the intermediate value
-is zero, otherwise set <code>CF</code> to 0. Return the <code>CF</code> value.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_permute_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permute_ps'>_mm256_permute_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle single-precision (32-bit) floating-point elements in <code>a</code>
-within 128-bit lanes using the control in <code>imm8</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_castps_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_castps_pd'>_mm256_castps_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Cast vector of type __m256 to type __m256d.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_cvtpd_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cvtpd_ps'>_mm256_cvtpd_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Convert packed double-precision (64-bit) floating-point elements in <code>a</code>
-to packed single-precision (32-bit) floating-point elements.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="fn" href="fn._mm256_andnot_pd.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_andnot_pd'>_mm256_andnot_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
@@ -1748,41 +1241,28 @@ and then AND with <code>b</code>.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_stream_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_stream_pd'>_mm256_stream_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_broadcast_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_broadcast_pd'>_mm256_broadcast_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Moves double-precision values from a 256-bit vector of <code>[4 x double]</code>
-to a 32-byte aligned memory location. To minimize caching, the data is
-flagged as non-temporal (unlikely to be used again soon).</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Broadcast 128 bits from memory (composed of 2 packed double-precision
+(64-bit) floating-point elements) to all elements of the returned vector.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_cmp_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cmp_pd'>_mm256_cmp_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed double-precision (64-bit) floating-point
-elements in <code>a</code> and <code>b</code> based on the comparison operand
-specified by <code>imm8</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_add_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_add_ps'>_mm256_add_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Add packed single-precision (32-bit) floating-point elements in <code>a</code> and
-<code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fnmsub_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fnmsub_ps'>_mm256_fnmsub_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_fmsub_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmsub_ps'>_mm256_fmsub_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed single-precision (32-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and subtract packed elements in <code>c</code> from the negated intermediate
-result.</p>
+and <code>b</code>, and subtract packed elements in <code>c</code> from the intermediate result.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_castpd_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_castpd_ps'>_mm256_castpd_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Cast vector of type __m256d to type __m256.</p>
 
                            </td>
                        </tr>
@@ -1799,30 +1279,38 @@ indices 0, 1, 4, 5; while sums of elements from <code>b</code> are locations
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_blend_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_blend_pd'>_mm256_blend_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_movemask_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_movemask_ps'>_mm256_movemask_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Blend packed double-precision (64-bit) floating-point elements from
-<code>a</code> and <code>b</code> using control mask <code>imm8</code>.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set each bit of the returned mask based on the most significant bit of the
+corresponding packed single-precision (32-bit) floating-point element in
+<code>a</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fmaddsub_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmaddsub_ps'>_mm256_fmaddsub_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_mul_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_mul_ps'>_mm256_mul_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed single-precision (32-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and alternatively add and subtract packed elements in <code>c</code> to/from
-the intermediate result.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Add packed single-precision (32-bit) floating-point elements in <code>a</code> and
+<code>b</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_floor_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_floor_pd'>_mm256_floor_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_shuffle_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_shuffle_ps'>_mm256_shuffle_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed double-precision (64-bit) floating point elements in <code>a</code>
-toward negative infinity.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle single-precision (32-bit) floating-point elements in <code>a</code> within
+128-bit lanes using the control in <code>imm8</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_zeroall.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_zeroall'>_mm256_zeroall</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Zero the contents of all XMM or YMM registers.</p>
 
                            </td>
                        </tr>
@@ -1838,34 +1326,6 @@ while sums of elements from <code>b</code> are returned in odd locations.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_unpackhi_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_unpackhi_pd'>_mm256_unpackhi_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Unpack and interleave double-precision (64-bit) floating-point elements
-from the high half of each 128-bit lane in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fnmsub_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fnmsub_pd'>_mm256_fnmsub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and subtract packed elements in <code>c</code> from the negated intermediate
-result.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_round_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_round_pd'>_mm256_round_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed double-precision (64-bit) floating point elements in <code>a</code>
-according to the flag <code>b</code>. The value of <code>b</code> may be as follows:</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="fn" href="fn._mm256_storeu_pd.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_storeu_pd'>_mm256_storeu_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
@@ -1876,91 +1336,11 @@ floating-point elements) from <code>a</code> into memory.
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_setzero_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setzero_ps'>_mm256_setzero_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_round_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_round_pd'>_mm256_round_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return vector of type __m256 with all elements set to zero.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_unpackhi_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_unpackhi_ps'>_mm256_unpackhi_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Unpack and interleave single-precision (32-bit) floating-point elements
-from the high half of each 128-bit lane in <code>a</code> and <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_sqrt_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_sqrt_pd'>_mm256_sqrt_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return the square root of packed double-precision (64-bit) floating point
-elements in <code>a</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_maskstore_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_maskstore_ps'>_mm256_maskstore_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Store packed single-precision (32-bit) floating-point elements from <code>a</code>
-into memory using <code>mask</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fmsub_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmsub_ps'>_mm256_fmsub_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed single-precision (32-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and subtract packed elements in <code>c</code> from the intermediate result.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_maskstore_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_maskstore_pd'>_mm256_maskstore_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Store packed double-precision (64-bit) floating-point elements from <code>a</code>
-into memory using <code>mask</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_undefined_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_undefined_pd'>_mm256_undefined_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return vector of type <code>__m256d</code> with undefined elements.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_movemask_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_movemask_pd'>_mm256_movemask_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set each bit of the returned mask based on the most significant bit of the
-corresponding packed double-precision (64-bit) floating-point element in
-<code>a</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_broadcast_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_broadcast_ps'>_mm256_broadcast_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Broadcast 128 bits from memory (composed of 4 packed single-precision
-(32-bit) floating-point elements) to all elements of the returned vector.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_mul_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_mul_ps'>_mm256_mul_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Add packed single-precision (32-bit) floating-point elements in <code>a</code> and
-<code>b</code>.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed double-precision (64-bit) floating point elements in <code>a</code>
+according to the flag <code>b</code>. The value of <code>b</code> may be as follows:</p>
 
                            </td>
                        </tr>
@@ -1984,47 +1364,34 @@ The maximum relative error for this approximation is less than 1.5*2^-12.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_min_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_min_ps'>_mm256_min_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_add_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_add_pd'>_mm256_add_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed single-precision (32-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and return packed minimum values</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Add packed double-precision (64-bit) floating-point elements
+in <code>a</code> and <code>b</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_addsub_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_addsub_pd'>_mm256_addsub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_testc_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_testc_pd'>_mm256_testc_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Alternatively add and subtract packed double-precision (64-bit)
-floating-point elements in <code>a</code> to/from packed elements in <code>b</code>.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of 256 bits (representing double-precision (64-bit)
+floating-point elements) in <code>a</code> and <code>b</code>, producing an intermediate 256-bit
+value, and set <code>ZF</code> to 1 if the sign bit of each 64-bit element in the
+intermediate value is zero, otherwise set <code>ZF</code> to 0. Compute the bitwise
+NOT of <code>a</code> and then AND with <code>b</code>, producing an intermediate value, and set
+<code>CF</code> to 1 if the sign bit of each 64-bit element in the intermediate value
+is zero, otherwise set <code>CF</code> to 0. Return the <code>CF</code> value.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_movehdup_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_movehdup_ps'>_mm256_movehdup_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_unpackhi_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_unpackhi_ps'>_mm256_unpackhi_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Duplicate odd-indexed single-precision (32-bit) floating-point elements
-from <code>a</code>, and return the results.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_blendv_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_blendv_ps'>_mm256_blendv_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Blend packed single-precision (32-bit) floating-point elements from
-<code>a</code> and <code>b</code> using <code>c</code> as a mask.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_min_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_min_pd'>_mm256_min_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed double-precision (64-bit) floating-point elements
-in <code>a</code> and <code>b</code>, and return packed minimum values</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Unpack and interleave single-precision (32-bit) floating-point elements
+from the high half of each 128-bit lane in <code>a</code> and <code>b</code>.</p>
 
                            </td>
                        </tr>
@@ -2038,47 +1405,95 @@ from &quot;a&quot;, and return the results.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_loadu_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_loadu_ps'>_mm256_loadu_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Load 256-bits (composed of 8 packed single-precision (32-bit)
-floating-point elements) from memory into result.
-<code>mem_addr</code> does not need to be aligned on any particular boundary.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_setzero_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setzero_pd'>_mm256_setzero_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return vector of type __m256d with all elements set to zero.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_broadcast_sd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_broadcast_sd'>_mm256_broadcast_sd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Broadcast a double-precision (64-bit) floating-point element from memory
-to all elements of the returned vector.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_div_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_div_pd'>_mm256_div_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the division of each of the 4 packed 64-bit floating-point elements
-in <code>a</code> by the corresponding packed elements in <code>b</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_permutevar_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permutevar_pd'>_mm256_permutevar_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_permute_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permute_pd'>_mm256_permute_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle double-precision (64-bit) floating-point elements in <code>a</code>
-within 256-bit lanes using the control in <code>b</code>.</p>
+within 128-bit lanes using the control in <code>imm8</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_undefined_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_undefined_pd'>_mm256_undefined_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return vector of type <code>__m256d</code> with undefined elements.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_testz_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_testz_ps'>_mm256_testz_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of 256 bits (representing single-precision (32-bit)
+floating-point elements) in <code>a</code> and <code>b</code>, producing an intermediate 256-bit
+value, and set <code>ZF</code> to 1 if the sign bit of each 32-bit element in the
+intermediate value is zero, otherwise set <code>ZF</code> to 0. Compute the bitwise
+NOT of <code>a</code> and then AND with <code>b</code>, producing an intermediate value, and set
+<code>CF</code> to 1 if the sign bit of each 32-bit element in the intermediate value
+is zero, otherwise set <code>CF</code> to 0. Return the <code>ZF</code> value.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_and_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_and_pd'>_mm256_and_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of a packed double-precision (64-bit)
+floating-point elements
+in <code>a</code> and <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_andnot_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_andnot_ps'>_mm256_andnot_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise NOT of packed single-precision (32-bit) floating-point
+elements in <code>a</code>
+and then AND with <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_movemask_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_movemask_pd'>_mm256_movemask_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set each bit of the returned mask based on the most significant bit of the
+corresponding packed double-precision (64-bit) floating-point element in
+<code>a</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_castps_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_castps_pd'>_mm256_castps_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Cast vector of type __m256 to type __m256d.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_testc_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_testc_ps'>_mm256_testc_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of 256 bits (representing single-precision (32-bit)
+floating-point elements) in <code>a</code> and <code>b</code>, producing an intermediate 256-bit
+value, and set <code>ZF</code> to 1 if the sign bit of each 32-bit element in the
+intermediate value is zero, otherwise set <code>ZF</code> to 0. Compute the bitwise
+NOT of <code>a</code> and then AND with <code>b</code>, producing an intermediate value, and set
+<code>CF</code> to 1 if the sign bit of each 32-bit element in the intermediate value
+is zero, otherwise set <code>CF</code> to 0. Return the <code>CF</code> value.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_maskload_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_maskload_ps'>_mm256_maskload_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Load packed single-precision (32-bit) floating-point elements from memory
+into result using <code>mask</code> (elements are zeroed out when the high bit of the
+corresponding element is not set).</p>
 
                            </td>
                        </tr>
@@ -2093,11 +1508,390 @@ the intermediate result.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fmadd_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmadd_pd'>_mm256_fmadd_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_undefined_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_undefined_ps'>_mm256_undefined_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return vector of type <code>__m256</code> with undefined elements.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_setzero_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setzero_pd'>_mm256_setzero_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return vector of type __m256d with all elements set to zero.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_storeu_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_storeu_ps'>_mm256_storeu_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Store 256-bits (composed of 8 packed single-precision (32-bit)
+floating-point elements) from <code>a</code> into memory.
+<code>mem_addr</code> does not need to be aligned on any particular boundary.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_fmsubadd_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmsubadd_pd'>_mm256_fmsubadd_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and alternatively subtract and add packed elements in <code>c</code> from/to
+the intermediate result.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_loadu_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_loadu_ps'>_mm256_loadu_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Load 256-bits (composed of 8 packed single-precision (32-bit)
+floating-point elements) from memory into result.
+<code>mem_addr</code> does not need to be aligned on any particular boundary.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_fmsub_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmsub_pd'>_mm256_fmsub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and subtract packed elements in <code>c</code> from the intermediate result.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_permute_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permute_ps'>_mm256_permute_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle single-precision (32-bit) floating-point elements in <code>a</code>
+within 128-bit lanes using the control in <code>imm8</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_div_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_div_ps'>_mm256_div_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the division of each of the 8 packed 32-bit floating-point elements
+in <code>a</code> by the corresponding packed elements in <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_moveldup_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_moveldup_ps'>_mm256_moveldup_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Duplicate even-indexed single-precision (32-bit) floating-point elements
+from <code>a</code>, and return the results.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_max_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_max_ps'>_mm256_max_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed single-precision (32-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and return packed maximum values</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_cmp_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cmp_pd'>_mm256_cmp_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed double-precision (64-bit) floating-point
+elements in <code>a</code> and <code>b</code> based on the comparison operand
+specified by <code>imm8</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_xor_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_xor_ps'>_mm256_xor_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise XOR of packed single-precision (32-bit) floating-point
+elements in <code>a</code> and <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_add_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_add_ps'>_mm256_add_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Add packed single-precision (32-bit) floating-point elements in <code>a</code> and
+<code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_blend_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_blend_pd'>_mm256_blend_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Blend packed double-precision (64-bit) floating-point elements from
+<code>a</code> and <code>b</code> using control mask <code>imm8</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_floor_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_floor_ps'>_mm256_floor_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed single-precision (32-bit) floating point elements in <code>a</code>
+toward negative infinity.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_unpackhi_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_unpackhi_pd'>_mm256_unpackhi_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Unpack and interleave double-precision (64-bit) floating-point elements
+from the high half of each 128-bit lane in <code>a</code> and <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_maskstore_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_maskstore_pd'>_mm256_maskstore_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Store packed double-precision (64-bit) floating-point elements from <code>a</code>
+into memory using <code>mask</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_fnmsub_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fnmsub_pd'>_mm256_fnmsub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and subtract packed elements in <code>c</code> from the negated intermediate
+result.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_min_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_min_ps'>_mm256_min_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed single-precision (32-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and return packed minimum values</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_sqrt_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_sqrt_pd'>_mm256_sqrt_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return the square root of packed double-precision (64-bit) floating point
+elements in <code>a</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_set_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set_pd'>_mm256_set_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed double-precision (64-bit) floating-point elements in returned
+vector with the supplied values.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_broadcastsd_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_broadcastsd_pd'>_mm256_broadcastsd_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx2</code></div>] <p>Broadcast the low double-precision (64-bit) floating-point element
+from <code>a</code> to all elements of the 256-bit returned value.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_unpacklo_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_unpacklo_ps'>_mm256_unpacklo_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Unpack and interleave single-precision (32-bit) floating-point elements
+from the low half of each 128-bit lane in <code>a</code> and <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_dp_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_dp_ps'>_mm256_dp_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Conditionally multiply the packed single-precision (32-bit) floating-point
+elements in <code>a</code> and <code>b</code> using the high 4 bits in <code>imm8</code>,
+sum the four products, and conditionally return the sum
+using the low 4 bits of <code>imm8</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_sub_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_sub_ps'>_mm256_sub_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Subtract packed single-precision (32-bit) floating-point elements in <code>b</code>
+from packed elements in <code>a</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_blendv_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_blendv_ps'>_mm256_blendv_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Blend packed single-precision (32-bit) floating-point elements from
+<code>a</code> and <code>b</code> using <code>c</code> as a mask.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_sqrt_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_sqrt_ps'>_mm256_sqrt_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return the square root of packed single-precision (32-bit) floating point
+elements in <code>a</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_maskload_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_maskload_pd'>_mm256_maskload_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Load packed double-precision (64-bit) floating-point elements from memory
+into result using <code>mask</code> (elements are zeroed out when the high bit of the
+corresponding element is not set).</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_rcp_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_rcp_ps'>_mm256_rcp_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the approximate reciprocal of packed single-precision (32-bit)
+floating-point elements in <code>a</code>, and return the results. The maximum
+relative error for this approximation is less than 1.5*2^-12.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_div_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_div_pd'>_mm256_div_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the division of each of the 4 packed 64-bit floating-point elements
+in <code>a</code> by the corresponding packed elements in <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_movehdup_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_movehdup_ps'>_mm256_movehdup_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Duplicate odd-indexed single-precision (32-bit) floating-point elements
+from <code>a</code>, and return the results.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_mul_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_mul_pd'>_mm256_mul_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Add packed double-precision (64-bit) floating-point elements
+in <code>a</code> and <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_set_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set_ps'>_mm256_set_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed single-precision (32-bit) floating-point elements in returned
+vector with the supplied values.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_shuffle_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_shuffle_pd'>_mm256_shuffle_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle double-precision (64-bit) floating-point elements within 128-bit
+lanes using the control in <code>imm8</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_store_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_store_pd'>_mm256_store_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Store 256-bits (composed of 4 packed double-precision (64-bit)
+floating-point elements) from <code>a</code> into memory.
+<code>mem_addr</code> must be aligned on a 32-byte boundary or a
+general-protection exception may be generated.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_fnmadd_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fnmadd_ps'>_mm256_fnmadd_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed single-precision (32-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and add the negated intermediate result to packed elements in <code>c</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_xor_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_xor_pd'>_mm256_xor_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise XOR of packed double-precision (64-bit) floating-point
+elements in <code>a</code> and <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_permutevar_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permutevar_ps'>_mm256_permutevar_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle single-precision (32-bit) floating-point elements in <code>a</code>
+within 128-bit lanes using the control in <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_fmadd_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmadd_ps'>_mm256_fmadd_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed single-precision (32-bit) floating-point elements in <code>a</code>
 and <code>b</code>, and add the intermediate result to packed elements in <code>c</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_ceil_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_ceil_ps'>_mm256_ceil_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed single-precision (32-bit) floating point elements in <code>a</code>
+toward positive infinity.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_cvtpd_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cvtpd_ps'>_mm256_cvtpd_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Convert packed double-precision (64-bit) floating-point elements in <code>a</code>
+to packed single-precision (32-bit) floating-point elements.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_stream_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_stream_pd'>_mm256_stream_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Moves double-precision values from a 256-bit vector of <code>[4 x double]</code>
+to a 32-byte aligned memory location. To minimize caching, the data is
+flagged as non-temporal (unlikely to be used again soon).</p>
 
                            </td>
                        </tr>
@@ -2113,56 +1907,40 @@ general-protection exception may be generated.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_shuffle_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_shuffle_pd'>_mm256_shuffle_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_min_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_min_pd'>_mm256_min_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle double-precision (64-bit) floating-point elements within 128-bit
-lanes using the control in <code>imm8</code>.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed double-precision (64-bit) floating-point elements
+in <code>a</code> and <code>b</code>, and return packed minimum values</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fmsubadd_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmsubadd_pd'>_mm256_fmsubadd_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_blendv_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_blendv_pd'>_mm256_blendv_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and alternatively subtract and add packed elements in <code>c</code> from/to
-the intermediate result.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Blend packed double-precision (64-bit) floating-point elements from
+<code>a</code> and <code>b</code> using <code>c</code> as a mask.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fmsub_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmsub_pd'>_mm256_fmsub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_stream_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_stream_ps'>_mm256_stream_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and subtract packed elements in <code>c</code> from the intermediate result.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Moves single-precision floating point values from a 256-bit vector
+of <code>[8 x float]</code> to a 32-byte aligned memory location. To minimize
+caching, the data is flagged as non-temporal (unlikely to be used again
+soon).</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_undefined_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_undefined_ps'>_mm256_undefined_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_floor_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_floor_pd'>_mm256_floor_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Return vector of type <code>__m256</code> with undefined elements.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_fmadd_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmadd_ps'>_mm256_fmadd_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed single-precision (32-bit) floating-point elements in <code>a</code>
-and <code>b</code>, and add the intermediate result to packed elements in <code>c</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_broadcast_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_broadcast_pd'>_mm256_broadcast_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Broadcast 128 bits from memory (composed of 2 packed double-precision
-(64-bit) floating-point elements) to all elements of the returned vector.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed double-precision (64-bit) floating point elements in <code>a</code>
+toward negative infinity.</p>
 
                            </td>
                        </tr>
@@ -2177,65 +1955,287 @@ floating-point elements) from memory into result.
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_broadcastsd_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_broadcastsd_pd'>_mm256_broadcastsd_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_testnzc_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_testnzc_pd'>_mm256_testnzc_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx2</code></div>] <p>Broadcast the low double-precision (64-bit) floating-point element
-from <code>a</code> to all elements of the 256-bit returned value.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of 256 bits (representing double-precision (64-bit)
+floating-point elements) in <code>a</code> and <code>b</code>, producing an intermediate 256-bit
+value, and set <code>ZF</code> to 1 if the sign bit of each 64-bit element in the
+intermediate value is zero, otherwise set <code>ZF</code> to 0. Compute the bitwise
+NOT of <code>a</code> and then AND with <code>b</code>, producing an intermediate value, and set
+<code>CF</code> to 1 if the sign bit of each 64-bit element in the intermediate value
+is zero, otherwise set <code>CF</code> to 0. Return 1 if both the <code>ZF</code> and <code>CF</code> values
+are zero, otherwise return 0.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_div_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_div_ps'>_mm256_div_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_fmadd_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmadd_pd'>_mm256_fmadd_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the division of each of the 8 packed 32-bit floating-point elements
-in <code>a</code> by the corresponding packed elements in <code>b</code>.</p>
+                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and add the intermediate result to packed elements in <code>c</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_broadcastss_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_broadcastss_ps'>_mm256_broadcastss_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_or_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_or_ps'>_mm256_or_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx2</code></div>] <p>Broadcast the low single-precision (32-bit) floating-point element
-from <code>a</code> to all elements of the 256-bit returned value.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise OR packed single-precision (32-bit) floating-point
+elements in <code>a</code> and <code>b</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_sub_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_sub_ps'>_mm256_sub_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_hsub_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_hsub_ps'>_mm256_hsub_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Subtract packed single-precision (32-bit) floating-point elements in <code>b</code>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Horizontal subtraction of adjacent pairs in the two packed vectors
+of 8 32-bit floating points <code>a</code> and <code>b</code>.
+In the result, sums of elements from <code>a</code> are returned in locations of
+indices 0, 1, 4, 5; while sums of elements from <code>b</code> are locations
+2, 3, 6, 7.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_maskstore_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_maskstore_ps'>_mm256_maskstore_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Store packed single-precision (32-bit) floating-point elements from <code>a</code>
+into memory using <code>mask</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_fmaddsub_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmaddsub_ps'>_mm256_fmaddsub_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed single-precision (32-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and alternatively add and subtract packed elements in <code>c</code> to/from
+the intermediate result.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_fmaddsub_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fmaddsub_pd'>_mm256_fmaddsub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and alternatively add and subtract packed elements in <code>c</code> to/from
+the intermediate result.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_zeroupper.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_zeroupper'>_mm256_zeroupper</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Zero the upper 128 bits of all YMM registers;
+the lower 128-bits of the registers are unmodified.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_max_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_max_pd'>_mm256_max_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compare packed double-precision (64-bit) floating-point elements
+in <code>a</code> and <code>b</code>, and return packed maximum values</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_and_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_and_ps'>_mm256_and_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of packed single-precision (32-bit) floating-point
+elements in <code>a</code> and <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_load_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_load_ps'>_mm256_load_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Load 256-bits (composed of 8 packed single-precision (32-bit)
+floating-point elements) from memory into result.
+<code>mem_addr</code> must be aligned on a 32-byte boundary or a
+general-protection exception may be generated.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_setr_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setr_ps'>_mm256_setr_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed single-precision (32-bit) floating-point elements in returned
+vector with the supplied values in reverse order.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_testnzc_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_testnzc_ps'>_mm256_testnzc_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise AND of 256 bits (representing single-precision (32-bit)
+floating-point elements) in <code>a</code> and <code>b</code>, producing an intermediate 256-bit
+value, and set <code>ZF</code> to 1 if the sign bit of each 32-bit element in the
+intermediate value is zero, otherwise set <code>ZF</code> to 0. Compute the bitwise
+NOT of <code>a</code> and then AND with <code>b</code>, producing an intermediate value, and set
+<code>CF</code> to 1 if the sign bit of each 32-bit element in the intermediate value
+is zero, otherwise set <code>CF</code> to 0. Return 1 if both the <code>ZF</code> and <code>CF</code> values
+are zero, otherwise return 0.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_ceil_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_ceil_pd'>_mm256_ceil_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed double-precision (64-bit) floating point elements in <code>a</code>
+toward positive infinity.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_broadcast_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_broadcast_ps'>_mm256_broadcast_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Broadcast 128 bits from memory (composed of 4 packed single-precision
+(32-bit) floating-point elements) to all elements of the returned vector.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_setr_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setr_pd'>_mm256_setr_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed double-precision (64-bit) floating-point elements in returned
+vector with the supplied values in reverse order.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_addsub_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_addsub_pd'>_mm256_addsub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Alternatively add and subtract packed double-precision (64-bit)
+floating-point elements in <code>a</code> to/from packed elements in <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_load_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_load_pd'>_mm256_load_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Load 256-bits (composed of 4 packed double-precision (64-bit)
+floating-point elements) from memory into result.
+<code>mem_addr</code> must be aligned on a 32-byte boundary or a
+general-protection exception may be generated.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_or_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_or_pd'>_mm256_or_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Compute the bitwise OR packed double-precision (64-bit) floating-point
+elements in <code>a</code> and <code>b</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_hsub_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_hsub_pd'>_mm256_hsub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Horizontal subtraction of adjacent pairs in the two packed vectors
+of 4 64-bit floating points <code>a</code> and <code>b</code>.
+In the result, sums of elements from <code>a</code> are returned in even locations,
+while sums of elements from <code>b</code> are returned in odd locations.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_round_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_round_ps'>_mm256_round_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed single-precision (32-bit) floating point elements in <code>a</code>
+according to the flag <code>b</code>. The value of <code>b</code> may be as follows:</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_blend_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_blend_ps'>_mm256_blend_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Blend packed single-precision (32-bit) floating-point elements from
+<code>a</code> and <code>b</code> using control mask <code>imm8</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_broadcast_sd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_broadcast_sd'>_mm256_broadcast_sd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Broadcast a double-precision (64-bit) floating-point element from memory
+to all elements of the returned vector.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_cvtps_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cvtps_pd'>_mm256_cvtps_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Convert packed single-precision (32-bit) floating-point elements in <code>a</code>
+to packed double-precision (64-bit) floating-point elements.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_sub_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_sub_pd'>_mm256_sub_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Subtract packed double-precision (64-bit) floating-point elements in <code>b</code>
 from packed elements in <code>a</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_castpd_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_castpd_ps'>_mm256_castpd_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_unpacklo_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_unpacklo_pd'>_mm256_unpacklo_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Cast vector of type __m256d to type __m256.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Unpack and interleave double-precision (64-bit) floating-point elements
+from the low half of each 128-bit lane in <code>a</code> and <code>b</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_floor_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_floor_ps'>_mm256_floor_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_permutevar_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permutevar_pd'>_mm256_permutevar_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Round packed single-precision (32-bit) floating point elements in <code>a</code>
-toward negative infinity.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle double-precision (64-bit) floating-point elements in <code>a</code>
+within 256-bit lanes using the control in <code>b</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_movemask_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_movemask_ps'>_mm256_movemask_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_fnmadd_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fnmadd_pd'>_mm256_fnmadd_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set each bit of the returned mask based on the most significant bit of the
-corresponding packed single-precision (32-bit) floating-point element in
-<code>a</code>.</p>
+                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed double-precision (64-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and add the negated intermediate result to packed elements in <code>c</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_fnmsub_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_fnmsub_ps'>_mm256_fnmsub_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>fma</code></div>] <p>Multiply packed single-precision (32-bit) floating-point elements in <code>a</code>
+and <code>b</code>, and subtract packed elements in <code>c</code> from the negated intermediate
+result.</p>
 
                            </td>
                        </tr>
@@ -2506,18 +2506,18 @@ the upper 128 bits of the result are undefined.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_castsi256_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_castsi256_pd'>_mm256_castsi256_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Casts vector of type __m256i to type __m256d.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="fn" href="fn._mm256_castsi256_ps.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_castsi256_ps'>_mm256_castsi256_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Casts vector of type __m256i to type __m256.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_castsi256_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_castsi256_pd'>_mm256_castsi256_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Casts vector of type __m256i to type __m256d.</p>
 
                            </td>
                        </tr>
@@ -2603,19 +2603,19 @@ the upper 128 bits of the result are undefined.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_cvtepi32_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cvtepi32_ps'>_mm256_cvtepi32_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_cvtepi32_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cvtepi32_pd'>_mm256_cvtepi32_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Convert packed 32-bit integers in <code>a</code> to packed single-precision (32-bit)
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Convert packed 32-bit integers in <code>a</code> to packed double-precision (64-bit)
 floating-point elements.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_cvtepi32_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cvtepi32_pd'>_mm256_cvtepi32_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_cvtepi32_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_cvtepi32_ps'>_mm256_cvtepi32_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Convert packed 32-bit integers in <code>a</code> to packed double-precision (64-bit)
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Convert packed 32-bit integers in <code>a</code> to packed single-precision (32-bit)
 floating-point elements.</p>
 
                            </td>
@@ -3508,19 +3508,19 @@ using unsigned saturation</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_permute2f128_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permute2f128_ps'>_mm256_permute2f128_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_permute2f128_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permute2f128_pd'>_mm256_permute2f128_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle 256-bits (composed of 8 packed single-precision (32-bit)
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle 256-bits (composed of 4 packed double-precision (64-bit)
 floating-point elements) selected by <code>imm8</code> from <code>a</code> and <code>b</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_permute2f128_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permute2f128_pd'>_mm256_permute2f128_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_permute2f128_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_permute2f128_ps'>_mm256_permute2f128_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle 256-bits (composed of 4 packed double-precision (64-bit)
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Shuffle 256-bits (composed of 8 packed single-precision (32-bit)
 floating-point elements) selected by <code>imm8</code> from <code>a</code> and <code>b</code>.</p>
 
                            </td>
@@ -3588,19 +3588,19 @@ integers in the low 16 bits of the 64-bit return value</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_set1_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set1_pd'>_mm256_set1_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_set1_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set1_ps'>_mm256_set1_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Broadcast double-precision (64-bit) floating-point value <code>a</code> to all
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Broadcast single-precision (32-bit) floating-point value <code>a</code> to all
 elements of returned vector.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_set1_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set1_ps'>_mm256_set1_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_set1_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set1_pd'>_mm256_set1_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Broadcast single-precision (32-bit) floating-point value <code>a</code> to all
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Broadcast double-precision (64-bit) floating-point value <code>a</code> to all
 elements of returned vector.</p>
 
                            </td>
@@ -3675,10 +3675,10 @@ reverse order.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_set_m128.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set_m128'>_mm256_set_m128</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_set_m128i.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set_m128i'>_mm256_set_m128i</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed __m256 returned vector with the supplied values.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed __m256i returned vector with the supplied values.</p>
 
                            </td>
                        </tr>
@@ -3691,10 +3691,10 @@ reverse order.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_set_m128i.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set_m128i'>_mm256_set_m128i</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_set_m128.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_set_m128'>_mm256_set_m128</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed __m256i returned vector with the supplied values.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed __m256 returned vector with the supplied values.</p>
 
                            </td>
                        </tr>
@@ -3735,10 +3735,10 @@ reverse order.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_setr_m128.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setr_m128'>_mm256_setr_m128</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_setr_m128i.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setr_m128i'>_mm256_setr_m128i</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed __m256 returned vector with the supplied values.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed __m256i returned vector with the supplied values.</p>
 
                            </td>
                        </tr>
@@ -3751,10 +3751,10 @@ reverse order.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_setr_m128i.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setr_m128i'>_mm256_setr_m128i</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm256_setr_m128.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_setr_m128'>_mm256_setr_m128</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed __m256i returned vector with the supplied values.</p>
+                               [<div class='stab portability'>x86-64 and <code>avx</code></div>] <p>Set packed __m256 returned vector with the supplied values.</p>
 
                            </td>
                        </tr>
@@ -4051,17 +4051,6 @@ general-protection exception may be generated.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm256_storeu2_m128d.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_storeu2_m128d'>_mm256_storeu2_m128d</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>avx,sse2</code></div>] <p>Store the high and low 128-bit halves (each composed of 2 packed
-double-precision (64-bit) floating-point elements) from <code>a</code> into memory two
-different 128-bit locations.
-<code>hiaddr</code> and <code>loaddr</code> do not need to be aligned on any particular boundary.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="fn" href="fn._mm256_storeu2_m128.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_storeu2_m128'>_mm256_storeu2_m128</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
@@ -4078,6 +4067,17 @@ different 128-bit locations.
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>avx,sse2</code></div>] <p>Store the high and low 128-bit halves (each composed of integer data) from
 <code>a</code> into memory two different 128-bit locations.
+<code>hiaddr</code> and <code>loaddr</code> do not need to be aligned on any particular boundary.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm256_storeu2_m128d.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm256_storeu2_m128d'>_mm256_storeu2_m128d</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>avx,sse2</code></div>] <p>Store the high and low 128-bit halves (each composed of 2 packed
+double-precision (64-bit) floating-point elements) from <code>a</code> into memory two
+different 128-bit locations.
 <code>hiaddr</code> and <code>loaddr</code> do not need to be aligned on any particular boundary.</p>
 
                            </td>
@@ -5919,19 +5919,19 @@ a 32-bit integer.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm_cvtsd_si64x.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsd_si64x'>_mm_cvtsd_si64x</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Alias for <code>_mm_cvtsd_si64</code></p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class="fn" href="fn._mm_cvtsd_si64.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsd_si64'>_mm_cvtsd_si64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Convert the lower double-precision (64-bit) floating-point element in a to
 a 64-bit integer.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm_cvtsd_si64x.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsd_si64x'>_mm_cvtsd_si64x</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Alias for <code>_mm_cvtsd_si64</code></p>
 
                            </td>
                        </tr>
@@ -5947,15 +5947,6 @@ to the upper element the return value.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm_cvtsi32_sd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi32_sd'>_mm_cvtsi32_sd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Return <code>a</code> with its lower element replaced by <code>b</code> after converting it to
-an <code>f64</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="fn" href="fn._mm_cvtsi32_ss.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi32_ss'>_mm_cvtsi32_ss</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
@@ -5965,8 +5956,26 @@ vector <code>a</code> with the lowest 32 bit float replaced by the converted int
                            </td>
                        </tr>
                        <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm_cvtsi32_sd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi32_sd'>_mm_cvtsi32_sd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Return <code>a</code> with its lower element replaced by <code>b</code> after converting it to
+an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class="fn" href="fn._mm_cvtsi64x_sd.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi64x_sd'>_mm_cvtsi64x_sd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Return <code>a</code> with its lower element replaced by <code>b</code> after converting it to
+an <code>f64</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm_cvtsi64_sd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi64_sd'>_mm_cvtsi64_sd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Return <code>a</code> with its lower element replaced by <code>b</code> after converting it to
 an <code>f64</code>.</p>
@@ -5983,15 +5992,6 @@ vector <code>a</code> with the lowest 32 bit float replaced by the converted int
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm_cvtsi64_sd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi64_sd'>_mm_cvtsi64_sd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Return <code>a</code> with its lower element replaced by <code>b</code> after converting it to
-an <code>f64</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="fn" href="fn._mm_cvtsi128_si32.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi128_si32'>_mm_cvtsi128_si32</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
@@ -6000,16 +6000,16 @@ an <code>f64</code>.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm_cvtsi128_si64.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi128_si64'>_mm_cvtsi128_si64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm_cvtsi128_si64x.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi128_si64x'>_mm_cvtsi128_si64x</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Return the lowest element of <code>a</code>.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm_cvtsi128_si64x.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi128_si64x'>_mm_cvtsi128_si64x</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm_cvtsi128_si64.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtsi128_si64'>_mm_cvtsi128_si64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Return the lowest element of <code>a</code>.</p>
 
@@ -6113,19 +6113,19 @@ to a 32-bit integer with truncation.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm_cvttsd_si64x.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvttsd_si64x'>_mm_cvttsd_si64x</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Alias for <code>_mm_cvttsd_si64</code></p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="fn" href="fn._mm_cvttsd_si64.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvttsd_si64'>_mm_cvttsd_si64</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Convert the lower double-precision (64-bit) floating-point element in <code>a</code>
 to a 64-bit integer with truncation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn._mm_cvttsd_si64x.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvttsd_si64x'>_mm_cvttsd_si64x</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab portability'>x86-64 and <code>sse2</code></div>] <p>Alias for <code>_mm_cvttsd_si64</code></p>
 
                            </td>
                        </tr>
@@ -6619,8 +6619,8 @@ where
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm_i64gather_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_i64gather_ps'>_mm_i64gather_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm_i64gather_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_i64gather_pd'>_mm_i64gather_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>avx2</code></div>] <p>Return values from <code>slice</code> at offsets determined by <code>offsets * scale</code>,
 where
@@ -6629,8 +6629,8 @@ where
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm_i64gather_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_i64gather_pd'>_mm_i64gather_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm_i64gather_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_i64gather_ps'>_mm_i64gather_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>avx2</code></div>] <p>Return values from <code>slice</code> at offsets determined by <code>offsets * scale</code>,
 where
@@ -6960,8 +6960,8 @@ that position instead.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm_mask_i64gather_ps.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_mask_i64gather_ps'>_mm_mask_i64gather_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm_mask_i64gather_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_mask_i64gather_pd'>_mm_mask_i64gather_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>avx2</code></div>] <p>Return values from <code>slice</code> at offsets determined by <code>offsets * scale</code>,
 where
@@ -6971,8 +6971,8 @@ that position instead.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="fn" href="fn._mm_mask_i64gather_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_mask_i64gather_pd'>_mm_mask_i64gather_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td><a class="fn" href="fn._mm_mask_i64gather_ps.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_mask_i64gather_ps'>_mm_mask_i64gather_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                [<div class='stab portability'>x86-64 and <code>avx2</code></div>] <p>Return values from <code>slice</code> at offsets determined by <code>offsets * scale</code>,
 where
@@ -9393,7 +9393,8 @@ by <code>a</code>.</p>
                            <td><a class="fn" href="fn._MM_SHUFFLE.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_MM_SHUFFLE'>_MM_SHUFFLE</a></td>
                            <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] [<div class='stab portability'>x86-64</div>] <p>A utility function for creating masks to use with Intel shuffle and permute intrinsics.</p>
+                               [<div class='stab unstable'>Experimental</div>] [<div class='stab portability'>x86-64</div>] <p>A utility function for creating masks to use with Intel shuffle and
+permute intrinsics.</p>
 
                            </td>
                        </tr>
@@ -9834,16 +9835,6 @@ returned in a 64-bit vector of <code>[2 x i32]</code>.</p>
                            </td>
                        </tr>
                        <tr class='unstable module-item'>
-                           <td><a class="fn" href="fn._mm_cvtpi32_pd.html"
-                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtpi32_pd'>_mm_cvtpi32_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] [<div class='stab portability'>x86-64 and <code>sse2,mmx</code></div>] <p>Converts the two signed 32-bit integer elements of a 64-bit vector of
-<code>[2 x i32]</code> into two double-precision floating-point values, returned in a
-128-bit vector of <code>[2 x double]</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
                            <td><a class="fn" href="fn._mm_cvtpi32_ps.html"
                                   title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtpi32_ps'>_mm_cvtpi32_ps</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
@@ -9851,6 +9842,16 @@ returned in a 64-bit vector of <code>[2 x i32]</code>.</p>
 floating point values and writes them to the lower 64-bits of the
 destination. The remaining higher order elements of the destination are
 copied from the corresponding elements in the first operand.</p>
+
+                           </td>
+                       </tr>
+                       <tr class='unstable module-item'>
+                           <td><a class="fn" href="fn._mm_cvtpi32_pd.html"
+                                  title='fn argmin::prelude::failure::_core::arch::x86_64::_mm_cvtpi32_pd'>_mm_cvtpi32_pd</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
+                           <td class='docblock-short'>
+                               [<div class='stab unstable'>Experimental</div>] [<div class='stab portability'>x86-64 and <code>sse2,mmx</code></div>] <p>Converts the two signed 32-bit integer elements of a 64-bit vector of
+<code>[2 x i32]</code> into two double-precision floating-point values, returned in a
+128-bit vector of <code>[2 x double]</code>.</p>
 
                            </td>
                        </tr>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["TrustRegion","Trust region solver"]]});

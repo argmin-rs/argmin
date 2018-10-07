@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CauchyPoint","Cauchy Point"]]});
