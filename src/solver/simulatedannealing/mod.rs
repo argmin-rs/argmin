@@ -58,7 +58,7 @@ pub enum SATempFunc {
 #[log("reanneal_fixed" => "self.reanneal_fixed")]
 #[log("reanneal_accepted" => "self.reanneal_accepted")]
 #[log("reanneal_best" => "self.reanneal_best")]
-pub struct SimulatedAnnealing<T, H>
+pub struct SimulatedAnnealing<'a, T, H>
 where
     T: Clone + Default,
     H: Clone + Default,
@@ -97,10 +97,10 @@ where
     /// random number generator
     rng: rand::ThreadRng,
     /// base
-    base: ArgminBase<T, f64, H>,
+    base: ArgminBase<'a, T, f64, H>,
 }
 
-impl<T, H> SimulatedAnnealing<T, H>
+impl<'a, T, H> SimulatedAnnealing<'a, T, H>
 where
     T: Clone + Default,
     H: Clone + Default,
@@ -113,7 +113,7 @@ where
     /// `init_param`: Initial parameter vector
     /// `init_temp`: Initial temperature
     pub fn new(
-        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
         init_param: T,
         init_temp: f64,
     ) -> Result<Self, Error> {
@@ -272,7 +272,7 @@ where
     }
 }
 
-impl<T, H> ArgminNextIter for SimulatedAnnealing<T, H>
+impl<'a, T, H> ArgminNextIter for SimulatedAnnealing<'a, T, H>
 where
     T: Clone + Default,
     H: Clone + Default,

@@ -33,7 +33,7 @@ where
     /// line search
     linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     /// Base stuff
-    base: ArgminBase<T, f64, H>,
+    base: ArgminBase<'a, T, f64, H>,
 }
 
 impl<'a, T, H> SteepestDescent<'a, T, H>
@@ -52,7 +52,7 @@ where
 {
     /// Constructor
     pub fn new(
-        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
         init_param: T,
     ) -> Result<Self, Error> {
         let linesearch = HagerZhangLineSearch::new(cost_function.clone());

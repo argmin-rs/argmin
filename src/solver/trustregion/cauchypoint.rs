@@ -24,7 +24,7 @@ use std;
 
 /// Cauchy Point
 #[derive(ArgminSolver)]
-pub struct CauchyPoint<T, H>
+pub struct CauchyPoint<'a, T, H>
 where
     T: Clone
         + std::default::Default
@@ -37,10 +37,10 @@ where
     /// Radius
     radius: f64,
     /// base
-    base: ArgminBase<T, f64, H>,
+    base: ArgminBase<'a, T, f64, H>,
 }
 
-impl<T, H> CauchyPoint<T, H>
+impl<'a, T, H> CauchyPoint<'a, T, H>
 where
     T: Clone
         + std::default::Default
@@ -56,7 +56,7 @@ where
     ///
     /// `operator`: operator
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     ) -> Self {
         let base = ArgminBase::new(operator, T::default());
         CauchyPoint {
@@ -66,7 +66,7 @@ where
     }
 }
 
-impl<T, H> ArgminNextIter for CauchyPoint<T, H>
+impl<'a, T, H> ArgminNextIter for CauchyPoint<'a, T, H>
 where
     T: Clone
         + std::default::Default
@@ -103,7 +103,7 @@ where
     }
 }
 
-impl<T, H> ArgminTrustRegion for CauchyPoint<T, H>
+impl<'a, T, H> ArgminTrustRegion for CauchyPoint<'a, T, H>
 where
     T: Clone
         + std::default::Default

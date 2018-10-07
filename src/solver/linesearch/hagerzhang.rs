@@ -30,7 +30,7 @@ use std;
 #[stop("self.best_f - self.finit < self.delta * self.best_x * self.dginit" => LineSearchConditionMet)]
 #[stop("self.best_g > self.sigma * self.dginit" => LineSearchConditionMet)]
 #[stop("(2.0*self.delta - 1.0)*self.dginit >= self.best_g && self.best_g >= self.sigma * self.dginit && self.best_f <= self.finit + self.epsilon_k" => LineSearchConditionMet)]
-pub struct HagerZhangLineSearch<T, H>
+pub struct HagerZhangLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
@@ -105,10 +105,10 @@ where
     /// Search direction in 1D
     dginit: f64,
     /// base
-    base: ArgminBase<T, f64, H>,
+    base: ArgminBase<'a, T, f64, H>,
 }
 
-impl<T, H> HagerZhangLineSearch<T, H>
+impl<'a, T, H> HagerZhangLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
@@ -118,7 +118,7 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
-    HagerZhangLineSearch<T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    HagerZhangLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
     /// Constructor
     ///
@@ -126,7 +126,7 @@ where
     ///
     /// `operator`: operator
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     ) -> Self {
         HagerZhangLineSearch {
             delta: 0.1,
@@ -427,7 +427,7 @@ where
     }
 }
 
-impl<T, H> ArgminLineSearch for HagerZhangLineSearch<T, H>
+impl<'a, T, H> ArgminLineSearch for HagerZhangLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
@@ -480,7 +480,7 @@ where
     }
 }
 
-impl<T, H> ArgminNextIter for HagerZhangLineSearch<T, H>
+impl<'a, T, H> ArgminNextIter for HagerZhangLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone

@@ -43,7 +43,7 @@ impl Step {
 
 /// More-Thuente Line Search
 #[derive(ArgminSolver)]
-pub struct MoreThuenteLineSearch<T, H>
+pub struct MoreThuenteLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
@@ -107,10 +107,10 @@ where
     /// infoc
     infoc: usize,
     /// base
-    base: ArgminBase<T, f64, H>,
+    base: ArgminBase<'a, T, f64, H>,
 }
 
-impl<T, H> MoreThuenteLineSearch<T, H>
+impl<'a, T, H> MoreThuenteLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
@@ -120,7 +120,7 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
-    MoreThuenteLineSearch<T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    MoreThuenteLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
     /// Constructor
     ///
@@ -128,7 +128,7 @@ where
     ///
     /// `operator`: operator
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     ) -> Self {
         MoreThuenteLineSearch {
             init_param_b: None,
@@ -211,7 +211,7 @@ where
     }
 }
 
-impl<T, H> ArgminLineSearch for MoreThuenteLineSearch<T, H>
+impl<'a, T, H> ArgminLineSearch for MoreThuenteLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
@@ -270,7 +270,7 @@ where
     }
 }
 
-impl<T, H> ArgminNextIter for MoreThuenteLineSearch<T, H>
+impl<'a, T, H> ArgminNextIter for MoreThuenteLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone

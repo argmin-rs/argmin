@@ -26,7 +26,7 @@ use std::default::Default;
 
 /// Conjugate Gradient struct
 #[derive(ArgminSolver)]
-pub struct ConjugateGradient<T, H>
+pub struct ConjugateGradient<'a, T, H>
 where
     T: Clone
         + Default
@@ -45,10 +45,10 @@ where
     /// beta
     beta: f64,
     /// base
-    base: ArgminBase<T, T, H>,
+    base: ArgminBase<'a, T, T, H>,
 }
 
-impl<T, H> ConjugateGradient<T, H>
+impl<'a, T, H> ConjugateGradient<'a, T, H>
 where
     T: Clone
         + Default
@@ -81,7 +81,7 @@ where
     }
 }
 
-impl<T, H> ArgminNextIter for ConjugateGradient<T, H>
+impl<'a, T, H> ArgminNextIter for ConjugateGradient<'a, T, H>
 where
     T: Clone
         + Default

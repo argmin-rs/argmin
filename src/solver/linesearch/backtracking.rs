@@ -23,7 +23,7 @@ use std;
 /// Backtracking Line Search
 #[derive(ArgminSolver)]
 #[stop("self.eval_condition()" => LineSearchConditionMet)]
-pub struct BacktrackingLineSearch<T, H>
+pub struct BacktrackingLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
@@ -48,10 +48,10 @@ where
     /// alpha
     alpha: f64,
     /// base
-    base: ArgminBase<T, f64, H>,
+    base: ArgminBase<'a, T, f64, H>,
 }
 
-impl<T, H> BacktrackingLineSearch<T, H>
+impl<'a, T, H> BacktrackingLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
@@ -60,7 +60,7 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
-    BacktrackingLineSearch<T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    BacktrackingLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
     /// Constructor
     ///
@@ -69,7 +69,7 @@ where
     /// `cost_function`: cost function
     /// `rho`: todo
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     ) -> Self {
         // let cond = ArmijoCondition::new(0.0001).unwrap();
         // let cond = WolfeCondition::new(0.0001, 0.9).unwrap();
@@ -124,7 +124,7 @@ where
     }
 }
 
-impl<T, H> ArgminLineSearch for BacktrackingLineSearch<T, H>
+impl<'a, T, H> ArgminLineSearch for BacktrackingLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
@@ -133,7 +133,7 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
-    BacktrackingLineSearch<T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    BacktrackingLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: T) {
@@ -183,7 +183,7 @@ where
     }
 }
 
-impl<T, H> ArgminNextIter for BacktrackingLineSearch<T, H>
+impl<'a, T, H> ArgminNextIter for BacktrackingLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
