@@ -19,6 +19,7 @@ struct MyProblem {}
 impl ArgminOperator for MyProblem {
     type Parameters = Vec<f64>;
     type OperatorOutput = f64;
+    type Hessian = ();
 
     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
         Ok(sphere(param))
