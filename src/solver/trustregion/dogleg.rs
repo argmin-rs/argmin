@@ -30,9 +30,10 @@ where
         + std::default::Default
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
+        + ArgminDot<T, f64>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
-    H: Clone + std::default::Default,
+    H: Clone + std::default::Default + ArgminInv<H>,
 {
     /// Radius
     radius: f64,
@@ -46,9 +47,10 @@ where
         + std::default::Default
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
+        + ArgminDot<T, f64>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
-    H: Clone + std::default::Default,
+    H: Clone + std::default::Default + ArgminInv<H>,
 {
     /// Constructor
     ///
@@ -72,9 +74,10 @@ where
         + std::default::Default
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
+        + ArgminDot<T, f64>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
-    H: Clone + std::default::Default,
+    H: Clone + std::default::Default + ArgminInv<H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -88,25 +91,31 @@ where
     }
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
-        // TODO: Math trait ArgminInverse
-        //       Probably will only work with ndarray or nalgebra...
+        let g = self.base.cur_grad();
+        let h = self.base.cur_hessian();
+        let pstar;
         // compute tau
+        let tau: f64 = 0.0;
         // pb = -H^-1g
+        // let pb = (self.base.cur_hessian().ainv()?).mul(self.base.cur_grad());
         // pu = - (g^Tg)/(g^THg) * g
+        let pu = g.scale(-g.dot(g.clone()) / g.weighted_dot(h.clone(), g.clone()));
+        if tau >= 0.0 && tau < 1.0 {
+            pstar = pu.scale(tau);
+        } else if tau >= 1.0 && tau <= 2.0 {
+            // pstar = pu + (tau - 1.0) * (pb - pu)
+            pstar = unimplemented!();
+        } else {
+            return Err(ArgminError::ImpossibleError {
+                text: "tau is bigger than 2, this is not supposed to happen.".to_string(),
+            }
+            .into());
+        }
         // if 0 <= tau < 1
         //     p* = tau * pu
         // if 1 <= tau <= 2
         //     p* = pu + (tau-1)*(pb - pu)
         unimplemented!()
-        // let grad = self.base.cur_grad();
-        // let grad_norm = grad.norm();
-        // let wdp = grad.weighted_dot(self.base.cur_hessian().clone(), grad.clone());
-        // let tau: f64 = if wdp <= 0.0 {
-        //     1.0
-        // } else {
-        //     1.0f64.min(grad_norm.powi(3) / (self.radius * wdp))
-        // };
-        //
         // let new_param = grad.scale(-tau * self.radius / grad_norm);
         // let out = ArgminIterationData::new(new_param, 0.0);
         // Ok(out)
@@ -119,9 +128,10 @@ where
         + std::default::Default
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
+        + ArgminDot<T, f64>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
-    H: Clone + std::default::Default,
+    H: Clone + std::default::Default + ArgminInv<H>,
 {
     // fn set_initial_parameter(&mut self, param: T) {
     //     self.base.set_cur_param(param);
