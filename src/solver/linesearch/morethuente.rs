@@ -171,13 +171,13 @@ where
     pub fn set_c(&mut self, c1: f64, c2: f64) -> Result<&mut Self, Error> {
         if c1 <= 0.0 || c1 >= c2 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "MoreThuenteLineSearch: Parameter c1 must be in (0, c2).".to_string(),
+                text: "MoreThuenteLineSearch: Parameter c1 must be in (0, c2).".to_string(),
             }
             .into());
         }
         if c2 <= c1 || c2 >= 1.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "MoreThuenteLineSearch: Parameter c2 must be in (c1, 1).".to_string(),
+                text: "MoreThuenteLineSearch: Parameter c2 must be in (c1, 1).".to_string(),
             }
             .into());
         }
@@ -194,13 +194,13 @@ where
     ) -> Result<&mut Self, Error> {
         if alpha_min < 0.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "MoreThuenteLineSearch: alpha_min must be >= 0.0.".to_string(),
+                text: "MoreThuenteLineSearch: alpha_min must be >= 0.0.".to_string(),
             }
             .into());
         }
         if alpha_max <= alpha_min {
             return Err(ArgminError::InvalidParameter {
-                parameter: "MoreThuenteLineSearch: alpha_min must be smaller than alpha_max."
+                text: "MoreThuenteLineSearch: alpha_min must be smaller than alpha_max."
                     .to_string(),
             }
             .into());
@@ -261,7 +261,7 @@ where
     fn set_initial_alpha(&mut self, alpha: f64) -> Result<(), Error> {
         if alpha <= 0.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "MoreThuenteLineSearch: Initial alpha must be > 0.".to_string(),
+                text: "MoreThuenteLineSearch: Initial alpha must be > 0.".to_string(),
             }
             .into());
         }

@@ -9,10 +9,13 @@
 
 /// Cauchy Point
 pub mod cauchypoint;
+/// Dogleg method
+pub mod dogleg;
 /// Trust region solver
 pub mod trustregion;
 
 pub use self::cauchypoint::*;
+pub use self::dogleg::*;
 pub use self::trustregion::*;
 
 /// Computes reduction ratio

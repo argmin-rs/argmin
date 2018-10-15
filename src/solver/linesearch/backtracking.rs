@@ -97,7 +97,7 @@ where
     pub fn set_rho(&mut self, rho: f64) -> Result<&mut Self, Error> {
         if rho <= 0.0 || rho >= 1.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "BacktrackingLineSearch: Contraction factor rho must be in (0, 1)."
+                text: "BacktrackingLineSearch: Contraction factor rho must be in (0, 1)."
                     .to_string(),
             }
             .into());
@@ -150,7 +150,7 @@ where
     fn set_initial_alpha(&mut self, alpha: f64) -> Result<(), Error> {
         if alpha <= 0.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "LineSearch: Inital alpha must be > 0.".to_string(),
+                text: "LineSearch: Inital alpha must be > 0.".to_string(),
             }
             .into());
         }

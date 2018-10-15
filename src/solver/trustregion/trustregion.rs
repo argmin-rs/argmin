@@ -98,7 +98,7 @@ where
     pub fn set_eta(&mut self, eta: f64) -> Result<&mut Self, Error> {
         if eta >= 0.25 || eta < 0.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "TrustRegion: eta must be in [0, 1/4).".to_string(),
+                text: "TrustRegion: eta must be in [0, 1/4).".to_string(),
             }
             .into());
         }

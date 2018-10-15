@@ -26,8 +26,9 @@ impl ArmijoCondition {
     pub fn new(c: f64) -> Result<Self, Error> {
         if c <= 0.0 || c >= 1.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "ArmijoCondition: Parameter c must be in (0, 1)".to_string(),
-            }.into());
+                text: "ArmijoCondition: Parameter c must be in (0, 1)".to_string(),
+            }
+            .into());
         }
         Ok(ArmijoCondition { c })
     }
@@ -65,13 +66,15 @@ impl WolfeCondition {
     pub fn new(c1: f64, c2: f64) -> Result<Self, Error> {
         if c1 <= 0.0 || c1 >= 1.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "WolfeCondition: Parameter c1 must be in (0, 1)".to_string(),
-            }.into());
+                text: "WolfeCondition: Parameter c1 must be in (0, 1)".to_string(),
+            }
+            .into());
         }
         if c2 <= c1 || c2 >= 1.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "WolfeCondition: Parameter c2 must be in (c1, 1)".to_string(),
-            }.into());
+                text: "WolfeCondition: Parameter c2 must be in (c1, 1)".to_string(),
+            }
+            .into());
         }
         Ok(WolfeCondition { c1, c2 })
     }
@@ -111,13 +114,15 @@ impl StrongWolfeCondition {
     pub fn new(c1: f64, c2: f64) -> Result<Self, Error> {
         if c1 <= 0.0 || c1 >= 1.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "StrongWolfeCondition: Parameter c1 must be in (0, 1)".to_string(),
-            }.into());
+                text: "StrongWolfeCondition: Parameter c1 must be in (0, 1)".to_string(),
+            }
+            .into());
         }
         if c2 <= c1 || c2 >= 1.0 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "StrongWolfeCondition: Parameter c2 must be in (c1, 1)".to_string(),
-            }.into());
+                text: "StrongWolfeCondition: Parameter c2 must be in (c1, 1)".to_string(),
+            }
+            .into());
         }
         Ok(StrongWolfeCondition { c1, c2 })
     }
@@ -156,8 +161,9 @@ impl GoldsteinCondition {
     pub fn new(c: f64) -> Result<Self, Error> {
         if c <= 0.0 || c >= 0.5 {
             return Err(ArgminError::InvalidParameter {
-                parameter: "GoldsteinCondition: Parameter c must be in (0, 0.5)".to_string(),
-            }.into());
+                text: "GoldsteinCondition: Parameter c must be in (0, 0.5)".to_string(),
+            }
+            .into());
         }
         Ok(GoldsteinCondition { c })
     }

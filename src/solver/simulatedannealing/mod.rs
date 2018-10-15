@@ -120,7 +120,7 @@ where
         let prev_cost = cost_function.apply(&init_param)?;
         if init_temp <= 0_f64 {
             Err(ArgminError::InvalidParameter {
-                parameter: "initial temperature".to_string(),
+                text: "initial temperature".to_string(),
             }
             .into())
         } else {
