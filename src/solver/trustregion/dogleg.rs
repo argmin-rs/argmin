@@ -31,9 +31,11 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
+        + ArgminAdd<T>
+        + ArgminSub<T>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
-    H: Clone + std::default::Default + ArgminInv<H>,
+    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// Radius
     radius: f64,
@@ -48,9 +50,11 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
+        + ArgminAdd<T>
+        + ArgminSub<T>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
-    H: Clone + std::default::Default + ArgminInv<H>,
+    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// Constructor
     ///
@@ -75,9 +79,11 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
+        + ArgminAdd<T>
+        + ArgminSub<T>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
-    H: Clone + std::default::Default + ArgminInv<H>,
+    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -97,14 +103,16 @@ where
         // compute tau
         let tau: f64 = 0.0;
         // pb = -H^-1g
-        // let pb = (self.base.cur_hessian().ainv()?).mul(self.base.cur_grad());
+        let pb = (self.base.cur_hessian().ainv()?)
+            .dot(self.base.cur_grad())
+            .scale(-1.0);
         // pu = - (g^Tg)/(g^THg) * g
         let pu = g.scale(-g.dot(g.clone()) / g.weighted_dot(h.clone(), g.clone()));
         if tau >= 0.0 && tau < 1.0 {
             pstar = pu.scale(tau);
         } else if tau >= 1.0 && tau <= 2.0 {
             // pstar = pu + (tau - 1.0) * (pb - pu)
-            pstar = unimplemented!();
+            pstar = pu.add(pb.sub(pu.clone()).scale(tau - 1.0));
         } else {
             return Err(ArgminError::ImpossibleError {
                 text: "tau is bigger than 2, this is not supposed to happen.".to_string(),
@@ -129,9 +137,11 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
+        + ArgminAdd<T>
+        + ArgminSub<T>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
-    H: Clone + std::default::Default + ArgminInv<H>,
+    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     // fn set_initial_parameter(&mut self, param: T) {
     //     self.base.set_cur_param(param);
