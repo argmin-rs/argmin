@@ -99,15 +99,32 @@ where
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let g = self.base.cur_grad();
         let h = self.base.cur_hessian();
-        let pstar;
-        // compute tau
-        let tau: f64 = 0.0;
         // pb = -H^-1g
         let pb = (self.base.cur_hessian().ainv()?)
             .dot(self.base.cur_grad())
             .scale(-1.0);
         // pu = - (g^Tg)/(g^THg) * g
         let pu = g.scale(-g.dot(g.clone()) / g.weighted_dot(h.clone(), g.clone()));
+
+        let utu = pu.dot(pu.clone());
+        let btb = pb.dot(pb.clone());
+        let utb = pu.dot(pb.clone());
+        println!("{:?}", pb);
+        // compute tau
+        let delta = self.radius.powi(2);
+        let t1 = 3.0 * utb - btb - 2.0 * utu;
+        let t2 = (utb.powi(2) - 2.0 * utb * delta + delta * btb - btb * utu + delta * utu).sqrt();
+        let t3 = -2.0 * utb + btb + utu;
+        let tau1: f64 = (t1 + t2) / t3;
+        let tau2: f64 = (t1 - t2) / t3;
+        println!("tau1: {}; tau2: {}", tau1, tau2);
+        let tau = tau1;
+
+        // if 0 <= tau < 1
+        //     p* = tau * pu
+        // if 1 <= tau <= 2
+        //     p* = pu + (tau-1)*(pb - pu)
+        let pstar;
         if tau >= 0.0 && tau < 1.0 {
             pstar = pu.scale(tau);
         } else if tau >= 1.0 && tau <= 2.0 {
@@ -119,14 +136,9 @@ where
             }
             .into());
         }
-        // if 0 <= tau < 1
-        //     p* = tau * pu
-        // if 1 <= tau <= 2
-        //     p* = pu + (tau-1)*(pb - pu)
-        unimplemented!()
-        // let new_param = grad.scale(-tau * self.radius / grad_norm);
-        // let out = ArgminIterationData::new(new_param, 0.0);
-        // Ok(out)
+        // let new_param = self.base.cur_param().add(pstar);
+        let out = ArgminIterationData::new(pstar, 0.0);
+        Ok(out)
     }
 }
 

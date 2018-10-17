@@ -20,7 +20,8 @@
 
 use prelude::*;
 use solver::trustregion::reduction_ratio;
-use solver::trustregion::CauchyPoint;
+// use solver::trustregion::CauchyPoint;
+use solver::trustregion::Dogleg;
 use std;
 
 /// Trust region solver
@@ -34,8 +35,9 @@ where
         + ArgminDot<T, f64>
         + ArgminNorm<f64>
         + ArgminAdd<T>
+        + ArgminSub<T>
         + ArgminScale<f64>,
-    H: Clone + std::default::Default,
+    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// Radius
     radius: f64,
@@ -63,8 +65,9 @@ where
         + ArgminDot<T, f64>
         + ArgminNorm<f64>
         + ArgminAdd<T>
+        + ArgminSub<T>
         + ArgminScale<f64>,
-    H: 'a + Clone + std::default::Default,
+    H: 'a + Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// Constructor
     ///
@@ -76,9 +79,10 @@ where
         param: T,
     ) -> Self {
         let base = ArgminBase::new(operator.clone(), param);
-        let subproblem = Box::new(CauchyPoint::new(operator.clone()));
+        // let subproblem = Box::new(CauchyPoint::new(operator.clone()));
+        let subproblem = Box::new(Dogleg::new(operator.clone()));
         TrustRegion {
-            radius: 1.0,
+            radius: 0.5,
             max_radius: 10.0,
             eta: 0.125,
             subproblem: subproblem,
@@ -122,8 +126,9 @@ where
         + ArgminDot<T, f64>
         + ArgminNorm<f64>
         + ArgminAdd<T>
+        + ArgminSub<T>
         + ArgminScale<f64>,
-    H: Clone + std::default::Default,
+    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
