@@ -33,8 +33,8 @@ fn rosenbrock_hessian(x: &Array1<f64>) -> Array2<f64> {
     // hacky...
     let mut out = Array2::eye(2);
     out[(0, 0)] = bla[0];
-    out[(0, 1)] = bla[1];
-    out[(1, 0)] = bla[2];
+    out[(0, 1)] = bla[2];
+    out[(1, 0)] = bla[1];
     out[(1, 1)] = bla[3];
     out
 }
@@ -56,7 +56,7 @@ fn run() -> Result<(), Error> {
     let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
     // let init_param: Vec<f64> = vec![-1.2, 1.0];
 
-    let iters = 1000;
+    let iters = 10;
     let mut solver = TrustRegion::new(Box::new(cost), init_param);
     solver.set_max_iters(iters);
     solver.add_logger(ArgminSlogLogger::term_noblock());
