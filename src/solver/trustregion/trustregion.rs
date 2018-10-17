@@ -82,7 +82,7 @@ where
         // let subproblem = Box::new(CauchyPoint::new(operator.clone()));
         let subproblem = Box::new(Dogleg::new(operator.clone()));
         TrustRegion {
-            radius: 0.5,
+            radius: 1.0,
             max_radius: 10.0,
             eta: 0.125,
             subproblem: subproblem,
