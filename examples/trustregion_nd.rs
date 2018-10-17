@@ -54,7 +54,7 @@ fn run() -> Result<(), Error> {
 
     // definie inital parameter vector
     let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
-    // let init_param: Vec<f64> = vec![-1.2, 1.0];
+    // let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 
     let iters = 10;
     let mut solver = TrustRegion::new(Box::new(cost), init_param);
