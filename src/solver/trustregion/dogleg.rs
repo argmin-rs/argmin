@@ -100,11 +100,12 @@ where
         let g = self.base.cur_grad();
         let h = self.base.cur_hessian();
         let pstar;
+
         // pb = -H^-1g
         let pb = (self.base.cur_hessian().ainv()?)
             .dot(self.base.cur_grad())
             .scale(-1.0);
-        // println!("rad: {}, {:?}", self.radius, pb);
+
         if pb.norm() <= self.radius {
             pstar = pb;
         } else {
@@ -113,24 +114,25 @@ where
 
             let utu = pu.dot(pu.clone());
             let btb = pb.dot(pb.clone());
-            // let utb = pu.dot(pb.clone());
+            let utb = pu.dot(pb.clone());
+
             // compute tau
             let delta = self.radius.powi(2);
-            // let t1 = 3.0 * utb - btb - 2.0 * utu;
-            // let t2 =
-            //     (utb.powi(2) - 2.0 * utb * delta + delta * btb - btb * utu + delta * utu).sqrt();
-            // let t3 = -2.0 * utb + btb + utu;
-            // let tau1: f64 = (t1 + t2) / t3;
-            // let tau2: f64 = (t1 - t2) / t3;
-            // println!("tau1: {}; tau2: {}", tau1, tau2);
-            // let tau = tau1;
-            let tau = (delta + btb - 2.0 * utu) / (btb - utu);
-            // println!("tau: {}", tau);
+            let t1 = 3.0 * utb - btb - 2.0 * utu;
+            let t2 =
+                (utb.powi(2) - 2.0 * utb * delta + delta * btb - btb * utu + delta * utu).sqrt();
+            let t3 = -2.0 * utb + btb + utu;
+            let tau1: f64 = -(t1 + t2) / t3;
+            let tau2: f64 = -(t1 - t2) / t3;
 
-            // if 0 <= tau < 1
-            //     p* = tau * pu
-            // if 1 <= tau <= 2
-            //     p* = pu + (tau-1)*(pb - pu)
+            // pick maximum value of both -- not sure if this is the proper way
+            let mut tau = tau1.max(tau2);
+
+            // if calculation failed because t3 is too small, use the third option
+            if tau.is_nan() {
+                tau = (delta + btb - 2.0 * utu) / (btb - utu);
+            }
+
             if tau >= 0.0 && tau < 1.0 {
                 pstar = pu.scale(tau);
             } else if tau >= 1.0 && tau <= 2.0 {
@@ -143,7 +145,6 @@ where
                 .into());
             }
         }
-        // let new_param = self.base.cur_param().add(pstar);
         let out = ArgminIterationData::new(pstar, 0.0);
         Ok(out)
     }
@@ -168,6 +169,10 @@ where
 
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
+    }
+
+    fn radius(&self) -> f64 {
+        self.radius
     }
 
     fn set_grad(&mut self, grad: T) {
