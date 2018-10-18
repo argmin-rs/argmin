@@ -171,10 +171,6 @@ where
         self.radius = radius;
     }
 
-    fn radius(&self) -> f64 {
-        self.radius
-    }
-
     fn set_grad(&mut self, grad: T) {
         self.base.set_cur_grad(grad);
     }
