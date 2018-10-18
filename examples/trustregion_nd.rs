@@ -33,8 +33,8 @@ fn rosenbrock_hessian(x: &Array1<f64>) -> Array2<f64> {
     // hacky...
     let mut out = Array2::eye(2);
     out[(0, 0)] = bla[0];
-    out[(0, 1)] = bla[2];
-    out[(1, 0)] = bla[1];
+    out[(0, 1)] = bla[1];
+    out[(1, 0)] = bla[2];
     out[(1, 1)] = bla[3];
     out
 }
