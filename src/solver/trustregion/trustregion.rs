@@ -157,6 +157,7 @@ where
 
         let pk_norm = pk.norm();
 
+        let cur_radius = self.radius;
         self.radius = if rho < 0.25 {
             0.25 * pk_norm
         } else {
@@ -167,7 +168,7 @@ where
             }
         };
 
-        if rho > self.eta {
+        let mut out = if rho > self.eta {
             // self.base.set_cur_param(new_param.clone());
             self.fxk = fxkpk;
             self.mk0 = fxkpk;
@@ -175,11 +176,13 @@ where
             self.base.set_cur_grad(grad);
             let hessian = self.hessian(&new_param)?;
             self.base.set_cur_hessian(hessian);
-            let out = ArgminIterationData::new(new_param, fxkpk);
-            return Ok(out);
+            ArgminIterationData::new(new_param, fxkpk)
         } else {
-            let out = ArgminIterationData::new(self.base.cur_param(), self.fxk);
-            return Ok(out);
-        }
+            ArgminIterationData::new(self.base.cur_param(), self.fxk)
+        };
+        let kv = make_kv!("radius" => cur_radius;);
+        out.add_kv(kv);
+
+        return Ok(out);
     }
 }
