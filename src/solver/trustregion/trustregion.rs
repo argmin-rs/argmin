@@ -21,7 +21,8 @@
 use prelude::*;
 use solver::trustregion::reduction_ratio;
 // use solver::trustregion::CauchyPoint;
-use solver::trustregion::Dogleg;
+// use solver::trustregion::Dogleg;
+use solver::trustregion::Steihaug;
 use std;
 
 /// Trust region solver
@@ -36,6 +37,7 @@ where
         + ArgminNorm<f64>
         + ArgminAdd<T>
         + ArgminSub<T>
+        + ArgminZero
         + ArgminScale<f64>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
@@ -66,6 +68,7 @@ where
         + ArgminNorm<f64>
         + ArgminAdd<T>
         + ArgminSub<T>
+        + ArgminZero
         + ArgminScale<f64>,
     H: 'a + Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
@@ -80,7 +83,9 @@ where
     ) -> Self {
         let base = ArgminBase::new(operator.clone(), param);
         // let subproblem = Box::new(CauchyPoint::new(operator.clone()));
-        let subproblem = Box::new(Dogleg::new(operator.clone()));
+        // let subproblem = Box::new(Dogleg::new(operator.clone()));
+        let mut subproblem = Box::new(Steihaug::new(operator.clone()));
+        subproblem.set_max_iters(2);
         TrustRegion {
             radius: 1.0,
             max_radius: 10.0,
@@ -127,6 +132,7 @@ where
         + ArgminNorm<f64>
         + ArgminAdd<T>
         + ArgminSub<T>
+        + ArgminZero
         + ArgminScale<f64>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {

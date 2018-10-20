@@ -46,6 +46,8 @@ where
     p: T,
     /// residual
     r: T,
+    /// initial residual
+    r_0: T,
     /// direction
     d: T,
     /// base
@@ -77,9 +79,10 @@ where
         let base = ArgminBase::new(operator, T::default());
         Steihaug {
             radius: std::f64::NAN,
-            epsilon: 10e-8,
+            epsilon: 10e-10,
             p: T::default(),
             r: T::default(),
+            r_0: T::default(),
             d: T::default(),
             base: base,
         }
@@ -104,7 +107,10 @@ where
     }
 
     /// calculate all possible step lengths
-    fn tau(&self) -> f64 {
+    fn tau<F>(&self, filter: F) -> f64
+    where
+        F: Fn(f64) -> bool,
+    {
         let a = self.p.dot(self.p.clone());
         let b = self.d.dot(self.d.clone());
         let c = self.p.dot(self.d.clone());
@@ -118,11 +124,12 @@ where
             .iter()
             .cloned()
             .enumerate()
-            .filter(|(_, tau)| !tau.is_nan())
+            .filter(|(_, tau)| !tau.is_nan() && filter(*tau))
             .map(|(i, tau)| {
                 let p = self.p.add(self.d.scale(tau));
                 (i, self.eval_m(p))
             })
+            .filter(|(_, m)| !m.is_nan())
             .collect::<Vec<(usize, f64)>>();
         v.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
         v[0].1
@@ -150,11 +157,12 @@ where
     fn init(&mut self) -> Result<(), Error> {
         self.base.reset();
 
-        self.r = self.base.cur_grad();
-        self.d = self.r.scale(-1.0);
-        self.p = self.r.zero();
+        self.r_0 = self.base.cur_grad();
+        self.d = self.r_0.scale(-1.0);
+        self.p = self.r_0.zero();
+        self.r = self.r_0.clone();
 
-        if self.p.norm() < self.epsilon {
+        if self.r_0.norm() < self.epsilon {
             self.base
                 .set_termination_reason(TerminationReason::TargetPrecisionReached);
             self.base.set_best_param(self.p.clone());
@@ -164,65 +172,43 @@ where
     }
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+        let h = self.base.cur_hessian();
+
         // Current search direction d is a direction of zero curvature or negative curvature
-        if self.d.weighted_dot(self.base.cur_hessian(), self.d.clone()) <= 0.0 {
-            let tau = self.tau();
+        if self.d.weighted_dot(h.clone(), self.d.clone()) <= 0.0 {
+            let tau = self.tau(|_| true);
+            self.base
+                .set_termination_reason(TerminationReason::TargetPrecisionReached);
+            return Ok(ArgminIterationData::new(
+                self.p.add(self.d.scale(tau)),
+                std::f64::NEG_INFINITY,
+            ));
+        }
+
+        let alpha = self.r.dot(self.r.clone()) / self.d.weighted_dot(h.clone(), self.d.clone());
+        let p_n = self.p.add(self.d.scale(alpha));
+
+        // new p violates trust region bound
+        if p_n.norm() >= self.radius {
+            let tau = self.tau(|x| x >= 0.0);
             self.base
                 .set_termination_reason(TerminationReason::TargetPrecisionReached);
             return Ok(ArgminIterationData::new(self.p.add(self.d.scale(tau)), 0.0));
         }
 
-        unimplemented!()
-        // let g = self.base.cur_grad();
-        // let h = self.base.cur_hessian();
-        // let pstar;
-        //
-        // // pb = -H^-1g
-        // let pb = (self.base.cur_hessian().ainv()?)
-        //     .dot(self.base.cur_grad())
-        //     .scale(-1.0);
-        //
-        // if pb.norm() <= self.radius {
-        //     pstar = pb;
-        // } else {
-        //     // pu = - (g^Tg)/(g^THg) * g
-        //     let pu = g.scale(-g.dot(g.clone()) / g.weighted_dot(h.clone(), g.clone()));
-        //
-        //     let utu = pu.dot(pu.clone());
-        //     let btb = pb.dot(pb.clone());
-        //     let utb = pu.dot(pb.clone());
-        //
-        //     // compute tau
-        //     let delta = self.radius.powi(2);
-        //     let t1 = 3.0 * utb - btb - 2.0 * utu;
-        //     let t2 =
-        //         (utb.powi(2) - 2.0 * utb * delta + delta * btb - btb * utu + delta * utu).sqrt();
-        //     let t3 = -2.0 * utb + btb + utu;
-        //     let tau1: f64 = -(t1 + t2) / t3;
-        //     let tau2: f64 = -(t1 - t2) / t3;
-        //
-        //     // pick maximum value of both -- not sure if this is the proper way
-        //     let mut tau = tau1.max(tau2);
-        //
-        //     // if calculation failed because t3 is too small, use the third option
-        //     if tau.is_nan() {
-        //         tau = (delta + btb - 2.0 * utu) / (btb - utu);
-        //     }
-        //
-        //     if tau >= 0.0 && tau < 1.0 {
-        //         pstar = pu.scale(tau);
-        //     } else if tau >= 1.0 && tau <= 2.0 {
-        //         // pstar = pu + (tau - 1.0) * (pb - pu)
-        //         pstar = pu.add(pb.sub(pu.clone()).scale(tau - 1.0));
-        //     } else {
-        //         return Err(ArgminError::ImpossibleError {
-        //             text: "tau is bigger than 2, this is not supposed to happen.".to_string(),
-        //         }
-        //         .into());
-        //     }
-        // }
-        // let out = ArgminIterationData::new(pstar, 0.0);
-        // Ok(out)
+        let r_n = self.r.add(h.dot(self.d.clone()).scale(alpha));
+        if r_n.norm() < self.epsilon * self.r_0.norm() {
+            self.base
+                .set_termination_reason(TerminationReason::TargetPrecisionReached);
+            return Ok(ArgminIterationData::new(p_n, std::f64::NEG_INFINITY));
+        }
+
+        let beta = r_n.dot(r_n.clone()) / self.r.dot(self.r.clone());
+        self.d = r_n.add(self.d.scale(beta));
+        self.r = r_n;
+        self.p = p_n;
+
+        Ok(ArgminIterationData::new(self.p.clone(), 0.0))
     }
 }
 
