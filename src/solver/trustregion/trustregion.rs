@@ -88,13 +88,19 @@ where
         subproblem.set_max_iters(2);
         TrustRegion {
             radius: 1.0,
-            max_radius: 10.0,
+            max_radius: 100.0,
             eta: 0.125,
             subproblem: subproblem,
             fxk: std::f64::NAN,
             mk0: std::f64::NAN,
             base: base,
         }
+    }
+
+    /// set radius
+    pub fn set_radius(&mut self, radius: f64) -> &mut Self {
+        self.radius = radius;
+        self
     }
 
     /// Set maximum radius
@@ -167,7 +173,8 @@ where
         self.radius = if rho < 0.25 {
             0.25 * pk_norm
         } else {
-            if rho > 0.75 && pk_norm == self.radius {
+            // if rho > 0.75 && pk_norm == self.radius {
+            if rho > 0.75 && (pk_norm - self.radius).abs() <= 10.0 * std::f64::EPSILON {
                 self.max_radius.min(2.0 * self.radius)
             } else {
                 self.radius
