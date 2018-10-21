@@ -124,6 +124,8 @@ where
             let tau3 = (delta - a) / (2.0 * c);
             t.push(tau3);
         }
+        // remove NAN taus and calculate m (without f_init) for all taus, then sort them based on
+        // their result and return the tau which corresponds to the lowest m
         let mut v = t
             .iter()
             .cloned()
