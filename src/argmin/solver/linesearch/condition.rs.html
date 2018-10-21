@@ -184,6 +184,12 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -213,8 +219,9 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;=</span> <span class="number">0.0</span> <span class="op">||</span> <span class="ident">c</span> <span class="op">&gt;=</span> <span class="number">1.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;ArmijoCondition: Parameter c must be in (0, 1)&quot;</span>.<span class="ident">to_string</span>(),
-            }.<span class="ident">into</span>());
+                <span class="ident">text</span>: <span class="string">&quot;ArmijoCondition: Parameter c must be in (0, 1)&quot;</span>.<span class="ident">to_string</span>(),
+            }
+            .<span class="ident">into</span>());
         }
         <span class="prelude-val">Ok</span>(<span class="ident">ArmijoCondition</span> { <span class="ident">c</span> })
     }
@@ -252,13 +259,15 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c1</span>: <span class="ident">f64</span>, <span class="ident">c2</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;=</span> <span class="number">0.0</span> <span class="op">||</span> <span class="ident">c1</span> <span class="op">&gt;=</span> <span class="number">1.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;WolfeCondition: Parameter c1 must be in (0, 1)&quot;</span>.<span class="ident">to_string</span>(),
-            }.<span class="ident">into</span>());
+                <span class="ident">text</span>: <span class="string">&quot;WolfeCondition: Parameter c1 must be in (0, 1)&quot;</span>.<span class="ident">to_string</span>(),
+            }
+            .<span class="ident">into</span>());
         }
         <span class="kw">if</span> <span class="ident">c2</span> <span class="op">&lt;=</span> <span class="ident">c1</span> <span class="op">||</span> <span class="ident">c2</span> <span class="op">&gt;=</span> <span class="number">1.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;WolfeCondition: Parameter c2 must be in (c1, 1)&quot;</span>.<span class="ident">to_string</span>(),
-            }.<span class="ident">into</span>());
+                <span class="ident">text</span>: <span class="string">&quot;WolfeCondition: Parameter c2 must be in (c1, 1)&quot;</span>.<span class="ident">to_string</span>(),
+            }
+            .<span class="ident">into</span>());
         }
         <span class="prelude-val">Ok</span>(<span class="ident">WolfeCondition</span> { <span class="ident">c1</span>, <span class="ident">c2</span> })
     }
@@ -298,13 +307,15 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c1</span>: <span class="ident">f64</span>, <span class="ident">c2</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;=</span> <span class="number">0.0</span> <span class="op">||</span> <span class="ident">c1</span> <span class="op">&gt;=</span> <span class="number">1.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)&quot;</span>.<span class="ident">to_string</span>(),
-            }.<span class="ident">into</span>());
+                <span class="ident">text</span>: <span class="string">&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)&quot;</span>.<span class="ident">to_string</span>(),
+            }
+            .<span class="ident">into</span>());
         }
         <span class="kw">if</span> <span class="ident">c2</span> <span class="op">&lt;=</span> <span class="ident">c1</span> <span class="op">||</span> <span class="ident">c2</span> <span class="op">&gt;=</span> <span class="number">1.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)&quot;</span>.<span class="ident">to_string</span>(),
-            }.<span class="ident">into</span>());
+                <span class="ident">text</span>: <span class="string">&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)&quot;</span>.<span class="ident">to_string</span>(),
+            }
+            .<span class="ident">into</span>());
         }
         <span class="prelude-val">Ok</span>(<span class="ident">StrongWolfeCondition</span> { <span class="ident">c1</span>, <span class="ident">c2</span> })
     }
@@ -343,8 +354,9 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;=</span> <span class="number">0.0</span> <span class="op">||</span> <span class="ident">c</span> <span class="op">&gt;=</span> <span class="number">0.5</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)&quot;</span>.<span class="ident">to_string</span>(),
-            }.<span class="ident">into</span>());
+                <span class="ident">text</span>: <span class="string">&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)&quot;</span>.<span class="ident">to_string</span>(),
+            }
+            .<span class="ident">into</span>());
         }
         <span class="prelude-val">Ok</span>(<span class="ident">GoldsteinCondition</span> { <span class="ident">c</span> })
     }

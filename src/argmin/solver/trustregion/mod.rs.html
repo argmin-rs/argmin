@@ -19,6 +19,12 @@
 <span id="19">19</span>
 <span id="20">20</span>
 <span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -31,10 +37,16 @@
 
 <span class="doccomment">/// Cauchy Point</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cauchypoint</span>;
+<span class="doccomment">/// Dogleg method</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dogleg</span>;
+<span class="doccomment">/// Steihaug method</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">steihaug</span>;
 <span class="doccomment">/// Trust region solver</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">trustregion</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">cauchypoint</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">dogleg</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">steihaug</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">trustregion</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Computes reduction ratio</span>

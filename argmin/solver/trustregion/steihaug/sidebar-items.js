@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Steihaug","Steihaug method"]]});

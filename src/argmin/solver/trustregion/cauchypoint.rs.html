@@ -213,16 +213,16 @@
     <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span>;
 
     <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">reset</span>();
+        <span class="self">self</span>.<span class="ident">base_reset</span>();
         <span class="comment">// This is not an iterative method.</span>
         <span class="self">self</span>.<span class="ident">set_max_iters</span>(<span class="number">1</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn</span> <span class="ident">next_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterationData</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">cur_grad</span>();
+        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_grad</span>();
         <span class="kw">let</span> <span class="ident">grad_norm</span> <span class="op">=</span> <span class="ident">grad</span>.<span class="ident">norm</span>();
-        <span class="kw">let</span> <span class="ident">wdp</span> <span class="op">=</span> <span class="ident">grad</span>.<span class="ident">weighted_dot</span>(<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">cur_hessian</span>().<span class="ident">clone</span>(), <span class="ident">grad</span>.<span class="ident">clone</span>());
+        <span class="kw">let</span> <span class="ident">wdp</span> <span class="op">=</span> <span class="ident">grad</span>.<span class="ident">weighted_dot</span>(<span class="self">self</span>.<span class="ident">cur_hessian</span>().<span class="ident">clone</span>(), <span class="ident">grad</span>.<span class="ident">clone</span>());
         <span class="kw">let</span> <span class="ident">tau</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">wdp</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="number">1.0</span>
         } <span class="kw">else</span> {
@@ -246,7 +246,7 @@
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
 {
     <span class="comment">// fn set_initial_parameter(&amp;mut self, param: T) {</span>
-    <span class="comment">//     self.base.set_cur_param(param);</span>
+    <span class="comment">//     self.set_cur_param(param);</span>
     <span class="comment">// }</span>
 
     <span class="kw">fn</span> <span class="ident">set_radius</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">f64</span>) {
@@ -254,11 +254,11 @@
     }
 
     <span class="kw">fn</span> <span class="ident">set_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="ident">T</span>) {
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_cur_grad</span>(<span class="ident">grad</span>);
+        <span class="self">self</span>.<span class="ident">set_cur_grad</span>(<span class="ident">grad</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">set_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="ident">H</span>) {
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_cur_hessian</span>(<span class="ident">hessian</span>);
+        <span class="self">self</span>.<span class="ident">set_cur_hessian</span>(<span class="ident">hessian</span>);
     }
 }
 </pre>

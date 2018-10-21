@@ -643,7 +643,6 @@
 <span id="643">643</span>
 <span id="644">644</span>
 <span id="645">645</span>
-<span id="646">646</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -818,13 +817,13 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_c</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">c1</span>: <span class="ident">f64</span>, <span class="ident">c2</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;=</span> <span class="number">0.0</span> <span class="op">||</span> <span class="ident">c1</span> <span class="op">&gt;=</span> <span class="ident">c2</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;MoreThuenteLineSearch: Parameter c1 must be in (0, c2).&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;MoreThuenteLineSearch: Parameter c1 must be in (0, c2).&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
         <span class="kw">if</span> <span class="ident">c2</span> <span class="op">&lt;=</span> <span class="ident">c1</span> <span class="op">||</span> <span class="ident">c2</span> <span class="op">&gt;=</span> <span class="number">1.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;MoreThuenteLineSearch: Parameter c2 must be in (c1, 1).&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;MoreThuenteLineSearch: Parameter c2 must be in (c1, 1).&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -841,13 +840,13 @@
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">alpha_min</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;MoreThuenteLineSearch: alpha_min must be &gt;= 0.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;MoreThuenteLineSearch: alpha_min must be &gt;= 0.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
         <span class="kw">if</span> <span class="ident">alpha_max</span> <span class="op">&lt;=</span> <span class="ident">alpha_min</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;MoreThuenteLineSearch: alpha_min must be smaller than alpha_max.&quot;</span>
+                <span class="ident">text</span>: <span class="string">&quot;MoreThuenteLineSearch: alpha_min must be smaller than alpha_max.&quot;</span>
                     .<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
@@ -877,7 +876,7 @@
     <span class="doccomment">/// Set initial parameter</span>
     <span class="kw">fn</span> <span class="ident">set_initial_parameter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="ident">T</span>) {
         <span class="self">self</span>.<span class="ident">init_param_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">param</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_cur_param</span>(<span class="ident">param</span>);
+        <span class="self">self</span>.<span class="ident">set_cur_param</span>(<span class="ident">param</span>);
     }
 
     <span class="doccomment">/// Set initial cost function value</span>
@@ -892,14 +891,14 @@
 
     <span class="doccomment">/// Calculate initial cost function value</span>
     <span class="kw">fn</span> <span class="ident">calc_initial_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">cur_param</span>();
+        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_param</span>();
         <span class="self">self</span>.<span class="ident">finit_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Calculate initial cost function value</span>
     <span class="kw">fn</span> <span class="ident">calc_initial_gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">cur_param</span>();
+        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_param</span>();
         <span class="self">self</span>.<span class="ident">init_grad_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>);
         <span class="prelude-val">Ok</span>(())
     }
@@ -908,7 +907,7 @@
     <span class="kw">fn</span> <span class="ident">set_initial_alpha</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;MoreThuenteLineSearch: Initial alpha must be &gt; 0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;MoreThuenteLineSearch: Initial alpha must be &gt; 0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -1010,9 +1009,10 @@
             .<span class="ident">scaled_add</span>(<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">clone</span>());
         <span class="self">self</span>.<span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_cur_cost</span>(<span class="self">self</span>.<span class="ident">f</span>);
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_cur_param</span>(<span class="ident">new_param</span>);
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_cur_grad</span>(<span class="ident">new_grad</span>.<span class="ident">clone</span>());
+        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>.<span class="ident">clone</span>();
+        <span class="self">self</span>.<span class="ident">set_cur_cost</span>(<span class="ident">f</span>);
+        <span class="self">self</span>.<span class="ident">set_cur_param</span>(<span class="ident">new_param</span>);
+        <span class="self">self</span>.<span class="ident">set_cur_grad</span>(<span class="ident">new_grad</span>.<span class="ident">clone</span>());
         <span class="comment">// self.stx.fx = new_cost;</span>
         <span class="kw">let</span> <span class="ident">dg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">dot</span>(<span class="ident">new_grad</span>);
         <span class="kw">let</span> <span class="ident">ftest1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
@@ -1041,9 +1041,8 @@
         }
 
         <span class="kw">if</span> <span class="ident">info</span> <span class="op">!=</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">base</span>
-                .<span class="ident">set_termination_reason</span>(<span class="ident">TerminationReason</span>::<span class="ident">LineSearchConditionMet</span>);
-            <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">ArgminIterationData</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">cur_param</span>(), <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">cur_cost</span>());
+            <span class="self">self</span>.<span class="ident">set_termination_reason</span>(<span class="ident">TerminationReason</span>::<span class="ident">LineSearchConditionMet</span>);
+            <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">ArgminIterationData</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">cur_param</span>(), <span class="self">self</span>.<span class="ident">cur_cost</span>());
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">out</span>);
         }
 
@@ -1104,7 +1103,6 @@
             <span class="self">self</span>.<span class="ident">width</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span>).<span class="ident">abs</span>();
         }
 
-        <span class="comment">// let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());</span>
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">init_param</span>
             .<span class="ident">scaled_add</span>(<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">clone</span>());

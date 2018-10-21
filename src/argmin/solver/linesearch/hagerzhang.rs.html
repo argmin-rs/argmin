@@ -592,7 +592,6 @@
 <span id="592">592</span>
 <span id="593">593</span>
 <span id="594">594</span>
-<span id="595">595</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -770,13 +769,13 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_delta</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: delta must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: delta must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
         <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&gt;=</span> <span class="number">1.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: delta must be &lt; 1.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: delta must be &lt; 1.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -788,13 +787,13 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sigma</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sigma</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">sigma</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">delta</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: sigma must be &gt;= delta.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: sigma must be &gt;= delta.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
         <span class="kw">if</span> <span class="ident">sigma</span> <span class="op">&gt;=</span> <span class="number">1.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: sigma must be &lt; 1.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: sigma must be &lt; 1.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -806,7 +805,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_epsilon</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">epsilon</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">epsilon</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: epsilon must be &gt;= 0.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: epsilon must be &gt;= 0.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -818,13 +817,13 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_theta</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">theta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">theta</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: theta must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: theta must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
         <span class="kw">if</span> <span class="ident">theta</span> <span class="op">&gt;=</span> <span class="number">1.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: theta must be &lt; 1.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: theta must be &lt; 1.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -836,13 +835,13 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_gamma</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: gamma must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: gamma must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
         <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&gt;=</span> <span class="number">1.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: gamma must be &lt; 1.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: gamma must be &lt; 1.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -854,7 +853,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_eta</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">eta</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: eta must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: eta must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -870,14 +869,13 @@
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">alpha_min</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: alpha_min must be &gt;= 0.0.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: alpha_min must be &gt;= 0.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
         <span class="kw">if</span> <span class="ident">alpha_max</span> <span class="op">&lt;=</span> <span class="ident">alpha_min</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: alpha_min must be smaller than alpha_max.&quot;</span>
-                    .<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: alpha_min must be smaller than alpha_max.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -934,8 +932,7 @@
 
         <span class="comment">// return Ok(((a_x, a_f, a_g), (b_x, b_f, b_g)));</span>
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-            <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: Reached unreachable point in `update` method.&quot;</span>
-                .<span class="ident">to_string</span>(),
+            <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: Reached unreachable point in `update` method.&quot;</span>.<span class="ident">to_string</span>(),
         }
         .<span class="ident">into</span>());
     }
@@ -1042,7 +1039,7 @@
     <span class="doccomment">/// Set initial parameter</span>
     <span class="kw">fn</span> <span class="ident">set_initial_parameter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="ident">T</span>) {
         <span class="self">self</span>.<span class="ident">init_param_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">param</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_cur_param</span>(<span class="ident">param</span>);
+        <span class="self">self</span>.<span class="ident">set_cur_param</span>(<span class="ident">param</span>);
     }
 
     <span class="doccomment">/// Set initial cost function value</span>
@@ -1057,14 +1054,14 @@
 
     <span class="doccomment">/// Calculate initial cost function value</span>
     <span class="kw">fn</span> <span class="ident">calc_initial_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">cur_param</span>();
+        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_param</span>();
         <span class="self">self</span>.<span class="ident">finit_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Calculate initial cost function value</span>
     <span class="kw">fn</span> <span class="ident">calc_initial_gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">cur_param</span>();
+        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_param</span>();
         <span class="self">self</span>.<span class="ident">init_grad_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>);
         <span class="prelude-val">Ok</span>(())
     }
@@ -1094,7 +1091,7 @@
     <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sigma</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">delta</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
-                <span class="ident">parameter</span>: <span class="string">&quot;HagerZhangLineSearch: sigma must be &gt;= delta.&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: sigma must be &gt;= delta.&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -1141,8 +1138,9 @@
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">init_param</span>
             .<span class="ident">scaled_add</span>(<span class="self">self</span>.<span class="ident">best_x</span>, <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_best_param</span>(<span class="ident">new_param</span>);
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_best_cost</span>(<span class="self">self</span>.<span class="ident">best_f</span>);
+        <span class="self">self</span>.<span class="ident">set_best_param</span>(<span class="ident">new_param</span>);
+        <span class="kw">let</span> <span class="ident">best_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">best_f</span>.<span class="ident">clone</span>();
+        <span class="self">self</span>.<span class="ident">set_best_cost</span>(<span class="ident">best_f</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
