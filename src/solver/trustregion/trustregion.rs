@@ -122,9 +122,7 @@ where
     }
 
     fn m(&self, p: &T) -> f64 {
-        self.fxk
-            + p.dot(self.base.cur_grad())
-            + 0.5 * p.weighted_dot(self.base.cur_hessian(), p.clone())
+        self.fxk + p.dot(self.cur_grad()) + 0.5 * p.weighted_dot(self.cur_hessian(), p.clone())
     }
 }
 
@@ -147,7 +145,7 @@ where
     type Hessian = H;
 
     fn init(&mut self) -> Result<(), Error> {
-        let param = self.base.cur_param();
+        let param = self.cur_param();
         let grad = self.gradient(&param)?;
         self.base.set_cur_grad(grad);
         let hessian = self.hessian(&param)?;
@@ -158,11 +156,13 @@ where
     }
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
-        self.subproblem.set_grad(self.base.cur_grad());
-        self.subproblem.set_hessian(self.base.cur_hessian());
+        let g = self.cur_grad();
+        let h = self.cur_hessian();
+        self.subproblem.set_grad(g);
+        self.subproblem.set_hessian(h);
         self.subproblem.set_radius(self.radius);
         let pk = self.subproblem.run_fast()?.param;
-        let new_param = pk.add(self.base.cur_param().clone());
+        let new_param = pk.add(self.cur_param().clone());
         let fxkpk = self.apply(&new_param)?;
         let mkpk = self.m(&pk);
         let rho = reduction_ratio(self.fxk, fxkpk, self.mk0, mkpk);
@@ -191,7 +191,7 @@ where
             self.base.set_cur_hessian(hessian);
             ArgminIterationData::new(new_param, fxkpk)
         } else {
-            ArgminIterationData::new(self.base.cur_param(), self.fxk)
+            ArgminIterationData::new(self.cur_param(), self.fxk)
         };
         let kv = make_kv!("radius" => cur_radius;);
         out.add_kv(kv);

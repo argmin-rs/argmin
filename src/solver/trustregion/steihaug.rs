@@ -102,8 +102,7 @@ where
 
     /// evaluate m(p) (without considering f_init because it is not available)
     fn eval_m(&self, p: T) -> f64 {
-        self.base.cur_grad().dot(p.clone())
-            + 0.5 * p.weighted_dot(self.base.cur_hessian(), p.clone())
+        self.cur_grad().dot(p.clone()) + 0.5 * p.weighted_dot(self.cur_hessian(), p.clone())
     }
 
     /// calculate all possible step lengths
@@ -163,7 +162,7 @@ where
     fn init(&mut self) -> Result<(), Error> {
         self.base.reset();
 
-        self.r_0 = self.base.cur_grad();
+        self.r_0 = self.cur_grad();
         self.d = self.r_0.scale(-1.0);
         self.p = self.r_0.zero();
         self.r = self.r_0.clone();
@@ -178,7 +177,7 @@ where
     }
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
-        let h = self.base.cur_hessian();
+        let h = self.cur_hessian();
 
         // Current search direction d is a direction of zero curvature or negative curvature
         if self.d.weighted_dot(h.clone(), self.d.clone()) <= 0.0 {
