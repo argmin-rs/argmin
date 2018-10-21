@@ -81,16 +81,16 @@ where
     type Hessian = H;
 
     fn init(&mut self) -> Result<(), Error> {
-        self.base.reset();
+        self.base_reset();
         // This is not an iterative method.
         self.set_max_iters(1);
         Ok(())
     }
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
-        let grad = self.base.cur_grad();
+        let grad = self.cur_grad();
         let grad_norm = grad.norm();
-        let wdp = grad.weighted_dot(self.base.cur_hessian().clone(), grad.clone());
+        let wdp = grad.weighted_dot(self.cur_hessian().clone(), grad.clone());
         let tau: f64 = if wdp <= 0.0 {
             1.0
         } else {
@@ -114,7 +114,7 @@ where
     H: Clone + std::default::Default,
 {
     // fn set_initial_parameter(&mut self, param: T) {
-    //     self.base.set_cur_param(param);
+    //     self.set_cur_param(param);
     // }
 
     fn set_radius(&mut self, radius: f64) {
@@ -122,10 +122,10 @@ where
     }
 
     fn set_grad(&mut self, grad: T) {
-        self.base.set_cur_grad(grad);
+        self.set_cur_grad(grad);
     }
 
     fn set_hessian(&mut self, hessian: H) {
-        self.base.set_cur_hessian(hessian);
+        self.set_cur_hessian(hessian);
     }
 }

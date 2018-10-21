@@ -90,20 +90,20 @@ where
     type Hessian = H;
 
     fn init(&mut self) -> Result<(), Error> {
-        self.base.reset();
+        self.base_reset();
         // This is not an iterative method.
         self.set_max_iters(1);
         Ok(())
     }
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
-        let g = self.base.cur_grad();
-        let h = self.base.cur_hessian();
+        let g = self.cur_grad();
+        let h = self.cur_hessian();
         let pstar;
 
         // pb = -H^-1g
-        let pb = (self.base.cur_hessian().ainv()?)
-            .dot(self.base.cur_grad())
+        let pb = (self.cur_hessian().ainv()?)
+            .dot(self.cur_grad())
             .scale(-1.0);
 
         if pb.norm() <= self.radius {
@@ -164,7 +164,7 @@ where
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     // fn set_initial_parameter(&mut self, param: T) {
-    //     self.base.set_cur_param(param);
+    //     self.set_cur_param(param);
     // }
 
     fn set_radius(&mut self, radius: f64) {
@@ -172,10 +172,10 @@ where
     }
 
     fn set_grad(&mut self, grad: T) {
-        self.base.set_cur_grad(grad);
+        self.set_cur_grad(grad);
     }
 
     fn set_hessian(&mut self, hessian: H) {
-        self.base.set_cur_hessian(hessian);
+        self.set_cur_hessian(hessian);
     }
 }

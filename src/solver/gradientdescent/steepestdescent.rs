@@ -93,9 +93,9 @@ where
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         // reset line search
-        self.linesearch.reset();
+        self.linesearch.base_reset();
 
-        let param_new = self.base.cur_param();
+        let param_new = self.cur_param();
         let new_cost = self.apply(&param_new)?;
         let new_grad = self.gradient(&param_new)?;
 

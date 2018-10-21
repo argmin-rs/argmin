@@ -444,7 +444,7 @@ where
     /// Set initial parameter
     fn set_initial_parameter(&mut self, param: T) {
         self.init_param_b = Some(param.clone());
-        self.base.set_cur_param(param);
+        self.set_cur_param(param);
     }
 
     /// Set initial cost function value
@@ -459,14 +459,14 @@ where
 
     /// Calculate initial cost function value
     fn calc_initial_cost(&mut self) -> Result<(), Error> {
-        let tmp = self.base.cur_param();
+        let tmp = self.cur_param();
         self.finit_b = Some(self.apply(&tmp)?);
         Ok(())
     }
 
     /// Calculate initial cost function value
     fn calc_initial_gradient(&mut self) -> Result<(), Error> {
-        let tmp = self.base.cur_param();
+        let tmp = self.cur_param();
         self.init_grad_b = Some(self.gradient(&tmp)?);
         Ok(())
     }
@@ -543,8 +543,9 @@ where
         let new_param = self
             .init_param
             .scaled_add(self.best_x, self.search_direction.clone());
-        self.base.set_best_param(new_param);
-        self.base.set_best_cost(self.best_f);
+        self.set_best_param(new_param);
+        let best_f = self.best_f.clone();
+        self.set_best_cost(best_f);
 
         Ok(())
     }

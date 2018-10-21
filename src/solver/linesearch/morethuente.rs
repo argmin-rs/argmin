@@ -230,7 +230,7 @@ where
     /// Set initial parameter
     fn set_initial_parameter(&mut self, param: T) {
         self.init_param_b = Some(param.clone());
-        self.base.set_cur_param(param);
+        self.set_cur_param(param);
     }
 
     /// Set initial cost function value
@@ -245,14 +245,14 @@ where
 
     /// Calculate initial cost function value
     fn calc_initial_cost(&mut self) -> Result<(), Error> {
-        let tmp = self.base.cur_param();
+        let tmp = self.cur_param();
         self.finit_b = Some(self.apply(&tmp)?);
         Ok(())
     }
 
     /// Calculate initial cost function value
     fn calc_initial_gradient(&mut self) -> Result<(), Error> {
-        let tmp = self.base.cur_param();
+        let tmp = self.cur_param();
         self.init_grad_b = Some(self.gradient(&tmp)?);
         Ok(())
     }
@@ -363,9 +363,10 @@ where
             .scaled_add(self.stp.x, self.search_direction.clone());
         self.f = self.apply(&new_param)?;
         let new_grad = self.gradient(&new_param)?;
-        self.base.set_cur_cost(self.f);
-        self.base.set_cur_param(new_param);
-        self.base.set_cur_grad(new_grad.clone());
+        let f = self.f.clone();
+        self.set_cur_cost(f);
+        self.set_cur_param(new_param);
+        self.set_cur_grad(new_grad.clone());
         // self.stx.fx = new_cost;
         let dg = self.search_direction.dot(new_grad);
         let ftest1 = self.finit + self.stp.x * self.dgtest;
@@ -394,9 +395,8 @@ where
         }
 
         if info != 0 {
-            self.base
-                .set_termination_reason(TerminationReason::LineSearchConditionMet);
-            let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());
+            self.set_termination_reason(TerminationReason::LineSearchConditionMet);
+            let out = ArgminIterationData::new(self.cur_param(), self.cur_cost());
             return Ok(out);
         }
 
@@ -457,7 +457,6 @@ where
             self.width = (self.sty.x - self.stx.x).abs();
         }
 
-        // let out = ArgminIterationData::new(self.base.cur_param(), self.base.cur_cost());
         let new_param = self
             .init_param
             .scaled_add(self.stp.x, self.search_direction.clone());

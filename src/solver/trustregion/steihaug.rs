@@ -160,7 +160,7 @@ where
     type Hessian = H;
 
     fn init(&mut self) -> Result<(), Error> {
-        self.base.reset();
+        self.base_reset();
 
         self.r_0 = self.cur_grad();
         self.d = self.r_0.scale(-1.0);
@@ -182,8 +182,7 @@ where
         // Current search direction d is a direction of zero curvature or negative curvature
         if self.d.weighted_dot(h.clone(), self.d.clone()) <= 0.0 {
             let tau = self.tau(|_| true);
-            self.base
-                .set_termination_reason(TerminationReason::TargetPrecisionReached);
+            self.set_termination_reason(TerminationReason::TargetPrecisionReached);
             return Ok(ArgminIterationData::new(
                 self.p.add(self.d.scale(tau)),
                 std::f64::NEG_INFINITY,
@@ -196,15 +195,13 @@ where
         // new p violates trust region bound
         if p_n.norm() >= self.radius {
             let tau = self.tau(|x| x >= 0.0);
-            self.base
-                .set_termination_reason(TerminationReason::TargetPrecisionReached);
+            self.set_termination_reason(TerminationReason::TargetPrecisionReached);
             return Ok(ArgminIterationData::new(self.p.add(self.d.scale(tau)), 0.0));
         }
 
         let r_n = self.r.add(h.dot(self.d.clone()).scale(alpha));
         if r_n.norm() < self.epsilon * self.r_0.norm() {
-            self.base
-                .set_termination_reason(TerminationReason::TargetPrecisionReached);
+            self.set_termination_reason(TerminationReason::TargetPrecisionReached);
             return Ok(ArgminIterationData::new(p_n, std::f64::NEG_INFINITY));
         }
 

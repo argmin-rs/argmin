@@ -5,7 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#[macro_use]
 extern crate argmin;
 extern crate rand;
 use argmin::prelude::*;
@@ -33,6 +32,7 @@ impl MyProblem {
 impl ArgminOperator for MyProblem {
     type Parameters = Vec<f64>;
     type OperatorOutput = f64;
+    type Hessian = ();
 
     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
         Ok(rosenbrock(param, 1.0, 100.0))

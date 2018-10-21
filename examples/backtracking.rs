@@ -5,12 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#[macro_use]
 extern crate argmin;
 extern crate rand;
 use argmin::prelude::*;
 // use argmin_core::WriteToFile;
-use argmin::solver::linesearch::*;
+use argmin::solver::linesearch::BacktrackingLineSearch;
 use argmin::testfunctions::{sphere, sphere_derivative};
 
 #[derive(Clone)]
@@ -19,6 +18,7 @@ struct MyProblem {}
 impl ArgminOperator for MyProblem {
     type Parameters = Vec<f64>;
     type OperatorOutput = f64;
+    type Hessian = ();
 
     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
         Ok(sphere(param))
@@ -40,13 +40,12 @@ fn run() -> Result<(), Error> {
     // Set up Line Search method
     let iters = 100;
     let mut solver = BacktrackingLineSearch::new(Box::new(operator));
-    // BacktrackingLineSearch::new(Box::new(operator), vec![-1.0, 0.0], init_param, 0.9)?;
 
     solver.set_search_direction(vec![-1.0, 0.0]);
     solver.set_initial_parameter(init_param);
     solver.set_rho(0.9)?;
-    solver.calc_inital_cost()?;
-    solver.calc_inital_gradient()?;
+    solver.calc_initial_cost()?;
+    solver.calc_initial_gradient()?;
     solver.set_initial_alpha(1.0)?;
     solver.set_max_iters(iters);
     // solver.add_writer(WriteToFile::new());

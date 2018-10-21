@@ -102,7 +102,7 @@ where
         let apk = self.apply(&p)?;
         let rtr = self.r.dot(self.r.clone());
         self.alpha = rtr / self.p.dot(apk.clone());
-        let new_param = self.base.cur_param().scaled_add(self.alpha, p.clone());
+        let new_param = self.cur_param().scaled_add(self.alpha, p.clone());
         self.r = self.r.scaled_sub(self.alpha, apk);
         self.beta = self.r.dot(self.r.clone()) / rtr;
         self.p = self.r.scaled_add(self.beta, p);

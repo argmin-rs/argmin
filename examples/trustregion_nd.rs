@@ -9,7 +9,6 @@
 #![feature(unrestricted_attribute_tokens)]
 #![allow(unused_attributes)]
 
-#[macro_use]
 extern crate argmin;
 #[macro_use]
 extern crate argmin_codegen;

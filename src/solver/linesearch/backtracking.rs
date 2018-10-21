@@ -114,8 +114,8 @@ where
 
     fn eval_condition(&self) -> bool {
         self.condition.eval(
-            self.base.cur_cost(),
-            self.base.cur_grad(),
+            self.cur_cost(),
+            self.cur_grad(),
             self.init_cost,
             self.init_grad.clone(),
             self.search_direction.clone(),
@@ -143,7 +143,7 @@ where
     /// Set initial parameter
     fn set_initial_parameter(&mut self, param: T) {
         self.init_param = param.clone();
-        self.base.set_cur_param(param);
+        self.set_cur_param(param);
     }
 
     /// Set initial alpha value
@@ -170,14 +170,14 @@ where
 
     /// Calculate initial cost function value
     fn calc_initial_cost(&mut self) -> Result<(), Error> {
-        let tmp = self.base.cur_param();
+        let tmp = self.cur_param();
         self.init_cost = self.apply(&tmp)?;
         Ok(())
     }
 
     /// Calculate initial cost function value
     fn calc_initial_gradient(&mut self) -> Result<(), Error> {
-        let tmp = self.base.cur_param();
+        let tmp = self.cur_param();
         self.init_grad = self.gradient(&tmp)?;
         Ok(())
     }
@@ -206,7 +206,7 @@ where
 
         if self.condition.requires_cur_grad() {
             let grad = self.gradient(&new_param)?;
-            self.base.set_cur_grad(grad);
+            self.set_cur_grad(grad);
         }
 
         self.alpha *= self.rho;

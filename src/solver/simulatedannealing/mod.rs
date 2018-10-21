@@ -52,7 +52,7 @@ pub enum SATempFunc {
 /// Simulated Annealing struct
 #[derive(ArgminSolver)]
 #[log("initial temperature" => "self.init_temp")]
-#[log("maximum number of iterations" => "self.base.max_iters()")]
+#[log("maximum number of iterations" => "self.max_iters()")]
 #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
 #[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
 #[log("reanneal_fixed" => "self.reanneal_fixed")]
@@ -198,13 +198,13 @@ where
         {
             // If yes, update the parameter vector for the next iteration.
             self.prev_cost = next_cost;
-            self.base.set_cur_param(next_param.clone());
+            self.set_cur_param(next_param.clone());
 
             // In case the new solution is better than the current best, update best as well.
-            if next_cost < self.base.best_cost() {
+            if next_cost < self.best_cost() {
                 new_best = true;
-                self.base.set_best_cost(next_cost);
-                self.base.set_best_param(next_param.clone());
+                self.set_best_cost(next_cost);
+                self.set_best_param(next_param.clone());
             }
             true
         } else {
@@ -227,7 +227,7 @@ where
 
     /// Perform annealing
     fn anneal(&mut self) -> Result<T, Error> {
-        let tmp = self.base.cur_param();
+        let tmp = self.cur_param();
         let cur_temp = self.cur_temp.clone();
         self.modify(&tmp, cur_temp)
     }
