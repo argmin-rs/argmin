@@ -118,8 +118,12 @@ where
         let t1 = (-a * b + b * delta + c.powi(2)).sqrt();
         let tau1 = -(t1 + c) / b;
         let tau2 = (t1 - c) / b;
-        let tau3 = (delta - a) / (2.0 * c);
-        let t = vec![tau1, tau2, tau3];
+        let mut t = vec![tau1, tau2];
+        // Maybe calculating tau3 should only be done if b is close to zero?
+        if b.abs() < 10e-8 || tau1.is_nan() || tau2.is_nan() {
+            let tau3 = (delta - a) / (2.0 * c);
+            t.push(tau3);
+        }
         let mut v = t
             .iter()
             .cloned()
@@ -132,7 +136,7 @@ where
             .filter(|(_, m)| !m.is_nan())
             .collect::<Vec<(usize, f64)>>();
         v.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
-        v[0].1
+        t[v[0].0]
     }
 }
 
@@ -208,7 +212,10 @@ where
         self.r = r_n;
         self.p = p_n;
 
-        Ok(ArgminIterationData::new(self.p.clone(), 0.0))
+        Ok(ArgminIterationData::new(
+            self.p.clone(),
+            std::f64::NEG_INFINITY,
+        ))
     }
 }
 
