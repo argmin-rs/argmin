@@ -235,7 +235,7 @@ where
     H: Clone + std::default::Default + ArgminDot<T, T>,
 {
     // fn set_initial_parameter(&mut self, param: T) {
-    //     self.base.set_cur_param(param);
+    //     self.set_cur_param(param);
     // }
 
     fn set_radius(&mut self, radius: f64) {
@@ -243,10 +243,10 @@ where
     }
 
     fn set_grad(&mut self, grad: T) {
-        self.base.set_cur_grad(grad);
+        self.set_cur_grad(grad);
     }
 
     fn set_hessian(&mut self, hessian: H) {
-        self.base.set_cur_hessian(hessian);
+        self.set_cur_hessian(hessian);
     }
 }

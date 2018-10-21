@@ -147,9 +147,9 @@ where
     fn init(&mut self) -> Result<(), Error> {
         let param = self.cur_param();
         let grad = self.gradient(&param)?;
-        self.base.set_cur_grad(grad);
+        self.set_cur_grad(grad);
         let hessian = self.hessian(&param)?;
-        self.base.set_cur_hessian(hessian);
+        self.set_cur_hessian(hessian);
         self.fxk = self.apply(&param)?;
         self.mk0 = self.fxk;
         Ok(())
@@ -182,13 +182,13 @@ where
         };
 
         let mut out = if rho > self.eta {
-            // self.base.set_cur_param(new_param.clone());
+            // self.set_cur_param(new_param.clone());
             self.fxk = fxkpk;
             self.mk0 = fxkpk;
             let grad = self.gradient(&new_param)?;
-            self.base.set_cur_grad(grad);
+            self.set_cur_grad(grad);
             let hessian = self.hessian(&new_param)?;
-            self.base.set_cur_hessian(hessian);
+            self.set_cur_hessian(hessian);
             ArgminIterationData::new(new_param, fxkpk)
         } else {
             ArgminIterationData::new(self.cur_param(), self.fxk)
