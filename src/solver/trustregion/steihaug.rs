@@ -170,7 +170,8 @@ where
         if self.r_0.norm() < self.epsilon {
             self.base
                 .set_termination_reason(TerminationReason::TargetPrecisionReached);
-            self.base.set_best_param(self.p.clone());
+            let best = self.p.clone();
+            self.set_best_param(best);
         }
 
         Ok(())
