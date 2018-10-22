@@ -46,8 +46,10 @@ where
     p: T,
     /// residual
     r: T,
+    /// r^Tr
+    rtr: f64,
     /// initial residual
-    r_0: T,
+    r_0_norm: f64,
     /// direction
     d: T,
     /// base
@@ -82,7 +84,8 @@ where
             epsilon: 10e-10,
             p: T::default(),
             r: T::default(),
-            r_0: T::default(),
+            rtr: std::f64::NAN,
+            r_0_norm: std::f64::NAN,
             d: T::default(),
             base: base,
         }
@@ -106,7 +109,7 @@ where
     }
 
     /// calculate all possible step lengths
-    fn tau<F>(&self, filter: F) -> f64
+    fn tau<F>(&self, filter_func: F, eval: bool) -> f64
     where
         F: Fn(f64) -> bool,
     {
@@ -119,24 +122,37 @@ where
         let tau2 = (t1 - c) / b;
         let mut t = vec![tau1, tau2];
         // Maybe calculating tau3 should only be done if b is close to zero?
-        if b.abs() < 10e-8 || tau1.is_nan() || tau2.is_nan() {
+        if b.abs() < 2.0 * std::f64::EPSILON || tau1.is_nan() || tau2.is_nan() {
             let tau3 = (delta - a) / (2.0 * c);
             t.push(tau3);
         }
-        // remove NAN taus and calculate m (without f_init) for all taus, then sort them based on
-        // their result and return the tau which corresponds to the lowest m
-        let mut v = t
-            .iter()
-            .cloned()
-            .enumerate()
-            .filter(|(_, tau)| !tau.is_nan() && filter(*tau))
-            .map(|(i, tau)| {
-                let p = self.p.add(self.d.scale(tau));
-                (i, self.eval_m(p))
-            })
-            .filter(|(_, m)| !m.is_nan())
-            .collect::<Vec<(usize, f64)>>();
-        v.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+        let v = if eval {
+            // remove NAN taus and calculate m (without f_init) for all taus, then sort them based
+            // on their result and return the tau which corresponds to the lowest m
+            let mut v = t
+                .iter()
+                .cloned()
+                .enumerate()
+                .filter(|(_, tau)| !tau.is_nan() && filter_func(*tau))
+                .map(|(i, tau)| {
+                    let p = self.p.add(self.d.scale(tau));
+                    (i, self.eval_m(p))
+                })
+                .filter(|(_, m)| !m.is_nan())
+                .collect::<Vec<(usize, f64)>>();
+            v.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+            v
+        } else {
+            let mut v = t
+                .iter()
+                .cloned()
+                .enumerate()
+                .filter(|(_, tau)| !tau.is_nan() && filter_func(*tau))
+                .collect::<Vec<(usize, f64)>>();
+            v.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+            v
+        };
+
         t[v[0].0]
     }
 }
@@ -162,12 +178,13 @@ where
     fn init(&mut self) -> Result<(), Error> {
         self.base_reset();
 
-        self.r_0 = self.cur_grad();
-        self.d = self.r_0.scale(-1.0);
-        self.p = self.r_0.zero();
-        self.r = self.r_0.clone();
+        self.r = self.cur_grad();
+        self.r_0_norm = self.r.norm();
+        self.rtr = self.r.dot(self.r.clone());
+        self.d = self.r.scale(-1.0);
+        self.p = self.r.zero();
 
-        if self.r_0.norm() < self.epsilon {
+        if self.r_0_norm < self.epsilon {
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
             let best = self.p.clone();
             self.set_best_param(best);
@@ -178,42 +195,40 @@ where
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let h = self.cur_hessian();
+        let dhd = self.d.weighted_dot(h.clone(), self.d.clone());
 
         // Current search direction d is a direction of zero curvature or negative curvature
-        if self.d.weighted_dot(h.clone(), self.d.clone()) <= 0.0 {
-            let tau = self.tau(|_| true);
+        if dhd <= 0.0 {
+            let tau = self.tau(|_| true, true);
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterationData::new(
-                self.p.add(self.d.scale(tau)),
-                std::f64::NEG_INFINITY,
-            ));
+            return Ok(ArgminIterationData::new(self.p.add(self.d.scale(tau)), 0.0));
         }
 
-        let alpha = self.r.dot(self.r.clone()) / self.d.weighted_dot(h.clone(), self.d.clone());
+        let alpha = self.rtr / dhd;
         let p_n = self.p.add(self.d.scale(alpha));
 
         // new p violates trust region bound
         if p_n.norm() >= self.radius {
-            let tau = self.tau(|x| x >= 0.0);
+            let tau = self.tau(|x| x >= 0.0, false);
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
             return Ok(ArgminIterationData::new(self.p.add(self.d.scale(tau)), 0.0));
         }
 
         let r_n = self.r.add(h.dot(self.d.clone()).scale(alpha));
-        if r_n.norm() < self.epsilon * self.r_0.norm() {
+
+        if r_n.norm() < self.epsilon * self.r_0_norm {
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterationData::new(p_n, std::f64::NEG_INFINITY));
+            return Ok(ArgminIterationData::new(p_n, 0.0));
         }
 
-        let beta = r_n.dot(r_n.clone()) / self.r.dot(self.r.clone());
+        let rjtrj = r_n.dot(r_n.clone());
+        let beta = rjtrj / self.rtr;
         self.d = r_n.add(self.d.scale(beta));
         self.r = r_n;
         self.p = p_n;
+        self.rtr = rjtrj;
 
-        Ok(ArgminIterationData::new(
-            self.p.clone(),
-            std::f64::NEG_INFINITY,
-        ))
+        Ok(ArgminIterationData::new(self.p.clone(), 0.0))
     }
 }
 
@@ -231,10 +246,6 @@ where
         + ArgminScale<f64>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
 {
-    // fn set_initial_parameter(&mut self, param: T) {
-    //     self.set_cur_param(param);
-    // }
-
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
     }
