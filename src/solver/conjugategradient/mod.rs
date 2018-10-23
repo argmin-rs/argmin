@@ -16,11 +16,7 @@
 // //! todo
 // //! ```
 
-use argmin_core::{
-    ArgminBase, ArgminDot, ArgminIterationData, ArgminKV, ArgminLog, ArgminNextIter,
-    ArgminOperator, ArgminResult, ArgminScaledAdd, ArgminScaledSub, ArgminSolver, ArgminSub,
-    ArgminWrite, Error, TerminationReason,
-};
+use prelude::*;
 use std;
 use std::default::Default;
 
@@ -31,15 +27,21 @@ where
     T: Clone
         + Default
         + ArgminSub<T>
+        + ArgminAdd<T>
+        + ArgminScale<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
     H: Clone + Default,
 {
+    /// b
+    b: T,
     /// residual
     r: T,
     /// p
     p: T,
+    /// r^T * r
+    rtr: f64,
     /// alpha
     alpha: f64,
     /// beta
@@ -53,6 +55,8 @@ where
     T: Clone
         + Default
         + ArgminSub<T>
+        + ArgminAdd<T>
+        + ArgminScale<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
@@ -69,11 +73,11 @@ where
         b: T,
         init_param: T,
     ) -> Result<Self, Error> {
-        let ap = operator.apply(&init_param)?;
-        let r0: T = b.sub(ap);
         Ok(ConjugateGradient {
-            r: r0.clone(),
-            p: r0,
+            b: b,
+            r: T::default(),
+            p: T::default(),
+            rtr: std::f64::NAN,
             alpha: std::f64::NAN,
             beta: std::f64::NAN,
             base: ArgminBase::new(operator, init_param),
@@ -86,6 +90,8 @@ where
     T: Clone
         + Default
         + ArgminSub<T>
+        + ArgminAdd<T>
+        + ArgminScale<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
@@ -95,17 +101,28 @@ where
     type OperatorOutput = T;
     type Hessian = H;
 
+    fn init(&mut self) -> Result<(), Error> {
+        let init_param = self.cur_param();
+        let ap = self.apply(&init_param)?;
+        let r0 = self.b.sub(ap).scale(-1.0);
+        self.r = r0.clone();
+        self.p = r0.scale(-1.0);
+        self.rtr = self.r.dot(self.r.clone());
+        Ok(())
+    }
+
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         // Still way too much cloning going on here
         let p = self.p.clone();
         let apk = self.apply(&p)?;
-        let rtr = self.r.dot(self.r.clone());
-        self.alpha = rtr / self.p.dot(apk.clone());
+        self.alpha = self.rtr / self.p.dot(apk.clone());
         let new_param = self.cur_param().scaled_add(self.alpha, p.clone());
-        self.r = self.r.scaled_sub(self.alpha, apk);
-        self.beta = self.r.dot(self.r.clone()) / rtr;
-        self.p = self.r.scaled_add(self.beta, p);
+        self.r = self.r.scaled_add(self.alpha, apk);
+        let rtr_n = self.r.dot(self.r.clone());
+        self.beta = rtr_n / self.rtr;
+        self.rtr = rtr_n;
+        self.p = self.r.scale(-1.0).scaled_add(self.beta, p);
         let norm = self.r.dot(self.r.clone());
 
         let mut out = ArgminIterationData::new(new_param, norm);
