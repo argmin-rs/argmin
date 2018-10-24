@@ -13,9 +13,8 @@ Please get in touch with me if you're interested.
 
 ## Design goals
 
-This crate's intention is to be useful to users of optimization algorithms as well as developers/implementers of optimization algorithms.
-It should be easy to apply optimization algorithms and to develop optimization algorithms.
-In particular, as a developer of optimization algorithms you should not need to worry about usability features (such as logging, dealing with different types, setters and getter for certain parameters, counting cost function and gradient evaluations, termination,  and so on).
+This crate's intention is to be useful to users as well as developers of optimization algorithms, meaning that it should be both easy to apply and easy to implement algoritms.
+In particular, as a developer of optimization algorithms you should not need to worry about usability features (such as logging, dealing with different types, setters and getters for certain common parameters, counting cost function and gradient evaluations, termination,  and so on).
 Instead you can focus on implementing your algorithm and let argmin do the boring stuff for you.
 
 - Provide an easy framework for the implementation of optimization algorithms: Define a struct to hold your data, implement a single iteration of your method and let argmin generate the rest with `#[derive(ArgminSolver)]`. With is approach, the interfaces to different solvers will be fairly similar, making it easy for users to try different methods on their problem without much work.
@@ -44,7 +43,7 @@ Any help is appreciated!
 
 ## Algorithms
 
-- Linesearches
+- [X] Linesearches
   - [X] Backtracking line search
   - [X] More-Thuente line search
   - [X] Hager-Zhang line search
