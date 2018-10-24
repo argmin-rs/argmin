@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["ConjugateGradient","Conjugate Gradient struct"]]});
+initSidebarItems({"mod":[["conjugategradient","Conjugate gradient method # Conjugate Gradient Method"]]});
