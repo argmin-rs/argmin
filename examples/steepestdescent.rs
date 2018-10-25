@@ -16,7 +16,7 @@ use argmin::prelude::*;
 use argmin::solver::gradientdescent::*;
 // use argmin::solver::linesearch::BacktrackingLineSearch;
 use argmin::solver::linesearch::HagerZhangLineSearch;
-use argmin::solver::linesearch::MoreThuenteLineSearch;
+// use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
 fn rosenbrock(x: &Vec<f64>) -> f64 {
@@ -43,8 +43,8 @@ fn run() -> Result<(), Error> {
     let init_param: Vec<f64> = vec![1.2, 1.2];
     // let init_param: Vec<f64> = vec![-1.2, 1.0];
 
-    let mut linesearch = MoreThuenteLineSearch::new(Box::new(cost.clone()));
-    // let mut linesearch = HagerZhangLineSearch::new(Box::new(cost.clone()));
+    // let mut linesearch = MoreThuenteLineSearch::new(Box::new(cost.clone()));
+    let mut linesearch = HagerZhangLineSearch::new(Box::new(cost.clone()));
     // let mut linesearch = BacktrackingLineSearch::new(Box::new(cost.clone()));
     // linesearch.set_initial_alpha(1.0)?;
     // linesearch.set_initial_alpha(10.0)?;
