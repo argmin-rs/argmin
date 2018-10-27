@@ -17,8 +17,7 @@ exclude = [
 ]
 
 [dependencies]
-# argmin_core = { path = "../argmin-core", features = ["ctrlc"]}
-argmin_core = { path = "../argmin-core", features = []}
+argmin_core = { path = "../argmin-core"}
 argmin_codegen = { path = "../argmin-codegen"}
 argmin_testfunctions = { path = "../argmin-testfunctions" }
 # argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git" }
@@ -36,7 +35,8 @@ ndarray-linalg = { version = "0.10.0", features = ["openblas"] }
 
 [features]
 default = []
-ctrlc = []
+ctrlc = ["argmin_core/ctrlc"]
+ndarrayl = ["argmin_core/ndarrayl"]
 
 [badges]
 travis-ci = { repository = "argmin-rs/argmin", branch = "master" }
