@@ -56,6 +56,30 @@ Any help is appreciated!
 - [X] Simulated Annealing
 
 
+## Usage
+
+Put this in your `Cargo.toml`:
+
+```
+argmin = "0.1.2"
+```
+
+
+### Optional features
+
+There are additional features which can be activated in `Cargo.toml`:
+
+```
+argmin = { verstion = "0.1.2", features = ["ctrlc", "ndarrayl"] }
+```
+
+These are currently optional, but they may move to the default features in the future. 
+Without adding these features compilation to `wasm32-unknown-unkown` seems to be possible.
+
+- *ctrlc*: Uses the `ctrlc` crate to properly stop the optimization (and return the current best result) after pressing Ctrl+C.
+- *ndarrayl*: Support for `ndarray` and `ndarray-linalg`.
+
+
 ## License
 
 Licensed under either of
