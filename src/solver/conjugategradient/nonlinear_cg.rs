@@ -38,8 +38,6 @@ where
 {
     /// p
     p: T,
-    /// alpha
-    alpha: f64,
     /// beta
     beta: f64,
     /// line search
@@ -74,7 +72,6 @@ where
         let linesearch = HagerZhangLineSearch::new(operator.clone());
         Ok(NonlinearConjugateGradient {
             p: T::default(),
-            alpha: std::f64::NAN,
             beta: std::f64::NAN,
             linesearch: Box::new(linesearch),
             base: ArgminBase::new(operator, init_param),
@@ -144,9 +141,14 @@ where
 
         self.p = new_grad.scale(-1.0).add(self.p.scale(self.beta));
 
-        let mut out = ArgminIterationData::new(xk1, new_grad_norm);
+        // let new_p = self.p.clone();
+        self.set_cur_param(xk1.clone());
+        self.set_cur_grad(new_grad);
+        let cost = self.apply(&xk1)?;
+        self.set_cur_cost(cost);
+
+        let mut out = ArgminIterationData::new(xk1, cost);
         out.add_kv(make_kv!(
-                "alpha" => self.alpha;
                 "beta" => self.beta;
             ));
         Ok(out)
