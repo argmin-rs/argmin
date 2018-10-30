@@ -14,3 +14,4 @@ pub mod conjugategradient;
 pub mod nonlinear_cg;
 
 pub use self::conjugategradient::*;
+pub use self::nonlinear_cg::*;
