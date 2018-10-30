@@ -34,7 +34,6 @@ pub struct HagerZhangLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
-        + std::fmt::Debug
         + ArgminSub<T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -112,7 +111,6 @@ impl<'a, T, H> HagerZhangLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
-        + std::fmt::Debug
         + ArgminSub<T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -429,7 +427,6 @@ impl<'a, T, H> ArgminLineSearch for HagerZhangLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
-        + std::fmt::Debug
         + ArgminSub<T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -482,7 +479,6 @@ impl<'a, T, H> ArgminNextIter for HagerZhangLineSearch<'a, T, H>
 where
     T: std::default::Default
         + Clone
-        + std::fmt::Debug
         + ArgminSub<T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
