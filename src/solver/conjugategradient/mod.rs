@@ -10,4 +10,7 @@
 /// Conjugate gradient method
 pub mod conjugategradient;
 
+/// Nonlinear Conjugate gradient method
+pub mod nonlinear_cg;
+
 pub use self::conjugategradient::*;

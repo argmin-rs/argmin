@@ -17,50 +17,49 @@
 // //! ```
 
 use prelude::*;
+use solver::linesearch::HagerZhangLineSearch;
 use std;
 use std::default::Default;
 
 /// Nonlinear Conjugate Gradient struct
 #[derive(ArgminSolver)]
-pub struct NonlinearConjugateGradient<'a, T, H>
+pub struct NonlinearConjugateGradient<'a, T>
 where
-    T: Clone
+    T: 'a
+        + Clone
         + Default
         + ArgminSub<T>
         + ArgminAdd<T>
         + ArgminScale<f64>
+        + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    H: Clone + Default,
 {
-    /// b
-    b: T,
-    /// residual
-    r: T,
     /// p
     p: T,
-    /// r^T * r
-    rtr: f64,
     /// alpha
     alpha: f64,
     /// beta
     beta: f64,
+    /// line search
+    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = ()> + 'a>,
     /// base
-    base: ArgminBase<'a, T, T, H>,
+    base: ArgminBase<'a, T, f64, ()>,
 }
 
-impl<'a, T, H> NonlinearConjugateGradient<'a, T, H>
+impl<'a, T> NonlinearConjugateGradient<'a, T>
 where
-    T: Clone
+    T: 'a
+        + Clone
         + Default
         + ArgminSub<T>
         + ArgminAdd<T>
         + ArgminScale<f64>
+        + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    H: Clone + Default,
 {
     /// Constructor
     ///
@@ -69,70 +68,87 @@ where
     /// `cost_function`: cost function
     /// `init_param`: Initial parameter vector
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = H>>,
-        b: T,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>>,
         init_param: T,
     ) -> Result<Self, Error> {
-        unimplemented!()
-        // Ok(NonlinearConjugateGradient {
-        //     b: b,
-        //     r: T::default(),
-        //     p: T::default(),
-        //     rtr: std::f64::NAN,
-        //     alpha: std::f64::NAN,
-        //     beta: std::f64::NAN,
-        //     base: ArgminBase::new(operator, init_param),
-        // })
+        let linesearch = HagerZhangLineSearch::new(operator.clone());
+        Ok(NonlinearConjugateGradient {
+            p: T::default(),
+            alpha: std::f64::NAN,
+            beta: std::f64::NAN,
+            linesearch: Box::new(linesearch),
+            base: ArgminBase::new(operator, init_param),
+        })
+    }
+
+    /// Specify line search method
+    pub fn set_linesearch(
+        &mut self,
+        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = ()> + 'a>,
+    ) -> &mut Self {
+        self.linesearch = linesearch;
+        self
     }
 }
 
-impl<'a, T, H> ArgminNextIter for NonlinearConjugateGradient<'a, T, H>
+impl<'a, T> ArgminNextIter for NonlinearConjugateGradient<'a, T>
 where
-    T: Clone
+    T: 'a
+        + Clone
         + Default
         + ArgminSub<T>
         + ArgminAdd<T>
         + ArgminScale<f64>
+        + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    H: Clone + Default,
 {
     type Parameters = T;
-    type OperatorOutput = T;
-    type Hessian = H;
+    type OperatorOutput = f64;
+    type Hessian = ();
 
     fn init(&mut self) -> Result<(), Error> {
-        unimplemented!();
-        // let init_param = self.cur_param();
-        // let ap = self.apply(&init_param)?;
-        // let r0 = self.b.sub(ap).scale(-1.0);
-        // self.r = r0.clone();
-        // self.p = r0.scale(-1.0);
-        // self.rtr = self.r.dot(self.r.clone());
+        let param = self.cur_param();
+        let cost = self.apply(&param)?;
+        let grad = self.gradient(&param)?;
+        self.p = grad.scale(-1.0);
+        self.set_cur_cost(cost);
+        self.set_cur_grad(grad);
         Ok(())
     }
 
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
-        unimplemented!()
-        // Still way too much cloning going on here
-        // let p = self.p.clone();
-        // let apk = self.apply(&p)?;
-        // self.alpha = self.rtr / self.p.dot(apk.clone());
-        // let new_param = self.cur_param().scaled_add(self.alpha, p.clone());
-        // self.r = self.r.scaled_add(self.alpha, apk);
-        // let rtr_n = self.r.dot(self.r.clone());
-        // self.beta = rtr_n / self.rtr;
-        // self.rtr = rtr_n;
-        // self.p = self.r.scale(-1.0).scaled_add(self.beta, p);
-        // let norm = self.r.dot(self.r.clone());
-        //
-        // let mut out = ArgminIterationData::new(new_param, norm);
-        // out.add_kv(make_kv!(
-        //         "alpha" => self.alpha;
-        //         "beta" => self.beta;
-        //     ));
-        // Ok(out)
+        // reset line search
+        self.linesearch.base_reset();
+
+        let xk = self.cur_param();
+        let grad = self.cur_grad();
+        let pk = self.p.clone();
+        let cur_cost = self.cur_cost();
+        self.linesearch.set_initial_parameter(xk);
+        self.linesearch.set_search_direction(pk);
+        self.linesearch.set_initial_gradient(grad.clone());
+        self.linesearch.set_initial_cost(cur_cost);
+
+        self.linesearch.run_fast()?;
+
+        let xk1 = self.linesearch.result().param;
+
+        let new_grad = self.gradient(&xk1)?;
+        let new_grad_norm = new_grad.dot(new_grad.clone());
+
+        // store this new dot product somewhere and reuse it in next iteration
+        self.beta = new_grad_norm / grad.dot(grad.clone());
+
+        self.p = new_grad.scale(-1.0).add(self.p.scale(self.beta));
+
+        let mut out = ArgminIterationData::new(xk1, new_grad_norm);
+        out.add_kv(make_kv!(
+                "alpha" => self.alpha;
+                "beta" => self.beta;
+            ));
+        Ok(out)
     }
 }
