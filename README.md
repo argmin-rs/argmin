@@ -53,6 +53,7 @@ Any help is appreciated!
   - [X] Steihaug method
 - [X] Steepest Descent
 - [X] Conjugate Gradient method
+- [X] Nonlinear Conjugate Gradient method
 - [X] Simulated Annealing
 
 
@@ -62,7 +63,7 @@ Add this to your `Cargo.toml`:
 
 ```
 [dependencies]
-argmin = "0.1.2"
+argmin = "0.1.3"
 ```
 
 
@@ -72,7 +73,7 @@ There are additional features which can be activated in `Cargo.toml`:
 
 ```
 [dependencies]
-argmin = { version = "0.1.2", features = ["ctrlc", "ndarrayl"] }
+argmin = { version = "0.1.3", features = ["ctrlc", "ndarrayl"] }
 ```
 
 These are currently optional, but they may move to the default features in the future. 
