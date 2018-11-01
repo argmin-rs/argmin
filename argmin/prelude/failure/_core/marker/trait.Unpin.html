@@ -9,7 +9,7 @@ See the <a href="../../std/pin/index.html"><code>pin module</code></a> documenta
 which then allows it to move out with functions such as <a href="../../std/mem/fn.replace.html"><code>replace</code></a>.</p>
 <p>So this, for example, can only be done on types implementing <code>Unpin</code>:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">pin</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">replace</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
@@ -18,7 +18,7 @@ which then allows it to move out with functions such as <a href="../../std/mem/f
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pinned_string</span> <span class="op">=</span> <span class="ident">Pin</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">string</span>);
 
 <span class="comment">// dereferencing the pointer mutably is only possible because String implements Unpin</span>
-<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">pinned_string</span>, <span class="string">&quot;other&quot;</span>.<span class="ident">to_string</span>());</pre>
+<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">pinned_string</span>, <span class="string">&quot;other&quot;</span>.<span class="ident">to_string</span>());</pre></div>
 <p>This trait is automatically implemented for almost every type.</p>
 </div>
                 <h2 id='foreign-impls' class='small-section-header'>

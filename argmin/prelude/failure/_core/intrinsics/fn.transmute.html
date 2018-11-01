@@ -15,15 +15,15 @@ documentation.</p>
 <p>Getting the bitpattern of a floating point type (or, more generally,
 type punning, when <code>T</code> and <code>U</code> aren't pointers):</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">bitpattern</span> <span class="op">=</span> <span class="kw">unsafe</span> {
     <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="ident">f32</span>, <span class="ident">u32</span><span class="op">&gt;</span>(<span class="number">1.0</span>)
 };
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">bitpattern</span>, <span class="number">0x3F800000</span>);</pre>
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">bitpattern</span>, <span class="number">0x3F800000</span>);</pre></div>
 <p>Turning a pointer into a function pointer. This is <em>not</em> portable to
 machines where function pointers and data pointers have different sizes.</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">fn</span> <span class="ident">foo</span>() <span class="op">-&gt;</span> <span class="ident">i32</span> {
     <span class="number">0</span>
 }
@@ -31,11 +31,11 @@ machines where function pointers and data pointers have different sizes.</p>
 <span class="kw">let</span> <span class="ident">function</span> <span class="op">=</span> <span class="kw">unsafe</span> {
     <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> (), <span class="kw">fn</span>() <span class="op">-&gt;</span> <span class="ident">i32</span><span class="op">&gt;</span>(<span class="ident">pointer</span>)
 };
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">function</span>(), <span class="number">0</span>);</pre>
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">function</span>(), <span class="number">0</span>);</pre></div>
 <p>Extending a lifetime, or shortening an invariant lifetime. This is
 advanced, very unsafe Rust!</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">struct</span> <span class="ident">R</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">i32</span>);
 <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">extend_lifetime</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="ident">R</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">R</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;&gt;</span>(<span class="ident">r</span>)
@@ -44,34 +44,34 @@ advanced, very unsafe Rust!</p>
 <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">shorten_invariant_lifetime</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">R</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>)
                                              <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">R</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span><span class="op">&gt;</span> {
     <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">R</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">R</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span><span class="op">&gt;&gt;</span>(<span class="ident">r</span>)
-}</pre>
+}</pre></div>
 <h1 id="alternatives" class="section-header"><a href="#alternatives">Alternatives</a></h1>
 <p>Don't despair: many uses of <code>transmute</code> can be achieved through other means.
 Below are common applications of <code>transmute</code> which can be replaced with safer
 constructs.</p>
 <p>Turning a pointer into a <code>usize</code>:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="number">0</span>;
 <span class="kw">let</span> <span class="ident">ptr_num_transmute</span> <span class="op">=</span> <span class="kw">unsafe</span> {
     <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">i32</span>, <span class="ident">usize</span><span class="op">&gt;</span>(<span class="ident">ptr</span>)
 };
 
 <span class="comment">// Use an `as` cast instead</span>
-<span class="kw">let</span> <span class="ident">ptr_num_cast</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">i32</span> <span class="kw">as</span> <span class="ident">usize</span>;</pre>
+<span class="kw">let</span> <span class="ident">ptr_num_cast</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">i32</span> <span class="kw">as</span> <span class="ident">usize</span>;</pre></div>
 <p>Turning a <code>*mut T</code> into an <code>&amp;mut T</code>:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">i32</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="number">0</span>;
 <span class="kw">let</span> <span class="ident">ref_transmuted</span> <span class="op">=</span> <span class="kw">unsafe</span> {
     <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">i32</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">i32</span><span class="op">&gt;</span>(<span class="ident">ptr</span>)
 };
 
 <span class="comment">// Use a reborrow instead</span>
-<span class="kw">let</span> <span class="ident">ref_casted</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">ptr</span> };</pre>
+<span class="kw">let</span> <span class="ident">ref_casted</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">ptr</span> };</pre></div>
 <p>Turning an <code>&amp;mut T</code> into an <code>&amp;mut U</code>:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="number">0</span>;
 <span class="kw">let</span> <span class="ident">val_transmuted</span> <span class="op">=</span> <span class="kw">unsafe</span> {
     <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">i32</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">u32</span><span class="op">&gt;</span>(<span class="ident">ptr</span>)
@@ -79,10 +79,10 @@ constructs.</p>
 
 <span class="comment">// Now, put together `as` and reborrowing - note the chaining of `as`</span>
 <span class="comment">// `as` is not transitive</span>
-<span class="kw">let</span> <span class="ident">val_casts</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">i32</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u32</span>) };</pre>
+<span class="kw">let</span> <span class="ident">val_casts</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">i32</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u32</span>) };</pre></div>
 <p>Turning an <code>&amp;str</code> into an <code>&amp;[u8]</code>:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="comment">// this is not a good way to do this.</span>
 <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>(<span class="string">&quot;Rust&quot;</span>) };
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">slice</span>, <span class="kw-2">&amp;</span>[<span class="number">82</span>, <span class="number">117</span>, <span class="number">115</span>, <span class="number">116</span>]);
@@ -93,10 +93,10 @@ constructs.</p>
 
 <span class="comment">// Or, just use a byte string, if you have control over the string</span>
 <span class="comment">// literal</span>
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">b&quot;Rust&quot;</span>, <span class="kw-2">&amp;</span>[<span class="number">82</span>, <span class="number">117</span>, <span class="number">115</span>, <span class="number">116</span>]);</pre>
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">b&quot;Rust&quot;</span>, <span class="kw-2">&amp;</span>[<span class="number">82</span>, <span class="number">117</span>, <span class="number">115</span>, <span class="number">116</span>]);</pre></div>
 <p>Turning a <code>Vec&lt;&amp;T&gt;</code> into a <code>Vec&lt;Option&lt;&amp;T&gt;&gt;</code>:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v_orig</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">i32</span><span class="op">&gt;&gt;</span>();
 
@@ -126,10 +126,10 @@ constructs.</p>
                         <span class="ident">v_orig</span>.<span class="ident">len</span>(),
                         <span class="ident">v_orig</span>.<span class="ident">capacity</span>())
 };
-<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">v_orig</span>);</pre>
+<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">v_orig</span>);</pre></div>
 <p>Implementing <code>split_at_mut</code>:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">slice</span>, <span class="ident">mem</span>};
 
 <span class="comment">// There are multiple ways to do this; and there are multiple problems</span>
@@ -177,5 +177,5 @@ constructs.</p>
         (<span class="ident">slice</span>::<span class="ident">from_raw_parts_mut</span>(<span class="ident">ptr</span>, <span class="ident">mid</span>),
          <span class="ident">slice</span>::<span class="ident">from_raw_parts_mut</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="ident">mid</span>), <span class="ident">len</span> <span class="op">-</span> <span class="ident">mid</span>))
     }
-}</pre>
+}</pre></div>
 </div></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../";window.currentCrate = "argmin";</script><script src="../../../../../aliases.js"></script><script src="../../../../../main.js"></script><script defer src="../../../../../search-index.js"></script></body></html>

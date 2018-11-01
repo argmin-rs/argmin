@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `option` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, option"><title>argmin::prelude::failure::_core::option - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module option</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'option', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.0.0'>1.0.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#204' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>option</a></span></h1><div class='docblock'><p>Optional values.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `option` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, option"><title>argmin::prelude::failure::_core::option - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module option</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'option', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.0.0'>1.0.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#205' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>option</a></span></h1><div class='docblock'><p>Optional values.</p>
 <p>Type <a href="enum.Option.html"><code>Option</code></a> represents an optional value: every <a href="enum.Option.html"><code>Option</code></a>
 is either <a href="enum.Option.html#variant.Some"><code>Some</code></a> and contains a value, or <a href="enum.Option.html#variant.None"><code>None</code></a>, and
 does not. <a href="enum.Option.html"><code>Option</code></a> types are very common in Rust code, as
@@ -18,7 +18,7 @@ returned on error</li>
 <p><a href="enum.Option.html"><code>Option</code></a>s are commonly paired with pattern matching to query the presence
 of a value and take action, always accounting for the <a href="enum.Option.html#variant.None"><code>None</code></a> case.</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">fn</span> <span class="ident">divide</span>(<span class="ident">numerator</span>: <span class="ident">f64</span>, <span class="ident">denominator</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">denominator</span> <span class="op">==</span> <span class="number">0.0</span> {
         <span class="prelude-val">None</span>
@@ -36,7 +36,7 @@ of a value and take action, always accounting for the <a href="enum.Option.html#
     <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Result: {}&quot;</span>, <span class="ident">x</span>),
     <span class="comment">// The division was invalid</span>
     <span class="prelude-val">None</span>    <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Cannot divide by 0&quot;</span>),
-}</pre>
+}</pre></div>
 <h1 id="options-and-pointers-nullable-pointers" class="section-header"><a href="#options-and-pointers-nullable-pointers">Options and pointers (&quot;nullable&quot; pointers)</a></h1>
 <p>Rust's pointer types must always point to a valid location; there are
 no &quot;null&quot; pointers. Instead, Rust has <em>optional</em> pointers, like
@@ -47,7 +47,7 @@ the optional owned box, <a href="enum.Option.html"><code>Option</code></a><code>
 determine whether the box has a value (i.e. it is <a href="enum.Option.html#variant.Some"><code>Some(...)</code></a>) or
 not (<a href="enum.Option.html#variant.None"><code>None</code></a>).</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">optional</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 <span class="ident">check_optional</span>(<span class="ident">optional</span>);
 
@@ -59,7 +59,7 @@ not (<a href="enum.Option.html#variant.None"><code>None</code></a>).</p>
         <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;has value {}&quot;</span>, <span class="ident">p</span>),
         <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;has no value&quot;</span>),
     }
-}</pre>
+}</pre></div>
 <p>This usage of <a href="enum.Option.html"><code>Option</code></a> to create safe nullable pointers is so
 common that Rust does special optimizations to make the
 representation of <a href="enum.Option.html"><code>Option</code></a><code>&lt;</code><a href="../../std/boxed/struct.Box.html"><code>Box&lt;T&gt;</code></a><code>&gt;</code> a single pointer. Optional pointers
@@ -67,7 +67,7 @@ in Rust are stored as efficiently as any other pointer type.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
 <p>Basic pattern matching on <a href="enum.Option.html"><code>Option</code></a>:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;howdy&quot;</span>);
 
 <span class="comment">// Take a reference to the contained string</span>
@@ -76,10 +76,10 @@ in Rust are stored as efficiently as any other pointer type.</p>
 }
 
 <span class="comment">// Remove the contained string, destroying the Option</span>
-<span class="kw">let</span> <span class="ident">unwrapped_msg</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;default message&quot;</span>);</pre>
+<span class="kw">let</span> <span class="ident">unwrapped_msg</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;default message&quot;</span>);</pre></div>
 <p>Initialize a result to <a href="enum.Option.html#variant.None"><code>None</code></a> before a loop:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">enum</span> <span class="ident">Kingdom</span> { <span class="ident">Plant</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>), <span class="ident">Animal</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) }
 
 <span class="comment">// A list of data to search through.</span>
@@ -110,7 +110,7 @@ in Rust are stored as efficiently as any other pointer type.</p>
 <span class="kw">match</span> <span class="ident">name_of_biggest_animal</span> {
     <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;the biggest animal is {}&quot;</span>, <span class="ident">name</span>),
     <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;there are no animals :(&quot;</span>),
-}</pre>
+}</pre></div>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>

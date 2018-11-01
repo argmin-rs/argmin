@@ -34,7 +34,7 @@ dropped.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
 <p>Manually remove the last item from a vector:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
 
@@ -57,11 +57,11 @@ dropped.</p>
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">v</span>, <span class="kw-2">&amp;</span>[<span class="number">0</span>.<span class="ident">into</span>()]);
 
 <span class="comment">// Ensure that the last item was dropped.</span>
-<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">weak</span>.<span class="ident">upgrade</span>().<span class="ident">is_none</span>());</pre>
+<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">weak</span>.<span class="ident">upgrade</span>().<span class="ident">is_none</span>());</pre></div>
 <p>Unaligned values cannot be dropped in place, they must be copied to an aligned
 location first:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
 
@@ -81,7 +81,7 @@ location first:</p>
 <span class="kw">unsafe</span> {
     <span class="ident">drop_after_copy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">p</span>.<span class="ident">unaligned</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
     <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">p</span>);
-}</pre>
+}</pre></div>
 <p>Notice that the compiler performs this copy automatically when dropping packed structs,
 i.e., you do not usually have to worry about such issues unless you call <code>drop_in_place</code>
 manually.</p>

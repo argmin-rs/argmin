@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `iter` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, iter"><title>argmin::prelude::failure::_core::iter - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module iter</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'iter', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.0.0'>1.0.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#203' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>iter</a></span></h1><div class='docblock'><p>Composable external iteration.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `iter` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, iter"><title>argmin::prelude::failure::_core::iter - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module iter</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'iter', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.0.0'>1.0.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#204' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>iter</a></span></h1><div class='docblock'><p>Composable external iteration.</p>
 <p>If you've found yourself with a collection of some kind, and needed to
 perform an operation on the elements of said collection, you'll quickly run
 into 'iterators'. Iterators are heavily used in idiomatic Rust code, so
@@ -21,11 +21,11 @@ see '<a href="#implementing-iterator">Implementing Iterator</a>'.</li>
 <p>The heart and soul of this module is the <a href="trait.Iterator.html"><code>Iterator</code></a> trait. The core of
 <a href="trait.Iterator.html"><code>Iterator</code></a> looks like this:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">trait</span> <span class="ident">Iterator</span> {
     <span class="kw">type</span> <span class="ident">Item</span>;
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span>;
-}</pre>
+}</pre></div>
 <p>An iterator has a method, <a href="trait.Iterator.html#tymethod.next"><code>next</code></a>, which when called, returns an
 <a href="../../std/option/enum.Option.html"><code>Option</code></a><code>&lt;Item&gt;</code>. <a href="trait.Iterator.html#tymethod.next"><code>next</code></a> will return <code>Some(Item)</code> as long as there
 are elements, and once they've all been exhausted, will return <code>None</code> to
@@ -54,7 +54,7 @@ hold the iterator's state, and then <code>impl</code>ementing <a href="trait.Ite
 one for each iterator and iterator adapter.</p>
 <p>Let's make an iterator named <code>Counter</code> which counts from <code>1</code> to <code>5</code>:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="comment">// First, the struct:</span>
 
 <span class="doccomment">/// An iterator which counts from one to five</span>
@@ -108,7 +108,7 @@ one for each iterator and iterator adapter.</p>
 <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>);
 
 <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">counter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>);</pre>
+<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>);</pre></div>
 <p>This will print <code>1</code> through <code>5</code>, each on their own line.</p>
 <p>Calling <code>next()</code> this way gets repetitive. Rust has a construct which can
 call <code>next()</code> on your iterator, until it reaches <code>None</code>. Let's go over that
@@ -117,12 +117,12 @@ next.</p>
 <p>Rust's <code>for</code> loop syntax is actually sugar for iterators. Here's a basic
 example of <code>for</code>:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
 
 <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="ident">values</span> {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>);
-}</pre>
+}</pre></div>
 <p>This will print the numbers one through five, each on their own line. But
 you'll notice something here: we never called anything on our vector to
 produce an iterator. What gives?</p>
@@ -132,15 +132,15 @@ which converts the thing implementing <a href="trait.IntoIterator.html"><code>In
 Let's take a look at that <code>for</code> loop again, and what the compiler converts
 it into:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
 
 <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="ident">values</span> {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>);
-}</pre>
+}</pre></div>
 <p>Rust de-sugars this into:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
 {
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">IntoIterator</span>::<span class="ident">into_iter</span>(<span class="ident">values</span>) {
@@ -155,15 +155,15 @@ it into:</p>
         },
     };
     <span class="ident">result</span>
-}</pre>
+}</pre></div>
 <p>First, we call <code>into_iter()</code> on the value. Then, we match on the iterator
 that returns, calling <a href="trait.Iterator.html#tymethod.next"><code>next</code></a> over and over until we see a <code>None</code>. At
 that point, we <code>break</code> out of the loop, and we're done iterating.</p>
 <p>There's one more subtle bit here: the standard library contains an
 interesting implementation of <a href="trait.IntoIterator.html"><code>IntoIterator</code></a>:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><pre class="rust rust-example-rendered ignore">
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">I</span></pre>
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">I</span></pre></div>
 <p>In other words, all <a href="trait.Iterator.html"><code>Iterator</code></a>s implement <a href="trait.IntoIterator.html"><code>IntoIterator</code></a>, by just
 returning themselves. This means two things:</p>
 <ol>
@@ -184,9 +184,9 @@ until you call <a href="trait.Iterator.html#tymethod.next"><code>next</code></a>
 creating an iterator solely for its side effects. For example, the <a href="trait.Iterator.html#method.map"><code>map</code></a>
 method calls a closure on each element it iterates over:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
-<span class="ident">v</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>));</pre>
+<span class="ident">v</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>));</pre></div>
 <p>This will not print any values, as we only created an iterator, rather than
 using it. The compiler will warn us about this kind of behavior:</p>
 <pre><code class="language-text">warning: unused result that must be used: iterator adaptors are lazy and
@@ -195,30 +195,30 @@ do nothing unless consumed
 <p>The idiomatic way to write a <a href="trait.Iterator.html#method.map"><code>map</code></a> for its side effects is to use a
 <code>for</code> loop instead:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
 
 <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">v</span> {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>);
-}</pre>
+}</pre></div>
 <p>The two most common ways to evaluate an iterator are to use a <code>for</code> loop
 like this, or using the <a href="trait.Iterator.html#method.collect"><code>collect</code></a> method to produce a new collection.</p>
 <h1 id="infinity" class="section-header"><a href="#infinity">Infinity</a></h1>
 <p>Iterators do not have to be finite. As an example, an open-ended range is
 an infinite iterator:</p>
 
-<pre class="rust rust-example-rendered">
-<span class="kw">let</span> <span class="ident">numbers</span> <span class="op">=</span> <span class="number">0</span>..;</pre>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">let</span> <span class="ident">numbers</span> <span class="op">=</span> <span class="number">0</span>..;</pre></div>
 <p>It is common to use the <a href="trait.Iterator.html#method.take"><code>take</code></a> iterator adapter to turn an infinite
 iterator into a finite one:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">numbers</span> <span class="op">=</span> <span class="number">0</span>..;
 <span class="kw">let</span> <span class="ident">five_numbers</span> <span class="op">=</span> <span class="ident">numbers</span>.<span class="ident">take</span>(<span class="number">5</span>);
 
 <span class="kw">for</span> <span class="ident">number</span> <span class="kw">in</span> <span class="ident">five_numbers</span> {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">number</span>);
-}</pre>
+}</pre></div>
 <p>This will print the numbers <code>0</code> through <code>4</code>, each on their own line.</p>
 <p>Bear in mind that methods on infinite iterators, even those for which a
 result can be determined mathematically in finite time, may not terminate.
@@ -226,11 +226,11 @@ Specifically, methods such as <a href="trait.Iterator.html#method.min"><code>min
 traversing every element in the iterator, are likely not to return
 successfully for any infinite iterators.</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">ones</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">repeat</span>(<span class="number">1</span>);
 <span class="kw">let</span> <span class="ident">least</span> <span class="op">=</span> <span class="ident">ones</span>.<span class="ident">min</span>().<span class="ident">unwrap</span>(); <span class="comment">// Oh no! An infinite loop!</span>
 <span class="comment">// `ones.min()` causes an infinite loop, so we won&#39;t reach this point!</span>
-<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;The smallest number one is {}.&quot;</span>, <span class="ident">least</span>);</pre>
+<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;The smallest number one is {}.&quot;</span>, <span class="ident">least</span>);</pre></div>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["NonlinearConjugateGradient","Nonlinear Conjugate Gradient struct"]]});

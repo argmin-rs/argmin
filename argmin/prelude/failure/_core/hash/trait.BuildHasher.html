@@ -9,7 +9,7 @@ another, since <a href="trait.Hasher.html"><code>Hasher</code></a>s contain stat
 <a href="#tymethod.build_hasher"><code>build_hasher</code></a> should be identical. That is, if the same stream of bytes
 is fed into each hasher, the same output will also be generated.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">hash_map</span>::<span class="ident">RandomState</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hasher</span>};
 
@@ -20,7 +20,7 @@ is fed into each hasher, the same output will also be generated.</p>
 <span class="ident">hasher_1</span>.<span class="ident">write_u32</span>(<span class="number">8128</span>);
 <span class="ident">hasher_2</span>.<span class="ident">write_u32</span>(<span class="number">8128</span>);
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">hasher_1</span>.<span class="ident">finish</span>(), <span class="ident">hasher_2</span>.<span class="ident">finish</span>());</pre>
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">hasher_1</span>.<span class="ident">finish</span>(), <span class="ident">hasher_2</span>.<span class="ident">finish</span>());</pre></div>
 </div>
             <h2 id='associated-types' class='small-section-header'>
               Associated Types<a href='#associated-types' class='anchor'></a>
@@ -36,12 +36,12 @@ is fed into each hasher, the same output will also be generated.</p>
 <p>Each call to <code>build_hasher</code> on the same instance should produce identical
 <a href="trait.Hasher.html"><code>Hasher</code></a>s.</p>
 <h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">hash_map</span>::<span class="ident">RandomState</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::<span class="ident">BuildHasher</span>;
 
 <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">RandomState</span>::<span class="ident">new</span>();
-<span class="kw">let</span> <span class="ident">new_s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">build_hasher</span>();</pre>
+<span class="kw">let</span> <span class="ident">new_s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">build_hasher</span>();</pre></div>
 </div></div>
                 <h2 id='foreign-impls' class='small-section-header'>
                   Implementations on Foreign Types<a href='#foreign-impls' class='anchor'></a>

@@ -20,7 +20,7 @@ are often used for lazy global initialization.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
 <p>A simple spinlock:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">thread</span>;
@@ -39,16 +39,16 @@ are often used for lazy global initialization.</p>
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">panic</span>) <span class="op">=</span> <span class="ident">thread</span>.<span class="ident">join</span>() {
         <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Thread had an error: {:?}&quot;</span>, <span class="ident">panic</span>);
     }
-}</pre>
+}</pre></div>
 <p>Keep a global count of live threads:</p>
 
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>, <span class="ident">ATOMIC_USIZE_INIT</span>};
 
 <span class="kw">static</span> <span class="ident">GLOBAL_THREAD_COUNT</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">ATOMIC_USIZE_INIT</span>;
 
 <span class="kw">let</span> <span class="ident">old_thread_count</span> <span class="op">=</span> <span class="ident">GLOBAL_THREAD_COUNT</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
-<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;live threads: {}&quot;</span>, <span class="ident">old_thread_count</span> <span class="op">+</span> <span class="number">1</span>);</pre>
+<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;live threads: {}&quot;</span>, <span class="ident">old_thread_count</span> <span class="op">+</span> <span class="number">1</span>);</pre></div>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>

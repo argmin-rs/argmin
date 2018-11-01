@@ -22,7 +22,7 @@ passed to a reallocation method that returns a non-null pointer.</p>
 </li>
 </ul>
 <h1 id="example" class="section-header"><a href="#example">Example</a></h1>
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">alloc</span>::{<span class="ident">GlobalAlloc</span>, <span class="ident">Layout</span>, <span class="ident">alloc</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null_mut</span>;
 
@@ -40,7 +40,7 @@ passed to a reallocation method that returns a non-null pointer.</p>
     <span class="kw">unsafe</span> {
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">alloc</span>(<span class="ident">Layout</span>::<span class="ident">new</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>()).<span class="ident">is_null</span>())
     }
-}</pre>
+}</pre></div>
 <h1 id="unsafety" class="section-header"><a href="#unsafety">Unsafety</a></h1>
 <p>The <code>GlobalAlloc</code> trait is an <code>unsafe</code> trait for a number of reasons, and
 implementors must ensure that they adhere to these contracts:</p>
@@ -116,7 +116,7 @@ rather than directly invoking <code>panic!</code> or similar.</p>
 </div><h3 id='method.realloc' class='method'><span id='realloc.v' class='invisible'><code>unsafe fn <a href='#method.realloc' class='fnname'>realloc</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;ptr: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;layout: <a class="struct" href="../../../../../argmin/prelude/failure/_core/alloc/struct.Layout.html" title="struct argmin::prelude::failure::_core::alloc::Layout">Layout</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;new_size: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a><br>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code></span></h3><div class='docblock'><p>Shink or grow a block of memory to the given <code>new_size</code>.
 The block is described by the given <code>ptr</code> pointer and <code>layout</code>.</p>
 <p>If this returns a non-null pointer, then ownership of the memory block
-referenced by <code>ptr</code> has been transferred to this alloctor.
+referenced by <code>ptr</code> has been transferred to this allocator.
 The memory may or may not have been deallocated,
 and should be considered unusable (unless of course it was
 transferred back to the caller again via the return value of

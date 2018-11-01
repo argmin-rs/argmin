@@ -22,7 +22,7 @@ vtable does not correspond to the type of the value to which the
 data pointer points—is highly likely to lead to undefined
 behavior.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">raw</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">mem</span>, <span class="ident">raw</span>};
@@ -62,7 +62,7 @@ behavior.</p>
 
 <span class="comment">// it should work just as if we had constructed a trait object out of</span>
 <span class="comment">// `other_value` directly</span>
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">synthesized</span>.<span class="ident">bar</span>(), <span class="number">457</span>);</pre>
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">synthesized</span>.<span class="ident">bar</span>(), <span class="number">457</span>);</pre></div>
 </div><h2 id='fields' class='fields small-section-header'>
                        Fields<a href='#fields' class='anchor'></a></h2><span id="structfield.data" class="structfield small-section-header">
                            <a href="#structfield.data" class="anchor field"></a>
