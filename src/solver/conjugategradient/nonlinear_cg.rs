@@ -48,6 +48,10 @@ where
     linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = ()> + 'a>,
     /// beta update method
     beta_method: Box<ArgminNLCGBetaUpdate<T> + 'a>,
+    /// Number of iterations after which a restart is performed
+    restart_iter: u64,
+    /// Restart based on orthogonality
+    restart_orthogonality: Option<f64>,
     /// base
     base: ArgminBase<'a, T, f64, ()>,
 }
@@ -84,6 +88,8 @@ where
             beta: std::f64::NAN,
             linesearch: Box::new(linesearch),
             beta_method: Box::new(beta_method),
+            restart_iter: std::u64::MAX,
+            restart_orthogonality: None,
             base: ArgminBase::new(operator, init_param),
         })
     }
@@ -143,6 +149,18 @@ where
         self.beta_method = beta_method;
         self
     }
+
+    /// Specifiy the number of iterations after which a restart should be performed
+    pub fn set_restart_iters(&mut self, iters: u64) -> &mut Self {
+        self.restart_iter = iters;
+        self
+    }
+
+    /// Set the value for the orthogonality measure
+    pub fn set_restart_orthogonality(&mut self, v: f64) -> &mut Self {
+        self.restart_orthogonality = Some(v);
+        self
+    }
 }
 
 impl<'a, T> ArgminNextIter for NonlinearConjugateGradient<'a, T>
@@ -195,7 +213,18 @@ where
         // Update of beta
         let new_grad = self.gradient(&xk1)?;
 
-        self.beta = self.beta_method.update(&grad, &new_grad, &pk);
+        let restart_orthogonality = match self.restart_orthogonality {
+            Some(v) => new_grad.dot(grad.clone()).abs() / new_grad.norm().powi(2) >= v,
+            None => false,
+        };
+
+        let restart_iter: bool = (self.cur_iter() % self.restart_iter == 0) && self.cur_iter() != 0;
+
+        if restart_iter || restart_orthogonality {
+            self.beta = 0.0;
+        } else {
+            self.beta = self.beta_method.update(&grad, &new_grad, &pk);
+        }
 
         // Update of p
         self.p = new_grad.scale(-1.0).add(self.p.scale(self.beta));
@@ -209,6 +238,8 @@ where
         let mut out = ArgminIterationData::new(xk1, cost);
         out.add_kv(make_kv!(
                 "beta" => self.beta;
+                "restart_iter" => restart_iter;
+                "restart_orthogonality" => restart_orthogonality;
             ));
         Ok(out)
     }

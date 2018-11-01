@@ -43,6 +43,8 @@ fn run() -> Result<(), Error> {
     let mut solver = NonlinearConjugateGradient::new_pr(Box::new(operator), init_param)?;
     solver.set_max_iters(iters);
     solver.set_target_cost(0.0);
+    solver.set_restart_iters(10);
+    solver.set_restart_orthogonality(0.1);
     // solver.add_writer(WriteToFile::new());
     solver.add_logger(ArgminSlogLogger::term());
     // solver.add_logger(ArgminSlogLogger::file("file.log")?);
