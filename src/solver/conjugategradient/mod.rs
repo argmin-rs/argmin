@@ -13,5 +13,9 @@ pub mod conjugategradient;
 /// Nonlinear Conjugate gradient method
 pub mod nonlinear_cg;
 
+/// Beta update methods for nonlinear CG
+pub mod beta;
+
+pub use self::beta::*;
 pub use self::conjugategradient::*;
 pub use self::nonlinear_cg::*;
