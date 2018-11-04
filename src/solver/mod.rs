@@ -7,6 +7,7 @@
 
 pub mod conjugategradient;
 pub mod gradientdescent;
+pub mod landweber;
 pub mod linesearch;
 pub mod simulatedannealing;
 pub mod trustregion;
