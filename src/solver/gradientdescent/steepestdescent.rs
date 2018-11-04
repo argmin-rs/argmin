@@ -14,7 +14,7 @@ use std::default::Default;
 
 // use solver::linesearch::BacktrackingLineSearch;
 
-/// Template
+/// Steepest Descent solver
 #[derive(ArgminSolver)]
 pub struct SteepestDescent<'a, T, H>
 where
