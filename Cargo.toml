@@ -17,12 +17,12 @@ exclude = [
 ]
 
 [dependencies]
-argmin_core = { path = "../argmin-core"}
-argmin_codegen = { path = "../argmin-codegen"}
-argmin_testfunctions = { path = "../argmin-testfunctions" }
-# argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git" }
-# argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git" }
-# argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git" }
+# argmin_core = { path = "../argmin-core"}
+# argmin_codegen = { path = "../argmin-codegen"}
+# argmin_testfunctions = { path = "../argmin-testfunctions" }
+argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git" }
+argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git" }
+argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git" }
 # argmin_core = "0.1.3"
 # argmin_codegen = "0.1.3"
 # argmin_testfunctions = "0.1.0"
