@@ -9,5 +9,8 @@
 
 /// Newton's method
 pub mod newton;
+/// Newton-CG method
+pub mod newton_cg;
 
 pub use self::newton::*;
+pub use self::newton_cg::*;
