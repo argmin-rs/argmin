@@ -41,9 +41,15 @@ where
     }
 
     /// set gamma
-    pub fn set_gamma(&mut self, gamma: f64) -> &mut Self {
+    pub fn set_gamma(&mut self, gamma: f64) -> Result<&mut Self, Error> {
+        if gamma <= 0.0 || gamma > 1.0 {
+            return Err(ArgminError::InvalidParameter {
+                text: "Newton: gamma must be in  (0, 1].".to_string(),
+            }
+            .into());
+        }
         self.gamma = gamma;
-        self
+        Ok(self)
     }
 }
 
