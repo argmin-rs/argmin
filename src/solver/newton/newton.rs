@@ -11,7 +11,7 @@ use prelude::*;
 use std;
 use std::default::Default;
 
-/// Landweber iteration
+/// Newton's Method
 #[derive(ArgminSolver)]
 pub struct Newton<'a, T, H>
 where
