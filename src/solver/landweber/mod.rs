@@ -48,7 +48,6 @@ where
     type OperatorOutput = f64;
     type Hessian = ();
 
-    /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let param = self.cur_param();
         let grad = self.gradient(&param)?;
