@@ -54,6 +54,7 @@ Any help is appreciated!
 - [X] Steepest Descent
 - [X] Conjugate Gradient method
 - [X] Nonlinear Conjugate Gradient method
+- [X] Newton's Method
 - [X] Landweber iteration
 - [X] Simulated Annealing
 
