@@ -22,7 +22,7 @@ use std::default::Default;
 
 /// Conjugate Gradient struct
 #[derive(ArgminSolver)]
-pub struct ConjugateGradient<'a, T, H>
+pub struct ConjugateGradient<'a, T>
 where
     T: Clone
         + Default
@@ -32,7 +32,6 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    H: Clone + Default,
 {
     /// b
     b: T,
@@ -47,10 +46,10 @@ where
     /// beta
     beta: f64,
     /// base
-    base: ArgminBase<'a, T, T, H>,
+    base: ArgminBase<'a, T, T, ()>,
 }
 
-impl<'a, T, H> ConjugateGradient<'a, T, H>
+impl<'a, T> ConjugateGradient<'a, T>
 where
     T: Clone
         + Default
@@ -60,7 +59,6 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    H: Clone + Default,
 {
     /// Constructor
     ///
@@ -69,7 +67,7 @@ where
     /// `cost_function`: cost function
     /// `init_param`: Initial parameter vector
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = H>>,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>>,
         b: T,
         init_param: T,
     ) -> Result<Self, Error> {
@@ -85,7 +83,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for ConjugateGradient<'a, T, H>
+impl<'a, T> ArgminNextIter for ConjugateGradient<'a, T>
 where
     T: Clone
         + Default
@@ -95,11 +93,10 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
-    H: Clone + Default,
 {
     type Parameters = T;
     type OperatorOutput = T;
-    type Hessian = H;
+    type Hessian = ();
 
     fn init(&mut self) -> Result<(), Error> {
         let init_param = self.cur_param();
