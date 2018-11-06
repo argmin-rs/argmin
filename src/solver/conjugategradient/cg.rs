@@ -67,7 +67,7 @@ where
     /// `cost_function`: cost function
     /// `init_param`: Initial parameter vector
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>>,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()> + 'a>,
         b: T,
         init_param: T,
     ) -> Result<Self, Error> {
