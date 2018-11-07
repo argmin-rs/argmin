@@ -132,7 +132,7 @@ where
         self.p = self.r.scale(-1.0).scaled_add(self.beta, p);
         let norm = self.r.dot(self.r.clone());
 
-        let mut out = ArgminIterationData::new(new_param, norm);
+        let mut out = ArgminIterationData::new(new_param, norm.sqrt());
         out.add_kv(make_kv!(
                 "alpha" => self.alpha;
                 "beta" => self.beta;
