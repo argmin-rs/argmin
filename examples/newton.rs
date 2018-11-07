@@ -55,8 +55,8 @@ fn run() -> Result<(), Error> {
     // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
     let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 
-    let iters = 8;
-    let mut solver = Newton::new(Box::new(cost), init_param);
+    let iters = 20;
+    let mut solver = NewtonCG::new(Box::new(cost), init_param);
     solver.set_max_iters(iters);
     solver.add_logger(ArgminSlogLogger::term());
 
