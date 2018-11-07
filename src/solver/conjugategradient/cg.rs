@@ -81,6 +81,16 @@ where
             base: ArgminBase::new(operator, init_param),
         })
     }
+
+    /// Return the current search direction (This is needed by NewtonCG for instance)
+    pub fn p(&self) -> T {
+        self.p.clone()
+    }
+
+    /// Return the current residual (This is needed by NewtonCG for instance)
+    pub fn residual(&self) -> T {
+        self.r.clone()
+    }
 }
 
 impl<'a, T> ArgminNextIter for ConjugateGradient<'a, T>
