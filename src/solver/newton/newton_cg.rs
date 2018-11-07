@@ -8,6 +8,7 @@
 //! # Newton-CG method
 
 use crate::solver::conjugategradient::ConjugateGradient;
+use crate::solver::linesearch::HagerZhangLineSearch;
 use prelude::*;
 use std;
 use std::default::Default;
@@ -29,8 +30,8 @@ where
         + ArgminScale<f64>,
     H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
-    // /// CG
-    // cg: ConjugateGradient<'a, T>,
+    /// line search
+    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     /// Base stuff
     base: ArgminBase<'a, T, f64, H>,
 }
@@ -55,9 +56,20 @@ where
         cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
         init_param: T,
     ) -> Self {
+        let linesearch = HagerZhangLineSearch::new(cost_function.clone());
         NewtonCG {
+            linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),
         }
+    }
+
+    /// Specify line search method
+    pub fn set_linesearch(
+        &mut self,
+        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+    ) -> &mut Self {
+        self.linesearch = linesearch;
+        self
     }
 }
 
@@ -96,7 +108,7 @@ where
         cg.init()?;
         let norm = grad.norm();
         for iter in 0.. {
-            let data = self.next_iter()?;
+            let data = cg.next_iter()?;
             cg.increment_iter();
             cg.set_cur_param(data.param());
             cg.set_cur_cost(data.cost());
@@ -118,10 +130,23 @@ where
             x_p = x.clone();
         }
 
-        // let new_param = param.scaled_sub(self.gamma, hessian.ainv()?.dot(grad));
-        unimplemented!()
-        // let out = ArgminIterationData::new(new_param, 0.0);
-        // Ok(out)
+        // perform line search
+        self.linesearch.base_reset();
+        self.linesearch.set_initial_parameter(param);
+        self.linesearch.set_initial_gradient(grad);
+        let cost = self.cur_cost();
+        self.linesearch.set_initial_cost(cost);
+        // self.linesearch.calc_initial_cost()?;
+        self.linesearch.set_search_direction(x);
+
+        self.linesearch.run_fast()?;
+
+        let linesearch_result = self.linesearch.result();
+
+        // todo: count cost function, gradient and hessian calls everywhere!
+
+        let out = ArgminIterationData::new(linesearch_result.param, linesearch_result.cost);
+        Ok(out)
     }
 }
 
