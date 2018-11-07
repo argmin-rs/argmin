@@ -25,6 +25,7 @@ where
         + ArgminAdd<T>
         + ArgminSub<T>
         + ArgminZero
+        + ArgminNorm<f64>
         + ArgminScale<f64>,
     H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
@@ -45,6 +46,7 @@ where
         + ArgminAdd<T>
         + ArgminSub<T>
         + ArgminZero
+        + ArgminNorm<f64>
         + ArgminScale<f64>,
     H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
@@ -70,6 +72,7 @@ where
         + ArgminAdd<T>
         + ArgminSub<T>
         + ArgminZero
+        + ArgminNorm<f64>
         + ArgminScale<f64>,
     H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
@@ -82,12 +85,39 @@ where
         let grad = self.gradient(&param)?;
         let hessian = self.hessian(&param)?;
 
-        let op: CGProblem<'a, T, H> = CGProblem::new(hessian);
-        let bla = Box::new(op);
+        // Solve CG subproblem
+        let op: CGSubProblem<'a, T, H> = CGSubProblem::new(hessian.clone());
+        let cg_op = Box::new(op);
 
-        let cg = ConjugateGradient::new(bla, grad, param.zero());
+        let mut x_p = param.zero();
+        let mut x: T = param.zero();
+        let mut cg = ConjugateGradient::new(cg_op, grad.scale(-1.0), x_p.clone())?;
 
-        // let cg = ConjugateGradient::new(op, b, self.p.zero());
+        cg.init()?;
+        let norm = grad.norm();
+        for iter in 0.. {
+            let data = self.next_iter()?;
+            cg.increment_iter();
+            cg.set_cur_param(data.param());
+            cg.set_cur_cost(data.cost());
+            let p = cg.p();
+            let curvature = p.dot(hessian.dot(p.clone()));
+            if curvature <= 0.0 {
+                if iter == 0 {
+                    x = data.param();
+                    break;
+                } else {
+                    x = x_p;
+                    break;
+                }
+            }
+            if cg.residual().norm() <= 0.5f64.min(norm.sqrt()) * norm {
+                x = data.param();
+                break;
+            }
+            x_p = x.clone();
+        }
+
         // let new_param = param.scaled_sub(self.gamma, hessian.ainv()?.dot(grad));
         unimplemented!()
         // let out = ArgminIterationData::new(new_param, 0.0);
@@ -96,7 +126,7 @@ where
 }
 
 #[derive(Clone)]
-struct CGProblem<'a, T, H>
+struct CGSubProblem<'a, T, H>
 where
     H: 'a + Clone + Default + ArgminDot<T, T>,
     T: 'a + Clone,
@@ -105,21 +135,21 @@ where
     phantom: std::marker::PhantomData<&'a T>,
 }
 
-impl<'a, T, H> CGProblem<'a, T, H>
+impl<'a, T, H> CGSubProblem<'a, T, H>
 where
     H: 'a + Clone + Default + ArgminDot<T, T>,
     T: 'a + Clone,
 {
     /// constructor
     pub fn new(hessian: H) -> Self {
-        CGProblem {
+        CGSubProblem {
             hessian: hessian,
             phantom: std::marker::PhantomData,
         }
     }
 }
 
-impl<'a, T, H> ArgminOperator for CGProblem<'a, T, H>
+impl<'a, T, H> ArgminOperator for CGSubProblem<'a, T, H>
 where
     T: 'a + Clone,
     H: 'a + Clone + Default + ArgminDot<T, T>,
