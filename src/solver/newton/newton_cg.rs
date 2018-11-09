@@ -12,6 +12,7 @@ use crate::solver::linesearch::HagerZhangLineSearch;
 use prelude::*;
 use std;
 use std::default::Default;
+use std::fmt::Debug;
 
 /// Newton-CG Method
 #[derive(ArgminSolver)]
@@ -20,6 +21,7 @@ where
     T: 'a
         + Clone
         + Default
+        + Debug
         + ArgminScaledSub<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminDot<T, f64>
@@ -41,6 +43,7 @@ where
     T: 'a
         + Clone
         + Default
+        + Debug
         + ArgminScaledSub<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminDot<T, f64>
@@ -78,6 +81,7 @@ where
     T: 'a
         + Clone
         + Default
+        + Debug
         + ArgminScaledSub<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminDot<T, f64>
@@ -106,24 +110,27 @@ where
         let mut cg = ConjugateGradient::new(cg_op, grad.scale(-1.0), x_p.clone())?;
 
         cg.init()?;
-        let norm = grad.norm();
+        let grad_norm = grad.norm();
         for iter in 0.. {
             let data = cg.next_iter()?;
             cg.increment_iter();
             cg.set_cur_param(data.param());
             cg.set_cur_cost(data.cost());
-            let p = cg.p();
+            let p = cg.p_prev();
+            // let p = cg.p();
             let curvature = p.dot(hessian.dot(p.clone()));
+            println!("iter: {:?}, curv: {:?}", iter, curvature);
+            // println!("curv: {:?}", curvature);
             if curvature <= 0.0 {
                 if iter == 0 {
-                    x = data.param();
+                    x = grad.scale(-1.0);
                     break;
                 } else {
                     x = x_p;
                     break;
                 }
             }
-            if cg.residual().norm() <= 0.5f64.min(norm.sqrt()) * norm {
+            if data.cost() <= 0.5f64.min(grad_norm.sqrt()) * grad_norm {
                 x = data.param();
                 break;
             }
@@ -132,16 +139,19 @@ where
 
         // perform line search
         self.linesearch.base_reset();
-        self.linesearch.set_initial_parameter(param);
+        self.linesearch.set_initial_parameter(param.clone());
         self.linesearch.set_initial_gradient(grad);
         let cost = self.cur_cost();
         self.linesearch.set_initial_cost(cost);
         // self.linesearch.calc_initial_cost()?;
-        self.linesearch.set_search_direction(x);
+        self.linesearch.set_search_direction(x.clone());
 
         self.linesearch.run_fast()?;
 
         let linesearch_result = self.linesearch.result();
+        // println!("{:?} | {:?} || {:?}", param, linesearch_result.param, x);
+        println!("{:?} | {:?}", param, linesearch_result.param);
+        // println!("{:?}", x);
 
         // todo: count cost function, gradient and hessian calls everywhere!
 

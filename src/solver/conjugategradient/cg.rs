@@ -39,6 +39,8 @@ where
     r: T,
     /// p
     p: T,
+    /// previous p
+    p_prev: T,
     /// r^T * r
     rtr: f64,
     /// alpha
@@ -75,6 +77,7 @@ where
             b: b,
             r: T::default(),
             p: T::default(),
+            p_prev: T::default(),
             rtr: std::f64::NAN,
             alpha: std::f64::NAN,
             beta: std::f64::NAN,
@@ -85,6 +88,11 @@ where
     /// Return the current search direction (This is needed by NewtonCG for instance)
     pub fn p(&self) -> T {
         self.p.clone()
+    }
+
+    /// Return the previous search direction (This is needed by NewtonCG for instance)
+    pub fn p_prev(&self) -> T {
+        self.p_prev.clone()
     }
 
     /// Return the current residual (This is needed by NewtonCG for instance)
@@ -121,6 +129,7 @@ where
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         // Still way too much cloning going on here
+        self.p_prev = self.p.clone();
         let p = self.p.clone();
         let apk = self.apply(&p)?;
         self.alpha = self.rtr / self.p.dot(apk.clone());
