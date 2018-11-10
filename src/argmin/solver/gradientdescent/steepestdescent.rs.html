@@ -115,6 +115,11 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -124,6 +129,11 @@
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
 <span class="doccomment">//! # Argmin Steepest Descent</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # References:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="kw">use</span> <span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">solver</span>::<span class="ident">linesearch</span>::<span class="ident">HagerZhangLineSearch</span>;
@@ -132,7 +142,7 @@
 
 <span class="comment">// use solver::linesearch::BacktrackingLineSearch;</span>
 
-<span class="doccomment">/// Template</span>
+<span class="doccomment">/// Steepest Descent solver</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SteepestDescent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>

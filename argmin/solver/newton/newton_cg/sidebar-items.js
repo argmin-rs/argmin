@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["NewtonCG","Newton-CG Method"]]});

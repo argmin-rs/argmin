@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["newton","Newton's method # Newton's method"],["newton_cg","Newton-CG method # Newton-CG method"]]});

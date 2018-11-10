@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SteepestDescent","Template"]]});
+initSidebarItems({"struct":[["SteepestDescent","Steepest Descent solver"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Newton","Newton's Method"]]});
