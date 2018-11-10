@@ -55,6 +55,7 @@ Any help is appreciated!
 - [X] Conjugate Gradient method
 - [X] Nonlinear Conjugate Gradient method
 - [X] Newton's Method
+- [X] Newton-CG
 - [X] Landweber iteration
 - [X] Simulated Annealing
 
