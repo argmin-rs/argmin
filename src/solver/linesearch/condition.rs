@@ -5,6 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+//! # References:
+//!
+//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! Springer. ISBN 0-387-30303-0.
+
 use {ArgminDot, ArgminError, Error};
 
 /// Needs to be implemented by everything that wants to be a LineSearchCondition

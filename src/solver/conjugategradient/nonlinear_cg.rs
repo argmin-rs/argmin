@@ -12,6 +12,10 @@
 //! Important TODO: Find out which line search should be the default choice. Also try to replicate
 //! CG_DESCENT.
 //!
+//! # References:
+//!
+//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! Springer. ISBN 0-387-30303-0.
 // //!
 // //! # Example
 // //!

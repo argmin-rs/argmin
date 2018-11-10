@@ -4,8 +4,13 @@
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
-
 //! # Landweber iteration
+//!
+//! # References
+//!
+//! [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
+//! kind. Amer. J. Math. 73, 615–624
+//! [1] https://en.wikipedia.org/wiki/Landweber_iteration
 
 use prelude::*;
 use std;

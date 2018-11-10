@@ -8,6 +8,11 @@
 //! # Newton-CG method
 //!
 //! TODO: Stop when search direction is close to 0
+//!
+//! # References:
+//!
+//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! Springer. ISBN 0-387-30303-0.
 
 use crate::solver::conjugategradient::ConjugateGradient;
 // use crate::solver::linesearch::HagerZhangLineSearch;
