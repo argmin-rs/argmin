@@ -39,7 +39,7 @@ where
         init_param: T,
     ) -> Result<Self, Error> {
         Ok(Landweber {
-            omega: omega,
+            omega,
             base: ArgminBase::new(cost_function, init_param),
         })
     }

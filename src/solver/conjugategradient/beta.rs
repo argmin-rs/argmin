@@ -24,6 +24,7 @@ use prelude::*;
 
 /// Fletcher and Reeves (FR) method
 /// TODO: Reference
+#[derive(Default)]
 pub struct FletcherReeves {}
 
 impl FletcherReeves {
@@ -44,6 +45,7 @@ where
 
 /// Polak and Ribiere (PR) method
 /// TODO: Reference
+#[derive(Default)]
 pub struct PolakRibiere {}
 
 impl PolakRibiere {
@@ -65,6 +67,7 @@ where
 
 /// Polak and Ribiere Plus (PR+) method
 /// TODO: Reference
+#[derive(Default)]
 pub struct PolakRibierePlus {}
 
 impl PolakRibierePlus {
@@ -87,6 +90,7 @@ where
 
 /// Hestenes and Stiefel (HS) method
 /// TODO: Reference
+#[derive(Default)]
 pub struct HestenesStiefel {}
 
 impl HestenesStiefel {

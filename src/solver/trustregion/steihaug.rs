@@ -87,7 +87,7 @@ where
             rtr: std::f64::NAN,
             r_0_norm: std::f64::NAN,
             d: T::default(),
-            base: base,
+            base,
         }
     }
 
@@ -104,11 +104,12 @@ where
     }
 
     /// evaluate m(p) (without considering f_init because it is not available)
-    fn eval_m(&self, p: T) -> f64 {
+    fn eval_m(&self, p: &T) -> f64 {
         self.cur_grad().dot(p.clone()) + 0.5 * p.weighted_dot(self.cur_hessian(), p.clone())
     }
 
     /// calculate all possible step lengths
+    #[allow(clippy::many_single_char_names)]
     fn tau<F>(&self, filter_func: F, eval: bool) -> f64
     where
         F: Fn(f64) -> bool,
@@ -136,7 +137,7 @@ where
                 .filter(|(_, tau)| !tau.is_nan() && filter_func(*tau))
                 .map(|(i, tau)| {
                     let p = self.p.add(self.d.scale(tau));
-                    (i, self.eval_m(p))
+                    (i, self.eval_m(&p))
                 })
                 .filter(|(_, m)| !m.is_nan())
                 .collect::<Vec<(usize, f64)>>();

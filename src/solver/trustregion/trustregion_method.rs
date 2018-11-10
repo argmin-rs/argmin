@@ -92,10 +92,10 @@ where
             radius: 1.0,
             max_radius: 100.0,
             eta: 0.125,
-            subproblem: subproblem,
+            subproblem,
             fxk: std::f64::NAN,
             mk0: std::f64::NAN,
-            base: base,
+            base,
         }
     }
 
@@ -198,6 +198,6 @@ where
         let kv = make_kv!("radius" => cur_radius;);
         out.add_kv(kv);
 
-        return Ok(out);
+        Ok(out)
     }
 }

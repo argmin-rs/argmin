@@ -94,8 +94,7 @@ where
         Ok(NonlinearConjugateGradient {
             p: T::default(),
             beta: std::f64::NAN,
-            // linesearch: Box::new(&mut linesearch),
-            linesearch: linesearch,
+            linesearch,
             beta_method: Box::new(beta_method),
             restart_iter: std::u64::MAX,
             restart_orthogonality: None,

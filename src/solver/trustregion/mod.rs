@@ -14,12 +14,12 @@ pub mod dogleg;
 /// Steihaug method
 pub mod steihaug;
 /// Trust region solver
-pub mod trustregion;
+pub mod trustregion_method;
 
 pub use self::cauchypoint::*;
 pub use self::dogleg::*;
 pub use self::steihaug::*;
-pub use self::trustregion::*;
+pub use self::trustregion_method::*;
 
 /// Computes reduction ratio
 pub fn reduction_ratio(fxk: f64, fxkpk: f64, mk0: f64, mkpk: f64) -> f64 {

@@ -125,7 +125,7 @@ where
             .into())
         } else {
             Ok(SimulatedAnnealing {
-                init_temp: init_temp,
+                init_temp,
                 temp_func: SATempFunc::TemperatureFast,
                 temp_iter: 0u64,
                 stall_iter_accepted: 0u64,
@@ -139,7 +139,7 @@ where
                 reanneal_best: std::u64::MAX,
                 reanneal_iter_best: 0,
                 cur_temp: init_temp,
-                prev_cost: prev_cost,
+                prev_cost,
                 rng: rand::thread_rng(),
                 base: ArgminBase::new(cost_function, init_param),
             })
@@ -228,7 +228,7 @@ where
     /// Perform annealing
     fn anneal(&mut self) -> Result<T, Error> {
         let tmp = self.cur_param();
-        let cur_temp = self.cur_temp.clone();
+        let cur_temp = self.cur_temp;
         self.modify(&tmp, cur_temp)
     }
 
@@ -250,24 +250,28 @@ where
 
     /// Update the stall iter variables
     fn update_stall_and_reanneal_iter(&mut self, accepted: bool, new_best: bool) {
-        self.stall_iter_accepted = match accepted {
-            false => self.stall_iter_accepted + 1,
-            true => 0,
+        self.stall_iter_accepted = if accepted {
+            0
+        } else {
+            self.stall_iter_accepted + 1
         };
 
-        self.reanneal_iter_accepted = match accepted {
-            false => self.reanneal_iter_accepted + 1,
-            true => 0,
+        self.reanneal_iter_accepted = if accepted {
+            0
+        } else {
+            self.reanneal_iter_accepted + 1
         };
 
-        self.stall_iter_best = match new_best {
-            false => self.stall_iter_best + 1,
-            true => 0,
+        self.stall_iter_best = if new_best {
+            0
+        } else {
+            self.stall_iter_best + 1
         };
 
-        self.reanneal_iter_best = match new_best {
-            false => self.reanneal_iter_best + 1,
-            true => 0,
+        self.reanneal_iter_best = if new_best {
+            0
+        } else {
+            self.reanneal_iter_best + 1
         };
     }
 }

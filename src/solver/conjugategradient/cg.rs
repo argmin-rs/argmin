@@ -78,7 +78,7 @@ where
         init_param: T,
     ) -> Result<Self, Error> {
         Ok(ConjugateGradient {
-            b: b,
+            b,
             r: T::default(),
             p: T::default(),
             p_prev: T::default(),

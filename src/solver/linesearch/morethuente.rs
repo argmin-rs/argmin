@@ -334,15 +334,15 @@ where
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
-        let stmin;
-        let stmax;
-        if self.brackt {
-            stmin = self.stx.x.min(self.sty.x);
-            stmax = self.stx.x.max(self.sty.x);
+        let mut info = 0;
+        let (stmin, stmax) = if self.brackt {
+            (self.stx.x.min(self.sty.x), self.stx.x.max(self.sty.x))
         } else {
-            stmin = self.stx.x;
-            stmax = self.stp.x + self.xtrapf * (self.stp.x - self.stx.x);
-        }
+            (
+                self.stx.x,
+                self.stp.x + self.xtrapf * (self.stp.x - self.stx.x),
+            )
+        };
 
         // alpha needs to be within bounds
         self.stp.x = self.stp.x.max(self.stpmin);
@@ -363,7 +363,7 @@ where
             .scaled_add(self.stp.x, self.search_direction.clone());
         self.f = self.apply(&new_param)?;
         let new_grad = self.gradient(&new_param)?;
-        let f = self.f.clone();
+        let f = self.f;
         self.set_cur_cost(f);
         self.set_cur_param(new_param);
         self.set_cur_grad(new_grad.clone());
@@ -373,16 +373,20 @@ where
         // self.stp.fx = new_cost;
         // self.stp.gx = dg;
 
-        let mut info = 0;
         if (self.brackt && (self.stp.x <= stmin || self.stp.x >= stmax)) || self.infoc == 0 {
             info = 6;
         }
 
-        if self.stp.x == self.stpmax && self.f <= ftest1 && dg <= self.dgtest {
+        if (self.stp.x - self.stpmax).abs() < std::f64::EPSILON
+            && self.f <= ftest1
+            && dg <= self.dgtest
+        {
             info = 5;
         }
 
-        if self.stp.x == self.stpmin && (self.f > ftest1 || dg >= self.dgtest) {
+        if (self.stp.x - self.stpmin).abs() < std::f64::EPSILON
+            && (self.f > ftest1 || dg >= self.dgtest)
+        {
             info = 4;
         }
 
@@ -424,10 +428,10 @@ where
             self.stx.x = stx1.x;
             self.sty.x = sty1.x;
             self.stp.x = stp1.x;
-            self.stx.fx = self.stx.fx + stx1.x * self.dgtest;
-            self.sty.fx = self.sty.fx + sty1.x * self.dgtest;
-            self.stx.gx = self.stx.gx + self.dgtest;
-            self.sty.gx = self.sty.gx + self.dgtest;
+            self.stx.fx += stx1.x * self.dgtest;
+            self.sty.fx += sty1.x * self.dgtest;
+            self.stx.gx += self.dgtest;
+            self.sty.gx += self.dgtest;
             self.brackt = brackt1;
             self.stp = stp1;
             self.infoc = infoc;
@@ -580,12 +584,10 @@ fn cstep(
             } else {
                 stpf = stpq;
             }
+        } else if (stp.x - stpc).abs() > (stp.x - stpq).abs() {
+            stpf = stpc;
         } else {
-            if (stp.x - stpc).abs() > (stp.x - stpq).abs() {
-                stpf = stpc;
-            } else {
-                stpf = stpq;
-            }
+            stpf = stpq;
         }
     } else {
         // Fourth case. A lower function value, derivatives of the same sign, and the magnitued of

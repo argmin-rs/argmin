@@ -25,6 +25,8 @@
 use prelude::*;
 use std;
 
+type Triplet = (f64, f64, f64);
+
 /// Hager-Zhang Line Search
 #[derive(ArgminSolver)]
 #[stop("self.best_f - self.finit < self.delta * self.best_x * self.dginit" => LineSearchConditionMet)]
@@ -289,10 +291,10 @@ where
 
     fn update(
         &mut self,
-        (a_x, a_f, a_g): (f64, f64, f64),
-        (b_x, b_f, b_g): (f64, f64, f64),
-        (c_x, c_f, c_g): (f64, f64, f64),
-    ) -> Result<((f64, f64, f64), (f64, f64, f64)), Error> {
+        (a_x, a_f, a_g): Triplet,
+        (b_x, b_f, b_g): Triplet,
+        (c_x, c_f, c_g): Triplet,
+    ) -> Result<(Triplet, Triplet), Error> {
         // U0
         if c_x <= a_x || c_x >= b_x {
             // nothing changes.
@@ -334,10 +336,10 @@ where
         }
 
         // return Ok(((a_x, a_f, a_g), (b_x, b_f, b_g)));
-        return Err(ArgminError::InvalidParameter {
+        Err(ArgminError::InvalidParameter {
             text: "HagerZhangLineSearch: Reached unreachable point in `update` method.".to_string(),
         }
-        .into());
+        .into())
     }
 
     /// secant step
@@ -348,31 +350,30 @@ where
     /// double secant step
     fn secant2(
         &mut self,
-        (a_x, a_f, a_g): (f64, f64, f64),
-        (b_x, b_f, b_g): (f64, f64, f64),
-    ) -> Result<((f64, f64, f64), (f64, f64, f64)), Error> {
+        (a_x, a_f, a_g): Triplet,
+        (b_x, b_f, b_g): Triplet,
+    ) -> Result<(Triplet, Triplet), Error> {
         // S1
         let c_x = self.secant(a_x, a_g, b_x, b_g);
         let c_f = self.calc(c_x)?;
         let c_g = self.calc_grad(c_x)?;
+        let mut c_bar_x: f64 = 0.0;
 
         let ((aa_x, aa_f, aa_g), (bb_x, bb_f, bb_g)) =
             self.update((a_x, a_f, a_g), (b_x, b_f, b_g), (c_x, c_f, c_g))?;
 
-        let mut c_bar_x: f64 = 0.0;
-
         // S2
-        if c_x == bb_x {
+        if (c_x - bb_x).abs() < std::f64::EPSILON {
             c_bar_x = self.secant(b_x, b_g, bb_x, bb_g);
         }
 
         // S3
-        if c_x == aa_x {
+        if (c_x - aa_x).abs() < std::f64::EPSILON {
             c_bar_x = self.secant(a_x, a_g, aa_x, aa_g);
         }
 
         // S4
-        if c_x == aa_x || c_x == bb_x {
+        if (c_x - aa_x).abs() < std::f64::EPSILON || (c_x - bb_x).abs() < std::f64::EPSILON {
             let c_bar_f = self.calc(c_bar_x)?;
             let c_bar_g = self.calc_grad(c_bar_x)?;
 
@@ -381,9 +382,9 @@ where
                 (bb_x, bb_f, bb_g),
                 (c_bar_x, c_bar_f, c_bar_g),
             )?;
-            return Ok((a_bar, b_bar));
+            Ok((a_bar, b_bar))
         } else {
-            return Ok(((aa_x, aa_f, aa_g), (bb_x, bb_f, bb_g)));
+            Ok(((aa_x, aa_f, aa_g), (bb_x, bb_f, bb_g)))
         }
     }
 
@@ -540,7 +541,7 @@ where
             .init_param
             .scaled_add(self.best_x, self.search_direction.clone());
         self.set_best_param(new_param);
-        let best_f = self.best_f.clone();
+        let best_f = self.best_f;
         self.set_best_cost(best_f);
 
         Ok(())

@@ -190,7 +190,7 @@ where
     /// constructor
     pub fn new(hessian: H) -> Self {
         CGSubProblem {
-            hessian: hessian,
+            hessian,
             phantom: std::marker::PhantomData,
         }
     }

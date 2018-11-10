@@ -7,10 +7,10 @@
 
 //! Newton's Method
 
-/// Newton's method
-pub mod newton;
 /// Newton-CG method
 pub mod newton_cg;
+/// Newton's method
+pub mod newton_method;
 
-pub use self::newton::*;
 pub use self::newton_cg::*;
+pub use self::newton_method::*;

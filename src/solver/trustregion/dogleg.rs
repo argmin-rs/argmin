@@ -67,7 +67,7 @@ where
         let base = ArgminBase::new(operator, T::default());
         Dogleg {
             radius: std::f64::NAN,
-            base: base,
+            base,
         }
     }
 }
