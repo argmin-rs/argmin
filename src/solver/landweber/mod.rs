@@ -34,7 +34,7 @@ where
 {
     /// Constructor
     pub fn new(
-        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()> + 'a>,
+        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
         omega: f64,
         init_param: T,
     ) -> Result<Self, Error> {

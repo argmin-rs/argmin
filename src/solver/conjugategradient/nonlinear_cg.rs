@@ -49,6 +49,8 @@ where
     /// beta
     beta: f64,
     /// line search
+    // linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = ()> + 'a>,
+    // linesearch: Box<&'a mut ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = ()>>,
     linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = ()> + 'a>,
     /// beta update method
     beta_method: Box<ArgminNLCGBetaUpdate<T> + 'a>,
@@ -80,17 +82,20 @@ where
     /// `cost_function`: cost function
     /// `init_param`: Initial parameter vector
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>>,
+        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
         init_param: T,
     ) -> Result<Self, Error> {
-        let linesearch = HagerZhangLineSearch::new(operator.clone());
+        let linesearch: Box<
+            dyn ArgminLineSearch<Parameters = _, OperatorOutput = _, Hessian = _>,
+        > = Box::new(HagerZhangLineSearch::new(operator));
         // let beta_method = FletcherReeves::new();
         let beta_method = PolakRibiere::new();
         // let beta_method = PolakRibierePlus::new();
         Ok(NonlinearConjugateGradient {
             p: T::default(),
             beta: std::f64::NAN,
-            linesearch: Box::new(linesearch),
+            // linesearch: Box::new(&mut linesearch),
+            linesearch: linesearch,
             beta_method: Box::new(beta_method),
             restart_iter: std::u64::MAX,
             restart_orthogonality: None,
@@ -100,7 +105,7 @@ where
 
     /// New PolakRibiere CG (PR-CG)
     pub fn new_pr(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>>,
+        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
         init_param: T,
     ) -> Result<Self, Error> {
         Self::new(operator, init_param)
@@ -108,7 +113,7 @@ where
 
     /// New PolakRibierePlus CG (PR+-CG)
     pub fn new_prplus(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>>,
+        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
         init_param: T,
     ) -> Result<Self, Error> {
         let mut s = Self::new(operator, init_param)?;
@@ -119,7 +124,7 @@ where
 
     /// New FletcherReeves CG (FR-CG)
     pub fn new_fr(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>>,
+        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
         init_param: T,
     ) -> Result<Self, Error> {
         let mut s = Self::new(operator, init_param)?;
@@ -130,7 +135,7 @@ where
 
     /// New HestenesStiefel CG (HS-CG)
     pub fn new_hs(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>>,
+        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
         init_param: T,
     ) -> Result<Self, Error> {
         let mut s = Self::new(operator, init_param)?;

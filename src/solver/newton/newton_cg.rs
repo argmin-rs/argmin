@@ -64,11 +64,11 @@ where
 {
     /// Constructor
     pub fn new(
-        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
         init_param: T,
     ) -> Self {
-        // let linesearch = HagerZhangLineSearch::new(cost_function.clone());
-        let linesearch = MoreThuenteLineSearch::new(cost_function.clone());
+        // let linesearch = HagerZhangLineSearch::new(cost_function);
+        let linesearch = MoreThuenteLineSearch::new(cost_function);
         NewtonCG {
             linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),
@@ -112,11 +112,10 @@ where
 
         // Solve CG subproblem
         let op: CGSubProblem<'a, T, H> = CGSubProblem::new(hessian.clone());
-        let cg_op = Box::new(op);
 
         let mut x_p = param.zero();
         let mut x: T = param.zero();
-        let mut cg = ConjugateGradient::new(cg_op, grad.scale(-1.0), x_p.clone())?;
+        let mut cg = ConjugateGradient::new(&op, grad.scale(-1.0), x_p.clone())?;
 
         cg.init()?;
         let grad_norm = grad.norm();

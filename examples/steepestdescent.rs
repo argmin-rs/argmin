@@ -43,16 +43,16 @@ fn run() -> Result<(), Error> {
     let init_param: Vec<f64> = vec![1.2, 1.2];
     // let init_param: Vec<f64> = vec![-1.2, 1.0];
 
-    // let mut linesearch = MoreThuenteLineSearch::new(Box::new(cost.clone()));
-    let mut linesearch = HagerZhangLineSearch::new(Box::new(cost.clone()));
-    // let mut linesearch = BacktrackingLineSearch::new(Box::new(cost.clone()));
+    // let mut linesearch = MoreThuenteLineSearch::new(&cost);
+    let mut linesearch = HagerZhangLineSearch::new(&cost);
+    // let mut linesearch = BacktrackingLineSearch::new(&cost);
     // linesearch.set_initial_alpha(1.0)?;
     // linesearch.set_initial_alpha(10.0)?;
     linesearch.set_max_iters(200);
     // linesearch.set_rho(0.5);
 
     let iters = 10000;
-    let mut solver = SteepestDescent::new(Box::new(cost), init_param)?;
+    let mut solver = SteepestDescent::new(&cost, init_param)?;
     // solver.set_linesearch(Box::new(linesearch));
     solver.set_max_iters(iters);
     solver.add_logger(ArgminSlogLogger::term_noblock());

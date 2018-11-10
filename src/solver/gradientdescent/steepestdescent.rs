@@ -57,10 +57,10 @@ where
 {
     /// Constructor
     pub fn new(
-        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
         init_param: T,
     ) -> Result<Self, Error> {
-        let linesearch = HagerZhangLineSearch::new(cost_function.clone());
+        let linesearch = HagerZhangLineSearch::new(cost_function);
         Ok(SteepestDescent {
             linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),

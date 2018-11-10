@@ -36,8 +36,8 @@ fn run() -> Result<(), Error> {
     let operator = MyProblem {};
 
     // Set up Conjugate Gradient method
-    let iters = 200;
-    let mut solver = Landweber::new(Box::new(operator), 0.1, init_param)?;
+    let iters = 20;
+    let mut solver = Landweber::new(&operator, 0.1, init_param)?;
     solver.set_max_iters(iters);
     solver.add_logger(ArgminSlogLogger::term());
     solver.run()?;

@@ -39,7 +39,7 @@ where
         + ArgminSub<T>
         + ArgminZero
         + ArgminScale<f64>,
-    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
+    H: Clone + std::default::Default + ArgminDot<T, T>,
 {
     /// Radius
     radius: f64,
@@ -70,7 +70,7 @@ where
         + ArgminSub<T>
         + ArgminZero
         + ArgminScale<f64>,
-    H: 'a + Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
+    H: 'a + Clone + std::default::Default + ArgminDot<T, T>,
 {
     /// Constructor
     ///
@@ -78,13 +78,15 @@ where
     ///
     /// `operator`: operator
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>>,
+        // operator: &Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
         param: T,
     ) -> Self {
-        let base = ArgminBase::new(operator.clone(), param);
+        // let bla = *operator;
+        let base = ArgminBase::new(operator, param);
         // let subproblem = Box::new(CauchyPoint::new(operator.clone()));
         // let subproblem = Box::new(Dogleg::new(operator.clone()));
-        let mut subproblem = Box::new(Steihaug::new(operator.clone()));
+        let mut subproblem = Box::new(Steihaug::new(operator));
         subproblem.set_max_iters(2);
         TrustRegion {
             radius: 1.0,
@@ -138,7 +140,7 @@ where
         + ArgminSub<T>
         + ArgminZero
         + ArgminScale<f64>,
-    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
+    H: Clone + std::default::Default + ArgminDot<T, T>,
 {
     type Parameters = T;
     type OperatorOutput = f64;

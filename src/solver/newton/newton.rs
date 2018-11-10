@@ -36,7 +36,7 @@ where
 {
     /// Constructor
     pub fn new(
-        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
         init_param: T,
     ) -> Self {
         Newton {

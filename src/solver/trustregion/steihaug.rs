@@ -76,7 +76,7 @@ where
     ///
     /// `operator`: operator
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
     ) -> Self {
         let base = ArgminBase::new(operator, T::default());
         Steihaug {

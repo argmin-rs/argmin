@@ -113,7 +113,7 @@ where
     /// `init_param`: Initial parameter vector
     /// `init_temp`: Initial temperature
     pub fn new(
-        cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
         init_param: T,
         init_temp: f64,
     ) -> Result<Self, Error> {

@@ -38,7 +38,7 @@ impl ArgminOperator for MyProblem {
         Ok(rosenbrock(param, 1.0, 100.0))
     }
 
-    fn modify(&mut self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
+    fn modify(&self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
         let mut param_n = param.clone();
         for _ in 0..(temp.floor() as u64 + 1) {
             let idx = self.rng.gen_range(0, param.len());
@@ -75,7 +75,7 @@ fn run() -> Result<(), Error> {
     let iters = 10;
     let temp = 0.5;
     // solver.temp_func(SATempFunc::Exponential(0.8));
-    let mut solver = SimulatedAnnealing::new(Box::new(operator), init_param, temp)?;
+    let mut solver = SimulatedAnnealing::new(&operator, init_param, temp)?;
     solver.set_max_iters(iters);
     solver.set_target_cost(0.0);
     solver.reannealing_fixed(10);

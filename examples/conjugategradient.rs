@@ -34,7 +34,7 @@ fn run() -> Result<(), Error> {
 
     // Set up Conjugate Gradient method
     let iters = 2;
-    let mut solver = ConjugateGradient::new(Box::new(operator), b, init_param)?;
+    let mut solver = ConjugateGradient::new(&operator, b, init_param)?;
     solver.set_max_iters(iters);
     solver.set_target_cost(0.0);
     // solver.add_writer(WriteToFile::new());

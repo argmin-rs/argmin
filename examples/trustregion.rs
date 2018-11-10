@@ -9,7 +9,6 @@
 #![feature(unrestricted_attribute_tokens)]
 #![allow(unused_attributes)]
 
-#[macro_use]
 extern crate argmin;
 #[macro_use]
 extern crate argmin_codegen;
@@ -54,7 +53,7 @@ fn run() -> Result<(), Error> {
     // let init_param: Vec<f64> = vec![-1.2, 1.0];
 
     let iters = 1000;
-    let mut solver = TrustRegion::new(Box::new(cost), init_param);
+    let mut solver = TrustRegion::new(&cost, init_param);
     solver.set_max_iters(iters);
     solver.add_logger(ArgminSlogLogger::term_noblock());
 

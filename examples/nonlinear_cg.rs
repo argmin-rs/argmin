@@ -40,7 +40,7 @@ fn run() -> Result<(), Error> {
 
     // Set up Conjugate Gradient method
     let iters = 20;
-    let mut solver = NonlinearConjugateGradient::new_pr(Box::new(operator), init_param)?;
+    let mut solver = NonlinearConjugateGradient::new_pr(&operator, init_param)?;
     solver.set_max_iters(iters);
     solver.set_target_cost(0.0);
     solver.set_restart_iters(10);

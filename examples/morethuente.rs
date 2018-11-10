@@ -39,7 +39,7 @@ fn run() -> Result<(), Error> {
 
     // Set up Line Search method
     let iters = 20;
-    let mut solver = MoreThuenteLineSearch::new(Box::new(operator));
+    let mut solver = MoreThuenteLineSearch::new(&operator);
 
     solver.set_search_direction(vec![-1.0, 0.0]);
     solver.set_initial_parameter(init_param);

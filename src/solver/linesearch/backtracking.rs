@@ -73,7 +73,7 @@ where
     /// `cost_function`: cost function
     /// `rho`: todo
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
     ) -> Self {
         // let cond = ArmijoCondition::new(0.0001).unwrap();
         // let cond = WolfeCondition::new(0.0001, 0.9).unwrap();
