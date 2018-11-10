@@ -9,6 +9,7 @@
 
 use crate::solver::conjugategradient::ConjugateGradient;
 use crate::solver::linesearch::HagerZhangLineSearch;
+// use crate::solver::linesearch::MoreThuenteLineSearch;
 use prelude::*;
 use std;
 use std::default::Default;
@@ -60,6 +61,7 @@ where
         init_param: T,
     ) -> Self {
         let linesearch = HagerZhangLineSearch::new(cost_function.clone());
+        // let linesearch = MoreThuenteLineSearch::new(cost_function.clone());
         NewtonCG {
             linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),
@@ -113,14 +115,14 @@ where
         let grad_norm = grad.norm();
         for iter in 0.. {
             let data = cg.next_iter()?;
+            x = data.param();
             cg.increment_iter();
             cg.set_cur_param(data.param());
             cg.set_cur_cost(data.cost());
             let p = cg.p_prev();
             // let p = cg.p();
             let curvature = p.dot(hessian.dot(p.clone()));
-            println!("iter: {:?}, curv: {:?}", iter, curvature);
-            // println!("curv: {:?}", curvature);
+            // println!("iter: {:?}, curv: {:?}", iter, curvature);
             if curvature <= 0.0 {
                 if iter == 0 {
                     x = grad.scale(-1.0);
@@ -130,8 +132,7 @@ where
                     break;
                 }
             }
-            if data.cost() <= 0.5f64.min(grad_norm.sqrt()) * grad_norm {
-                x = data.param();
+            if data.cost() <= (0.5f64).min(grad_norm.sqrt()) * grad_norm {
                 break;
             }
             x_p = x.clone();
@@ -139,19 +140,15 @@ where
 
         // perform line search
         self.linesearch.base_reset();
-        self.linesearch.set_initial_parameter(param.clone());
+        self.linesearch.set_initial_parameter(param);
         self.linesearch.set_initial_gradient(grad);
         let cost = self.cur_cost();
         self.linesearch.set_initial_cost(cost);
-        // self.linesearch.calc_initial_cost()?;
-        self.linesearch.set_search_direction(x.clone());
+        self.linesearch.set_search_direction(x);
 
         self.linesearch.run_fast()?;
 
         let linesearch_result = self.linesearch.result();
-        // println!("{:?} | {:?} || {:?}", param, linesearch_result.param, x);
-        println!("{:?} | {:?}", param, linesearch_result.param);
-        // println!("{:?}", x);
 
         // todo: count cost function, gradient and hessian calls everywhere!
 
