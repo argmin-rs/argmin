@@ -8,8 +8,8 @@
 //! # Newton-CG method
 
 use crate::solver::conjugategradient::ConjugateGradient;
-use crate::solver::linesearch::HagerZhangLineSearch;
-// use crate::solver::linesearch::MoreThuenteLineSearch;
+// use crate::solver::linesearch::HagerZhangLineSearch;
+use crate::solver::linesearch::MoreThuenteLineSearch;
 use prelude::*;
 use std;
 use std::default::Default;
@@ -60,8 +60,8 @@ where
         cost_function: Box<ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
         init_param: T,
     ) -> Self {
-        let linesearch = HagerZhangLineSearch::new(cost_function.clone());
-        // let linesearch = MoreThuenteLineSearch::new(cost_function.clone());
+        // let linesearch = HagerZhangLineSearch::new(cost_function.clone());
+        let linesearch = MoreThuenteLineSearch::new(cost_function.clone());
         NewtonCG {
             linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),
@@ -150,7 +150,16 @@ where
 
         let linesearch_result = self.linesearch.result();
 
-        // todo: count cost function, gradient and hessian calls everywhere!
+        // take care of counting
+        let cost_count_cg = cg.cost_func_count();
+        let grad_count_cg = cg.grad_func_count();
+        let hessian_count_cg = cg.hessian_func_count();
+        let cost_count_ls = self.linesearch.cost_func_count();
+        let grad_count_ls = self.linesearch.grad_func_count();
+        let hessian_count_ls = self.linesearch.hessian_func_count();
+        self.increase_cost_func_count(cost_count_cg + cost_count_ls);
+        self.increase_grad_func_count(grad_count_cg + grad_count_ls);
+        self.increase_hessian_func_count(hessian_count_cg + hessian_count_ls);
 
         let out = ArgminIterationData::new(linesearch_result.param, linesearch_result.cost);
         Ok(out)

@@ -58,12 +58,12 @@ fn run() -> Result<(), Error> {
     let iters = 20;
     let mut solver = NewtonCG::new(Box::new(cost), init_param);
     solver.set_max_iters(iters);
-    // solver.add_logger(ArgminSlogLogger::term());
+    solver.add_logger(ArgminSlogLogger::term());
 
     solver.run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)
-    // std::thread::sleep(std::time::Duration::from_secs(1));
+    std::thread::sleep(std::time::Duration::from_secs(1));
     println!("{:?}", solver.result());
     Ok(())
 }
