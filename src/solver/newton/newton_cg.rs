@@ -6,6 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 //! # Newton-CG method
+//!
+//! TODO: Stop when search direction is close to 0
 
 use crate::solver::conjugategradient::ConjugateGradient;
 // use crate::solver::linesearch::HagerZhangLineSearch;
