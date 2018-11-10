@@ -295,7 +295,7 @@
     <span class="doccomment">/// `cost_function`: cost function</span>
     <span class="doccomment">/// `rho`: todo</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">operator</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
     ) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="comment">// let cond = ArmijoCondition::new(0.0001).unwrap();</span>
         <span class="comment">// let cond = WolfeCondition::new(0.0001, 0.9).unwrap();</span>

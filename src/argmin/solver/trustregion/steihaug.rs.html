@@ -258,6 +258,7 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
+<span id="261">261</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -337,7 +338,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// `operator`: operator</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">operator</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
     ) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">ArgminBase</span>::<span class="ident">new</span>(<span class="ident">operator</span>, <span class="ident">T</span>::<span class="ident">default</span>());
         <span class="ident">Steihaug</span> {
@@ -348,7 +349,7 @@
             <span class="ident">rtr</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
             <span class="ident">r_0_norm</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
             <span class="ident">d</span>: <span class="ident">T</span>::<span class="ident">default</span>(),
-            <span class="ident">base</span>: <span class="ident">base</span>,
+            <span class="ident">base</span>,
         }
     }
 
@@ -365,11 +366,12 @@
     }
 
     <span class="doccomment">/// evaluate m(p) (without considering f_init because it is not available)</span>
-    <span class="kw">fn</span> <span class="ident">eval_m</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">fn</span> <span class="ident">eval_m</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="self">self</span>.<span class="ident">cur_grad</span>().<span class="ident">dot</span>(<span class="ident">p</span>.<span class="ident">clone</span>()) <span class="op">+</span> <span class="number">0.5</span> <span class="op">*</span> <span class="ident">p</span>.<span class="ident">weighted_dot</span>(<span class="self">self</span>.<span class="ident">cur_hessian</span>(), <span class="ident">p</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// calculate all possible step lengths</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">many_single_char_names</span>)]</span>
     <span class="kw">fn</span> <span class="ident">tau</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter_func</span>: <span class="ident">F</span>, <span class="ident">eval</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">bool</span>,
@@ -397,7 +399,7 @@
                 .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">tau</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">tau</span>.<span class="ident">is_nan</span>() <span class="op">&amp;&amp;</span> <span class="ident">filter_func</span>(<span class="kw-2">*</span><span class="ident">tau</span>))
                 .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">tau</span>)<span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">add</span>(<span class="self">self</span>.<span class="ident">d</span>.<span class="ident">scale</span>(<span class="ident">tau</span>));
-                    (<span class="ident">i</span>, <span class="self">self</span>.<span class="ident">eval_m</span>(<span class="ident">p</span>))
+                    (<span class="ident">i</span>, <span class="self">self</span>.<span class="ident">eval_m</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>))
                 })
                 .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">m</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">m</span>.<span class="ident">is_nan</span>())
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">f64</span>)<span class="op">&gt;&gt;</span>();

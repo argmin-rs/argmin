@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/trustregion/trustregion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>trustregion.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/trustregion/trustregion_method.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>trustregion_method.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -199,6 +199,8 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -241,7 +243,7 @@
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminZero</span>
         <span class="op">+</span> <span class="ident">ArgminScale</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span> <span class="op">+</span> <span class="ident">ArgminInv</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Radius</span>
     <span class="ident">radius</span>: <span class="ident">f64</span>,
@@ -272,7 +274,7 @@
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminZero</span>
         <span class="op">+</span> <span class="ident">ArgminScale</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">H</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span> <span class="op">+</span> <span class="ident">ArgminInv</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">H</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Constructor</span>
     <span class="doccomment">///</span>
@@ -280,22 +282,24 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// `operator`: operator</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;&gt;</span>,
+        <span class="comment">// operator: &amp;Box&lt;ArgminOperator&lt;Parameters = T, OperatorOutput = f64, Hessian = H&gt; + &#39;a&gt;,</span>
+        <span class="ident">operator</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
         <span class="ident">param</span>: <span class="ident">T</span>,
     ) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">ArgminBase</span>::<span class="ident">new</span>(<span class="ident">operator</span>.<span class="ident">clone</span>(), <span class="ident">param</span>);
+        <span class="comment">// let bla = *operator;</span>
+        <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">ArgminBase</span>::<span class="ident">new</span>(<span class="ident">operator</span>, <span class="ident">param</span>);
         <span class="comment">// let subproblem = Box::new(CauchyPoint::new(operator.clone()));</span>
         <span class="comment">// let subproblem = Box::new(Dogleg::new(operator.clone()));</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subproblem</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">Steihaug</span>::<span class="ident">new</span>(<span class="ident">operator</span>.<span class="ident">clone</span>()));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subproblem</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">Steihaug</span>::<span class="ident">new</span>(<span class="ident">operator</span>));
         <span class="ident">subproblem</span>.<span class="ident">set_max_iters</span>(<span class="number">2</span>);
         <span class="ident">TrustRegion</span> {
             <span class="ident">radius</span>: <span class="number">1.0</span>,
             <span class="ident">max_radius</span>: <span class="number">100.0</span>,
             <span class="ident">eta</span>: <span class="number">0.125</span>,
-            <span class="ident">subproblem</span>: <span class="ident">subproblem</span>,
+            <span class="ident">subproblem</span>,
             <span class="ident">fxk</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
             <span class="ident">mk0</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
-            <span class="ident">base</span>: <span class="ident">base</span>,
+            <span class="ident">base</span>,
         }
     }
 
@@ -340,7 +344,7 @@
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminZero</span>
         <span class="op">+</span> <span class="ident">ArgminScale</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span> <span class="op">+</span> <span class="ident">ArgminInv</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>;
     <span class="kw">type</span> <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>;
@@ -398,7 +402,7 @@
         <span class="kw">let</span> <span class="ident">kv</span> <span class="op">=</span> <span class="macro">make_kv</span><span class="macro">!</span>(<span class="string">&quot;radius&quot;</span> <span class="op">=&gt;</span> <span class="ident">cur_radius</span>;);
         <span class="ident">out</span>.<span class="ident">add_kv</span>(<span class="ident">kv</span>);
 
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">out</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">out</span>)
     }
 }
 </pre></div>

@@ -244,12 +244,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// `operator`: operator</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">operator</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
     ) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">ArgminBase</span>::<span class="ident">new</span>(<span class="ident">operator</span>, <span class="ident">T</span>::<span class="ident">default</span>());
         <span class="ident">Dogleg</span> {
             <span class="ident">radius</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
-            <span class="ident">base</span>: <span class="ident">base</span>,
+            <span class="ident">base</span>,
         }
     }
 }

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["reduction_ratio","Computes reduction ratio"]],"mod":[["cauchypoint","Cauchy Point # Cauchy point"],["dogleg","Dogleg method # Dogleg method"],["steihaug","Steihaug method # Steihaug method"],["trustregion","Trust region solver # Trust region solver"]]});
+initSidebarItems({"fn":[["reduction_ratio","Computes reduction ratio"]],"mod":[["cauchypoint","Cauchy Point # Cauchy point"],["dogleg","Dogleg method # Dogleg method"],["steihaug","Steihaug method # Steihaug method"],["trustregion_method","Trust region solver # Trust region solver"]]});
