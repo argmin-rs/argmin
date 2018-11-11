@@ -66,7 +66,7 @@ Add this to your `Cargo.toml`:
 
 ```
 [dependencies]
-argmin = "0.1.3"
+argmin = "0.1.5"
 ```
 
 
@@ -76,7 +76,7 @@ There are additional features which can be activated in `Cargo.toml`:
 
 ```
 [dependencies]
-argmin = { version = "0.1.3", features = ["ctrlc", "ndarrayl"] }
+argmin = { version = "0.1.5", features = ["ctrlc", "ndarrayl"] }
 ```
 
 These are currently optional, but they may move to the default features in the future. 
