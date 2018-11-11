@@ -13,6 +13,9 @@
 #![feature(custom_attribute)]
 #![feature(unrestricted_attribute_tokens)]
 #![allow(unused_attributes)]
+// Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,
+// this is just to make sure that it will always stay this way.)
+#![deny(clippy::float_cmp)]
 
 extern crate argmin_core;
 #[macro_use]
