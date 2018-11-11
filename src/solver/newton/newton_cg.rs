@@ -217,9 +217,4 @@ where
     fn apply(&self, p: &T) -> Result<T, Error> {
         Ok(self.hessian.dot(p.clone()))
     }
-
-    /// dont ever clone this
-    fn box_clone(&self) -> Box<ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>> {
-        unimplemented!()
-    }
 }

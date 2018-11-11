@@ -16,7 +16,7 @@ use rand::{Rng, ThreadRng};
 struct MyProblem {
     lower_bound: Vec<f64>,
     upper_bound: Vec<f64>,
-    rng: ThreadRng,
+    // rng: ThreadRng,
 }
 
 impl MyProblem {
@@ -24,7 +24,7 @@ impl MyProblem {
         MyProblem {
             lower_bound,
             upper_bound,
-            rng: rand::thread_rng(),
+            // rng: rand::thread_rng(),
         }
     }
 }
@@ -40,9 +40,12 @@ impl ArgminOperator for MyProblem {
 
     fn modify(&self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
         let mut param_n = param.clone();
+        let mut rng = rand::thread_rng();
         for _ in 0..(temp.floor() as u64 + 1) {
-            let idx = self.rng.gen_range(0, param.len());
-            let val = 0.001 * self.rng.gen_range(-1.0, 1.0);
+            // let idx = self.rng.gen_range(0, param.len());
+            let idx = rng.gen_range(0, param.len());
+            // let val = 0.001 * self.rng.gen_range(-1.0, 1.0);
+            let val = 0.001 * rng.gen_range(-1.0, 1.0);
             let tmp = param[idx] + val;
             if tmp > self.upper_bound[idx] {
                 param_n[idx] = self.upper_bound[idx];
@@ -54,8 +57,6 @@ impl ArgminOperator for MyProblem {
         }
         Ok(param_n)
     }
-
-    box_clone!();
 }
 
 fn run() -> Result<(), Error> {

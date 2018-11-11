@@ -27,8 +27,6 @@ impl ArgminOperator for MyProblem {
     fn gradient(&self, param: &Vec<f64>) -> Result<Vec<f64>, Error> {
         Ok(sphere_derivative(param))
     }
-
-    box_clone!();
 }
 
 fn run() -> Result<(), Error> {

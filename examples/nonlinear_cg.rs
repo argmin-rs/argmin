@@ -29,8 +29,6 @@ impl ArgminOperator for MyProblem {
     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
     }
-
-    box_clone!();
 }
 
 fn run() -> Result<(), Error> {
