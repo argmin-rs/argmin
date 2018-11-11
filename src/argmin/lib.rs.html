@@ -32,6 +32,9 @@
 <span id="32">32</span>
 <span id="33">33</span>
 <span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -48,6 +51,9 @@
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">custom_attribute</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">unrestricted_attribute_tokens</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_attributes</span>)]</span>
+<span class="comment">// Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,</span>
+<span class="comment">// this is just to make sure that it will always stay this way.)</span>
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">clippy</span>::<span class="ident">float_cmp</span>)]</span>
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">argmin_core</span>;
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>

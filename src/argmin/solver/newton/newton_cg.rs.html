@@ -214,6 +214,10 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -259,6 +263,8 @@
 {
     <span class="doccomment">/// line search</span>
     <span class="ident">linesearch</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminLineSearch</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// curvature_threshold</span>
+    <span class="ident">curvature_threshold</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// Base stuff</span>
     <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">H</span><span class="op">&gt;</span>,
 }
@@ -288,6 +294,7 @@
         <span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch</span>::<span class="ident">new</span>(<span class="ident">cost_function</span>);
         <span class="ident">NewtonCG</span> {
             <span class="ident">linesearch</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">linesearch</span>),
+            <span class="ident">curvature_threshold</span>: <span class="number">0.0</span>,
             <span class="ident">base</span>: <span class="ident">ArgminBase</span>::<span class="ident">new</span>(<span class="ident">cost_function</span>, <span class="ident">init_param</span>),
         }
     }
@@ -298,6 +305,12 @@
         <span class="ident">linesearch</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminLineSearch</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     ) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">linesearch</span> <span class="op">=</span> <span class="ident">linesearch</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set curvature threshold</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_curvature_threshold</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">threshold</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">curvature_threshold</span> <span class="op">=</span> <span class="ident">threshold</span>;
         <span class="self">self</span>
     }
 }
@@ -346,7 +359,7 @@
             <span class="comment">// let p = cg.p();</span>
             <span class="kw">let</span> <span class="ident">curvature</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">dot</span>(<span class="ident">hessian</span>.<span class="ident">dot</span>(<span class="ident">p</span>.<span class="ident">clone</span>()));
             <span class="comment">// println!(&quot;iter: {:?}, curv: {:?}&quot;, iter, curvature);</span>
-            <span class="kw">if</span> <span class="ident">curvature</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
+            <span class="kw">if</span> <span class="ident">curvature</span> <span class="op">&lt;=</span> <span class="self">self</span>.<span class="ident">curvature_threshold</span> {
                 <span class="kw">if</span> <span class="ident">iter</span> <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">x</span> <span class="op">=</span> <span class="ident">grad</span>.<span class="ident">scale</span>(<span class="op">-</span><span class="number">1.0</span>);
                     <span class="kw">break</span>;
@@ -424,11 +437,6 @@
 
     <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">hessian</span>.<span class="ident">dot</span>(<span class="ident">p</span>.<span class="ident">clone</span>()))
-    }
-
-    <span class="doccomment">/// dont ever clone this</span>
-    <span class="kw">fn</span> <span class="ident">box_clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;&gt;</span> {
-        <span class="macro">unimplemented</span><span class="macro">!</span>()
     }
 }
 </pre></div>
