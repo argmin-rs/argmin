@@ -1,9 +1,9 @@
 [package]
 name = "argmin"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 license = "MIT OR Apache-2.0"
-description = "WIP optimization toolbox for Rust"
+description = "A pure Rust optimization toolbox"
 documentation = "https://argmin-rs.github.io/argmin/argmin/"
 homepage = "https://github.com/argmin-rs/argmin"
 repository = "https://github.com/argmin-rs/argmin"
@@ -20,12 +20,12 @@ exclude = [
 # argmin_core = { path = "../argmin-core"}
 # argmin_codegen = { path = "../argmin-codegen"}
 # argmin_testfunctions = { path = "../argmin-testfunctions" }
-argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git", branch = "master"}
-argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
-argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git", branch = "master"}
-# argmin_core = "0.1.4"
-# argmin_codegen = "0.1.4"
-# argmin_testfunctions = "0.1.0"
+# argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git", branch = "master"}
+# argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
+# argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git", branch = "master"}
+argmin_core = "0.1.5"
+argmin_codegen = "0.1.5"
+argmin_testfunctions = "0.1.0"
 rand = "0.5.5"
 
 [dev-dependencies]
