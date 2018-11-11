@@ -42,6 +42,8 @@ where
 {
     /// line search
     linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+    /// curvature_threshold
+    curvature_threshold: f64,
     /// Base stuff
     base: ArgminBase<'a, T, f64, H>,
 }
@@ -71,6 +73,7 @@ where
         let linesearch = MoreThuenteLineSearch::new(cost_function);
         NewtonCG {
             linesearch: Box::new(linesearch),
+            curvature_threshold: 0.0,
             base: ArgminBase::new(cost_function, init_param),
         }
     }
@@ -81,6 +84,12 @@ where
         linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     ) -> &mut Self {
         self.linesearch = linesearch;
+        self
+    }
+
+    /// Set curvature threshold
+    pub fn set_curvature_threshold(&mut self, threshold: f64) -> &mut Self {
+        self.curvature_threshold = threshold;
         self
     }
 }
@@ -129,7 +138,7 @@ where
             // let p = cg.p();
             let curvature = p.dot(hessian.dot(p.clone()));
             // println!("iter: {:?}, curv: {:?}", iter, curvature);
-            if curvature <= 0.0 {
+            if curvature <= self.curvature_threshold {
                 if iter == 0 {
                     x = grad.scale(-1.0);
                     break;
