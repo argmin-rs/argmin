@@ -20,8 +20,8 @@ exclude = [
 # argmin_core = { path = "../argmin-core"}
 # argmin_codegen = { path = "../argmin-codegen"}
 # argmin_testfunctions = { path = "../argmin-testfunctions" }
-argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git", branch = "newton"}
-argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "newton"}
+argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git", branch = "master"}
+argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
 argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git", branch = "master"}
 # argmin_core = "0.1.4"
 # argmin_codegen = "0.1.4"
