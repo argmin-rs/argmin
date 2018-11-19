@@ -27,7 +27,7 @@ an unaligned pointer.</p>
 </li>
 </ul>
 <p>Additionally, if <code>T</code> is not <a href="../marker/trait.Copy.html"><code>Copy</code></a>, using the pointed-to value after
-calling <code>drop_in_place</code> can cause undefined behavior. Note that <code>*to_drop = foo</code> counts as a use because it will cause the the value to be dropped
+calling <code>drop_in_place</code> can cause undefined behavior. Note that <code>*to_drop = foo</code> counts as a use because it will cause the value to be dropped
 again. <a href="../ptr/fn.write.html"><code>write</code></a> can be used to overwrite data without causing it to be
 dropped.</p>
 <p>Note that even if <code>T</code> has size <code>0</code>, the pointer must be non-NULL and properly aligned.</p>

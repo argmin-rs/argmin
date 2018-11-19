@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `char` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, char"><title>argmin::prelude::failure::_core::char - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module char</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#constants">Constants</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'char', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.2.0'>1.2.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#199' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>char</a></span></h1><div class='docblock'><p>A character type.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `char` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, char"><title>argmin::prelude::failure::_core::char - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module char</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#constants">Constants</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'char', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.2.0'>1.2.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#200' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>char</a></span></h1><div class='docblock'><p>A character type.</p>
 <p>The <code>char</code> type represents a single character. More specifically, since
 'character' isn't a well-defined concept in Unicode, <code>char</code> is a '<a href="http://www.unicode.org/glossary/#unicode_scalar_value">Unicode
 scalar value</a>', which is similar to, but not the same as, a '<a href="http://www.unicode.org/glossary/#code_point">Unicode code
@@ -10,146 +10,27 @@ itself.</p>
 implemented on <code>char</code>, as well as some useful constants and conversion
 functions that convert various types to <code>char</code>.</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.DecodeUtf16Error.html"
-                                  title='struct argmin::prelude::failure::_core::char::DecodeUtf16Error'>DecodeUtf16Error</a></td>
-                           <td class='docblock-short'>
-                                <p>An error that can be returned when decoding UTF-16 code points.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.DecodeUtf16.html"
-                                  title='struct argmin::prelude::failure::_core::char::DecodeUtf16'>DecodeUtf16</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator that decodes UTF-16 encoded code points from an iterator of <code>u16</code>s.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.EscapeDebug.html"
-                                  title='struct argmin::prelude::failure::_core::char::EscapeDebug'>EscapeDebug</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator that yields the literal escape code of a <code>char</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.EscapeDefault.html"
-                                  title='struct argmin::prelude::failure::_core::char::EscapeDefault'>EscapeDefault</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator that yields the literal escape code of a <code>char</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.EscapeUnicode.html"
-                                  title='struct argmin::prelude::failure::_core::char::EscapeUnicode'>EscapeUnicode</a></td>
-                           <td class='docblock-short'>
-                                <p>Returns an iterator that yields the hexadecimal Unicode escape of a
+<table><tr class='module-item'><td><a class="struct" href="struct.DecodeUtf16Error.html" title='argmin::prelude::failure::_core::char::DecodeUtf16Error struct'>DecodeUtf16Error</a></td><td class='docblock-short'><p>An error that can be returned when decoding UTF-16 code points.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.DecodeUtf16.html" title='argmin::prelude::failure::_core::char::DecodeUtf16 struct'>DecodeUtf16</a></td><td class='docblock-short'><p>An iterator that decodes UTF-16 encoded code points from an iterator of <code>u16</code>s.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.EscapeDebug.html" title='argmin::prelude::failure::_core::char::EscapeDebug struct'>EscapeDebug</a></td><td class='docblock-short'><p>An iterator that yields the literal escape code of a <code>char</code>.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.EscapeDefault.html" title='argmin::prelude::failure::_core::char::EscapeDefault struct'>EscapeDefault</a></td><td class='docblock-short'><p>An iterator that yields the literal escape code of a <code>char</code>.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.EscapeUnicode.html" title='argmin::prelude::failure::_core::char::EscapeUnicode struct'>EscapeUnicode</a></td><td class='docblock-short'><p>Returns an iterator that yields the hexadecimal Unicode escape of a
 character, as <code>char</code>s.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.ParseCharError.html"
-                                  title='struct argmin::prelude::failure::_core::char::ParseCharError'>ParseCharError</a></td>
-                           <td class='docblock-short'>
-                                <p>An error which can be returned when parsing a char.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.ToLowercase.html"
-                                  title='struct argmin::prelude::failure::_core::char::ToLowercase'>ToLowercase</a></td>
-                           <td class='docblock-short'>
-                                <p>Returns an iterator that yields the lowercase equivalent of a <code>char</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.ToUppercase.html"
-                                  title='struct argmin::prelude::failure::_core::char::ToUppercase'>ToUppercase</a></td>
-                           <td class='docblock-short'>
-                                <p>Returns an iterator that yields the uppercase equivalent of a <code>char</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="struct" href="struct.CharTryFromError.html"
-                                  title='struct argmin::prelude::failure::_core::char::CharTryFromError'>CharTryFromError</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>The error type returned when a conversion from u32 to char fails.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="struct" href="struct.UnicodeVersion.html"
-                                  title='struct argmin::prelude::failure::_core::char::UnicodeVersion'>UnicodeVersion</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>Represents a Unicode Version.</p>
-
-                           </td>
-                       </tr></table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.MAX.html"
-                                  title='constant argmin::prelude::failure::_core::char::MAX'>MAX</a></td>
-                           <td class='docblock-short'>
-                                <p>The highest valid code point a <code>char</code> can have.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.REPLACEMENT_CHARACTER.html"
-                                  title='constant argmin::prelude::failure::_core::char::REPLACEMENT_CHARACTER'>REPLACEMENT_CHARACTER</a></td>
-                           <td class='docblock-short'>
-                                <p><code>U+FFFD REPLACEMENT CHARACTER</code> (�) is used in Unicode to represent a
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ParseCharError.html" title='argmin::prelude::failure::_core::char::ParseCharError struct'>ParseCharError</a></td><td class='docblock-short'><p>An error which can be returned when parsing a char.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ToLowercase.html" title='argmin::prelude::failure::_core::char::ToLowercase struct'>ToLowercase</a></td><td class='docblock-short'><p>Returns an iterator that yields the lowercase equivalent of a <code>char</code>.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ToUppercase.html" title='argmin::prelude::failure::_core::char::ToUppercase struct'>ToUppercase</a></td><td class='docblock-short'><p>Returns an iterator that yields the uppercase equivalent of a <code>char</code>.</p>
+</td></tr><tr class='unstable module-item'><td><a class="struct" href="struct.CharTryFromError.html" title='argmin::prelude::failure::_core::char::CharTryFromError struct'>CharTryFromError</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>The error type returned when a conversion from u32 to char fails.</p>
+</td></tr><tr class='unstable module-item'><td><a class="struct" href="struct.UnicodeVersion.html" title='argmin::prelude::failure::_core::char::UnicodeVersion struct'>UnicodeVersion</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>Represents a Unicode Version.</p>
+</td></tr></table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
+<table><tr class='module-item'><td><a class="constant" href="constant.MAX.html" title='argmin::prelude::failure::_core::char::MAX constant'>MAX</a></td><td class='docblock-short'><p>The highest valid code point a <code>char</code> can have.</p>
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.REPLACEMENT_CHARACTER.html" title='argmin::prelude::failure::_core::char::REPLACEMENT_CHARACTER constant'>REPLACEMENT_CHARACTER</a></td><td class='docblock-short'><p><code>U+FFFD REPLACEMENT CHARACTER</code> (�) is used in Unicode to represent a
 decoding error.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="constant" href="constant.UNICODE_VERSION.html"
-                                  title='constant argmin::prelude::failure::_core::char::UNICODE_VERSION'>UNICODE_VERSION</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>The version of <a href="http://www.unicode.org/">Unicode</a> that the Unicode parts of
+</td></tr><tr class='unstable module-item'><td><a class="constant" href="constant.UNICODE_VERSION.html" title='argmin::prelude::failure::_core::char::UNICODE_VERSION constant'>UNICODE_VERSION</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>The version of <a href="http://www.unicode.org/">Unicode</a> that the Unicode parts of
 <code>char</code> and <code>str</code> methods are based on.</p>
-
-                           </td>
-                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.decode_utf16.html"
-                                  title='fn argmin::prelude::failure::_core::char::decode_utf16'>decode_utf16</a></td>
-                           <td class='docblock-short'>
-                                <p>Create an iterator over the UTF-16 encoded code points in <code>iter</code>,
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.decode_utf16.html" title='argmin::prelude::failure::_core::char::decode_utf16 fn'>decode_utf16</a></td><td class='docblock-short'><p>Create an iterator over the UTF-16 encoded code points in <code>iter</code>,
 returning unpaired surrogates as <code>Err</code>s.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.from_digit.html"
-                                  title='fn argmin::prelude::failure::_core::char::from_digit'>from_digit</a></td>
-                           <td class='docblock-short'>
-                                <p>Converts a digit in the given radix to a <code>char</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.from_u32.html"
-                                  title='fn argmin::prelude::failure::_core::char::from_u32'>from_u32</a></td>
-                           <td class='docblock-short'>
-                                <p>Converts a <code>u32</code> to a <code>char</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.from_u32_unchecked.html"
-                                  title='fn argmin::prelude::failure::_core::char::from_u32_unchecked'>from_u32_unchecked</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                                <p>Converts a <code>u32</code> to a <code>char</code>, ignoring validity.</p>
-
-                           </td>
-                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../";window.currentCrate = "argmin";</script><script src="../../../../../aliases.js"></script><script src="../../../../../main.js"></script><script defer src="../../../../../search-index.js"></script></body></html>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.from_digit.html" title='argmin::prelude::failure::_core::char::from_digit fn'>from_digit</a></td><td class='docblock-short'><p>Converts a digit in the given radix to a <code>char</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.from_u32_unchecked.html" title='argmin::prelude::failure::_core::char::from_u32_unchecked fn'>from_u32_unchecked</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td><td class='docblock-short'><p>Converts a <code>u32</code> to a <code>char</code>, ignoring validity.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.from_u32.html" title='argmin::prelude::failure::_core::char::from_u32 fn'>from_u32</a></td><td class='docblock-short'><p>Converts a <code>u32</code> to a <code>char</code>.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../";window.currentCrate = "argmin";</script><script src="../../../../../aliases.js"></script><script src="../../../../../main.js"></script><script defer src="../../../../../search-index.js"></script></body></html>

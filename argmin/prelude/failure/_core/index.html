@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `_core` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, _core"><title>argmin::prelude::failure::_core - Rust</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module _core</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div><p class='location'><a href='../../../index.html'>argmin</a>::<wbr><a href='../../index.html'>prelude</a>::<wbr><a href='../index.html'>failure</a></p><script>window.sidebarCurrent = {name: '_core', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.6.0'>1.6.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#11-258' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../index.html'>argmin</a>::<wbr><a href='../../index.html'>prelude</a>::<wbr><a href='../index.html'>failure</a>::<wbr><a class="mod" href=''>_core</a></span></h1><div class='docblock'><h1 id="the-rust-core-library" class="section-header"><a href="#the-rust-core-library">The Rust Core Library</a></h1>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `_core` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, _core"><title>argmin::prelude::failure::_core - Rust</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module _core</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div><p class='location'><a href='../../../index.html'>argmin</a>::<wbr><a href='../../index.html'>prelude</a>::<wbr><a href='../index.html'>failure</a></p><script>window.sidebarCurrent = {name: '_core', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.6.0'>1.6.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#11-259' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../index.html'>argmin</a>::<wbr><a href='../../index.html'>prelude</a>::<wbr><a href='../index.html'>failure</a>::<wbr><a class="mod" href=''>_core</a></span></h1><div class='docblock'><h1 id="the-rust-core-library" class="section-header"><a href="#the-rust-core-library">The Rust Core Library</a></h1>
 <p>The Rust Core Library is the dependency-free<sup id="fnref1"><a href="#fn1">1</a></sup> foundation of <a href="../std/index.html">The
 Rust Standard Library</a>. It is the portable glue
 between the language and its libraries, defining the intrinsic and
@@ -36,506 +36,72 @@ called. The <code>lang</code> attribute is called <code>eh_personality</code>.</
 <div class="footnotes"><hr><ol><li id="fn1">
 <p>Strictly speaking, there are some symbols which are needed but
 they aren't always necessary.&nbsp;<a href="#fnref1" rev="footnote">↩</a></p></li></ol></div></div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="alloc/index.html"
-                                  title='mod argmin::prelude::failure::_core::alloc'>alloc</a></td>
-                           <td class='docblock-short'>
-                                <p>Memory allocation APIs</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="any/index.html"
-                                  title='mod argmin::prelude::failure::_core::any'>any</a></td>
-                           <td class='docblock-short'>
-                                <p>This module implements the <code>Any</code> trait, which enables dynamic typing
+<table><tr class='module-item'><td><a class="mod" href="alloc/index.html" title='argmin::prelude::failure::_core::alloc mod'>alloc</a></td><td class='docblock-short'><p>Memory allocation APIs</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="any/index.html" title='argmin::prelude::failure::_core::any mod'>any</a></td><td class='docblock-short'><p>This module implements the <code>Any</code> trait, which enables dynamic typing
 of any <code>'static</code> type through runtime reflection.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="arch/index.html"
-                                  title='mod argmin::prelude::failure::_core::arch'>arch</a></td>
-                           <td class='docblock-short'>
-                                <p>Platform dependent vendor intrinsics.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="ascii/index.html"
-                                  title='mod argmin::prelude::failure::_core::ascii'>ascii</a></td>
-                           <td class='docblock-short'>
-                                <p>Operations on ASCII strings and characters.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="borrow/index.html"
-                                  title='mod argmin::prelude::failure::_core::borrow'>borrow</a></td>
-                           <td class='docblock-short'>
-                                <p>A module for working with borrowed data.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="cell/index.html"
-                                  title='mod argmin::prelude::failure::_core::cell'>cell</a></td>
-                           <td class='docblock-short'>
-                                <p>Shareable mutable containers.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="char/index.html"
-                                  title='mod argmin::prelude::failure::_core::char'>char</a></td>
-                           <td class='docblock-short'>
-                                <p>A character type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="clone/index.html"
-                                  title='mod argmin::prelude::failure::_core::clone'>clone</a></td>
-                           <td class='docblock-short'>
-                                <p>The <code>Clone</code> trait for types that cannot be 'implicitly copied'.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="cmp/index.html"
-                                  title='mod argmin::prelude::failure::_core::cmp'>cmp</a></td>
-                           <td class='docblock-short'>
-                                <p>Functionality for ordering and comparison.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="convert/index.html"
-                                  title='mod argmin::prelude::failure::_core::convert'>convert</a></td>
-                           <td class='docblock-short'>
-                                <p>Traits for conversions between types.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="default/index.html"
-                                  title='mod argmin::prelude::failure::_core::default'>default</a></td>
-                           <td class='docblock-short'>
-                                <p>The <code>Default</code> trait for types which may have meaningful default values.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="f32/index.html"
-                                  title='mod argmin::prelude::failure::_core::f32'>f32</a></td>
-                           <td class='docblock-short'>
-                                <p>This module provides constants which are specific to the implementation
+</td></tr><tr class='module-item'><td><a class="mod" href="arch/index.html" title='argmin::prelude::failure::_core::arch mod'>arch</a></td><td class='docblock-short'><p>Platform dependent vendor intrinsics.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="ascii/index.html" title='argmin::prelude::failure::_core::ascii mod'>ascii</a></td><td class='docblock-short'><p>Operations on ASCII strings and characters.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="borrow/index.html" title='argmin::prelude::failure::_core::borrow mod'>borrow</a></td><td class='docblock-short'><p>A module for working with borrowed data.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="cell/index.html" title='argmin::prelude::failure::_core::cell mod'>cell</a></td><td class='docblock-short'><p>Shareable mutable containers.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="char/index.html" title='argmin::prelude::failure::_core::char mod'>char</a></td><td class='docblock-short'><p>A character type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="clone/index.html" title='argmin::prelude::failure::_core::clone mod'>clone</a></td><td class='docblock-short'><p>The <code>Clone</code> trait for types that cannot be 'implicitly copied'.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="cmp/index.html" title='argmin::prelude::failure::_core::cmp mod'>cmp</a></td><td class='docblock-short'><p>Functionality for ordering and comparison.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="convert/index.html" title='argmin::prelude::failure::_core::convert mod'>convert</a></td><td class='docblock-short'><p>Traits for conversions between types.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="default/index.html" title='argmin::prelude::failure::_core::default mod'>default</a></td><td class='docblock-short'><p>The <code>Default</code> trait for types which may have meaningful default values.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="f32/index.html" title='argmin::prelude::failure::_core::f32 mod'>f32</a></td><td class='docblock-short'><p>This module provides constants which are specific to the implementation
 of the <code>f32</code> floating point data type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="f64/index.html"
-                                  title='mod argmin::prelude::failure::_core::f64'>f64</a></td>
-                           <td class='docblock-short'>
-                                <p>This module provides constants which are specific to the implementation
+</td></tr><tr class='module-item'><td><a class="mod" href="f64/index.html" title='argmin::prelude::failure::_core::f64 mod'>f64</a></td><td class='docblock-short'><p>This module provides constants which are specific to the implementation
 of the <code>f64</code> floating point data type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="ffi/index.html"
-                                  title='mod argmin::prelude::failure::_core::ffi'>ffi</a></td>
-                           <td class='docblock-short'>
-                                <p>Utilities related to FFI bindings.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="fmt/index.html"
-                                  title='mod argmin::prelude::failure::_core::fmt'>fmt</a></td>
-                           <td class='docblock-short'>
-                                <p>Utilities for formatting and printing strings.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="hash/index.html"
-                                  title='mod argmin::prelude::failure::_core::hash'>hash</a></td>
-                           <td class='docblock-short'>
-                                <p>Generic hashing support.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="hint/index.html"
-                                  title='mod argmin::prelude::failure::_core::hint'>hint</a></td>
-                           <td class='docblock-short'>
-                                <p>Hints to compiler that affects how code should be emitted or optimized.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="i8/index.html"
-                                  title='mod argmin::prelude::failure::_core::i8'>i8</a></td>
-                           <td class='docblock-short'>
-                                <p>The 8-bit signed integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="i16/index.html"
-                                  title='mod argmin::prelude::failure::_core::i16'>i16</a></td>
-                           <td class='docblock-short'>
-                                <p>The 16-bit signed integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="i32/index.html"
-                                  title='mod argmin::prelude::failure::_core::i32'>i32</a></td>
-                           <td class='docblock-short'>
-                                <p>The 32-bit signed integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="i64/index.html"
-                                  title='mod argmin::prelude::failure::_core::i64'>i64</a></td>
-                           <td class='docblock-short'>
-                                <p>The 64-bit signed integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="i128/index.html"
-                                  title='mod argmin::prelude::failure::_core::i128'>i128</a></td>
-                           <td class='docblock-short'>
-                                <p>The 128-bit signed integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="isize/index.html"
-                                  title='mod argmin::prelude::failure::_core::isize'>isize</a></td>
-                           <td class='docblock-short'>
-                                <p>The pointer-sized signed integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="iter/index.html"
-                                  title='mod argmin::prelude::failure::_core::iter'>iter</a></td>
-                           <td class='docblock-short'>
-                                <p>Composable external iteration.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="marker/index.html"
-                                  title='mod argmin::prelude::failure::_core::marker'>marker</a></td>
-                           <td class='docblock-short'>
-                                <p>Primitive traits and types representing basic properties of types.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="mem/index.html"
-                                  title='mod argmin::prelude::failure::_core::mem'>mem</a></td>
-                           <td class='docblock-short'>
-                                <p>Basic functions for dealing with memory.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="num/index.html"
-                                  title='mod argmin::prelude::failure::_core::num'>num</a></td>
-                           <td class='docblock-short'>
-                                <p>Numeric traits and functions for the built-in numeric types.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="ops/index.html"
-                                  title='mod argmin::prelude::failure::_core::ops'>ops</a></td>
-                           <td class='docblock-short'>
-                                <p>Overloadable operators.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="option/index.html"
-                                  title='mod argmin::prelude::failure::_core::option'>option</a></td>
-                           <td class='docblock-short'>
-                                <p>Optional values.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="prelude/index.html"
-                                  title='mod argmin::prelude::failure::_core::prelude'>prelude</a></td>
-                           <td class='docblock-short'>
-                                <p>The libcore prelude</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="ptr/index.html"
-                                  title='mod argmin::prelude::failure::_core::ptr'>ptr</a></td>
-                           <td class='docblock-short'>
-                                <p>Manually manage memory through raw pointers.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="result/index.html"
-                                  title='mod argmin::prelude::failure::_core::result'>result</a></td>
-                           <td class='docblock-short'>
-                                <p>Error handling with the <code>Result</code> type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="slice/index.html"
-                                  title='mod argmin::prelude::failure::_core::slice'>slice</a></td>
-                           <td class='docblock-short'>
-                                <p>Slice management and manipulation</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="str/index.html"
-                                  title='mod argmin::prelude::failure::_core::str'>str</a></td>
-                           <td class='docblock-short'>
-                                <p>String manipulation</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="sync/index.html"
-                                  title='mod argmin::prelude::failure::_core::sync'>sync</a></td>
-                           <td class='docblock-short'>
-                                <p>Synchronization primitives</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="time/index.html"
-                                  title='mod argmin::prelude::failure::_core::time'>time</a></td>
-                           <td class='docblock-short'>
-                                <p>Temporal quantification.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="u8/index.html"
-                                  title='mod argmin::prelude::failure::_core::u8'>u8</a></td>
-                           <td class='docblock-short'>
-                                <p>The 8-bit unsigned integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="u16/index.html"
-                                  title='mod argmin::prelude::failure::_core::u16'>u16</a></td>
-                           <td class='docblock-short'>
-                                <p>The 16-bit unsigned integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="u32/index.html"
-                                  title='mod argmin::prelude::failure::_core::u32'>u32</a></td>
-                           <td class='docblock-short'>
-                                <p>The 32-bit unsigned integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="u64/index.html"
-                                  title='mod argmin::prelude::failure::_core::u64'>u64</a></td>
-                           <td class='docblock-short'>
-                                <p>The 64-bit unsigned integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="u128/index.html"
-                                  title='mod argmin::prelude::failure::_core::u128'>u128</a></td>
-                           <td class='docblock-short'>
-                                <p>The 128-bit unsigned integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="usize/index.html"
-                                  title='mod argmin::prelude::failure::_core::usize'>usize</a></td>
-                           <td class='docblock-short'>
-                                <p>The pointer-sized unsigned integer type.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="mod" href="array/index.html"
-                                  title='mod argmin::prelude::failure::_core::array'>array</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>Implementations of things like <code>Eq</code> for fixed-length arrays
+</td></tr><tr class='module-item'><td><a class="mod" href="ffi/index.html" title='argmin::prelude::failure::_core::ffi mod'>ffi</a></td><td class='docblock-short'><p>Utilities related to FFI bindings.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="fmt/index.html" title='argmin::prelude::failure::_core::fmt mod'>fmt</a></td><td class='docblock-short'><p>Utilities for formatting and printing strings.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="hash/index.html" title='argmin::prelude::failure::_core::hash mod'>hash</a></td><td class='docblock-short'><p>Generic hashing support.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="hint/index.html" title='argmin::prelude::failure::_core::hint mod'>hint</a></td><td class='docblock-short'><p>Hints to compiler that affects how code should be emitted or optimized.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="i8/index.html" title='argmin::prelude::failure::_core::i8 mod'>i8</a></td><td class='docblock-short'><p>The 8-bit signed integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="i16/index.html" title='argmin::prelude::failure::_core::i16 mod'>i16</a></td><td class='docblock-short'><p>The 16-bit signed integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="i32/index.html" title='argmin::prelude::failure::_core::i32 mod'>i32</a></td><td class='docblock-short'><p>The 32-bit signed integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="i64/index.html" title='argmin::prelude::failure::_core::i64 mod'>i64</a></td><td class='docblock-short'><p>The 64-bit signed integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="i128/index.html" title='argmin::prelude::failure::_core::i128 mod'>i128</a></td><td class='docblock-short'><p>The 128-bit signed integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="isize/index.html" title='argmin::prelude::failure::_core::isize mod'>isize</a></td><td class='docblock-short'><p>The pointer-sized signed integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="iter/index.html" title='argmin::prelude::failure::_core::iter mod'>iter</a></td><td class='docblock-short'><p>Composable external iteration.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="marker/index.html" title='argmin::prelude::failure::_core::marker mod'>marker</a></td><td class='docblock-short'><p>Primitive traits and types representing basic properties of types.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="mem/index.html" title='argmin::prelude::failure::_core::mem mod'>mem</a></td><td class='docblock-short'><p>Basic functions for dealing with memory.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="num/index.html" title='argmin::prelude::failure::_core::num mod'>num</a></td><td class='docblock-short'><p>Numeric traits and functions for the built-in numeric types.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="ops/index.html" title='argmin::prelude::failure::_core::ops mod'>ops</a></td><td class='docblock-short'><p>Overloadable operators.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="option/index.html" title='argmin::prelude::failure::_core::option mod'>option</a></td><td class='docblock-short'><p>Optional values.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="prelude/index.html" title='argmin::prelude::failure::_core::prelude mod'>prelude</a></td><td class='docblock-short'><p>The libcore prelude</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="ptr/index.html" title='argmin::prelude::failure::_core::ptr mod'>ptr</a></td><td class='docblock-short'><p>Manually manage memory through raw pointers.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="result/index.html" title='argmin::prelude::failure::_core::result mod'>result</a></td><td class='docblock-short'><p>Error handling with the <code>Result</code> type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="slice/index.html" title='argmin::prelude::failure::_core::slice mod'>slice</a></td><td class='docblock-short'><p>Slice management and manipulation</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="str/index.html" title='argmin::prelude::failure::_core::str mod'>str</a></td><td class='docblock-short'><p>String manipulation</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="sync/index.html" title='argmin::prelude::failure::_core::sync mod'>sync</a></td><td class='docblock-short'><p>Synchronization primitives</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="time/index.html" title='argmin::prelude::failure::_core::time mod'>time</a></td><td class='docblock-short'><p>Temporal quantification.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="u8/index.html" title='argmin::prelude::failure::_core::u8 mod'>u8</a></td><td class='docblock-short'><p>The 8-bit unsigned integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="u16/index.html" title='argmin::prelude::failure::_core::u16 mod'>u16</a></td><td class='docblock-short'><p>The 16-bit unsigned integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="u32/index.html" title='argmin::prelude::failure::_core::u32 mod'>u32</a></td><td class='docblock-short'><p>The 32-bit unsigned integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="u64/index.html" title='argmin::prelude::failure::_core::u64 mod'>u64</a></td><td class='docblock-short'><p>The 64-bit unsigned integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="u128/index.html" title='argmin::prelude::failure::_core::u128 mod'>u128</a></td><td class='docblock-short'><p>The 128-bit unsigned integer type.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="usize/index.html" title='argmin::prelude::failure::_core::usize mod'>usize</a></td><td class='docblock-short'><p>The pointer-sized unsigned integer type.</p>
+</td></tr><tr class='unstable module-item'><td><a class="mod" href="array/index.html" title='argmin::prelude::failure::_core::array mod'>array</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>Implementations of things like <code>Eq</code> for fixed-length arrays
 up to a certain length. Eventually we should able to generalize
 to all lengths.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="mod" href="future/index.html"
-                                  title='mod argmin::prelude::failure::_core::future'>future</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>Asynchronous values.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="mod" href="intrinsics/index.html"
-                                  title='mod argmin::prelude::failure::_core::intrinsics'>intrinsics</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>rustc compiler intrinsics.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="mod" href="panic/index.html"
-                                  title='mod argmin::prelude::failure::_core::panic'>panic</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>Panic support in the standard library.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="mod" href="panicking/index.html"
-                                  title='mod argmin::prelude::failure::_core::panicking'>panicking</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>Panic support for libcore</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="mod" href="pin/index.html"
-                                  title='mod argmin::prelude::failure::_core::pin'>pin</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>Types which pin data to its location in memory</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="mod" href="raw/index.html"
-                                  title='mod argmin::prelude::failure::_core::raw'>raw</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>Contains struct definitions for the layout of compiler built-in types.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="mod" href="task/index.html"
-                                  title='mod argmin::prelude::failure::_core::task'>task</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>Types and Traits for working with asynchronous tasks.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="mod" href="unicode/index.html"
-                                  title='mod argmin::prelude::failure::_core::unicode'>unicode</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] 
-                           </td>
-                       </tr></table><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.assert_eq.html"
-                                  title='macro argmin::prelude::failure::_core::assert_eq'>assert_eq</a></td>
-                           <td class='docblock-short'>
-                                <p>Asserts that two expressions are equal to each other (using <a href="cmp/trait.PartialEq.html"><code>PartialEq</code></a>).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.assert_ne.html"
-                                  title='macro argmin::prelude::failure::_core::assert_ne'>assert_ne</a></td>
-                           <td class='docblock-short'>
-                                <p>Asserts that two expressions are not equal to each other (using <a href="cmp/trait.PartialEq.html"><code>PartialEq</code></a>).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.debug_assert.html"
-                                  title='macro argmin::prelude::failure::_core::debug_assert'>debug_assert</a></td>
-                           <td class='docblock-short'>
-                                <p>Ensure that a boolean expression is <code>true</code> at runtime.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.debug_assert_eq.html"
-                                  title='macro argmin::prelude::failure::_core::debug_assert_eq'>debug_assert_eq</a></td>
-                           <td class='docblock-short'>
-                                <p>Asserts that two expressions are equal to each other.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.debug_assert_ne.html"
-                                  title='macro argmin::prelude::failure::_core::debug_assert_ne'>debug_assert_ne</a></td>
-                           <td class='docblock-short'>
-                                <p>Asserts that two expressions are not equal to each other.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.panic.html"
-                                  title='macro argmin::prelude::failure::_core::panic'>panic</a></td>
-                           <td class='docblock-short'>
-                                <p>Entry point of thread panic, for details, see std::macros</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.try.html"
-                                  title='macro argmin::prelude::failure::_core::try'>try</a></td>
-                           <td class='docblock-short'>
-                                <p>Helper macro for reducing boilerplate code for matching <code>Result</code> together
+</td></tr><tr class='unstable module-item'><td><a class="mod" href="future/index.html" title='argmin::prelude::failure::_core::future mod'>future</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>Asynchronous values.</p>
+</td></tr><tr class='unstable module-item'><td><a class="mod" href="intrinsics/index.html" title='argmin::prelude::failure::_core::intrinsics mod'>intrinsics</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>rustc compiler intrinsics.</p>
+</td></tr><tr class='unstable module-item'><td><a class="mod" href="panic/index.html" title='argmin::prelude::failure::_core::panic mod'>panic</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>Panic support in the standard library.</p>
+</td></tr><tr class='unstable module-item'><td><a class="mod" href="panicking/index.html" title='argmin::prelude::failure::_core::panicking mod'>panicking</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>Panic support for libcore</p>
+</td></tr><tr class='unstable module-item'><td><a class="mod" href="pin/index.html" title='argmin::prelude::failure::_core::pin mod'>pin</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>Types which pin data to its location in memory</p>
+</td></tr><tr class='unstable module-item'><td><a class="mod" href="raw/index.html" title='argmin::prelude::failure::_core::raw mod'>raw</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>Contains struct definitions for the layout of compiler built-in types.</p>
+</td></tr><tr class='unstable module-item'><td><a class="mod" href="task/index.html" title='argmin::prelude::failure::_core::task mod'>task</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>Types and Traits for working with asynchronous tasks.</p>
+</td></tr><tr class='unstable module-item'><td><a class="mod" href="unicode/index.html" title='argmin::prelude::failure::_core::unicode mod'>unicode</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]</td></tr></table><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
+<table><tr class='module-item'><td><a class="macro" href="macro.assert_eq.html" title='argmin::prelude::failure::_core::assert_eq macro'>assert_eq</a></td><td class='docblock-short'><p>Asserts that two expressions are equal to each other (using <a href="cmp/trait.PartialEq.html"><code>PartialEq</code></a>).</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.assert_ne.html" title='argmin::prelude::failure::_core::assert_ne macro'>assert_ne</a></td><td class='docblock-short'><p>Asserts that two expressions are not equal to each other (using <a href="cmp/trait.PartialEq.html"><code>PartialEq</code></a>).</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.debug_assert.html" title='argmin::prelude::failure::_core::debug_assert macro'>debug_assert</a></td><td class='docblock-short'><p>Ensure that a boolean expression is <code>true</code> at runtime.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.debug_assert_eq.html" title='argmin::prelude::failure::_core::debug_assert_eq macro'>debug_assert_eq</a></td><td class='docblock-short'><p>Asserts that two expressions are equal to each other.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.debug_assert_ne.html" title='argmin::prelude::failure::_core::debug_assert_ne macro'>debug_assert_ne</a></td><td class='docblock-short'><p>Asserts that two expressions are not equal to each other.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.panic.html" title='argmin::prelude::failure::_core::panic macro'>panic</a></td><td class='docblock-short'><p>Entry point of thread panic, for details, see std::macros</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.try.html" title='argmin::prelude::failure::_core::try macro'>try</a></td><td class='docblock-short'><p>Helper macro for reducing boilerplate code for matching <code>Result</code> together
 with converting downstream errors.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.unimplemented.html"
-                                  title='macro argmin::prelude::failure::_core::unimplemented'>unimplemented</a></td>
-                           <td class='docblock-short'>
-                                <p>A standardized placeholder for marking unfinished code.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.unreachable.html"
-                                  title='macro argmin::prelude::failure::_core::unreachable'>unreachable</a></td>
-                           <td class='docblock-short'>
-                                <p>A utility macro for indicating unreachable code.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.write.html"
-                                  title='macro argmin::prelude::failure::_core::write'>write</a></td>
-                           <td class='docblock-short'>
-                                <p>Write formatted data into a buffer.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="macro" href="macro.writeln.html"
-                                  title='macro argmin::prelude::failure::_core::writeln'>writeln</a></td>
-                           <td class='docblock-short'>
-                                <p>Write formatted data into a buffer, with a newline appended.</p>
-
-                           </td>
-                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script defer src="../../../../search-index.js"></script></body></html>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.unimplemented.html" title='argmin::prelude::failure::_core::unimplemented macro'>unimplemented</a></td><td class='docblock-short'><p>A standardized placeholder for marking unfinished code.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.unreachable.html" title='argmin::prelude::failure::_core::unreachable macro'>unreachable</a></td><td class='docblock-short'><p>A utility macro for indicating unreachable code.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.write.html" title='argmin::prelude::failure::_core::write macro'>write</a></td><td class='docblock-short'><p>Write formatted data into a buffer.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.writeln.html" title='argmin::prelude::failure::_core::writeln macro'>writeln</a></td><td class='docblock-short'><p>Write formatted data into a buffer, with a newline appended.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script defer src="../../../../search-index.js"></script></body></html>

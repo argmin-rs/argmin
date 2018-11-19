@@ -35,6 +35,38 @@
 <span id="35">35</span>
 <span id="36">36</span>
 <span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -43,9 +75,41 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! Optimizaton toolbox</span>
+<span class="doccomment">//! # argmin -- A pure Rust optimization toolbox</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! TODOs</span>
+<span class="doccomment">//! This crate offers a (work in progress) optimization toolbox/framework written entirely in Rust.</span>
+<span class="doccomment">//! It is at the moment probably highly unstable and potentially very buggy. Please use with care</span>
+<span class="doccomment">//! and report any bugs you encounter. This crate is looking for contributors!</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Design goals</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This crate&#39;s intention is to be useful to users as well as developers of optimization</span>
+<span class="doccomment">//! algorithms, meaning that it should be both easy to apply and easy to implement algoritms. In</span>
+<span class="doccomment">//! particular, as a developer of optimization algorithms you should not need to worry about</span>
+<span class="doccomment">//! usability features (such as logging, dealing with different types, setters and getters for</span>
+<span class="doccomment">//! certain common parameters, counting cost function and gradient evaluations, termination, and so</span>
+<span class="doccomment">//! on). Instead you can focus on implementing your algorithm and let argmin do the boring stuff</span>
+<span class="doccomment">//! for you.  </span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - Provide an easy framework for the implementation of optimization algorithms: Define a struct</span>
+<span class="doccomment">//!   to hold your data, implement a single iteration of your method and let argmin generate the</span>
+<span class="doccomment">//!   rest with `#[derive(ArgminSolver)]`. With is approach, the interfaces to different solvers</span>
+<span class="doccomment">//!   will be fairly similar, making it easy for users to try different methods on their problem</span>
+<span class="doccomment">//!   without much work.</span>
+<span class="doccomment">//! - Provide pure Rust implementations of many optimization methods. That way there is no need to</span>
+<span class="doccomment">//!   compile and interface C code and it furthermore avoids inconsistent interfaces.</span>
+<span class="doccomment">//! - Be type-agnostic: If you have your own special type that you need for solving your</span>
+<span class="doccomment">//!   optimization problem, you just need to implement a couple of traits on that type and you&#39;re</span>
+<span class="doccomment">//!   ready to go. These traits will already be implemented for common types.</span>
+<span class="doccomment">//! - Easy iteration information logging: Either print your iteration information to the terminal,</span>
+<span class="doccomment">//!   or write it to a file, or store it in a database or send it to a big data pipeline.</span>
+<span class="doccomment">//! - Easy evaluation of algorithms: Make it possible to run algorithms with different parameters</span>
+<span class="doccomment">//!   and store all necessary of information of all iterations and calculate measures in order to</span>
+<span class="doccomment">//!   evaluate the performance of the implementation/method. Take particular care of stochastic</span>
+<span class="doccomment">//!   methods.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Since this crate is in a very early stage, so far most points are only partially implemented.</span>
+<span class="doccomment">//! In addition it is at the moment very likely *very buggy*.</span>
 
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">custom_attribute</span>)]</span>
@@ -64,12 +128,12 @@
 <span class="doccomment">/// Definition of all relevant traits</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
 
-<span class="doccomment">/// solvers</span>
+<span class="doccomment">/// Solvers</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">solver</span>;
 
 <span class="kw">use</span> <span class="ident">argmin_core</span>::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// testfunctions</span>
+<span class="doccomment">/// Testfunctions</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">testfunctions</span> {
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">argmin_testfunctions</span>::<span class="kw-2">*</span>;
 }

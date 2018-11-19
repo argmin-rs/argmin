@@ -1,226 +1,51 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `slice` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, slice"><title>argmin::prelude::failure::_core::slice - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module slice</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'slice', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.0.0'>1.0.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#209' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>slice</a></span></h1><div class='docblock'><p>Slice management and manipulation</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `slice` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, slice"><title>argmin::prelude::failure::_core::slice - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module slice</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'slice', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.0.0'>1.0.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#210' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>slice</a></span></h1><div class='docblock'><p>Slice management and manipulation</p>
 <p>For more details see <a href="../../std/slice/index.html"><code>std::slice</code></a>.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
-<table>
-                       <tr class='unstable module-item'>
-                           <td><a class="mod" href="memchr/index.html"
-                                  title='mod argmin::prelude::failure::_core::slice::memchr'>memchr</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>Pure rust memchr implementation, taken from rust-memchr</p>
-
-                           </td>
-                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Chunks.html"
-                                  title='struct argmin::prelude::failure::_core::slice::Chunks'>Chunks</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over a slice in (non-overlapping) chunks (<code>chunk_size</code> elements at a
+<table><tr class='unstable module-item'><td><a class="mod" href="memchr/index.html" title='argmin::prelude::failure::_core::slice::memchr mod'>memchr</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>Pure rust memchr implementation, taken from rust-memchr</p>
+</td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.Chunks.html" title='argmin::prelude::failure::_core::slice::Chunks struct'>Chunks</a></td><td class='docblock-short'><p>An iterator over a slice in (non-overlapping) chunks (<code>chunk_size</code> elements at a
 time), starting at the beginning of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.ChunksExact.html"
-                                  title='struct argmin::prelude::failure::_core::slice::ChunksExact'>ChunksExact</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over a slice in (non-overlapping) chunks (<code>chunk_size</code> elements at a
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ChunksExact.html" title='argmin::prelude::failure::_core::slice::ChunksExact struct'>ChunksExact</a></td><td class='docblock-short'><p>An iterator over a slice in (non-overlapping) chunks (<code>chunk_size</code> elements at a
 time), starting at the beginning of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.ChunksExactMut.html"
-                                  title='struct argmin::prelude::failure::_core::slice::ChunksExactMut'>ChunksExactMut</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over a slice in (non-overlapping) mutable chunks (<code>chunk_size</code>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ChunksExactMut.html" title='argmin::prelude::failure::_core::slice::ChunksExactMut struct'>ChunksExactMut</a></td><td class='docblock-short'><p>An iterator over a slice in (non-overlapping) mutable chunks (<code>chunk_size</code>
 elements at a time), starting at the beginning of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.ChunksMut.html"
-                                  title='struct argmin::prelude::failure::_core::slice::ChunksMut'>ChunksMut</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over a slice in (non-overlapping) mutable chunks (<code>chunk_size</code>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ChunksMut.html" title='argmin::prelude::failure::_core::slice::ChunksMut struct'>ChunksMut</a></td><td class='docblock-short'><p>An iterator over a slice in (non-overlapping) mutable chunks (<code>chunk_size</code>
 elements at a time), starting at the beginning of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Iter.html"
-                                  title='struct argmin::prelude::failure::_core::slice::Iter'>Iter</a></td>
-                           <td class='docblock-short'>
-                                <p>Immutable slice iterator</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.IterMut.html"
-                                  title='struct argmin::prelude::failure::_core::slice::IterMut'>IterMut</a></td>
-                           <td class='docblock-short'>
-                                <p>Mutable slice iterator.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RChunks.html"
-                                  title='struct argmin::prelude::failure::_core::slice::RChunks'>RChunks</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over a slice in (non-overlapping) chunks (<code>chunk_size</code> elements at a
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Iter.html" title='argmin::prelude::failure::_core::slice::Iter struct'>Iter</a></td><td class='docblock-short'><p>Immutable slice iterator</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.IterMut.html" title='argmin::prelude::failure::_core::slice::IterMut struct'>IterMut</a></td><td class='docblock-short'><p>Mutable slice iterator.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RChunks.html" title='argmin::prelude::failure::_core::slice::RChunks struct'>RChunks</a></td><td class='docblock-short'><p>An iterator over a slice in (non-overlapping) chunks (<code>chunk_size</code> elements at a
 time), starting at the end of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RChunksExact.html"
-                                  title='struct argmin::prelude::failure::_core::slice::RChunksExact'>RChunksExact</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over a slice in (non-overlapping) chunks (<code>chunk_size</code> elements at a
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RChunksExact.html" title='argmin::prelude::failure::_core::slice::RChunksExact struct'>RChunksExact</a></td><td class='docblock-short'><p>An iterator over a slice in (non-overlapping) chunks (<code>chunk_size</code> elements at a
 time), starting at the end of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RChunksExactMut.html"
-                                  title='struct argmin::prelude::failure::_core::slice::RChunksExactMut'>RChunksExactMut</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over a slice in (non-overlapping) mutable chunks (<code>chunk_size</code>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RChunksExactMut.html" title='argmin::prelude::failure::_core::slice::RChunksExactMut struct'>RChunksExactMut</a></td><td class='docblock-short'><p>An iterator over a slice in (non-overlapping) mutable chunks (<code>chunk_size</code>
 elements at a time), starting at the end of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RChunksMut.html"
-                                  title='struct argmin::prelude::failure::_core::slice::RChunksMut'>RChunksMut</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over a slice in (non-overlapping) mutable chunks (<code>chunk_size</code>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RChunksMut.html" title='argmin::prelude::failure::_core::slice::RChunksMut struct'>RChunksMut</a></td><td class='docblock-short'><p>An iterator over a slice in (non-overlapping) mutable chunks (<code>chunk_size</code>
 elements at a time), starting at the end of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RSplit.html"
-                                  title='struct argmin::prelude::failure::_core::slice::RSplit'>RSplit</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over subslices separated by elements that match a predicate
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RSplit.html" title='argmin::prelude::failure::_core::slice::RSplit struct'>RSplit</a></td><td class='docblock-short'><p>An iterator over subslices separated by elements that match a predicate
 function, starting from the end of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RSplitMut.html"
-                                  title='struct argmin::prelude::failure::_core::slice::RSplitMut'>RSplitMut</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over the subslices of the vector which are separated
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RSplitMut.html" title='argmin::prelude::failure::_core::slice::RSplitMut struct'>RSplitMut</a></td><td class='docblock-short'><p>An iterator over the subslices of the vector which are separated
 by elements that match <code>pred</code>, starting from the end of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RSplitN.html"
-                                  title='struct argmin::prelude::failure::_core::slice::RSplitN'>RSplitN</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over subslices separated by elements that match a
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RSplitN.html" title='argmin::prelude::failure::_core::slice::RSplitN struct'>RSplitN</a></td><td class='docblock-short'><p>An iterator over subslices separated by elements that match a
 predicate function, limited to a given number of splits, starting
 from the end of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RSplitNMut.html"
-                                  title='struct argmin::prelude::failure::_core::slice::RSplitNMut'>RSplitNMut</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over subslices separated by elements that match a
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RSplitNMut.html" title='argmin::prelude::failure::_core::slice::RSplitNMut struct'>RSplitNMut</a></td><td class='docblock-short'><p>An iterator over subslices separated by elements that match a
 predicate function, limited to a given number of splits, starting
 from the end of the slice.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Split.html"
-                                  title='struct argmin::prelude::failure::_core::slice::Split'>Split</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over subslices separated by elements that match a predicate
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Split.html" title='argmin::prelude::failure::_core::slice::Split struct'>Split</a></td><td class='docblock-short'><p>An iterator over subslices separated by elements that match a predicate
 function.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.SplitMut.html"
-                                  title='struct argmin::prelude::failure::_core::slice::SplitMut'>SplitMut</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over the subslices of the vector which are separated
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.SplitMut.html" title='argmin::prelude::failure::_core::slice::SplitMut struct'>SplitMut</a></td><td class='docblock-short'><p>An iterator over the subslices of the vector which are separated
 by elements that match <code>pred</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.SplitN.html"
-                                  title='struct argmin::prelude::failure::_core::slice::SplitN'>SplitN</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over subslices separated by elements that match a predicate
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.SplitN.html" title='argmin::prelude::failure::_core::slice::SplitN struct'>SplitN</a></td><td class='docblock-short'><p>An iterator over subslices separated by elements that match a predicate
 function, limited to a given number of splits.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.SplitNMut.html"
-                                  title='struct argmin::prelude::failure::_core::slice::SplitNMut'>SplitNMut</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over subslices separated by elements that match a predicate
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.SplitNMut.html" title='argmin::prelude::failure::_core::slice::SplitNMut struct'>SplitNMut</a></td><td class='docblock-short'><p>An iterator over subslices separated by elements that match a predicate
 function, limited to a given number of splits.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Windows.html"
-                                  title='struct argmin::prelude::failure::_core::slice::Windows'>Windows</a></td>
-                           <td class='docblock-short'>
-                                <p>An iterator over overlapping subslices of length <code>size</code>.</p>
-
-                           </td>
-                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.SliceIndex.html"
-                                  title='trait argmin::prelude::failure::_core::slice::SliceIndex'>SliceIndex</a></td>
-                           <td class='docblock-short'>
-                                <p>A helper trait used for indexing operations.</p>
-
-                           </td>
-                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.from_mut.html"
-                                  title='fn argmin::prelude::failure::_core::slice::from_mut'>from_mut</a></td>
-                           <td class='docblock-short'>
-                                <p>Converts a reference to T into a slice of length 1 (without copying).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.from_raw_parts.html"
-                                  title='fn argmin::prelude::failure::_core::slice::from_raw_parts'>from_raw_parts</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                                <p>Forms a slice from a pointer and a length.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.from_raw_parts_mut.html"
-                                  title='fn argmin::prelude::failure::_core::slice::from_raw_parts_mut'>from_raw_parts_mut</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
-                           <td class='docblock-short'>
-                                <p>Performs the same functionality as <a href="../../std/slice/fn.from_raw_parts.html"><code>from_raw_parts</code></a>, except that a
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Windows.html" title='argmin::prelude::failure::_core::slice::Windows struct'>Windows</a></td><td class='docblock-short'><p>An iterator over overlapping subslices of length <code>size</code>.</p>
+</td></tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table><tr class='module-item'><td><a class="trait" href="trait.SliceIndex.html" title='argmin::prelude::failure::_core::slice::SliceIndex trait'>SliceIndex</a></td><td class='docblock-short'><p>A helper trait used for indexing operations.</p>
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.from_mut.html" title='argmin::prelude::failure::_core::slice::from_mut fn'>from_mut</a></td><td class='docblock-short'><p>Converts a reference to T into a slice of length 1 (without copying).</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.from_raw_parts.html" title='argmin::prelude::failure::_core::slice::from_raw_parts fn'>from_raw_parts</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td><td class='docblock-short'><p>Forms a slice from a pointer and a length.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.from_raw_parts_mut.html" title='argmin::prelude::failure::_core::slice::from_raw_parts_mut fn'>from_raw_parts_mut</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td><td class='docblock-short'><p>Performs the same functionality as <a href="../../std/slice/fn.from_raw_parts.html"><code>from_raw_parts</code></a>, except that a
 mutable slice is returned.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.from_ref.html"
-                                  title='fn argmin::prelude::failure::_core::slice::from_ref'>from_ref</a></td>
-                           <td class='docblock-short'>
-                                <p>Converts a reference to T into a slice of length 1 (without copying).</p>
-
-                           </td>
-                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../";window.currentCrate = "argmin";</script><script src="../../../../../aliases.js"></script><script src="../../../../../main.js"></script><script defer src="../../../../../search-index.js"></script></body></html>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.from_ref.html" title='argmin::prelude::failure::_core::slice::from_ref fn'>from_ref</a></td><td class='docblock-short'><p>Converts a reference to T into a slice of length 1 (without copying).</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../";window.currentCrate = "argmin";</script><script src="../../../../../aliases.js"></script><script src="../../../../../main.js"></script><script defer src="../../../../../search-index.js"></script></body></html>

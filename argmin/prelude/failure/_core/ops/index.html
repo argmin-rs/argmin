@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `ops` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, ops"><title>argmin::prelude::failure::_core::ops - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module ops</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'ops', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.0.0'>1.0.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#185' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>ops</a></span></h1><div class='docblock'><p>Overloadable operators.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `ops` mod in crate `argmin`."><meta name="keywords" content="rust, rustlang, rust-lang, ops"><title>argmin::prelude::failure::_core::ops - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script src="../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module ops</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div><p class='location'><a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a></p><script>window.sidebarCurrent = {name: 'ops', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span class='since' title='Stable since Rust version 1.0.0'>1.0.0</span><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/lib.rs.html#186' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../index.html'>argmin</a>::<wbr><a href='../../../index.html'>prelude</a>::<wbr><a href='../../index.html'>failure</a>::<wbr><a href='../index.html'>_core</a>::<wbr><a class="mod" href=''>ops</a></span></h1><div class='docblock'><p>Overloadable operators.</p>
 <p>Implementing these traits allows you to overload certain operators.</p>
 <p>Some of these traits are imported by the prelude, so they are available in
 every Rust program. Only operators backed by traits can be overloaded. For
@@ -116,331 +116,58 @@ closures as arguments.</p>
 
 <span class="comment">// `consume_and_return_x` can no longer be invoked at this point</span></pre></div>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Range.html"
-                                  title='struct argmin::prelude::failure::_core::ops::Range'>Range</a></td>
-                           <td class='docblock-short'>
-                                <p>A (half-open) range bounded inclusively below and exclusively above
+<table><tr class='module-item'><td><a class="struct" href="struct.Range.html" title='argmin::prelude::failure::_core::ops::Range struct'>Range</a></td><td class='docblock-short'><p>A (half-open) range bounded inclusively below and exclusively above
 (<code>start..end</code>).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RangeFrom.html"
-                                  title='struct argmin::prelude::failure::_core::ops::RangeFrom'>RangeFrom</a></td>
-                           <td class='docblock-short'>
-                                <p>A range only bounded inclusively below (<code>start..</code>).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RangeFull.html"
-                                  title='struct argmin::prelude::failure::_core::ops::RangeFull'>RangeFull</a></td>
-                           <td class='docblock-short'>
-                                <p>An unbounded range (<code>..</code>).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RangeInclusive.html"
-                                  title='struct argmin::prelude::failure::_core::ops::RangeInclusive'>RangeInclusive</a></td>
-                           <td class='docblock-short'>
-                                <p>A range bounded inclusively below and above (<code>start..=end</code>).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RangeTo.html"
-                                  title='struct argmin::prelude::failure::_core::ops::RangeTo'>RangeTo</a></td>
-                           <td class='docblock-short'>
-                                <p>A range only bounded exclusively above (<code>..end</code>).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RangeToInclusive.html"
-                                  title='struct argmin::prelude::failure::_core::ops::RangeToInclusive'>RangeToInclusive</a></td>
-                           <td class='docblock-short'>
-                                <p>A range only bounded inclusively above (<code>..=end</code>).</p>
-
-                           </td>
-                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Bound.html"
-                                  title='enum argmin::prelude::failure::_core::ops::Bound'>Bound</a></td>
-                           <td class='docblock-short'>
-                                <p>An endpoint of a range of keys.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="enum" href="enum.GeneratorState.html"
-                                  title='enum argmin::prelude::failure::_core::ops::GeneratorState'>GeneratorState</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>The result of a generator resumption.</p>
-
-                           </td>
-                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Add.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Add'>Add</a></td>
-                           <td class='docblock-short'>
-                                <p>The addition operator <code>+</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.AddAssign.html"
-                                  title='trait argmin::prelude::failure::_core::ops::AddAssign'>AddAssign</a></td>
-                           <td class='docblock-short'>
-                                <p>The addition assignment operator <code>+=</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.BitAnd.html"
-                                  title='trait argmin::prelude::failure::_core::ops::BitAnd'>BitAnd</a></td>
-                           <td class='docblock-short'>
-                                <p>The bitwise AND operator <code>&amp;</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.BitAndAssign.html"
-                                  title='trait argmin::prelude::failure::_core::ops::BitAndAssign'>BitAndAssign</a></td>
-                           <td class='docblock-short'>
-                                <p>The bitwise AND assignment operator <code>&amp;=</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.BitOr.html"
-                                  title='trait argmin::prelude::failure::_core::ops::BitOr'>BitOr</a></td>
-                           <td class='docblock-short'>
-                                <p>The bitwise OR operator <code>|</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.BitOrAssign.html"
-                                  title='trait argmin::prelude::failure::_core::ops::BitOrAssign'>BitOrAssign</a></td>
-                           <td class='docblock-short'>
-                                <p>The bitwise OR assignment operator <code>|=</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.BitXor.html"
-                                  title='trait argmin::prelude::failure::_core::ops::BitXor'>BitXor</a></td>
-                           <td class='docblock-short'>
-                                <p>The bitwise XOR operator <code>^</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.BitXorAssign.html"
-                                  title='trait argmin::prelude::failure::_core::ops::BitXorAssign'>BitXorAssign</a></td>
-                           <td class='docblock-short'>
-                                <p>The bitwise XOR assignment operator <code>^=</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Deref.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Deref'>Deref</a></td>
-                           <td class='docblock-short'>
-                                <p>Used for immutable dereferencing operations, like <code>*v</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.DerefMut.html"
-                                  title='trait argmin::prelude::failure::_core::ops::DerefMut'>DerefMut</a></td>
-                           <td class='docblock-short'>
-                                <p>Used for mutable dereferencing operations, like in <code>*v = 1;</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Div.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Div'>Div</a></td>
-                           <td class='docblock-short'>
-                                <p>The division operator <code>/</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.DivAssign.html"
-                                  title='trait argmin::prelude::failure::_core::ops::DivAssign'>DivAssign</a></td>
-                           <td class='docblock-short'>
-                                <p>The division assignment operator <code>/=</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Index.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Index'>Index</a></td>
-                           <td class='docblock-short'>
-                                <p>Used for indexing operations (<code>container[index]</code>) in immutable contexts.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.IndexMut.html"
-                                  title='trait argmin::prelude::failure::_core::ops::IndexMut'>IndexMut</a></td>
-                           <td class='docblock-short'>
-                                <p>Used for indexing operations (<code>container[index]</code>) in mutable contexts.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Mul.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Mul'>Mul</a></td>
-                           <td class='docblock-short'>
-                                <p>The multiplication operator <code>*</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.MulAssign.html"
-                                  title='trait argmin::prelude::failure::_core::ops::MulAssign'>MulAssign</a></td>
-                           <td class='docblock-short'>
-                                <p>The multiplication assignment operator <code>*=</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Neg.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Neg'>Neg</a></td>
-                           <td class='docblock-short'>
-                                <p>The unary negation operator <code>-</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Not.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Not'>Not</a></td>
-                           <td class='docblock-short'>
-                                <p>The unary logical negation operator <code>!</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.RangeBounds.html"
-                                  title='trait argmin::prelude::failure::_core::ops::RangeBounds'>RangeBounds</a></td>
-                           <td class='docblock-short'>
-                                <p><code>RangeBounds</code> is implemented by Rust's built-in range types, produced
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RangeFrom.html" title='argmin::prelude::failure::_core::ops::RangeFrom struct'>RangeFrom</a></td><td class='docblock-short'><p>A range only bounded inclusively below (<code>start..</code>).</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RangeFull.html" title='argmin::prelude::failure::_core::ops::RangeFull struct'>RangeFull</a></td><td class='docblock-short'><p>An unbounded range (<code>..</code>).</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RangeInclusive.html" title='argmin::prelude::failure::_core::ops::RangeInclusive struct'>RangeInclusive</a></td><td class='docblock-short'><p>A range bounded inclusively below and above (<code>start..=end</code>).</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RangeTo.html" title='argmin::prelude::failure::_core::ops::RangeTo struct'>RangeTo</a></td><td class='docblock-short'><p>A range only bounded exclusively above (<code>..end</code>).</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RangeToInclusive.html" title='argmin::prelude::failure::_core::ops::RangeToInclusive struct'>RangeToInclusive</a></td><td class='docblock-short'><p>A range only bounded inclusively above (<code>..=end</code>).</p>
+</td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table><tr class='module-item'><td><a class="enum" href="enum.Bound.html" title='argmin::prelude::failure::_core::ops::Bound enum'>Bound</a></td><td class='docblock-short'><p>An endpoint of a range of keys.</p>
+</td></tr><tr class='unstable module-item'><td><a class="enum" href="enum.GeneratorState.html" title='argmin::prelude::failure::_core::ops::GeneratorState enum'>GeneratorState</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>The result of a generator resumption.</p>
+</td></tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table><tr class='module-item'><td><a class="trait" href="trait.Add.html" title='argmin::prelude::failure::_core::ops::Add trait'>Add</a></td><td class='docblock-short'><p>The addition operator <code>+</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.AddAssign.html" title='argmin::prelude::failure::_core::ops::AddAssign trait'>AddAssign</a></td><td class='docblock-short'><p>The addition assignment operator <code>+=</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.BitAnd.html" title='argmin::prelude::failure::_core::ops::BitAnd trait'>BitAnd</a></td><td class='docblock-short'><p>The bitwise AND operator <code>&amp;</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.BitAndAssign.html" title='argmin::prelude::failure::_core::ops::BitAndAssign trait'>BitAndAssign</a></td><td class='docblock-short'><p>The bitwise AND assignment operator <code>&amp;=</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.BitOr.html" title='argmin::prelude::failure::_core::ops::BitOr trait'>BitOr</a></td><td class='docblock-short'><p>The bitwise OR operator <code>|</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.BitOrAssign.html" title='argmin::prelude::failure::_core::ops::BitOrAssign trait'>BitOrAssign</a></td><td class='docblock-short'><p>The bitwise OR assignment operator <code>|=</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.BitXor.html" title='argmin::prelude::failure::_core::ops::BitXor trait'>BitXor</a></td><td class='docblock-short'><p>The bitwise XOR operator <code>^</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.BitXorAssign.html" title='argmin::prelude::failure::_core::ops::BitXorAssign trait'>BitXorAssign</a></td><td class='docblock-short'><p>The bitwise XOR assignment operator <code>^=</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Deref.html" title='argmin::prelude::failure::_core::ops::Deref trait'>Deref</a></td><td class='docblock-short'><p>Used for immutable dereferencing operations, like <code>*v</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.DerefMut.html" title='argmin::prelude::failure::_core::ops::DerefMut trait'>DerefMut</a></td><td class='docblock-short'><p>Used for mutable dereferencing operations, like in <code>*v = 1;</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Div.html" title='argmin::prelude::failure::_core::ops::Div trait'>Div</a></td><td class='docblock-short'><p>The division operator <code>/</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.DivAssign.html" title='argmin::prelude::failure::_core::ops::DivAssign trait'>DivAssign</a></td><td class='docblock-short'><p>The division assignment operator <code>/=</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Index.html" title='argmin::prelude::failure::_core::ops::Index trait'>Index</a></td><td class='docblock-short'><p>Used for indexing operations (<code>container[index]</code>) in immutable contexts.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.IndexMut.html" title='argmin::prelude::failure::_core::ops::IndexMut trait'>IndexMut</a></td><td class='docblock-short'><p>Used for indexing operations (<code>container[index]</code>) in mutable contexts.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Mul.html" title='argmin::prelude::failure::_core::ops::Mul trait'>Mul</a></td><td class='docblock-short'><p>The multiplication operator <code>*</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.MulAssign.html" title='argmin::prelude::failure::_core::ops::MulAssign trait'>MulAssign</a></td><td class='docblock-short'><p>The multiplication assignment operator <code>*=</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Neg.html" title='argmin::prelude::failure::_core::ops::Neg trait'>Neg</a></td><td class='docblock-short'><p>The unary negation operator <code>-</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Not.html" title='argmin::prelude::failure::_core::ops::Not trait'>Not</a></td><td class='docblock-short'><p>The unary logical negation operator <code>!</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.RangeBounds.html" title='argmin::prelude::failure::_core::ops::RangeBounds trait'>RangeBounds</a></td><td class='docblock-short'><p><code>RangeBounds</code> is implemented by Rust's built-in range types, produced
 by range syntax like <code>..</code>, <code>a..</code>, <code>..b</code> or <code>c..d</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Rem.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Rem'>Rem</a></td>
-                           <td class='docblock-short'>
-                                <p>The remainder operator <code>%</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.RemAssign.html"
-                                  title='trait argmin::prelude::failure::_core::ops::RemAssign'>RemAssign</a></td>
-                           <td class='docblock-short'>
-                                <p>The remainder assignment operator <code>%=</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Shl.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Shl'>Shl</a></td>
-                           <td class='docblock-short'>
-                                <p>The left shift operator <code>&lt;&lt;</code>. Note that because this trait is implemented
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Rem.html" title='argmin::prelude::failure::_core::ops::Rem trait'>Rem</a></td><td class='docblock-short'><p>The remainder operator <code>%</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.RemAssign.html" title='argmin::prelude::failure::_core::ops::RemAssign trait'>RemAssign</a></td><td class='docblock-short'><p>The remainder assignment operator <code>%=</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Shl.html" title='argmin::prelude::failure::_core::ops::Shl trait'>Shl</a></td><td class='docblock-short'><p>The left shift operator <code>&lt;&lt;</code>. Note that because this trait is implemented
 for all integer types with multiple right-hand-side types, Rust's type
 checker has special handling for <code>_ &lt;&lt; _</code>, setting the result type for
 integer operations to the type of the left-hand-side operand. This means
 that though <code>a &lt;&lt; b</code> and <code>a.shl(b)</code> are one and the same from an evaluation
 standpoint, they are different when it comes to type inference.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.ShlAssign.html"
-                                  title='trait argmin::prelude::failure::_core::ops::ShlAssign'>ShlAssign</a></td>
-                           <td class='docblock-short'>
-                                <p>The left shift assignment operator <code>&lt;&lt;=</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Shr.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Shr'>Shr</a></td>
-                           <td class='docblock-short'>
-                                <p>The right shift operator <code>&gt;&gt;</code>. Note that because this trait is implemented
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.ShlAssign.html" title='argmin::prelude::failure::_core::ops::ShlAssign trait'>ShlAssign</a></td><td class='docblock-short'><p>The left shift assignment operator <code>&lt;&lt;=</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Shr.html" title='argmin::prelude::failure::_core::ops::Shr trait'>Shr</a></td><td class='docblock-short'><p>The right shift operator <code>&gt;&gt;</code>. Note that because this trait is implemented
 for all integer types with multiple right-hand-side types, Rust's type
 checker has special handling for <code>_ &gt;&gt; _</code>, setting the result type for
 integer operations to the type of the left-hand-side operand. This means
 that though <code>a &gt;&gt; b</code> and <code>a.shr(b)</code> are one and the same from an evaluation
 standpoint, they are different when it comes to type inference.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.ShrAssign.html"
-                                  title='trait argmin::prelude::failure::_core::ops::ShrAssign'>ShrAssign</a></td>
-                           <td class='docblock-short'>
-                                <p>The right shift assignment operator <code>&gt;&gt;=</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Sub.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Sub'>Sub</a></td>
-                           <td class='docblock-short'>
-                                <p>The subtraction operator <code>-</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.SubAssign.html"
-                                  title='trait argmin::prelude::failure::_core::ops::SubAssign'>SubAssign</a></td>
-                           <td class='docblock-short'>
-                                <p>The subtraction assignment operator <code>-=</code>.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="trait" href="trait.CoerceUnsized.html"
-                                  title='trait argmin::prelude::failure::_core::ops::CoerceUnsized'>CoerceUnsized</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>Trait that indicates that this is a pointer or a wrapper for one,
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.ShrAssign.html" title='argmin::prelude::failure::_core::ops::ShrAssign trait'>ShrAssign</a></td><td class='docblock-short'><p>The right shift assignment operator <code>&gt;&gt;=</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Sub.html" title='argmin::prelude::failure::_core::ops::Sub trait'>Sub</a></td><td class='docblock-short'><p>The subtraction operator <code>-</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.SubAssign.html" title='argmin::prelude::failure::_core::ops::SubAssign trait'>SubAssign</a></td><td class='docblock-short'><p>The subtraction assignment operator <code>-=</code>.</p>
+</td></tr><tr class='unstable module-item'><td><a class="trait" href="trait.CoerceUnsized.html" title='argmin::prelude::failure::_core::ops::CoerceUnsized trait'>CoerceUnsized</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>Trait that indicates that this is a pointer or a wrapper for one,
 where unsizing can be performed on the pointee.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="trait" href="trait.DispatchFromDyn.html"
-                                  title='trait argmin::prelude::failure::_core::ops::DispatchFromDyn'>DispatchFromDyn</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>This is used for object safety, to check that a method's receiver type can be dispatched on.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="trait" href="trait.Generator.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Generator'>Generator</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>The trait implemented by builtin generator types.</p>
-
-                           </td>
-                       </tr>
-                       <tr class='unstable module-item'>
-                           <td><a class="trait" href="trait.Try.html"
-                                  title='trait argmin::prelude::failure::_core::ops::Try'>Try</a></td>
-                           <td class='docblock-short'>
-                               [<div class='stab unstable'>Experimental</div>] <p>A trait for customizing the behavior of the <code>?</code> operator.</p>
-
-                           </td>
-                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../";window.currentCrate = "argmin";</script><script src="../../../../../aliases.js"></script><script src="../../../../../main.js"></script><script defer src="../../../../../search-index.js"></script></body></html>
+</td></tr><tr class='unstable module-item'><td><a class="trait" href="trait.DispatchFromDyn.html" title='argmin::prelude::failure::_core::ops::DispatchFromDyn trait'>DispatchFromDyn</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>This is used for object safety, to check that a method's receiver type can be dispatched on.</p>
+</td></tr><tr class='unstable module-item'><td><a class="trait" href="trait.Generator.html" title='argmin::prelude::failure::_core::ops::Generator trait'>Generator</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>The trait implemented by builtin generator types.</p>
+</td></tr><tr class='unstable module-item'><td><a class="trait" href="trait.Try.html" title='argmin::prelude::failure::_core::ops::Try trait'>Try</a></td><td class='docblock-short'>[<div class='stab unstable'>Experimental</div>]<p>A trait for customizing the behavior of the <code>?</code> operator.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../";window.currentCrate = "argmin";</script><script src="../../../../../aliases.js"></script><script src="../../../../../main.js"></script><script defer src="../../../../../search-index.js"></script></body></html>
