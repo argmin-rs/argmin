@@ -1,35 +1,80 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `argmin` crate."><meta name="keywords" content="rust, rustlang, rust-lang, argmin"><title>argmin - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Crate argmin</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all argmin's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'argmin', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/argmin/lib.rs.html#8-69' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>argmin</a></span></h1><div class='docblock'><h1 id="argmin----a-pure-rust-optimization-toolbox" class="section-header"><a href="#argmin----a-pure-rust-optimization-toolbox">argmin -- A pure Rust optimization toolbox</a></h1>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `argmin` crate."><meta name="keywords" content="rust, rustlang, rust-lang, argmin"><title>argmin - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Crate argmin</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all argmin's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'argmin', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/argmin/lib.rs.html#8-114' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>argmin</a></span></h1><div class='docblock'><h1 id="argmin----a-pure-rust-optimization-toolbox" class="section-header"><a href="#argmin----a-pure-rust-optimization-toolbox">argmin -- A pure Rust optimization toolbox</a></h1>
 <p>This crate offers a (work in progress) optimization toolbox/framework written entirely in Rust.
 It is at the moment probably highly unstable and potentially very buggy. Please use with care
 and report any bugs you encounter. This crate is looking for contributors!</p>
 <h2 id="design-goals" class="section-header"><a href="#design-goals">Design goals</a></h2>
 <p>This crate's intention is to be useful to users as well as developers of optimization
-algorithms, meaning that it should be both easy to apply and easy to implement algoritms. In
+algorithms, meaning that it should be both easy to apply and easy to implement algorithms. In
 particular, as a developer of optimization algorithms you should not need to worry about
 usability features (such as logging, dealing with different types, setters and getters for
 certain common parameters, counting cost function and gradient evaluations, termination, and so
-on). Instead you can focus on implementing your algorithm and let argmin do the boring stuff
-for you.</p>
+on). Instead you can focus on implementing your algorithm and let <code>argmin-codegen</code> do the rest.</p>
 <ul>
-<li>Provide an easy framework for the implementation of optimization algorithms: Define a struct
-to hold your data, implement a single iteration of your method and let argmin generate the
-rest with <code>#[derive(ArgminSolver)]</code>. With is approach, the interfaces to different solvers
-will be fairly similar, making it easy for users to try different methods on their problem
-without much work.</li>
-<li>Provide pure Rust implementations of many optimization methods. That way there is no need to
-compile and interface C code and it furthermore avoids inconsistent interfaces.</li>
-<li>Be type-agnostic: If you have your own special type that you need for solving your
-optimization problem, you just need to implement a couple of traits on that type and you're
-ready to go. These traits will already be implemented for common types.</li>
-<li>Easy iteration information logging: Either print your iteration information to the terminal,
-or write it to a file, or store it in a database or send it to a big data pipeline.</li>
-<li>Easy evaluation of algorithms: Make it possible to run algorithms with different parameters
-and store all necessary of information of all iterations and calculate measures in order to
-evaluate the performance of the implementation/method. Take particular care of stochastic
-methods.</li>
+<li>Easy framework for the implementation of optimization algorithms: Define a struct to hold your
+data, implement a single iteration of your method and let argmin generate the rest with
+<code>#[derive(ArgminSolver)]</code>. This lead to similar interfaces for different solvers, making it
+easy for users.</li>
+<li>Pure Rust implementations of a wide range of optimization methods: This avoids the need to
+compile and interface C code.</li>
+<li>Type-agnostic: Many problems require data structures that go beyond simple vectors to
+represent the parameters. In argmin, everything is generic: All that needs to be done is
+implementing certain traits on your data type. For common types, these traits are already
+implemented.</li>
+<li>Convenient: Automatic and consistent logging of anything that may be important. Log to the
+terminal, to a file or implement your own loggers. Future plans include sending metrics to
+databases and connecting to big data piplines.</li>
+<li>Algorithm evaluation: Methods to assess the performance of an algorithm for different
+parameter settings, problem classes, ...</li>
 </ul>
-<p>Since this crate is in a very early stage, so far most points are only partially implemented.
-In addition it is at the moment very likely <em>very buggy</em>.</p>
+<p>Since this crate is in a very early stage, so far most points are only partially implemented or
+remain future plans.</p>
+<h2 id="algorithms" class="section-header"><a href="#algorithms">Algorithms</a></h2>
+<ul>
+<li>Linesearches
+<ul>
+<li>Backtracking line search</li>
+<li>More-Thuente line search</li>
+<li>Hager-Zhang line search</li>
+</ul>
+</li>
+<li>Trust region method
+<ul>
+<li>Cauchy point method</li>
+<li>Dogleg method</li>
+<li>Steihaug method</li>
+</ul>
+</li>
+<li>Steepest Descent</li>
+<li>Conjugate Gradient method</li>
+<li>Nonlinear Conjugate Gradient method</li>
+<li>Newton Methods
+<ul>
+<li>Basic Newton's Method</li>
+<li>Newton-CG</li>
+</ul>
+</li>
+<li>Landweber iteration</li>
+<li>Simulated Annealing</li>
+</ul>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
+<p>Add this to your <code>Cargo.toml</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+[<span class="ident">dependencies</span>]
+<span class="ident">argmin</span> <span class="op">=</span> <span class="string">&quot;0.1.5&quot;</span></pre></div>
+<h3 id="optional-features" class="section-header"><a href="#optional-features">Optional features</a></h3>
+<p>There are additional features which can be activated in <code>Cargo.toml</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+[<span class="ident">dependencies</span>]
+<span class="ident">argmin</span> <span class="op">=</span> { <span class="ident">version</span> <span class="op">=</span> <span class="string">&quot;0.1.5&quot;</span>, <span class="ident">features</span> <span class="op">=</span> [<span class="string">&quot;ctrlc&quot;</span>, <span class="string">&quot;ndarrayl&quot;</span>] }</pre></div>
+<p>These may become default features in the future. Without these features compilation to
+<code>wasm32-unknown-unkown</code> seems to be possible.</p>
+<ul>
+<li><code>ctrlc</code>: Uses the <code>ctrlc</code> crate to properly stop the optimization (and return the current best
+result) after pressing Ctrl+C.</li>
+<li><code>ndarrayl</code>: Support for <code>ndarray</code> and <code>ndarray-linalg</code>.</li>
+</ul>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table><tr class='module-item'><td><a class="mod" href="prelude/index.html" title='argmin::prelude mod'>prelude</a></td><td class='docblock-short'><p>Definition of all relevant traits</p>
 </td></tr><tr class='module-item'><td><a class="mod" href="solver/index.html" title='argmin::solver mod'>solver</a></td><td class='docblock-short'><p>Solvers</p>
