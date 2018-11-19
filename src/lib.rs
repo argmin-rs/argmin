@@ -14,32 +14,74 @@
 //! ## Design goals
 //!
 //! This crate's intention is to be useful to users as well as developers of optimization
-//! algorithms, meaning that it should be both easy to apply and easy to implement algoritms. In
+//! algorithms, meaning that it should be both easy to apply and easy to implement algorithms. In
 //! particular, as a developer of optimization algorithms you should not need to worry about
 //! usability features (such as logging, dealing with different types, setters and getters for
 //! certain common parameters, counting cost function and gradient evaluations, termination, and so
-//! on). Instead you can focus on implementing your algorithm and let argmin do the boring stuff
-//! for you.  
+//! on). Instead you can focus on implementing your algorithm and let `argmin-codegen` do the rest.
 //!
-//! - Provide an easy framework for the implementation of optimization algorithms: Define a struct
-//!   to hold your data, implement a single iteration of your method and let argmin generate the
-//!   rest with `#[derive(ArgminSolver)]`. With is approach, the interfaces to different solvers
-//!   will be fairly similar, making it easy for users to try different methods on their problem
-//!   without much work.
-//! - Provide pure Rust implementations of many optimization methods. That way there is no need to
-//!   compile and interface C code and it furthermore avoids inconsistent interfaces.
-//! - Be type-agnostic: If you have your own special type that you need for solving your
-//!   optimization problem, you just need to implement a couple of traits on that type and you're
-//!   ready to go. These traits will already be implemented for common types.
-//! - Easy iteration information logging: Either print your iteration information to the terminal,
-//!   or write it to a file, or store it in a database or send it to a big data pipeline.
-//! - Easy evaluation of algorithms: Make it possible to run algorithms with different parameters
-//!   and store all necessary of information of all iterations and calculate measures in order to
-//!   evaluate the performance of the implementation/method. Take particular care of stochastic
-//!   methods.
+//! - Easy framework for the implementation of optimization algorithms: Define a struct to hold your
+//!   data, implement a single iteration of your method and let argmin generate the rest with
+//!   `#[derive(ArgminSolver)]`. This lead to similar interfaces for different solvers, making it
+//!   easy for users.
+//! - Pure Rust implementations of a wide range of optimization methods: This avoids the need to
+//!   compile and interface C code.
+//! - Type-agnostic: Many problems require data structures that go beyond simple vectors to
+//!   represent the parameters. In argmin, everything is generic: All that needs to be done is
+//!   implementing certain traits on your data type. For common types, these traits are already
+//!   implemented.
+//! - Convenient: Automatic and consistent logging of anything that may be important. Log to the
+//!   terminal, to a file or implement your own loggers. Future plans include sending metrics to
+//!   databases and connecting to big data piplines.
+//! - Algorithm evaluation: Methods to assess the performance of an algorithm for different
+//!   parameter settings, problem classes, ...
 //!
-//! Since this crate is in a very early stage, so far most points are only partially implemented.
-//! In addition it is at the moment very likely *very buggy*.
+//! Since this crate is in a very early stage, so far most points are only partially implemented or
+//! remain future plans.
+//!
+//! ## Algorithms
+//!
+//! - Linesearches
+//!   - Backtracking line search
+//!   - More-Thuente line search
+//!   - Hager-Zhang line search
+//! - Trust region method
+//!   - Cauchy point method
+//!   - Dogleg method
+//!   - Steihaug method
+//! - Steepest Descent
+//! - Conjugate Gradient method
+//! - Nonlinear Conjugate Gradient method
+//! - Newton Methods
+//!   - Basic Newton's Method
+//!   - Newton-CG
+//! - Landweber iteration
+//! - Simulated Annealing
+//!
+//! ## Usage
+//!
+//! Add this to your `Cargo.toml`:
+//!
+//! ```
+//! [dependencies]
+//! argmin = "0.1.5"
+//! ```
+//!
+//! ### Optional features
+//!
+//! There are additional features which can be activated in `Cargo.toml`:
+//!
+//! ```
+//! [dependencies]
+//! argmin = { version = "0.1.5", features = ["ctrlc", "ndarrayl"] }
+//! ```
+//!
+//! These may become default features in the future. Without these features compilation to
+//! `wasm32-unknown-unkown` seems to be possible.
+//!
+//! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
+//!    result) after pressing Ctrl+C.
+//! - `ndarrayl`: Support for `ndarray` and `ndarray-linalg`.
 
 #![warn(missing_docs)]
 #![feature(custom_attribute)]
@@ -65,5 +107,8 @@ use argmin_core::*;
 
 /// Testfunctions
 pub mod testfunctions {
+    //! # Testfunctions
+    //!
+    //! Reexport of `argmin-testfunctions`.
     pub use argmin_testfunctions::*;
 }
