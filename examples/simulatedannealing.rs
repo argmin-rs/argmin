@@ -10,7 +10,8 @@ extern crate rand;
 use argmin::prelude::*;
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin::testfunctions::rosenbrock;
-use rand::{Rng, ThreadRng};
+use rand::Rng;
+// use rand::ThreadRng;
 
 #[derive(Clone)]
 struct MyProblem {
