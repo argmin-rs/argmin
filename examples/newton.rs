@@ -17,7 +17,7 @@ extern crate ndarray_linalg;
 use argmin::prelude::*;
 use argmin::solver::newton::*;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-use ndarray::{Array1, Array2};
+use ndarray::{Array, Array1, Array2};
 
 fn rosenbrock(x: &Array1<f64>) -> f64 {
     rosenbrock_2d(&x.to_vec(), 1.0, 100.0)
@@ -28,14 +28,8 @@ fn rosenbrock_gradient(x: &Array1<f64>) -> Array1<f64> {
 }
 
 fn rosenbrock_hessian(x: &Array1<f64>) -> Array2<f64> {
-    let bla = rosenbrock_2d_hessian(&x.to_vec(), 1.0, 100.0);
-    // hacky...
-    let mut out = Array2::eye(2);
-    out[(0, 0)] = bla[0];
-    out[(0, 1)] = bla[1];
-    out[(1, 0)] = bla[2];
-    out[(1, 1)] = bla[3];
-    out
+    let h = rosenbrock_2d_hessian(&x.to_vec(), 1.0, 100.0);
+    Array::from_shape_vec((2, 2), h).unwrap()
 }
 
 #[derive(Clone, ArgminOperator)]
