@@ -2,8 +2,8 @@
 
 # argmin
 
-A work-in-progress optimization toolbox written in Rust.
-Highly unstable and potentially *very buggy*.
+This crate offers a (work in progress) numerical optimization toolbox/framework written entirely in Rust.
+It is at the moment quite unstable and potentially very buggy.
 Please use with care and report any bugs you encounter.
 This crate is looking for contributors!
 Please get in touch with me if you're interested.
@@ -18,24 +18,25 @@ In particular, as a developer of optimization algorithms you should not need to 
 Instead you can focus on implementing your algorithm and let `argmin-codegen` do the rest.
 
 - Easy framework for the implementation of optimization algorithms: Define a struct to hold your data, implement a single iteration of your method and let argmin generate the rest with `#[derive(ArgminSolver)]`. This lead to similar interfaces for different solvers, making it easy for users.
-- Pure Rust implementations of a wide range of optimization methods: This avoids the need to compile and interface C code.
+- Pure Rust implementations of a wide range of optimization methods: This avoids the need to compile and interface C/C++/Fortran code.
 - Type-agnostic: Many problems require data structures that go beyond simple vectors to represent the parameters. In argmin, everything is generic: All that needs to be done is implementing certain traits on your data type. For common types, these traits are already implemented.
 - Convenient: Automatic and consistent logging of anything that may be important. Log to the terminal, to a file or implement your own loggers. Future plans include sending metrics to databases and connecting to big data piplines.
 - Algorithm evaluation: Methods to assess the performance of an algorithm for different parameter settings, problem classes, ...
 
-Since this crate is in a very early stage, so far most points are only partially implemented or remain future plans.
+Since this crate is in a very early stage, so far most points are only partially implemented or
+remain future plans.
+
 
 ## What is still needed?
 
 The following list shows some of the important parts that need to be tackled in the near future:
 
-- (Much, much) more optimization algorithms
-- Tests, tests, tests!
+- More optimization algorithms
+- Tests
 - Evaluation on real problems
-- Strong focus on speed
+- Improve speed
 - Making it ready for wasm and `#![no_std]`
-- Useful documentation
-- Extensive tutorials
+- Documentation & Tutorials
 
 Any help is appreciated! 
 
@@ -94,6 +95,7 @@ Licensed under either of
   * MIT License ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
+
 
 ### Contribution
 

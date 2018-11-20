@@ -5,13 +5,13 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # argmin -- A pure Rust optimization toolbox
+//! A pure Rust optimization framework
 //!
-//! This crate offers a (work in progress) optimization toolbox/framework written entirely in Rust.
-//! It is at the moment probably highly unstable and potentially very buggy. Please use with care
-//! and report any bugs you encounter. This crate is looking for contributors!
+//! This crate offers a (work in progress) numerical optimization toolbox/framework written entirely
+//! in Rust. It is at the moment quite unstable and potentially very buggy. Please use with care and
+//! report any bugs you encounter. This crate is looking for contributors!
 //!
-//! ## Design goals
+//! # Design goals
 //!
 //! This crate's intention is to be useful to users as well as developers of optimization
 //! algorithms, meaning that it should be both easy to apply and easy to implement algorithms. In
@@ -25,7 +25,7 @@
 //!   `#[derive(ArgminSolver)]`. This lead to similar interfaces for different solvers, making it
 //!   easy for users.
 //! - Pure Rust implementations of a wide range of optimization methods: This avoids the need to
-//!   compile and interface C code.
+//!   compile and interface C/C++/Fortran code.
 //! - Type-agnostic: Many problems require data structures that go beyond simple vectors to
 //!   represent the parameters. In argmin, everything is generic: All that needs to be done is
 //!   implementing certain traits on your data type. For common types, these traits are already
@@ -39,7 +39,7 @@
 //! Since this crate is in a very early stage, so far most points are only partially implemented or
 //! remain future plans.
 //!
-//! ## Algorithms
+//! # Algorithms
 //!
 //! - Linesearches
 //!   - Backtracking line search
@@ -58,20 +58,20 @@
 //! - Landweber iteration
 //! - Simulated Annealing
 //!
-//! ## Usage
+//! # Usage
 //!
 //! Add this to your `Cargo.toml`:
 //!
-//! ```
+//! ```toml
 //! [dependencies]
 //! argmin = "0.1.5"
 //! ```
 //!
-//! ### Optional features
+//! ## Optional features
 //!
 //! There are additional features which can be activated in `Cargo.toml`:
 //!
-//! ```
+//! ```toml
 //! [dependencies]
 //! argmin = { version = "0.1.5", features = ["ctrlc", "ndarrayl"] }
 //! ```
@@ -104,42 +104,129 @@
 //! `argmin-testfunctions` in argmin:
 //!
 //! ```rust
-//! extern crate argmin;
-//! extern crate argmin_testfunctions;
-//! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-//! use argmin::prelude::*;
+//! # extern crate argmin;
+//! # extern crate argmin_testfunctions;
+//! # extern crate ndarray;
+//! # use ndarray::{Array, Array1, Array2};
+//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+//! # use argmin::prelude::*;
+//! // [Imports ommited]
 //!
 //! /// First, create a struct for your problem
 //! #[derive(Clone)]
-//! struct Rosenbrock {}
+//! struct Rosenbrock {
+//!     a: f64,
+//!     b: f64,
+//! }
 //!
-//! /// Implement `ArgminOperator` for `MyProblem`
+//! /// Implement `ArgminOperator` for `Rosenbrock`
 //! impl ArgminOperator for Rosenbrock {
 //!     /// Type of the parameter vector
-//!     type Parameters = Vec<f64>;
+//!     type Parameters = Array1<f64>;
 //!     /// Type of the return value computed by the cost function
 //!     type OperatorOutput = f64;
 //!     /// Type of the Hessian. If not Hessian is available/needed, this can be set to `()`
-//!     type Hessian = ();
+//!     type Hessian = Array2<f64>;
 //!
 //!     /// Apply the cost function to a parameter `p`
-//!     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
-//!         Ok(rosenbrock_2d(p, 1.0, 100.0))
+//!     fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+//!         Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
 //!     }
 //!
 //!     /// Compute the gradient at parameter `p`. This is optional: If not implemented, this
 //!     /// method will return an `Err` when called.
-//!     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
-//!         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+//!     fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+//!         Ok(Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), self.a, self.b)))
 //!     }
 //!
-//!     // /// Compute the Hessian at parameter `p`. This is optional: If not implemented, this method
-//!     // /// will return an `Err` when called.
-//!     // fn hessian(&self, p: &Vec<f64>) -> Result<Self::Hessian, Error> {
-//!     //     Ok(...)
-//!     // }
+//!     /// Compute the Hessian at parameter `p`. This is optional: If not implemented, this method
+//!     /// will return an `Err` when called.
+//!     fn hessian(&self, p: &Self::Parameters) -> Result<Self::Hessian, Error> {
+//!         let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);
+//!         Ok(Array::from_shape_vec((2, 2), h).unwrap())
+//!     }
 //! }
 //!
+//! ```
+//!
+//! # Running a solver
+//!
+//! The following example shows how to use the previously shown definition of a problem in a
+//! Steepest Descent (Gradient Descent) solver.
+//!
+//! ```
+//! extern crate argmin;
+//! extern crate ndarray;
+//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+//! use argmin::prelude::*;
+//! use argmin::solver::gradientdescent::*;
+//!
+//! // [Problem definition ommited]
+//! # /// First, create a struct for your problem
+//! # #[derive(Clone)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # /// Implement `ArgminOperator` for `Rosenbrock`
+//! # impl ArgminOperator for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Parameters = ndarray::Array1<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type OperatorOutput = f64;
+//! #     /// Type of the Hessian. If not Hessian is available/needed, this can be set to `()`
+//! #     type Hessian = ndarray::Array2<f64>;
+//! #
+//! #    /// Apply the cost function to a parameter `p`
+//! #    fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+//! #        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
+//! #    }
+//! #
+//! #    /// Compute the gradient at parameter `p`. This is optional: If not implemented, this
+//! #    /// method will return an `Err` when called.
+//! #    fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+//! #        Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), self.a, self.b)))
+//! #    }
+//! #
+//! #    /// Compute the Hessian at parameter `p`. This is optional: If not implemented, this method
+//! #    /// will return an `Err` when called.
+//! #    fn hessian(&self, p: &Self::Parameters) -> Result<Self::Hessian, Error> {
+//! #        let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);
+//! #        Ok(ndarray::Array::from_shape_vec((2, 2), h).unwrap())
+//! #    }
+//! # }
+//!
+//! fn run() -> Result<(), Error> {
+//!     // Define cost function
+//!     let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//!
+//!     // Define inital parameter vector
+//!     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);
+//!
+//!     // Create solver
+//!     let mut solver = SteepestDescent::new(&cost, init_param)?;
+//!
+//!     // Set the maximum number of iterations to 1000
+//!     solver.set_max_iters(1000);
+//!
+//!     // Attach a terminal logger (slog) to the solver
+//!     solver.add_logger(ArgminSlogLogger::term());
+//!
+//!     // Run the solver
+//!     solver.run()?;
+//!
+//!     // Print the result
+//!     println!("{:?}", solver.result());
+//!     Ok(())
+//! }
+//!
+//! fn main() {
+//!     if let Err(ref e) = run() {
+//!         println!("{} {}", e.as_fail(), e.backtrace());
+//!         std::process::exit(1);
+//!     }
+//! }
 //! ```
 
 #![warn(missing_docs)]
