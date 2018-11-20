@@ -112,6 +112,65 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -197,6 +256,65 @@
 <span class="doccomment">//! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best</span>
 <span class="doccomment">//!    result) after pressing Ctrl+C.</span>
 <span class="doccomment">//! - `ndarrayl`: Support for `ndarray` and `ndarray-linalg`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Defining a problem</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A problem can be defined by implementing the `ArgminOperator` trait which comes with the</span>
+<span class="doccomment">//! associated types `Parameters`, `OperatorOutput` and `Hessian`. `Parameters` is the type of your</span>
+<span class="doccomment">//! parameter vector (i.e. the input to your cost function), `OperatorOutput` is the type returned</span>
+<span class="doccomment">//! by the cost function and `Hessian` is the type of the Hessian.</span>
+<span class="doccomment">//! The trait provides the following methods:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `apply(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::OperatorOutput, Error&gt;`: Applys the cost</span>
+<span class="doccomment">//!   function to parameters `p` of type `Self::Parameters` and returns the cost function value.</span>
+<span class="doccomment">//! - `gradient(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::Parameters, Error&gt;`: Computes the</span>
+<span class="doccomment">//!   gradient at `p`. Optional. By default returns an `Err` if not implemented.</span>
+<span class="doccomment">//! - `hessian(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::Hessian, Error&gt;`: Computes the Hessian</span>
+<span class="doccomment">//!   at `p`. Optional. By default returns an `Err` if not implemented. The type of `Hessian` can</span>
+<span class="doccomment">//!   be set to `()` if this method is not implemented.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The following code snippet shows an example of how to use the Rosenbrock test functions from</span>
+<span class="doccomment">//! `argmin-testfunctions` in argmin:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! extern crate argmin;</span>
+<span class="doccomment">//! extern crate argmin_testfunctions;</span>
+<span class="doccomment">//! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
+<span class="doccomment">//! use argmin::prelude::*;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! /// First, create a struct for your problem</span>
+<span class="doccomment">//! #[derive(Clone)]</span>
+<span class="doccomment">//! struct Rosenbrock {}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! /// Implement `ArgminOperator` for `MyProblem`</span>
+<span class="doccomment">//! impl ArgminOperator for Rosenbrock {</span>
+<span class="doccomment">//!     /// Type of the parameter vector</span>
+<span class="doccomment">//!     type Parameters = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//!     /// Type of the return value computed by the cost function</span>
+<span class="doccomment">//!     type OperatorOutput = f64;</span>
+<span class="doccomment">//!     /// Type of the Hessian. If not Hessian is available/needed, this can be set to `()`</span>
+<span class="doccomment">//!     type Hessian = ();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     /// Apply the cost function to a parameter `p`</span>
+<span class="doccomment">//!     fn apply(&amp;self, p: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;f64, Error&gt; {</span>
+<span class="doccomment">//!         Ok(rosenbrock_2d(p, 1.0, 100.0))</span>
+<span class="doccomment">//!     }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     /// Compute the gradient at parameter `p`. This is optional: If not implemented, this</span>
+<span class="doccomment">//!     /// method will return an `Err` when called.</span>
+<span class="doccomment">//!     fn gradient(&amp;self, p: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;Vec&lt;f64&gt;, Error&gt; {</span>
+<span class="doccomment">//!         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))</span>
+<span class="doccomment">//!     }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     // /// Compute the Hessian at parameter `p`. This is optional: If not implemented, this method</span>
+<span class="doccomment">//!     // /// will return an `Err` when called.</span>
+<span class="doccomment">//!     // fn hessian(&amp;self, p: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;Self::Hessian, Error&gt; {</span>
+<span class="doccomment">//!     //     Ok(...)</span>
+<span class="doccomment">//!     // }</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
 
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">custom_attribute</span>)]</span>
@@ -212,7 +330,7 @@
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">argmin_testfunctions</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rand</span>;
 
-<span class="doccomment">/// Definition of all relevant traits</span>
+<span class="doccomment">/// Definition of all relevant traits and types</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
 
 <span class="doccomment">/// Solvers</span>
