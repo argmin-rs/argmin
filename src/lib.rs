@@ -82,6 +82,65 @@
 //! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
 //!    result) after pressing Ctrl+C.
 //! - `ndarrayl`: Support for `ndarray` and `ndarray-linalg`.
+//!
+//! # Defining a problem
+//!
+//! A problem can be defined by implementing the `ArgminOperator` trait which comes with the
+//! associated types `Parameters`, `OperatorOutput` and `Hessian`. `Parameters` is the type of your
+//! parameter vector (i.e. the input to your cost function), `OperatorOutput` is the type returned
+//! by the cost function and `Hessian` is the type of the Hessian.
+//! The trait provides the following methods:
+//!
+//! - `apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error>`: Applys the cost
+//!   function to parameters `p` of type `Self::Parameters` and returns the cost function value.
+//! - `gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error>`: Computes the
+//!   gradient at `p`. Optional. By default returns an `Err` if not implemented.
+//! - `hessian(&self, p: &Self::Parameters) -> Result<Self::Hessian, Error>`: Computes the Hessian
+//!   at `p`. Optional. By default returns an `Err` if not implemented. The type of `Hessian` can
+//!   be set to `()` if this method is not implemented.
+//!
+//!
+//! The following code snippet shows an example of how to use the Rosenbrock test functions from
+//! `argmin-testfunctions` in argmin:
+//!
+//! ```rust
+//! extern crate argmin;
+//! extern crate argmin_testfunctions;
+//! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! use argmin::prelude::*;
+//!
+//! /// First, create a struct for your problem
+//! #[derive(Clone)]
+//! struct Rosenbrock {}
+//!
+//! /// Implement `ArgminOperator` for `MyProblem`
+//! impl ArgminOperator for Rosenbrock {
+//!     /// Type of the parameter vector
+//!     type Parameters = Vec<f64>;
+//!     /// Type of the return value computed by the cost function
+//!     type OperatorOutput = f64;
+//!     /// Type of the Hessian. If not Hessian is available/needed, this can be set to `()`
+//!     type Hessian = ();
+//!
+//!     /// Apply the cost function to a parameter `p`
+//!     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
+//!         Ok(rosenbrock_2d(p, 1.0, 100.0))
+//!     }
+//!
+//!     /// Compute the gradient at parameter `p`. This is optional: If not implemented, this
+//!     /// method will return an `Err` when called.
+//!     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
+//!         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+//!     }
+//!
+//!     // /// Compute the Hessian at parameter `p`. This is optional: If not implemented, this method
+//!     // /// will return an `Err` when called.
+//!     // fn hessian(&self, p: &Vec<f64>) -> Result<Self::Hessian, Error> {
+//!     //     Ok(...)
+//!     // }
+//! }
+//!
+//! ```
 
 #![warn(missing_docs)]
 #![feature(custom_attribute)]
@@ -97,7 +156,7 @@ extern crate argmin_codegen;
 extern crate argmin_testfunctions;
 extern crate rand;
 
-/// Definition of all relevant traits
+/// Definition of all relevant traits and types
 pub mod prelude;
 
 /// Solvers
