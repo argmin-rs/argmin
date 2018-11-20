@@ -39,7 +39,7 @@ fn run() -> Result<(), Error> {
     // Define cost function
     let cost = MyProblem {};
 
-    // definie inital parameter vector
+    // Define inital parameter vector
     let init_param: Vec<f64> = vec![1.2, 1.2];
     // let init_param: Vec<f64> = vec![-1.2, 1.0];
 
