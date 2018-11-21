@@ -107,7 +107,6 @@
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
 //! # extern crate ndarray;
-//! # use ndarray::{Array, Array1, Array2};
 //! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! # use argmin::prelude::*;
 //! // [Imports ommited]
@@ -122,11 +121,12 @@
 //! /// Implement `ArgminOperator` for `Rosenbrock`
 //! impl ArgminOperator for Rosenbrock {
 //!     /// Type of the parameter vector
-//!     type Parameters = Array1<f64>;
+//!     type Parameters = ndarray::Array1<f64>;
 //!     /// Type of the return value computed by the cost function
 //!     type OperatorOutput = f64;
-//!     /// Type of the Hessian. If not Hessian is available/needed, this can be set to `()`
-//!     type Hessian = Array2<f64>;
+//!     /// Type of the Hessian. If no Hessian is available or needed for the used solver, this can
+//!     /// be set to `()`
+//!     type Hessian = ndarray::Array2<f64>;
 //!
 //!     /// Apply the cost function to a parameter `p`
 //!     fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
@@ -136,17 +136,16 @@
 //!     /// Compute the gradient at parameter `p`. This is optional: If not implemented, this
 //!     /// method will return an `Err` when called.
 //!     fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
-//!         Ok(Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), self.a, self.b)))
+//!         Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), self.a, self.b)))
 //!     }
 //!
 //!     /// Compute the Hessian at parameter `p`. This is optional: If not implemented, this method
 //!     /// will return an `Err` when called.
 //!     fn hessian(&self, p: &Self::Parameters) -> Result<Self::Hessian, Error> {
 //!         let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);
-//!         Ok(Array::from_shape_vec((2, 2), h).unwrap())
+//!         Ok(ndarray::Array::from_shape_vec((2, 2), h).unwrap())
 //!     }
 //! }
-//!
 //! ```
 //!
 //! # Running a solver
@@ -157,45 +156,29 @@
 //! ```
 //! extern crate argmin;
 //! extern crate ndarray;
-//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+//! use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! use argmin::prelude::*;
-//! use argmin::solver::gradientdescent::*;
+//! use argmin::solver::gradientdescent::SteepestDescent;
 //!
-//! // [Problem definition ommited]
-//! # /// First, create a struct for your problem
-//! # #[derive(Clone)]
-//! # struct Rosenbrock {
-//! #     a: f64,
-//! #     b: f64,
-//! # }
-//! #
-//! # /// Implement `ArgminOperator` for `Rosenbrock`
-//! # impl ArgminOperator for Rosenbrock {
-//! #     /// Type of the parameter vector
-//! #     type Parameters = ndarray::Array1<f64>;
-//! #     /// Type of the return value computed by the cost function
-//! #     type OperatorOutput = f64;
-//! #     /// Type of the Hessian. If not Hessian is available/needed, this can be set to `()`
-//! #     type Hessian = ndarray::Array2<f64>;
-//! #
-//! #    /// Apply the cost function to a parameter `p`
-//! #    fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
-//! #        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
-//! #    }
-//! #
-//! #    /// Compute the gradient at parameter `p`. This is optional: If not implemented, this
-//! #    /// method will return an `Err` when called.
-//! #    fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
-//! #        Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), self.a, self.b)))
-//! #    }
-//! #
-//! #    /// Compute the Hessian at parameter `p`. This is optional: If not implemented, this method
-//! #    /// will return an `Err` when called.
-//! #    fn hessian(&self, p: &Self::Parameters) -> Result<Self::Hessian, Error> {
-//! #        let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);
-//! #        Ok(ndarray::Array::from_shape_vec((2, 2), h).unwrap())
-//! #    }
-//! # }
+//! #[derive(Clone)]
+//! struct Rosenbrock {
+//!     a: f64,
+//!     b: f64,
+//! }
+//!
+//! impl ArgminOperator for Rosenbrock {
+//!     type Parameters = ndarray::Array1<f64>;
+//!     type OperatorOutput = f64;
+//!     type Hessian = ();
+//!
+//!    fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+//!        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
+//!    }
+//!
+//!    fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+//!        Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), self.a, self.b)))
+//!    }
+//! }
 //!
 //! fn run() -> Result<(), Error> {
 //!     // Define cost function
@@ -227,6 +210,151 @@
 //!         std::process::exit(1);
 //!     }
 //! }
+//! ```
+//!
+//! Executing `solver.run()?` performs the actual optimization. In addition, there is
+//! `solver.fast_run()?`, which only executes the optimization algorithm and avoids all convenience
+//! functionality such as logging.
+//!
+//! # Logging
+//!
+//! Information such as the current iteration number, cost function value, and other metrics can be
+//! logged using any object which implements `argmin_core::ArgminLogger`. So far loggers based on
+//! the `slog` crate have been implemented: `ArgminSlogLogger::term` logs to the terminal and
+//! `ArgminSlogLogger::file` logs to a file in JSON format. Both loggers come with a `*_noblock`
+//! version which does not block the execution for logging, but may drop log entries when the
+//! buffer fills up.
+//!
+//! ```
+//! # extern crate argmin;
+//! # extern crate ndarray;
+//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+//! # use argmin::prelude::*;
+//! # use argmin::solver::gradientdescent::SteepestDescent;
+//! # #[derive(Clone)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! # impl ArgminOperator for Rosenbrock {
+//! #     type Parameters = ndarray::Array1<f64>;
+//! #     type OperatorOutput = f64;
+//! #     type Hessian = ();
+//! #    fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+//! #        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
+//! #    }
+//! #    fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+//! #        Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), self.a, self.b)))
+//! #    }
+//! # }
+//! # fn run() -> Result<(), Error> {
+//! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//! #     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);
+//! let mut solver = SteepestDescent::new(&cost, init_param)?;
+//! #     solver.set_max_iters(10);
+//! // Log to the terminal
+//! solver.add_logger(ArgminSlogLogger::term());
+//! // Log to the terminal without blocking
+//! solver.add_logger(ArgminSlogLogger::term_noblock());
+//! // Log to the file `log1.log`
+//! solver.add_logger(ArgminSlogLogger::file("log1.log")?);
+//! // Log to the file `log2.log` without blocking
+//! solver.add_logger(ArgminSlogLogger::file_noblock("log2.log")?);
+//! #     solver.run()?;
+//! #     Ok(())
+//! # }
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//! ```
+//!
+//! # Implementing an optimization algorithm
+//!
+//! In this section we are going to implement the Landweber solver, which essentially is a special
+//! form of gradient descent. In iteration `k`, the new parameter vector `x_{k+1}` is calculated
+//! from the previous parameter vector `x_k` and the gradient at `x_k` according to the following
+//! update rule:
+//!
+//! `x_{k+1} = x_k - omega * \nabla f(x_k)`
+//!
+//! In order to implement this using the argmin framework, one first needs to define a struct which
+//! holds data/parameters needed during the execution of the algorithm. In addition a field with
+//! the name `base` and type `ArgminBase<'a, T, U, H>` is needed, where `T` is the type of the
+//! parameter vector, `U` is the type of the return values of the cost function and `H` is the type
+//! of the Hessian (which can be `()` if not available).
+//!
+//! Deriving `ArgminSolver` for the struct using `#[derive(ArgminSolver)]` implements most of the
+//! API. What remains to be implemented for the struct is a constructor and `ArgminNextIter`. The
+//! latter is essentially an implementation of a single iteration of the algorithm.
+//!
+//! ```
+//! // needed for `#[derive(ArgminSolver)]`
+//! #[macro_use]
+//! extern crate argmin_codegen;
+//! use argmin::prelude::*;
+//! use std::default::Default;
+//!
+//! // The `Landweber` struct holds the `omega` parameter and has a field `base` which is of type
+//! // `ArgminBase`. The struct is generic over the paraemter vector (`T`) which (in this
+//! // particular case) has to implement `Clone`, `Default` and `ArgminScaledSub<T, f64>`. The
+//! // latter is needed for the update rule.
+//! // Deriving `ArgminSolver` implements a large portion of the API and provides many convenience
+//! // functions. It requires that `ArgminNextIter` is implemented on `Landweber` as well.
+//! #[derive(ArgminSolver)]
+//! pub struct Landweber<'a, T>
+//! where
+//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+//! {
+//!     omega: f64,
+//!     base: ArgminBase<'a, T, f64, ()>,
+//! }
+//!
+//! // For convenience, a constructor can/should be implemented
+//! impl<'a, T> Landweber<'a, T>
+//! where
+//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+//! {
+//!     pub fn new(
+//!         cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
+//!         omega: f64,
+//!         init_param: T,
+//!     ) -> Result<Self, Error> {
+//!         Ok(Landweber {
+//!             omega,
+//!             base: ArgminBase::new(cost_function, init_param),
+//!         })
+//!     }
+//! }
+//!
+//! // This implements a single iteration of the optimization algorithm.
+//! impl<'a, T> ArgminNextIter for Landweber<'a, T>
+//! where
+//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+//! {
+//!     type Parameters = T;
+//!     type OperatorOutput = f64;
+//!     type Hessian = ();
+//!
+//!     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+//!         // Obtain current parameter vector
+//!         // The method `cur_param()` has been implemented by deriving `ArgminSolver`.
+//!         let param = self.cur_param();
+//!         // Compute gradient at current parameter vector `param`
+//!         // The method `gradient()` has been implemented by deriving `ArgminSolver`.
+//!         let grad = self.gradient(&param)?;
+//!         // Calculate new parameter vector based on update rule
+//!         let new_param = param.scaled_sub(self.omega, grad);
+//!         // Return new parameter vector. Since there is no need to compute the cost function
+//!         // value, we return 0.0 instead.
+//!         let out = ArgminIterationData::new(new_param, 0.0);
+//!         Ok(out)
+//!     }
+//! }
+//! # fn main() {
+//! # }
 //! ```
 
 #![warn(missing_docs)]
