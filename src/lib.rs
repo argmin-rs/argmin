@@ -55,7 +55,7 @@
 //! - Newton Methods
 //!   - Basic Newton's Method
 //!   - Newton-CG
-//! - Landweber iteration
+//! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - Simulated Annealing
 //!
 //! # Usage
@@ -109,7 +109,7 @@
 //! # extern crate ndarray;
 //! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! # use argmin::prelude::*;
-//! // [Imports ommited]
+//! // [Imports omited]
 //!
 //! /// First, create a struct for your problem
 //! #[derive(Clone)]
@@ -213,7 +213,7 @@
 //! ```
 //!
 //! Executing `solver.run()?` performs the actual optimization. In addition, there is
-//! `solver.fast_run()?`, which only executes the optimization algorithm and avoids all convenience
+//! `solver.run_fast()?`, which only executes the optimization algorithm and avoids all convenience
 //! functionality such as logging.
 //!
 //! # Logging

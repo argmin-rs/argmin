@@ -4,8 +4,10 @@
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
-//! # Landweber iteration
+
+//! Landweber iteration
 //!
+//! [Landweber](struct.Landweber.html)
 //! # References
 //!
 //! [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
@@ -16,7 +18,64 @@ use prelude::*;
 use std;
 use std::default::Default;
 
-/// Landweber iteration
+/// The Landweber iteration is a solver for ill-posed linear inverse problems.
+///
+/// In iteration `k`, the new parameter vector `x_{k+1}` is calculated from the previous parameter
+/// vector `x_k` and the gradient at `x_k` according to the following update rule:
+///
+/// `x_{k+1} = x_k - omega * \nabla f(x_k)`
+///
+/// # Example
+///
+/// ```
+/// # extern crate argmin;
+/// # use argmin::prelude::*;
+/// # use argmin::solver::landweber::*;
+/// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+/// #
+/// # #[derive(Clone)]
+/// # struct MyProblem {}
+/// #
+/// # impl ArgminOperator for MyProblem {
+/// #     type Parameters = Vec<f64>;
+/// #     type OperatorOutput = f64;
+/// #     type Hessian = ();
+/// #
+/// #     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
+/// #         Ok(rosenbrock_2d(p, 1.0, 100.0))
+/// #     }
+/// #
+/// #     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
+/// #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+/// #     }
+/// # }
+/// #
+/// # fn run() -> Result<(), Error> {
+/// let operator = MyProblem {};
+/// let init_param: Vec<f64> = vec![1.2, 1.2];
+/// let omega = 0.001;
+///
+/// let mut solver = Landweber::new(&operator, omega, init_param)?;
+/// solver.set_max_iters(100);
+/// solver.add_logger(ArgminSlogLogger::term());
+/// solver.run()?;
+///
+/// println!("{:?}", solver.result());
+/// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     if let Err(ref e) = run() {
+/// #         println!("{} {}", e.as_fail(), e.backtrace());
+/// #     }
+/// # }
+/// ```
+///
+/// # References
+///
+/// [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
+/// kind. Amer. J. Math. 73, 615–624
+/// [1] https://en.wikipedia.org/wiki/Landweber_iteration
 #[derive(ArgminSolver)]
 pub struct Landweber<'a, T>
 where
