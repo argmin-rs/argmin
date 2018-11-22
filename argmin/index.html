@@ -53,7 +53,7 @@ remain future plans.</p>
 <li>Newton-CG</li>
 </ul>
 </li>
-<li>Landweber iteration</li>
+<li><a href="solver/landweber/struct.Landweber.html">Landweber iteration</a></li>
 <li>Simulated Annealing</li>
 </ul>
 <h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
@@ -92,7 +92,7 @@ be set to <code>()</code> if this method is not implemented.</li>
 <code>argmin-testfunctions</code> in argmin:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="comment">// [Imports ommited]</span>
+<span class="comment">// [Imports omited]</span>
 
 <span class="doccomment">/// First, create a struct for your problem</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
@@ -191,7 +191,7 @@ Steepest Descent (Gradient Descent) solver.</p>
     }
 }</pre></div>
 <p>Executing <code>solver.run()?</code> performs the actual optimization. In addition, there is
-<code>solver.fast_run()?</code>, which only executes the optimization algorithm and avoids all convenience
+<code>solver.run_fast()?</code>, which only executes the optimization algorithm and avoids all convenience
 functionality such as logging.</p>
 <h1 id="logging" class="section-header"><a href="#logging">Logging</a></h1>
 <p>Information such as the current iteration number, cost function value, and other metrics can be
