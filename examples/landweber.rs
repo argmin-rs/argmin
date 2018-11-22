@@ -6,36 +6,34 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
-extern crate rand;
 use argmin::prelude::*;
 use argmin::solver::landweber::*;
-use argmin::testfunctions::{sphere, sphere_derivative};
+use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
 #[derive(Clone)]
-struct MyProblem {}
+struct Rosenbrock {}
 
-impl ArgminOperator for MyProblem {
+impl ArgminOperator for Rosenbrock {
     type Parameters = Vec<f64>;
     type OperatorOutput = f64;
     type Hessian = ();
 
     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
-        Ok(sphere(p))
+        Ok(rosenbrock_2d(p, 1.0, 100.0))
     }
 
     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
-        Ok(sphere_derivative(p))
+        Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
     }
 }
 
 fn run() -> Result<(), Error> {
-    // definie inital parameter vector
-    let init_param: Vec<f64> = vec![2.0, 1.0];
-    let operator = MyProblem {};
+    // define inital parameter vector
+    let init_param: Vec<f64> = vec![1.2, 1.2];
+    let operator = Rosenbrock {};
 
-    // Set up Conjugate Gradient method
-    let iters = 20;
-    let mut solver = Landweber::new(&operator, 0.1, init_param)?;
+    let iters = 4000;
+    let mut solver = Landweber::new(&operator, 0.001, init_param)?;
     solver.set_max_iters(iters);
     solver.add_logger(ArgminSlogLogger::term());
     solver.run()?;
