@@ -5,62 +5,69 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#![feature(custom_attribute)]
-#![feature(unrestricted_attribute_tokens)]
-#![allow(unused_attributes)]
+#![allow(unused_imports)]
 
 extern crate argmin;
-#[macro_use]
-extern crate argmin_codegen;
 use argmin::prelude::*;
-use argmin::solver::gradientdescent::*;
-// use argmin::solver::linesearch::BacktrackingLineSearch;
+use argmin::solver::gradientdescent::SteepestDescent;
 use argmin::solver::linesearch::HagerZhangLineSearch;
-// use argmin::solver::linesearch::MoreThuenteLineSearch;
+use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
-fn rosenbrock(x: &Vec<f64>) -> f64 {
-    rosenbrock_2d(x, 1.0, 100.0)
+#[derive(Clone)]
+struct Rosenbrock {
+    a: f64,
+    b: f64,
 }
 
-fn rosenbrock_gradient(x: &Vec<f64>) -> Vec<f64> {
-    rosenbrock_2d_derivative(x, 1.0, 100.0)
-}
+impl ArgminOperator for Rosenbrock {
+    type Parameters = Vec<f64>;
+    type OperatorOutput = f64;
+    type Hessian = ();
 
-#[derive(Clone, ArgminOperator)]
-#[output_type(f64)]
-#[parameters_type(Vec<f64>)]
-#[hessian_type(())]
-#[cost_function(rosenbrock)]
-#[gradient(rosenbrock_gradient)]
-struct MyProblem {}
+    fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+        Ok(rosenbrock_2d(p, self.a, self.b))
+    }
+
+    fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+        Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+    }
+}
 
 fn run() -> Result<(), Error> {
-    // Define cost function
-    let cost = MyProblem {};
+    // Define cost function (must implement `ArgminOperator`)
+    let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
-    // Define inital parameter vector
+    // Define initial parameter vector
+    // easy case
     let init_param: Vec<f64> = vec![1.2, 1.2];
+    // tough case
     // let init_param: Vec<f64> = vec![-1.2, 1.0];
 
-    // let mut linesearch = MoreThuenteLineSearch::new(&cost);
-    let mut linesearch = HagerZhangLineSearch::new(&cost);
-    // let mut linesearch = BacktrackingLineSearch::new(&cost);
-    // linesearch.set_initial_alpha(1.0)?;
-    // linesearch.set_initial_alpha(10.0)?;
-    linesearch.set_max_iters(200);
-    // linesearch.set_rho(0.5);
+    // Pick a line search. If no line search algorithm is provided, SteepestDescent defaults to
+    // HagerZhang.
+    let linesearch = HagerZhangLineSearch::new(&cost);
+    // let linesearch = MoreThuenteLineSearch::new(&cost);
 
-    let iters = 10000;
+    // Set up solver
     let mut solver = SteepestDescent::new(&cost, init_param)?;
-    // solver.set_linesearch(Box::new(linesearch));
-    solver.set_max_iters(iters);
+
+    // Set line search. If this is omitted, `SteepestDescent` will default to `HagerZhang`.
+    solver.set_linesearch(Box::new(linesearch));
+
+    // Set maximum number of iterations
+    solver.set_max_iters(10_000);
+
+    // Attach a logger which will output information in each iteration.
     solver.add_logger(ArgminSlogLogger::term_noblock());
 
+    // Run the solver
     solver.run()?;
 
-    // Wait a second (lets the logger flush everything before printing to screen again)
+    // Wait a second (lets the logger flush everything first)
     std::thread::sleep(std::time::Duration::from_secs(1));
+
+    // print result
     println!("{:?}", solver.result());
     Ok(())
 }
@@ -71,3 +78,12 @@ fn main() {
         std::process::exit(1);
     }
 }
+
+// DUMP (ignore)
+// #[derive(Clone, ArgminOperator)]
+// #[output_type(f64)]
+// #[parameters_type(Vec<f64>)]
+// #[hessian_type(())]
+// #[cost_function(rosenbrock)]
+// #[gradient(rosenbrock_gradient)]
+// struct MyProblem {}
