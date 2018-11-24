@@ -120,6 +120,7 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
+<span id="123">123</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -131,6 +132,7 @@
 <span class="doccomment">//! Landweber iteration</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [Landweber](struct.Landweber.html)</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! # References</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first</span>
@@ -152,10 +154,10 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # extern crate argmin;</span>
-<span class="doccomment">/// # use argmin::prelude::*;</span>
-<span class="doccomment">/// # use argmin::solver::landweber::*;</span>
+<span class="doccomment">/// use argmin::prelude::*;</span>
+<span class="doccomment">/// use argmin::solver::landweber::Landweber;</span>
 <span class="doccomment">/// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
-<span class="doccomment">/// #</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// # #[derive(Clone)]</span>
 <span class="doccomment">/// # struct MyProblem {}</span>
 <span class="doccomment">/// #</span>
