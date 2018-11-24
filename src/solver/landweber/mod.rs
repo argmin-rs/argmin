@@ -29,10 +29,10 @@ use std::default::Default;
 ///
 /// ```
 /// # extern crate argmin;
-/// # use argmin::prelude::*;
-/// # use argmin::solver::landweber::*;
+/// use argmin::prelude::*;
+/// use argmin::solver::landweber::Landweber;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-/// #
+///
 /// # #[derive(Clone)]
 /// # struct MyProblem {}
 /// #
