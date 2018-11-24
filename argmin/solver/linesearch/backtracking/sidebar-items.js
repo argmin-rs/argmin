@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["BacktrackingLineSearch","Backtracking Line Search"]]});
+initSidebarItems({"struct":[["BacktrackingLineSearch","The Backtracking line search is a simple method to find a step length which obeys the Armijo (sufficient decrease) condition."]]});

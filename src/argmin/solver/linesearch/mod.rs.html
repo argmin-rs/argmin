@@ -20,6 +20,23 @@
 <span id="20">20</span>
 <span id="21">21</span>
 <span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -28,11 +45,28 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! Argmin Line search methods</span>
+<span class="doccomment">//! Line search methods</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * [Backtracking line search](backtracking/struct.BacktrackingLineSearch.html)</span>
+<span class="doccomment">//! * [More-Thuente line search](morethuente/struct.MoreThuenteLineSearch.html)</span>
+<span class="doccomment">//! * [Hager-Zhang line search](hagerzhang/struct.HagerZhangLineSearch.html)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # References:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [1] Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient</span>
+<span class="doccomment">//! decrease.&quot; ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.</span>
+<span class="doccomment">//! DOI: https://doi.org/10.1145/192115.192132</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [2] William W. Hager and Hongchao Zhang. &quot;A new conjugate gradient method with guaranteed</span>
+<span class="doccomment">//! descent and an efficient line search.&quot; SIAM J. Optim. 16(1), 2006, 170-192.</span>
+<span class="doccomment">//! DOI: https://doi.org/10.1137/030601880</span>
 
-<span class="doccomment">/// backtracking algorithm</span>
+<span class="doccomment">/// Backtracking line search algorithm</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">backtracking</span>;
-<span class="doccomment">/// acceptance conditions</span>
+<span class="doccomment">/// Acceptance conditions</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">condition</span>;
 <span class="doccomment">/// Hager-Zhang line search algorithm</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">hagerzhang</span>;

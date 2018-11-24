@@ -196,6 +196,8 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -231,6 +233,7 @@
 <span class="doccomment">/// use argmin::solver::gradientdescent::SteepestDescent;</span>
 <span class="doccomment">/// use argmin::solver::linesearch::HagerZhangLineSearch;</span>
 <span class="doccomment">/// use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
+<span class="doccomment">/// use argmin::solver::linesearch::BacktrackingLineSearch;</span>
 <span class="doccomment">/// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # #[derive(Clone)]</span>
@@ -261,6 +264,7 @@
 <span class="doccomment">/// // HagerZhang.</span>
 <span class="doccomment">/// let linesearch = HagerZhangLineSearch::new(&amp;cost);</span>
 <span class="doccomment">/// // let linesearch = MoreThuenteLineSearch::new(&amp;cost);</span>
+<span class="doccomment">/// // let linesearch = BacktrackingLineSearch::new(&amp;cost);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Set up solver</span>
 <span class="doccomment">/// let mut solver = SteepestDescent::new(&amp;cost, init_param)?;</span>
