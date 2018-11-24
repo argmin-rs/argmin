@@ -41,8 +41,8 @@
 //!
 //! # Algorithms
 //!
-//! - Linesearches
-//!   - Backtracking line search
+//! - [Linesearches](solver/linesearch/index.html)
+//!   - [Backtracking line search](solver/linesearch/backtracking/struct.BacktrackingLineSearch.html)
 //!   - More-Thuente line search
 //!   - Hager-Zhang line search
 //! - Trust region method

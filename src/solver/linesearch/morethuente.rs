@@ -17,13 +17,6 @@
 //! Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 //! decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
 //! DOI: https://doi.org/10.1145/192115.192132
-//!
-// //!
-// //! # Example
-// //!
-// //! ```rust
-// //! todo
-// //! ```
 
 use prelude::*;
 use std;

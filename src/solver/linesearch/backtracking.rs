@@ -5,26 +5,104 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Line search methods
-//!
-//! TODO: Proper documentation.
-//!
-//! # References:
-//!
-//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
-//! Springer. ISBN 0-387-30303-0.
-// //!
-// //! # Example
-// //!
-// //! ```rust
-// //! todo
-// //! ```
+//! * [Backtracking line search](struct.BacktrackingLineSearch.html)
 
 use prelude::*;
 use solver::linesearch::condition::*;
 use std;
 
-/// Backtracking Line Search
+/// The Backtracking line search is a simple method to find a step length which obeys the Armijo
+/// (sufficient decrease) condition.
+///
+/// # Example
+///
+/// ```
+/// # extern crate argmin;
+/// use argmin::prelude::*;
+/// use argmin::solver::linesearch::BacktrackingLineSearch;
+/// # use argmin::testfunctions::{sphere, sphere_derivative};
+///  
+/// # #[derive(Clone)]
+/// # struct Sphere {}
+/// #
+/// # impl ArgminOperator for Sphere {
+/// #     type Parameters = Vec<f64>;
+/// #     type OperatorOutput = f64;
+/// #     type Hessian = ();
+/// #
+/// #     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
+/// #         Ok(sphere(param))
+/// #     }
+/// #
+/// #     fn gradient(&self, param: &Vec<f64>) -> Result<Vec<f64>, Error> {
+/// #         Ok(sphere_derivative(param))
+/// #     }
+/// # }
+/// #
+/// # fn run() -> Result<(), Error> {
+/// // definie inital parameter vector
+/// let init_param: Vec<f64> = vec![1.0, 0.0];
+///
+/// // Define problem
+/// let operator = Sphere {};
+///
+/// // Set up Line Search method
+/// let mut solver = BacktrackingLineSearch::new(&operator);
+///
+/// // Set search direction
+/// solver.set_search_direction(vec![-2.0, 0.0]);
+///
+/// // Set initial position
+/// solver.set_initial_parameter(init_param);
+///
+/// // Set contraction factor
+/// solver.set_rho(0.9)?;
+///
+/// // Calculate initial cost ...
+/// solver.calc_initial_cost()?;
+///
+/// // ... or, alternatively, set cost if it is already computed
+/// // solver.set_initial_cost(...);
+///
+/// // Calculate initial gradient ...
+/// solver.calc_initial_gradient()?;
+///
+/// // .. or, alternatively, set gradient if it is already computed
+/// // solver.set_initial_gradient(...);
+///
+/// // Set initial step length
+/// solver.set_initial_alpha(1.0)?;
+///
+/// // Set maximum number of iterations
+/// solver.set_max_iters(100);
+///
+/// // Attach a logger
+/// solver.add_logger(ArgminSlogLogger::term());
+///
+/// // Run solver
+/// solver.run()?;
+///
+/// // Wait a second (lets the logger flush everything before printing again)
+/// std::thread::sleep(std::time::Duration::from_secs(1));
+///
+/// // Print result
+/// println!("{:?}", solver.result());
+/// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     if let Err(ref e) = run() {
+/// #         println!("{} {}", e.as_fail(), e.backtrace());
+/// #     }
+/// # }
+/// ```
+///
+/// # References:
+///
+/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
+///
+/// [1] Wikipedia: https://en.wikipedia.org/wiki/Backtracking_line_search
 #[derive(ArgminSolver)]
 #[stop("self.eval_condition()" => LineSearchConditionMet)]
 pub struct BacktrackingLineSearch<'a, T, H>
@@ -45,7 +123,7 @@ where
     init_grad: T,
     /// Search direction
     search_direction: T,
-    /// rho
+    /// Contraction factor rho
     rho: f64,
     /// Stopping condition
     condition: Box<LineSearchCondition<T>>,
@@ -70,15 +148,11 @@ where
     ///
     /// Parameters:
     ///
-    /// `cost_function`: cost function
-    /// `rho`: todo
+    /// `operator`: Must implement `ArgminOperator`
     pub fn new(
         operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
     ) -> Self {
-        // let cond = ArmijoCondition::new(0.0001).unwrap();
-        // let cond = WolfeCondition::new(0.0001, 0.9).unwrap();
-        let cond = StrongWolfeCondition::new(0.0001, 0.9).unwrap();
-        // let cond = GoldsteinCondition::new(0.25).unwrap();
+        let cond = ArmijoCondition::new(0.5).unwrap();
         BacktrackingLineSearch {
             init_param: T::default(),
             init_cost: std::f64::INFINITY,
@@ -97,7 +171,7 @@ where
         self
     }
 
-    /// Set rho
+    /// Set contraction factor rho
     pub fn set_rho(&mut self, rho: f64) -> Result<&mut Self, Error> {
         if rho <= 0.0 || rho >= 1.0 {
             return Err(ArgminError::InvalidParameter {

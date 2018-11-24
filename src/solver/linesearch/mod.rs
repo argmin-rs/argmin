@@ -5,11 +5,28 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Argmin Line search methods
+//! Line search methods
+//!
+//! * [Backtracking line search](backtracking/struct.BacktrackingLineSearch.html)
+//! * [More-Thuente line search](morethuente/struct.MoreThuenteLineSearch.html)
+//! * [Hager-Zhang line search](hagerzhang/struct.HagerZhangLineSearch.html)
+//!
+//! # References:
+//!
+//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! Springer. ISBN 0-387-30303-0.
+//!
+//! [1] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
+//! decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
+//! DOI: https://doi.org/10.1145/192115.192132
+//!
+//! [2] William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed
+//! descent and an efficient line search." SIAM J. Optim. 16(1), 2006, 170-192.
+//! DOI: https://doi.org/10.1137/030601880
 
-/// backtracking algorithm
+/// Backtracking line search algorithm
 pub mod backtracking;
-/// acceptance conditions
+/// Acceptance conditions
 pub mod condition;
 /// Hager-Zhang line search algorithm
 pub mod hagerzhang;
