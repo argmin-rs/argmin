@@ -49,7 +49,7 @@
 //!   - Cauchy point method
 //!   - Dogleg method
 //!   - Steihaug method
-//! - Steepest Descent
+//! - [Steepest Descent](solver/gradientdescent/steepestdescent/struct.SteepestDescent.html)
 //! - Conjugate Gradient method
 //! - Nonlinear Conjugate Gradient method
 //! - Newton Methods

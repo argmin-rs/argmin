@@ -17,9 +17,78 @@ use solver::linesearch::HagerZhangLineSearch;
 use std;
 use std::default::Default;
 
-// use solver::linesearch::BacktrackingLineSearch;
-
-/// Steepest Descent solver
+/// Steepest descent iteratively takes steps in the direction of the strongest negative gradient.
+/// In each iteration, a line search is employed to obtain an appropriate step length.
+///
+/// # Example
+///
+/// ```rust
+/// # #![allow(unused_imports)]
+/// #
+/// # extern crate argmin;
+/// use argmin::prelude::*;
+/// use argmin::solver::gradientdescent::SteepestDescent;
+/// use argmin::solver::linesearch::HagerZhangLineSearch;
+/// use argmin::solver::linesearch::MoreThuenteLineSearch;
+/// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+///
+/// # #[derive(Clone)]
+/// # struct MyProblem {}
+/// #
+/// # impl ArgminOperator for MyProblem {
+/// #     type Parameters = Vec<f64>;
+/// #     type OperatorOutput = f64;
+/// #     type Hessian = ();
+/// #
+/// #     fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+/// #         Ok(rosenbrock_2d(p, 1.0, 100.0))
+/// #     }
+/// #
+/// #     fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+/// #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+/// #     }
+/// # }
+/// #
+/// # fn run() -> Result<(), Error> {
+/// // Define cost function (must implement `ArgminOperator`)
+/// let cost = MyProblem { };
+///
+/// // Define initial parameter vector
+/// let init_param: Vec<f64> = vec![1.2, 1.2];
+///
+/// // Pick a line search. If no line search algorithm is provided, SteepestDescent defaults to
+/// // HagerZhang.
+/// let linesearch = HagerZhangLineSearch::new(&cost);
+/// // let linesearch = MoreThuenteLineSearch::new(&cost);
+///
+/// // Set up solver
+/// let mut solver = SteepestDescent::new(&cost, init_param)?;
+/// // Set linesearch. This can be omitted, which will then default to `HagerZhangLineSearch`
+/// solver.set_linesearch(Box::new(linesearch));
+/// // Set maximum number of iterations
+/// solver.set_max_iters(100);
+///
+/// // Attach a logger which will output information in each iteration.
+/// solver.add_logger(ArgminSlogLogger::term_noblock());
+///
+/// // Run the solver
+/// solver.run()?;
+///
+/// // Wait a second (lets the logger flush everything first)
+/// std::thread::sleep(std::time::Duration::from_secs(1));
+///
+/// // Print result
+/// println!("{:?}", solver.result());
+/// # Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     if let Err(ref e) = run() {
+/// #         println!("{} {}", e.as_fail(), e.backtrace());
+/// #         std::process::exit(1);
+/// #     }
+/// # }
+/// ```
 #[derive(ArgminSolver)]
 pub struct SteepestDescent<'a, T, H>
 where
