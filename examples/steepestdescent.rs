@@ -10,6 +10,7 @@
 extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::gradientdescent::SteepestDescent;
+use argmin::solver::linesearch::BacktrackingLineSearch;
 use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -48,6 +49,7 @@ fn run() -> Result<(), Error> {
     // HagerZhang.
     let linesearch = HagerZhangLineSearch::new(&cost);
     // let linesearch = MoreThuenteLineSearch::new(&cost);
+    // let linesearch = BacktrackingLineSearch::new(&cost);
 
     // Set up solver
     let mut solver = SteepestDescent::new(&cost, init_param)?;

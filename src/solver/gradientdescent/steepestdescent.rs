@@ -32,6 +32,7 @@ use std::default::Default;
 /// use argmin::solver::gradientdescent::SteepestDescent;
 /// use argmin::solver::linesearch::HagerZhangLineSearch;
 /// use argmin::solver::linesearch::MoreThuenteLineSearch;
+/// use argmin::solver::linesearch::BacktrackingLineSearch;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 ///
 /// # #[derive(Clone)]
@@ -62,6 +63,7 @@ use std::default::Default;
 /// // HagerZhang.
 /// let linesearch = HagerZhangLineSearch::new(&cost);
 /// // let linesearch = MoreThuenteLineSearch::new(&cost);
+/// // let linesearch = BacktrackingLineSearch::new(&cost);
 ///
 /// // Set up solver
 /// let mut solver = SteepestDescent::new(&cost, init_param)?;
