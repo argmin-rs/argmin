@@ -8,6 +8,7 @@
 //! Landweber iteration
 //!
 //! [Landweber](struct.Landweber.html)
+//!
 //! # References
 //!
 //! [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
