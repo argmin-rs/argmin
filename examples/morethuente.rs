@@ -34,7 +34,7 @@ fn run() -> Result<(), Error> {
     // Problem definition
     let operator = Sphere {};
 
-    // Set up Line Search method
+    // Set up line search method
     let mut solver = MoreThuenteLineSearch::new(&operator);
 
     // Set search direction

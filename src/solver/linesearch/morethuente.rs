@@ -46,9 +46,9 @@ impl Step {
 /// # use argmin::testfunctions::{sphere, sphere_derivative};
 /// #
 /// # #[derive(Clone)]
-/// # struct Sphere {}
+/// # struct MyProblem {}
 /// #
-/// # impl ArgminOperator for Sphere {
+/// # impl ArgminOperator for MyProblem {
 /// #     type Parameters = Vec<f64>;
 /// #     type OperatorOutput = f64;
 /// #     type Hessian = ();
@@ -67,9 +67,9 @@ impl Step {
 /// let init_param: Vec<f64> = vec![1.0, 0.0];
 ///
 /// // Problem definition
-/// let operator = Sphere {};
+/// let operator = MyProblem {};
 ///
-/// // Set up Line Search method
+/// // Set up line search method
 /// let mut solver = MoreThuenteLineSearch::new(&operator);
 ///
 /// // Set search direction
