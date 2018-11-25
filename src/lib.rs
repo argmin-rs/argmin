@@ -41,7 +41,7 @@
 //!
 //! # Algorithms
 //!
-//! - [Linesearches](solver/linesearch/index.html)
+//! - [Line searches](solver/linesearch/index.html)
 //!   - [Backtracking line search](solver/linesearch/backtracking/struct.BacktrackingLineSearch.html)
 //!   - [More-Thuente line search](solver/linesearch/morethuente/struct.MoreThuenteLineSearch.html)
 //!   - [Hager-Zhang line search](solver/linesearch/hagerzhang/struct.HagerZhangLineSearch.html)
@@ -52,8 +52,8 @@
 //! - [Steepest Descent](solver/gradientdescent/steepestdescent/struct.SteepestDescent.html)
 //! - Conjugate Gradient method
 //! - Nonlinear Conjugate Gradient method
-//! - Newton Methods
-//!   - Basic Newton's Method
+//! - Newton methods
+//!   - Basic Newton's method
 //!   - Newton-CG
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - Simulated Annealing
