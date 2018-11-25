@@ -175,7 +175,6 @@ where
         self.radius = if rho < 0.25 {
             0.25 * pk_norm
         } else {
-            // if rho > 0.75 && pk_norm == self.radius {
             if rho > 0.75 && (pk_norm - self.radius).abs() <= 10.0 * std::f64::EPSILON {
                 self.max_radius.min(2.0 * self.radius)
             } else {
