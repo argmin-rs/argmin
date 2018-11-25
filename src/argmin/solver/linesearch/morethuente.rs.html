@@ -738,7 +738,7 @@
 <span class="doccomment">//! This implementation follows the excellent MATLAB implementation of Dianne P. O&#39;Leary at</span>
 <span class="doccomment">//! http://www.cs.umd.edu/users/oleary/software/</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ## Reference</span>
+<span class="doccomment">//! # Reference</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient</span>
 <span class="doccomment">//! decrease.&quot; ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.</span>
@@ -772,9 +772,9 @@
 <span class="doccomment">/// # use argmin::testfunctions::{sphere, sphere_derivative};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # #[derive(Clone)]</span>
-<span class="doccomment">/// # struct Sphere {}</span>
+<span class="doccomment">/// # struct MyProblem {}</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// # impl ArgminOperator for Sphere {</span>
+<span class="doccomment">/// # impl ArgminOperator for MyProblem {</span>
 <span class="doccomment">/// #     type Parameters = Vec&lt;f64&gt;;</span>
 <span class="doccomment">/// #     type OperatorOutput = f64;</span>
 <span class="doccomment">/// #     type Hessian = ();</span>
@@ -793,9 +793,9 @@
 <span class="doccomment">/// let init_param: Vec&lt;f64&gt; = vec![1.0, 0.0];</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Problem definition</span>
-<span class="doccomment">/// let operator = Sphere {};</span>
+<span class="doccomment">/// let operator = MyProblem {};</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// // Set up Line Search method</span>
+<span class="doccomment">/// // Set up line search method</span>
 <span class="doccomment">/// let mut solver = MoreThuenteLineSearch::new(&amp;operator);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Set search direction</span>
