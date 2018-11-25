@@ -6,16 +6,14 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
-extern crate rand;
 use argmin::prelude::*;
-// use argmin_core::WriteToFile;
-use argmin::solver::linesearch::*;
+use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::testfunctions::{sphere, sphere_derivative};
 
 #[derive(Clone)]
-struct MyProblem {}
+struct Sphere {}
 
-impl ArgminOperator for MyProblem {
+impl ArgminOperator for Sphere {
     type Parameters = Vec<f64>;
     type OperatorOutput = f64;
     type Hessian = ();
@@ -30,29 +28,44 @@ impl ArgminOperator for MyProblem {
 }
 
 fn run() -> Result<(), Error> {
-    // definie inital parameter vector
-    let init_param: Vec<f64> = vec![2.0, 0.0];
+    // Define inital parameter vector
+    let init_param: Vec<f64> = vec![1.0, 0.0];
 
-    let operator = MyProblem {};
+    // Problem definition
+    let operator = Sphere {};
 
     // Set up Line Search method
-    let iters = 20;
     let mut solver = MoreThuenteLineSearch::new(&operator);
 
-    solver.set_search_direction(vec![-1.0, 0.0]);
+    // Set search direction
+    solver.set_search_direction(vec![-2.0, 0.0]);
+
+    // Set initial position
     solver.set_initial_parameter(init_param);
-    solver.set_initial_alpha(50.0)?;
+
+    // Calculate initial cost ...
     solver.calc_initial_cost()?;
+    // ... or, alternatively, set cost if it is already computed
+    // solver.set_initial_cost(...);
+
+    // Calculate initial gradient ...
     solver.calc_initial_gradient()?;
-    // solver.set_initial_alpha(1.0)?;
-    solver.set_max_iters(iters);
-    // solver.add_writer(WriteToFile::new());
+    // .. or, alternatively, set gradient if it is already computed
+    // solver.set_initial_gradient(...);
+
+    // Set initial step length
+    solver.set_initial_alpha(1.0)?;
+
+    // Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
-    solver.add_logger(ArgminSlogLogger::file("file.log")?);
+
+    // Run solver
     solver.run()?;
 
-    // Wait a second (lets the logger flush everything before printing to screen again)
+    // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
+
+    // Print Result
     println!("{:?}", solver.result());
     Ok(())
 }
