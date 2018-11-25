@@ -5,9 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # More-Thuente line search algorithm
+//! * [More-Thuente line search](struct.MoreThuenteLineSearch.html)
 //!
-//! TODO: Proper documentation. Apparently it is missing stopping criteria!
+//! TODO: Apparently it is missing stopping criteria!
 //!
 //! This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
 //! http://www.cs.umd.edu/users/oleary/software/
@@ -34,7 +34,92 @@ impl Step {
     }
 }
 
-/// More-Thuente Line Search
+/// The More-Thuente line search is a method to find a step length which obeys the strong Wolfe
+/// conditions.
+///
+/// # Example
+///
+/// ```
+/// # extern crate argmin;
+/// # use argmin::prelude::*;
+/// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+/// # use argmin::testfunctions::{sphere, sphere_derivative};
+/// #
+/// # #[derive(Clone)]
+/// # struct Sphere {}
+/// #
+/// # impl ArgminOperator for Sphere {
+/// #     type Parameters = Vec<f64>;
+/// #     type OperatorOutput = f64;
+/// #     type Hessian = ();
+/// #
+/// #     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
+/// #         Ok(sphere(param))
+/// #     }
+/// #
+/// #     fn gradient(&self, param: &Vec<f64>) -> Result<Vec<f64>, Error> {
+/// #         Ok(sphere_derivative(param))
+/// #     }
+/// # }
+/// #
+/// # fn run() -> Result<(), Error> {
+/// // Define inital parameter vector
+/// let init_param: Vec<f64> = vec![1.0, 0.0];
+///
+/// // Problem definition
+/// let operator = Sphere {};
+///
+/// // Set up Line Search method
+/// let mut solver = MoreThuenteLineSearch::new(&operator);
+///
+/// // Set search direction
+/// solver.set_search_direction(vec![-2.0, 0.0]);
+///
+/// // Set initial position
+/// solver.set_initial_parameter(init_param);
+///
+/// // Calculate initial cost ...
+/// solver.calc_initial_cost()?;
+/// // ... or, alternatively, set cost if it is already computed
+/// // solver.set_initial_cost(...);
+///
+/// // Calculate initial gradient ...
+/// solver.calc_initial_gradient()?;
+/// // .. or, alternatively, set gradient if it is already computed
+/// // solver.set_initial_gradient(...);
+///
+/// // Set initial step length
+/// solver.set_initial_alpha(1.0)?;
+///
+/// // Attach a logger
+/// solver.add_logger(ArgminSlogLogger::term());
+///
+/// // Run solver
+/// solver.run()?;
+///
+/// // Wait a second (lets the logger flush everything before printing again)
+/// std::thread::sleep(std::time::Duration::from_secs(1));
+///
+/// // Print Result
+/// println!("{:?}", solver.result());
+/// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     if let Err(ref e) = run() {
+/// #         println!("{} {}", e.as_fail(), e.backtrace());
+/// #     }
+/// # }
+/// ```
+///
+/// # References
+///
+/// This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
+/// http://www.cs.umd.edu/users/oleary/software/
+///
+/// [0] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
+/// decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
+/// DOI: https://doi.org/10.1145/192115.192132
 #[derive(ArgminSolver)]
 pub struct MoreThuenteLineSearch<'a, T, H>
 where

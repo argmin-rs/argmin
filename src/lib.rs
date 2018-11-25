@@ -43,7 +43,7 @@
 //!
 //! - [Linesearches](solver/linesearch/index.html)
 //!   - [Backtracking line search](solver/linesearch/backtracking/struct.BacktrackingLineSearch.html)
-//!   - More-Thuente line search
+//!   - [More-Thuente line search](solver/linesearch/morethuente/struct.MoreThuenteLineSearch.html)
 //!   - Hager-Zhang line search
 //! - Trust region method
 //!   - Cauchy point method
