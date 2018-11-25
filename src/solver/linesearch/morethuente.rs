@@ -12,7 +12,7 @@
 //! This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
 //! http://www.cs.umd.edu/users/oleary/software/
 //!
-//! ## Reference
+//! # Reference
 //!
 //! Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 //! decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
