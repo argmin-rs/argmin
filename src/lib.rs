@@ -45,7 +45,7 @@
 //!   - [Backtracking line search](solver/linesearch/backtracking/struct.BacktrackingLineSearch.html)
 //!   - [More-Thuente line search](solver/linesearch/morethuente/struct.MoreThuenteLineSearch.html)
 //!   - [Hager-Zhang line search](solver/linesearch/hagerzhang/struct.HagerZhangLineSearch.html)
-//! - Trust region method
+//! - [Trust region method](solver/trustregion/trustregion_method/struct.TrustRegion.html)
 //!   - Cauchy point method
 //!   - Dogleg method
 //!   - Steihaug method
