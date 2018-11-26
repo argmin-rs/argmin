@@ -5,24 +5,22 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Dogleg method
-//!
-//!
 //! # References:
 //!
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
-// //!
-// //! # Example
-// //!
-// //! ```rust
-// //! todo
-// //! ```
 
 use prelude::*;
 use std;
 
-/// Dogleg method
+/// The Dogleg method computes the intersection of the trust region boundary with a path given by
+/// the unconstraind minimum along the steepest descent direction and the optimum of the quadratic
+/// approximation of the cost function at the current point.
+///
+/// # References:
+///
+/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
 pub struct Dogleg<'a, T, H>
 where

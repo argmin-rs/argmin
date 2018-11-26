@@ -5,24 +5,21 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Cauchy point
-//!
-//!
 //! # References:
 //!
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
-// //!
-// //! # Example
-// //!
-// //! ```rust
-// //! todo
-// //! ```
 
 use prelude::*;
 use std;
 
-/// Cauchy Point
+/// The Cauchy point is the minimum of the quadratic approximation of the cost function within the
+/// trust region along the direction given by the first derivative.
+///
+/// # References:
+///
+/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
 pub struct CauchyPoint<'a, T, H>
 where
@@ -113,10 +110,6 @@ where
         + ArgminScale<f64>,
     H: Clone + std::default::Default,
 {
-    // fn set_initial_parameter(&mut self, param: T) {
-    //     self.set_cur_param(param);
-    // }
-
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
     }

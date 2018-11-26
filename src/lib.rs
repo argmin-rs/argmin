@@ -46,9 +46,9 @@
 //!   - [More-Thuente line search](solver/linesearch/morethuente/struct.MoreThuenteLineSearch.html)
 //!   - [Hager-Zhang line search](solver/linesearch/hagerzhang/struct.HagerZhangLineSearch.html)
 //! - [Trust region method](solver/trustregion/trustregion_method/struct.TrustRegion.html)
-//!   - Cauchy point method
-//!   - Dogleg method
-//!   - Steihaug method
+//!   - [Cauchy point method](solver/trustregion/cauchypoint/struct.CauchyPoint.html)
+//!   - [Dogleg method](solver/trustregion/dogleg/struct.Dogleg.html)
+//!   - [Steihaug method](solver/trustregion/steihaug/struct.Steihaug.html)
 //! - [Steepest Descent](solver/gradientdescent/steepestdescent/struct.SteepestDescent.html)
 //! - Conjugate Gradient method
 //! - Nonlinear Conjugate Gradient method

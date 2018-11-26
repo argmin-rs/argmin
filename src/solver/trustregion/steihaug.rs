@@ -5,24 +5,21 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Steihaug method
-//!
-//!
 //! # References:
 //!
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
-// //!
-// //! # Example
-// //!
-// //! ```rust
-// //! todo
-// //! ```
 
 use prelude::*;
 use std;
 
-/// Steihaug method
+/// The Steihaug method is a conjugate gradients based approach for finding an approximate solution
+/// to the second order approximation of the cost function within the trust region.
+///
+/// # References:
+///
+/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
 pub struct Steihaug<'a, T, H>
 where
