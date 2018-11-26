@@ -256,9 +256,6 @@
 <span id="256">256</span>
 <span id="257">257</span>
 <span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -267,24 +264,21 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! # Steihaug method</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
 <span class="doccomment">//! # References:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
-<span class="comment">// //!</span>
-<span class="comment">// //! # Example</span>
-<span class="comment">// //!</span>
-<span class="comment">// //! ```rust</span>
-<span class="comment">// //! todo</span>
-<span class="comment">// //! ```</span>
 
 <span class="kw">use</span> <span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>;
 
-<span class="doccomment">/// Steihaug method</span>
+<span class="doccomment">/// The Steihaug method is a conjugate gradients based approach for finding an approximate solution</span>
+<span class="doccomment">/// to the second order approximation of the cost function within the trust region.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # References:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>

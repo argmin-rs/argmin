@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Steihaug","Steihaug method"]]});
+initSidebarItems({"struct":[["Steihaug","The Steihaug method is a conjugate gradients based approach for finding an approximate solution to the second order approximation of the cost function within the trust region."]]});

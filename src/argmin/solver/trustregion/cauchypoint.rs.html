@@ -122,13 +122,6 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -137,24 +130,21 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! # Cauchy point</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
 <span class="doccomment">//! # References:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
-<span class="comment">// //!</span>
-<span class="comment">// //! # Example</span>
-<span class="comment">// //!</span>
-<span class="comment">// //! ```rust</span>
-<span class="comment">// //! todo</span>
-<span class="comment">// //! ```</span>
 
 <span class="kw">use</span> <span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>;
 
-<span class="doccomment">/// Cauchy Point</span>
+<span class="doccomment">/// The Cauchy point is the minimum of the quadratic approximation of the cost function within the</span>
+<span class="doccomment">/// trust region along the direction given by the first derivative.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # References:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CauchyPoint</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>
@@ -245,10 +235,6 @@
         <span class="op">+</span> <span class="ident">ArgminScale</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
 {
-    <span class="comment">// fn set_initial_parameter(&amp;mut self, param: T) {</span>
-    <span class="comment">//     self.set_cur_param(param);</span>
-    <span class="comment">// }</span>
-
     <span class="kw">fn</span> <span class="ident">set_radius</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">f64</span>) {
         <span class="self">self</span>.<span class="ident">radius</span> <span class="op">=</span> <span class="ident">radius</span>;
     }
