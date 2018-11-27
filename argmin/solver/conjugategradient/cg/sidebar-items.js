@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["ConjugateGradient","Conjugate Gradient struct"]]});
+initSidebarItems({"struct":[["ConjugateGradient","The conjugate gradient method is a solver for systems of linear equations with a symmetric and positive-definite matrix."]]});
