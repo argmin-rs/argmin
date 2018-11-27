@@ -6,10 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
-extern crate rand;
-use argmin::solver::conjugategradient::*;
-// use argmin_core::WriteToFile;
 use argmin::prelude::*;
+use argmin::solver::conjugategradient::ConjugateGradient;
 
 #[derive(Clone)]
 struct MyProblem {}
@@ -25,23 +23,31 @@ impl ArgminOperator for MyProblem {
 }
 
 fn run() -> Result<(), Error> {
-    // definie inital parameter vector
+    // Define inital parameter vector
     let init_param: Vec<f64> = vec![2.0, 1.0];
+
+    // Define the right hand side `b` of `A * x = b`
     let b = vec![1.0, 2.0];
+
+    // Set up operator
     let operator = MyProblem {};
 
-    // Set up Conjugate Gradient method
-    let iters = 2;
+    // Set up the solver
     let mut solver = ConjugateGradient::new(&operator, b, init_param)?;
-    solver.set_max_iters(iters);
-    solver.set_target_cost(0.0);
-    // solver.add_writer(WriteToFile::new());
+
+    // Set maximum number of iterations
+    solver.set_max_iters(2);
+
+    // Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
-    solver.add_logger(ArgminSlogLogger::file("file.log")?);
+
+    // Run solver
     solver.run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)
     std::thread::sleep(std::time::Duration::from_secs(1));
+
+    // Print result
     println!("{:?}", solver.result());
     Ok(())
 }
