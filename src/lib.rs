@@ -49,9 +49,9 @@
 //!   - [Cauchy point method](solver/trustregion/cauchypoint/struct.CauchyPoint.html)
 //!   - [Dogleg method](solver/trustregion/dogleg/struct.Dogleg.html)
 //!   - [Steihaug method](solver/trustregion/steihaug/struct.Steihaug.html)
-//! - [Steepest Descent](solver/gradientdescent/steepestdescent/struct.SteepestDescent.html)
-//! - [Conjugate Gradient method](solver/conjugategradient/cg/struct.ConjugateGradient.html)
-//! - Nonlinear Conjugate Gradient method
+//! - [Steepest descent](solver/gradientdescent/steepestdescent/struct.SteepestDescent.html)
+//! - [Conjugate gradient method](solver/conjugategradient/cg/struct.ConjugateGradient.html)
+//! - [Nonlinear conjugate gradient method](solver/conjugategradient/nonlinear_cg/struct.NonlinearConjugateGradient.html)
 //! - Newton methods
 //!   - Basic Newton's method
 //!   - Newton-CG

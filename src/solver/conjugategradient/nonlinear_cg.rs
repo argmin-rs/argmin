@@ -5,10 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Nonlinear Conjugate Gradient Method
-//!
-//! TODO: Proper documentation.
-//!
 //! Important TODO: Find out which line search should be the default choice. Also try to replicate
 //! CG_DESCENT.
 //!
@@ -16,12 +12,6 @@
 //!
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
-// //!
-// //! # Example
-// //!
-// //! ```rust
-// //! todo
-// //! ```
 
 use prelude::*;
 use solver::conjugategradient::{FletcherReeves, HestenesStiefel, PolakRibiere, PolakRibierePlus};
@@ -29,7 +19,89 @@ use solver::linesearch::HagerZhangLineSearch;
 use std;
 use std::default::Default;
 
-/// Nonlinear Conjugate Gradient struct
+/// The nonlinear conjugate gradient is a generalization of the conjugate gradient method for
+/// nonlinear optimization problems.
+///
+/// # Example
+///
+/// ```
+/// # extern crate argmin;
+/// use argmin::prelude::*;
+/// use argmin::solver::conjugategradient::NonlinearConjugateGradient;
+/// use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+///  
+/// # #[derive(Clone)]
+/// # struct MyProblem {}
+/// #
+/// # impl ArgminOperator for MyProblem {
+/// #     type Parameters = Vec<f64>;
+/// #     type OperatorOutput = f64;
+/// #     type Hessian = ();
+/// #
+/// #     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
+/// #         Ok(rosenbrock_2d(p, 1.0, 100.0))
+/// #     }
+/// #
+/// #     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
+/// #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+/// #     }
+/// # }
+/// #
+/// # fn run() -> Result<(), Error> {
+/// // Set up cost function
+/// let operator = MyProblem {};
+///
+/// // define inital parameter vector
+/// let init_param: Vec<f64> = vec![1.2, 1.2];
+///
+/// // Set up nonlinear conjugate gradient method
+/// let mut solver = NonlinearConjugateGradient::new_pr(&operator, init_param)?;
+///
+/// // Set maximum number of iterations
+/// solver.set_max_iters(20);
+///
+/// // Set target cost function value
+/// solver.set_target_cost(0.0);
+///
+/// // Set the number of iterations when a restart should be performed
+/// // This allows the algorithm to "forget" previous information which may not be helpful anymore.
+/// solver.set_restart_iters(10);
+///
+/// // Set the value for the orthogonality measure.
+/// // Setting this parameter leads to a restart of the algorithm (setting beta = 0) after two
+/// // consecutive search directions are not orthogonal anymore. In other words, if this condition
+/// // is met:
+/// //
+/// // `|\nabla f_k^T * \nabla f_{k-1}| / | \nabla f_k ||^2 >= v`
+/// //
+/// // A typical value for `v` is 0.1.
+/// solver.set_restart_orthogonality(0.1);
+///
+/// // Attach a logger
+/// solver.add_logger(ArgminSlogLogger::term());
+///
+/// // Run solver
+/// solver.run()?;
+///
+/// // Wait a second (lets the logger flush everything before printing to screen again)
+/// std::thread::sleep(std::time::Duration::from_secs(1));
+///
+/// // Print result
+/// println!("{:?}", solver.result());
+/// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     if let Err(ref e) = run() {
+/// #         println!("{} {}", e.as_fail(), e.backtrace());
+/// #     }
+/// # }
+/// ```
+///
+/// # References:
+///
+/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
 pub struct NonlinearConjugateGradient<'a, T>
 where
@@ -49,8 +121,6 @@ where
     /// beta
     beta: f64,
     /// line search
-    // linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = ()> + 'a>,
-    // linesearch: Box<&'a mut ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = ()>>,
     linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = ()> + 'a>,
     /// beta update method
     beta_method: Box<ArgminNLCGBetaUpdate<T> + 'a>,
@@ -76,21 +146,13 @@ where
         + ArgminScaledSub<T, f64>,
 {
     /// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))
-    ///
-    /// Parameters:
-    ///
-    /// `cost_function`: cost function
-    /// `init_param`: Initial parameter vector
     pub fn new(
         operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
         init_param: T,
     ) -> Result<Self, Error> {
-        let linesearch: Box<
-            dyn ArgminLineSearch<Parameters = _, OperatorOutput = _, Hessian = _>,
-        > = Box::new(HagerZhangLineSearch::new(operator));
-        // let beta_method = FletcherReeves::new();
+        let linesearch: Box<dyn ArgminLineSearch<Parameters = _, OperatorOutput = _, Hessian = _>> =
+            Box::new(HagerZhangLineSearch::new(operator));
         let beta_method = PolakRibiere::new();
-        // let beta_method = PolakRibierePlus::new();
         Ok(NonlinearConjugateGradient {
             p: T::default(),
             beta: std::f64::NAN,
@@ -159,12 +221,21 @@ where
     }
 
     /// Specifiy the number of iterations after which a restart should be performed
+    /// This allows the algorithm to "forget" previous information which may not be helpful
+    /// anymore.
     pub fn set_restart_iters(&mut self, iters: u64) -> &mut Self {
         self.restart_iter = iters;
         self
     }
 
-    /// Set the value for the orthogonality measure
+    /// Set the value for the orthogonality measure.
+    /// Setting this parameter leads to a restart of the algorithm (setting beta = 0) after two
+    /// consecutive search directions are not orthogonal anymore. In other words, if this condition
+    /// is met:
+    ///
+    /// `|\nabla f_k^T * \nabla f_{k-1}| / | \nabla f_k ||^2 >= v`
+    ///
+    /// A typical value for `v` is 0.1.
     pub fn set_restart_orthogonality(&mut self, v: f64) -> &mut Self {
         self.restart_orthogonality = Some(v);
         self
@@ -245,10 +316,10 @@ where
 
         let mut out = ArgminIterationData::new(xk1, cost);
         out.add_kv(make_kv!(
-                "beta" => self.beta;
-                "restart_iter" => restart_iter;
-                "restart_orthogonality" => restart_orthogonality;
-            ));
+            "beta" => self.beta;
+            "restart_iter" => restart_iter;
+            "restart_orthogonality" => restart_orthogonality;
+        ));
         Ok(out)
     }
 }
