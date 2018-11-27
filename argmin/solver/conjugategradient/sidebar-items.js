@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["beta","Beta update methods for nonlinear CG # Beta update methods"],["cg","Conjugate gradient method # References:"],["nonlinear_cg","Nonlinear conjugate gradient method # Nonlinear Conjugate Gradient Method"]]});
+initSidebarItems({"mod":[["beta","Beta update methods for nonlinear CG # Beta update methods"],["cg","Conjugate gradient method # References:"],["nonlinear_cg","Nonlinear conjugate gradient method Important TODO: Find out which line search should be the default choice. Also try to replicate CG_DESCENT."]]});
