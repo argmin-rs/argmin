@@ -50,7 +50,7 @@
 //!   - [Dogleg method](solver/trustregion/dogleg/struct.Dogleg.html)
 //!   - [Steihaug method](solver/trustregion/steihaug/struct.Steihaug.html)
 //! - [Steepest Descent](solver/gradientdescent/steepestdescent/struct.SteepestDescent.html)
-//! - Conjugate Gradient method
+//! - [Conjugate Gradient method](solver/conjugategradient/cg/struct.ConjugateGradient.html)
 //! - Nonlinear Conjugate Gradient method
 //! - Newton methods
 //!   - Basic Newton's method

@@ -5,26 +5,79 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Conjugate Gradient Method
-//!
-//! TODO: Proper documentation.
-//!
 //! # References:
 //!
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
-// //!
-// //! # Example
-// //!
-// //! ```rust
-// //! todo
-// //! ```
 
 use prelude::*;
 use std;
 use std::default::Default;
 
-/// Conjugate Gradient struct
+/// The conjugate gradient method is a solver for systems of linear equations with a symmetric and
+/// positive-definite matrix.
+///
+/// # Example
+///
+/// ```
+/// extern crate argmin;
+/// use argmin::prelude::*;
+/// use argmin::solver::conjugategradient::ConjugateGradient;
+///
+/// #[derive(Clone)]
+/// struct MyProblem {}
+///
+/// impl ArgminOperator for MyProblem {
+///     type Parameters = Vec<f64>;
+///     type OperatorOutput = Vec<f64>;
+///     type Hessian = ();
+///
+///     fn apply(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
+///         Ok(vec![4.0 * p[0] + 1.0 * p[1], 1.0 * p[0] + 3.0 * p[1]])
+///     }
+/// }
+///
+/// # fn run() -> Result<(), Error> {
+/// // Define inital parameter vector
+/// let init_param: Vec<f64> = vec![2.0, 1.0];
+///
+/// // Define the right hand side `b` of `A * x = b`
+/// let b = vec![1.0, 2.0];
+///
+/// // Set up operator
+/// let operator = MyProblem {};
+///
+/// // Set up the solver
+/// let mut solver = ConjugateGradient::new(&operator, b, init_param)?;
+///
+/// // Set maximum number of iterations
+/// solver.set_max_iters(2);
+///
+/// // Attach a logger
+/// solver.add_logger(ArgminSlogLogger::term());
+///
+/// // Run solver
+/// solver.run()?;
+///
+/// // Wait a second (lets the logger flush everything before printing to screen again)
+/// std::thread::sleep(std::time::Duration::from_secs(1));
+///
+/// // Print result
+/// println!("{:?}", solver.result());
+/// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     if let Err(ref e) = run() {
+/// #         println!("{} {}", e.as_fail(), e.backtrace());
+/// #     }
+/// # }
+/// ```
+///
+/// # References:
+///
+/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
 pub struct ConjugateGradient<'a, T>
 where
@@ -37,7 +90,7 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
 {
-    /// b
+    /// b (right hand side)
     b: T,
     /// residual
     r: T,
@@ -71,6 +124,9 @@ where
     /// Parameters:
     ///
     /// `cost_function`: cost function
+    ///
+    /// `b`: right hand side of `A * x = b`
+    ///
     /// `init_param`: Initial parameter vector
     pub fn new(
         operator: &'a ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>,
@@ -147,9 +203,9 @@ where
 
         let mut out = ArgminIterationData::new(new_param, norm.sqrt());
         out.add_kv(make_kv!(
-                "alpha" => self.alpha;
-                "beta" => self.beta;
-            ));
+            "alpha" => self.alpha;
+            "beta" => self.beta;
+        ));
         Ok(out)
     }
 }

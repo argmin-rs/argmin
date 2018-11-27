@@ -5,12 +5,15 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Argmin Trust Conjugate Gradient methods
+//! Conjugate Gradient methods
+//!
+//! * [Conjugate Gradients](cg/struct.ConjugateGradient.html)
+//! * [Nonlinear Conjugate Gradients](nonlinear_cg/struct.NonlinearConjugateGradient.html)
 
 /// Conjugate gradient method
 pub mod cg;
 
-/// Nonlinear Conjugate gradient method
+/// Nonlinear conjugate gradient method
 pub mod nonlinear_cg;
 
 /// Beta update methods for nonlinear CG
