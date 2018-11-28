@@ -52,8 +52,8 @@
 //! - [Steepest descent](solver/gradientdescent/steepestdescent/struct.SteepestDescent.html)
 //! - [Conjugate gradient method](solver/conjugategradient/cg/struct.ConjugateGradient.html)
 //! - [Nonlinear conjugate gradient method](solver/conjugategradient/nonlinear_cg/struct.NonlinearConjugateGradient.html)
-//! - Newton methods
-//!   - Basic Newton's method
+//! - [Newton methods](solver/newton/index.html)
+//!   - [Newton's method](solver/newton/newton_method/struct.Newton.html)
 //!   - Newton-CG
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - Simulated Annealing
