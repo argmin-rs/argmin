@@ -54,7 +54,7 @@
 //! - [Nonlinear conjugate gradient method](solver/conjugategradient/nonlinear_cg/struct.NonlinearConjugateGradient.html)
 //! - [Newton methods](solver/newton/index.html)
 //!   - [Newton's method](solver/newton/newton_method/struct.Newton.html)
-//!   - Newton-CG
+//!   - [Newton-CG](solver/newton/newton_cg/struct.NewtonCG.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - Simulated Annealing
 //!

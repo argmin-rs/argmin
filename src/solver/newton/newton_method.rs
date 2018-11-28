@@ -14,7 +14,7 @@ use prelude::*;
 use std;
 use std::default::Default;
 
-/// Newton's Method iteratively finds the stationary points of a function f by using a second order
+/// Newton's method iteratively finds the stationary points of a function f by using a second order
 /// approximation of f at the current point.
 ///
 /// # Example
@@ -54,7 +54,6 @@ use std::default::Default;
 /// let cost = MyProblem {};
 ///
 /// // Define initial parameter vector
-/// // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
 /// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 ///
 /// // Set up solver
