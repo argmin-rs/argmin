@@ -8,7 +8,7 @@
 extern crate argmin;
 extern crate ndarray;
 use argmin::prelude::*;
-use argmin::solver::newton::*;
+use argmin::solver::newton::Newton;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
 
