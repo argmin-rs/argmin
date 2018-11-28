@@ -5,60 +5,66 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#![feature(custom_attribute)]
-#![feature(unrestricted_attribute_tokens)]
-#![allow(unused_attributes)]
-
 extern crate argmin;
-#[macro_use]
-extern crate argmin_codegen;
 extern crate ndarray;
-extern crate ndarray_linalg;
 use argmin::prelude::*;
 use argmin::solver::newton::*;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
 
-fn rosenbrock(x: &Array1<f64>) -> f64 {
-    rosenbrock_2d(&x.to_vec(), 1.0, 100.0)
+#[derive(Clone)]
+struct Rosenbrock {
+    a: f64,
+    b: f64,
 }
 
-fn rosenbrock_gradient(x: &Array1<f64>) -> Array1<f64> {
-    Array1::from_vec(rosenbrock_2d_derivative(&x.to_vec(), 1.0, 100.0))
-}
+impl ArgminOperator for Rosenbrock {
+    type Parameters = Array1<f64>;
+    type OperatorOutput = f64;
+    type Hessian = Array2<f64>;
 
-fn rosenbrock_hessian(x: &Array1<f64>) -> Array2<f64> {
-    let h = rosenbrock_2d_hessian(&x.to_vec(), 1.0, 100.0);
-    Array::from_shape_vec((2, 2), h).unwrap()
-}
+    fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
+    }
 
-#[derive(Clone, ArgminOperator)]
-#[output_type(f64)]
-#[parameters_type(Array1<f64>)]
-#[hessian_type(Array2<f64>)]
-#[cost_function(rosenbrock)]
-#[gradient(rosenbrock_gradient)]
-#[hessian(rosenbrock_hessian)]
-struct MyProblem {}
+    fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+        Ok(Array1::from_vec(rosenbrock_2d_derivative(
+            &p.to_vec(),
+            self.a,
+            self.b,
+        )))
+    }
+
+    fn hessian(&self, p: &Self::Parameters) -> Result<Self::Hessian, Error> {
+        let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);
+        Ok(Array::from_shape_vec((2, 2), h)?)
+    }
+}
 
 fn run() -> Result<(), Error> {
     // Define cost function
-    let cost = MyProblem {};
+    let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
-    // definie inital parameter vector
+    // Define initial parameter vector
     // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
     let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 
-    let iters = 78;
-    let mut solver = NewtonCG::new(&cost, init_param);
-    // let mut solver = Newton::new(&cost, init_param);
-    solver.set_max_iters(iters);
+    // Set up solver
+    let mut solver = Newton::new(&cost, init_param);
+
+    // Set maximum number of iterations
+    solver.set_max_iters(7);
+
+    // Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
 
+    // Run solver
     solver.run()?;
 
-    // Wait a second (lets the logger flush everything before printing to screen again)
+    // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
+
+    // Print result
     println!("{:?}", solver.result());
     Ok(())
 }
