@@ -218,6 +218,77 @@
 <span id="218">218</span>
 <span id="219">219</span>
 <span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -226,8 +297,6 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! # Newton-CG method</span>
-<span class="doccomment">//!</span>
 <span class="doccomment">//! TODO: Stop when search direction is close to 0</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # References:</span>
@@ -243,7 +312,80 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>;
 
-<span class="doccomment">/// Newton-CG Method</span>
+<span class="doccomment">/// The Newton-CG method (also called truncated Newton method) uses a modified CG to solve the</span>
+<span class="doccomment">/// Newton equations approximately. After a search direction is found, a line search is performed.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # extern crate argmin;</span>
+<span class="doccomment">/// # extern crate ndarray;</span>
+<span class="doccomment">/// use argmin::prelude::*;</span>
+<span class="doccomment">/// use argmin::solver::newton::NewtonCG;</span>
+<span class="doccomment">/// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};</span>
+<span class="doccomment">/// use ndarray::{Array, Array1, Array2};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # #[derive(Clone)]</span>
+<span class="doccomment">/// # struct MyProblem {}</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # impl ArgminOperator for MyProblem {</span>
+<span class="doccomment">/// #     type Parameters = Array1&lt;f64&gt;;</span>
+<span class="doccomment">/// #     type OperatorOutput = f64;</span>
+<span class="doccomment">/// #     type Hessian = Array2&lt;f64&gt;;</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// #     fn apply(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::OperatorOutput, Error&gt; {</span>
+<span class="doccomment">/// #         Ok(rosenbrock_2d(&amp;p.to_vec(), 1.0, 100.0))</span>
+<span class="doccomment">/// #     }</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// #     fn gradient(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::Parameters, Error&gt; {</span>
+<span class="doccomment">/// #         Ok(Array1::from_vec(rosenbrock_2d_derivative(&amp;p.to_vec(), 1.0, 100.0)))</span>
+<span class="doccomment">/// #     }</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// #     fn hessian(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::Hessian, Error&gt; {</span>
+<span class="doccomment">/// #         let h = rosenbrock_2d_hessian(&amp;p.to_vec(), 1.0, 100.0);</span>
+<span class="doccomment">/// #         Ok(Array::from_shape_vec((2, 2), h)?)</span>
+<span class="doccomment">/// #     }</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # fn run() -&gt; Result&lt;(), Error&gt; {</span>
+<span class="doccomment">/// // Define cost function</span>
+<span class="doccomment">/// let cost = MyProblem {};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Define initial parameter vector</span>
+<span class="doccomment">/// let init_param: Array1&lt;f64&gt; = Array1::from_vec(vec![-1.2, 1.0]);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Set up solver</span>
+<span class="doccomment">/// let mut solver = NewtonCG::new(&amp;cost, init_param);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Set maximum number of iterations</span>
+<span class="doccomment">/// solver.set_max_iters(20);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Attach a logger</span>
+<span class="doccomment">/// solver.add_logger(ArgminSlogLogger::term());</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Run solver</span>
+<span class="doccomment">/// solver.run()?;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Wait a second (lets the logger flush everything before printing again)</span>
+<span class="doccomment">/// std::thread::sleep(std::time::Duration::from_secs(1));</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Print result</span>
+<span class="doccomment">/// println!(&quot;{:?}&quot;, solver.result());</span>
+<span class="doccomment">/// #     Ok(())</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # fn main() {</span>
+<span class="doccomment">/// #     if let Err(ref e) = run() {</span>
+<span class="doccomment">/// #         println!(&quot;{} {}&quot;, e.as_fail(), e.backtrace());</span>
+<span class="doccomment">/// #         std::process::exit(1);</span>
+<span class="doccomment">/// #     }</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # References:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NewtonCG</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>
