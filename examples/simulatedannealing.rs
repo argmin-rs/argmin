@@ -10,27 +10,38 @@ extern crate rand;
 use argmin::prelude::*;
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin::testfunctions::rosenbrock;
-use rand::Rng;
-// use rand::ThreadRng;
+use rand::{Rng, ThreadRng};
+use std::cell::RefCell;
 
 #[derive(Clone)]
-struct MyProblem {
+struct Rosenbrock {
+    /// Parameter a, usually 1.0
+    a: f64,
+    /// Parameter b, usually 100.0
+    b: f64,
+    /// lower bound
     lower_bound: Vec<f64>,
+    /// upper bound
     upper_bound: Vec<f64>,
-    // rng: ThreadRng,
+    /// Random number generator. We use a `RefCell` here because `ArgminOperator` requires `self`
+    /// to be passed as an immutable reference. `RefCell` gives us interior mutability.
+    rng: RefCell<ThreadRng>,
 }
 
-impl MyProblem {
-    pub fn new(lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> Self {
-        MyProblem {
+impl Rosenbrock {
+    /// Constructor
+    pub fn new(a: f64, b: f64, lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> Self {
+        Rosenbrock {
+            a,
+            b,
             lower_bound,
             upper_bound,
-            // rng: rand::thread_rng(),
+            rng: RefCell::new(rand::thread_rng()),
         }
     }
 }
 
-impl ArgminOperator for MyProblem {
+impl ArgminOperator for Rosenbrock {
     type Parameters = Vec<f64>;
     type OperatorOutput = f64;
     type Hessian = ();
@@ -41,12 +52,9 @@ impl ArgminOperator for MyProblem {
 
     fn modify(&self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
         let mut param_n = param.clone();
-        let mut rng = rand::thread_rng();
         for _ in 0..(temp.floor() as u64 + 1) {
-            // let idx = self.rng.gen_range(0, param.len());
-            let idx = rng.gen_range(0, param.len());
-            // let val = 0.001 * self.rng.gen_range(-1.0, 1.0);
-            let val = 0.001 * rng.gen_range(-1.0, 1.0);
+            let idx = self.rng.borrow_mut().gen_range(0, param.len());
+            let val = 0.001 * self.rng.borrow_mut().gen_range(-1.0, 1.0);
             let tmp = param[idx] + val;
             if tmp > self.upper_bound[idx] {
                 param_n[idx] = self.upper_bound[idx];
@@ -66,31 +74,39 @@ fn run() -> Result<(), Error> {
     let upper_bound: Vec<f64> = vec![5.0, 5.0];
 
     // Define cost function
-    let operator = MyProblem::new(lower_bound, upper_bound);
+    let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
 
     // definie inital parameter vector
     let init_param: Vec<f64> = vec![1.0, 1.2];
 
-    // Set up simulated annealing solver
-    // let iters = 10_000;
-    // let iters = 31;
-    let iters = 10;
-    let temp = 0.5;
-    // solver.temp_func(SATempFunc::Exponential(0.8));
-    let mut solver = SimulatedAnnealing::new(&operator, init_param, temp)?;
-    solver.set_max_iters(iters);
-    solver.set_target_cost(0.0);
-    solver.reannealing_fixed(10);
-    solver.temp_func(SATempFunc::Boltzmann);
-    solver.add_logger(ArgminSlogLogger::term());
-    solver.add_logger(ArgminSlogLogger::file("file.log")?);
-    // solver.add_writer(WriteToFile::new());
+    // Define initial temperature
+    let temp = 15.0;
 
-    // .stall_best(100);
+    // Set up simulated annealing solver
+    let mut solver = SimulatedAnnealing::new(&operator, init_param, temp)?;
+
+    // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
+    solver.set_max_iters(100);
+
+    // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
+    solver.set_target_cost(0.0);
+
+    // Optional: Reanneal after 10 iterations (resets temperatur to initial temperature)
+    solver.reannealing_fixed(10);
+
+    // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
+    solver.temp_func(SATempFunc::Boltzmann);
+
+    // Optional: Attach a logger
+    solver.add_logger(ArgminSlogLogger::term());
+
+    // Run solver
     solver.run()?;
 
-    // Wait a second (lets the logger flush everything before printing to screen again)
+    // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
+
+    // Print result
     println!("{:?}", solver.result());
     Ok(())
 }
