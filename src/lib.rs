@@ -56,7 +56,7 @@
 //!   - [Newton's method](solver/newton/newton_method/struct.Newton.html)
 //!   - [Newton-CG](solver/newton/newton_cg/struct.NewtonCG.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
-//! - Simulated Annealing
+//! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
 //!
 //! # Usage
 //!
