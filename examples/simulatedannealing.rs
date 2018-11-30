@@ -121,13 +121,13 @@ fn run() -> Result<(), Error> {
     // Reannealing         //
     /////////////////////////
 
-    // Optional: Reanneal after 1000 iterations (resets temperatur to initial temperature)
+    // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
     solver.reannealing_fixed(1000);
 
     // Optional: Reanneal after no accepted solution has been found for `iter` iterations
     solver.reannealing_accepted(500);
 
-    // Start reannealing after no new best solution has been found for `iter` iterations
+    // Optional: Start reannealing after no new best solution has been found for 800 iterations
     solver.reannealing_best(800);
 
     /////////////////////////
