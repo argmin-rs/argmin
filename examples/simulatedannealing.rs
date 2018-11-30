@@ -47,15 +47,25 @@ impl ArgminOperator for Rosenbrock {
     type Hessian = ();
 
     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
-        Ok(rosenbrock(param, 1.0, 100.0))
+        Ok(rosenbrock(param, self.a, self.b))
     }
 
+    /// This function is called by the annealing function
     fn modify(&self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
         let mut param_n = param.clone();
+        // Perform modifications to a degree proportional to the current temperature `temp`.
         for _ in 0..(temp.floor() as u64 + 1) {
+            // Compute random index of the parameter vector using the supplied random number
+            // generator.
             let idx = self.rng.borrow_mut().gen_range(0, param.len());
-            let val = 0.001 * self.rng.borrow_mut().gen_range(-1.0, 1.0);
+
+            // Compute random number in [0.01, 0.01].
+            let val = 0.01 * self.rng.borrow_mut().gen_range(-1.0, 1.0);
+
+            // modify previous parameter value at random position `idx` by `val`
             let tmp = param[idx] + val;
+
+            // check if bounds are violated. If yes, project onto bound.
             if tmp > self.upper_bound[idx] {
                 param_n[idx] = self.upper_bound[idx];
             } else if tmp < self.lower_bound[idx] {
@@ -85,22 +95,45 @@ fn run() -> Result<(), Error> {
     // Set up simulated annealing solver
     let mut solver = SimulatedAnnealing::new(&operator, init_param, temp)?;
 
-    // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-    solver.set_max_iters(100);
-
-    // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
-    solver.set_target_cost(0.0);
-
-    // Optional: Reanneal after 10 iterations (resets temperatur to initial temperature)
-    solver.reannealing_fixed(10);
-
     // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
     solver.temp_func(SATempFunc::Boltzmann);
 
     // Optional: Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
 
-    // Run solver
+    /////////////////////////
+    // Stopping criteria   //
+    /////////////////////////
+
+    // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
+    solver.set_max_iters(10_000);
+
+    // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
+    solver.set_target_cost(0.0);
+
+    // Optional: stop if there was no new best solution after 1000 iterations
+    solver.stall_best(1000);
+
+    // Optional: stop if there was no accepted solution after 1000 iterations
+    solver.stall_accepted(1000);
+
+    /////////////////////////
+    // Reannealing         //
+    /////////////////////////
+
+    // Optional: Reanneal after 1000 iterations (resets temperatur to initial temperature)
+    solver.reannealing_fixed(1000);
+
+    // Optional: Reanneal after no accepted solution has been found for `iter` iterations
+    solver.reannealing_accepted(500);
+
+    // Start reannealing after no new best solution has been found for `iter` iterations
+    solver.reannealing_best(800);
+
+    /////////////////////////
+    // Run solver          //
+    /////////////////////////
+
     solver.run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
