@@ -34,7 +34,7 @@ The following list shows some of the important parts that need to be tackled in 
 - More optimization algorithms
 - Tests
 - Evaluation on real problems
-- Improve speed
+- Speed improvements
 - Making it ready for wasm and `#![no_std]`
 - Documentation & Tutorials
 
@@ -43,7 +43,7 @@ Any help is appreciated!
 
 ## Algorithms
 
-- Linesearches
+- Line searches
   - Backtracking line search
   - More-Thuente line search
   - Hager-Zhang line search
@@ -51,11 +51,11 @@ Any help is appreciated!
   - Cauchy point method
   - Dogleg method
   - Steihaug method
-- Steepest Descent
-- Conjugate Gradient method
-- Nonlinear Conjugate Gradient method
-- Newton Methods
-  - Basic Newton's Method
+- Steepest descent
+- Conjugate gradient method
+- Nonlinear conjugate gradient method
+- Newton methods
+  - Newton's method
   - Newton-CG
 - Landweber iteration
 - Simulated Annealing
@@ -67,7 +67,7 @@ Add this to your `Cargo.toml`:
 
 ```
 [dependencies]
-argmin = "0.1.5"
+argmin = "0.1.6"
 ```
 
 
@@ -77,7 +77,7 @@ There are additional features which can be activated in `Cargo.toml`:
 
 ```
 [dependencies]
-argmin = { version = "0.1.5", features = ["ctrlc", "ndarrayl"] }
+argmin = { version = "0.1.6", features = ["ctrlc", "ndarrayl"] }
 ```
 
 These are currently optional, but they may move to the default features in the future. 
