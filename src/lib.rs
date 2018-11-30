@@ -64,7 +64,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = "0.1.5"
+//! argmin = "0.1.6"
 //! ```
 //!
 //! ## Optional features
@@ -73,7 +73,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = { version = "0.1.5", features = ["ctrlc", "ndarrayl"] }
+//! argmin = { version = "0.1.6", features = ["ctrlc", "ndarrayl"] }
 //! ```
 //!
 //! These may become default features in the future. Without these features compilation to
