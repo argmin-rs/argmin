@@ -195,6 +195,14 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -208,12 +216,20 @@
 <span class="doccomment">//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
-<span class="kw">use</span> {<span class="ident">ArgminDot</span>, <span class="ident">ArgminError</span>, <span class="ident">Error</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminError</span>, <span class="ident">Error</span>};
 
 <span class="doccomment">/// Needs to be implemented by everything that wants to be a LineSearchCondition</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Evaluate the condition</span>
-    <span class="kw">fn</span> <span class="ident">eval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f64</span>, <span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span>, <span class="ident">T</span>, <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">eval</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">cur_cost</span>: <span class="ident">f64</span>,
+        <span class="ident">cur_grad</span>: <span class="ident">T</span>,
+        <span class="ident">init_cost</span>: <span class="ident">f64</span>,
+        <span class="ident">init_grad</span>: <span class="ident">T</span>,
+        <span class="ident">search_direction</span>: <span class="ident">T</span>,
+        <span class="ident">alpha</span>: <span class="ident">f64</span>,
+    ) <span class="op">-&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Indicates whether this condition requires the computation of the gradient at the new point</span>
     <span class="kw">fn</span> <span class="ident">requires_cur_grad</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span>;
@@ -394,4 +410,4 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script defer src="../../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-files.js"></script><script src="../../../../source-script.js"></script><script defer src="../../../../search-index.js"></script></body></html>
