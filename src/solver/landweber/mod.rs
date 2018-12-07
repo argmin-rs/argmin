@@ -15,7 +15,7 @@
 //! kind. Amer. J. Math. 73, 615–624
 //! [1] https://en.wikipedia.org/wiki/Landweber_iteration
 
-use prelude::*;
+use crate::prelude::*;
 use std;
 use std::default::Default;
 

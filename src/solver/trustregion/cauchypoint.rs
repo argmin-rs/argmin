@@ -10,7 +10,7 @@
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use prelude::*;
+use crate::prelude::*;
 use std;
 
 /// The Cauchy point is the minimum of the quadratic approximation of the cost function within the

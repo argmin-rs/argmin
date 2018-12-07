@@ -291,9 +291,10 @@
 //! latter is essentially an implementation of a single iteration of the algorithm.
 //!
 //! ```
+//! # #![feature(uniform_paths)]
 //! // needed for `#[derive(ArgminSolver)]`
-//! #[macro_use]
-//! extern crate argmin_codegen;
+//! # extern crate argmin_codegen;
+//! use argmin_codegen::ArgminSolver;
 //! use argmin::prelude::*;
 //! use std::default::Default;
 //!
@@ -364,6 +365,7 @@
 // Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,
 // this is just to make sure that it will always stay this way.)
 #![deny(clippy::float_cmp)]
+#![feature(uniform_paths)]
 
 extern crate argmin_core;
 #[macro_use]

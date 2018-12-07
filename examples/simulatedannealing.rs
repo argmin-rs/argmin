@@ -10,7 +10,7 @@ extern crate rand;
 use argmin::prelude::*;
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin::testfunctions::rosenbrock;
-use rand::{Rng, ThreadRng};
+use rand::prelude::*;
 use std::cell::RefCell;
 
 #[derive(Clone)]

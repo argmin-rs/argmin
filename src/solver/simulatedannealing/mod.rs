@@ -15,7 +15,8 @@
 //! Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 //! DOI: 10.1126/science.220.4598.671  
 
-use prelude::*;
+use crate::prelude::*;
+use argmin_codegen::ArgminSolver;
 use rand;
 use rand::Rng;
 use std;
@@ -53,7 +54,7 @@ pub enum SATempFunc {
 /// use argmin::prelude::*;
 /// use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 /// use argmin::testfunctions::rosenbrock;
-/// use rand::{Rng, ThreadRng};
+/// use rand::prelude::*;
 /// use std::cell::RefCell;
 ///
 /// #[derive(Clone)]
@@ -246,7 +247,7 @@ where
     /// previous cost
     prev_cost: f64,
     /// random number generator
-    rng: rand::ThreadRng,
+    rng: rand::prelude::ThreadRng,
     /// base
     base: ArgminBase<'a, T, f64, H>,
 }

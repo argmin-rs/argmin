@@ -10,12 +10,20 @@
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use {ArgminDot, ArgminError, Error};
+use crate::{ArgminDot, ArgminError, Error};
 
 /// Needs to be implemented by everything that wants to be a LineSearchCondition
 pub trait LineSearchCondition<T> {
     /// Evaluate the condition
-    fn eval(&self, f64, T, f64, T, T, f64) -> bool;
+    fn eval(
+        &self,
+        cur_cost: f64,
+        cur_grad: T,
+        init_cost: f64,
+        init_grad: T,
+        search_direction: T,
+        alpha: f64,
+    ) -> bool;
 
     /// Indicates whether this condition requires the computation of the gradient at the new point
     fn requires_cur_grad(&self) -> bool;

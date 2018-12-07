@@ -13,9 +13,11 @@
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use prelude::*;
-use solver::conjugategradient::{FletcherReeves, HestenesStiefel, PolakRibiere, PolakRibierePlus};
-use solver::linesearch::HagerZhangLineSearch;
+use crate::prelude::*;
+use crate::solver::conjugategradient::{
+    FletcherReeves, HestenesStiefel, PolakRibiere, PolakRibierePlus,
+};
+use crate::solver::linesearch::HagerZhangLineSearch;
 use std;
 use std::default::Default;
 

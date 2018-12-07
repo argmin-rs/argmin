@@ -7,8 +7,8 @@
 
 //! * [Backtracking line search](struct.BacktrackingLineSearch.html)
 
-use prelude::*;
-use solver::linesearch::condition::*;
+use crate::prelude::*;
+use crate::solver::linesearch::condition::*;
 use std;
 
 /// The Backtracking line search is a simple method to find a step length which obeys the Armijo

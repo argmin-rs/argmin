@@ -10,7 +10,7 @@
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use prelude::*;
+use crate::prelude::*;
 use std;
 
 /// The Steihaug method is a conjugate gradients based approach for finding an approximate solution

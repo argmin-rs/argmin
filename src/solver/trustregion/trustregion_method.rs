@@ -10,9 +10,9 @@
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use prelude::*;
-use solver::trustregion::reduction_ratio;
-use solver::trustregion::Steihaug;
+use crate::prelude::*;
+use crate::solver::trustregion::reduction_ratio;
+use crate::solver::trustregion::Steihaug;
 use std;
 
 /// The trust region method approximates the cost function within a certain region around the

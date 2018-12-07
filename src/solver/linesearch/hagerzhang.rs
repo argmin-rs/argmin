@@ -15,7 +15,7 @@
 //! and an efficient line search." SIAM J. Optim. 16(1), 2006, 170-192.
 //! DOI: https://doi.org/10.1137/030601880
 
-use prelude::*;
+use crate::prelude::*;
 use std;
 
 type Triplet = (f64, f64, f64);

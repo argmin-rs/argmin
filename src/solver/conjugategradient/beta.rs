@@ -20,7 +20,7 @@
 // //! todo
 // //! ```
 
-use prelude::*;
+use crate::prelude::*;
 
 /// Fletcher and Reeves (FR) method
 /// TODO: Reference

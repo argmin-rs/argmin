@@ -18,7 +18,7 @@
 //! decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
 //! DOI: https://doi.org/10.1145/192115.192132
 
-use prelude::*;
+use crate::prelude::*;
 use std;
 
 #[derive(Default, Clone)]
