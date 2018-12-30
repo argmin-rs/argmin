@@ -347,7 +347,7 @@
 //!         // The method `gradient()` has been implemented by deriving `ArgminSolver`.
 //!         let grad = self.gradient(&param)?;
 //!         // Calculate new parameter vector based on update rule
-//!         let new_param = param.scaled_sub(self.omega, grad);
+//!         let new_param = param.scaled_sub(self.omega, &grad);
 //!         // Return new parameter vector. Since there is no need to compute the cost function
 //!         // value, we return 0.0 instead.
 //!         let out = ArgminIterationData::new(new_param, 0.0);
