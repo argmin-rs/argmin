@@ -384,7 +384,7 @@ where
             "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
 
-        self.dginit = self.init_grad.dot(self.search_direction.clone());
+        self.dginit = self.init_grad.dot(&self.search_direction);
 
         // compute search direction in 1D
         if self.dginit >= 0.0 {
@@ -438,7 +438,7 @@ where
         // Evaluate the function and gradient at new stp.x and compute the directional derivative
         let new_param = self
             .init_param
-            .scaled_add(self.stp.x, self.search_direction.clone());
+            .scaled_add(self.stp.x, &self.search_direction);
         self.f = self.apply(&new_param)?;
         let new_grad = self.gradient(&new_param)?;
         let f = self.f;
@@ -446,7 +446,7 @@ where
         self.set_cur_param(new_param);
         self.set_cur_grad(new_grad.clone());
         // self.stx.fx = new_cost;
-        let dg = self.search_direction.dot(new_grad);
+        let dg = self.search_direction.dot(&new_grad);
         let ftest1 = self.finit + self.stp.x * self.dgtest;
         // self.stp.fx = new_cost;
         // self.stp.gx = dg;
@@ -541,7 +541,7 @@ where
 
         let new_param = self
             .init_param
-            .scaled_add(self.stp.x, self.search_direction.clone());
+            .scaled_add(self.stp.x, &self.search_direction);
         let out = ArgminIterationData::new(new_param, self.stp.fx);
         Ok(out)
     }

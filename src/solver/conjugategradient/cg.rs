@@ -179,10 +179,10 @@ where
     fn init(&mut self) -> Result<(), Error> {
         let init_param = self.cur_param();
         let ap = self.apply(&init_param)?;
-        let r0 = self.b.sub(ap).scale(-1.0);
+        let r0 = self.b.sub(&ap).scale(-1.0);
         self.r = r0.clone();
         self.p = r0.scale(-1.0);
-        self.rtr = self.r.dot(self.r.clone());
+        self.rtr = self.r.dot(&self.r);
         Ok(())
     }
 
@@ -192,14 +192,14 @@ where
         self.p_prev = self.p.clone();
         let p = self.p.clone();
         let apk = self.apply(&p)?;
-        self.alpha = self.rtr / self.p.dot(apk.clone());
-        let new_param = self.cur_param().scaled_add(self.alpha, p.clone());
-        self.r = self.r.scaled_add(self.alpha, apk);
-        let rtr_n = self.r.dot(self.r.clone());
+        self.alpha = self.rtr / self.p.dot(&apk);
+        let new_param = self.cur_param().scaled_add(self.alpha, &p);
+        self.r = self.r.scaled_add(self.alpha, &apk);
+        let rtr_n = self.r.dot(&self.r);
         self.beta = rtr_n / self.rtr;
         self.rtr = rtr_n;
-        self.p = self.r.scale(-1.0).scaled_add(self.beta, p);
-        let norm = self.r.dot(self.r.clone());
+        self.p = self.r.scale(-1.0).scaled_add(self.beta, &p);
+        let norm = self.r.dot(&self.r);
 
         let mut out = ArgminIterationData::new(new_param, norm.sqrt());
         out.add_kv(make_kv!(

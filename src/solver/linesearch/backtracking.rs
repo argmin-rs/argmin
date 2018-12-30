@@ -21,7 +21,7 @@ use std;
 /// use argmin::prelude::*;
 /// use argmin::solver::linesearch::BacktrackingLineSearch;
 /// # use argmin::testfunctions::{sphere, sphere_derivative};
-///  
+///
 /// # #[derive(Clone)]
 /// # struct Sphere {}
 /// #
@@ -278,7 +278,7 @@ where
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let new_param = self
             .init_param
-            .scaled_add(self.alpha, self.search_direction.clone());
+            .scaled_add(self.alpha, &self.search_direction);
 
         let cur_cost = self.apply(&new_param)?;
 

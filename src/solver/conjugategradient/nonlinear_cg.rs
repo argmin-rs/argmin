@@ -31,7 +31,7 @@ use std::default::Default;
 /// use argmin::prelude::*;
 /// use argmin::solver::conjugategradient::NonlinearConjugateGradient;
 /// use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-///  
+///
 /// # #[derive(Clone)]
 /// # struct MyProblem {}
 /// #
@@ -295,7 +295,7 @@ where
         let new_grad = self.gradient(&xk1)?;
 
         let restart_orthogonality = match self.restart_orthogonality {
-            Some(v) => new_grad.dot(grad.clone()).abs() / new_grad.norm().powi(2) >= v,
+            Some(v) => new_grad.dot(&grad).abs() / new_grad.norm().powi(2) >= v,
             None => false,
         };
 
@@ -308,7 +308,7 @@ where
         }
 
         // Update of p
-        self.p = new_grad.scale(-1.0).add(self.p.scale(self.beta));
+        self.p = new_grad.scale(-1.0).add(&self.p.scale(self.beta));
 
         // Housekeeping
         self.set_cur_param(xk1.clone());

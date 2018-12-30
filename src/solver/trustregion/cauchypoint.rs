@@ -87,7 +87,7 @@ where
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let grad = self.cur_grad();
         let grad_norm = grad.norm();
-        let wdp = grad.weighted_dot(self.cur_hessian().clone(), grad.clone());
+        let wdp = grad.weighted_dot(&self.cur_hessian(), &grad);
         let tau: f64 = if wdp <= 0.0 {
             1.0
         } else {

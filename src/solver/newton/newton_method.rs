@@ -142,7 +142,7 @@ where
         let param = self.cur_param();
         let grad = self.gradient(&param)?;
         let hessian = self.hessian(&param)?;
-        let new_param = param.scaled_sub(self.gamma, hessian.ainv()?.dot(grad));
+        let new_param = param.scaled_sub(self.gamma, &hessian.ainv()?.dot(&grad));
         let out = ArgminIterationData::new(new_param, 0.0);
         Ok(out)
     }

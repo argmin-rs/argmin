@@ -216,7 +216,7 @@ where
     }
 
     fn m(&self, p: &T) -> f64 {
-        self.fxk + p.dot(self.cur_grad()) + 0.5 * p.weighted_dot(self.cur_hessian(), p.clone())
+        self.fxk + p.dot(&self.cur_grad()) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
     }
 }
 
@@ -256,7 +256,7 @@ where
         self.subproblem.set_hessian(h);
         self.subproblem.set_radius(self.radius);
         let pk = self.subproblem.run_fast()?.param;
-        let new_param = pk.add(self.cur_param().clone());
+        let new_param = pk.add(&self.cur_param());
         let fxkpk = self.apply(&new_param)?;
         let mkpk = self.m(&pk);
         let rho = reduction_ratio(self.fxk, fxkpk, self.mk0, mkpk);

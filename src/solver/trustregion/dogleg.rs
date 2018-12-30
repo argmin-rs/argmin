@@ -101,18 +101,18 @@ where
 
         // pb = -H^-1g
         let pb = (self.cur_hessian().ainv()?)
-            .dot(self.cur_grad())
+            .dot(&self.cur_grad())
             .scale(-1.0);
 
         if pb.norm() <= self.radius {
             pstar = pb;
         } else {
             // pu = - (g^Tg)/(g^THg) * g
-            let pu = g.scale(-g.dot(g.clone()) / g.weighted_dot(h.clone(), g.clone()));
+            let pu = g.scale(-g.dot(&g) / g.weighted_dot(&h, &g));
 
-            let utu = pu.dot(pu.clone());
-            let btb = pb.dot(pb.clone());
-            let utb = pu.dot(pb.clone());
+            let utu = pu.dot(&pu);
+            let btb = pb.dot(&pb);
+            let utb = pu.dot(&pb);
 
             // compute tau
             let delta = self.radius.powi(2);
@@ -135,7 +135,7 @@ where
                 pstar = pu.scale(tau);
             } else if tau >= 1.0 && tau <= 2.0 {
                 // pstar = pu + (tau - 1.0) * (pb - pu)
-                pstar = pu.add(pb.sub(pu.clone()).scale(tau - 1.0));
+                pstar = pu.add(&pb.sub(&pu).scale(tau - 1.0));
             } else {
                 return Err(ArgminError::ImpossibleError {
                     text: "tau is bigger than 2, this is not supposed to happen.".to_string(),

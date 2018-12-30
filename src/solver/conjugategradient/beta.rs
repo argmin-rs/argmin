@@ -39,7 +39,7 @@ where
     T: Clone + ArgminDot<T, f64>,
 {
     fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> f64 {
-        dfk1.dot(dfk1.clone()) / dfk.dot(dfk.clone())
+        dfk1.dot(&dfk1) / dfk.dot(&dfk)
     }
 }
 
@@ -61,7 +61,7 @@ where
 {
     fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> f64 {
         let dfk_norm_sq = dfk.norm().powi(2);
-        dfk1.dot(dfk1.sub(dfk.clone())) / dfk_norm_sq
+        dfk1.dot(&dfk1.sub(&dfk)) / dfk_norm_sq
     }
 }
 
@@ -83,7 +83,7 @@ where
 {
     fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> f64 {
         let dfk_norm_sq = dfk.norm().powi(2);
-        let beta = dfk1.dot(dfk1.sub(dfk.clone())) / dfk_norm_sq;
+        let beta = dfk1.dot(&dfk1.sub(&dfk)) / dfk_norm_sq;
         0.0f64.max(beta)
     }
 }
@@ -105,7 +105,7 @@ where
     T: Clone + ArgminDot<T, f64> + ArgminSub<T> + ArgminNorm<f64>,
 {
     fn update(&self, dfk: &T, dfk1: &T, pk: &T) -> f64 {
-        let d = dfk1.sub(dfk.clone());
-        dfk1.dot(d.clone()) / d.dot(pk.clone())
+        let d = dfk1.sub(&dfk);
+        dfk1.dot(&d) / d.dot(&pk)
     }
 }

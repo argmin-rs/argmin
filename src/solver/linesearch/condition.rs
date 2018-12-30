@@ -60,7 +60,7 @@ where
         search_direction: T,
         alpha: f64,
     ) -> bool {
-        cur_cost <= init_cost + self.c * alpha * init_grad.dot(search_direction)
+        cur_cost <= init_cost + self.c * alpha * init_grad.dot(&search_direction)
     }
 
     fn requires_cur_grad(&self) -> bool {
@@ -106,9 +106,9 @@ where
         search_direction: T,
         alpha: f64,
     ) -> bool {
-        let tmp = init_grad.dot(search_direction.clone());
+        let tmp = init_grad.dot(&search_direction);
         (cur_cost <= init_cost + self.c1 * alpha * tmp)
-            && cur_grad.dot(search_direction) >= self.c2 * tmp
+            && cur_grad.dot(&search_direction) >= self.c2 * tmp
     }
 
     fn requires_cur_grad(&self) -> bool {
@@ -154,9 +154,9 @@ where
         search_direction: T,
         alpha: f64,
     ) -> bool {
-        let tmp = init_grad.dot(search_direction.clone());
+        let tmp = init_grad.dot(&search_direction);
         (cur_cost <= init_cost + self.c1 * alpha * tmp)
-            && cur_grad.dot(search_direction).abs() <= self.c2 * tmp.abs()
+            && cur_grad.dot(&search_direction).abs() <= self.c2 * tmp.abs()
     }
 
     fn requires_cur_grad(&self) -> bool {
@@ -195,7 +195,7 @@ where
         search_direction: T,
         alpha: f64,
     ) -> bool {
-        let tmp = alpha * init_grad.dot(search_direction);
+        let tmp = alpha * init_grad.dot(&search_direction);
         init_cost + (1.0 - self.c) * tmp <= cur_cost && cur_cost <= init_cost + self.c * alpha * tmp
     }
 

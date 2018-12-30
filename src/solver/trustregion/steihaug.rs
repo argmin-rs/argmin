@@ -102,7 +102,7 @@ where
 
     /// evaluate m(p) (without considering f_init because it is not available)
     fn eval_m(&self, p: &T) -> f64 {
-        self.cur_grad().dot(p.clone()) + 0.5 * p.weighted_dot(self.cur_hessian(), p.clone())
+        self.cur_grad().dot(&p) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
     }
 
     /// calculate all possible step lengths
@@ -111,9 +111,9 @@ where
     where
         F: Fn(f64) -> bool,
     {
-        let a = self.p.dot(self.p.clone());
-        let b = self.d.dot(self.d.clone());
-        let c = self.p.dot(self.d.clone());
+        let a = self.p.dot(&self.p);
+        let b = self.d.dot(&self.d);
+        let c = self.p.dot(&self.d);
         let delta = self.radius.powi(2);
         let t1 = (-a * b + b * delta + c.powi(2)).sqrt();
         let tau1 = -(t1 + c) / b;
@@ -133,7 +133,7 @@ where
                 .enumerate()
                 .filter(|(_, tau)| !tau.is_nan() && filter_func(*tau))
                 .map(|(i, tau)| {
-                    let p = self.p.add(self.d.scale(tau));
+                    let p = self.p.add(&self.d.scale(tau));
                     (i, self.eval_m(&p))
                 })
                 .filter(|(_, m)| !m.is_nan())
@@ -178,7 +178,7 @@ where
 
         self.r = self.cur_grad();
         self.r_0_norm = self.r.norm();
-        self.rtr = self.r.dot(self.r.clone());
+        self.rtr = self.r.dot(&self.r);
         self.d = self.r.scale(-1.0);
         self.p = self.r.zero();
 
@@ -193,35 +193,35 @@ where
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let h = self.cur_hessian();
-        let dhd = self.d.weighted_dot(h.clone(), self.d.clone());
+        let dhd = self.d.weighted_dot(&h, &self.d);
 
         // Current search direction d is a direction of zero curvature or negative curvature
         if dhd <= 0.0 {
             let tau = self.tau(|_| true, true);
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterationData::new(self.p.add(self.d.scale(tau)), 0.0));
+            return Ok(ArgminIterationData::new(self.p.add(&self.d.scale(tau)), 0.0));
         }
 
         let alpha = self.rtr / dhd;
-        let p_n = self.p.add(self.d.scale(alpha));
+        let p_n = self.p.add(&self.d.scale(alpha));
 
         // new p violates trust region bound
         if p_n.norm() >= self.radius {
             let tau = self.tau(|x| x >= 0.0, false);
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterationData::new(self.p.add(self.d.scale(tau)), 0.0));
+            return Ok(ArgminIterationData::new(self.p.add(&self.d.scale(tau)), 0.0));
         }
 
-        let r_n = self.r.add(h.dot(self.d.clone()).scale(alpha));
+        let r_n = self.r.add(&h.dot(&self.d).scale(alpha));
 
         if r_n.norm() < self.epsilon * self.r_0_norm {
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
             return Ok(ArgminIterationData::new(p_n, 0.0));
         }
 
-        let rjtrj = r_n.dot(r_n.clone());
+        let rjtrj = r_n.dot(&r_n);
         let beta = rjtrj / self.rtr;
-        self.d = r_n.add(self.d.scale(beta));
+        self.d = r_n.add(&self.d.scale(beta));
         self.r = r_n;
         self.p = p_n;
         self.rtr = rjtrj;

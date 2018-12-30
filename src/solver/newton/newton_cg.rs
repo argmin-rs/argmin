@@ -207,7 +207,7 @@ where
             cg.set_cur_cost(data.cost());
             let p = cg.p_prev();
             // let p = cg.p();
-            let curvature = p.dot(hessian.dot(p.clone()));
+            let curvature = p.dot(&hessian.dot(&p));
             // println!("iter: {:?}, curv: {:?}", iter, curvature);
             if curvature <= self.curvature_threshold {
                 if iter == 0 {
@@ -286,6 +286,6 @@ where
     type Hessian = ();
 
     fn apply(&self, p: &T) -> Result<T, Error> {
-        Ok(self.hessian.dot(p.clone()))
+        Ok(self.hessian.dot(&p))
     }
 }

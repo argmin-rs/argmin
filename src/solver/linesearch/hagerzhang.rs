@@ -466,16 +466,16 @@ where
     fn calc(&mut self, alpha: f64) -> Result<f64, Error> {
         let tmp = self
             .init_param
-            .scaled_add(alpha, self.search_direction.clone());
+            .scaled_add(alpha, &self.search_direction);
         self.apply(&tmp)
     }
 
     fn calc_grad(&mut self, alpha: f64) -> Result<f64, Error> {
         let tmp = self
             .init_param
-            .scaled_add(alpha, self.search_direction.clone());
+            .scaled_add(alpha, &self.search_direction);
         let grad = self.gradient(&tmp)?;
-        Ok(self.search_direction.dot(grad))
+        Ok(self.search_direction.dot(&grad))
     }
 
     fn set_best(&mut self) {
@@ -609,12 +609,12 @@ where
 
         self.epsilon_k = self.epsilon * self.finit.abs();
 
-        self.dginit = self.init_grad.dot(self.search_direction.clone());
+        self.dginit = self.init_grad.dot(&self.search_direction);
 
         self.set_best();
         let new_param = self
             .init_param
-            .scaled_add(self.best_x, self.search_direction.clone());
+            .scaled_add(self.best_x, &self.search_direction);
         self.set_best_param(new_param);
         let best_f = self.best_f;
         self.set_best_cost(best_f);
@@ -634,10 +634,10 @@ where
             let c_x = (at_x + bt_x) / 2.0;
             let tmp = self
                 .init_param
-                .scaled_add(c_x, self.search_direction.clone());
+                .scaled_add(c_x, &self.search_direction);
             let c_f = self.apply(&tmp)?;
             let grad = self.gradient(&tmp)?;
-            let c_g = self.search_direction.dot(grad);
+            let c_g = self.search_direction.dot(&grad);
             let ((an_x, an_f, an_g), (bn_x, bn_f, bn_g)) =
                 self.update((at_x, at_f, at_g), (bt_x, bt_f, bt_g), (c_x, c_f, c_g))?;
             at_x = an_x;
@@ -659,7 +659,7 @@ where
         self.set_best();
         let new_param = self
             .init_param
-            .scaled_add(self.best_x, self.search_direction.clone());
+            .scaled_add(self.best_x, &self.search_direction);
         let out = ArgminIterationData::new(new_param, self.best_f);
         Ok(out)
     }
