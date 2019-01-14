@@ -31,11 +31,12 @@ where
         + Clone
         + Default
         + ArgminDot<T, f64>
+        + ArgminDot<T, H>
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
         + ArgminSub<T>,
-    H: 'a + Clone + Default + ArgminDot<T, T>,
+    H: 'a + Clone + Default + ArgminDot<T, T> + ArgminEye,
 {
     /// Inverse Hessian
     inv_hessian: H,
@@ -51,11 +52,12 @@ where
         + Clone
         + Default
         + ArgminDot<T, f64>
+        + ArgminDot<T, H>
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
         + ArgminSub<T>,
-    H: 'a + Clone + Default + ArgminDot<T, T>,
+    H: 'a + Clone + Default + ArgminDot<T, T> + ArgminEye,
 {
     /// Constructor
     pub fn new(
@@ -87,11 +89,12 @@ where
         + Clone
         + Default
         + ArgminDot<T, f64>
+        + ArgminDot<T, H>
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
         + ArgminSub<T>,
-    H: 'a + Clone + Default + ArgminDot<T, T>,
+    H: 'a + Clone + Default + ArgminDot<T, T> + ArgminEye,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -103,11 +106,11 @@ where
 
         let param = self.cur_param();
         let cur_cost = self.cur_cost();
-        let grad = self.gradient(&param)?;
-        let p = self.inv_hessian.dot(&grad).scale(-1.0);
+        let prev_grad = self.base.cur_grad();
+        let p = self.inv_hessian.dot(&prev_grad).scale(-1.0);
 
-        self.linesearch.set_initial_parameter(param);
-        self.linesearch.set_initial_gradient(grad);
+        self.linesearch.set_initial_parameter(param.clone());
+        self.linesearch.set_initial_gradient(prev_grad.clone());
         self.linesearch.set_initial_cost(cur_cost);
         self.linesearch.set_search_direction(p);
 
@@ -115,9 +118,20 @@ where
 
         let linesearch_result = self.linesearch.result();
 
+        let grad = self.gradient(&param)?;
+        let yk = grad.sub(&prev_grad);
+        self.base.set_cur_grad(grad);
+
+        let xk1 = linesearch_result.param;
+        let sk = xk1.sub(&param);
+
+        let yksk: f64 = yk.dot(&sk);
+        let rhok = 1.0 / yksk;
+
+        let e = H::eye(12);
         // TODO: Update H
 
-        let out = ArgminIterationData::new(linesearch_result.param, linesearch_result.cost);
+        let out = ArgminIterationData::new(xk1, linesearch_result.cost);
         Ok(out)
     }
 }
