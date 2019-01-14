@@ -27,7 +27,7 @@ use std::default::Default;
 pub struct BFGS<'a, T, H>
 where
     T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    H: 'a + Clone + Default + ArgminDot<T, T>,
 {
     /// Base stuff
     base: ArgminBase<'a, T, f64, H>,
@@ -36,7 +36,7 @@ where
 impl<'a, T, H> BFGS<'a, T, H>
 where
     T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    H: 'a + Clone + Default + ArgminDot<T, T>,
 {
     /// Constructor
     pub fn new(
@@ -53,7 +53,7 @@ where
 impl<'a, T, H> ArgminNextIter for BFGS<'a, T, H>
 where
     T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    H: 'a + Clone + Default + ArgminDot<T, T>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
