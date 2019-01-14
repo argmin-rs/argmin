@@ -42,10 +42,11 @@ where
     pub fn new(
         cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
         init_param: T,
+        init_inverse_hessian: H,
     ) -> Self {
-        BFGS {
-            base: ArgminBase::new(cost_function, init_param),
-        }
+        let mut base = ArgminBase::new(cost_function, init_param);
+        base.set_cur_hessian(init_inverse_hessian);
+        BFGS { base }
     }
 }
 
@@ -59,9 +60,10 @@ where
     type Hessian = H;
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
-        // let param = self.cur_param();
-        // let grad = self.gradient(&param)?;
-        // let hessian = self.hessian(&param)?;
+        let param = self.cur_param();
+        let grad = self.gradient(&param)?;
+        let inv_hessian = self.cur_hessian();
+        let p = inv_hessian.dot(&grad);
         // let new_param = param.scaled_sub(self.gamma, &hessian.ainv()?.dot(&grad));
         // let out = ArgminIterationData::new(new_param, 0.0);
         // Ok(out)
