@@ -5,11 +5,15 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-pub mod conjugategradient;
-pub mod gradientdescent;
-pub mod landweber;
-pub mod linesearch;
-pub mod newton;
-pub mod quasinewton;
-pub mod simulatedannealing;
-pub mod trustregion;
+//! Quasi-Newton methods
+//!
+//! [BFGS](BFGS/struct.BFGS.html)
+//!
+//! # References:
+//!
+//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! Springer. ISBN 0-387-30303-0.
+
+pub mod bfgs;
+
+pub use self::bfgs::*;
