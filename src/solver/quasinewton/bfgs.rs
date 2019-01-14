@@ -11,6 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+use crate::solver::linesearch::HagerZhangLineSearch;
 use std;
 use std::default::Default;
 
@@ -26,16 +27,34 @@ use std::default::Default;
 #[derive(ArgminSolver)]
 pub struct BFGS<'a, T, H>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+    T: 'a
+        + Clone
+        + Default
+        + ArgminDot<T, f64>
+        + ArgminScale<f64>
+        + ArgminScaledAdd<T, f64>
+        + ArgminScaledSub<T, f64>
+        + ArgminSub<T>,
     H: 'a + Clone + Default + ArgminDot<T, T>,
 {
+    /// Inverse Hessian
+    inv_hessian: H,
+    /// line search
+    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     /// Base stuff
     base: ArgminBase<'a, T, f64, H>,
 }
 
 impl<'a, T, H> BFGS<'a, T, H>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+    T: 'a
+        + Clone
+        + Default
+        + ArgminDot<T, f64>
+        + ArgminScale<f64>
+        + ArgminScaledAdd<T, f64>
+        + ArgminScaledSub<T, f64>
+        + ArgminSub<T>,
     H: 'a + Clone + Default + ArgminDot<T, T>,
 {
     /// Constructor
@@ -44,15 +63,34 @@ where
         init_param: T,
         init_inverse_hessian: H,
     ) -> Self {
-        let mut base = ArgminBase::new(cost_function, init_param);
-        base.set_cur_hessian(init_inverse_hessian);
-        BFGS { base }
+        let linesearch = HagerZhangLineSearch::new(cost_function);
+        BFGS {
+            inv_hessian: init_inverse_hessian,
+            linesearch: Box::new(linesearch),
+            base: ArgminBase::new(cost_function, init_param),
+        }
+    }
+
+    /// Specify line search method
+    pub fn set_linesearch(
+        &mut self,
+        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+    ) -> &mut Self {
+        self.linesearch = linesearch;
+        self
     }
 }
 
 impl<'a, T, H> ArgminNextIter for BFGS<'a, T, H>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+    T: 'a
+        + Clone
+        + Default
+        + ArgminDot<T, f64>
+        + ArgminScale<f64>
+        + ArgminScaledAdd<T, f64>
+        + ArgminScaledSub<T, f64>
+        + ArgminSub<T>,
     H: 'a + Clone + Default + ArgminDot<T, T>,
 {
     type Parameters = T;
@@ -60,13 +98,26 @@ where
     type Hessian = H;
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+        // reset line search
+        self.linesearch.base_reset();
+
         let param = self.cur_param();
+        let cur_cost = self.cur_cost();
         let grad = self.gradient(&param)?;
-        let inv_hessian = self.cur_hessian();
-        let p = inv_hessian.dot(&grad);
-        // let new_param = param.scaled_sub(self.gamma, &hessian.ainv()?.dot(&grad));
-        // let out = ArgminIterationData::new(new_param, 0.0);
-        // Ok(out)
-        unimplemented!()
+        let p = self.inv_hessian.dot(&grad).scale(-1.0);
+
+        self.linesearch.set_initial_parameter(param);
+        self.linesearch.set_initial_gradient(grad);
+        self.linesearch.set_initial_cost(cur_cost);
+        self.linesearch.set_search_direction(p);
+
+        self.linesearch.run_fast()?;
+
+        let linesearch_result = self.linesearch.result();
+
+        // TODO: Update H
+
+        let out = ArgminIterationData::new(linesearch_result.param, linesearch_result.cost);
+        Ok(out)
     }
 }
