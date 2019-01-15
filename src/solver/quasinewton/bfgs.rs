@@ -11,9 +11,11 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use crate::solver::linesearch::HagerZhangLineSearch;
+// use crate::solver::linesearch::HagerZhangLineSearch;
+use crate::solver::linesearch::MoreThuenteLineSearch;
 use std;
 use std::default::Default;
+use std::fmt::Debug;
 
 /// Text
 ///
@@ -25,13 +27,16 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
+#[stop("self.cur_grad().norm() < std::f64::EPSILON.sqrt()" => TargetPrecisionReached)]
 pub struct BFGS<'a, T, H>
 where
     T: 'a
         + Clone
         + Default
+        + Debug
         + ArgminDot<T, f64>
         + ArgminDot<T, H>
+        + ArgminNorm<f64>
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
@@ -59,8 +64,10 @@ where
     T: 'a
         + Clone
         + Default
+        + Debug
         + ArgminDot<T, f64>
         + ArgminDot<T, H>
+        + ArgminNorm<f64>
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
@@ -81,7 +88,7 @@ where
         init_param: T,
         init_inverse_hessian: H,
     ) -> Self {
-        let linesearch = HagerZhangLineSearch::new(cost_function);
+        let linesearch = MoreThuenteLineSearch::new(cost_function);
         BFGS {
             inv_hessian: init_inverse_hessian,
             linesearch: Box::new(linesearch),
@@ -104,8 +111,10 @@ where
     T: 'a
         + Clone
         + Default
+        + Debug
         + ArgminDot<T, f64>
         + ArgminDot<T, H>
+        + ArgminNorm<f64>
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
@@ -124,6 +133,12 @@ where
     type OperatorOutput = f64;
     type Hessian = H;
 
+    fn init(&mut self) -> Result<(), Error> {
+        let grad = self.gradient(&self.base.cur_param())?;
+        self.base.set_cur_grad(grad);
+        Ok(())
+    }
+
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         // reset line search
         self.linesearch.base_reset();
@@ -137,22 +152,21 @@ where
         self.linesearch.set_initial_gradient(prev_grad.clone());
         self.linesearch.set_initial_cost(cur_cost);
         self.linesearch.set_search_direction(p);
-
         self.linesearch.run_fast()?;
 
         let linesearch_result = self.linesearch.result();
+        let xk1 = linesearch_result.param;
 
-        let grad = self.gradient(&param)?;
+        let grad = self.gradient(&xk1)?;
         let yk = grad.sub(&prev_grad);
         self.base.set_cur_grad(grad);
 
-        let xk1 = linesearch_result.param;
         let sk = xk1.sub(&param);
 
         let yksk: f64 = yk.dot(&sk);
         let rhok = 1.0 / yksk;
 
-        let e = H::eye(12);
+        let e = H::eye(2);
         let mat1: H = sk.dot(&yk);
         let mat1 = mat1.scale(rhok);
         // This is unnecessary ... however, there is no ArgminTranspose yet....
