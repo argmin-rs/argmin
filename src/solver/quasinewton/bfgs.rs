@@ -44,6 +44,7 @@ where
     H: 'a
         + Clone
         + Default
+        + Debug
         + ArgminDot<T, T>
         + ArgminDot<H, H>
         + ArgminEye
@@ -75,6 +76,7 @@ where
     H: 'a
         + Clone
         + Default
+        + Debug
         + ArgminDot<T, T>
         + ArgminDot<H, H>
         + ArgminEye
@@ -89,6 +91,7 @@ where
         init_inverse_hessian: H,
     ) -> Self {
         let linesearch = MoreThuenteLineSearch::new(cost_function);
+        // let linesearch = HagerZhangLineSearch::new(cost_function);
         BFGS {
             inv_hessian: init_inverse_hessian,
             linesearch: Box::new(linesearch),
@@ -122,6 +125,7 @@ where
     H: 'a
         + Clone
         + Default
+        + Debug
         + ArgminDot<T, T>
         + ArgminDot<H, H>
         + ArgminEye
@@ -134,8 +138,10 @@ where
     type Hessian = H;
 
     fn init(&mut self) -> Result<(), Error> {
+        let cost = self.apply(&self.base.cur_param())?;
         let grad = self.gradient(&self.base.cur_param())?;
         self.base.set_cur_grad(grad);
+        self.base.set_cur_cost(cost);
         Ok(())
     }
 
@@ -148,10 +154,14 @@ where
         let prev_grad = self.base.cur_grad();
         let p = self.inv_hessian.dot(&prev_grad).scale(-1.0);
 
+        // println!("ih: {:?}", self.inv_hessian);
+        // println!("p: {:?}", p);
         self.linesearch.set_initial_parameter(param.clone());
         self.linesearch.set_initial_gradient(prev_grad.clone());
         self.linesearch.set_initial_cost(cur_cost);
-        self.linesearch.set_search_direction(p);
+        self.linesearch
+            .set_search_direction(p.scale(1.0 / p.norm()));
+        // self.linesearch.set_search_direction(p);
         self.linesearch.run_fast()?;
 
         let linesearch_result = self.linesearch.result();
@@ -162,11 +172,12 @@ where
         self.base.set_cur_grad(grad);
 
         let sk = xk1.sub(&param);
+        // println!("sk: {:?}", sk);
 
         let yksk: f64 = yk.dot(&sk);
         let rhok = 1.0 / yksk;
 
-        let e = H::eye(2);
+        let e = self.inv_hessian.eye_like();
         let mat1: H = sk.dot(&yk);
         let mat1 = mat1.scale(rhok);
         // This is unnecessary ... however, there is no ArgminTranspose yet....
