@@ -36,7 +36,15 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
         + ArgminSub<T>,
-    H: 'a + Clone + Default + ArgminDot<T, T> + ArgminEye,
+    H: 'a
+        + Clone
+        + Default
+        + ArgminDot<T, T>
+        + ArgminDot<H, H>
+        + ArgminEye
+        + ArgminSub<H>
+        + ArgminAdd<H>
+        + ArgminScale<f64>,
 {
     /// Inverse Hessian
     inv_hessian: H,
@@ -57,7 +65,15 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
         + ArgminSub<T>,
-    H: 'a + Clone + Default + ArgminDot<T, T> + ArgminEye,
+    H: 'a
+        + Clone
+        + Default
+        + ArgminDot<T, T>
+        + ArgminDot<H, H>
+        + ArgminEye
+        + ArgminSub<H>
+        + ArgminAdd<H>
+        + ArgminScale<f64>,
 {
     /// Constructor
     pub fn new(
@@ -94,7 +110,15 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
         + ArgminSub<T>,
-    H: 'a + Clone + Default + ArgminDot<T, T> + ArgminEye,
+    H: 'a
+        + Clone
+        + Default
+        + ArgminDot<T, T>
+        + ArgminDot<H, H>
+        + ArgminEye
+        + ArgminSub<H>
+        + ArgminAdd<H>
+        + ArgminScale<f64>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -129,7 +153,20 @@ where
         let rhok = 1.0 / yksk;
 
         let e = H::eye(12);
+        let mat1: H = sk.dot(&yk);
+        let mat1 = mat1.scale(rhok);
+        // This is unnecessary ... however, there is no ArgminTranspose yet....
+        let mat2: H = yk.dot(&sk);
+        let mat2 = mat2.scale(rhok);
+
+        let tmp1 = e.sub(&mat1);
+        let tmp2 = e.sub(&mat2);
+
         // TODO: Update H
+        let sksk: H = sk.dot(&sk);
+        let sksk = sksk.scale(rhok);
+
+        self.inv_hessian = tmp1.dot(&self.inv_hessian.dot(&tmp2)).add(&sksk);
 
         let out = ArgminIterationData::new(xk1, linesearch_result.cost);
         Ok(out)
