@@ -17,10 +17,75 @@ use std;
 use std::default::Default;
 use std::fmt::Debug;
 
-/// Text
+/// BFGS method
 ///
 /// # Example
 ///
+/// ```rust
+/// # extern crate argmin;
+/// # extern crate ndarray;
+/// use argmin::prelude::*;
+/// use argmin::solver::quasinewton::BFGS;
+/// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+/// use ndarray::{array, Array1, Array2};
+///
+/// # #[derive(Clone)]
+/// # struct MyProblem { }
+/// #
+/// #  impl ArgminOperator for MyProblem {
+/// #      type Parameters = Array1<f64>;
+/// #      type OperatorOutput = f64;
+/// #      type Hessian = Array2<f64>;
+/// #
+/// #      fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+/// #          Ok(rosenbrock_2d(&p.to_vec(), 1.0, 100.0))
+/// #      }
+/// #
+/// #      fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+/// #          Ok(Array1::from_vec(rosenbrock_2d_derivative(
+/// #              &p.to_vec(),
+/// #              1.0,
+/// #              100.0,
+/// #          )))
+/// #      }
+/// #  }
+/// #
+/// #  fn run() -> Result<(), Error> {
+/// // Define cost function
+/// let cost = MyProblem {};
+///
+/// // Define initial parameter vector
+/// // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
+/// let init_param: Array1<f64> = array![-1.2, 1.0];
+/// let init_hessian: Array2<f64> = Array2::eye(2);
+///
+/// // Set up solver
+/// let mut solver = BFGS::new(&cost, init_param, init_hessian);
+///
+/// // Set maximum number of iterations
+/// solver.set_max_iters(80);
+///
+/// // Attach a logger
+/// solver.add_logger(ArgminSlogLogger::term());
+///
+/// // Run solver
+/// solver.run()?;
+///
+/// // Wait a second (lets the logger flush everything before printing again)
+/// std::thread::sleep(std::time::Duration::from_secs(1));
+///
+/// // Print result
+/// println!("{:?}", solver.result());
+/// # Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     if let Err(ref e) = run() {
+/// #         println!("{} {}", e.as_fail(), e.backtrace());
+/// #         std::process::exit(1);
+/// #     }
+/// # }
+/// ```
 ///
 /// # References:
 ///
