@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["identity","An identity function."]],"trait":[["TryFrom","Attempt to construct `Self` via a conversion."],["TryInto","An attempted conversion that consumes `self`, which may or may not be expensive."]]});

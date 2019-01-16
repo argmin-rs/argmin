@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["Ordering","An `Ordering` is the result of a comparison between two values."]],"fn":[["max","Compares and returns the maximum of two values."],["min","Compares and returns the minimum of two values."]],"struct":[["Reverse","A helper struct for reverse ordering."]]});

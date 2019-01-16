@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["BuildHasherDefault","Used to create a default [`BuildHasher`] instance for types that implement [`Hasher`] and [`Default`]."],["SipHasher","An implementation of SipHash 2-4."]],"trait":[["BuildHasher","A trait for creating instances of [`Hasher`]."],["Hash","A hashable type."],["Hasher","A trait for hashing an arbitrary stream of bytes."]]});

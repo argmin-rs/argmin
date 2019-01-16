@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["MAX","The largest value that can be represented by this integer type."],["MIN","The smallest value that can be represented by this integer type."]]});
