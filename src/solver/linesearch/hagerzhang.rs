@@ -211,7 +211,7 @@ where
             theta: 0.5,
             gamma: 0.66,
             eta: 0.01,
-            a_x_init: 0.0,
+            a_x_init: std::f64::EPSILON,
             a_x: std::f64::NAN,
             a_f: std::f64::NAN,
             a_g: std::f64::NAN,
@@ -464,16 +464,12 @@ where
     }
 
     fn calc(&mut self, alpha: f64) -> Result<f64, Error> {
-        let tmp = self
-            .init_param
-            .scaled_add(alpha, &self.search_direction);
+        let tmp = self.init_param.scaled_add(alpha, &self.search_direction);
         self.apply(&tmp)
     }
 
     fn calc_grad(&mut self, alpha: f64) -> Result<f64, Error> {
-        let tmp = self
-            .init_param
-            .scaled_add(alpha, &self.search_direction);
+        let tmp = self.init_param.scaled_add(alpha, &self.search_direction);
         let grad = self.gradient(&tmp)?;
         Ok(self.search_direction.dot(&grad))
     }
@@ -632,9 +628,7 @@ where
         // L2
         if bt_x - at_x > self.gamma * (self.b_x - self.a_x) {
             let c_x = (at_x + bt_x) / 2.0;
-            let tmp = self
-                .init_param
-                .scaled_add(c_x, &self.search_direction);
+            let tmp = self.init_param.scaled_add(c_x, &self.search_direction);
             let c_f = self.apply(&tmp)?;
             let grad = self.gradient(&tmp)?;
             let c_g = self.search_direction.dot(&grad);
