@@ -112,6 +112,7 @@ where
         + Debug
         + ArgminDot<T, T>
         + ArgminDot<H, H>
+        + ArgminTranspose
         + ArgminEye
         + ArgminSub<H>
         + ArgminAdd<H>
@@ -144,6 +145,7 @@ where
         + Debug
         + ArgminDot<T, T>
         + ArgminDot<H, H>
+        + ArgminTranspose
         + ArgminEye
         + ArgminSub<H>
         + ArgminAdd<H>
@@ -193,6 +195,7 @@ where
         + Debug
         + ArgminDot<T, T>
         + ArgminDot<H, H>
+        + ArgminTranspose
         + ArgminEye
         + ArgminSub<H>
         + ArgminAdd<H>
@@ -243,9 +246,7 @@ where
         let mat1: H = sk.dot(&yk);
         let mat1 = mat1.scale(rhok);
 
-        // This is unnecessary ... however, there is no ArgminTranspose yet....
-        let mat2: H = yk.dot(&sk);
-        let mat2 = mat2.scale(rhok);
+        let mat2 = mat1.clone().t();
 
         let tmp1 = e.sub(&mat1);
         let tmp2 = e.sub(&mat2);
