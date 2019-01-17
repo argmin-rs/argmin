@@ -219,8 +219,6 @@ where
         let prev_grad = self.base.cur_grad();
         let p = self.inv_hessian.dot(&prev_grad).scale(-1.0);
 
-        // println!("ih: {:?}", self.inv_hessian);
-        // println!("p: {:?}", p);
         self.linesearch.set_initial_parameter(param.clone());
         self.linesearch.set_initial_gradient(prev_grad.clone());
         self.linesearch.set_initial_cost(cur_cost);
@@ -237,7 +235,6 @@ where
         self.base.set_cur_grad(grad);
 
         let sk = xk1.sub(&param);
-        // println!("sk: {:?}", sk);
 
         let yksk: f64 = yk.dot(&sk);
         let rhok = 1.0 / yksk;
@@ -245,6 +242,7 @@ where
         let e = self.inv_hessian.eye_like();
         let mat1: H = sk.dot(&yk);
         let mat1 = mat1.scale(rhok);
+
         // This is unnecessary ... however, there is no ArgminTranspose yet....
         let mat2: H = yk.dot(&sk);
         let mat2 = mat2.scale(rhok);
@@ -252,7 +250,6 @@ where
         let tmp1 = e.sub(&mat1);
         let tmp2 = e.sub(&mat2);
 
-        // TODO: Update H
         let sksk: H = sk.dot(&sk);
         let sksk = sksk.scale(rhok);
 
