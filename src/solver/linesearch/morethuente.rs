@@ -226,7 +226,7 @@ where
             width1: std::f64::NAN,
             xtol: 1e-10,
             alpha: 1.0,
-            stpmin: 1e-15,
+            stpmin: std::f64::EPSILON.sqrt(),
             stpmax: std::f64::INFINITY,
             stp: Step::default(),
             stx: Step::default(),
