@@ -9,7 +9,9 @@ extern crate argmin;
 extern crate ndarray;
 use argmin::prelude::*;
 use argmin::solver::quasinewton::BFGS;
-use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use argmin_core::finitediff::*;
+// use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use argmin::testfunctions::rosenbrock;
 use ndarray::{array, Array1, Array2};
 
 #[derive(Clone)]
@@ -24,15 +26,18 @@ impl ArgminOperator for Rosenbrock {
     type Hessian = Array2<f64>;
 
     fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
-        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
+        Ok(rosenbrock(&p.to_vec(), self.a, self.b))
     }
 
     fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
-        Ok(Array1::from_vec(rosenbrock_2d_derivative(
-            &p.to_vec(),
-            self.a,
-            self.b,
-        )))
+        Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
+        // vec![0.0, 0.0].forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b));
+        // unimplemented!()
+        // Ok(Array1::from_vec(rosenbrock_2d_derivative(
+        //     &p.to_vec(),
+        //     self.a,
+        //     self.b,
+        // )))
     }
 }
 
@@ -41,15 +46,15 @@ fn run() -> Result<(), Error> {
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
     // Define initial parameter vector
-    // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
-    let init_param: Array1<f64> = array![-1.2, 1.0];
-    let init_hessian: Array2<f64> = Array2::eye(2);
+    // let init_param: Array1<f64> = array![-1.2, 1.0];
+    let init_param: Array1<f64> = array![-1.2, 1.0, -1.0, 2.0, 3.0, 2.0];
+    let init_hessian: Array2<f64> = Array2::eye(6);
 
     // Set up solver
     let mut solver = BFGS::new(&cost, init_param, init_hessian);
 
     // Set maximum number of iterations
-    solver.set_max_iters(80);
+    solver.set_max_iters(800);
 
     // Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
