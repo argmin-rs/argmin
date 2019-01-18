@@ -31,13 +31,6 @@ impl ArgminOperator for Rosenbrock {
 
     fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
         Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
-        // vec![0.0, 0.0].forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b));
-        // unimplemented!()
-        // Ok(Array1::from_vec(rosenbrock_2d_derivative(
-        //     &p.to_vec(),
-        //     self.a,
-        //     self.b,
-        // )))
     }
 }
 
