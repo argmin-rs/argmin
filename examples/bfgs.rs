@@ -47,8 +47,8 @@ fn run() -> Result<(), Error> {
 
     // Define initial parameter vector
     // let init_param: Array1<f64> = array![-1.2, 1.0];
-    let init_param: Array1<f64> = array![-1.2, 1.0, -1.0, 2.0, 3.0, 2.0];
-    let init_hessian: Array2<f64> = Array2::eye(6);
+    let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+    let init_hessian: Array2<f64> = Array2::eye(8);
 
     // Set up solver
     let mut solver = BFGS::new(&cost, init_param, init_hessian);
