@@ -293,7 +293,6 @@
 //! latter is essentially an implementation of a single iteration of the algorithm.
 //!
 //! ```
-//! # #![feature(uniform_paths)]
 //! // needed for `#[derive(ArgminSolver)]`
 //! # extern crate argmin_codegen;
 //! use argmin_codegen::ArgminSolver;
