@@ -193,8 +193,8 @@ where
         // Solve CG subproblem
         let op: CGSubProblem<'a, T, H> = CGSubProblem::new(hessian.clone());
 
-        let mut x_p = param.zero();
-        let mut x: T = param.zero();
+        let mut x_p = param.zero_like();
+        let mut x: T = param.zero_like();
         let mut cg = ConjugateGradient::new(&op, grad.scale(-1.0), x_p.clone())?;
 
         cg.init()?;

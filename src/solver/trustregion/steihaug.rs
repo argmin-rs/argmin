@@ -180,7 +180,7 @@ where
         self.r_0_norm = self.r.norm();
         self.rtr = self.r.dot(&self.r);
         self.d = self.r.scale(-1.0);
-        self.p = self.r.zero();
+        self.p = self.r.zero_like();
 
         if self.r_0_norm < self.epsilon {
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
@@ -199,7 +199,10 @@ where
         if dhd <= 0.0 {
             let tau = self.tau(|_| true, true);
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterationData::new(self.p.add(&self.d.scale(tau)), 0.0));
+            return Ok(ArgminIterationData::new(
+                self.p.add(&self.d.scale(tau)),
+                0.0,
+            ));
         }
 
         let alpha = self.rtr / dhd;
@@ -209,7 +212,10 @@ where
         if p_n.norm() >= self.radius {
             let tau = self.tau(|x| x >= 0.0, false);
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterationData::new(self.p.add(&self.d.scale(tau)), 0.0));
+            return Ok(ArgminIterationData::new(
+                self.p.add(&self.d.scale(tau)),
+                0.0,
+            ));
         }
 
         let r_n = self.r.add(&h.dot(&self.d).scale(alpha));
