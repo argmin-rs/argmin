@@ -9,6 +9,8 @@ extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::particleswarm::*;
 
+use argmin_testfunctions::himmelblau;
+
 
 struct PhonyOperator
 {
@@ -22,13 +24,8 @@ impl ArgminOperator for PhonyOperator {
     type Hessian = ();
 
     fn apply(&self, param: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
-        Ok(0.)
+        Ok(himmelblau(param))
     }
-
-    fn modify(&self, param: &Self::Parameters, extent: f64) -> Result<Self::Parameters, Error> {
-        Ok(Vec::<f64>::new())
-    }
-
 }
 
 
@@ -37,7 +34,7 @@ impl ArgminOperator for PhonyOperator {
 
 fn run() -> Result<(), Error> {
     // Define inital parameter vector
-    let init_param: Vec<f64> = vec![1.0, 0.0];
+    let init_param: Vec<f64> = vec![0.1, 0.1];
 
     let cost_function = PhonyOperator {};
 
@@ -45,7 +42,9 @@ fn run() -> Result<(), Error> {
     let mut solver = ParticleSwarm::new(&cost_function, init_param)?;
 
     // Attach a logger
-    // solver.add_logger(ArgminSlogLogger::term());
+    solver.add_logger(ArgminSlogLogger::term());
+
+    solver.set_max_iters(10);
 
     // Run solver
     solver.run()?;
