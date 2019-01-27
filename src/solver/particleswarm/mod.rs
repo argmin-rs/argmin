@@ -27,9 +27,12 @@ where
     T: Clone + Default + ArgminAdd<T>,
     H: Clone + Default,
 {
-    rng: rand::prelude::ThreadRng,
     base: ArgminBase<'a, T, f64, H>,
+    rng: rand::prelude::ThreadRng,
+    iter_callback: Option<&'a mut (FnMut(&T, f64) -> ())>,
 }
+
+fn default_callback<T>(p: &T, cost: f64) {}
 
 impl<'a, T, H> ParticleSwarm<'a, T, H>
 where
@@ -48,9 +51,14 @@ where
         init_param: T,
     ) -> Result<Self, Error> {
         Ok(ParticleSwarm {
-            rng: rand::thread_rng(),
             base: ArgminBase::new(cost_function, init_param),
+            rng: rand::thread_rng(),
+            iter_callback: None,
         })
+    }
+
+    pub fn set_iter_callback(&mut self, callback: &'a mut FnMut(&T, f64) -> ()) {
+        self.iter_callback = Some(callback);
     }
 }
 
@@ -70,11 +78,21 @@ where
         let new_param = self.cur_param().add(&self.cur_param());
         let new_cost = self.apply(&new_param)?;
 
+        // TODO: move callback to ArgminBase
+        // TODO: accept &self, not new_param, new_cost
+        //       as callback parameters
+        match &mut self.iter_callback {
+            Some(callback) => (*callback)(&new_param, new_cost),
+            None => ()
+        };
+
+
         let out = ArgminIterationData::new(new_param, new_cost);
         // out.add_kv(make_kv!(
         //     "t" => self.cur_temp;
 
         // ));
+
         Ok(out)
     }
 }
