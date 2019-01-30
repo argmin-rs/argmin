@@ -115,7 +115,7 @@ where
         + ArgminTranspose
         + ArgminEye
         + ArgminSub<H>
-        + ArgminAdd<H>
+        + ArgminAdd<H, H>
         + ArgminScale<f64>,
 {
     /// Inverse Hessian
@@ -148,7 +148,7 @@ where
         + ArgminTranspose
         + ArgminEye
         + ArgminSub<H>
-        + ArgminAdd<H>
+        + ArgminAdd<H, H>
         + ArgminScale<f64>,
 {
     /// Constructor
@@ -198,7 +198,7 @@ where
         + ArgminTranspose
         + ArgminEye
         + ArgminSub<H>
-        + ArgminAdd<H>
+        + ArgminAdd<H, H>
         + ArgminScale<f64>,
 {
     type Parameters = T;

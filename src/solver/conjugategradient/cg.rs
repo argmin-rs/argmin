@@ -84,7 +84,7 @@ where
     T: Clone
         + Default
         + ArgminSub<T>
-        + ArgminAdd<T>
+        + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -113,7 +113,7 @@ where
     T: Clone
         + Default
         + ArgminSub<T>
-        + ArgminAdd<T>
+        + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -166,7 +166,7 @@ where
     T: Clone
         + Default
         + ArgminSub<T>
-        + ArgminAdd<T>
+        + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>

@@ -28,7 +28,7 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
-        + ArgminAdd<T>
+        + ArgminAdd<T, T>
         + ArgminSub<T>
         + ArgminNorm<f64>
         + ArgminZero
@@ -60,7 +60,7 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
-        + ArgminAdd<T>
+        + ArgminAdd<T, T>
         + ArgminSub<T>
         + ArgminNorm<f64>
         + ArgminZero
@@ -162,7 +162,7 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
-        + ArgminAdd<T>
+        + ArgminAdd<T, T>
         + ArgminSub<T>
         + ArgminNorm<f64>
         + ArgminZero
@@ -243,7 +243,7 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
-        + ArgminAdd<T>
+        + ArgminAdd<T, T>
         + ArgminSub<T>
         + ArgminNorm<f64>
         + ArgminZero
