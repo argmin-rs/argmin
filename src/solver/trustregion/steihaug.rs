@@ -29,7 +29,7 @@ where
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminZero
         + ArgminScale<f64>,
@@ -61,7 +61,7 @@ where
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminZero
         + ArgminScale<f64>,
@@ -163,7 +163,7 @@ where
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminZero
         + ArgminScale<f64>,
@@ -244,7 +244,7 @@ where
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminZero
         + ArgminScale<f64>,

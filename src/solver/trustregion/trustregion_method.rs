@@ -123,7 +123,7 @@ where
         + ArgminDot<T, f64>
         + ArgminNorm<f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminZero
         + ArgminScale<f64>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
@@ -154,7 +154,7 @@ where
         + ArgminDot<T, f64>
         + ArgminNorm<f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminZero
         + ArgminScale<f64>,
     H: 'a + Clone + std::default::Default + ArgminDot<T, T>,
@@ -229,7 +229,7 @@ where
         + ArgminDot<T, f64>
         + ArgminNorm<f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminZero
         + ArgminScale<f64>,
     H: Clone + std::default::Default + ArgminDot<T, T>,

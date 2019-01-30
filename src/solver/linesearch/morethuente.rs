@@ -126,7 +126,7 @@ where
     T: std::default::Default
         + Clone
         + std::fmt::Debug
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
@@ -193,7 +193,7 @@ where
     T: std::default::Default
         + Clone
         + std::fmt::Debug
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
@@ -294,7 +294,7 @@ where
     T: std::default::Default
         + Clone
         + std::fmt::Debug
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,
@@ -353,7 +353,7 @@ where
     T: std::default::Default
         + Clone
         + std::fmt::Debug
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>,

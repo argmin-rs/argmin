@@ -105,7 +105,7 @@ where
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
-        + ArgminSub<T>,
+        + ArgminSub<T, T>,
     H: 'a
         + Clone
         + Default
@@ -114,7 +114,7 @@ where
         + ArgminDot<H, H>
         + ArgminTranspose
         + ArgminEye
-        + ArgminSub<H>
+        + ArgminSub<H, H>
         + ArgminAdd<H, H>
         + ArgminScale<f64>,
 {
@@ -138,7 +138,7 @@ where
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
-        + ArgminSub<T>,
+        + ArgminSub<T, T>,
     H: 'a
         + Clone
         + Default
@@ -147,7 +147,7 @@ where
         + ArgminDot<H, H>
         + ArgminTranspose
         + ArgminEye
-        + ArgminSub<H>
+        + ArgminSub<H, H>
         + ArgminAdd<H, H>
         + ArgminScale<f64>,
 {
@@ -188,7 +188,7 @@ where
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64>
         + ArgminScaledSub<T, f64>
-        + ArgminSub<T>,
+        + ArgminSub<T, T>,
     H: 'a
         + Clone
         + Default
@@ -197,7 +197,7 @@ where
         + ArgminDot<H, H>
         + ArgminTranspose
         + ArgminEye
-        + ArgminSub<H>
+        + ArgminSub<H, H>
         + ArgminAdd<H, H>
         + ArgminScale<f64>,
 {

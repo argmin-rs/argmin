@@ -110,7 +110,7 @@ where
     T: 'a
         + Clone
         + Default
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminNorm<f64>
@@ -139,7 +139,7 @@ where
     T: 'a
         + Clone
         + Default
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminNorm<f64>
@@ -249,7 +249,7 @@ where
     T: 'a
         + Clone
         + Default
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminNorm<f64>

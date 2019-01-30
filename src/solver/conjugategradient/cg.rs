@@ -83,7 +83,7 @@ pub struct ConjugateGradient<'a, T>
 where
     T: Clone
         + Default
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
@@ -112,7 +112,7 @@ impl<'a, T> ConjugateGradient<'a, T>
 where
     T: Clone
         + Default
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
@@ -165,7 +165,7 @@ impl<'a, T> ArgminNextIter for ConjugateGradient<'a, T>
 where
     T: Clone
         + Default
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>

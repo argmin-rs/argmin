@@ -57,7 +57,7 @@ impl PolakRibiere {
 
 impl<T> ArgminNLCGBetaUpdate<T> for PolakRibiere
 where
-    T: Clone + ArgminDot<T, f64> + ArgminSub<T> + ArgminNorm<f64>,
+    T: Clone + ArgminDot<T, f64> + ArgminSub<T, T> + ArgminNorm<f64>,
 {
     fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> f64 {
         let dfk_norm_sq = dfk.norm().powi(2);
@@ -79,7 +79,7 @@ impl PolakRibierePlus {
 
 impl<T> ArgminNLCGBetaUpdate<T> for PolakRibierePlus
 where
-    T: Clone + ArgminDot<T, f64> + ArgminSub<T> + ArgminNorm<f64>,
+    T: Clone + ArgminDot<T, f64> + ArgminSub<T, T> + ArgminNorm<f64>,
 {
     fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> f64 {
         let dfk_norm_sq = dfk.norm().powi(2);
@@ -102,7 +102,7 @@ impl HestenesStiefel {
 
 impl<T> ArgminNLCGBetaUpdate<T> for HestenesStiefel
 where
-    T: Clone + ArgminDot<T, f64> + ArgminSub<T> + ArgminNorm<f64>,
+    T: Clone + ArgminDot<T, f64> + ArgminSub<T, T> + ArgminNorm<f64>,
 {
     fn update(&self, dfk: &T, dfk1: &T, pk: &T) -> f64 {
         let d = dfk1.sub(&dfk);

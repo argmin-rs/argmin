@@ -105,7 +105,7 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminZero
         + ArgminNorm<f64>
         + ArgminScale<f64>,
@@ -129,7 +129,7 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminZero
         + ArgminNorm<f64>
         + ArgminScale<f64>,
@@ -175,7 +175,7 @@ where
         + ArgminScaledAdd<T, f64>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminZero
         + ArgminNorm<f64>
         + ArgminScale<f64>,

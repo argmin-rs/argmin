@@ -106,7 +106,7 @@ where
         + Default
         + std::fmt::Debug
         + ArgminScale<f64>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -126,7 +126,7 @@ where
         + Default
         + std::fmt::Debug
         + ArgminScale<f64>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>
@@ -162,7 +162,7 @@ where
         + Default
         + std::fmt::Debug
         + ArgminScale<f64>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64>

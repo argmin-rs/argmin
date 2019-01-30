@@ -30,7 +30,7 @@ where
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
@@ -49,7 +49,7 @@ where
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
@@ -78,7 +78,7 @@ where
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
@@ -156,7 +156,7 @@ where
         + ArgminWeightedDot<T, f64, H>
         + ArgminDot<T, f64>
         + ArgminAdd<T, T>
-        + ArgminSub<T>
+        + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminScale<f64>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
