@@ -111,8 +111,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
 {
     /// initial parameter vector
@@ -139,8 +138,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
     BacktrackingLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
@@ -208,8 +206,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
     BacktrackingLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
@@ -267,8 +264,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
 {
     type Parameters = T;
@@ -278,7 +274,7 @@ where
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let new_param = self
             .init_param
-            .scaled_add(self.alpha, &self.search_direction);
+            .scaled_add(&self.alpha, &self.search_direction);
 
         let cur_cost = self.apply(&new_param)?;
 

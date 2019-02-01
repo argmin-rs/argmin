@@ -113,7 +113,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
 {
@@ -190,7 +190,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
     HagerZhangLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
@@ -464,12 +464,12 @@ where
     }
 
     fn calc(&mut self, alpha: f64) -> Result<f64, Error> {
-        let tmp = self.init_param.scaled_add(alpha, &self.search_direction);
+        let tmp = self.init_param.scaled_add(&alpha, &self.search_direction);
         self.apply(&tmp)
     }
 
     fn calc_grad(&mut self, alpha: f64) -> Result<f64, Error> {
-        let tmp = self.init_param.scaled_add(alpha, &self.search_direction);
+        let tmp = self.init_param.scaled_add(&alpha, &self.search_direction);
         let grad = self.gradient(&tmp)?;
         Ok(self.search_direction.dot(&grad))
     }
@@ -501,7 +501,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
 {
@@ -553,7 +553,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
 {
@@ -610,7 +610,7 @@ where
         self.set_best();
         let new_param = self
             .init_param
-            .scaled_add(self.best_x, &self.search_direction);
+            .scaled_add(&self.best_x, &self.search_direction);
         self.set_best_param(new_param);
         let best_f = self.best_f;
         self.set_best_cost(best_f);
@@ -628,7 +628,7 @@ where
         // L2
         if bt_x - at_x > self.gamma * (self.b_x - self.a_x) {
             let c_x = (at_x + bt_x) / 2.0;
-            let tmp = self.init_param.scaled_add(c_x, &self.search_direction);
+            let tmp = self.init_param.scaled_add(&c_x, &self.search_direction);
             let c_f = self.apply(&tmp)?;
             let grad = self.gradient(&tmp)?;
             let c_g = self.search_direction.dot(&grad);
@@ -653,7 +653,7 @@ where
         self.set_best();
         let new_param = self
             .init_param
-            .scaled_add(self.best_x, &self.search_direction);
+            .scaled_add(&self.best_x, &self.search_direction);
         let out = ArgminIterationData::new(new_param, self.best_f);
         Ok(out)
     }

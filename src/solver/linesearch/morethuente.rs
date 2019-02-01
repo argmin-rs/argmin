@@ -128,7 +128,7 @@ where
         + std::fmt::Debug
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
 {
@@ -195,7 +195,7 @@ where
         + std::fmt::Debug
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
     MoreThuenteLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
@@ -296,7 +296,7 @@ where
         + std::fmt::Debug
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
 {
@@ -355,7 +355,7 @@ where
         + std::fmt::Debug
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
     H: Clone + std::default::Default,
 {
@@ -438,7 +438,7 @@ where
         // Evaluate the function and gradient at new stp.x and compute the directional derivative
         let new_param = self
             .init_param
-            .scaled_add(self.stp.x, &self.search_direction);
+            .scaled_add(&self.stp.x, &self.search_direction);
         self.f = self.apply(&new_param)?;
         let new_grad = self.gradient(&new_param)?;
         let f = self.f;
@@ -541,7 +541,7 @@ where
 
         let new_param = self
             .init_param
-            .scaled_add(self.stp.x, &self.search_direction);
+            .scaled_add(&self.stp.x, &self.search_direction);
         let out = ArgminIterationData::new(new_param, self.stp.fx);
         Ok(out)
     }

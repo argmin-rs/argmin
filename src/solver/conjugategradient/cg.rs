@@ -87,7 +87,7 @@ where
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
 {
     /// b (right hand side)
@@ -116,7 +116,7 @@ where
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
 {
     /// Constructor
@@ -169,7 +169,7 @@ where
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
 {
     type Parameters = T;
@@ -193,12 +193,12 @@ where
         let p = self.p.clone();
         let apk = self.apply(&p)?;
         self.alpha = self.rtr / self.p.dot(&apk);
-        let new_param = self.cur_param().scaled_add(self.alpha, &p);
-        self.r = self.r.scaled_add(self.alpha, &apk);
+        let new_param = self.cur_param().scaled_add(&self.alpha, &p);
+        self.r = self.r.scaled_add(&self.alpha, &apk);
         let rtr_n = self.r.dot(&self.r);
         self.beta = rtr_n / self.rtr;
         self.rtr = rtr_n;
-        self.p = self.r.scale(-1.0).scaled_add(self.beta, &p);
+        self.p = self.r.scale(-1.0).scaled_add(&self.beta, &p);
         let norm = self.r.dot(&self.r);
 
         let mut out = ArgminIterationData::new(new_param, norm.sqrt());

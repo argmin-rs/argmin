@@ -115,7 +115,7 @@ where
         + ArgminScale<f64>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
 {
     /// p
@@ -144,7 +144,7 @@ where
         + ArgminScale<f64>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
 {
     /// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))
@@ -254,7 +254,7 @@ where
         + ArgminScale<f64>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64>
+        + ArgminScaledAdd<T, f64, T>
         + ArgminScaledSub<T, f64>,
 {
     type Parameters = T;
