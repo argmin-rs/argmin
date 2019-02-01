@@ -113,8 +113,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
 {
     /// delta: (0, 0.5), used in the Wolve conditions
@@ -190,8 +189,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
     HagerZhangLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
@@ -501,8 +499,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
 {
     /// Set search direction
@@ -553,8 +550,7 @@ where
         + Clone
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
 {
     type Parameters = T;

@@ -128,8 +128,7 @@ where
         + std::fmt::Debug
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
 {
     /// initial parameter vector (builder)
@@ -195,8 +194,7 @@ where
         + std::fmt::Debug
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
     MoreThuenteLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
 {
@@ -296,8 +294,7 @@ where
         + std::fmt::Debug
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
 {
     /// Set search direction
@@ -355,8 +352,7 @@ where
         + std::fmt::Debug
         + ArgminSub<T, T>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
 {
     type Parameters = T;

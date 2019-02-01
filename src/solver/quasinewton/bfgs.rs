@@ -104,7 +104,6 @@ where
         + ArgminNorm<f64>
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>
         + ArgminSub<T, T>,
     H: 'a
         + Clone
@@ -137,7 +136,6 @@ where
         + ArgminNorm<f64>
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>
         + ArgminSub<T, T>,
     H: 'a
         + Clone
@@ -187,7 +185,6 @@ where
         + ArgminNorm<f64>
         + ArgminScale<f64>
         + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>
         + ArgminSub<T, T>,
     H: 'a
         + Clone

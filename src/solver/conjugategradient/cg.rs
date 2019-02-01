@@ -87,8 +87,7 @@ where
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
 {
     /// b (right hand side)
     b: T,
@@ -116,8 +115,7 @@ where
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
 {
     /// Constructor
     ///
@@ -169,8 +167,7 @@ where
         + ArgminAdd<T, T>
         + ArgminScale<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
 {
     type Parameters = T;
     type OperatorOutput = T;

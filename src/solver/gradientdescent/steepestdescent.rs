@@ -109,8 +109,7 @@ where
         + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: 'a + Clone + Default,
 {
     /// line search
@@ -129,8 +128,7 @@ where
         + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: 'a + Clone + Default,
 {
     /// Constructor
@@ -165,8 +163,7 @@ where
         + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminScaledSub<T, f64>,
+        + ArgminScaledAdd<T, f64, T>,
     H: 'a + Clone + Default,
 {
     type Parameters = T;
