@@ -34,26 +34,16 @@ where
 }
 
 
-pub trait Add { // FIXME: replace by ArgminAdd. Only here to test supertrait Position
-    fn add(&self, other: &Self) -> Self;
-}
-
-
-impl Add for Vec<f64> { // FIXME: replace by ArgminAdd. Only here to test supertrait Position
-    fn add(&self, other: &Self) -> Self {
-        self.iter().zip(other.iter()).map(|(a, b)| a + b).collect()
-    }
-}
-
-
 pub trait Position
 : Clone
 + Default
 // + RandFromRange
-+ Add {
++ ArgminAdd<Self, Self> {
 
 }
 
+
+// FIXME: this does not belong here
 impl Position for Vec<f64> {}
 
 
