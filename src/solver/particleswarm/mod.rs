@@ -24,19 +24,68 @@ use argmin_core::ArgminAdd;
 #[derive(ArgminSolver)]
 pub struct ParticleSwarm<'a, T, H>
 where
-    T: Clone + Default + ArgminAdd<T, T>,
+    T: Position,
     H: Clone + Default,
 {
     base: ArgminBase<'a, T, f64, H>,
     rng: rand::prelude::ThreadRng,
     iter_callback: Option<&'a mut (FnMut(&T, f64) -> ())>,
+    // particles: Vec<Particle<T>>
 }
 
-fn default_callback<T>(p: &T, cost: f64) {}
+
+pub trait Add { // FIXME: replace by ArgminAdd. Only here to test supertrait Position
+    fn add(&self, other: &Self) -> Self;
+}
+
+
+impl Add for Vec<f64> { // FIXME: replace by ArgminAdd. Only here to test supertrait Position
+    fn add(&self, other: &Self) -> Self {
+        self.iter().zip(other.iter()).map(|(a, b)| a + b).collect()
+    }
+}
+
+
+pub trait Position
+: Clone
++ Default
+// + RandFromRange
++ Add {
+
+}
+
+impl Position for Vec<f64> {}
+
+
+pub trait RandFromRange {
+    fn rand_from_range(min: &Self, max: &Self);
+}
+
+// struct Particle<T: RandFromRange> {
+//     position: T,
+//     velocity: T,
+//     best_position: T,
+// }
+
+// impl<T: RandFromRange> Particle<T> {
+//     fn new(min: T, max: T) -> Self {
+
+//         let delta = max.sub(min);
+
+//         let initial_position = T::rand_from_range(&min, &max);
+//         Self {
+//             position: initial_position,
+//             best_position: initial_position,
+//             velocity: T::rand_from_range(-delta, delta)
+//         }
+
+//     }
+// }
+
 
 impl<'a, T, H> ParticleSwarm<'a, T, H>
 where
-    T: Clone + Default + ArgminAdd<T, T>,
+    T: Position,
     H: Clone + Default,
 {
     /// Constructor
@@ -49,11 +98,17 @@ where
     pub fn new(
         cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
         init_param: T,
+        // search_region: (T, T),
+        // num_particles: usize,
     ) -> Result<Self, Error> {
+
         Ok(ParticleSwarm {
             base: ArgminBase::new(cost_function, init_param),
             rng: rand::thread_rng(),
             iter_callback: None,
+            // particles: (0..num_particles).map(
+            //     |_| Particle::new(search_region.0, search_region.1)
+            // ).collect()
         })
     }
 
@@ -65,7 +120,7 @@ where
 
 impl<'a, T, H> ArgminNextIter for ParticleSwarm<'a, T, H>
 where
-    T: Clone + Default + ArgminAdd<T, T>,
+    T: Position,
     H: Clone + Default,
 {
     type Parameters = T;
@@ -75,7 +130,9 @@ where
     /// Perform one iteration of algorithm
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
 
+        // FIXME: replace by actual parameter search
         let new_param = self.cur_param().add(&self.cur_param());
+
         let new_cost = self.apply(&new_param)?;
 
         // TODO: move callback to ArgminBase
