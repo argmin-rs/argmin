@@ -91,7 +91,7 @@ use std::default::Default;
 #[derive(ArgminSolver)]
 pub struct Newton<'a, T, H>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
     H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// gamma
@@ -102,7 +102,7 @@ where
 
 impl<'a, T, H> Newton<'a, T, H>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
     H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// Constructor
@@ -131,7 +131,7 @@ where
 
 impl<'a, T, H> ArgminNextIter for Newton<'a, T, H>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
     H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     type Parameters = T;
@@ -142,7 +142,7 @@ where
         let param = self.cur_param();
         let grad = self.gradient(&param)?;
         let hessian = self.hessian(&param)?;
-        let new_param = param.scaled_sub(self.gamma, &hessian.ainv()?.dot(&grad));
+        let new_param = param.scaled_sub(&self.gamma, &hessian.ainv()?.dot(&grad));
         let out = ArgminIterationData::new(new_param, 0.0);
         Ok(out)
     }

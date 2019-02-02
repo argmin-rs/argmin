@@ -80,7 +80,7 @@ use std::default::Default;
 #[derive(ArgminSolver)]
 pub struct Landweber<'a, T>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
 {
     /// omgea
     omega: f64,
@@ -90,7 +90,7 @@ where
 
 impl<'a, T> Landweber<'a, T>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
 {
     /// Constructor
     pub fn new(
@@ -107,7 +107,7 @@ where
 
 impl<'a, T> ArgminNextIter for Landweber<'a, T>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -116,7 +116,7 @@ where
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let param = self.cur_param();
         let grad = self.gradient(&param)?;
-        let new_param = param.scaled_sub(self.omega, &grad);
+        let new_param = param.scaled_sub(&self.omega, &grad);
         let out = ArgminIterationData::new(new_param, 0.0);
         Ok(out)
     }
