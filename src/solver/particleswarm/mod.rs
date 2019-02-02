@@ -24,7 +24,7 @@ use argmin_core::ArgminAdd;
 #[derive(ArgminSolver)]
 pub struct ParticleSwarm<'a, T, H>
 where
-    T: Clone + Default + ArgminAdd<T>,
+    T: Clone + Default + ArgminAdd<T, T>,
     H: Clone + Default,
 {
     base: ArgminBase<'a, T, f64, H>,
@@ -36,7 +36,7 @@ fn default_callback<T>(p: &T, cost: f64) {}
 
 impl<'a, T, H> ParticleSwarm<'a, T, H>
 where
-    T: Clone + Default + ArgminAdd<T>,
+    T: Clone + Default + ArgminAdd<T, T>,
     H: Clone + Default,
 {
     /// Constructor
@@ -65,7 +65,7 @@ where
 
 impl<'a, T, H> ArgminNextIter for ParticleSwarm<'a, T, H>
 where
-    T: Clone + Default + ArgminAdd<T>,
+    T: Clone + Default + ArgminAdd<T, T>,
     H: Clone + Default,
 {
     type Parameters = T;
