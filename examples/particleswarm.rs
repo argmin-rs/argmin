@@ -37,8 +37,7 @@ fn run() -> Result<(), Error> {
 
     let cost_function = Himmelblau {};
 
-    let mut visualizer = Visualizer { fg: gnuplot::Figure::new() };
-    visualizer.cost_function();
+    let mut visualizer = Visualizer::new();
 
     // Set up line search method
     let mut solver = ParticleSwarm::new(&cost_function, init_param)?;
@@ -46,7 +45,7 @@ fn run() -> Result<(), Error> {
     // Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
 
-    solver.set_max_iters(10);
+    solver.set_max_iters(5);
 
     let mut callback = |xy: &Vec<f64>, c: f64| visualizer.iteration(xy, c);
     solver.set_iter_callback(&mut callback);
@@ -69,48 +68,94 @@ fn main() {
 }
 
 
+
+/// Helper class for visualized surface
+struct Surface {
+    window: (f64, f64, f64, f64),
+    width: usize,
+    height: usize,
+    zvalues: Vec<f64>
+}
+
+impl Surface {
+    fn new(window: (f64, f64, f64, f64), resolution: f64) -> Self {
+        let width = window.2 - window.0;
+        let height = window.3 - window.1;
+        let num_x = (width / resolution) as usize;
+        let num_y = (height / resolution) as usize;
+
+        let mut zvalues: Vec<f64> = vec![];
+
+        for i in 0..num_y {
+            for j in 0..num_x {
+                let y = height * (i as f64) / num_y as f64 - (0.5*height);
+                let x = width * (j as f64) / num_x as f64 - (0.5*width);
+                zvalues.push(himmelblau(&vec![x, y]));
+            }
+        }
+
+        Self { window: window, width:  num_x, height: num_y, zvalues }
+    }
+}
+
+
 struct Visualizer {
-    fg: gnuplot::Figure
+
+    fg: gnuplot::Figure,
+
+    optima_x: Vec<f64>,
+    optima_y: Vec<f64>,
+    optima_z: Vec<f64>,
+
+    surface: Surface
 }
 
 // TODO: destroy window
 impl Visualizer {
-    fn cost_function(&mut self) {
+
+    fn new() -> Self {
+        Self {
+        fg: gnuplot::Figure::new(),
+        optima_x: vec![],
+        optima_y: vec![],
+        optima_z: vec![],
+        surface: Surface::new((-4.0, -4.0, 4.0, 4.0), 0.1)
+        }
+    }
+
+    fn draw(&mut self) {
+
         use gnuplot::*;
 
-        let zw = 61;
-        let zh = 61;
-        let mut z1 = Vec::with_capacity((zw * zh) as usize);
-        for i in 0..zh
-        {
-            for j in 0..zw
-            {
-                let y = 8.0 * (i as f64) / zh as f64 - 4.0;
-                let x = 8.0 * (j as f64) / zw as f64 - 4.0;
-                z1.push(himmelblau(&vec![x, y]));
-            }
-        }
-
+        let options = [Color("#ff0000"), PointSize(2.0)];
+        let window = Some(self.surface.window);
         self.fg.axes3d()
-            .set_title("Surface fg4.2", &[])
-            .surface(z1.iter(), zw, zh, Some((-4.0, -4.0, 4.0, 4.0)), &[])
+            // .set_title("Surface fg4.2", &[])
+            .surface(
+                self.surface.zvalues.iter(),
+                self.surface.width,
+                self.surface.height, window, &[])
             // .set_x_label("X", &[])
             // .set_y_label("Y", &[])
             // .set_z_label("Z", &[])
             // .set_z_range(Fix(0.0), Fix(2000.0))
             // .set_z_ticks(Some((Fix(100.0), 1)), &[Mirror(false)], &[])
             // .set_cb_range(Fix(-1.0), Fix(1.0))
-            .set_view(0.0, 0.0)
+            .points(&self.optima_x, &self.optima_y, &self.optima_z, &options)
+            // .set_view(0.0, 0.0)
             ;
-
-        self.fg.show();
-    }
-
-    fn iteration(&mut self, xy: &Vec<f64>, cost: f64) {
-        self.fg.axes2d().points(&[xy[0]], &[xy[1]], &[]);
         self.fg.show();
 
         std::thread::sleep(std::time::Duration::from_secs(1));
 
+    }
+
+    fn iteration(&mut self, xy: &Vec<f64>, cost: f64) {
+
+        self.optima_x.push(xy[0]);
+        self.optima_y.push(xy[1]);
+        self.optima_z.push(cost);
+
+        self.draw();
     }
 }
