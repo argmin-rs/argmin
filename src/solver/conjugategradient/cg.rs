@@ -85,7 +85,7 @@ where
         + Default
         + ArgminSub<T, T>
         + ArgminAdd<T, T>
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
 {
@@ -113,7 +113,7 @@ where
         + Default
         + ArgminSub<T, T>
         + ArgminAdd<T, T>
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
 {
@@ -165,7 +165,7 @@ where
         + Default
         + ArgminSub<T, T>
         + ArgminAdd<T, T>
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
 {
@@ -176,9 +176,9 @@ where
     fn init(&mut self) -> Result<(), Error> {
         let init_param = self.cur_param();
         let ap = self.apply(&init_param)?;
-        let r0 = self.b.sub(&ap).scale(-1.0);
+        let r0 = self.b.sub(&ap).mul(&(-1.0));
         self.r = r0.clone();
-        self.p = r0.scale(-1.0);
+        self.p = r0.mul(&(-1.0));
         self.rtr = self.r.dot(&self.r);
         Ok(())
     }
@@ -195,7 +195,7 @@ where
         let rtr_n = self.r.dot(&self.r);
         self.beta = rtr_n / self.rtr;
         self.rtr = rtr_n;
-        self.p = self.r.scale(-1.0).scaled_add(&self.beta, &p);
+        self.p = self.r.mul(&(-1.0)).scaled_add(&self.beta, &p);
         let norm = self.r.dot(&self.r);
 
         let mut out = ArgminIterationData::new(new_param, norm.sqrt());

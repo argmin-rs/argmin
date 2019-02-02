@@ -32,7 +32,7 @@ where
         + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminZero
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
 {
     /// Radius
@@ -64,7 +64,7 @@ where
         + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminZero
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
 {
     /// Constructor
@@ -133,7 +133,7 @@ where
                 .enumerate()
                 .filter(|(_, tau)| !tau.is_nan() && filter_func(*tau))
                 .map(|(i, tau)| {
-                    let p = self.p.add(&self.d.scale(tau));
+                    let p = self.p.add(&self.d.mul(&tau));
                     (i, self.eval_m(&p))
                 })
                 .filter(|(_, m)| !m.is_nan())
@@ -166,7 +166,7 @@ where
         + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminZero
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
 {
     type Parameters = T;
@@ -179,7 +179,7 @@ where
         self.r = self.cur_grad();
         self.r_0_norm = self.r.norm();
         self.rtr = self.r.dot(&self.r);
-        self.d = self.r.scale(-1.0);
+        self.d = self.r.mul(&(-1.0));
         self.p = self.r.zero_like();
 
         if self.r_0_norm < self.epsilon {
@@ -199,26 +199,20 @@ where
         if dhd <= 0.0 {
             let tau = self.tau(|_| true, true);
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterationData::new(
-                self.p.add(&self.d.scale(tau)),
-                0.0,
-            ));
+            return Ok(ArgminIterationData::new(self.p.add(&self.d.mul(&tau)), 0.0));
         }
 
         let alpha = self.rtr / dhd;
-        let p_n = self.p.add(&self.d.scale(alpha));
+        let p_n = self.p.add(&self.d.mul(&alpha));
 
         // new p violates trust region bound
         if p_n.norm() >= self.radius {
             let tau = self.tau(|x| x >= 0.0, false);
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterationData::new(
-                self.p.add(&self.d.scale(tau)),
-                0.0,
-            ));
+            return Ok(ArgminIterationData::new(self.p.add(&self.d.mul(&tau)), 0.0));
         }
 
-        let r_n = self.r.add(&h.dot(&self.d).scale(alpha));
+        let r_n = self.r.add(&h.dot(&self.d).mul(&alpha));
 
         if r_n.norm() < self.epsilon * self.r_0_norm {
             self.set_termination_reason(TerminationReason::TargetPrecisionReached);
@@ -227,7 +221,7 @@ where
 
         let rjtrj = r_n.dot(&r_n);
         let beta = rjtrj / self.rtr;
-        self.d = r_n.add(&self.d.scale(beta));
+        self.d = r_n.add(&self.d.mul(&beta));
         self.r = r_n;
         self.p = p_n;
         self.rtr = rjtrj;
@@ -247,7 +241,7 @@ where
         + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminZero
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
 {
     fn set_radius(&mut self, radius: f64) {

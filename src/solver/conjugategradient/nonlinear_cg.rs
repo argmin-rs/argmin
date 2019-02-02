@@ -112,7 +112,7 @@ where
         + Default
         + ArgminSub<T, T>
         + ArgminAdd<T, T>
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
@@ -140,7 +140,7 @@ where
         + Default
         + ArgminSub<T, T>
         + ArgminAdd<T, T>
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
@@ -249,7 +249,7 @@ where
         + Default
         + ArgminSub<T, T>
         + ArgminAdd<T, T>
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
@@ -262,7 +262,7 @@ where
         let param = self.cur_param();
         let cost = self.apply(&param)?;
         let grad = self.gradient(&param)?;
-        self.p = grad.scale(-1.0);
+        self.p = grad.mul(&(-1.0));
         self.set_cur_cost(cost);
         self.set_cur_grad(grad);
         Ok(())
@@ -305,7 +305,7 @@ where
         }
 
         // Update of p
-        self.p = new_grad.scale(-1.0).add(&self.p.scale(self.beta));
+        self.p = new_grad.mul(&(-1.0)).add(&self.p.mul(&self.beta));
 
         // Housekeeping
         self.set_cur_param(xk1.clone());

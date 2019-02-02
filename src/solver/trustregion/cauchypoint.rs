@@ -28,7 +28,7 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default,
 {
     /// Radius
@@ -44,7 +44,7 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default,
 {
     /// Constructor
@@ -70,7 +70,7 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default,
 {
     type Parameters = T;
@@ -94,7 +94,7 @@ where
             1.0f64.min(grad_norm.powi(3) / (self.radius * wdp))
         };
 
-        let new_param = grad.scale(-tau * self.radius / grad_norm);
+        let new_param = grad.mul(&(-tau * self.radius / grad_norm));
         let out = ArgminIterationData::new(new_param, 0.0);
         Ok(out)
     }
@@ -107,7 +107,7 @@ where
         + std::fmt::Debug
         + ArgminWeightedDot<T, f64, H>
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default,
 {
     fn set_radius(&mut self, radius: f64) {

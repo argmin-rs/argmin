@@ -105,7 +105,7 @@ where
         + Clone
         + Default
         + std::fmt::Debug
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
@@ -124,7 +124,7 @@ where
         + Clone
         + Default
         + std::fmt::Debug
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
@@ -159,7 +159,7 @@ where
         + Clone
         + Default
         + std::fmt::Debug
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminSub<T, T>
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
@@ -185,7 +185,7 @@ where
         self.linesearch.set_initial_gradient(new_grad.clone());
         self.linesearch.set_initial_cost(new_cost);
         self.linesearch
-            .set_search_direction(new_grad.scale(-1.0 / norm));
+            .set_search_direction(new_grad.mul(&(-1.0 / norm)));
 
         self.linesearch.run_fast()?;
 

@@ -102,7 +102,7 @@ where
         + ArgminDot<T, f64>
         + ArgminDot<T, H>
         + ArgminNorm<f64>
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminScaledAdd<T, f64, T>
         + ArgminSub<T, T>,
     H: 'a
@@ -115,7 +115,7 @@ where
         + ArgminEye
         + ArgminSub<H, H>
         + ArgminAdd<H, H>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, H>,
 {
     /// Inverse Hessian
     inv_hessian: H,
@@ -134,7 +134,7 @@ where
         + ArgminDot<T, f64>
         + ArgminDot<T, H>
         + ArgminNorm<f64>
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminScaledAdd<T, f64, T>
         + ArgminSub<T, T>,
     H: 'a
@@ -147,7 +147,7 @@ where
         + ArgminEye
         + ArgminSub<H, H>
         + ArgminAdd<H, H>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, H>,
 {
     /// Constructor
     pub fn new(
@@ -183,7 +183,7 @@ where
         + ArgminDot<T, f64>
         + ArgminDot<T, H>
         + ArgminNorm<f64>
-        + ArgminScale<f64>
+        + ArgminMul<f64, T>
         + ArgminScaledAdd<T, f64, T>
         + ArgminSub<T, T>,
     H: 'a
@@ -196,7 +196,7 @@ where
         + ArgminEye
         + ArgminSub<H, H>
         + ArgminAdd<H, H>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -217,13 +217,13 @@ where
         let param = self.cur_param();
         let cur_cost = self.cur_cost();
         let prev_grad = self.base.cur_grad();
-        let p = self.inv_hessian.dot(&prev_grad).scale(-1.0);
+        let p = self.inv_hessian.dot(&prev_grad).mul(&(-1.0));
 
         self.linesearch.set_initial_parameter(param.clone());
         self.linesearch.set_initial_gradient(prev_grad.clone());
         self.linesearch.set_initial_cost(cur_cost);
         self.linesearch
-            .set_search_direction(p.scale(1.0 / p.norm()));
+            .set_search_direction(p.mul(&(1.0 / p.norm())));
         // self.linesearch.set_search_direction(p);
         self.linesearch.run_fast()?;
 
@@ -241,7 +241,7 @@ where
 
         let e = self.inv_hessian.eye_like();
         let mat1: H = sk.dot(&yk);
-        let mat1 = mat1.scale(rhok);
+        let mat1 = mat1.mul(&rhok);
 
         let mat2 = mat1.clone().t();
 
@@ -249,7 +249,7 @@ where
         let tmp2 = e.sub(&mat2);
 
         let sksk: H = sk.dot(&sk);
-        let sksk = sksk.scale(rhok);
+        let sksk = sksk.mul(&rhok);
 
         self.inv_hessian = tmp1.dot(&self.inv_hessian.dot(&tmp2)).add(&sksk);
 

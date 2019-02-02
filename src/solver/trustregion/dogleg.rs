@@ -32,7 +32,7 @@ where
         + ArgminAdd<T, T>
         + ArgminSub<T, T>
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// Radius
@@ -51,7 +51,7 @@ where
         + ArgminAdd<T, T>
         + ArgminSub<T, T>
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// Constructor
@@ -80,7 +80,7 @@ where
         + ArgminAdd<T, T>
         + ArgminSub<T, T>
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     type Parameters = T;
@@ -102,13 +102,13 @@ where
         // pb = -H^-1g
         let pb = (self.cur_hessian().ainv()?)
             .dot(&self.cur_grad())
-            .scale(-1.0);
+            .mul(&(-1.0));
 
         if pb.norm() <= self.radius {
             pstar = pb;
         } else {
             // pu = - (g^Tg)/(g^THg) * g
-            let pu = g.scale(-g.dot(&g) / g.weighted_dot(&h, &g));
+            let pu = g.mul(&(-g.dot(&g) / g.weighted_dot(&h, &g)));
 
             let utu = pu.dot(&pu);
             let btb = pb.dot(&pb);
@@ -132,10 +132,10 @@ where
             }
 
             if tau >= 0.0 && tau < 1.0 {
-                pstar = pu.scale(tau);
+                pstar = pu.mul(&tau);
             } else if tau >= 1.0 && tau <= 2.0 {
                 // pstar = pu + (tau - 1.0) * (pb - pu)
-                pstar = pu.add(&pb.sub(&pu).scale(tau - 1.0));
+                pstar = pu.add(&pb.sub(&pu).mul(&(tau - 1.0)));
             } else {
                 return Err(ArgminError::ImpossibleError {
                     text: "tau is bigger than 2, this is not supposed to happen.".to_string(),
@@ -158,7 +158,7 @@ where
         + ArgminAdd<T, T>
         + ArgminSub<T, T>
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     // fn set_initial_parameter(&mut self, param: T) {

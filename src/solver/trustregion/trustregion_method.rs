@@ -125,7 +125,7 @@ where
         + ArgminAdd<T, T>
         + ArgminSub<T, T>
         + ArgminZero
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
 {
     /// Radius
@@ -156,7 +156,7 @@ where
         + ArgminAdd<T, T>
         + ArgminSub<T, T>
         + ArgminZero
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: 'a + Clone + std::default::Default + ArgminDot<T, T>,
 {
     /// Constructor
@@ -231,7 +231,7 @@ where
         + ArgminAdd<T, T>
         + ArgminSub<T, T>
         + ArgminZero
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
 {
     type Parameters = T;

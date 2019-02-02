@@ -107,7 +107,7 @@ where
         + ArgminSub<T, T>
         + ArgminZero
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// line search
@@ -130,7 +130,7 @@ where
         + ArgminSub<T, T>
         + ArgminZero
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// Constructor
@@ -175,7 +175,7 @@ where
         + ArgminSub<T, T>
         + ArgminZero
         + ArgminNorm<f64>
-        + ArgminScale<f64>,
+        + ArgminMul<f64, T>,
     H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     type Parameters = T;
@@ -192,7 +192,7 @@ where
 
         let mut x_p = param.zero_like();
         let mut x: T = param.zero_like();
-        let mut cg = ConjugateGradient::new(&op, grad.scale(-1.0), x_p.clone())?;
+        let mut cg = ConjugateGradient::new(&op, grad.mul(&(-1.0)), x_p.clone())?;
 
         cg.init()?;
         let grad_norm = grad.norm();
@@ -208,7 +208,7 @@ where
             // println!("iter: {:?}, curv: {:?}", iter, curvature);
             if curvature <= self.curvature_threshold {
                 if iter == 0 {
-                    x = grad.scale(-1.0);
+                    x = grad.mul(&(-1.0));
                     break;
                 } else {
                     x = x_p;
