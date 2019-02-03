@@ -9,10 +9,15 @@
 use crate::prelude::*;
 use argmin_codegen::ArgminSolver;
 // use rand;
-// use rand::Rng;
+use rand::Rng;
+use rand::distributions::uniform::SampleUniform;
 use std;
 use std::default::Default;
 use argmin_core::ArgminAdd;
+
+
+// TODO: pass particles by reference
+type Callback<T> = FnMut(&T, f64, Vec<Particle<T>>) -> ();
 
 
 // #[log("initial_temperature" => "self.init_temp")]
@@ -29,49 +34,9 @@ where
 {
     base: ArgminBase<'a, T, f64, H>,
     rng: rand::prelude::ThreadRng,
-    iter_callback: Option<&'a mut (FnMut(&T, f64) -> ())>,
-    // particles: Vec<Particle<T>>
+    iter_callback: Option<&'a mut Callback<T>>,
+    particles: Vec<Particle<T>>
 }
-
-
-pub trait Position
-: Clone
-+ Default
-// + RandFromRange
-+ ArgminAdd<Self, Self> {
-
-}
-
-
-// FIXME: this does not belong here
-impl Position for Vec<f64> {}
-
-
-pub trait RandFromRange {
-    fn rand_from_range(min: &Self, max: &Self);
-}
-
-// struct Particle<T: RandFromRange> {
-//     position: T,
-//     velocity: T,
-//     best_position: T,
-// }
-
-// impl<T: RandFromRange> Particle<T> {
-//     fn new(min: T, max: T) -> Self {
-
-//         let delta = max.sub(min);
-
-//         let initial_position = T::rand_from_range(&min, &max);
-//         Self {
-//             position: initial_position,
-//             best_position: initial_position,
-//             velocity: T::rand_from_range(-delta, delta)
-//         }
-
-//     }
-// }
-
 
 impl<'a, T, H> ParticleSwarm<'a, T, H>
 where
@@ -88,21 +53,23 @@ where
     pub fn new(
         cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
         init_param: T,
-        // search_region: (T, T),
-        // num_particles: usize,
+        search_region: (T, T),
+        num_particles: usize,
     ) -> Result<Self, Error> {
+
+        let mut rng = rand::thread_rng();
 
         Ok(ParticleSwarm {
             base: ArgminBase::new(cost_function, init_param),
-            rng: rand::thread_rng(),
+            rng: rng.clone(),
             iter_callback: None,
-            // particles: (0..num_particles).map(
-            //     |_| Particle::new(search_region.0, search_region.1)
-            // ).collect()
+            particles: (0..num_particles).map(
+                |_| Particle::new(&mut rng, search_region.0.clone(), search_region.1.clone())
+            ).collect()
         })
     }
 
-    pub fn set_iter_callback(&mut self, callback: &'a mut FnMut(&T, f64) -> ()) {
+    pub fn set_iter_callback(&mut self, callback: &'a mut Callback<T>) {
         self.iter_callback = Some(callback);
     }
 }
@@ -125,11 +92,21 @@ where
 
         let new_cost = self.apply(&new_param)?;
 
+        // TODO: this must be possible with less code
+        let mut costs = vec![];
+        for particle in self.particles.clone() {
+            let cost: f64 = self.apply(&particle.position)?;
+            costs.push(cost);
+        }
+        for i in 0..self.particles.len() {
+            self.particles[i].set_cost(costs[i]);
+        }
+
         // TODO: move callback to ArgminBase
         // TODO: accept &self, not new_param, new_cost
         //       as callback parameters
         match &mut self.iter_callback {
-            Some(callback) => (*callback)(&new_param, new_cost),
+            Some(callback) => (*callback)(&new_param, new_cost, self.particles.clone()),
             None => ()
         };
 
@@ -142,4 +119,69 @@ where
 
         Ok(out)
     }
+}
+
+
+// TODO: use a generic function
+pub trait RandFromRange
+{
+    fn rand_from_range(rng: &mut rand::prelude::ThreadRng,
+                       min: &Self, max: &Self) -> Self;
+}
+
+impl<Scalar> RandFromRange for Vec<Scalar>
+    where Scalar: SampleUniform
+{
+    fn rand_from_range(rng: &mut rand::prelude::ThreadRng,
+                       min: &Self, max: &Self) -> Self
+    {
+        return min.iter().zip(max.iter()).map(|(a, b)| rng.gen_range(a, b)).collect();
+    }
+}
+
+
+pub trait Position
+: Clone
++ Default
++ ArgminAdd<Self, Self>
++ ArgminSub<Self, Self>
++ ArgminMul<f64, Self>
++ RandFromRange
+{}
+
+impl<T> Position for T where T
+: Clone
++ Default
++ ArgminAdd<Self, Self>
++ ArgminSub<Self, Self>
++ ArgminMul<f64, Self>
++ RandFromRange
+{}
+
+
+
+#[derive(Clone)]
+pub struct Particle<T: Position> {
+    pub position: T,
+    velocity: T,
+    pub cost: f64,
+    best_position: T,
+}
+
+impl<T: Position> Particle<T> {
+    fn new(rng: &mut rand::prelude::ThreadRng, min: T, max: T) -> Self {
+
+        let delta = max.sub(&min);
+        let delta_neg = delta.mul(&-1.0);
+
+        let initial_position = T::rand_from_range(rng, &min, &max);
+        Self {
+            position: initial_position.clone(),
+            velocity: T::rand_from_range(rng, &delta_neg, &delta),
+            cost: 0.0,
+            best_position: initial_position,
+        }
+    }
+
+    pub fn set_cost(&mut self, cost: f64) { self.cost = cost; }
 }

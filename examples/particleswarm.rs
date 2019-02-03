@@ -29,7 +29,7 @@ impl ArgminOperator for Himmelblau {
 }
 
 
-
+type Particles = Vec<Particle<Vec<f64>>>;
 
 fn run() -> Result<(), Error> {
 
@@ -41,25 +41,32 @@ fn run() -> Result<(), Error> {
 
     let mut visualizer = Visualizer::new();
 
-    // Set up line search method
-    let mut solver = ParticleSwarm::new(&cost_function, init_param)?;
+    {
+        let mut solver = ParticleSwarm::new(
+            &cost_function,
+            init_param,
+            (vec![-4.0, -4.0], vec![4.0, 4.0]),
+            10,
+        )?;
 
-    // Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
+        // Attach a logger
+        solver.add_logger(ArgminSlogLogger::term());
 
-    solver.set_max_iters(5);
+        solver.set_max_iters(5);
 
-    let mut callback = |xy: &Vec<f64>, c: f64| visualizer.iteration(xy, c);
-    solver.set_iter_callback(&mut callback);
 
-    // Run solver
-    solver.run()?;
+        let mut callback = move |xy: &Vec<f64>, c: f64, v: Particles| visualizer.iteration(xy, c, v);
+        solver.set_iter_callback(&mut callback);
 
-    // Wait a second (lets the logger flush everything before printing again)
-    std::thread::sleep(std::time::Duration::from_secs(100));
+        // Run solver
+        solver.run()?;
 
-    // Print Result
-    println!("{:?}", solver.result());
+        // Wait a second (lets the logger flush everything before printing again)
+        std::thread::sleep(std::time::Duration::from_secs(100));
+
+        // Print Result
+        println!("{:?}", solver.result());
+    }
     Ok(())
 }
 
@@ -108,6 +115,9 @@ struct Visualizer {
     optima_x: Vec<f64>,
     optima_y: Vec<f64>,
     optima_z: Vec<f64>,
+    particles_x: Vec<f64>,
+    particles_y: Vec<f64>,
+    particles_z: Vec<f64>,
 
     surface: Surface
 }
@@ -121,6 +131,9 @@ impl Visualizer {
         optima_x: vec![],
         optima_y: vec![],
         optima_z: vec![],
+        particles_x: vec![],
+        particles_y: vec![],
+        particles_z: vec![],
         surface: Surface::new((-4.0, -4.0, 4.0, 4.0), 0.1)
         }
     }
@@ -129,7 +142,8 @@ impl Visualizer {
 
         use gnuplot::*;
 
-        let options = [Color("#ff0000"), PointSize(2.0)];
+        let options_optima = [Color("#ff0000"), PointSize(2.0)];
+        let options_particles = [Color("#0000ff"), PointSize(2.0)];
         let window = Some(self.surface.window);
         self.fg.axes3d()
             // .set_title("Surface fg4.2", &[])
@@ -143,7 +157,8 @@ impl Visualizer {
             // .set_z_range(Fix(0.0), Fix(2000.0))
             // .set_z_ticks(Some((Fix(100.0), 1)), &[Mirror(false)], &[])
             // .set_cb_range(Fix(-1.0), Fix(1.0))
-            .points(&self.optima_x, &self.optima_y, &self.optima_z, &options)
+            .points(&self.optima_x, &self.optima_y, &self.optima_z, &options_optima)
+            .points(&self.particles_x, &self.particles_y, &self.particles_z, &options_particles)
             // .set_view(0.0, 0.0)
             ;
         self.fg.show();
@@ -152,11 +167,21 @@ impl Visualizer {
 
     }
 
-    fn iteration(&mut self, xy: &Vec<f64>, cost: f64) {
+    fn iteration(&mut self, xy: &Vec<f64>, cost: f64, particles: Particles) {
 
         self.optima_x.push(xy[0]);
         self.optima_y.push(xy[1]);
         self.optima_z.push(cost);
+
+
+        self.particles_x.clear();
+        self.particles_y.clear();
+        self.particles_z.clear();
+        for particle in particles {
+            self.particles_x.push(particle.position[0]);
+            self.particles_y.push(particle.position[1]);
+            self.particles_z.push(0.0);
+        }
 
         self.draw();
     }
