@@ -100,7 +100,7 @@ where
         let pstar;
 
         // pb = -H^-1g
-        let pb = (self.cur_hessian().ainv()?)
+        let pb = (self.cur_hessian().inv()?)
             .dot(&self.cur_grad())
             .mul(&(-1.0));
 
