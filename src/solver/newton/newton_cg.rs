@@ -100,6 +100,8 @@ where
     T: 'a
         + Clone
         + Default
+        + Send
+        + Sync
         + Debug
         + ArgminScaledAdd<T, f64, T>
         + ArgminDot<T, f64>
@@ -108,7 +110,7 @@ where
         + ArgminZero
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    H: 'a + Clone + Default + Send + Sync + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// line search
     linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
@@ -123,6 +125,8 @@ where
     T: 'a
         + Clone
         + Default
+        + Send
+        + Sync
         + Debug
         + ArgminScaledAdd<T, f64, T>
         + ArgminDot<T, f64>
@@ -131,7 +135,7 @@ where
         + ArgminZero
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    H: 'a + Clone + Default + Send + Sync + ArgminInv<H> + ArgminDot<T, T>,
 {
     /// Constructor
     pub fn new(
@@ -168,6 +172,8 @@ where
     T: 'a
         + Clone
         + Default
+        + Send
+        + Sync
         + Debug
         + ArgminScaledAdd<T, f64, T>
         + ArgminDot<T, f64>
@@ -176,7 +182,7 @@ where
         + ArgminZero
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    H: 'a + Clone + Send + Sync + Default + ArgminInv<H> + ArgminDot<T, T>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -252,8 +258,8 @@ where
 #[derive(Clone)]
 struct CGSubProblem<'a, T, H>
 where
-    H: 'a + Clone + Default + ArgminDot<T, T>,
-    T: 'a + Clone,
+    T: 'a + Clone + Send + Sync,
+    H: 'a + Clone + Default + ArgminDot<T, T> + Send + Sync,
 {
     hessian: H,
     phantom: std::marker::PhantomData<&'a T>,
@@ -261,8 +267,8 @@ where
 
 impl<'a, T, H> CGSubProblem<'a, T, H>
 where
-    H: 'a + Clone + Default + ArgminDot<T, T>,
-    T: 'a + Clone,
+    T: 'a + Clone + Send + Sync,
+    H: 'a + Clone + Default + ArgminDot<T, T> + Send + Sync,
 {
     /// constructor
     pub fn new(hessian: H) -> Self {
@@ -275,8 +281,8 @@ where
 
 impl<'a, T, H> ArgminOperator for CGSubProblem<'a, T, H>
 where
-    T: 'a + Clone,
-    H: 'a + Clone + Default + ArgminDot<T, T>,
+    T: 'a + Clone + Send + Sync,
+    H: 'a + Clone + Default + ArgminDot<T, T> + Send + Sync,
 {
     type Parameters = T;
     type OperatorOutput = T;

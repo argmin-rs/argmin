@@ -308,7 +308,7 @@
 //! #[derive(ArgminSolver)]
 //! pub struct Landweber<'a, T>
 //! where
-//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
 //! {
 //!     omega: f64,
 //!     base: ArgminBase<'a, T, f64, ()>,
@@ -317,7 +317,7 @@
 //! // For convenience, a constructor can/should be implemented
 //! impl<'a, T> Landweber<'a, T>
 //! where
-//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
 //! {
 //!     pub fn new(
 //!         cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
@@ -334,7 +334,7 @@
 //! // This implements a single iteration of the optimization algorithm.
 //! impl<'a, T> ArgminNextIter for Landweber<'a, T>
 //! where
-//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64>,
+//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
 //! {
 //!     type Parameters = T;
 //!     type OperatorOutput = f64;
@@ -348,7 +348,7 @@
 //!         // The method `gradient()` has been implemented by deriving `ArgminSolver`.
 //!         let grad = self.gradient(&param)?;
 //!         // Calculate new parameter vector based on update rule
-//!         let new_param = param.scaled_sub(self.omega, &grad);
+//!         let new_param = param.scaled_sub(&self.omega, &grad);
 //!         // Return new parameter vector. Since there is no need to compute the cost function
 //!         // value, we return 0.0 instead.
 //!         let out = ArgminIterationData::new(new_param, 0.0);
