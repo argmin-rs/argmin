@@ -66,7 +66,7 @@ fn run() -> Result<(), Error> {
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print Result
-    println!("{:?}", solver.result());
+    println!("{}", solver.result());
     Ok(())
 }
 
