@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/linesearch/morethuente.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>morethuente.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/linesearch/morethuente.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>morethuente.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../..//index.html'><img src='../../../../rust-logo.png' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -719,10 +719,6 @@
 <span id="719">719</span>
 <span id="720">720</span>
 <span id="721">721</span>
-<span id="722">722</span>
-<span id="723">723</span>
-<span id="724">724</span>
-<span id="725">725</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -852,10 +848,9 @@
     <span class="ident">T</span>: <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
 {
     <span class="doccomment">/// initial parameter vector (builder)</span>
@@ -919,10 +914,9 @@
     <span class="ident">T</span>: <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
     <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>: <span class="ident">ArgminSolver</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
 {
@@ -952,7 +946,7 @@
             <span class="ident">width1</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
             <span class="ident">xtol</span>: <span class="number">1e-10</span>,
             <span class="ident">alpha</span>: <span class="number">1.0</span>,
-            <span class="ident">stpmin</span>: <span class="number">1e-15</span>,
+            <span class="ident">stpmin</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>.<span class="ident">sqrt</span>(),
             <span class="ident">stpmax</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>,
             <span class="ident">stp</span>: <span class="ident">Step</span>::<span class="ident">default</span>(),
             <span class="ident">stx</span>: <span class="ident">Step</span>::<span class="ident">default</span>(),
@@ -1020,10 +1014,9 @@
     <span class="ident">T</span>: <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
 {
     <span class="doccomment">/// Set search direction</span>
@@ -1079,10 +1072,9 @@
     <span class="ident">T</span>: <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
 {
     <span class="kw">type</span> <span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>;
@@ -1164,7 +1156,7 @@
         <span class="comment">// Evaluate the function and gradient at new stp.x and compute the directional derivative</span>
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">init_param</span>
-            .<span class="ident">scaled_add</span>(<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
+            .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
         <span class="self">self</span>.<span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>;
@@ -1267,7 +1259,7 @@
 
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">init_param</span>
-            .<span class="ident">scaled_add</span>(<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
+            .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
         <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">ArgminIterationData</span>::<span class="ident">new</span>(<span class="ident">new_param</span>, <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">fx</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">out</span>)
     }

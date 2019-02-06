@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/simulatedannealing/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/simulatedannealing/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../..//index.html'><img src='../../../../rust-logo.png' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -483,6 +483,8 @@
 <span id="483">483</span>
 <span id="484">484</span>
 <span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -541,7 +543,7 @@
 <span class="doccomment">/// use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};</span>
 <span class="doccomment">/// use argmin::testfunctions::rosenbrock;</span>
 <span class="doccomment">/// use rand::prelude::*;</span>
-<span class="doccomment">/// use std::cell::RefCell;</span>
+<span class="doccomment">/// use std::sync::{Arc, Mutex};;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[derive(Clone)]</span>
 <span class="doccomment">/// struct Rosenbrock {</span>
@@ -553,9 +555,10 @@
 <span class="doccomment">///     lower_bound: Vec&lt;f64&gt;,</span>
 <span class="doccomment">///     /// upper bound</span>
 <span class="doccomment">///     upper_bound: Vec&lt;f64&gt;,</span>
-<span class="doccomment">///     /// Random number generator. We use a `RefCell` here because `ArgminOperator` requires `self`</span>
-<span class="doccomment">///     /// to be passed as an immutable reference. `RefCell` gives us interior mutability.</span>
-<span class="doccomment">///     rng: RefCell&lt;ThreadRng&gt;,</span>
+<span class="doccomment">///     /// Random number generator. We use a `Arc&lt;Mutex&lt;_&gt;&gt;` here because `ArgminOperator` requires</span>
+<span class="doccomment">///     /// `self` to be passed as an immutable reference. This gives us thread safe interior</span>
+<span class="doccomment">///     /// mutability.</span>
+<span class="doccomment">///     rng: Arc&lt;Mutex&lt;SmallRng&gt;&gt;,</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl Rosenbrock {</span>
@@ -566,7 +569,7 @@
 <span class="doccomment">///             b,</span>
 <span class="doccomment">///             lower_bound,</span>
 <span class="doccomment">///             upper_bound,</span>
-<span class="doccomment">///             rng: RefCell::new(rand::thread_rng()),</span>
+<span class="doccomment">///             rng: Arc::new(Mutex::new(SmallRng::from_entropy())),</span>
 <span class="doccomment">///         }</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
@@ -587,10 +590,11 @@
 <span class="doccomment">///         for _ in 0..(temp.floor() as u64 + 1) {</span>
 <span class="doccomment">///             // Compute random index of the parameter vector using the supplied random number</span>
 <span class="doccomment">///             // generator.</span>
-<span class="doccomment">///             let idx = self.rng.borrow_mut().gen_range(0, param.len());</span>
+<span class="doccomment">///             let mut rng = self.rng.lock().unwrap();</span>
+<span class="doccomment">///             let idx = (*rng).gen_range(0, param.len());</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///             // Compute random number in [0.01, 0.01].</span>
-<span class="doccomment">///             let val = 0.01 * self.rng.borrow_mut().gen_range(-1.0, 1.0);</span>
+<span class="doccomment">///             let val = 0.01 * (*rng).gen_range(-1.0, 1.0);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///             // modify previous parameter value at random position `idx` by `val`</span>
 <span class="doccomment">///             let tmp = param[idx] + val;</span>

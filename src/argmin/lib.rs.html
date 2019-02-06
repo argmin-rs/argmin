@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../..//index.html'><img src='../../rust-logo.png' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -388,8 +388,6 @@
 <span id="388">388</span>
 <span id="389">389</span>
 <span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -686,7 +684,6 @@
 <span class="doccomment">//! latter is essentially an implementation of a single iteration of the algorithm.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #![feature(uniform_paths)]</span>
 <span class="doccomment">//! // needed for `#[derive(ArgminSolver)]`</span>
 <span class="doccomment">//! # extern crate argmin_codegen;</span>
 <span class="doccomment">//! use argmin_codegen::ArgminSolver;</span>
@@ -702,7 +699,7 @@
 <span class="doccomment">//! #[derive(ArgminSolver)]</span>
 <span class="doccomment">//! pub struct Landweber&lt;&#39;a, T&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     T: &#39;a + Clone + Default + ArgminScaledSub&lt;T, f64&gt;,</span>
+<span class="doccomment">//!     T: &#39;a + Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     omega: f64,</span>
 <span class="doccomment">//!     base: ArgminBase&lt;&#39;a, T, f64, ()&gt;,</span>
@@ -711,7 +708,7 @@
 <span class="doccomment">//! // For convenience, a constructor can/should be implemented</span>
 <span class="doccomment">//! impl&lt;&#39;a, T&gt; Landweber&lt;&#39;a, T&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     T: &#39;a + Clone + Default + ArgminScaledSub&lt;T, f64&gt;,</span>
+<span class="doccomment">//!     T: &#39;a + Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     pub fn new(</span>
 <span class="doccomment">//!         cost_function: &amp;&#39;a ArgminOperator&lt;Parameters = T, OperatorOutput = f64, Hessian = ()&gt;,</span>
@@ -728,7 +725,7 @@
 <span class="doccomment">//! // This implements a single iteration of the optimization algorithm.</span>
 <span class="doccomment">//! impl&lt;&#39;a, T&gt; ArgminNextIter for Landweber&lt;&#39;a, T&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     T: &#39;a + Clone + Default + ArgminScaledSub&lt;T, f64&gt;,</span>
+<span class="doccomment">//!     T: &#39;a + Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     type Parameters = T;</span>
 <span class="doccomment">//!     type OperatorOutput = f64;</span>
@@ -742,7 +739,7 @@
 <span class="doccomment">//!         // The method `gradient()` has been implemented by deriving `ArgminSolver`.</span>
 <span class="doccomment">//!         let grad = self.gradient(&amp;param)?;</span>
 <span class="doccomment">//!         // Calculate new parameter vector based on update rule</span>
-<span class="doccomment">//!         let new_param = param.scaled_sub(self.omega, &amp;grad);</span>
+<span class="doccomment">//!         let new_param = param.scaled_sub(&amp;self.omega, &amp;grad);</span>
 <span class="doccomment">//!         // Return new parameter vector. Since there is no need to compute the cost function</span>
 <span class="doccomment">//!         // value, we return 0.0 instead.</span>
 <span class="doccomment">//!         let out = ArgminIterationData::new(new_param, 0.0);</span>
@@ -760,7 +757,6 @@
 <span class="comment">// Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,</span>
 <span class="comment">// this is just to make sure that it will always stay this way.)</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">clippy</span>::<span class="ident">float_cmp</span>)]</span>
-<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">uniform_paths</span>)]</span>
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">argmin_core</span>;
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>

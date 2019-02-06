@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/quasinewton/bfgs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bfgs.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/quasinewton/bfgs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bfgs.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../..//index.html'><img src='../../../../rust-logo.png' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -257,11 +257,6 @@
 <span id="257">257</span>
 <span id="258">258</span>
 <span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -367,20 +362,20 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScale</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="lifetime">&#39;a</span>
         <span class="op">+</span> <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Debug</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminTranspose</span>
         <span class="op">+</span> <span class="ident">ArgminEye</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScale</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">H</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Inverse Hessian</span>
     <span class="ident">inv_hessian</span>: <span class="ident">H</span>,
@@ -399,20 +394,20 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScale</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="lifetime">&#39;a</span>
         <span class="op">+</span> <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Debug</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminTranspose</span>
         <span class="op">+</span> <span class="ident">ArgminEye</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScale</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">H</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
@@ -448,20 +443,20 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScale</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="lifetime">&#39;a</span>
         <span class="op">+</span> <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Debug</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminTranspose</span>
         <span class="op">+</span> <span class="ident">ArgminEye</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScale</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">H</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>;
     <span class="kw">type</span> <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>;
@@ -482,15 +477,13 @@
         <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_param</span>();
         <span class="kw">let</span> <span class="ident">cur_cost</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_cost</span>();
         <span class="kw">let</span> <span class="ident">prev_grad</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">cur_grad</span>();
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>).<span class="ident">scale</span>(<span class="op">-</span><span class="number">1.0</span>);
+        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="op">-</span><span class="number">1.0</span>));
 
-        <span class="comment">// println!(&quot;ih: {:?}&quot;, self.inv_hessian);</span>
-        <span class="comment">// println!(&quot;p: {:?}&quot;, p);</span>
         <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">set_initial_parameter</span>(<span class="ident">param</span>.<span class="ident">clone</span>());
         <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">set_initial_gradient</span>(<span class="ident">prev_grad</span>.<span class="ident">clone</span>());
         <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">set_initial_cost</span>(<span class="ident">cur_cost</span>);
         <span class="self">self</span>.<span class="ident">linesearch</span>
-            .<span class="ident">set_search_direction</span>(<span class="ident">p</span>.<span class="ident">scale</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">p</span>.<span class="ident">norm</span>()));
+            .<span class="ident">set_search_direction</span>(<span class="ident">p</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">p</span>.<span class="ident">norm</span>())));
         <span class="comment">// self.linesearch.set_search_direction(p);</span>
         <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">run_fast</span>()<span class="question-mark">?</span>;
 
@@ -502,24 +495,21 @@
         <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_cur_grad</span>(<span class="ident">grad</span>);
 
         <span class="kw">let</span> <span class="ident">sk</span> <span class="op">=</span> <span class="ident">xk1</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>);
-        <span class="comment">// println!(&quot;sk: {:?}&quot;, sk);</span>
 
         <span class="kw">let</span> <span class="ident">yksk</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="ident">yk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
         <span class="kw">let</span> <span class="ident">rhok</span> <span class="op">=</span> <span class="number">1.0</span> <span class="op">/</span> <span class="ident">yksk</span>;
 
         <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inv_hessian</span>.<span class="ident">eye_like</span>();
         <span class="kw">let</span> <span class="ident">mat1</span>: <span class="ident">H</span> <span class="op">=</span> <span class="ident">sk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">yk</span>);
-        <span class="kw">let</span> <span class="ident">mat1</span> <span class="op">=</span> <span class="ident">mat1</span>.<span class="ident">scale</span>(<span class="ident">rhok</span>);
-        <span class="comment">// This is unnecessary ... however, there is no ArgminTranspose yet....</span>
-        <span class="kw">let</span> <span class="ident">mat2</span>: <span class="ident">H</span> <span class="op">=</span> <span class="ident">yk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
-        <span class="kw">let</span> <span class="ident">mat2</span> <span class="op">=</span> <span class="ident">mat2</span>.<span class="ident">scale</span>(<span class="ident">rhok</span>);
+        <span class="kw">let</span> <span class="ident">mat1</span> <span class="op">=</span> <span class="ident">mat1</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">rhok</span>);
+
+        <span class="kw">let</span> <span class="ident">mat2</span> <span class="op">=</span> <span class="ident">mat1</span>.<span class="ident">clone</span>().<span class="ident">t</span>();
 
         <span class="kw">let</span> <span class="ident">tmp1</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">mat1</span>);
         <span class="kw">let</span> <span class="ident">tmp2</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">mat2</span>);
 
-        <span class="comment">// TODO: Update H</span>
         <span class="kw">let</span> <span class="ident">sksk</span>: <span class="ident">H</span> <span class="op">=</span> <span class="ident">sk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
-        <span class="kw">let</span> <span class="ident">sksk</span> <span class="op">=</span> <span class="ident">sksk</span>.<span class="ident">scale</span>(<span class="ident">rhok</span>);
+        <span class="kw">let</span> <span class="ident">sksk</span> <span class="op">=</span> <span class="ident">sksk</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">rhok</span>);
 
         <span class="self">self</span>.<span class="ident">inv_hessian</span> <span class="op">=</span> <span class="ident">tmp1</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">tmp2</span>)).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">sksk</span>);
 
