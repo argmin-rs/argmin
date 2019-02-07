@@ -21,7 +21,7 @@ use std;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct Steihaug<'a, T, H>
+pub struct Steihaug<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -34,6 +34,7 @@ where
         + ArgminZero
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Radius
     radius: f64,
@@ -50,10 +51,10 @@ where
     /// direction
     d: T,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, H, O>,
 }
 
-impl<'a, T, H> Steihaug<'a, T, H>
+impl<T, H, O> Steihaug<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -66,15 +67,14 @@ where
         + ArgminZero
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-    ) -> Self {
+    pub fn new(operator: O) -> Self {
         let base = ArgminBase::new(operator, T::default());
         Steihaug {
             radius: std::f64::NAN,
@@ -155,7 +155,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for Steihaug<'a, T, H>
+impl<T, H, O> ArgminNextIter for Steihaug<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -168,6 +168,7 @@ where
         + ArgminZero
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -230,7 +231,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminTrustRegion for Steihaug<'a, T, H>
+impl<T, H, O> ArgminTrustRegion for Steihaug<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -243,6 +244,7 @@ where
         + ArgminZero
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;

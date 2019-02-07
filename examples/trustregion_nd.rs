@@ -53,12 +53,12 @@ fn run() -> Result<(), Error> {
     let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 
     // Set up solver
-    let mut solver = TrustRegion::new(&cost, init_param);
+    let mut solver = TrustRegion::new(cost.clone(), init_param);
 
     // Set method for subproblem. Optional: If not provided, it will default to `Steihaug` method
-    // let subproblem = Box::new(CauchyPoint::new(&cost));
-    let subproblem = Box::new(Dogleg::new(&cost));
-    // let mut subproblem = Box::new(Steihaug::new(&cost));
+    // let subproblem = Box::new(CauchyPoint::new(cost));
+    let subproblem = Box::new(Dogleg::new(cost));
+    // let mut subproblem = Box::new(Steihaug::new(cost));
     solver.set_subproblem(subproblem);
 
     // Set the maximum number of iterations

@@ -21,7 +21,7 @@ use std;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct CauchyPoint<'a, T, H>
+pub struct CauchyPoint<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -30,14 +30,15 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Radius
     radius: f64,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, H, O>,
 }
 
-impl<'a, T, H> CauchyPoint<'a, T, H>
+impl<T, H, O> CauchyPoint<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -46,15 +47,14 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-    ) -> Self {
+    pub fn new(operator: O) -> Self {
         let base = ArgminBase::new(operator, T::default());
         CauchyPoint {
             radius: std::f64::NAN,
@@ -63,7 +63,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for CauchyPoint<'a, T, H>
+impl<T, H, O> ArgminNextIter for CauchyPoint<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -72,6 +72,7 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -100,7 +101,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminTrustRegion for CauchyPoint<'a, T, H>
+impl<T, H, O> ArgminTrustRegion for CauchyPoint<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -109,6 +110,7 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;

@@ -22,7 +22,7 @@ use std;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct Dogleg<'a, T, H>
+pub struct Dogleg<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -34,14 +34,15 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Radius
     radius: f64,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, H, O>,
 }
 
-impl<'a, T, H> Dogleg<'a, T, H>
+impl<T, H, O> Dogleg<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -53,15 +54,14 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-    ) -> Self {
+    pub fn new(operator: O) -> Self {
         let base = ArgminBase::new(operator, T::default());
         Dogleg {
             radius: std::f64::NAN,
@@ -70,7 +70,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for Dogleg<'a, T, H>
+impl<T, H, O> ArgminNextIter for Dogleg<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -82,6 +82,7 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -148,7 +149,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminTrustRegion for Dogleg<'a, T, H>
+impl<T, H, O> ArgminTrustRegion for Dogleg<T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -160,6 +161,7 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     // fn set_initial_parameter(&mut self, param: T) {
     //     self.set_cur_param(param);

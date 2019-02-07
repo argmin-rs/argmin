@@ -76,12 +76,12 @@ use std;
 /// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 ///
 /// // Set up solver
-/// let mut solver = TrustRegion::new(&cost, init_param);
+/// let mut solver = TrustRegion::new(cost.clone(), init_param);
 ///
 /// // Set method for subproblem. Optional: If not provided, it will default to `Steihaug` method
-/// // let subproblem = Box::new(CauchyPoint::new(&cost));
-/// let subproblem = Box::new(Dogleg::new(&cost));
-/// // let mut subproblem = Box::new(Steihaug::new(&cost));
+/// // let subproblem = Box::new(CauchyPoint::new(cost));
+/// let subproblem = Box::new(Dogleg::new(cost));
+/// // let mut subproblem = Box::new(Steihaug::new(cost));
 /// solver.set_subproblem(subproblem);
 ///
 /// // Set the maximum number of iterations
@@ -114,7 +114,7 @@ use std;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct TrustRegion<'a, T, H>
+pub struct TrustRegion<'a, T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -127,6 +127,7 @@ where
         + ArgminZero
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
+    O: 'a + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Radius
     radius: f64,
@@ -141,10 +142,10 @@ where
     /// mk(0)
     mk0: f64,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, H, O>,
 }
 
-impl<'a, T, H> TrustRegion<'a, T, H>
+impl<'a, T, H, O> TrustRegion<'a, T, H, O>
 where
     T: 'a
         + Clone
@@ -158,17 +159,15 @@ where
         + ArgminZero
         + ArgminMul<f64, T>,
     H: 'a + Clone + std::default::Default + ArgminDot<T, T>,
+    O: 'a + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-        param: T,
-    ) -> Self {
-        let base = ArgminBase::new(operator, param);
+    pub fn new(operator: O, param: T) -> Self {
+        let base = ArgminBase::new(operator.clone(), param);
         let mut subproblem = Box::new(Steihaug::new(operator));
         subproblem.set_max_iters(2);
         TrustRegion {
@@ -220,7 +219,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for TrustRegion<'a, T, H>
+impl<'a, T, H, O> ArgminNextIter for TrustRegion<'a, T, H, O>
 where
     T: Clone
         + std::default::Default
@@ -233,6 +232,7 @@ where
         + ArgminZero
         + ArgminMul<f64, T>,
     H: Clone + std::default::Default + ArgminDot<T, T>,
+    O: 'a + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
