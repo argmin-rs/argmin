@@ -63,7 +63,7 @@ use std::fmt::Debug;
 /// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 ///
 /// // Set up solver
-/// let mut solver = NewtonCG::new(&cost, init_param);
+/// let mut solver = NewtonCG::new(cost, init_param);
 ///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(20);
@@ -95,7 +95,7 @@ use std::fmt::Debug;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct NewtonCG<'a, T, H>
+pub struct NewtonCG<'a, T, H, O>
 where
     T: 'a
         + Clone
@@ -111,16 +111,17 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: 'a + Clone + Default + Send + Sync + ArgminInv<H> + ArgminDot<T, T>,
+    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// line search
     linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     /// curvature_threshold
     curvature_threshold: f64,
     /// Base stuff
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, H, O>,
 }
 
-impl<'a, T, H> NewtonCG<'a, T, H>
+impl<'a, T, H, O> NewtonCG<'a, T, H, O>
 where
     T: 'a
         + Clone
@@ -136,14 +137,12 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: 'a + Clone + Default + Send + Sync + ArgminInv<H> + ArgminDot<T, T>,
+    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Constructor
-    pub fn new(
-        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-        init_param: T,
-    ) -> Self {
-        // let linesearch = HagerZhangLineSearch::new(cost_function);
-        let linesearch = MoreThuenteLineSearch::new(cost_function);
+    pub fn new(cost_function: O, init_param: T) -> Self {
+        // let linesearch = HagerZhangLineSearch::new(cost_function.clone());
+        let linesearch = MoreThuenteLineSearch::new(cost_function.clone());
         NewtonCG {
             linesearch: Box::new(linesearch),
             curvature_threshold: 0.0,
@@ -167,7 +166,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for NewtonCG<'a, T, H>
+impl<'a, T, H, O> ArgminNextIter for NewtonCG<'a, T, H, O>
 where
     T: 'a
         + Clone
@@ -183,6 +182,7 @@ where
         + ArgminNorm<f64>
         + ArgminMul<f64, T>,
     H: 'a + Clone + Send + Sync + Default + ArgminInv<H> + ArgminDot<T, T>,
+    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
@@ -198,7 +198,7 @@ where
 
         let mut x_p = param.zero_like();
         let mut x: T = param.zero_like();
-        let mut cg = ConjugateGradient::new(&op, grad.mul(&(-1.0)), x_p.clone())?;
+        let mut cg = ConjugateGradient::new(op, grad.mul(&(-1.0)), x_p.clone())?;
 
         cg.init()?;
         let grad_norm = grad.norm();

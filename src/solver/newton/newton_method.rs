@@ -57,7 +57,7 @@ use std::default::Default;
 /// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 ///
 /// // Set up solver
-/// let mut solver = Newton::new(&cost, init_param);
+/// let mut solver = Newton::new(cost, init_param);
 ///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(7);
@@ -89,27 +89,26 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct Newton<'a, T, H>
+pub struct Newton<T, H, O>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    T: Clone + Default + ArgminScaledSub<T, f64, T>,
+    H: Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// gamma
     gamma: f64,
     /// Base stuff
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, H, O>,
 }
 
-impl<'a, T, H> Newton<'a, T, H>
+impl<T, H, O> Newton<T, H, O>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    T: Clone + Default + ArgminScaledSub<T, f64, T>,
+    H: Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Constructor
-    pub fn new(
-        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-        init_param: T,
-    ) -> Self {
+    pub fn new(cost_function: O, init_param: T) -> Self {
         Newton {
             gamma: 1.0,
             base: ArgminBase::new(cost_function, init_param),
@@ -129,10 +128,11 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for Newton<'a, T, H>
+impl<T, H, O> ArgminNextIter for Newton<T, H, O>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    T: Clone + Default + ArgminScaledSub<T, f64, T>,
+    H: Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
