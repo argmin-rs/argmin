@@ -47,12 +47,12 @@ fn run() -> Result<(), Error> {
 
     // Pick a line search. If no line search algorithm is provided, SteepestDescent defaults to
     // HagerZhang.
-    let linesearch = HagerZhangLineSearch::new(&cost);
-    // let linesearch = MoreThuenteLineSearch::new(&cost);
-    // let linesearch = BacktrackingLineSearch::new(&cost);
+    let linesearch = HagerZhangLineSearch::new(cost.clone());
+    // let linesearch = MoreThuenteLineSearch::new(cost.clone());
+    // let linesearch = BacktrackingLineSearch::new(cost.clone());
 
     // Set up solver
-    let mut solver = SteepestDescent::new(&cost, init_param)?;
+    let mut solver = SteepestDescent::new(cost, init_param)?;
 
     // Set line search. If this is omitted, `SteepestDescent` will default to `HagerZhang`.
     solver.set_linesearch(Box::new(linesearch));

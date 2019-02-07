@@ -33,7 +33,7 @@ fn run() -> Result<(), Error> {
     let operator = Rosenbrock {};
 
     let iters = 4000;
-    let mut solver = Landweber::new(&operator, 0.001, init_param)?;
+    let mut solver = Landweber::new(operator, 0.001, init_param)?;
     solver.set_max_iters(iters);
     solver.add_logger(ArgminSlogLogger::term());
     solver.run()?;

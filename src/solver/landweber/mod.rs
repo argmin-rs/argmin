@@ -56,7 +56,7 @@ use std::default::Default;
 /// let init_param: Vec<f64> = vec![1.2, 1.2];
 /// let omega = 0.001;
 ///
-/// let mut solver = Landweber::new(&operator, omega, init_param)?;
+/// let mut solver = Landweber::new(operator, omega, init_param)?;
 /// solver.set_max_iters(100);
 /// solver.add_logger(ArgminSlogLogger::term());
 /// solver.run()?;
@@ -78,26 +78,24 @@ use std::default::Default;
 /// kind. Amer. J. Math. 73, 615–624
 /// [1] https://en.wikipedia.org/wiki/Landweber_iteration
 #[derive(ArgminSolver)]
-pub struct Landweber<'a, T>
+pub struct Landweber<T, O>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
+    T: Clone + Default + ArgminScaledSub<T, f64, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 {
     /// omgea
     omega: f64,
     /// Base stuff
-    base: ArgminBase<'a, T, f64, ()>,
+    base: ArgminBase<T, f64, (), O>,
 }
 
-impl<'a, T> Landweber<'a, T>
+impl<T, O> Landweber<T, O>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
+    T: Clone + Default + ArgminScaledSub<T, f64, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 {
     /// Constructor
-    pub fn new(
-        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
-        omega: f64,
-        init_param: T,
-    ) -> Result<Self, Error> {
+    pub fn new(cost_function: O, omega: f64, init_param: T) -> Result<Self, Error> {
         Ok(Landweber {
             omega,
             base: ArgminBase::new(cost_function, init_param),
@@ -105,9 +103,10 @@ where
     }
 }
 
-impl<'a, T> ArgminNextIter for Landweber<'a, T>
+impl<T, O> ArgminNextIter for Landweber<T, O>
 where
-    T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
+    T: Clone + Default + ArgminScaledSub<T, f64, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 {
     type Parameters = T;
     type OperatorOutput = f64;

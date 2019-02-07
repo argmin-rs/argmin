@@ -35,7 +35,7 @@ fn run() -> Result<(), Error> {
     let init_param: Vec<f64> = vec![1.2, 1.2];
 
     // Set up nonlinear conjugate gradient method
-    let mut solver = NonlinearConjugateGradient::new_pr(&operator, init_param)?;
+    let mut solver = NonlinearConjugateGradient::new_pr(operator, init_param)?;
 
     // Set maximum number of iterations
     solver.set_max_iters(20);

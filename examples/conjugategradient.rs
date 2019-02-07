@@ -33,7 +33,7 @@ fn run() -> Result<(), Error> {
     let operator = MyProblem {};
 
     // Set up the solver
-    let mut solver = ConjugateGradient::new(&operator, b, init_param)?;
+    let mut solver = ConjugateGradient::new(operator, b, init_param)?;
 
     // Set maximum number of iterations
     solver.set_max_iters(2);

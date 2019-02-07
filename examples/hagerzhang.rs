@@ -35,7 +35,7 @@ fn run() -> Result<(), Error> {
     let operator = Sphere {};
 
     // Set up line search method
-    let mut solver = HagerZhangLineSearch::new(&operator);
+    let mut solver = HagerZhangLineSearch::new(operator);
 
     // Set search direction
     solver.set_search_direction(vec![-2.0, 0.0]);

@@ -121,7 +121,7 @@ impl Step {
 /// decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
 /// DOI: https://doi.org/10.1145/192115.192132
 #[derive(ArgminSolver)]
-pub struct MoreThuenteLineSearch<'a, T, H>
+pub struct MoreThuenteLineSearch<T, H, O>
 where
     T: std::default::Default
         + Clone
@@ -130,6 +130,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// initial parameter vector (builder)
     init_param_b: Option<T>,
@@ -184,10 +185,10 @@ where
     /// infoc
     infoc: usize,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, H, O>,
 }
 
-impl<'a, T, H> MoreThuenteLineSearch<'a, T, H>
+impl<T, H, O> MoreThuenteLineSearch<T, H, O>
 where
     T: std::default::Default
         + Clone
@@ -196,16 +197,15 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
-    MoreThuenteLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    MoreThuenteLineSearch<T, H, O>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-    ) -> Self {
+    pub fn new(operator: O) -> Self {
         MoreThuenteLineSearch {
             init_param_b: None,
             finit_b: None,
@@ -287,7 +287,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminLineSearch for MoreThuenteLineSearch<'a, T, H>
+impl<T, H, O> ArgminLineSearch for MoreThuenteLineSearch<T, H, O>
 where
     T: std::default::Default
         + Clone
@@ -296,6 +296,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: T) {
@@ -345,7 +346,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for MoreThuenteLineSearch<'a, T, H>
+impl<T, H, O> ArgminNextIter for MoreThuenteLineSearch<T, H, O>
 where
     T: std::default::Default
         + Clone
@@ -354,6 +355,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;

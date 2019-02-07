@@ -61,12 +61,12 @@ use std::default::Default;
 ///
 /// // Pick a line search. If no line search algorithm is provided, SteepestDescent defaults to
 /// // HagerZhang.
-/// let linesearch = HagerZhangLineSearch::new(&cost);
-/// // let linesearch = MoreThuenteLineSearch::new(&cost);
-/// // let linesearch = BacktrackingLineSearch::new(&cost);
+/// let linesearch = HagerZhangLineSearch::new(cost.clone());
+/// // let linesearch = MoreThuenteLineSearch::new(cost.clone());
+/// // let linesearch = BacktrackingLineSearch::new(cost.clone());
 ///
 /// // Set up solver
-/// let mut solver = SteepestDescent::new(&cost, init_param)?;
+/// let mut solver = SteepestDescent::new(cost, init_param)?;
 /// // Set linesearch. This can be omitted, which will then default to `HagerZhangLineSearch`
 /// solver.set_linesearch(Box::new(linesearch));
 /// // Set maximum number of iterations
@@ -99,7 +99,7 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct SteepestDescent<'a, T, H>
+pub struct SteepestDescent<'a, T, H, O>
 where
     T: 'a
         + Clone
@@ -111,14 +111,15 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: 'a + Clone + Default,
+    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// line search
     linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     /// Base stuff
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, H, O>,
 }
 
-impl<'a, T, H> SteepestDescent<'a, T, H>
+impl<'a, T, H, O> SteepestDescent<'a, T, H, O>
 where
     T: 'a
         + Clone
@@ -130,13 +131,11 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: 'a + Clone + Default,
+    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Constructor
-    pub fn new(
-        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-        init_param: T,
-    ) -> Result<Self, Error> {
-        let linesearch = HagerZhangLineSearch::new(cost_function);
+    pub fn new(cost_function: O, init_param: T) -> Result<Self, Error> {
+        let linesearch = HagerZhangLineSearch::new(cost_function.clone());
         Ok(SteepestDescent {
             linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),
@@ -153,7 +152,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for SteepestDescent<'a, T, H>
+impl<'a, T, H, O> ArgminNextIter for SteepestDescent<'a, T, H, O>
 where
     T: 'a
         + Clone
@@ -165,6 +164,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: 'a + Clone + Default,
+    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;

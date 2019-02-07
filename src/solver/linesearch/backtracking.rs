@@ -105,7 +105,7 @@ use std;
 /// [1] Wikipedia: https://en.wikipedia.org/wiki/Backtracking_line_search
 #[derive(ArgminSolver)]
 #[stop("self.eval_condition()" => LineSearchConditionMet)]
-pub struct BacktrackingLineSearch<'a, T, H>
+pub struct BacktrackingLineSearch<T, H, O>
 where
     T: std::default::Default
         + Clone
@@ -113,6 +113,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// initial parameter vector
     init_param: T,
@@ -129,10 +130,10 @@ where
     /// alpha
     alpha: f64,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, H, O>,
 }
 
-impl<'a, T, H> BacktrackingLineSearch<'a, T, H>
+impl<T, H, O> BacktrackingLineSearch<T, H, O>
 where
     T: std::default::Default
         + Clone
@@ -140,16 +141,15 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
-    BacktrackingLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    BacktrackingLineSearch<T, H, O>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: Must implement `ArgminOperator`
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-    ) -> Self {
+    pub fn new(operator: O) -> Self {
         let cond = ArmijoCondition::new(0.5).unwrap();
         BacktrackingLineSearch {
             init_param: T::default(),
@@ -200,7 +200,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminLineSearch for BacktrackingLineSearch<'a, T, H>
+impl<T, H, O> ArgminLineSearch for BacktrackingLineSearch<T, H, O>
 where
     T: std::default::Default
         + Clone
@@ -208,7 +208,8 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
-    BacktrackingLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    BacktrackingLineSearch<T, H, O>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: T) {
@@ -258,7 +259,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for BacktrackingLineSearch<'a, T, H>
+impl<T, H, O> ArgminNextIter for BacktrackingLineSearch<T, H, O>
 where
     T: std::default::Default
         + Clone
@@ -266,6 +267,7 @@ where
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
     H: Clone + std::default::Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;

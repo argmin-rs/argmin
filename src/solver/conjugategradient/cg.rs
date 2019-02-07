@@ -11,6 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+// #[feature(serde)]
+// use serde::{Deserialize, Serialize};
 use std;
 use std::default::Default;
 
@@ -48,7 +50,7 @@ use std::default::Default;
 /// let operator = MyProblem {};
 ///
 /// // Set up the solver
-/// let mut solver = ConjugateGradient::new(&operator, b, init_param)?;
+/// let mut solver = ConjugateGradient::new(operator, b, init_param)?;
 ///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(2);
@@ -78,8 +80,9 @@ use std::default::Default;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
-pub struct ConjugateGradient<'a, T>
+#[derive(ArgminSolver, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct ConjugateGradient<T, O>
 where
     T: Clone
         + Default
@@ -88,6 +91,7 @@ where
         + ArgminMul<f64, T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>,
 {
     /// b (right hand side)
     b: T,
@@ -104,10 +108,10 @@ where
     /// beta
     beta: f64,
     /// base
-    base: ArgminBase<'a, T, T, ()>,
+    base: ArgminBase<T, T, (), O>,
 }
 
-impl<'a, T> ConjugateGradient<'a, T>
+impl<T, O> ConjugateGradient<T, O>
 where
     T: Clone
         + Default
@@ -116,6 +120,7 @@ where
         + ArgminMul<f64, T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>,
 {
     /// Constructor
     ///
@@ -126,11 +131,7 @@ where
     /// `b`: right hand side of `A * x = b`
     ///
     /// `init_param`: Initial parameter vector
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>,
-        b: T,
-        init_param: T,
-    ) -> Result<Self, Error> {
+    pub fn new(operator: O, b: T, init_param: T) -> Result<Self, Error> {
         Ok(ConjugateGradient {
             b,
             r: T::default(),
@@ -159,7 +160,7 @@ where
     }
 }
 
-impl<'a, T> ArgminNextIter for ConjugateGradient<'a, T>
+impl<T, O> ArgminNextIter for ConjugateGradient<T, O>
 where
     T: Clone
         + Default
@@ -168,6 +169,7 @@ where
         + ArgminMul<f64, T>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>,
 {
     type Parameters = T;
     type OperatorOutput = T;

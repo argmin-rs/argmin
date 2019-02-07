@@ -57,7 +57,7 @@ use std::default::Default;
 /// let init_param: Vec<f64> = vec![1.2, 1.2];
 ///
 /// // Set up nonlinear conjugate gradient method
-/// let mut solver = NonlinearConjugateGradient::new_pr(&operator, init_param)?;
+/// let mut solver = NonlinearConjugateGradient::new_pr(operator, init_param)?;
 ///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(20);
@@ -105,7 +105,7 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct NonlinearConjugateGradient<'a, T>
+pub struct NonlinearConjugateGradient<'a, T, O>
 where
     T: 'a
         + Clone
@@ -116,6 +116,7 @@ where
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 {
     /// p
     p: T,
@@ -130,10 +131,10 @@ where
     /// Restart based on orthogonality
     restart_orthogonality: Option<f64>,
     /// base
-    base: ArgminBase<'a, T, f64, ()>,
+    base: ArgminBase<T, f64, (), O>,
 }
 
-impl<'a, T> NonlinearConjugateGradient<'a, T>
+impl<'a, T, O> NonlinearConjugateGradient<'a, T, O>
 where
     T: 'a
         + Clone
@@ -144,14 +145,12 @@ where
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
+    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 {
     /// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
-        init_param: T,
-    ) -> Result<Self, Error> {
+    pub fn new(operator: O, init_param: T) -> Result<Self, Error> {
         let linesearch: Box<dyn ArgminLineSearch<Parameters = _, OperatorOutput = _, Hessian = _>> =
-            Box::new(HagerZhangLineSearch::new(operator));
+            Box::new(HagerZhangLineSearch::new(operator.clone()));
         let beta_method = PolakRibiere::new();
         Ok(NonlinearConjugateGradient {
             p: T::default(),
@@ -165,18 +164,12 @@ where
     }
 
     /// New PolakRibiere CG (PR-CG)
-    pub fn new_pr(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
-        init_param: T,
-    ) -> Result<Self, Error> {
+    pub fn new_pr(operator: O, init_param: T) -> Result<Self, Error> {
         Self::new(operator, init_param)
     }
 
     /// New PolakRibierePlus CG (PR+-CG)
-    pub fn new_prplus(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
-        init_param: T,
-    ) -> Result<Self, Error> {
+    pub fn new_prplus(operator: O, init_param: T) -> Result<Self, Error> {
         let mut s = Self::new(operator, init_param)?;
         let beta_method = PolakRibierePlus::new();
         s.set_beta_update(Box::new(beta_method));
@@ -184,10 +177,7 @@ where
     }
 
     /// New FletcherReeves CG (FR-CG)
-    pub fn new_fr(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
-        init_param: T,
-    ) -> Result<Self, Error> {
+    pub fn new_fr(operator: O, init_param: T) -> Result<Self, Error> {
         let mut s = Self::new(operator, init_param)?;
         let beta_method = FletcherReeves::new();
         s.set_beta_update(Box::new(beta_method));
@@ -195,10 +185,7 @@ where
     }
 
     /// New HestenesStiefel CG (HS-CG)
-    pub fn new_hs(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
-        init_param: T,
-    ) -> Result<Self, Error> {
+    pub fn new_hs(operator: O, init_param: T) -> Result<Self, Error> {
         let mut s = Self::new(operator, init_param)?;
         let beta_method = HestenesStiefel::new();
         s.set_beta_update(Box::new(beta_method));
@@ -242,7 +229,7 @@ where
     }
 }
 
-impl<'a, T> ArgminNextIter for NonlinearConjugateGradient<'a, T>
+impl<'a, T, O> ArgminNextIter for NonlinearConjugateGradient<'a, T, O>
 where
     T: 'a
         + Clone
@@ -253,6 +240,7 @@ where
         + ArgminNorm<f64>
         + ArgminDot<T, f64>
         + ArgminScaledAdd<T, f64, T>,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
