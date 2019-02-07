@@ -70,7 +70,7 @@ impl Step {
 /// let operator = MyProblem {};
 ///
 /// // Set up line search method
-/// let mut solver = MoreThuenteLineSearch::new(&operator);
+/// let mut solver = MoreThuenteLineSearch::new(operator);
 ///
 /// // Set search direction
 /// solver.set_search_direction(vec![-2.0, 0.0]);

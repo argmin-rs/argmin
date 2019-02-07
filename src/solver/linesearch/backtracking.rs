@@ -47,7 +47,7 @@ use std;
 /// let operator = Sphere {};
 ///
 /// // Set up Line Search method
-/// let mut solver = BacktrackingLineSearch::new(&operator);
+/// let mut solver = BacktrackingLineSearch::new(operator);
 ///
 /// // Set search direction
 /// solver.set_search_direction(vec![-2.0, 0.0]);

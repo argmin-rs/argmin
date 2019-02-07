@@ -190,7 +190,7 @@
 //!     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);
 //!
 //!     // Create solver
-//!     let mut solver = SteepestDescent::new(&cost, init_param)?;
+//!     let mut solver = SteepestDescent::new(cost, init_param)?;
 //!
 //!     // Set the maximum number of iterations to 1000
 //!     solver.set_max_iters(1000);
@@ -252,7 +252,7 @@
 //! # fn run() -> Result<(), Error> {
 //! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 //! #     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);
-//! let mut solver = SteepestDescent::new(&cost, init_param)?;
+//! let mut solver = SteepestDescent::new(cost, init_param)?;
 //! #     solver.set_max_iters(10);
 //! // Log to the terminal
 //! solver.add_logger(ArgminSlogLogger::term());
@@ -306,24 +306,22 @@
 //! // Deriving `ArgminSolver` implements a large portion of the API and provides many convenience
 //! // functions. It requires that `ArgminNextIter` is implemented on `Landweber` as well.
 //! #[derive(ArgminSolver)]
-//! pub struct Landweber<'a, T>
+//! pub struct Landweber<T, O>
 //! where
-//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
+//!     T: Clone + Default + ArgminScaledSub<T, f64, T>,
+//!     O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 //! {
 //!     omega: f64,
-//!     base: ArgminBase<'a, T, f64, ()>,
+//!     base: ArgminBase<T, f64, (), O>,
 //! }
 //!
 //! // For convenience, a constructor can/should be implemented
-//! impl<'a, T> Landweber<'a, T>
+//! impl<T, O> Landweber<T, O>
 //! where
-//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
+//!     T: Clone + Default + ArgminScaledSub<T, f64, T>,
+//!     O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 //! {
-//!     pub fn new(
-//!         cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
-//!         omega: f64,
-//!         init_param: T,
-//!     ) -> Result<Self, Error> {
+//!     pub fn new(cost_function: O, omega: f64, init_param: T) -> Result<Self, Error> {
 //!         Ok(Landweber {
 //!             omega,
 //!             base: ArgminBase::new(cost_function, init_param),
@@ -332,9 +330,10 @@
 //! }
 //!
 //! // This implements a single iteration of the optimization algorithm.
-//! impl<'a, T> ArgminNextIter for Landweber<'a, T>
+//! impl<T, O> ArgminNextIter for Landweber<T, O>
 //! where
-//!     T: 'a + Clone + Default + ArgminScaledSub<T, f64, T>,
+//!     T: Clone + Default + ArgminScaledSub<T, f64, T>,
+//!     O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 //! {
 //!     type Parameters = T;
 //!     type OperatorOutput = f64;
