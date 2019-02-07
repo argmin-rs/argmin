@@ -44,7 +44,7 @@ fn run() -> Result<(), Error> {
     let init_hessian: Array2<f64> = Array2::eye(8);
 
     // Set up solver
-    let mut solver = BFGS::new(&cost, init_param, init_hessian);
+    let mut solver = BFGS::new(cost, init_param, init_hessian);
 
     // Set maximum number of iterations
     solver.set_max_iters(800);

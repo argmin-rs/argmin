@@ -96,7 +96,7 @@ fn run() -> Result<(), Error> {
     let temp = 15.0;
 
     // Set up simulated annealing solver
-    let mut solver = SimulatedAnnealing::new(&operator, init_param, temp)?;
+    let mut solver = SimulatedAnnealing::new(operator, init_param, temp)?;
 
     // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
     solver.temp_func(SATempFunc::Boltzmann);

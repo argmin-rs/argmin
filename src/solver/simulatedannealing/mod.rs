@@ -139,7 +139,7 @@ pub enum SATempFunc {
 ///     let temp = 15.0;
 ///
 ///     // Set up simulated annealing solver
-///     let mut solver = SimulatedAnnealing::new(&operator, init_param, temp)?;
+///     let mut solver = SimulatedAnnealing::new(operator, init_param, temp)?;
 ///
 ///     // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
 ///     solver.temp_func(SATempFunc::Boltzmann);
@@ -212,10 +212,10 @@ pub enum SATempFunc {
 #[log("reanneal_fixed" => "self.reanneal_fixed")]
 #[log("reanneal_accepted" => "self.reanneal_accepted")]
 #[log("reanneal_best" => "self.reanneal_best")]
-pub struct SimulatedAnnealing<'a, T, H>
+pub struct SimulatedAnnealing<T, O>
 where
     T: Clone + Default,
-    H: Clone + Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 {
     /// Initial temperature
     init_temp: f64,
@@ -251,13 +251,13 @@ where
     /// random number generator
     rng: rand::prelude::ThreadRng,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, (), O>,
 }
 
-impl<'a, T, H> SimulatedAnnealing<'a, T, H>
+impl<T, O> SimulatedAnnealing<T, O>
 where
     T: Clone + Default,
-    H: Clone + Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 {
     /// Constructor
     ///
@@ -266,11 +266,7 @@ where
     /// * `cost_function`: cost function
     /// * `init_param`: initial parameter vector
     /// * `init_temp`: initial temperature
-    pub fn new(
-        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-        init_param: T,
-        init_temp: f64,
-    ) -> Result<Self, Error> {
+    pub fn new(cost_function: O, init_param: T, init_temp: f64) -> Result<Self, Error> {
         let prev_cost = cost_function.apply(&init_param)?;
         if init_temp <= 0_f64 {
             Err(ArgminError::InvalidParameter {
@@ -431,14 +427,14 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for SimulatedAnnealing<'a, T, H>
+impl<T, O> ArgminNextIter for SimulatedAnnealing<T, O>
 where
     T: Clone + Default,
-    H: Clone + Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
-    type Hessian = H;
+    type Hessian = ();
 
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {

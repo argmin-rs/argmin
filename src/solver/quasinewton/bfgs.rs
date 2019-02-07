@@ -60,7 +60,7 @@ use std::fmt::Debug;
 /// let init_hessian: Array2<f64> = Array2::eye(2);
 ///
 /// // Set up solver
-/// let mut solver = BFGS::new(&cost, init_param, init_hessian);
+/// let mut solver = BFGS::new(cost, init_param, init_hessian);
 ///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(80);
@@ -93,7 +93,7 @@ use std::fmt::Debug;
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
 #[stop("self.cur_grad().norm() < std::f64::EPSILON.sqrt()" => TargetPrecisionReached)]
-pub struct BFGS<'a, T, H>
+pub struct BFGS<'a, T, H, O>
 where
     T: 'a
         + Clone
@@ -116,16 +116,17 @@ where
         + ArgminSub<H, H>
         + ArgminAdd<H, H>
         + ArgminMul<f64, H>,
+    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Inverse Hessian
     inv_hessian: H,
     /// line search
     linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     /// Base stuff
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<T, f64, H, O>,
 }
 
-impl<'a, T, H> BFGS<'a, T, H>
+impl<'a, T, H, O> BFGS<'a, T, H, O>
 where
     T: 'a
         + Clone
@@ -148,15 +149,12 @@ where
         + ArgminSub<H, H>
         + ArgminAdd<H, H>
         + ArgminMul<f64, H>,
+    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     /// Constructor
-    pub fn new(
-        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-        init_param: T,
-        init_inverse_hessian: H,
-    ) -> Self {
-        let linesearch = MoreThuenteLineSearch::new(cost_function);
-        // let linesearch = HagerZhangLineSearch::new(cost_function);
+    pub fn new(cost_function: O, init_param: T, init_inverse_hessian: H) -> Self {
+        let linesearch = MoreThuenteLineSearch::new(cost_function.clone());
+        // let linesearch = HagerZhangLineSearch::new(cost_function.clone());
         BFGS {
             inv_hessian: init_inverse_hessian,
             linesearch: Box::new(linesearch),
@@ -174,7 +172,7 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for BFGS<'a, T, H>
+impl<'a, T, H, O> ArgminNextIter for BFGS<'a, T, H, O>
 where
     T: 'a
         + Clone
@@ -197,6 +195,7 @@ where
         + ArgminSub<H, H>
         + ArgminAdd<H, H>
         + ArgminMul<f64, H>,
+    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
 {
     type Parameters = T;
     type OperatorOutput = f64;
