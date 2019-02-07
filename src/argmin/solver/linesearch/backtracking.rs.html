@@ -289,6 +289,8 @@
 <span id="289">289</span>
 <span id="290">290</span>
 <span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -339,7 +341,7 @@
 <span class="doccomment">/// let operator = Sphere {};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Set up Line Search method</span>
-<span class="doccomment">/// let mut solver = BacktrackingLineSearch::new(&amp;operator);</span>
+<span class="doccomment">/// let mut solver = BacktrackingLineSearch::new(operator);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Set search direction</span>
 <span class="doccomment">/// solver.set_search_direction(vec![-2.0, 0.0]);</span>
@@ -397,7 +399,7 @@
 <span class="doccomment">/// [1] Wikipedia: https://en.wikipedia.org/wiki/Backtracking_line_search</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>)]</span>
 <span class="attribute">#[<span class="ident">stop</span>(<span class="string">&quot;self.eval_condition()&quot;</span> <span class="op">=&gt;</span> <span class="ident">LineSearchConditionMet</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Clone</span>
@@ -405,6 +407,7 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// initial parameter vector</span>
     <span class="ident">init_param</span>: <span class="ident">T</span>,
@@ -421,10 +424,10 @@
     <span class="doccomment">/// alpha</span>
     <span class="ident">alpha</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// base</span>
-    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">H</span><span class="op">&gt;</span>,
+    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">H</span>, <span class="ident">O</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Clone</span>
@@ -432,16 +435,15 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
-    <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>: <span class="ident">ArgminSolver</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">O</span><span class="op">&gt;</span>: <span class="ident">ArgminSolver</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Constructor</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Parameters:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `operator`: Must implement `ArgminOperator`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">operator</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
-    ) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">operator</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="ident">ArmijoCondition</span>::<span class="ident">new</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>();
         <span class="ident">BacktrackingLineSearch</span> {
             <span class="ident">init_param</span>: <span class="ident">T</span>::<span class="ident">default</span>(),
@@ -492,7 +494,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">ArgminLineSearch</span> <span class="kw">for</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminLineSearch</span> <span class="kw">for</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Clone</span>
@@ -500,7 +502,8 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
-    <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>: <span class="ident">ArgminSolver</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">O</span><span class="op">&gt;</span>: <span class="ident">ArgminSolver</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Set search direction</span>
     <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">search_direction</span>: <span class="ident">T</span>) {
@@ -550,7 +553,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">ArgminNextIter</span> <span class="kw">for</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminNextIter</span> <span class="kw">for</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Clone</span>
@@ -558,6 +561,7 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>;
     <span class="kw">type</span> <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>;

@@ -310,18 +310,6 @@
 <span id="310">310</span>
 <span id="311">311</span>
 <span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -382,7 +370,7 @@
 <span class="doccomment">/// let init_param: Vec&lt;f64&gt; = vec![1.2, 1.2];</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Set up nonlinear conjugate gradient method</span>
-<span class="doccomment">/// let mut solver = NonlinearConjugateGradient::new_pr(&amp;operator, init_param)?;</span>
+<span class="doccomment">/// let mut solver = NonlinearConjugateGradient::new_pr(operator, init_param)?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Set maximum number of iterations</span>
 <span class="doccomment">/// solver.set_max_iters(20);</span>
@@ -430,7 +418,7 @@
 <span class="doccomment">/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="lifetime">&#39;a</span>
         <span class="op">+</span> <span class="ident">Clone</span>
@@ -441,6 +429,7 @@
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
 {
     <span class="doccomment">/// p</span>
     <span class="ident">p</span>: <span class="ident">T</span>,
@@ -455,10 +444,10 @@
     <span class="doccomment">/// Restart based on orthogonality</span>
     <span class="ident">restart_orthogonality</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// base</span>
-    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">f64</span>, ()<span class="op">&gt;</span>,
+    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, (), <span class="ident">O</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="lifetime">&#39;a</span>
         <span class="op">+</span> <span class="ident">Clone</span>
@@ -469,14 +458,12 @@
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">operator</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
-        <span class="ident">init_param</span>: <span class="ident">T</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">operator</span>: <span class="ident">O</span>, <span class="ident">init_param</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">linesearch</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ArgminLineSearch</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="kw">_</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="kw">_</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="kw">_</span><span class="op">&gt;&gt;</span> <span class="op">=</span>
-            <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">HagerZhangLineSearch</span>::<span class="ident">new</span>(<span class="ident">operator</span>));
+            <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">HagerZhangLineSearch</span>::<span class="ident">new</span>(<span class="ident">operator</span>.<span class="ident">clone</span>()));
         <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">PolakRibiere</span>::<span class="ident">new</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">NonlinearConjugateGradient</span> {
             <span class="ident">p</span>: <span class="ident">T</span>::<span class="ident">default</span>(),
@@ -490,18 +477,12 @@
     }
 
     <span class="doccomment">/// New PolakRibiere CG (PR-CG)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_pr</span>(
-        <span class="ident">operator</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
-        <span class="ident">init_param</span>: <span class="ident">T</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_pr</span>(<span class="ident">operator</span>: <span class="ident">O</span>, <span class="ident">init_param</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">operator</span>, <span class="ident">init_param</span>)
     }
 
     <span class="doccomment">/// New PolakRibierePlus CG (PR+-CG)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_prplus</span>(
-        <span class="ident">operator</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
-        <span class="ident">init_param</span>: <span class="ident">T</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_prplus</span>(<span class="ident">operator</span>: <span class="ident">O</span>, <span class="ident">init_param</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">operator</span>, <span class="ident">init_param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">PolakRibierePlus</span>::<span class="ident">new</span>();
         <span class="ident">s</span>.<span class="ident">set_beta_update</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">beta_method</span>));
@@ -509,10 +490,7 @@
     }
 
     <span class="doccomment">/// New FletcherReeves CG (FR-CG)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_fr</span>(
-        <span class="ident">operator</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
-        <span class="ident">init_param</span>: <span class="ident">T</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_fr</span>(<span class="ident">operator</span>: <span class="ident">O</span>, <span class="ident">init_param</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">operator</span>, <span class="ident">init_param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">FletcherReeves</span>::<span class="ident">new</span>();
         <span class="ident">s</span>.<span class="ident">set_beta_update</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">beta_method</span>));
@@ -520,10 +498,7 @@
     }
 
     <span class="doccomment">/// New HestenesStiefel CG (HS-CG)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_hs</span>(
-        <span class="ident">operator</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
-        <span class="ident">init_param</span>: <span class="ident">T</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_hs</span>(<span class="ident">operator</span>: <span class="ident">O</span>, <span class="ident">init_param</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">operator</span>, <span class="ident">init_param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">HestenesStiefel</span>::<span class="ident">new</span>();
         <span class="ident">s</span>.<span class="ident">set_beta_update</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">beta_method</span>));
@@ -567,7 +542,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ArgminNextIter</span> <span class="kw">for</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminNextIter</span> <span class="kw">for</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="lifetime">&#39;a</span>
         <span class="op">+</span> <span class="ident">Clone</span>
@@ -578,6 +553,7 @@
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">f64</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>;
     <span class="kw">type</span> <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>;

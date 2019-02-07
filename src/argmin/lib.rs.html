@@ -387,7 +387,6 @@
 <span id="387">387</span>
 <span id="388">388</span>
 <span id="389">389</span>
-<span id="390">390</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -581,7 +580,7 @@
 <span class="doccomment">//!     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     // Create solver</span>
-<span class="doccomment">//!     let mut solver = SteepestDescent::new(&amp;cost, init_param)?;</span>
+<span class="doccomment">//!     let mut solver = SteepestDescent::new(cost, init_param)?;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     // Set the maximum number of iterations to 1000</span>
 <span class="doccomment">//!     solver.set_max_iters(1000);</span>
@@ -643,7 +642,7 @@
 <span class="doccomment">//! # fn run() -&gt; Result&lt;(), Error&gt; {</span>
 <span class="doccomment">//! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };</span>
 <span class="doccomment">//! #     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);</span>
-<span class="doccomment">//! let mut solver = SteepestDescent::new(&amp;cost, init_param)?;</span>
+<span class="doccomment">//! let mut solver = SteepestDescent::new(cost, init_param)?;</span>
 <span class="doccomment">//! #     solver.set_max_iters(10);</span>
 <span class="doccomment">//! // Log to the terminal</span>
 <span class="doccomment">//! solver.add_logger(ArgminSlogLogger::term());</span>
@@ -697,24 +696,22 @@
 <span class="doccomment">//! // Deriving `ArgminSolver` implements a large portion of the API and provides many convenience</span>
 <span class="doccomment">//! // functions. It requires that `ArgminNextIter` is implemented on `Landweber` as well.</span>
 <span class="doccomment">//! #[derive(ArgminSolver)]</span>
-<span class="doccomment">//! pub struct Landweber&lt;&#39;a, T&gt;</span>
+<span class="doccomment">//! pub struct Landweber&lt;T, O&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     T: &#39;a + Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
+<span class="doccomment">//!     T: Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
+<span class="doccomment">//!     O: ArgminOperator&lt;Parameters = T, OperatorOutput = f64, Hessian = ()&gt;,</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     omega: f64,</span>
-<span class="doccomment">//!     base: ArgminBase&lt;&#39;a, T, f64, ()&gt;,</span>
+<span class="doccomment">//!     base: ArgminBase&lt;T, f64, (), O&gt;,</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // For convenience, a constructor can/should be implemented</span>
-<span class="doccomment">//! impl&lt;&#39;a, T&gt; Landweber&lt;&#39;a, T&gt;</span>
+<span class="doccomment">//! impl&lt;T, O&gt; Landweber&lt;T, O&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     T: &#39;a + Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
+<span class="doccomment">//!     T: Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
+<span class="doccomment">//!     O: ArgminOperator&lt;Parameters = T, OperatorOutput = f64, Hessian = ()&gt;,</span>
 <span class="doccomment">//! {</span>
-<span class="doccomment">//!     pub fn new(</span>
-<span class="doccomment">//!         cost_function: &amp;&#39;a ArgminOperator&lt;Parameters = T, OperatorOutput = f64, Hessian = ()&gt;,</span>
-<span class="doccomment">//!         omega: f64,</span>
-<span class="doccomment">//!         init_param: T,</span>
-<span class="doccomment">//!     ) -&gt; Result&lt;Self, Error&gt; {</span>
+<span class="doccomment">//!     pub fn new(cost_function: O, omega: f64, init_param: T) -&gt; Result&lt;Self, Error&gt; {</span>
 <span class="doccomment">//!         Ok(Landweber {</span>
 <span class="doccomment">//!             omega,</span>
 <span class="doccomment">//!             base: ArgminBase::new(cost_function, init_param),</span>
@@ -723,9 +720,10 @@
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // This implements a single iteration of the optimization algorithm.</span>
-<span class="doccomment">//! impl&lt;&#39;a, T&gt; ArgminNextIter for Landweber&lt;&#39;a, T&gt;</span>
+<span class="doccomment">//! impl&lt;T, O&gt; ArgminNextIter for Landweber&lt;T, O&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     T: &#39;a + Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
+<span class="doccomment">//!     T: Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
+<span class="doccomment">//!     O: ArgminOperator&lt;Parameters = T, OperatorOutput = f64, Hessian = ()&gt;,</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     type Parameters = T;</span>
 <span class="doccomment">//!     type OperatorOutput = f64;</span>
