@@ -16,8 +16,6 @@
 //! [1] https://en.wikipedia.org/wiki/Landweber_iteration
 
 use crate::prelude::*;
-use std;
-use std::default::Default;
 
 /// The Landweber iteration is a solver for ill-posed linear inverse problems.
 ///
@@ -78,24 +76,30 @@ use std::default::Default;
 /// kind. Amer. J. Math. 73, 615–624
 /// [1] https://en.wikipedia.org/wiki/Landweber_iteration
 #[derive(ArgminSolver)]
-pub struct Landweber<T, O>
+pub struct Landweber<O>
 where
-    T: Clone + Default + ArgminScaledSub<T, f64, T>,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
+    <O as ArgminOperator>::Parameters:
+        ArgminScaledSub<<O as ArgminOperator>::Parameters, f64, <O as ArgminOperator>::Parameters>,
+    O: ArgminOperator,
 {
     /// omgea
     omega: f64,
     /// Base stuff
-    base: ArgminBase<T, (), O>,
+    base: ArgminBase<O>,
 }
 
-impl<T, O> Landweber<T, O>
+impl<O> Landweber<O>
 where
-    T: Clone + Default + ArgminScaledSub<T, f64, T>,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
+    <O as ArgminOperator>::Parameters:
+        ArgminScaledSub<<O as ArgminOperator>::Parameters, f64, <O as ArgminOperator>::Parameters>,
+    O: ArgminOperator,
 {
     /// Constructor
-    pub fn new(cost_function: O, omega: f64, init_param: T) -> Result<Self, Error> {
+    pub fn new(
+        cost_function: O,
+        omega: f64,
+        init_param: <O as ArgminOperator>::Parameters,
+    ) -> Result<Self, Error> {
         Ok(Landweber {
             omega,
             base: ArgminBase::new(cost_function, init_param),
@@ -103,14 +107,15 @@ where
     }
 }
 
-impl<T, O> ArgminNextIter for Landweber<T, O>
+impl<O> ArgminNextIter for Landweber<O>
 where
-    T: Clone + Default + ArgminScaledSub<T, f64, T>,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
+    <O as ArgminOperator>::Parameters:
+        ArgminScaledSub<<O as ArgminOperator>::Parameters, f64, <O as ArgminOperator>::Parameters>,
+    O: ArgminOperator,
 {
-    type Parameters = T;
-    type OperatorOutput = f64;
-    type Hessian = ();
+    type Parameters = <O as ArgminOperator>::Parameters;
+    type OperatorOutput = <O as ArgminOperator>::OperatorOutput;
+    type Hessian = <O as ArgminOperator>::Hessian;
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
         let param = self.cur_param();
