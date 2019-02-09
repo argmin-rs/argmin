@@ -34,9 +34,9 @@ use crate::prelude::*;
 /// # #[derive(Clone)]
 /// # struct MyProblem {}
 /// #
-/// # impl ArgminOperator for MyProblem {
-/// #     type Parameters = Vec<f64>;
-/// #     type OperatorOutput = f64;
+/// # impl ArgminOp for MyProblem {
+/// #     type Param = Vec<f64>;
+/// #     type Output = f64;
 /// #     type Hessian = ();
 /// #
 /// #     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
@@ -109,33 +109,27 @@ use crate::prelude::*;
 #[derive(ArgminSolver)]
 pub struct MoreThuenteLineSearch<O>
 where
-    O: ArgminOperator<OperatorOutput = f64>,
-    <O as ArgminOperator>::Parameters: ArgminSub<
-            <O as ArgminOperator>::Parameters,
-            <O as ArgminOperator>::Parameters,
-        > + ArgminDot<<O as ArgminOperator>::Parameters, f64>
-        + ArgminScaledAdd<
-            <O as ArgminOperator>::Parameters,
-            f64,
-            <O as ArgminOperator>::Parameters,
-        >,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
     /// initial parameter vector (builder)
-    init_param_b: Option<<O as ArgminOperator>::Parameters>,
+    init_param_b: Option<<O as ArgminOp>::Param>,
     /// initial cost (builder)
     finit_b: Option<f64>,
     /// initial gradient (builder)
-    init_grad_b: Option<<O as ArgminOperator>::Parameters>,
+    init_grad_b: Option<<O as ArgminOp>::Param>,
     /// Search direction (builder)
-    search_direction_b: Option<<O as ArgminOperator>::Parameters>,
+    search_direction_b: Option<<O as ArgminOp>::Param>,
     /// initial parameter vector
-    init_param: <O as ArgminOperator>::Parameters,
+    init_param: <O as ArgminOp>::Param,
     /// initial cost
     finit: f64,
     /// initial gradient
-    init_grad: <O as ArgminOperator>::Parameters,
+    init_grad: <O as ArgminOp>::Param,
     /// Search direction
-    search_direction: <O as ArgminOperator>::Parameters,
+    search_direction: <O as ArgminOp>::Param,
     /// Search direction in 1D
     dginit: f64,
     /// dgtest
@@ -191,16 +185,10 @@ impl Step {
 
 impl<O> MoreThuenteLineSearch<O>
 where
-    O: ArgminOperator<OperatorOutput = f64>,
-    <O as ArgminOperator>::Parameters: ArgminSub<
-            <O as ArgminOperator>::Parameters,
-            <O as ArgminOperator>::Parameters,
-        > + ArgminDot<<O as ArgminOperator>::Parameters, f64>
-        + ArgminScaledAdd<
-            <O as ArgminOperator>::Parameters,
-            f64,
-            <O as ArgminOperator>::Parameters,
-        >,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
     /// Constructor
     ///
@@ -213,10 +201,10 @@ where
             finit_b: None,
             init_grad_b: None,
             search_direction_b: None,
-            init_param: <O as ArgminOperator>::Parameters::default(),
+            init_param: <O as ArgminOp>::Param::default(),
             finit: std::f64::INFINITY,
-            init_grad: <O as ArgminOperator>::Parameters::default(),
-            search_direction: <O as ArgminOperator>::Parameters::default(),
+            init_grad: <O as ArgminOp>::Param::default(),
+            search_direction: <O as ArgminOp>::Param::default(),
             dginit: 0.0,
             dgtest: 0.0,
             ftol: 1e-4,
@@ -235,12 +223,12 @@ where
             brackt: false,
             stage1: true,
             infoc: 1,
-            base: ArgminBase::new(operator, <O as ArgminOperator>::Parameters::default()),
+            base: ArgminBase::new(operator, <O as ArgminOp>::Param::default()),
         }
     }
 
     /// set current gradient value
-    pub fn set_cur_grad(&mut self, grad: <O as ArgminOperator>::Parameters) -> &mut Self {
+    pub fn set_cur_grad(&mut self, grad: <O as ArgminOp>::Param) -> &mut Self {
         self.base.set_cur_grad(grad);
         self
     }
@@ -291,24 +279,18 @@ where
 
 impl<O> ArgminLineSearch for MoreThuenteLineSearch<O>
 where
-    O: ArgminOperator<OperatorOutput = f64>,
-    <O as ArgminOperator>::Parameters: ArgminSub<
-            <O as ArgminOperator>::Parameters,
-            <O as ArgminOperator>::Parameters,
-        > + ArgminDot<<O as ArgminOperator>::Parameters, f64>
-        + ArgminScaledAdd<
-            <O as ArgminOperator>::Parameters,
-            f64,
-            <O as ArgminOperator>::Parameters,
-        >,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
     /// Set search direction
-    fn set_search_direction(&mut self, search_direction: <O as ArgminOperator>::Parameters) {
+    fn set_search_direction(&mut self, search_direction: <O as ArgminOp>::Param) {
         self.search_direction_b = Some(search_direction);
     }
 
     /// Set initial parameter
-    fn set_initial_parameter(&mut self, param: <O as ArgminOperator>::Parameters) {
+    fn set_initial_parameter(&mut self, param: <O as ArgminOp>::Param) {
         self.init_param_b = Some(param.clone());
         self.set_cur_param(param);
     }
@@ -319,7 +301,7 @@ where
     }
 
     /// Set initial gradient
-    fn set_initial_gradient(&mut self, init_grad: <O as ArgminOperator>::Parameters) {
+    fn set_initial_gradient(&mut self, init_grad: <O as ArgminOp>::Param) {
         self.init_grad_b = Some(init_grad);
     }
 
@@ -350,22 +332,16 @@ where
     }
 }
 
-impl<O> ArgminNextIter for MoreThuenteLineSearch<O>
+impl<O> ArgminIter for MoreThuenteLineSearch<O>
 where
-    O: ArgminOperator<OperatorOutput = f64>,
-    <O as ArgminOperator>::Parameters: ArgminSub<
-            <O as ArgminOperator>::Parameters,
-            <O as ArgminOperator>::Parameters,
-        > + ArgminDot<<O as ArgminOperator>::Parameters, f64>
-        + ArgminScaledAdd<
-            <O as ArgminOperator>::Parameters,
-            f64,
-            <O as ArgminOperator>::Parameters,
-        >,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
-    type Parameters = <O as ArgminOperator>::Parameters;
-    type OperatorOutput = f64;
-    type Hessian = <O as ArgminOperator>::Hessian;
+    type Param = <O as ArgminOp>::Param;
+    type Output = f64;
+    type Hessian = <O as ArgminOp>::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         self.init_param = check_param!(
@@ -414,7 +390,7 @@ where
         Ok(())
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {
@@ -482,7 +458,7 @@ where
 
         if info != 0 {
             self.set_termination_reason(TerminationReason::LineSearchConditionMet);
-            let out = ArgminIterationData::new(self.cur_param(), self.cur_cost());
+            let out = ArgminIterData::new(self.cur_param(), self.cur_cost());
             return Ok(out);
         }
 
@@ -546,7 +522,7 @@ where
         let new_param = self
             .init_param
             .scaled_add(&self.stp.x, &self.search_direction);
-        let out = ArgminIterationData::new(new_param, self.stp.fx);
+        let out = ArgminIterData::new(new_param, self.stp.fx);
         Ok(out)
     }
 }

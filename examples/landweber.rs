@@ -13,9 +13,9 @@ use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 #[derive(Clone, Default)]
 struct Rosenbrock {}
 
-impl ArgminOperator for Rosenbrock {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = f64;
+impl ArgminOp for Rosenbrock {
+    type Param = Vec<f64>;
+    type Output = f64;
     type Hessian = ();
 
     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {

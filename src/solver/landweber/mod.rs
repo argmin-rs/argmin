@@ -35,9 +35,9 @@ use crate::prelude::*;
 /// # #[derive(Clone)]
 /// # struct MyProblem {}
 /// #
-/// # impl ArgminOperator for MyProblem {
-/// #     type Parameters = Vec<f64>;
-/// #     type OperatorOutput = f64;
+/// # impl ArgminOp for MyProblem {
+/// #     type Param = Vec<f64>;
+/// #     type Output = f64;
 /// #     type Hessian = ();
 /// #
 /// #     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
@@ -78,9 +78,8 @@ use crate::prelude::*;
 #[derive(ArgminSolver)]
 pub struct Landweber<O>
 where
-    <O as ArgminOperator>::Parameters:
-        ArgminScaledSub<<O as ArgminOperator>::Parameters, f64, <O as ArgminOperator>::Parameters>,
-    O: ArgminOperator,
+    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    O: ArgminOp,
 {
     /// omgea
     omega: f64,
@@ -90,15 +89,14 @@ where
 
 impl<O> Landweber<O>
 where
-    <O as ArgminOperator>::Parameters:
-        ArgminScaledSub<<O as ArgminOperator>::Parameters, f64, <O as ArgminOperator>::Parameters>,
-    O: ArgminOperator,
+    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    O: ArgminOp,
 {
     /// Constructor
     pub fn new(
         cost_function: O,
         omega: f64,
-        init_param: <O as ArgminOperator>::Parameters,
+        init_param: <O as ArgminOp>::Param,
     ) -> Result<Self, Error> {
         Ok(Landweber {
             omega,
@@ -107,21 +105,20 @@ where
     }
 }
 
-impl<O> ArgminNextIter for Landweber<O>
+impl<O> ArgminIter for Landweber<O>
 where
-    <O as ArgminOperator>::Parameters:
-        ArgminScaledSub<<O as ArgminOperator>::Parameters, f64, <O as ArgminOperator>::Parameters>,
-    O: ArgminOperator,
+    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    O: ArgminOp,
 {
-    type Parameters = <O as ArgminOperator>::Parameters;
-    type OperatorOutput = <O as ArgminOperator>::OperatorOutput;
-    type Hessian = <O as ArgminOperator>::Hessian;
+    type Param = <O as ArgminOp>::Param;
+    type Output = <O as ArgminOp>::Output;
+    type Hessian = <O as ArgminOp>::Hessian;
 
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         let param = self.cur_param();
         let grad = self.gradient(&param)?;
         let new_param = param.scaled_sub(&self.omega, &grad);
-        let out = ArgminIterationData::new(new_param, 0.0);
+        let out = ArgminIterData::new(new_param, 0.0);
         Ok(out)
     }
 }

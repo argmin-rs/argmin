@@ -13,9 +13,9 @@ use argmin::testfunctions::{sphere, sphere_derivative};
 #[derive(Clone, Default)]
 struct Sphere {}
 
-impl ArgminOperator for Sphere {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = f64;
+impl ArgminOp for Sphere {
+    type Param = Vec<f64>;
+    type Output = f64;
     type Hessian = ();
 
     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {

@@ -88,12 +88,12 @@
 //! # Defining a problem
 //!
 //! A problem can be defined by implementing the `ArgminOperator` trait which comes with the
-//! associated types `Parameters`, `OperatorOutput` and `Hessian`. `Parameters` is the type of your
-//! parameter vector (i.e. the input to your cost function), `OperatorOutput` is the type returned
+//! associated types `Parameters`, `Output` and `Hessian`. `Parameters` is the type of your
+//! parameter vector (i.e. the input to your cost function), `Output` is the type returned
 //! by the cost function and `Hessian` is the type of the Hessian.
 //! The trait provides the following methods:
 //!
-//! - `apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error>`: Applys the cost
+//! - `apply(&self, p: &Self::Parameters) -> Result<Self::Output, Error>`: Applys the cost
 //!   function to parameters `p` of type `Self::Parameters` and returns the cost function value.
 //! - `gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error>`: Computes the
 //!   gradient at `p`. Optional. By default returns an `Err` if not implemented.
@@ -125,13 +125,13 @@
 //!     /// Type of the parameter vector
 //!     type Parameters = ndarray::Array1<f64>;
 //!     /// Type of the return value computed by the cost function
-//!     type OperatorOutput = f64;
+//!     type Output = f64;
 //!     /// Type of the Hessian. If no Hessian is available or needed for the used solver, this can
 //!     /// be set to `()`
 //!     type Hessian = ndarray::Array2<f64>;
 //!
 //!     /// Apply the cost function to a parameter `p`
-//!     fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+//!     fn apply(&self, p: &Self::Parameters) -> Result<Self::Output, Error> {
 //!         Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
 //!     }
 //!
@@ -170,10 +170,10 @@
 //!
 //! impl ArgminOperator for Rosenbrock {
 //!     type Parameters = ndarray::Array1<f64>;
-//!     type OperatorOutput = f64;
+//!     type Output = f64;
 //!     type Hessian = ();
 //!
-//!    fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+//!    fn apply(&self, p: &Self::Parameters) -> Result<Self::Output, Error> {
 //!        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
 //!    }
 //!
@@ -240,9 +240,9 @@
 //! # }
 //! # impl ArgminOperator for Rosenbrock {
 //! #     type Parameters = ndarray::Array1<f64>;
-//! #     type OperatorOutput = f64;
+//! #     type Output = f64;
 //! #     type Hessian = ();
-//! #    fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+//! #    fn apply(&self, p: &Self::Parameters) -> Result<Self::Output, Error> {
 //! #        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
 //! #    }
 //! #    fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
@@ -309,7 +309,7 @@
 //! pub struct Landweber<T, O>
 //! where
 //!     T: Clone + Default + ArgminScaledSub<T, f64, T>,
-//!     O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
+//!     O: ArgminOperator<Parameters = T, Output = f64, Hessian = ()>,
 //! {
 //!     omega: f64,
 //!     base: ArgminBase<T, (), O>,
@@ -319,7 +319,7 @@
 //! impl<T, O> Landweber<T, O>
 //! where
 //!     T: Clone + Default + ArgminScaledSub<T, f64, T>,
-//!     O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
+//!     O: ArgminOperator<Parameters = T, Output = f64, Hessian = ()>,
 //! {
 //!     pub fn new(cost_function: O, omega: f64, init_param: T) -> Result<Self, Error> {
 //!         Ok(Landweber {
@@ -330,16 +330,16 @@
 //! }
 //!
 //! // This implements a single iteration of the optimization algorithm.
-//! impl<T, O> ArgminNextIter for Landweber<T, O>
+//! impl<T, O> ArgminIter for Landweber<T, O>
 //! where
 //!     T: Clone + Default + ArgminScaledSub<T, f64, T>,
-//!     O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
+//!     O: ArgminOperator<Parameters = T, Output = f64, Hessian = ()>,
 //! {
 //!     type Parameters = T;
-//!     type OperatorOutput = f64;
+//!     type Output = f64;
 //!     type Hessian = ();
 //!
-//!     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+//!     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Parameters>, Error> {
 //!         // Obtain current parameter vector
 //!         // The method `cur_param()` has been implemented by deriving `ArgminSolver`.
 //!         let param = self.cur_param();
@@ -350,7 +350,7 @@
 //!         let new_param = param.scaled_sub(&self.omega, &grad);
 //!         // Return new parameter vector. Since there is no need to compute the cost function
 //!         // value, we return 0.0 instead.
-//!         let out = ArgminIterationData::new(new_param, 0.0);
+//!         let out = ArgminIterData::new(new_param, 0.0);
 //!         Ok(out)
 //!     }
 //! }
