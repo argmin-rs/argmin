@@ -9,7 +9,6 @@
 
 use crate::prelude::*;
 use crate::solver::linesearch::condition::*;
-use std;
 
 /// The Backtracking line search is a simple method to find a step length which obeys the Armijo
 /// (sufficient decrease) condition.
