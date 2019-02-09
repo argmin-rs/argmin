@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["FletcherReeves","Fletcher and Reeves (FR) method TODO: Reference"],["HestenesStiefel","Hestenes and Stiefel (HS) method TODO: Reference"],["PolakRibiere","Polak and Ribiere (PR) method TODO: Reference"],["PolakRibierePlus","Polak and Ribiere Plus (PR+) method TODO: Reference"]]});

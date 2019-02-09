@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["ArmijoCondition","Armijo Condition"],["GoldsteinCondition","Goldstein conditions"],["StrongWolfeCondition","Strong Wolfe conditions"],["WolfeCondition","Wolfe Condition"]],"trait":[["LineSearchCondition","Needs to be implemented by everything that wants to be a LineSearchCondition"]]});
