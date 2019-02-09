@@ -109,7 +109,7 @@ use crate::prelude::*;
 #[derive(ArgminSolver)]
 pub struct MoreThuenteLineSearch<O>
 where
-    O: ArgminOperator,
+    O: ArgminOperator<OperatorOutput = f64>,
     <O as ArgminOperator>::Parameters: ArgminSub<
             <O as ArgminOperator>::Parameters,
             <O as ArgminOperator>::Parameters,
@@ -191,7 +191,7 @@ impl Step {
 
 impl<O> MoreThuenteLineSearch<O>
 where
-    O: ArgminOperator,
+    O: ArgminOperator<OperatorOutput = f64>,
     <O as ArgminOperator>::Parameters: ArgminSub<
             <O as ArgminOperator>::Parameters,
             <O as ArgminOperator>::Parameters,
@@ -291,7 +291,7 @@ where
 
 impl<O> ArgminLineSearch for MoreThuenteLineSearch<O>
 where
-    O: ArgminOperator,
+    O: ArgminOperator<OperatorOutput = f64>,
     <O as ArgminOperator>::Parameters: ArgminSub<
             <O as ArgminOperator>::Parameters,
             <O as ArgminOperator>::Parameters,
@@ -352,7 +352,7 @@ where
 
 impl<O> ArgminNextIter for MoreThuenteLineSearch<O>
 where
-    O: ArgminOperator,
+    O: ArgminOperator<OperatorOutput = f64>,
     <O as ArgminOperator>::Parameters: ArgminSub<
             <O as ArgminOperator>::Parameters,
             <O as ArgminOperator>::Parameters,
@@ -364,7 +364,7 @@ where
         >,
 {
     type Parameters = <O as ArgminOperator>::Parameters;
-    type OperatorOutput = <O as ArgminOperator>::OperatorOutput;
+    type OperatorOutput = f64;
     type Hessian = <O as ArgminOperator>::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {

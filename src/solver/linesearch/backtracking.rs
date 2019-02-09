@@ -106,7 +106,7 @@ use crate::solver::linesearch::condition::*;
 #[stop("self.eval_condition()" => LineSearchConditionMet)]
 pub struct BacktrackingLineSearch<O>
 where
-    O: ArgminOperator,
+    O: ArgminOperator<OperatorOutput = f64>,
     <O as ArgminOperator>::Parameters: ArgminSub<
             <O as ArgminOperator>::Parameters,
             <O as ArgminOperator>::Parameters,
@@ -137,6 +137,7 @@ where
 
 impl<O> BacktrackingLineSearch<O>
 where
+    O: ArgminOperator<OperatorOutput = f64>,
     <O as ArgminOperator>::Parameters: ArgminSub<
             <O as ArgminOperator>::Parameters,
             <O as ArgminOperator>::Parameters,
@@ -208,6 +209,7 @@ where
 
 impl<O> ArgminLineSearch for BacktrackingLineSearch<O>
 where
+    O: ArgminOperator<OperatorOutput = f64>,
     <O as ArgminOperator>::Parameters: ArgminSub<
             <O as ArgminOperator>::Parameters,
             <O as ArgminOperator>::Parameters,
@@ -268,6 +270,7 @@ where
 
 impl<O> ArgminNextIter for BacktrackingLineSearch<O>
 where
+    O: ArgminOperator<OperatorOutput = f64>,
     <O as ArgminOperator>::Parameters: ArgminSub<
             <O as ArgminOperator>::Parameters,
             <O as ArgminOperator>::Parameters,
@@ -279,7 +282,7 @@ where
         >,
 {
     type Parameters = <O as ArgminOperator>::Parameters;
-    type OperatorOutput = <O as ArgminOperator>::OperatorOutput;
+    type OperatorOutput = f64;
     type Hessian = <O as ArgminOperator>::Hessian;
 
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {

@@ -10,7 +10,7 @@ use argmin::prelude::*;
 use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin::testfunctions::{sphere, sphere_derivative};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 struct Sphere {}
 
 impl ArgminOperator for Sphere {
