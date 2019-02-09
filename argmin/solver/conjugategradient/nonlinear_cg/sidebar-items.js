@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["NonlinearConjugateGradient","The nonlinear conjugate gradient is a generalization of the conjugate gradient method for nonlinear optimization problems."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Landweber","The Landweber iteration is a solver for ill-posed linear inverse problems."]]});

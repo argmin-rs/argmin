@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["PerturbationVector","Perturbation Vector for the accelerated computation of the Jacobian."]],"trait":[["FiniteDiff",""]],"type":[["PerturbationVectors","A collection of `PerturbationVector`s"]]});
