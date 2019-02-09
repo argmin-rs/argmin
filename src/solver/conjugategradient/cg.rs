@@ -11,8 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-// #[feature(serde)]
-// use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use std;
 use std::default::Default;
 
@@ -80,8 +79,7 @@ use std::default::Default;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(ArgminSolver, Clone, Serialize, Deserialize)]
 pub struct ConjugateGradient<T, O>
 where
     T: Clone
@@ -207,4 +205,15 @@ where
         ));
         Ok(out)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    send_sync_test!(
+        conjugate_gradient,
+        ConjugateGradient<Vec<f64>, NoOperator<Vec<f64>, Vec<f64>, ()>>
+    );
 }
