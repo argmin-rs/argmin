@@ -378,6 +378,13 @@ pub mod prelude;
 /// Solvers
 pub mod solver;
 
+/// Macros
+#[macro_use]
+mod macros;
+
+// #[cfg(test)]
+// use macros::*;
+
 use argmin_core::*;
 
 /// Testfunctions

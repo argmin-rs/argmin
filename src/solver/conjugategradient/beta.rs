@@ -118,3 +118,14 @@ where
         dfk1.dot(&d) / d.dot(&pk)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    send_sync_test!(fletcher_reeves, FletcherReeves);
+    send_sync_test!(polak_ribiere, PolakRibiere);
+    send_sync_test!(polak_ribiere_plus, PolakRibierePlus);
+    send_sync_test!(hestenes_stiefel, HestenesStiefel);
+}
