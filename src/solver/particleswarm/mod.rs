@@ -57,20 +57,44 @@ where
         num_particles: usize,
     ) -> Result<Self, Error> {
 
-        let mut rng = rand::thread_rng();
+        let rng = rand::thread_rng();
 
-        Ok(ParticleSwarm {
+        let mut particle_swarm = ParticleSwarm {
             base: ArgminBase::new(cost_function, init_param),
             rng: rng.clone(),
             iter_callback: None,
-            particles: (0..num_particles).map(
-                |_| Particle::new(&mut rng, search_region.0.clone(), search_region.1.clone())
-            ).collect()
-        })
+            particles: vec![]
+        };
+
+        particle_swarm.initialize_particles(num_particles, &search_region);
+
+        Ok(particle_swarm)
     }
 
     pub fn set_iter_callback(&mut self, callback: &'a mut Callback<T>) {
         self.iter_callback = Some(callback);
+    }
+
+    fn initialize_particles(&mut self, num_particles: usize, search_region: &(T, T)) {
+        self.particles = (0..num_particles).map(
+                |_| self.initialize_particle(search_region)
+        ).collect();
+    }
+
+    fn initialize_particle(&mut self, search_region: &(T, T)) -> Particle<T> {
+        let (min, max) = search_region;
+        let delta = max.sub(min);
+        let delta_neg = delta.mul(&-1.0);
+
+        let initial_position = T::rand_from_range(&mut self.rng, min, max);
+        let initial_cost = self.apply(&initial_position).unwrap(); // TODO: unwrap evil?
+
+        Particle {
+            position: initial_position.clone(),
+            velocity: T::rand_from_range(&mut self.rng, &delta_neg, &delta),
+            cost: initial_cost,
+            best_position: initial_position,
+        }
     }
 }
 
@@ -92,15 +116,15 @@ where
 
         let new_cost = self.apply(&new_param)?;
 
-        // TODO: this must be possible with less code
-        let mut costs = vec![];
-        for particle in self.particles.clone() {
-            let cost: f64 = self.apply(&particle.position)?;
-            costs.push(cost);
-        }
-        for i in 0..self.particles.len() {
-            self.particles[i].set_cost(costs[i]);
-        }
+        // // TODO: this must be possible with less code
+        // let mut costs = vec![];
+        // for particle in self.particles.clone() {
+        //     let cost: f64 = self.apply(&particle.position)?;
+        //     costs.push(cost);
+        // }
+        // for i in 0..self.particles.len() {
+        //     self.particles[i].cost = costs[i];
+        // }
 
         // TODO: move callback to ArgminBase
         // TODO: accept &self, not new_param, new_cost
@@ -168,20 +192,3 @@ pub struct Particle<T: Position> {
     best_position: T,
 }
 
-impl<T: Position> Particle<T> {
-    fn new(rng: &mut rand::prelude::ThreadRng, min: T, max: T) -> Self {
-
-        let delta = max.sub(&min);
-        let delta_neg = delta.mul(&-1.0);
-
-        let initial_position = T::rand_from_range(rng, &min, &max);
-        Self {
-            position: initial_position.clone(),
-            velocity: T::rand_from_range(rng, &delta_neg, &delta),
-            cost: 0.0,
-            best_position: initial_position,
-        }
-    }
-
-    pub fn set_cost(&mut self, cost: f64) { self.cost = cost; }
-}

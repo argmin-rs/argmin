@@ -46,7 +46,7 @@ fn run() -> Result<(), Error> {
             &cost_function,
             init_param,
             (vec![-4.0, -4.0], vec![4.0, 4.0]),
-            10,
+            100,
         )?;
 
         // Attach a logger
@@ -142,8 +142,8 @@ impl Visualizer {
 
         use gnuplot::*;
 
-        let options_optima = [Color("#ff0000"), PointSize(2.0)];
-        let options_particles = [Color("#0000ff"), PointSize(2.0)];
+        let options_optima = [Color("#ffff00"), PointSize(2.0)];
+        let options_particles = [Color("#ff0000"), PointSize(2.0)];
         let window = Some(self.surface.window);
         self.fg.axes3d()
             // .set_title("Surface fg4.2", &[])
@@ -180,7 +180,7 @@ impl Visualizer {
         for particle in particles {
             self.particles_x.push(particle.position[0]);
             self.particles_y.push(particle.position[1]);
-            self.particles_z.push(0.0);
+            self.particles_z.push(particle.cost);
         }
 
         self.draw();
