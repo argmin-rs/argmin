@@ -55,7 +55,7 @@ fn run() -> Result<(), Error> {
         solver.set_max_iters(5);
 
 
-        let mut callback = move |xy: &Vec<f64>, c: f64, v: Particles| visualizer.iteration(xy, c, v);
+        let mut callback = move |xy: &Vec<f64>, c: f64, v: &Particles| visualizer.iteration(xy, c, &v);
         solver.set_iter_callback(&mut callback);
 
         // Run solver
@@ -167,7 +167,7 @@ impl Visualizer {
 
     }
 
-    fn iteration(&mut self, xy: &Vec<f64>, cost: f64, particles: Particles) {
+    fn iteration(&mut self, xy: &Vec<f64>, cost: f64, particles: &Particles) {
 
         self.optima_x.push(xy[0]);
         self.optima_y.push(xy[1]);

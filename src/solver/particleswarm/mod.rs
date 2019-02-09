@@ -16,8 +16,7 @@ use std::default::Default;
 use argmin_core::ArgminAdd;
 
 
-// TODO: pass particles by reference
-type Callback<T> = FnMut(&T, f64, Vec<Particle<T>>) -> ();
+type Callback<T> = FnMut(&T, f64, &Vec<Particle<T>>) -> ();
 
 
 // #[log("initial_temperature" => "self.init_temp")]
@@ -130,7 +129,7 @@ where
         // TODO: accept &self, not new_param, new_cost
         //       as callback parameters
         match &mut self.iter_callback {
-            Some(callback) => (*callback)(&new_param, new_cost, self.particles.clone()),
+            Some(callback) => (*callback)(&new_param, new_cost, &self.particles),
             None => ()
         };
 
