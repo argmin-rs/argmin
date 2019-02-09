@@ -181,7 +181,7 @@ where
     /// Search direction in 1D
     dginit: f64,
     /// base
-    base: ArgminBase<T, f64, H, O>,
+    base: ArgminBase<T, H, O>,
 }
 
 impl<T, H, O> HagerZhangLineSearch<T, H, O>

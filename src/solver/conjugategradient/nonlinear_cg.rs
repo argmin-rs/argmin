@@ -131,7 +131,7 @@ where
     /// Restart based on orthogonality
     restart_orthogonality: Option<f64>,
     /// base
-    base: ArgminBase<T, f64, (), O>,
+    base: ArgminBase<T, (), O>,
 }
 
 impl<'a, T, O> NonlinearConjugateGradient<'a, T, O>

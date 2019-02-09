@@ -312,7 +312,7 @@
 //!     O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = ()>,
 //! {
 //!     omega: f64,
-//!     base: ArgminBase<T, f64, (), O>,
+//!     base: ArgminBase<T, (), O>,
 //! }
 //!
 //! // For convenience, a constructor can/should be implemented

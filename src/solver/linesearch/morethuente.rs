@@ -185,7 +185,7 @@ where
     /// infoc
     infoc: usize,
     /// base
-    base: ArgminBase<T, f64, H, O>,
+    base: ArgminBase<T, H, O>,
 }
 
 impl<T, H, O> MoreThuenteLineSearch<T, H, O>

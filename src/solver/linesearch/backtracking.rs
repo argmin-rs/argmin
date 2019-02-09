@@ -130,7 +130,7 @@ where
     /// alpha
     alpha: f64,
     /// base
-    base: ArgminBase<T, f64, H, O>,
+    base: ArgminBase<T, H, O>,
 }
 
 impl<T, H, O> BacktrackingLineSearch<T, H, O>

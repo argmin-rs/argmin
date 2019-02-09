@@ -142,7 +142,7 @@ where
     /// mk(0)
     mk0: f64,
     /// base
-    base: ArgminBase<T, f64, H, O>,
+    base: ArgminBase<T, H, O>,
 }
 
 impl<'a, T, H, O> TrustRegion<'a, T, H, O>

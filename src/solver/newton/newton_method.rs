@@ -98,7 +98,7 @@ where
     /// gamma
     gamma: f64,
     /// Base stuff
-    base: ArgminBase<T, f64, H, O>,
+    base: ArgminBase<T, H, O>,
 }
 
 impl<T, H, O> Newton<T, H, O>

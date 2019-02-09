@@ -51,7 +51,7 @@ where
     /// direction
     d: T,
     /// base
-    base: ArgminBase<T, f64, H, O>,
+    base: ArgminBase<T, H, O>,
 }
 
 impl<T, H, O> Steihaug<T, H, O>

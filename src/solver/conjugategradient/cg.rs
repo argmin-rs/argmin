@@ -106,7 +106,7 @@ where
     /// beta
     beta: f64,
     /// base
-    base: ArgminBase<T, T, (), O>,
+    base: ArgminBase<T, (), O>,
 }
 
 impl<T, O> ConjugateGradient<T, O>

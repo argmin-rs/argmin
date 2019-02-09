@@ -116,7 +116,7 @@ where
     /// line search
     linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
     /// Base stuff
-    base: ArgminBase<T, f64, H, O>,
+    base: ArgminBase<T, H, O>,
 }
 
 impl<'a, T, H, O> SteepestDescent<'a, T, H, O>

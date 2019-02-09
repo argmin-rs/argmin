@@ -251,7 +251,7 @@ where
     /// random number generator
     rng: rand::prelude::ThreadRng,
     /// base
-    base: ArgminBase<T, f64, (), O>,
+    base: ArgminBase<T, (), O>,
 }
 
 impl<T, O> SimulatedAnnealing<T, O>

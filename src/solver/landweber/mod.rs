@@ -86,7 +86,7 @@ where
     /// omgea
     omega: f64,
     /// Base stuff
-    base: ArgminBase<T, f64, (), O>,
+    base: ArgminBase<T, (), O>,
 }
 
 impl<T, O> Landweber<T, O>

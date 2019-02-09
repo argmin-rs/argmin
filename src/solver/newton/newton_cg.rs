@@ -118,7 +118,7 @@ where
     /// curvature_threshold
     curvature_threshold: f64,
     /// Base stuff
-    base: ArgminBase<T, f64, H, O>,
+    base: ArgminBase<T, H, O>,
 }
 
 impl<'a, T, H, O> NewtonCG<'a, T, H, O>

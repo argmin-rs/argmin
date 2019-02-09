@@ -39,7 +39,7 @@ where
     /// Radius
     radius: f64,
     /// base
-    base: ArgminBase<T, f64, H, O>,
+    base: ArgminBase<T, H, O>,
 }
 
 impl<T, H, O> Dogleg<T, H, O>
