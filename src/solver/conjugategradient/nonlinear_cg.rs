@@ -33,7 +33,7 @@ use std::default::Default;
 /// use argmin::solver::conjugategradient::NonlinearConjugateGradient;
 /// use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 ///
-/// # #[derive(Clone)]
+/// # #[derive(Clone, Default)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {

@@ -42,7 +42,7 @@ use std;
 /// # #[derive(Clone, Default)]
 /// # struct MyProblem {}
 /// #
-/// # impl ArgminOperator for MyProblem {
+/// # impl ArgminOp for MyProblem {
 /// #     type Param = Array1<f64>;
 /// #     type Output = f64;
 /// #     type Hessian = Array2<f64>;

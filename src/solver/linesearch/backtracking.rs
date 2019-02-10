@@ -21,7 +21,7 @@ use crate::solver::linesearch::condition::*;
 /// use argmin::solver::linesearch::BacktrackingLineSearch;
 /// # use argmin::testfunctions::{sphere, sphere_derivative};
 ///
-/// # #[derive(Clone)]
+/// # #[derive(Clone, Default)]
 /// # struct Sphere {}
 /// #
 /// # impl ArgminOp for Sphere {

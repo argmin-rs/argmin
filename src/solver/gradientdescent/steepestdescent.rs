@@ -33,10 +33,10 @@ use crate::solver::linesearch::HagerZhangLineSearch;
 /// use argmin::solver::linesearch::BacktrackingLineSearch;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 ///
-/// # #[derive(Clone)]
+/// # #[derive(Clone, Default)]
 /// # struct MyProblem {}
 /// #
-/// # impl ArgminOperator for MyProblem {
+/// # impl ArgminOp for MyProblem {
 /// #     type Param = Vec<f64>;
 /// #     type Output = f64;
 /// #     type Hessian = ();

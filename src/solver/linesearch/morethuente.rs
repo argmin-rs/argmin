@@ -31,7 +31,7 @@ use crate::prelude::*;
 /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
 /// # use argmin::testfunctions::{sphere, sphere_derivative};
 /// #
-/// # #[derive(Clone)]
+/// # #[derive(Clone, Default)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {

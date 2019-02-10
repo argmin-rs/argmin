@@ -25,10 +25,10 @@ use std::default::Default;
 /// use argmin::prelude::*;
 /// use argmin::solver::conjugategradient::ConjugateGradient;
 ///
-/// #[derive(Clone)]
+/// #[derive(Clone, Default)]
 /// struct MyProblem {}
 ///
-/// impl ArgminOpfor MyProblem {
+/// impl ArgminOp for MyProblem {
 ///     type Param = Vec<f64>;
 ///     type Output = Vec<f64>;
 ///     type Hessian = ();
@@ -215,6 +215,6 @@ mod tests {
 
     send_sync_test!(
         conjugate_gradient,
-        ConjugateGradient<Vec<f64>, NoOperator<Vec<f64>, Vec<f64>, ()>>
+        ConjugateGradient<NoOperator<Vec<f64>, Vec<f64>, ()>>
     );
 }

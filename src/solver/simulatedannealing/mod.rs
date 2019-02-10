@@ -55,7 +55,7 @@ pub enum SATempFunc {
 /// use rand::prelude::*;
 /// use std::sync::{Arc, Mutex};;
 ///
-/// #[derive(Clone, Default)]
+/// #[derive(Clone)]
 /// struct Rosenbrock {
 ///     /// Parameter a, usually 1.0
 ///     a: f64,
@@ -69,6 +69,14 @@ pub enum SATempFunc {
 ///     /// `self` to be passed as an immutable reference. This gives us thread safe interior
 ///     /// mutability.
 ///     rng: Arc<Mutex<SmallRng>>,
+/// }
+///
+/// impl std::default::Default for Rosenbrock {
+///     fn default() -> Self {
+///         let lower_bound: Vec<f64> = vec![-5.0, -5.0];
+///         let upper_bound: Vec<f64> = vec![5.0, 5.0];
+///         Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound)
+///     }
 /// }
 ///
 /// impl Rosenbrock {
