@@ -31,12 +31,12 @@ type Triplet = (f64, f64, f64);
 /// # use argmin::solver::linesearch::HagerZhangLineSearch;
 /// # use argmin::testfunctions::{sphere, sphere_derivative};
 /// #
-/// # #[derive(Clone)]
+/// # #[derive(Clone, Default)]
 /// # struct MyProblem {}
 /// #
-/// # impl ArgminOperator for MyProblem {
-/// #     type Parameters = Vec<f64>;
-/// #     type OperatorOutput = f64;
+/// # impl ArgminOp for MyProblem {
+/// #     type Param = Vec<f64>;
+/// #     type Output = f64;
 /// #     type Hessian = ();
 /// #
 /// #     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
@@ -56,7 +56,7 @@ type Triplet = (f64, f64, f64);
 /// let operator = MyProblem {};
 ///
 /// // Set up line search method
-/// let mut solver = HagerZhangLineSearch::new(&operator);
+/// let mut solver = HagerZhangLineSearch::new(operator);
 ///
 /// // Set search direction
 /// solver.set_search_direction(vec![-2.0, 0.0]);
@@ -107,14 +107,12 @@ type Triplet = (f64, f64, f64);
 #[stop("self.best_f - self.finit < self.delta * self.best_x * self.dginit" => LineSearchConditionMet)]
 #[stop("self.best_g > self.sigma * self.dginit" => LineSearchConditionMet)]
 #[stop("(2.0*self.delta - 1.0)*self.dginit >= self.best_g && self.best_g >= self.sigma * self.dginit && self.best_f <= self.finit + self.epsilon_k" => LineSearchConditionMet)]
-pub struct HagerZhangLineSearch<'a, T, H>
+pub struct HagerZhangLineSearch<O>
 where
-    T: std::default::Default
-        + Clone
-        + ArgminSub<T, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: Clone + std::default::Default,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
     /// delta: (0, 0.5), used in the Wolve conditions
     delta: f64,
@@ -162,45 +160,40 @@ where
     /// best slope
     best_g: f64,
     /// initial parameter vector (builder)
-    init_param_b: Option<T>,
+    init_param_b: Option<<O as ArgminOp>::Param>,
     /// initial cost (builder)
     finit_b: Option<f64>,
     /// initial gradient (builder)
-    init_grad_b: Option<T>,
+    init_grad_b: Option<<O as ArgminOp>::Param>,
     /// Search direction (builder)
-    search_direction_b: Option<T>,
+    search_direction_b: Option<<O as ArgminOp>::Param>,
     /// initial parameter vector
-    init_param: T,
+    init_param: <O as ArgminOp>::Param,
     /// initial cost
     finit: f64,
     /// initial gradient (builder)
-    init_grad: T,
+    init_grad: <O as ArgminOp>::Param,
     /// Search direction (builder)
-    search_direction: T,
+    search_direction: <O as ArgminOp>::Param,
     /// Search direction in 1D
     dginit: f64,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<O>,
 }
 
-impl<'a, T, H> HagerZhangLineSearch<'a, T, H>
+impl<O> HagerZhangLineSearch<O>
 where
-    T: std::default::Default
-        + Clone
-        + ArgminSub<T, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: Clone + std::default::Default,
-    HagerZhangLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-    ) -> Self {
+    pub fn new(operator: O) -> Self {
         HagerZhangLineSearch {
             delta: 0.1,
             sigma: 0.9,
@@ -228,17 +221,17 @@ where
             finit_b: None,
             init_grad_b: None,
             search_direction_b: None,
-            init_param: T::default(),
-            init_grad: T::default(),
-            search_direction: T::default(),
+            init_param: <O as ArgminOp>::Param::default(),
+            init_grad: <O as ArgminOp>::Param::default(),
+            search_direction: <O as ArgminOp>::Param::default(),
             dginit: std::f64::NAN,
             finit: std::f64::INFINITY,
-            base: ArgminBase::new(operator, T::default()),
+            base: ArgminBase::new(operator, <O as ArgminOp>::Param::default()),
         }
     }
 
     /// set current gradient value
-    pub fn set_cur_grad(&mut self, grad: T) -> &mut Self {
+    pub fn set_cur_grad(&mut self, grad: <O as ArgminOp>::Param) -> &mut Self {
         self.base.set_cur_grad(grad);
         self
     }
@@ -493,22 +486,20 @@ where
     }
 }
 
-impl<'a, T, H> ArgminLineSearch for HagerZhangLineSearch<'a, T, H>
+impl<O> ArgminLineSearch for HagerZhangLineSearch<O>
 where
-    T: std::default::Default
-        + Clone
-        + ArgminSub<T, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: Clone + std::default::Default,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
     /// Set search direction
-    fn set_search_direction(&mut self, search_direction: T) {
+    fn set_search_direction(&mut self, search_direction: <O as ArgminOp>::Param) {
         self.search_direction_b = Some(search_direction);
     }
 
     /// Set initial parameter
-    fn set_initial_parameter(&mut self, param: T) {
+    fn set_initial_parameter(&mut self, param: <O as ArgminOp>::Param) {
         self.init_param_b = Some(param.clone());
         self.set_cur_param(param);
     }
@@ -519,7 +510,7 @@ where
     }
 
     /// Set initial gradient
-    fn set_initial_gradient(&mut self, init_grad: T) {
+    fn set_initial_gradient(&mut self, init_grad: <O as ArgminOp>::Param) {
         self.init_grad_b = Some(init_grad);
     }
 
@@ -544,18 +535,16 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for HagerZhangLineSearch<'a, T, H>
+impl<O> ArgminIter for HagerZhangLineSearch<O>
 where
-    T: std::default::Default
-        + Clone
-        + ArgminSub<T, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: Clone + std::default::Default,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
-    type Parameters = T;
-    type OperatorOutput = f64;
-    type Hessian = H;
+    type Param = <O as ArgminOp>::Param;
+    type Output = f64;
+    type Hessian = <O as ArgminOp>::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         if self.sigma < self.delta {
@@ -614,7 +603,7 @@ where
         Ok(())
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);
         let bb = (self.b_x, self.b_f, self.b_g);
@@ -650,7 +639,7 @@ where
         let new_param = self
             .init_param
             .scaled_add(&self.best_x, &self.search_direction);
-        let out = ArgminIterationData::new(new_param, self.best_f);
+        let out = ArgminIterData::new(new_param, self.best_f);
         Ok(out)
     }
 }

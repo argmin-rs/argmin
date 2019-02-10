@@ -21,10 +21,13 @@
 // //! ```
 
 use crate::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// Fletcher and Reeves (FR) method
 /// TODO: Reference
-#[derive(Default)]
+#[derive(
+    Default, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug,
+)]
 pub struct FletcherReeves {}
 
 impl FletcherReeves {
@@ -45,7 +48,9 @@ where
 
 /// Polak and Ribiere (PR) method
 /// TODO: Reference
-#[derive(Default)]
+#[derive(
+    Default, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug,
+)]
 pub struct PolakRibiere {}
 
 impl PolakRibiere {
@@ -67,7 +72,9 @@ where
 
 /// Polak and Ribiere Plus (PR+) method
 /// TODO: Reference
-#[derive(Default)]
+#[derive(
+    Default, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug,
+)]
 pub struct PolakRibierePlus {}
 
 impl PolakRibierePlus {
@@ -90,7 +97,9 @@ where
 
 /// Hestenes and Stiefel (HS) method
 /// TODO: Reference
-#[derive(Default)]
+#[derive(
+    Default, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug,
+)]
 pub struct HestenesStiefel {}
 
 impl HestenesStiefel {
@@ -108,4 +117,15 @@ where
         let d = dfk1.sub(&dfk);
         dfk1.dot(&d) / d.dot(&pk)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    send_sync_test!(fletcher_reeves, FletcherReeves);
+    send_sync_test!(polak_ribiere, PolakRibiere);
+    send_sync_test!(polak_ribiere_plus, PolakRibierePlus);
+    send_sync_test!(hestenes_stiefel, HestenesStiefel);
 }

@@ -11,7 +11,8 @@ use argmin::prelude::*;
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin::testfunctions::rosenbrock;
 use rand::prelude::*;
-use std::cell::RefCell;
+use std::sync::Arc;
+use std::sync::Mutex;
 
 #[derive(Clone)]
 struct Rosenbrock {
@@ -23,9 +24,18 @@ struct Rosenbrock {
     lower_bound: Vec<f64>,
     /// upper bound
     upper_bound: Vec<f64>,
-    /// Random number generator. We use a `RefCell` here because `ArgminOperator` requires `self`
-    /// to be passed as an immutable reference. `RefCell` gives us interior mutability.
-    rng: RefCell<ThreadRng>,
+    /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
+    /// `self` to be passed as an immutable reference. This gives us thread safe interior
+    /// mutability.
+    rng: Arc<Mutex<SmallRng>>,
+}
+
+impl std::default::Default for Rosenbrock {
+    fn default() -> Self {
+        let lower_bound: Vec<f64> = vec![-5.0, -5.0];
+        let upper_bound: Vec<f64> = vec![5.0, 5.0];
+        Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound)
+    }
 }
 
 impl Rosenbrock {
@@ -36,14 +46,14 @@ impl Rosenbrock {
             b,
             lower_bound,
             upper_bound,
-            rng: RefCell::new(rand::thread_rng()),
+            rng: Arc::new(Mutex::new(SmallRng::from_entropy())),
         }
     }
 }
 
-impl ArgminOperator for Rosenbrock {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = f64;
+impl ArgminOp for Rosenbrock {
+    type Param = Vec<f64>;
+    type Output = f64;
     type Hessian = ();
 
     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
@@ -57,10 +67,11 @@ impl ArgminOperator for Rosenbrock {
         for _ in 0..(temp.floor() as u64 + 1) {
             // Compute random index of the parameter vector using the supplied random number
             // generator.
-            let idx = self.rng.borrow_mut().gen_range(0, param.len());
+            let mut rng = self.rng.lock().unwrap();
+            let idx = (*rng).gen_range(0, param.len());
 
-            // Compute random number in [0.01, 0.01].
-            let val = 0.01 * self.rng.borrow_mut().gen_range(-1.0, 1.0);
+            // Compute random number in [0.1, 0.1].
+            let val = 0.1 * (*rng).gen_range(-1.0, 1.0);
 
             // modify previous parameter value at random position `idx` by `val`
             let tmp = param[idx] + val;
@@ -93,7 +104,7 @@ fn run() -> Result<(), Error> {
     let temp = 15.0;
 
     // Set up simulated annealing solver
-    let mut solver = SimulatedAnnealing::new(&operator, init_param, temp)?;
+    let mut solver = SimulatedAnnealing::new(operator, init_param, temp)?;
 
     // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
     solver.temp_func(SATempFunc::Boltzmann);
@@ -140,7 +151,7 @@ fn run() -> Result<(), Error> {
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{:?}", solver.result());
+    println!("{}", solver.result());
     Ok(())
 }
 

@@ -16,9 +16,6 @@ use crate::prelude::*;
 use crate::solver::conjugategradient::ConjugateGradient;
 use crate::solver::linesearch::MoreThuenteLineSearch;
 // use crate::solver::linesearch::HagerZhangLineSearch;
-use std;
-use std::default::Default;
-use std::fmt::Debug;
 
 /// The Newton-CG method (also called truncated Newton method) uses a modified CG to solve the
 /// Newton equations approximately. After a search direction is found, a line search is performed.
@@ -33,23 +30,23 @@ use std::fmt::Debug;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 /// use ndarray::{Array, Array1, Array2};
 ///
-/// # #[derive(Clone)]
+/// # #[derive(Clone, Default)]
 /// # struct MyProblem {}
 /// #
-/// # impl ArgminOperator for MyProblem {
-/// #     type Parameters = Array1<f64>;
-/// #     type OperatorOutput = f64;
+/// # impl ArgminOp for MyProblem {
+/// #     type Param = Array1<f64>;
+/// #     type Output = f64;
 /// #     type Hessian = Array2<f64>;
 /// #
-/// #     fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+/// #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 /// #         Ok(rosenbrock_2d(&p.to_vec(), 1.0, 100.0))
 /// #     }
 /// #
-/// #     fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+/// #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
 /// #         Ok(Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), 1.0, 100.0)))
 /// #     }
 /// #
-/// #     fn hessian(&self, p: &Self::Parameters) -> Result<Self::Hessian, Error> {
+/// #     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
 /// #         let h = rosenbrock_2d_hessian(&p.to_vec(), 1.0, 100.0);
 /// #         Ok(Array::from_shape_vec((2, 2), h)?)
 /// #     }
@@ -63,7 +60,7 @@ use std::fmt::Debug;
 /// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 ///
 /// // Set up solver
-/// let mut solver = NewtonCG::new(&cost, init_param);
+/// let mut solver = NewtonCG::new(cost, init_param);
 ///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(20);
@@ -95,51 +92,50 @@ use std::fmt::Debug;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct NewtonCG<'a, T, H>
+pub struct NewtonCG<'a, O>
 where
-    T: 'a
-        + Clone
-        + Default
-        + Debug
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminDot<T, f64>
-        + ArgminAdd<T, T>
-        + ArgminSub<T, T>
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+        + ArgminMul<f64, <O as ArgminOp>::Param>
         + ArgminZero
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+        + ArgminNorm<f64>,
+    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
 {
     /// line search
-    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+    linesearch: Box<
+        ArgminLineSearch<
+                Param = <O as ArgminOp>::Param,
+                Output = <O as ArgminOp>::Output,
+                Hessian = <O as ArgminOp>::Hessian,
+            > + 'a,
+    >,
     /// curvature_threshold
     curvature_threshold: f64,
     /// Base stuff
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<O>,
 }
 
-impl<'a, T, H> NewtonCG<'a, T, H>
+impl<'a, O> NewtonCG<'a, O>
 where
-    T: 'a
-        + Clone
-        + Default
-        + Debug
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminDot<T, f64>
-        + ArgminAdd<T, T>
-        + ArgminSub<T, T>
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+        + ArgminMul<f64, <O as ArgminOp>::Param>
         + ArgminZero
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+        + ArgminNorm<f64>,
+    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
 {
     /// Constructor
-    pub fn new(
-        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-        init_param: T,
-    ) -> Self {
-        // let linesearch = HagerZhangLineSearch::new(cost_function);
-        let linesearch = MoreThuenteLineSearch::new(cost_function);
+    pub fn new(cost_function: O, init_param: <O as ArgminOp>::Param) -> Self {
+        // let linesearch = HagerZhangLineSearch::new(cost_function.clone());
+        let linesearch = MoreThuenteLineSearch::new(cost_function.clone());
         NewtonCG {
             linesearch: Box::new(linesearch),
             curvature_threshold: 0.0,
@@ -150,7 +146,13 @@ where
     /// Specify line search method
     pub fn set_linesearch(
         &mut self,
-        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        linesearch: Box<
+            ArgminLineSearch<
+                    Param = <O as ArgminOp>::Param,
+                    Output = <O as ArgminOp>::Output,
+                    Hessian = <O as ArgminOp>::Hessian,
+                > + 'a,
+        >,
     ) -> &mut Self {
         self.linesearch = linesearch;
         self
@@ -163,36 +165,34 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for NewtonCG<'a, T, H>
+impl<'a, O> ArgminIter for NewtonCG<'a, O>
 where
-    T: 'a
-        + Clone
-        + Default
-        + Debug
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminDot<T, f64>
-        + ArgminAdd<T, T>
-        + ArgminSub<T, T>
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+        + ArgminMul<f64, <O as ArgminOp>::Param>
         + ArgminZero
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: 'a + Clone + Default + ArgminInv<H> + ArgminDot<T, T>,
+        + ArgminNorm<f64>,
+    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
 {
-    type Parameters = T;
-    type OperatorOutput = f64;
-    type Hessian = H;
+    type Param = <O as ArgminOp>::Param;
+    type Output = <O as ArgminOp>::Output;
+    type Hessian = <O as ArgminOp>::Hessian;
 
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         let param = self.cur_param();
         let grad = self.gradient(&param)?;
         let hessian = self.hessian(&param)?;
 
         // Solve CG subproblem
-        let op: CGSubProblem<'a, T, H> = CGSubProblem::new(hessian.clone());
+        let op: CGSubProblem<Self::Param, Self::Hessian> = CGSubProblem::new(hessian.clone());
 
         let mut x_p = param.zero_like();
-        let mut x: T = param.zero_like();
-        let mut cg = ConjugateGradient::new(&op, grad.mul(&(-1.0)), x_p.clone())?;
+        let mut x: Self::Param = param.zero_like();
+        let mut cg = ConjugateGradient::new(op, grad.mul(&(-1.0)), x_p.clone())?;
 
         cg.init()?;
         let grad_norm = grad.norm();
@@ -244,25 +244,21 @@ where
         self.increase_grad_func_count(grad_count_cg + grad_count_ls);
         self.increase_hessian_func_count(hessian_count_cg + hessian_count_ls);
 
-        let out = ArgminIterationData::new(linesearch_result.param, linesearch_result.cost);
+        let out = ArgminIterData::new(linesearch_result.param, linesearch_result.cost);
         Ok(out)
     }
 }
 
-#[derive(Clone)]
-struct CGSubProblem<'a, T, H>
-where
-    H: 'a + Clone + Default + ArgminDot<T, T>,
-    T: 'a + Clone,
-{
+#[derive(Clone, Default)]
+struct CGSubProblem<T, H> {
     hessian: H,
-    phantom: std::marker::PhantomData<&'a T>,
+    phantom: std::marker::PhantomData<T>,
 }
 
-impl<'a, T, H> CGSubProblem<'a, T, H>
+impl<T, H> CGSubProblem<T, H>
 where
-    H: 'a + Clone + Default + ArgminDot<T, T>,
-    T: 'a + Clone,
+    T: Clone + Send + Sync,
+    H: Clone + Default + ArgminDot<T, T> + Send + Sync,
 {
     /// constructor
     pub fn new(hessian: H) -> Self {
@@ -273,13 +269,13 @@ where
     }
 }
 
-impl<'a, T, H> ArgminOperator for CGSubProblem<'a, T, H>
+impl<T, H> ArgminOp for CGSubProblem<T, H>
 where
-    T: 'a + Clone,
-    H: 'a + Clone + Default + ArgminDot<T, T>,
+    T: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned,
+    H: Clone + Default + ArgminDot<T, T> + Send + Sync,
 {
-    type Parameters = T;
-    type OperatorOutput = T;
+    type Param = T;
+    type Output = T;
     type Hessian = ();
 
     fn apply(&self, p: &T) -> Result<T, Error> {

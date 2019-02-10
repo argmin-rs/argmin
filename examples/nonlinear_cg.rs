@@ -10,12 +10,12 @@ use argmin::prelude::*;
 use argmin::solver::conjugategradient::NonlinearConjugateGradient;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 struct Rosenbrock {}
 
-impl ArgminOperator for Rosenbrock {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = f64;
+impl ArgminOp for Rosenbrock {
+    type Param = Vec<f64>;
+    type Output = f64;
     type Hessian = ();
 
     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
@@ -35,7 +35,7 @@ fn run() -> Result<(), Error> {
     let init_param: Vec<f64> = vec![1.2, 1.2];
 
     // Set up nonlinear conjugate gradient method
-    let mut solver = NonlinearConjugateGradient::new_pr(&operator, init_param)?;
+    let mut solver = NonlinearConjugateGradient::new_pr(operator, init_param)?;
 
     // Set maximum number of iterations
     solver.set_max_iters(20);
@@ -67,7 +67,7 @@ fn run() -> Result<(), Error> {
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{:?}", solver.result());
+    println!("{}", solver.result());
     Ok(())
 }
 

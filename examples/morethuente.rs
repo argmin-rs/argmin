@@ -10,12 +10,12 @@ use argmin::prelude::*;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::testfunctions::{sphere, sphere_derivative};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 struct Sphere {}
 
-impl ArgminOperator for Sphere {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = f64;
+impl ArgminOp for Sphere {
+    type Param = Vec<f64>;
+    type Output = f64;
     type Hessian = ();
 
     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
@@ -35,7 +35,7 @@ fn run() -> Result<(), Error> {
     let operator = Sphere {};
 
     // Set up line search method
-    let mut solver = MoreThuenteLineSearch::new(&operator);
+    let mut solver = MoreThuenteLineSearch::new(operator);
 
     // Set search direction
     solver.set_search_direction(vec![-2.0, 0.0]);
@@ -66,7 +66,7 @@ fn run() -> Result<(), Error> {
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print Result
-    println!("{:?}", solver.result());
+    println!("{}", solver.result());
     Ok(())
 }
 

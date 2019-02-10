@@ -19,8 +19,6 @@ use crate::prelude::*;
 use argmin_codegen::ArgminSolver;
 use rand;
 use rand::Rng;
-use std;
-use std::default::Default;
 
 /// Temperature functions for Simulated Annealing.
 ///
@@ -55,7 +53,7 @@ pub enum SATempFunc {
 /// use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 /// use argmin::testfunctions::rosenbrock;
 /// use rand::prelude::*;
-/// use std::cell::RefCell;
+/// use std::sync::{Arc, Mutex};;
 ///
 /// #[derive(Clone)]
 /// struct Rosenbrock {
@@ -67,9 +65,18 @@ pub enum SATempFunc {
 ///     lower_bound: Vec<f64>,
 ///     /// upper bound
 ///     upper_bound: Vec<f64>,
-///     /// Random number generator. We use a `RefCell` here because `ArgminOperator` requires `self`
-///     /// to be passed as an immutable reference. `RefCell` gives us interior mutability.
-///     rng: RefCell<ThreadRng>,
+///     /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
+///     /// `self` to be passed as an immutable reference. This gives us thread safe interior
+///     /// mutability.
+///     rng: Arc<Mutex<SmallRng>>,
+/// }
+///
+/// impl std::default::Default for Rosenbrock {
+///     fn default() -> Self {
+///         let lower_bound: Vec<f64> = vec![-5.0, -5.0];
+///         let upper_bound: Vec<f64> = vec![5.0, 5.0];
+///         Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound)
+///     }
 /// }
 ///
 /// impl Rosenbrock {
@@ -80,14 +87,14 @@ pub enum SATempFunc {
 ///             b,
 ///             lower_bound,
 ///             upper_bound,
-///             rng: RefCell::new(rand::thread_rng()),
+///             rng: Arc::new(Mutex::new(SmallRng::from_entropy())),
 ///         }
 ///     }
 /// }
 ///
-/// impl ArgminOperator for Rosenbrock {
-///     type Parameters = Vec<f64>;
-///     type OperatorOutput = f64;
+/// impl ArgminOp for Rosenbrock {
+///     type Param= Vec<f64>;
+///     type Output = f64;
 ///     type Hessian = ();
 ///
 ///     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
@@ -101,10 +108,11 @@ pub enum SATempFunc {
 ///         for _ in 0..(temp.floor() as u64 + 1) {
 ///             // Compute random index of the parameter vector using the supplied random number
 ///             // generator.
-///             let idx = self.rng.borrow_mut().gen_range(0, param.len());
+///             let mut rng = self.rng.lock().unwrap();
+///             let idx = (*rng).gen_range(0, param.len());
 ///
 ///             // Compute random number in [0.01, 0.01].
-///             let val = 0.01 * self.rng.borrow_mut().gen_range(-1.0, 1.0);
+///             let val = 0.01 * (*rng).gen_range(-1.0, 1.0);
 ///
 ///             // modify previous parameter value at random position `idx` by `val`
 ///             let tmp = param[idx] + val;
@@ -137,7 +145,7 @@ pub enum SATempFunc {
 ///     let temp = 15.0;
 ///
 ///     // Set up simulated annealing solver
-///     let mut solver = SimulatedAnnealing::new(&operator, init_param, temp)?;
+///     let mut solver = SimulatedAnnealing::new(operator, init_param, temp)?;
 ///
 ///     // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
 ///     solver.temp_func(SATempFunc::Boltzmann);
@@ -210,10 +218,9 @@ pub enum SATempFunc {
 #[log("reanneal_fixed" => "self.reanneal_fixed")]
 #[log("reanneal_accepted" => "self.reanneal_accepted")]
 #[log("reanneal_best" => "self.reanneal_best")]
-pub struct SimulatedAnnealing<'a, T, H>
+pub struct SimulatedAnnealing<O>
 where
-    T: Clone + Default,
-    H: Clone + Default,
+    O: ArgminOp<Output = f64>,
 {
     /// Initial temperature
     init_temp: f64,
@@ -249,13 +256,12 @@ where
     /// random number generator
     rng: rand::prelude::ThreadRng,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<O>,
 }
 
-impl<'a, T, H> SimulatedAnnealing<'a, T, H>
+impl<O> SimulatedAnnealing<O>
 where
-    T: Clone + Default,
-    H: Clone + Default,
+    O: ArgminOp<Output = f64>,
 {
     /// Constructor
     ///
@@ -265,8 +271,8 @@ where
     /// * `init_param`: initial parameter vector
     /// * `init_temp`: initial temperature
     pub fn new(
-        cost_function: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-        init_param: T,
+        cost_function: O,
+        init_param: <O as ArgminOp>::Param,
         init_temp: f64,
     ) -> Result<Self, Error> {
         let prev_cost = cost_function.apply(&init_param)?;
@@ -342,7 +348,7 @@ where
     /// `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
     ///
     /// which will always be between 0 and 0.5.
-    fn accept(&mut self, next_param: &T, next_cost: f64) -> (bool, bool) {
+    fn accept(&mut self, next_param: &<O as ArgminOp>::Param, next_cost: f64) -> (bool, bool) {
         let prob: f64 = self.rng.gen();
         let mut new_best = false;
         let accepted = if (next_cost < self.prev_cost)
@@ -378,7 +384,7 @@ where
     }
 
     /// Perform annealing
-    fn anneal(&mut self) -> Result<T, Error> {
+    fn anneal(&mut self) -> Result<<O as ArgminOp>::Param, Error> {
         let tmp = self.cur_param();
         let cur_temp = self.cur_temp;
         self.modify(&tmp, cur_temp)
@@ -429,17 +435,16 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for SimulatedAnnealing<'a, T, H>
+impl<O> ArgminIter for SimulatedAnnealing<O>
 where
-    T: Clone + Default,
-    H: Clone + Default,
+    O: ArgminOp<Output = f64>,
 {
-    type Parameters = T;
-    type OperatorOutput = f64;
-    type Hessian = H;
+    type Param = <O as ArgminOp>::Param;
+    type Output = <O as ArgminOp>::Output;
+    type Hessian = <O as ArgminOp>::Hessian;
 
     /// Perform one iteration of SA algorithm
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
         // behaviour. None of these strange behaviour is dangerous, but still.
@@ -466,7 +471,7 @@ where
 
         self.update_temperature();
 
-        let mut out = ArgminIterationData::new(new_param, new_cost);
+        let mut out = ArgminIterData::new(new_param, new_cost);
         out.add_kv(make_kv!(
             "t" => self.cur_temp;
             "new_be" => new_best;

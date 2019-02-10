@@ -15,22 +15,22 @@ use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 struct Rosenbrock {
     a: f64,
     b: f64,
 }
 
-impl ArgminOperator for Rosenbrock {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = f64;
+impl ArgminOp for Rosenbrock {
+    type Param = Vec<f64>;
+    type Output = f64;
     type Hessian = ();
 
-    fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+    fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(rosenbrock_2d(p, self.a, self.b))
     }
 
-    fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+    fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
     }
 }
@@ -47,12 +47,12 @@ fn run() -> Result<(), Error> {
 
     // Pick a line search. If no line search algorithm is provided, SteepestDescent defaults to
     // HagerZhang.
-    let linesearch = HagerZhangLineSearch::new(&cost);
-    // let linesearch = MoreThuenteLineSearch::new(&cost);
-    // let linesearch = BacktrackingLineSearch::new(&cost);
+    // let linesearch = HagerZhangLineSearch::new(cost.clone());
+    let linesearch = MoreThuenteLineSearch::new(cost.clone());
+    // let linesearch = BacktrackingLineSearch::new(cost.clone());
 
     // Set up solver
-    let mut solver = SteepestDescent::new(&cost, init_param)?;
+    let mut solver = SteepestDescent::new(cost, init_param)?;
 
     // Set line search. If this is omitted, `SteepestDescent` will default to `HagerZhang`.
     solver.set_linesearch(Box::new(linesearch));
@@ -70,7 +70,7 @@ fn run() -> Result<(), Error> {
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // print result
-    println!("{:?}", solver.result());
+    println!("{}", solver.result());
     Ok(())
 }
 

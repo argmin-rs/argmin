@@ -9,12 +9,12 @@ extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::conjugategradient::ConjugateGradient;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 struct MyProblem {}
 
-impl ArgminOperator for MyProblem {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = Vec<f64>;
+impl ArgminOp for MyProblem {
+    type Param = Vec<f64>;
+    type Output = Vec<f64>;
     type Hessian = ();
 
     fn apply(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
@@ -33,7 +33,7 @@ fn run() -> Result<(), Error> {
     let operator = MyProblem {};
 
     // Set up the solver
-    let mut solver = ConjugateGradient::new(&operator, b, init_param)?;
+    let mut solver = ConjugateGradient::new(operator, b, init_param)?;
 
     // Set maximum number of iterations
     solver.set_max_iters(2);
@@ -48,7 +48,7 @@ fn run() -> Result<(), Error> {
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{:?}", solver.result());
+    println!("{}", solver.result());
     Ok(())
 }
 

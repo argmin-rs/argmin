@@ -10,12 +10,12 @@ use argmin::prelude::*;
 use argmin::solver::landweber::*;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 struct Rosenbrock {}
 
-impl ArgminOperator for Rosenbrock {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = f64;
+impl ArgminOp for Rosenbrock {
+    type Param = Vec<f64>;
+    type Output = f64;
     type Hessian = ();
 
     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
@@ -33,14 +33,14 @@ fn run() -> Result<(), Error> {
     let operator = Rosenbrock {};
 
     let iters = 4000;
-    let mut solver = Landweber::new(&operator, 0.001, init_param)?;
+    let mut solver = Landweber::new(operator, 0.001, init_param)?;
     solver.set_max_iters(iters);
     solver.add_logger(ArgminSlogLogger::term());
     solver.run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)
     std::thread::sleep(std::time::Duration::from_secs(1));
-    println!("{:?}", solver.result());
+    println!("{}", solver.result());
     Ok(())
 }
 

@@ -39,19 +39,19 @@ use std;
 /// use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 /// use ndarray::{Array, Array1, Array2};
 ///
-/// # #[derive(Clone)]
+/// # #[derive(Clone, Default)]
 /// # struct MyProblem {}
 /// #
-/// # impl ArgminOperator for MyProblem {
-/// #     type Parameters = Array1<f64>;
-/// #     type OperatorOutput = f64;
+/// # impl ArgminOp for MyProblem {
+/// #     type Param = Array1<f64>;
+/// #     type Output = f64;
 /// #     type Hessian = Array2<f64>;
 /// #
-/// #     fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+/// #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 /// #         Ok(rosenbrock_2d(&p.to_vec(), 1.0, 100.0))
 /// #     }
 /// #
-/// #     fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+/// #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
 /// #         Ok(Array1::from_vec(rosenbrock_2d_derivative(
 /// #             &p.to_vec(),
 /// #             1.0,
@@ -59,7 +59,7 @@ use std;
 /// #         )))
 /// #     }
 /// #
-/// #     fn hessian(&self, p: &Self::Parameters) -> Result<Self::Hessian, Error> {
+/// #     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
 /// #         let h = rosenbrock_2d_hessian(&p.to_vec(), 1.0, 100.0);
 /// #         Ok(Array::from_shape_vec((2, 2), h)?)
 /// #     }
@@ -76,12 +76,12 @@ use std;
 /// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 ///
 /// // Set up solver
-/// let mut solver = TrustRegion::new(&cost, init_param);
+/// let mut solver = TrustRegion::new(cost.clone(), init_param);
 ///
 /// // Set method for subproblem. Optional: If not provided, it will default to `Steihaug` method
-/// // let subproblem = Box::new(CauchyPoint::new(&cost));
-/// let subproblem = Box::new(Dogleg::new(&cost));
-/// // let mut subproblem = Box::new(Steihaug::new(&cost));
+/// // let subproblem = Box::new(CauchyPoint::new(cost));
+/// let subproblem = Box::new(Dogleg::new(cost));
+/// // let mut subproblem = Box::new(Steihaug::new(cost));
 /// solver.set_subproblem(subproblem);
 ///
 /// // Set the maximum number of iterations
@@ -114,19 +114,19 @@ use std;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct TrustRegion<'a, T, H>
+pub struct TrustRegion<'a, O>
 where
-    T: Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminDot<T, f64>
-        + ArgminNorm<f64>
-        + ArgminAdd<T, T>
-        + ArgminSub<T, T>
-        + ArgminZero
-        + ArgminMul<f64, T>,
-    H: Clone + std::default::Default + ArgminDot<T, T>,
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>
+            + ArgminDot<<O as ArgminOp>::Param, f64>
+            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+            + ArgminZero
+            + ArgminMul<f64, <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
 {
     /// Radius
     radius: f64,
@@ -135,40 +135,42 @@ where
     /// eta \in [0, 1/4)
     eta: f64,
     /// subproblem
-    subproblem: Box<ArgminTrustRegion<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+    subproblem: Box<
+        ArgminTrustRegion<
+                Param = <O as ArgminOp>::Param,
+                Output = f64,
+                Hessian = <O as ArgminOp>::Hessian,
+            > + 'a,
+    >,
     /// f(xk)
     fxk: f64,
     /// mk(0)
     mk0: f64,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<O>,
 }
 
-impl<'a, T, H> TrustRegion<'a, T, H>
+impl<'a, O> TrustRegion<'a, O>
 where
-    T: 'a
-        + Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminDot<T, f64>
-        + ArgminNorm<f64>
-        + ArgminAdd<T, T>
-        + ArgminSub<T, T>
-        + ArgminZero
-        + ArgminMul<f64, T>,
-    H: 'a + Clone + std::default::Default + ArgminDot<T, T>,
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>
+            + ArgminDot<<O as ArgminOp>::Param, f64>
+            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+            + ArgminZero
+            + ArgminMul<f64, <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-        param: T,
-    ) -> Self {
-        let base = ArgminBase::new(operator, param);
+    pub fn new(operator: O, param: <O as ArgminOp>::Param) -> Self {
+        let base = ArgminBase::new(operator.clone(), param);
         let mut subproblem = Box::new(Steihaug::new(operator));
         subproblem.set_max_iters(2);
         TrustRegion {
@@ -209,34 +211,40 @@ where
     /// Set subproblem
     pub fn set_subproblem(
         &mut self,
-        subproblem: Box<ArgminTrustRegion<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        subproblem: Box<
+            ArgminTrustRegion<
+                    Param = <O as ArgminOp>::Param,
+                    Output = f64,
+                    Hessian = <O as ArgminOp>::Hessian,
+                > + 'a,
+        >,
     ) -> &mut Self {
         self.subproblem = subproblem;
         self
     }
 
-    fn m(&self, p: &T) -> f64 {
+    fn m(&self, p: &<O as ArgminOp>::Param) -> f64 {
         self.fxk + p.dot(&self.cur_grad()) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
     }
 }
 
-impl<'a, T, H> ArgminNextIter for TrustRegion<'a, T, H>
+impl<'a, O> ArgminIter for TrustRegion<'a, O>
 where
-    T: Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminDot<T, f64>
-        + ArgminNorm<f64>
-        + ArgminAdd<T, T>
-        + ArgminSub<T, T>
-        + ArgminZero
-        + ArgminMul<f64, T>,
-    H: Clone + std::default::Default + ArgminDot<T, T>,
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>
+            + ArgminDot<<O as ArgminOp>::Param, f64>
+            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+            + ArgminZero
+            + ArgminMul<f64, <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
 {
-    type Parameters = T;
-    type OperatorOutput = f64;
-    type Hessian = H;
+    type Param = <O as ArgminOp>::Param;
+    type Output = f64;
+    type Hessian = <O as ArgminOp>::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         let param = self.cur_param();
@@ -249,7 +257,7 @@ where
         Ok(())
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         let g = self.cur_grad();
         let h = self.cur_hessian();
         self.subproblem.set_grad(g);
@@ -279,9 +287,9 @@ where
             self.set_cur_grad(grad);
             let hessian = self.hessian(&new_param)?;
             self.set_cur_hessian(hessian);
-            ArgminIterationData::new(new_param, fxkpk)
+            ArgminIterData::new(new_param, fxkpk)
         } else {
-            ArgminIterationData::new(self.cur_param(), self.fxk)
+            ArgminIterData::new(self.cur_param(), self.fxk)
         };
         let kv = make_kv!("radius" => cur_radius;);
         out.add_kv(kv);

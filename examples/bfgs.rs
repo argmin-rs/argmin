@@ -14,22 +14,22 @@ use argmin_core::finitediff::*;
 use argmin::testfunctions::rosenbrock;
 use ndarray::{array, Array1, Array2};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 struct Rosenbrock {
     a: f64,
     b: f64,
 }
 
-impl ArgminOperator for Rosenbrock {
-    type Parameters = Array1<f64>;
-    type OperatorOutput = f64;
+impl ArgminOp for Rosenbrock {
+    type Param = Array1<f64>;
+    type Output = f64;
     type Hessian = Array2<f64>;
 
-    fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+    fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(rosenbrock(&p.to_vec(), self.a, self.b))
     }
 
-    fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+    fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
         Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
     }
 }
@@ -44,7 +44,7 @@ fn run() -> Result<(), Error> {
     let init_hessian: Array2<f64> = Array2::eye(8);
 
     // Set up solver
-    let mut solver = BFGS::new(&cost, init_param, init_hessian);
+    let mut solver = BFGS::new(cost, init_param, init_hessian);
 
     // Set maximum number of iterations
     solver.set_max_iters(800);
@@ -59,7 +59,7 @@ fn run() -> Result<(), Error> {
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{:?}", solver.result());
+    println!("{}", solver.result());
     Ok(())
 }
 

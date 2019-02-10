@@ -19,20 +19,6 @@
 //! DOI: https://doi.org/10.1145/192115.192132
 
 use crate::prelude::*;
-use std;
-
-#[derive(Default, Clone)]
-struct Step {
-    pub x: f64,
-    pub fx: f64,
-    pub gx: f64,
-}
-
-impl Step {
-    pub fn new(x: f64, fx: f64, gx: f64) -> Self {
-        Step { x, fx, gx }
-    }
-}
 
 /// The More-Thuente line search is a method to find a step length which obeys the strong Wolfe
 /// conditions.
@@ -45,12 +31,12 @@ impl Step {
 /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
 /// # use argmin::testfunctions::{sphere, sphere_derivative};
 /// #
-/// # #[derive(Clone)]
+/// # #[derive(Clone, Default)]
 /// # struct MyProblem {}
 /// #
-/// # impl ArgminOperator for MyProblem {
-/// #     type Parameters = Vec<f64>;
-/// #     type OperatorOutput = f64;
+/// # impl ArgminOp for MyProblem {
+/// #     type Param = Vec<f64>;
+/// #     type Output = f64;
 /// #     type Hessian = ();
 /// #
 /// #     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
@@ -70,7 +56,7 @@ impl Step {
 /// let operator = MyProblem {};
 ///
 /// // Set up line search method
-/// let mut solver = MoreThuenteLineSearch::new(&operator);
+/// let mut solver = MoreThuenteLineSearch::new(operator);
 ///
 /// // Set search direction
 /// solver.set_search_direction(vec![-2.0, 0.0]);
@@ -121,32 +107,29 @@ impl Step {
 /// decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
 /// DOI: https://doi.org/10.1145/192115.192132
 #[derive(ArgminSolver)]
-pub struct MoreThuenteLineSearch<'a, T, H>
+pub struct MoreThuenteLineSearch<O>
 where
-    T: std::default::Default
-        + Clone
-        + std::fmt::Debug
-        + ArgminSub<T, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: Clone + std::default::Default,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
     /// initial parameter vector (builder)
-    init_param_b: Option<T>,
+    init_param_b: Option<<O as ArgminOp>::Param>,
     /// initial cost (builder)
     finit_b: Option<f64>,
     /// initial gradient (builder)
-    init_grad_b: Option<T>,
+    init_grad_b: Option<<O as ArgminOp>::Param>,
     /// Search direction (builder)
-    search_direction_b: Option<T>,
+    search_direction_b: Option<<O as ArgminOp>::Param>,
     /// initial parameter vector
-    init_param: T,
+    init_param: <O as ArgminOp>::Param,
     /// initial cost
     finit: f64,
     /// initial gradient
-    init_grad: T,
+    init_grad: <O as ArgminOp>::Param,
     /// Search direction
-    search_direction: T,
+    search_direction: <O as ArgminOp>::Param,
     /// Search direction in 1D
     dginit: f64,
     /// dgtest
@@ -184,37 +167,44 @@ where
     /// infoc
     infoc: usize,
     /// base
-    base: ArgminBase<'a, T, f64, H>,
+    base: ArgminBase<O>,
 }
 
-impl<'a, T, H> MoreThuenteLineSearch<'a, T, H>
+#[derive(Default, Clone)]
+struct Step {
+    pub x: f64,
+    pub fx: f64,
+    pub gx: f64,
+}
+
+impl Step {
+    pub fn new(x: f64, fx: f64, gx: f64) -> Self {
+        Step { x, fx, gx }
+    }
+}
+
+impl<O> MoreThuenteLineSearch<O>
 where
-    T: std::default::Default
-        + Clone
-        + std::fmt::Debug
-        + ArgminSub<T, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: Clone + std::default::Default,
-    MoreThuenteLineSearch<'a, T, H>: ArgminSolver<Parameters = T, OperatorOutput = f64>,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
-    ) -> Self {
+    pub fn new(operator: O) -> Self {
         MoreThuenteLineSearch {
             init_param_b: None,
             finit_b: None,
             init_grad_b: None,
             search_direction_b: None,
-            init_param: T::default(),
+            init_param: <O as ArgminOp>::Param::default(),
             finit: std::f64::INFINITY,
-            init_grad: T::default(),
-            search_direction: T::default(),
+            init_grad: <O as ArgminOp>::Param::default(),
+            search_direction: <O as ArgminOp>::Param::default(),
             dginit: 0.0,
             dgtest: 0.0,
             ftol: 1e-4,
@@ -233,12 +223,12 @@ where
             brackt: false,
             stage1: true,
             infoc: 1,
-            base: ArgminBase::new(operator, T::default()),
+            base: ArgminBase::new(operator, <O as ArgminOp>::Param::default()),
         }
     }
 
     /// set current gradient value
-    pub fn set_cur_grad(&mut self, grad: T) -> &mut Self {
+    pub fn set_cur_grad(&mut self, grad: <O as ArgminOp>::Param) -> &mut Self {
         self.base.set_cur_grad(grad);
         self
     }
@@ -287,23 +277,20 @@ where
     }
 }
 
-impl<'a, T, H> ArgminLineSearch for MoreThuenteLineSearch<'a, T, H>
+impl<O> ArgminLineSearch for MoreThuenteLineSearch<O>
 where
-    T: std::default::Default
-        + Clone
-        + std::fmt::Debug
-        + ArgminSub<T, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: Clone + std::default::Default,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
     /// Set search direction
-    fn set_search_direction(&mut self, search_direction: T) {
+    fn set_search_direction(&mut self, search_direction: <O as ArgminOp>::Param) {
         self.search_direction_b = Some(search_direction);
     }
 
     /// Set initial parameter
-    fn set_initial_parameter(&mut self, param: T) {
+    fn set_initial_parameter(&mut self, param: <O as ArgminOp>::Param) {
         self.init_param_b = Some(param.clone());
         self.set_cur_param(param);
     }
@@ -314,7 +301,7 @@ where
     }
 
     /// Set initial gradient
-    fn set_initial_gradient(&mut self, init_grad: T) {
+    fn set_initial_gradient(&mut self, init_grad: <O as ArgminOp>::Param) {
         self.init_grad_b = Some(init_grad);
     }
 
@@ -345,19 +332,16 @@ where
     }
 }
 
-impl<'a, T, H> ArgminNextIter for MoreThuenteLineSearch<'a, T, H>
+impl<O> ArgminIter for MoreThuenteLineSearch<O>
 where
-    T: std::default::Default
-        + Clone
-        + std::fmt::Debug
-        + ArgminSub<T, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: Clone + std::default::Default,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
 {
-    type Parameters = T;
-    type OperatorOutput = f64;
-    type Hessian = H;
+    type Param = <O as ArgminOp>::Param;
+    type Output = f64;
+    type Hessian = <O as ArgminOp>::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         self.init_param = check_param!(
@@ -406,7 +390,7 @@ where
         Ok(())
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {
@@ -474,7 +458,7 @@ where
 
         if info != 0 {
             self.set_termination_reason(TerminationReason::LineSearchConditionMet);
-            let out = ArgminIterationData::new(self.cur_param(), self.cur_cost());
+            let out = ArgminIterData::new(self.cur_param(), self.cur_cost());
             return Ok(out);
         }
 
@@ -538,7 +522,7 @@ where
         let new_param = self
             .init_param
             .scaled_add(&self.stp.x, &self.search_direction);
-        let out = ArgminIterationData::new(new_param, self.stp.fx);
+        let out = ArgminIterData::new(new_param, self.stp.fx);
         Ok(out)
     }
 }
