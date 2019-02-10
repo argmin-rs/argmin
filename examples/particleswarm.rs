@@ -12,18 +12,19 @@ use argmin::solver::particleswarm::*;
 use argmin_testfunctions::himmelblau;
 
 
+#[derive(Default, Clone)]
 struct Himmelblau
 {
 
 }
 
 
-impl ArgminOperator for Himmelblau {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = f64;
+impl ArgminOp for Himmelblau {
+    type Param = Vec<f64>;
+    type Output = f64;
     type Hessian = ();
 
-    fn apply(&self, param: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+    fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
         Ok(himmelblau(param))
     }
 }
@@ -43,10 +44,10 @@ fn run() -> Result<(), Error> {
 
     {
         let mut solver = ParticleSwarm::new(
-            &cost_function,
+            cost_function.clone(),
             init_param,
             (vec![-4.0, -4.0], vec![4.0, 4.0]),
-            100,
+            10,
         )?;
 
         // Attach a logger
@@ -146,20 +147,12 @@ impl Visualizer {
         let options_particles = [Color("#ff0000"), PointSize(2.0)];
         let window = Some(self.surface.window);
         self.fg.axes3d()
-            // .set_title("Surface fg4.2", &[])
             .surface(
                 self.surface.zvalues.iter(),
                 self.surface.width,
                 self.surface.height, window, &[])
-            // .set_x_label("X", &[])
-            // .set_y_label("Y", &[])
-            // .set_z_label("Z", &[])
-            // .set_z_range(Fix(0.0), Fix(2000.0))
-            // .set_z_ticks(Some((Fix(100.0), 1)), &[Mirror(false)], &[])
-            // .set_cb_range(Fix(-1.0), Fix(1.0))
             .points(&self.optima_x, &self.optima_y, &self.optima_z, &options_optima)
             .points(&self.particles_x, &self.particles_y, &self.particles_z, &options_particles)
-            // .set_view(0.0, 0.0)
             ;
         self.fg.show();
 
