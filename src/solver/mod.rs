@@ -11,5 +11,5 @@ pub mod landweber;
 pub mod linesearch;
 // pub mod newton;
 // pub mod quasinewton;
-// pub mod simulatedannealing;
+pub mod simulatedannealing;
 // pub mod trustregion;

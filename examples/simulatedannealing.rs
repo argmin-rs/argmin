@@ -30,6 +30,14 @@ struct Rosenbrock {
     rng: Arc<Mutex<SmallRng>>,
 }
 
+impl std::default::Default for Rosenbrock {
+    fn default() -> Self {
+        let lower_bound: Vec<f64> = vec![-5.0, -5.0];
+        let upper_bound: Vec<f64> = vec![5.0, 5.0];
+        Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound)
+    }
+}
+
 impl Rosenbrock {
     /// Constructor
     pub fn new(a: f64, b: f64, lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> Self {
@@ -43,9 +51,9 @@ impl Rosenbrock {
     }
 }
 
-impl ArgminOperator for Rosenbrock {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = f64;
+impl ArgminOp for Rosenbrock {
+    type Param = Vec<f64>;
+    type Output = f64;
     type Hessian = ();
 
     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
@@ -62,8 +70,8 @@ impl ArgminOperator for Rosenbrock {
             let mut rng = self.rng.lock().unwrap();
             let idx = (*rng).gen_range(0, param.len());
 
-            // Compute random number in [0.01, 0.01].
-            let val = 0.01 * (*rng).gen_range(-1.0, 1.0);
+            // Compute random number in [0.1, 0.1].
+            let val = 0.1 * (*rng).gen_range(-1.0, 1.0);
 
             // modify previous parameter value at random position `idx` by `val`
             let tmp = param[idx] + val;
