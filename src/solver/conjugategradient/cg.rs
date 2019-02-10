@@ -28,9 +28,9 @@ use std::default::Default;
 /// #[derive(Clone)]
 /// struct MyProblem {}
 ///
-/// impl ArgminOperator for MyProblem {
-///     type Parameters = Vec<f64>;
-///     type OperatorOutput = Vec<f64>;
+/// impl ArgminOpfor MyProblem {
+///     type Param = Vec<f64>;
+///     type Output = Vec<f64>;
 ///     type Hessian = ();
 ///
 ///     fn apply(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
@@ -80,25 +80,24 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver, Clone, Serialize, Deserialize)]
-pub struct ConjugateGradient<T, O>
+pub struct ConjugateGradient<O>
 where
-    T: Clone
-        + Default
-        + ArgminSub<T, T>
-        + ArgminAdd<T, T>
-        + ArgminMul<f64, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    O: ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>,
+    O: ArgminOp<Output = <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminMul<f64, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>,
 {
     /// b (right hand side)
-    b: T,
+    b: <O as ArgminOp>::Param,
     /// residual
-    r: T,
+    r: <O as ArgminOp>::Param,
     /// p
-    p: T,
+    p: <O as ArgminOp>::Param,
     /// previous p
-    p_prev: T,
+    p_prev: <O as ArgminOp>::Param,
     /// r^T * r
     rtr: f64,
     /// alpha
@@ -106,19 +105,18 @@ where
     /// beta
     beta: f64,
     /// base
-    base: ArgminBase<T, (), O>,
+    base: ArgminBase<O>,
 }
 
-impl<T, O> ConjugateGradient<T, O>
+impl<O> ConjugateGradient<O>
 where
-    T: Clone
-        + Default
-        + ArgminSub<T, T>
-        + ArgminAdd<T, T>
-        + ArgminMul<f64, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    O: ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>,
+    O: ArgminOp<Output = <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminMul<f64, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>,
 {
     /// Constructor
     ///
@@ -129,12 +127,16 @@ where
     /// `b`: right hand side of `A * x = b`
     ///
     /// `init_param`: Initial parameter vector
-    pub fn new(operator: O, b: T, init_param: T) -> Result<Self, Error> {
+    pub fn new(
+        operator: O,
+        b: <O as ArgminOp>::Param,
+        init_param: <O as ArgminOp>::Param,
+    ) -> Result<Self, Error> {
         Ok(ConjugateGradient {
             b,
-            r: T::default(),
-            p: T::default(),
-            p_prev: T::default(),
+            r: <O as ArgminOp>::Param::default(),
+            p: <O as ArgminOp>::Param::default(),
+            p_prev: <O as ArgminOp>::Param::default(),
             rtr: std::f64::NAN,
             alpha: std::f64::NAN,
             beta: std::f64::NAN,
@@ -143,35 +145,34 @@ where
     }
 
     /// Return the current search direction (This is needed by NewtonCG for instance)
-    pub fn p(&self) -> T {
+    pub fn p(&self) -> <O as ArgminOp>::Param {
         self.p.clone()
     }
 
     /// Return the previous search direction (This is needed by NewtonCG for instance)
-    pub fn p_prev(&self) -> T {
+    pub fn p_prev(&self) -> <O as ArgminOp>::Param {
         self.p_prev.clone()
     }
 
     /// Return the current residual (This is needed by NewtonCG for instance)
-    pub fn residual(&self) -> T {
+    pub fn residual(&self) -> <O as ArgminOp>::Param {
         self.r.clone()
     }
 }
 
-impl<T, O> ArgminNextIter for ConjugateGradient<T, O>
+impl<O> ArgminIter for ConjugateGradient<O>
 where
-    T: Clone
-        + Default
-        + ArgminSub<T, T>
-        + ArgminAdd<T, T>
-        + ArgminMul<f64, T>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    O: ArgminOperator<Parameters = T, OperatorOutput = T, Hessian = ()>,
+    O: ArgminOp<Output = <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminMul<f64, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>,
 {
-    type Parameters = T;
-    type OperatorOutput = T;
-    type Hessian = ();
+    type Param = <O as ArgminOp>::Param;
+    type Output = <O as ArgminOp>::Output;
+    type Hessian = <O as ArgminOp>::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         let init_param = self.cur_param();
@@ -184,7 +185,7 @@ where
     }
 
     /// Perform one iteration of SA algorithm
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         // Still way too much cloning going on here
         self.p_prev = self.p.clone();
         let p = self.p.clone();
@@ -198,7 +199,7 @@ where
         self.p = self.r.mul(&(-1.0)).scaled_add(&self.beta, &p);
         let norm = self.r.dot(&self.r);
 
-        let mut out = ArgminIterationData::new(new_param, norm.sqrt());
+        let mut out = ArgminIterData::new(new_param, norm.sqrt());
         out.add_kv(make_kv!(
             "alpha" => self.alpha;
             "beta" => self.beta;

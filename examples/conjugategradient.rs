@@ -9,12 +9,12 @@ extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::conjugategradient::ConjugateGradient;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 struct MyProblem {}
 
-impl ArgminOperator for MyProblem {
-    type Parameters = Vec<f64>;
-    type OperatorOutput = Vec<f64>;
+impl ArgminOp for MyProblem {
+    type Param = Vec<f64>;
+    type Output = Vec<f64>;
     type Hessian = ();
 
     fn apply(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
