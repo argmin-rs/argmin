@@ -74,7 +74,10 @@ where
             rng: rng.clone(),
             iter_callback: None,
             particles: vec![],
-            best_position: O::Param::zero(), // FIXME: zero smart?
+            best_position: O::Param::rand_from_range( // FIXME: random smart?
+                &mut rng.clone(),
+                &search_region.0,
+                &search_region.1),
             best_cost: f64::INFINITY,
             weight_momentum: 1.0,
             weight_particle: 1.0,
@@ -152,6 +155,8 @@ where
     /// Perform one iteration of algorithm
     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
 
+        let zero = Self::Param::zero_like(&self.best_position);
+
         for p in self.particles.iter_mut() {
             // New velocity is composed of
             // 1) previous velocity (momentum),
@@ -164,13 +169,14 @@ where
             // ad 2)
             let to_optimum = p.best_position.sub(&p.position);
             let pull_to_optimum = Self::Param::rand_from_range(
-                &mut self.rng, &Self::Param::zero(), &to_optimum).mul(
+                &mut self.rng, &zero, &to_optimum);
+            let pull_to_optimum = pull_to_optimum.mul(
                     &self.weight_particle);
 
             // ad 3)
             let to_global_optimum = self.best_position.sub(&p.position);
             let pull_to_global_optimum =
-                Self::Param::rand_from_range(&mut self.rng, &Self::Param::zero(), &to_global_optimum).mul(
+                Self::Param::rand_from_range(&mut self.rng, &zero, &to_global_optimum).mul(
                     &self.weight_swarm);
 
             p.velocity = momentum.add(&pull_to_optimum).add(&pull_to_global_optimum);
@@ -212,13 +218,22 @@ pub trait RandFromRange
                        min: &Self, max: &Self) -> Self;
 }
 
+// TODO: move
 impl<Scalar> RandFromRange for Vec<Scalar>
-    where Scalar: SampleUniform
+    where Scalar: SampleUniform + std::cmp::PartialOrd + Clone
 {
     fn rand_from_range(rng: &mut rand::prelude::ThreadRng,
                        min: &Self, max: &Self) -> Self
     {
-        return min.iter().zip(max.iter()).map(|(a, b)| rng.gen_range(a, b)).collect();
+        assert!(min.len() > 0);
+        assert_eq!(min.len(), max.len());
+
+        if min.iter().zip(max.iter()).any(|(a, b)| a >= b) {
+            min.clone()
+        } else {
+            min.iter().zip(max.iter()).map(|(a, b)| rng.gen_range(a, b)).collect()
+        }
+
     }
 }
 
@@ -231,6 +246,7 @@ pub trait Position
 + ArgminMul<f64, Self>
 + ArgminZero
 + RandFromRange
++ std::fmt::Debug
 {}
 
 impl<T> Position for T where T
@@ -241,6 +257,7 @@ impl<T> Position for T where T
 + ArgminMul<f64, Self>
 + ArgminZero
 + RandFromRange
++ std::fmt::Debug
 {}
 
 pub struct Particle<T: Position> {
