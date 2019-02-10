@@ -57,6 +57,8 @@ Any help is appreciated!
 - Newton methods
   - Newton's method
   - Newton-CG
+- Quasi-Newton methods
+  - BFGS
 - Landweber iteration
 - Simulated Annealing
 
@@ -67,7 +69,7 @@ Add this to your `Cargo.toml`:
 
 ```
 [dependencies]
-argmin = "0.1.6"
+argmin = "0.1.7"
 ```
 
 
@@ -77,7 +79,7 @@ There are additional features which can be activated in `Cargo.toml`:
 
 ```
 [dependencies]
-argmin = { version = "0.1.6", features = ["ctrlc", "ndarrayl"] }
+argmin = { version = "0.1.7", features = ["ctrlc", "ndarrayl"] }
 ```
 
 These are currently optional, but they may move to the default features in the future. 
