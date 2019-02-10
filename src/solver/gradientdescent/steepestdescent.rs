@@ -16,8 +16,6 @@
 
 use crate::prelude::*;
 use crate::solver::linesearch::HagerZhangLineSearch;
-use std;
-use std::default::Default;
 
 /// Steepest descent iteratively takes steps in the direction of the strongest negative gradient.
 /// In each iteration, a line search is employed to obtain an appropriate step length.
@@ -39,15 +37,15 @@ use std::default::Default;
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOperator for MyProblem {
-/// #     type Parameters = Vec<f64>;
-/// #     type OperatorOutput = f64;
+/// #     type Param = Vec<f64>;
+/// #     type Output = f64;
 /// #     type Hessian = ();
 /// #
-/// #     fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+/// #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 /// #         Ok(rosenbrock_2d(p, 1.0, 100.0))
 /// #     }
 /// #
-/// #     fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+/// #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
 /// #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
 /// #     }
 /// # }
@@ -99,42 +97,40 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct SteepestDescent<'a, T, H, O>
+pub struct SteepestDescent<'a, O>
 where
-    T: 'a
-        + Clone
-        + Default
-        + std::fmt::Debug
-        + ArgminMul<f64, T>
-        + ArgminSub<T, T>
-        + ArgminNorm<f64>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: 'a + Clone + Default,
-    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+        + ArgminMul<f64, <O as ArgminOp>::Param>
+        + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminNorm<f64>,
 {
     /// line search
-    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+    linesearch: Box<
+        ArgminLineSearch<
+                Param = <O as ArgminOp>::Param,
+                Output = f64,
+                Hessian = <O as ArgminOp>::Hessian,
+            > + 'a,
+    >,
     /// Base stuff
-    base: ArgminBase<T, H, O>,
+    base: ArgminBase<O>,
 }
 
-impl<'a, T, H, O> SteepestDescent<'a, T, H, O>
+impl<'a, O> SteepestDescent<'a, O>
 where
-    T: 'a
-        + Clone
-        + Default
-        + std::fmt::Debug
-        + ArgminMul<f64, T>
-        + ArgminSub<T, T>
-        + ArgminNorm<f64>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: 'a + Clone + Default,
-    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+        + ArgminMul<f64, <O as ArgminOp>::Param>
+        + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminNorm<f64>,
 {
     /// Constructor
-    pub fn new(cost_function: O, init_param: T) -> Result<Self, Error> {
+    pub fn new(cost_function: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
         let linesearch = HagerZhangLineSearch::new(cost_function.clone());
         Ok(SteepestDescent {
             linesearch: Box::new(linesearch),
@@ -145,33 +141,35 @@ where
     /// Specify line search method
     pub fn set_linesearch(
         &mut self,
-        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        linesearch: Box<
+            ArgminLineSearch<
+                    Param = <O as ArgminOp>::Param,
+                    Output = f64,
+                    Hessian = <O as ArgminOp>::Hessian,
+                > + 'a,
+        >,
     ) -> &mut Self {
         self.linesearch = linesearch;
         self
     }
 }
 
-impl<'a, T, H, O> ArgminNextIter for SteepestDescent<'a, T, H, O>
+impl<'a, O> ArgminIter for SteepestDescent<'a, O>
 where
-    T: 'a
-        + Clone
-        + Default
-        + std::fmt::Debug
-        + ArgminMul<f64, T>
-        + ArgminSub<T, T>
-        + ArgminNorm<f64>
-        + ArgminDot<T, f64>
-        + ArgminScaledAdd<T, f64, T>,
-    H: 'a + Clone + Default,
-    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+        + ArgminMul<f64, <O as ArgminOp>::Param>
+        + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminNorm<f64>,
 {
-    type Parameters = T;
-    type OperatorOutput = f64;
-    type Hessian = H;
+    type Param = <O as ArgminOp>::Param;
+    type Output = f64;
+    type Hessian = <O as ArgminOp>::Hessian;
 
     /// Perform one iteration of SA algorithm
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         // reset line search
         self.linesearch.base_reset();
 
@@ -191,7 +189,7 @@ where
 
         let linesearch_result = self.linesearch.result();
 
-        let out = ArgminIterationData::new(linesearch_result.param, linesearch_result.cost);
+        let out = ArgminIterData::new(linesearch_result.param, linesearch_result.cost);
         Ok(out)
     }
 }
