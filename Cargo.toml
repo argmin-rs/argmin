@@ -28,10 +28,10 @@ argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunction
 # argmin_codegen = "0.1.6"
 # argmin_testfunctions = "0.1.1"
 rand = "0.6.1"
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive", "rc"] }
 
 [dev-dependencies]
-ndarray = "0.12.1"
+ndarray = { version = "0.12.1", features = ["serde-1"] }
 ndarray-linalg = { version = "0.10.0", features = ["openblas"] }
 paste = "0.1.4"
 
