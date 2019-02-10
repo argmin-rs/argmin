@@ -22,39 +22,37 @@ use std;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct Dogleg<T, H, O>
+pub struct Dogleg<O>
 where
-    T: Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminDot<T, f64>
-        + ArgminAdd<T, T>
-        + ArgminSub<T, T>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>
+            + ArgminDot<<O as ArgminOp>::Param, f64>
+            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
 {
     /// Radius
     radius: f64,
     /// base
-    base: ArgminBase<T, H, O>,
+    base: ArgminBase<O>,
 }
 
-impl<T, H, O> Dogleg<T, H, O>
+impl<O> Dogleg<O>
 where
-    T: Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminDot<T, f64>
-        + ArgminAdd<T, T>
-        + ArgminSub<T, T>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>
+            + ArgminDot<<O as ArgminOp>::Param, f64>
+            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
 {
     /// Constructor
     ///
@@ -62,7 +60,7 @@ where
     ///
     /// `operator`: operator
     pub fn new(operator: O) -> Self {
-        let base = ArgminBase::new(operator, T::default());
+        let base = ArgminBase::new(operator, <O as ArgminOp>::Param::default());
         Dogleg {
             radius: std::f64::NAN,
             base,
@@ -70,23 +68,22 @@ where
     }
 }
 
-impl<T, H, O> ArgminNextIter for Dogleg<T, H, O>
+impl<O> ArgminIter for Dogleg<O>
 where
-    T: Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminDot<T, f64>
-        + ArgminAdd<T, T>
-        + ArgminSub<T, T>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>
+            + ArgminDot<<O as ArgminOp>::Param, f64>
+            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
 {
-    type Parameters = T;
-    type OperatorOutput = f64;
-    type Hessian = H;
+    type Param = <O as ArgminOp>::Param;
+    type Output = <O as ArgminOp>::Output;
+    type Hessian = <O as ArgminOp>::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         self.base_reset();
@@ -95,7 +92,7 @@ where
         Ok(())
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         let g = self.cur_grad();
         let h = self.cur_hessian();
         let pstar;
@@ -144,24 +141,23 @@ where
                 .into());
             }
         }
-        let out = ArgminIterationData::new(pstar, 0.0);
+        let out = ArgminIterData::new(pstar, 0.0);
         Ok(out)
     }
 }
 
-impl<T, H, O> ArgminTrustRegion for Dogleg<T, H, O>
+impl<O> ArgminTrustRegion for Dogleg<O>
 where
-    T: Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminDot<T, f64>
-        + ArgminAdd<T, T>
-        + ArgminSub<T, T>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: Clone + std::default::Default + ArgminInv<H> + ArgminDot<T, T>,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>
+            + ArgminDot<<O as ArgminOp>::Param, f64>
+            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
 {
     // fn set_initial_parameter(&mut self, param: T) {
     //     self.set_cur_param(param);
@@ -171,11 +167,11 @@ where
         self.radius = radius;
     }
 
-    fn set_grad(&mut self, grad: T) {
+    fn set_grad(&mut self, grad: <O as ArgminOp>::Param) {
         self.set_cur_grad(grad);
     }
 
-    fn set_hessian(&mut self, hessian: H) {
+    fn set_hessian(&mut self, hessian: <O as ArgminOp>::Hessian) {
         self.set_cur_hessian(hessian);
     }
 }

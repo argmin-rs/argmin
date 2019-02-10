@@ -11,7 +11,6 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use std;
 
 /// The Cauchy point is the minimum of the quadratic approximation of the cost function within the
 /// trust region along the direction given by the first derivative.
@@ -21,33 +20,27 @@ use std;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
-pub struct CauchyPoint<T, H, O>
+pub struct CauchyPoint<O>
 where
-    T: Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: Clone + std::default::Default,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>,
 {
     /// Radius
     radius: f64,
     /// base
-    base: ArgminBase<T, H, O>,
+    base: ArgminBase<O>,
 }
 
-impl<T, H, O> CauchyPoint<T, H, O>
+impl<O> CauchyPoint<O>
 where
-    T: Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: Clone + std::default::Default,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>,
 {
     /// Constructor
     ///
@@ -55,7 +48,7 @@ where
     ///
     /// `operator`: operator
     pub fn new(operator: O) -> Self {
-        let base = ArgminBase::new(operator, T::default());
+        let base = ArgminBase::new(operator, <O as ArgminOp>::Param::default());
         CauchyPoint {
             radius: std::f64::NAN,
             base,
@@ -63,20 +56,17 @@ where
     }
 }
 
-impl<T, H, O> ArgminNextIter for CauchyPoint<T, H, O>
+impl<O> ArgminIter for CauchyPoint<O>
 where
-    T: Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: Clone + std::default::Default,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>,
 {
-    type Parameters = T;
-    type OperatorOutput = f64;
-    type Hessian = H;
+    type Param = <O as ArgminOp>::Param;
+    type Output = <O as ArgminOp>::Output;
+    type Hessian = <O as ArgminOp>::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         self.base_reset();
@@ -85,7 +75,7 @@ where
         Ok(())
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         let grad = self.cur_grad();
         let grad_norm = grad.norm();
         let wdp = grad.weighted_dot(&self.cur_hessian(), &grad);
@@ -96,31 +86,28 @@ where
         };
 
         let new_param = grad.mul(&(-tau * self.radius / grad_norm));
-        let out = ArgminIterationData::new(new_param, 0.0);
+        let out = ArgminIterData::new(new_param, 0.0);
         Ok(out)
     }
 }
 
-impl<T, H, O> ArgminTrustRegion for CauchyPoint<T, H, O>
+impl<O> ArgminTrustRegion for CauchyPoint<O>
 where
-    T: Clone
-        + std::default::Default
-        + std::fmt::Debug
-        + ArgminWeightedDot<T, f64, H>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, T>,
-    H: Clone + std::default::Default,
-    O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+    O: ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param:
+        ArgminMul<f64, <O as ArgminOp>::Param>
+            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
+            + ArgminNorm<f64>,
 {
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
     }
 
-    fn set_grad(&mut self, grad: T) {
+    fn set_grad(&mut self, grad: <O as ArgminOp>::Param) {
         self.set_cur_grad(grad);
     }
 
-    fn set_hessian(&mut self, hessian: H) {
+    fn set_hessian(&mut self, hessian: <O as ArgminOp>::Hessian) {
         self.set_cur_hessian(hessian);
     }
 }
