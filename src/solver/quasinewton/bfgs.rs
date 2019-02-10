@@ -13,9 +13,6 @@
 use crate::prelude::*;
 // use crate::solver::linesearch::HagerZhangLineSearch;
 use crate::solver::linesearch::MoreThuenteLineSearch;
-use std;
-use std::default::Default;
-use std::fmt::Debug;
 
 /// BFGS method
 ///
@@ -29,19 +26,19 @@ use std::fmt::Debug;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 /// use ndarray::{array, Array1, Array2};
 ///
-/// # #[derive(Clone)]
+/// # #[derive(Clone, Default)]
 /// # struct MyProblem { }
 /// #
-/// #  impl ArgminOperator for MyProblem {
-/// #      type Parameters = Array1<f64>;
-/// #      type OperatorOutput = f64;
+/// #  impl ArgminOp for MyProblem {
+/// #      type Param = Array1<f64>;
+/// #      type Output = f64;
 /// #      type Hessian = Array2<f64>;
 /// #
-/// #      fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+/// #      fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 /// #          Ok(rosenbrock_2d(&p.to_vec(), 1.0, 100.0))
 /// #      }
 /// #
-/// #      fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+/// #      fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
 /// #          Ok(Array1::from_vec(rosenbrock_2d_derivative(
 /// #              &p.to_vec(),
 /// #              1.0,
@@ -93,66 +90,60 @@ use std::fmt::Debug;
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver)]
 #[stop("self.cur_grad().norm() < std::f64::EPSILON.sqrt()" => TargetPrecisionReached)]
-pub struct BFGS<'a, T, H, O>
+pub struct BFGS<'a, O>
 where
-    T: 'a
-        + Clone
-        + Default
-        + Debug
-        + ArgminDot<T, f64>
-        + ArgminDot<T, H>
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Hessian>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
         + ArgminNorm<f64>
-        + ArgminMul<f64, T>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminSub<T, T>,
-    H: 'a
-        + Clone
-        + Default
-        + Debug
-        + ArgminDot<T, T>
-        + ArgminDot<H, H>
+        + ArgminMul<f64, <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Hessian: ArgminSub<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
+        + ArgminAdd<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
+        + ArgminMul<f64, <O as ArgminOp>::Hessian>
         + ArgminTranspose
-        + ArgminEye
-        + ArgminSub<H, H>
-        + ArgminAdd<H, H>
-        + ArgminMul<f64, H>,
-    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+        + ArgminEye,
 {
     /// Inverse Hessian
-    inv_hessian: H,
+    inv_hessian: <O as ArgminOp>::Hessian,
     /// line search
-    linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+    linesearch: Box<
+        ArgminLineSearch<
+                Param = <O as ArgminOp>::Param,
+                Output = <O as ArgminOp>::Output,
+                Hessian = <O as ArgminOp>::Hessian,
+            > + 'a,
+    >,
     /// Base stuff
-    base: ArgminBase<T, H, O>,
+    base: ArgminBase<O>,
 }
 
-impl<'a, T, H, O> BFGS<'a, T, H, O>
+impl<'a, O> BFGS<'a, O>
 where
-    T: 'a
-        + Clone
-        + Default
-        + Debug
-        + ArgminDot<T, f64>
-        + ArgminDot<T, H>
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Hessian>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
         + ArgminNorm<f64>
-        + ArgminMul<f64, T>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminSub<T, T>,
-    H: 'a
-        + Clone
-        + Default
-        + Debug
-        + ArgminDot<T, T>
-        + ArgminDot<H, H>
+        + ArgminMul<f64, <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Hessian: ArgminSub<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
+        + ArgminAdd<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
+        + ArgminMul<f64, <O as ArgminOp>::Hessian>
         + ArgminTranspose
-        + ArgminEye
-        + ArgminSub<H, H>
-        + ArgminAdd<H, H>
-        + ArgminMul<f64, H>,
-    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+        + ArgminEye,
 {
     /// Constructor
-    pub fn new(cost_function: O, init_param: T, init_inverse_hessian: H) -> Self {
+    pub fn new(
+        cost_function: O,
+        init_param: <O as ArgminOp>::Param,
+        init_inverse_hessian: <O as ArgminOp>::Hessian,
+    ) -> Self {
         let linesearch = MoreThuenteLineSearch::new(cost_function.clone());
         // let linesearch = HagerZhangLineSearch::new(cost_function.clone());
         BFGS {
@@ -165,41 +156,39 @@ where
     /// Specify line search method
     pub fn set_linesearch(
         &mut self,
-        linesearch: Box<ArgminLineSearch<Parameters = T, OperatorOutput = f64, Hessian = H> + 'a>,
+        linesearch: Box<
+            ArgminLineSearch<
+                    Param = <O as ArgminOp>::Param,
+                    Output = <O as ArgminOp>::Output,
+                    Hessian = <O as ArgminOp>::Hessian,
+                > + 'a,
+        >,
     ) -> &mut Self {
         self.linesearch = linesearch;
         self
     }
 }
 
-impl<'a, T, H, O> ArgminNextIter for BFGS<'a, T, H, O>
+impl<'a, O> ArgminIter for BFGS<'a, O>
 where
-    T: 'a
-        + Clone
-        + Default
-        + Debug
-        + ArgminDot<T, f64>
-        + ArgminDot<T, H>
+    O: 'a + ArgminOp<Output = f64>,
+    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Param, f64>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Hessian>
+        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
         + ArgminNorm<f64>
-        + ArgminMul<f64, T>
-        + ArgminScaledAdd<T, f64, T>
-        + ArgminSub<T, T>,
-    H: 'a
-        + Clone
-        + Default
-        + Debug
-        + ArgminDot<T, T>
-        + ArgminDot<H, H>
+        + ArgminMul<f64, <O as ArgminOp>::Param>,
+    <O as ArgminOp>::Hessian: ArgminSub<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
+        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+        + ArgminDot<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
+        + ArgminAdd<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
+        + ArgminMul<f64, <O as ArgminOp>::Hessian>
         + ArgminTranspose
-        + ArgminEye
-        + ArgminSub<H, H>
-        + ArgminAdd<H, H>
-        + ArgminMul<f64, H>,
-    O: 'a + Clone + ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+        + ArgminEye,
 {
-    type Parameters = T;
-    type OperatorOutput = f64;
-    type Hessian = H;
+    type Param = <O as ArgminOp>::Param;
+    type Output = <O as ArgminOp>::Output;
+    type Hessian = <O as ArgminOp>::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         let cost = self.apply(&self.base.cur_param())?;
@@ -209,7 +198,7 @@ where
         Ok(())
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         // reset line search
         self.linesearch.base_reset();
 
@@ -239,7 +228,7 @@ where
         let rhok = 1.0 / yksk;
 
         let e = self.inv_hessian.eye_like();
-        let mat1: H = sk.dot(&yk);
+        let mat1: Self::Hessian = sk.dot(&yk);
         let mat1 = mat1.mul(&rhok);
 
         let mat2 = mat1.clone().t();
@@ -247,12 +236,12 @@ where
         let tmp1 = e.sub(&mat1);
         let tmp2 = e.sub(&mat2);
 
-        let sksk: H = sk.dot(&sk);
+        let sksk: Self::Hessian = sk.dot(&sk);
         let sksk = sksk.mul(&rhok);
 
         self.inv_hessian = tmp1.dot(&self.inv_hessian.dot(&tmp2)).add(&sksk);
 
-        let out = ArgminIterationData::new(xk1, linesearch_result.cost);
+        let out = ArgminIterData::new(xk1, linesearch_result.cost);
         Ok(out)
     }
 }

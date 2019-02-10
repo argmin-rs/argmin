@@ -31,7 +31,7 @@ type Triplet = (f64, f64, f64);
 /// # use argmin::solver::linesearch::HagerZhangLineSearch;
 /// # use argmin::testfunctions::{sphere, sphere_derivative};
 /// #
-/// # #[derive(Clone)]
+/// # #[derive(Clone, Default)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {
