@@ -481,6 +481,13 @@
 <span id="481">481</span>
 <span id="482">482</span>
 <span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -503,8 +510,6 @@
 <span class="kw">use</span> <span class="ident">argmin_codegen</span>::<span class="ident">ArgminSolver</span>;
 <span class="kw">use</span> <span class="ident">rand</span>;
 <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">Rng</span>;
-<span class="kw">use</span> <span class="ident">std</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>;
 
 <span class="doccomment">/// Temperature functions for Simulated Annealing.</span>
 <span class="doccomment">///</span>
@@ -557,6 +562,14 @@
 <span class="doccomment">///     rng: Arc&lt;Mutex&lt;SmallRng&gt;&gt;,</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// impl std::default::Default for Rosenbrock {</span>
+<span class="doccomment">///     fn default() -&gt; Self {</span>
+<span class="doccomment">///         let lower_bound: Vec&lt;f64&gt; = vec![-5.0, -5.0];</span>
+<span class="doccomment">///         let upper_bound: Vec&lt;f64&gt; = vec![5.0, 5.0];</span>
+<span class="doccomment">///         Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound)</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// impl Rosenbrock {</span>
 <span class="doccomment">///     /// Constructor</span>
 <span class="doccomment">///     pub fn new(a: f64, b: f64, lower_bound: Vec&lt;f64&gt;, upper_bound: Vec&lt;f64&gt;) -&gt; Self {</span>
@@ -570,9 +583,9 @@
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// impl ArgminOperator for Rosenbrock {</span>
-<span class="doccomment">///     type Parameters = Vec&lt;f64&gt;;</span>
-<span class="doccomment">///     type OperatorOutput = f64;</span>
+<span class="doccomment">/// impl ArgminOp for Rosenbrock {</span>
+<span class="doccomment">///     type Param= Vec&lt;f64&gt;;</span>
+<span class="doccomment">///     type Output = f64;</span>
 <span class="doccomment">///     type Hessian = ();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///     fn apply(&amp;self, param: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;f64, Error&gt; {</span>
@@ -696,10 +709,9 @@
 <span class="attribute">#[<span class="ident">log</span>(<span class="string">&quot;reanneal_fixed&quot;</span> <span class="op">=&gt;</span> <span class="string">&quot;self.reanneal_fixed&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">log</span>(<span class="string">&quot;reanneal_accepted&quot;</span> <span class="op">=&gt;</span> <span class="string">&quot;self.reanneal_accepted&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">log</span>(<span class="string">&quot;reanneal_best&quot;</span> <span class="op">=&gt;</span> <span class="string">&quot;self.reanneal_best&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">O</span>: <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Initial temperature</span>
     <span class="ident">init_temp</span>: <span class="ident">f64</span>,
@@ -735,13 +747,12 @@
     <span class="doccomment">/// random number generator</span>
     <span class="ident">rng</span>: <span class="ident">rand</span>::<span class="ident">prelude</span>::<span class="ident">ThreadRng</span>,
     <span class="doccomment">/// base</span>
-    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">T</span>, (), <span class="ident">O</span><span class="op">&gt;</span>,
+    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">O</span>: <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Constructor</span>
     <span class="doccomment">///</span>
@@ -750,7 +761,11 @@
     <span class="doccomment">/// * `cost_function`: cost function</span>
     <span class="doccomment">/// * `init_param`: initial parameter vector</span>
     <span class="doccomment">/// * `init_temp`: initial temperature</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cost_function</span>: <span class="ident">O</span>, <span class="ident">init_param</span>: <span class="ident">T</span>, <span class="ident">init_temp</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
+        <span class="ident">cost_function</span>: <span class="ident">O</span>,
+        <span class="ident">init_param</span>: <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>,
+        <span class="ident">init_temp</span>: <span class="ident">f64</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">prev_cost</span> <span class="op">=</span> <span class="ident">cost_function</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">init_param</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">init_temp</span> <span class="op">&lt;=</span> <span class="number">0_f64</span> {
             <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
@@ -824,7 +839,7 @@
     <span class="doccomment">/// `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// which will always be between 0 and 0.5.</span>
-    <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">next_param</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">next_cost</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> (<span class="ident">bool</span>, <span class="ident">bool</span>) {
+    <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">next_param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">next_cost</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> (<span class="ident">bool</span>, <span class="ident">bool</span>) {
         <span class="kw">let</span> <span class="ident">prob</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">gen</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_best</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">let</span> <span class="ident">accepted</span> <span class="op">=</span> <span class="kw">if</span> (<span class="ident">next_cost</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">prev_cost</span>)
@@ -860,7 +875,7 @@
     }
 
     <span class="doccomment">/// Perform annealing</span>
-    <span class="kw">fn</span> <span class="ident">anneal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">anneal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_param</span>();
         <span class="kw">let</span> <span class="ident">cur_temp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_temp</span>;
         <span class="self">self</span>.<span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>, <span class="ident">cur_temp</span>)
@@ -911,17 +926,16 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminNextIter</span> <span class="kw">for</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminIter</span> <span class="kw">for</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">O</span>: <span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Hessian</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
 {
-    <span class="kw">type</span> <span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">f64</span>;
-    <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> ();
+    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>;
+    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Output</span>;
+    <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>;
 
     <span class="doccomment">/// Perform one iteration of SA algorithm</span>
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterationData</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Param</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// Careful: The order in here is *very* important, even if it may not seem so. Everything</span>
         <span class="comment">// is linked to the iteration number, and getting things mixed up will lead to strange</span>
         <span class="comment">// behaviour. None of these strange behaviour is dangerous, but still.</span>
@@ -948,7 +962,7 @@
 
         <span class="self">self</span>.<span class="ident">update_temperature</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">ArgminIterationData</span>::<span class="ident">new</span>(<span class="ident">new_param</span>, <span class="ident">new_cost</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">ArgminIterData</span>::<span class="ident">new</span>(<span class="ident">new_param</span>, <span class="ident">new_cost</span>);
         <span class="ident">out</span>.<span class="ident">add_kv</span>(<span class="macro">make_kv</span><span class="macro">!</span>(
             <span class="string">&quot;t&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">cur_temp</span>;
             <span class="string">&quot;new_be&quot;</span> <span class="op">=&gt;</span> <span class="ident">new_best</span>;

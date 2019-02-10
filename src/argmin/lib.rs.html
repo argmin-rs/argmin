@@ -394,6 +394,10 @@
 <span id="394">394</span>
 <span id="395">395</span>
 <span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -484,17 +488,17 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Defining a problem</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! A problem can be defined by implementing the `ArgminOperator` trait which comes with the</span>
-<span class="doccomment">//! associated types `Parameters`, `OperatorOutput` and `Hessian`. `Parameters` is the type of your</span>
-<span class="doccomment">//! parameter vector (i.e. the input to your cost function), `OperatorOutput` is the type returned</span>
+<span class="doccomment">//! A problem can be defined by implementing the `ArgminOp` trait which comes with the</span>
+<span class="doccomment">//! associated types `Param`, `Output` and `Hessian`. `Param` is the type of your</span>
+<span class="doccomment">//! parameter vector (i.e. the input to your cost function), `Output` is the type returned</span>
 <span class="doccomment">//! by the cost function and `Hessian` is the type of the Hessian.</span>
 <span class="doccomment">//! The trait provides the following methods:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! - `apply(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::OperatorOutput, Error&gt;`: Applys the cost</span>
-<span class="doccomment">//!   function to parameters `p` of type `Self::Parameters` and returns the cost function value.</span>
-<span class="doccomment">//! - `gradient(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::Parameters, Error&gt;`: Computes the</span>
+<span class="doccomment">//! - `apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt;`: Applys the cost</span>
+<span class="doccomment">//!   function to parameters `p` of type `Self::Param` and returns the cost function value.</span>
+<span class="doccomment">//! - `gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Param, Error&gt;`: Computes the</span>
 <span class="doccomment">//!   gradient at `p`. Optional. By default returns an `Err` if not implemented.</span>
-<span class="doccomment">//! - `hessian(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::Hessian, Error&gt;`: Computes the Hessian</span>
+<span class="doccomment">//! - `hessian(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt;`: Computes the Hessian</span>
 <span class="doccomment">//!   at `p`. Optional. By default returns an `Err` if not implemented. The type of `Hessian` can</span>
 <span class="doccomment">//!   be set to `()` if this method is not implemented.</span>
 <span class="doccomment">//!</span>
@@ -511,36 +515,36 @@
 <span class="doccomment">//! // [Imports omited]</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! /// First, create a struct for your problem</span>
-<span class="doccomment">//! #[derive(Clone)]</span>
+<span class="doccomment">//! #[derive(Clone, Default)]</span>
 <span class="doccomment">//! struct Rosenbrock {</span>
 <span class="doccomment">//!     a: f64,</span>
 <span class="doccomment">//!     b: f64,</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! /// Implement `ArgminOperator` for `Rosenbrock`</span>
-<span class="doccomment">//! impl ArgminOperator for Rosenbrock {</span>
+<span class="doccomment">//! /// Implement `ArgminOp` for `Rosenbrock`</span>
+<span class="doccomment">//! impl ArgminOp for Rosenbrock {</span>
 <span class="doccomment">//!     /// Type of the parameter vector</span>
-<span class="doccomment">//!     type Parameters = ndarray::Array1&lt;f64&gt;;</span>
+<span class="doccomment">//!     type Param = ndarray::Array1&lt;f64&gt;;</span>
 <span class="doccomment">//!     /// Type of the return value computed by the cost function</span>
-<span class="doccomment">//!     type OperatorOutput = f64;</span>
+<span class="doccomment">//!     type Output = f64;</span>
 <span class="doccomment">//!     /// Type of the Hessian. If no Hessian is available or needed for the used solver, this can</span>
 <span class="doccomment">//!     /// be set to `()`</span>
 <span class="doccomment">//!     type Hessian = ndarray::Array2&lt;f64&gt;;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     /// Apply the cost function to a parameter `p`</span>
-<span class="doccomment">//!     fn apply(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::OperatorOutput, Error&gt; {</span>
+<span class="doccomment">//!     fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
 <span class="doccomment">//!         Ok(rosenbrock_2d(&amp;p.to_vec(), self.a, self.b))</span>
 <span class="doccomment">//!     }</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     /// Compute the gradient at parameter `p`. This is optional: If not implemented, this</span>
 <span class="doccomment">//!     /// method will return an `Err` when called.</span>
-<span class="doccomment">//!     fn gradient(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::Parameters, Error&gt; {</span>
+<span class="doccomment">//!     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Param, Error&gt; {</span>
 <span class="doccomment">//!         Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(&amp;p.to_vec(), self.a, self.b)))</span>
 <span class="doccomment">//!     }</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     /// Compute the Hessian at parameter `p`. This is optional: If not implemented, this method</span>
 <span class="doccomment">//!     /// will return an `Err` when called.</span>
-<span class="doccomment">//!     fn hessian(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::Hessian, Error&gt; {</span>
+<span class="doccomment">//!     fn hessian(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt; {</span>
 <span class="doccomment">//!         let h = rosenbrock_2d_hessian(&amp;p.to_vec(), self.a, self.b);</span>
 <span class="doccomment">//!         Ok(ndarray::Array::from_shape_vec((2, 2), h).unwrap())</span>
 <span class="doccomment">//!     }</span>
@@ -559,22 +563,22 @@
 <span class="doccomment">//! use argmin::prelude::*;</span>
 <span class="doccomment">//! use argmin::solver::gradientdescent::SteepestDescent;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Clone)]</span>
+<span class="doccomment">//! #[derive(Clone, Default)]</span>
 <span class="doccomment">//! struct Rosenbrock {</span>
 <span class="doccomment">//!     a: f64,</span>
 <span class="doccomment">//!     b: f64,</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! impl ArgminOperator for Rosenbrock {</span>
-<span class="doccomment">//!     type Parameters = ndarray::Array1&lt;f64&gt;;</span>
-<span class="doccomment">//!     type OperatorOutput = f64;</span>
+<span class="doccomment">//! impl ArgminOp for Rosenbrock {</span>
+<span class="doccomment">//!     type Param = ndarray::Array1&lt;f64&gt;;</span>
+<span class="doccomment">//!     type Output = f64;</span>
 <span class="doccomment">//!     type Hessian = ();</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!    fn apply(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::OperatorOutput, Error&gt; {</span>
+<span class="doccomment">//!    fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
 <span class="doccomment">//!        Ok(rosenbrock_2d(&amp;p.to_vec(), self.a, self.b))</span>
 <span class="doccomment">//!    }</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!    fn gradient(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::Parameters, Error&gt; {</span>
+<span class="doccomment">//!    fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Param, Error&gt; {</span>
 <span class="doccomment">//!        Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(&amp;p.to_vec(), self.a, self.b)))</span>
 <span class="doccomment">//!    }</span>
 <span class="doccomment">//! }</span>
@@ -630,19 +634,19 @@
 <span class="doccomment">//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};</span>
 <span class="doccomment">//! # use argmin::prelude::*;</span>
 <span class="doccomment">//! # use argmin::solver::gradientdescent::SteepestDescent;</span>
-<span class="doccomment">//! # #[derive(Clone)]</span>
+<span class="doccomment">//! # #[derive(Clone, Default)]</span>
 <span class="doccomment">//! # struct Rosenbrock {</span>
 <span class="doccomment">//! #     a: f64,</span>
 <span class="doccomment">//! #     b: f64,</span>
 <span class="doccomment">//! # }</span>
-<span class="doccomment">//! # impl ArgminOperator for Rosenbrock {</span>
-<span class="doccomment">//! #     type Parameters = ndarray::Array1&lt;f64&gt;;</span>
-<span class="doccomment">//! #     type OperatorOutput = f64;</span>
+<span class="doccomment">//! # impl ArgminOp for Rosenbrock {</span>
+<span class="doccomment">//! #     type Param = ndarray::Array1&lt;f64&gt;;</span>
+<span class="doccomment">//! #     type Output = f64;</span>
 <span class="doccomment">//! #     type Hessian = ();</span>
-<span class="doccomment">//! #    fn apply(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::OperatorOutput, Error&gt; {</span>
+<span class="doccomment">//! #    fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
 <span class="doccomment">//! #        Ok(rosenbrock_2d(&amp;p.to_vec(), self.a, self.b))</span>
 <span class="doccomment">//! #    }</span>
-<span class="doccomment">//! #    fn gradient(&amp;self, p: &amp;Self::Parameters) -&gt; Result&lt;Self::Parameters, Error&gt; {</span>
+<span class="doccomment">//! #    fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Param, Error&gt; {</span>
 <span class="doccomment">//! #        Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(&amp;p.to_vec(), self.a, self.b)))</span>
 <span class="doccomment">//! #    }</span>
 <span class="doccomment">//! # }</span>
@@ -697,28 +701,32 @@
 <span class="doccomment">//! use std::default::Default;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // The `Landweber` struct holds the `omega` parameter and has a field `base` which is of type</span>
-<span class="doccomment">//! // `ArgminBase`. The struct is generic over the paraemter vector (`T`) which (in this</span>
-<span class="doccomment">//! // particular case) has to implement `Clone`, `Default` and `ArgminScaledSub&lt;T, f64&gt;`. The</span>
-<span class="doccomment">//! // latter is needed for the update rule.</span>
+<span class="doccomment">//! // `ArgminBase`. The struct is generic over the ArgminOp `O` which holds type information about</span>
+<span class="doccomment">//! // the parameter vector which (in this particular case) has to implement</span>
+<span class="doccomment">//! // `ArgminScaledSub&lt;T, f64&gt;`, which is neede for the update rule.</span>
 <span class="doccomment">//! // Deriving `ArgminSolver` implements a large portion of the API and provides many convenience</span>
-<span class="doccomment">//! // functions. It requires that `ArgminNextIter` is implemented on `Landweber` as well.</span>
+<span class="doccomment">//! // functions. It requires that `ArgminIter` is implemented on `Landweber` as well.</span>
 <span class="doccomment">//! #[derive(ArgminSolver)]</span>
-<span class="doccomment">//! pub struct Landweber&lt;T, O&gt;</span>
+<span class="doccomment">//! pub struct Landweber&lt;O&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     T: Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
-<span class="doccomment">//!     O: ArgminOperator&lt;Parameters = T, OperatorOutput = f64, Hessian = ()&gt;,</span>
+<span class="doccomment">//!     &lt;O as ArgminOp&gt;::Param: ArgminScaledSub&lt;&lt;O as ArgminOp&gt;::Param, f64, &lt;O as ArgminOp&gt;::Param&gt;,</span>
+<span class="doccomment">//!     O: ArgminOp,</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     omega: f64,</span>
-<span class="doccomment">//!     base: ArgminBase&lt;T, (), O&gt;,</span>
+<span class="doccomment">//!     base: ArgminBase&lt;O&gt;,</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // For convenience, a constructor can/should be implemented</span>
-<span class="doccomment">//! impl&lt;T, O&gt; Landweber&lt;T, O&gt;</span>
+<span class="doccomment">//! impl&lt;O&gt; Landweber&lt;O&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     T: Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
-<span class="doccomment">//!     O: ArgminOperator&lt;Parameters = T, OperatorOutput = f64, Hessian = ()&gt;,</span>
+<span class="doccomment">//!     &lt;O as ArgminOp&gt;::Param: ArgminScaledSub&lt;&lt;O as ArgminOp&gt;::Param, f64, &lt;O as ArgminOp&gt;::Param&gt;,</span>
+<span class="doccomment">//!     O: ArgminOp,</span>
 <span class="doccomment">//! {</span>
-<span class="doccomment">//!     pub fn new(cost_function: O, omega: f64, init_param: T) -&gt; Result&lt;Self, Error&gt; {</span>
+<span class="doccomment">//!     pub fn new(</span>
+<span class="doccomment">//!         cost_function: O,</span>
+<span class="doccomment">//!         omega: f64,</span>
+<span class="doccomment">//!         init_param: &lt;O as ArgminOp&gt;::Param,</span>
+<span class="doccomment">//!     ) -&gt; Result&lt;Self, Error&gt; {</span>
 <span class="doccomment">//!         Ok(Landweber {</span>
 <span class="doccomment">//!             omega,</span>
 <span class="doccomment">//!             base: ArgminBase::new(cost_function, init_param),</span>
@@ -727,16 +735,16 @@
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // This implements a single iteration of the optimization algorithm.</span>
-<span class="doccomment">//! impl&lt;T, O&gt; ArgminNextIter for Landweber&lt;T, O&gt;</span>
+<span class="doccomment">//! impl&lt;O&gt; ArgminIter for Landweber&lt;O&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     T: Clone + Default + ArgminScaledSub&lt;T, f64, T&gt;,</span>
-<span class="doccomment">//!     O: ArgminOperator&lt;Parameters = T, OperatorOutput = f64, Hessian = ()&gt;,</span>
+<span class="doccomment">//!     &lt;O as ArgminOp&gt;::Param: ArgminScaledSub&lt;&lt;O as ArgminOp&gt;::Param, f64, &lt;O as ArgminOp&gt;::Param&gt;,</span>
+<span class="doccomment">//!     O: ArgminOp,</span>
 <span class="doccomment">//! {</span>
-<span class="doccomment">//!     type Parameters = T;</span>
-<span class="doccomment">//!     type OperatorOutput = f64;</span>
-<span class="doccomment">//!     type Hessian = ();</span>
+<span class="doccomment">//!     type Param = &lt;O as ArgminOp&gt;::Param;</span>
+<span class="doccomment">//!     type Output = &lt;O as ArgminOp&gt;::Output;</span>
+<span class="doccomment">//!     type Hessian = &lt;O as ArgminOp&gt;::Hessian;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!     fn next_iter(&amp;mut self) -&gt; Result&lt;ArgminIterationData&lt;Self::Parameters&gt;, Error&gt; {</span>
+<span class="doccomment">//!     fn next_iter(&amp;mut self) -&gt; Result&lt;ArgminIterData&lt;Self::Param&gt;, Error&gt; {</span>
 <span class="doccomment">//!         // Obtain current parameter vector</span>
 <span class="doccomment">//!         // The method `cur_param()` has been implemented by deriving `ArgminSolver`.</span>
 <span class="doccomment">//!         let param = self.cur_param();</span>
@@ -747,7 +755,7 @@
 <span class="doccomment">//!         let new_param = param.scaled_sub(&amp;self.omega, &amp;grad);</span>
 <span class="doccomment">//!         // Return new parameter vector. Since there is no need to compute the cost function</span>
 <span class="doccomment">//!         // value, we return 0.0 instead.</span>
-<span class="doccomment">//!         let out = ArgminIterationData::new(new_param, 0.0);</span>
+<span class="doccomment">//!         let out = ArgminIterData::new(new_param, 0.0);</span>
 <span class="doccomment">//!         Ok(out)</span>
 <span class="doccomment">//!     }</span>
 <span class="doccomment">//! }</span>
