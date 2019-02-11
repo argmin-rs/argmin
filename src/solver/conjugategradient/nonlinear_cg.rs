@@ -19,7 +19,7 @@ use crate::solver::conjugategradient::{
 };
 // use crate::solver::linesearch::HagerZhangLineSearch;
 use crate::solver::linesearch::MoreThuenteLineSearch;
-use std;
+use serde::{Deserialize, Serialize};
 use std::default::Default;
 
 /// The nonlinear conjugate gradient is a generalization of the conjugate gradient method for
@@ -105,7 +105,7 @@ use std::default::Default;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct NonlinearConjugateGradient<'a, O>
 where
     O: 'a + ArgminOp<Output = f64>,

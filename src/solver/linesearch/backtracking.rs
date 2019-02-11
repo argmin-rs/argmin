@@ -9,6 +9,7 @@
 
 use crate::prelude::*;
 use crate::solver::linesearch::condition::*;
+use serde::{Deserialize, Serialize};
 
 /// The Backtracking line search is a simple method to find a step length which obeys the Armijo
 /// (sufficient decrease) condition.
@@ -102,14 +103,15 @@ use crate::solver::linesearch::condition::*;
 /// Springer. ISBN 0-387-30303-0.
 ///
 /// [1] Wikipedia: https://en.wikipedia.org/wiki/Backtracking_line_search
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 #[stop("self.eval_condition()" => LineSearchConditionMet)]
-pub struct BacktrackingLineSearch<O>
+pub struct BacktrackingLineSearch<O, L>
 where
     O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
         + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    L: LineSearchCondition<O::Param>,
 {
     /// initial parameter vector
     init_param: <O as ArgminOp>::Param,
@@ -122,34 +124,34 @@ where
     /// Contraction factor rho
     rho: f64,
     /// Stopping condition
-    condition: Box<LineSearchCondition<<O as ArgminOp>::Param>>,
+    condition: Box<L>,
     /// alpha
     alpha: f64,
     /// base
     base: ArgminBase<O>,
 }
 
-impl<O> BacktrackingLineSearch<O>
+impl<O, L> BacktrackingLineSearch<O, L>
 where
     O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
         + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    L: LineSearchCondition<O::Param>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: Must implement `ArgminOp`
-    pub fn new(operator: O) -> Self {
-        let cond = ArmijoCondition::new(0.5).unwrap();
+    pub fn new(operator: O, condition: L) -> Self {
         BacktrackingLineSearch {
             init_param: <O as ArgminOp>::Param::default(),
             init_cost: std::f64::INFINITY,
             init_grad: <O as ArgminOp>::Param::default(),
             search_direction: <O as ArgminOp>::Param::default(),
             rho: 0.9,
-            condition: Box::new(cond),
+            condition: Box::new(condition),
             alpha: 1.0,
             base: ArgminBase::new(operator, <O as ArgminOp>::Param::default()),
         }
@@ -174,15 +176,6 @@ where
         Ok(self)
     }
 
-    /// Set condition
-    pub fn set_condition(
-        &mut self,
-        condition: Box<LineSearchCondition<<O as ArgminOp>::Param>>,
-    ) -> &mut Self {
-        self.condition = condition;
-        self
-    }
-
     fn eval_condition(&self) -> bool {
         self.condition.eval(
             self.cur_cost(),
@@ -195,12 +188,13 @@ where
     }
 }
 
-impl<O> ArgminLineSearch for BacktrackingLineSearch<O>
+impl<O, L> ArgminLineSearch for BacktrackingLineSearch<O, L>
 where
     O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
         + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    L: LineSearchCondition<O::Param>,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: <O as ArgminOp>::Param) {
@@ -250,12 +244,13 @@ where
     }
 }
 
-impl<O> ArgminIter for BacktrackingLineSearch<O>
+impl<O, L> ArgminIter for BacktrackingLineSearch<O, L>
 where
     O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
         + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    L: LineSearchCondition<O::Param>,
 {
     type Param = <O as ArgminOp>::Param;
     type Output = f64;

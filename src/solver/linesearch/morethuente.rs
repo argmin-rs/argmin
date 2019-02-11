@@ -19,6 +19,7 @@
 //! DOI: https://doi.org/10.1145/192115.192132
 
 use crate::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// The More-Thuente line search is a method to find a step length which obeys the strong Wolfe
 /// conditions.
@@ -106,7 +107,7 @@ use crate::prelude::*;
 /// [0] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 /// decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
 /// DOI: https://doi.org/10.1145/192115.192132
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct MoreThuenteLineSearch<O>
 where
     O: ArgminOp<Output = f64>,
@@ -170,7 +171,7 @@ where
     base: ArgminBase<O>,
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Serialize, Deserialize)]
 struct Step {
     pub x: f64,
     pub fx: f64,

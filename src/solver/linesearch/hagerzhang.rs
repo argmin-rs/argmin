@@ -16,7 +16,7 @@
 //! DOI: https://doi.org/10.1137/030601880
 
 use crate::prelude::*;
-use std;
+use serde::{Deserialize, Serialize};
 
 type Triplet = (f64, f64, f64);
 
@@ -103,7 +103,7 @@ type Triplet = (f64, f64, f64);
 /// [0] William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed
 /// descent and an efficient line search." SIAM J. Optim. 16(1), 2006, 170-192.
 /// DOI: https://doi.org/10.1137/030601880
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 #[stop("self.best_f - self.finit < self.delta * self.best_x * self.dginit" => LineSearchConditionMet)]
 #[stop("self.best_g > self.sigma * self.dginit" => LineSearchConditionMet)]
 #[stop("(2.0*self.delta - 1.0)*self.dginit >= self.best_g && self.best_g >= self.sigma * self.dginit && self.best_f <= self.finit + self.epsilon_k" => LineSearchConditionMet)]

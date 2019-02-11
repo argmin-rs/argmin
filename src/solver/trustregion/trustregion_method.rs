@@ -13,7 +13,7 @@
 use crate::prelude::*;
 use crate::solver::trustregion::reduction_ratio;
 use crate::solver::trustregion::Steihaug;
-use std;
+use serde::{Deserialize, Serialize};
 
 /// The trust region method approximates the cost function within a certain region around the
 /// current point in parameter space. Depending on the quality of this approximation, the region is
