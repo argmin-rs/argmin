@@ -15,7 +15,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use crate::solver::linesearch::HagerZhangLineSearch;
+use serde::{Deserialize, Serialize};
 
 /// Steepest descent iteratively takes steps in the direction of the strongest negative gradient.
 /// In each iteration, a line search is employed to obtain an appropriate step length.
@@ -96,73 +96,58 @@ use crate::solver::linesearch::HagerZhangLineSearch;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
-pub struct SteepestDescent<'a, O>
+#[derive(ArgminSolver, Serialize, Deserialize)]
+pub struct SteepestDescent<O, L>
 where
-    O: 'a + ArgminOp<Output = f64>,
+    O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
         + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
         + ArgminMul<f64, <O as ArgminOp>::Param>
         + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminNorm<f64>,
+    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
     /// line search
-    linesearch: Box<
-        ArgminLineSearch<
-                Param = <O as ArgminOp>::Param,
-                Output = f64,
-                Hessian = <O as ArgminOp>::Hessian,
-            > + 'a,
-    >,
+    linesearch: Box<L>,
     /// Base stuff
     base: ArgminBase<O>,
 }
 
-impl<'a, O> SteepestDescent<'a, O>
+impl<O, L> SteepestDescent<O, L>
 where
-    O: 'a + ArgminOp<Output = f64>,
+    O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
         + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
         + ArgminMul<f64, <O as ArgminOp>::Param>
         + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminNorm<f64>,
+    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
     /// Constructor
-    pub fn new(cost_function: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
-        let linesearch = HagerZhangLineSearch::new(cost_function.clone());
+    pub fn new(
+        cost_function: O,
+        init_param: <O as ArgminOp>::Param,
+        linesearch: L,
+    ) -> Result<Self, Error> {
         Ok(SteepestDescent {
             linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),
         })
     }
-
-    /// Specify line search method
-    pub fn set_linesearch(
-        &mut self,
-        linesearch: Box<
-            ArgminLineSearch<
-                    Param = <O as ArgminOp>::Param,
-                    Output = f64,
-                    Hessian = <O as ArgminOp>::Hessian,
-                > + 'a,
-        >,
-    ) -> &mut Self {
-        self.linesearch = linesearch;
-        self
-    }
 }
 
-impl<'a, O> ArgminIter for SteepestDescent<'a, O>
+impl<O, L> ArgminIter for SteepestDescent<O, L>
 where
-    O: 'a + ArgminOp<Output = f64>,
+    O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
         + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
         + ArgminMul<f64, <O as ArgminOp>::Param>
         + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminNorm<f64>,
+    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
     type Param = <O as ArgminOp>::Param;
     type Output = f64;

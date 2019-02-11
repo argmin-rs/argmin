@@ -14,8 +14,9 @@ use argmin::solver::linesearch::BacktrackingLineSearch;
 use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 struct Rosenbrock {
     a: f64,
     b: f64,
@@ -52,10 +53,7 @@ fn run() -> Result<(), Error> {
     // let linesearch = BacktrackingLineSearch::new(cost.clone());
 
     // Set up solver
-    let mut solver = SteepestDescent::new(cost, init_param)?;
-
-    // Set line search. If this is omitted, `SteepestDescent` will default to `HagerZhang`.
-    solver.set_linesearch(Box::new(linesearch));
+    let mut solver = SteepestDescent::new(cost, init_param, linesearch)?;
 
     // Set maximum number of iterations
     solver.set_max_iters(10_000);
