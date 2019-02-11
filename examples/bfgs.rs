@@ -8,13 +8,14 @@
 extern crate argmin;
 extern crate ndarray;
 use argmin::prelude::*;
+use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::solver::quasinewton::BFGS;
-use argmin_core::finitediff::*;
-// use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 use argmin::testfunctions::rosenbrock;
+use argmin_core::finitediff::*;
 use ndarray::{array, Array1, Array2};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 struct Rosenbrock {
     a: f64,
     b: f64,
@@ -43,8 +44,11 @@ fn run() -> Result<(), Error> {
     let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
     let init_hessian: Array2<f64> = Array2::eye(8);
 
+    // set up a line search
+    let linesearch = MoreThuenteLineSearch::new(cost.clone());
+
     // Set up solver
-    let mut solver = BFGS::new(cost, init_param, init_hessian);
+    let mut solver = BFGS::new(cost, init_param, init_hessian, linesearch);
 
     // Set maximum number of iterations
     solver.set_max_iters(800);

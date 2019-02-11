@@ -11,8 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-// use crate::solver::linesearch::HagerZhangLineSearch;
-use crate::solver::linesearch::MoreThuenteLineSearch;
+use serde::{Deserialize, Serialize};
 
 /// BFGS method
 ///
@@ -23,10 +22,12 @@ use crate::solver::linesearch::MoreThuenteLineSearch;
 /// # extern crate ndarray;
 /// use argmin::prelude::*;
 /// use argmin::solver::quasinewton::BFGS;
+/// use argmin::solver::linesearch::MoreThuenteLineSearch;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 /// use ndarray::{array, Array1, Array2};
+/// # use serde::{Deserialize, Serialize};
 ///
-/// # #[derive(Clone, Default)]
+/// # #[derive(Clone, Default, Serialize, Deserialize)]
 /// # struct MyProblem { }
 /// #
 /// #  impl ArgminOp for MyProblem {
@@ -56,8 +57,11 @@ use crate::solver::linesearch::MoreThuenteLineSearch;
 /// let init_param: Array1<f64> = array![-1.2, 1.0];
 /// let init_hessian: Array2<f64> = Array2::eye(2);
 ///
+/// // set up a line search
+/// let linesearch = MoreThuenteLineSearch::new(cost.clone());
+///
 /// // Set up solver
-/// let mut solver = BFGS::new(cost, init_param, init_hessian);
+/// let mut solver = BFGS::new(cost, init_param, init_hessian, linesearch);
 ///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(80);
@@ -88,11 +92,11 @@ use crate::solver::linesearch::MoreThuenteLineSearch;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 #[stop("self.cur_grad().norm() < std::f64::EPSILON.sqrt()" => TargetPrecisionReached)]
-pub struct BFGS<'a, O>
+pub struct BFGS<O, L>
 where
-    O: 'a + ArgminOp<Output = f64>,
+    O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
         + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Hessian>
@@ -106,24 +110,19 @@ where
         + ArgminMul<f64, <O as ArgminOp>::Hessian>
         + ArgminTranspose
         + ArgminEye,
+    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
 {
     /// Inverse Hessian
     inv_hessian: <O as ArgminOp>::Hessian,
     /// line search
-    linesearch: Box<
-        ArgminLineSearch<
-                Param = <O as ArgminOp>::Param,
-                Output = <O as ArgminOp>::Output,
-                Hessian = <O as ArgminOp>::Hessian,
-            > + 'a,
-    >,
+    linesearch: Box<L>,
     /// Base stuff
     base: ArgminBase<O>,
 }
 
-impl<'a, O> BFGS<'a, O>
+impl<O, L> BFGS<O, L>
 where
-    O: 'a + ArgminOp<Output = f64>,
+    O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
         + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Hessian>
@@ -137,41 +136,26 @@ where
         + ArgminMul<f64, <O as ArgminOp>::Hessian>
         + ArgminTranspose
         + ArgminEye,
+    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
 {
     /// Constructor
     pub fn new(
         cost_function: O,
         init_param: <O as ArgminOp>::Param,
         init_inverse_hessian: <O as ArgminOp>::Hessian,
+        linesearch: L,
     ) -> Self {
-        let linesearch = MoreThuenteLineSearch::new(cost_function.clone());
-        // let linesearch = HagerZhangLineSearch::new(cost_function.clone());
         BFGS {
             inv_hessian: init_inverse_hessian,
             linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),
         }
     }
-
-    /// Specify line search method
-    pub fn set_linesearch(
-        &mut self,
-        linesearch: Box<
-            ArgminLineSearch<
-                    Param = <O as ArgminOp>::Param,
-                    Output = <O as ArgminOp>::Output,
-                    Hessian = <O as ArgminOp>::Hessian,
-                > + 'a,
-        >,
-    ) -> &mut Self {
-        self.linesearch = linesearch;
-        self
-    }
 }
 
-impl<'a, O> ArgminIter for BFGS<'a, O>
+impl<O, L> ArgminIter for BFGS<O, L>
 where
-    O: 'a + ArgminOp<Output = f64>,
+    O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
         + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Hessian>
@@ -185,6 +169,7 @@ where
         + ArgminMul<f64, <O as ArgminOp>::Hessian>
         + ArgminTranspose
         + ArgminEye,
+    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
 {
     type Param = <O as ArgminOp>::Param;
     type Output = <O as ArgminOp>::Output;
