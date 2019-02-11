@@ -150,10 +150,6 @@ where
         linesearch: L,
         beta_method: B,
     ) -> Result<Self, Error> {
-        // let linesearch: Box<dyn ArgminLineSearch<Param = _, Output = _, Hessian = _>> =
-        //     Box::new(MoreThuenteLineSearch::new(operator.clone()));
-        // Box::new(HagerZhangLineSearch::new(operator.clone()));
-        // let beta_method = PolakRibiere::new();
         Ok(NonlinearConjugateGradient {
             p: <O as ArgminOp>::Param::default(),
             beta: std::f64::NAN,
@@ -164,59 +160,6 @@ where
             base: ArgminBase::new(operator, init_param),
         })
     }
-
-    // /// New PolakRibiere CG (PR-CG)
-    // pub fn new_pr(operator: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
-    //     Self::new(operator, init_param)
-    // }
-    //
-    // /// New PolakRibierePlus CG (PR+-CG)
-    // pub fn new_prplus(operator: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
-    //     let mut s = Self::new(operator, init_param)?;
-    //     let beta_method = PolakRibierePlus::new();
-    //     s.set_beta_update(Box::new(beta_method));
-    //     Ok(s)
-    // }
-    //
-    // /// New FletcherReeves CG (FR-CG)
-    // pub fn new_fr(operator: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
-    //     let mut s = Self::new(operator, init_param)?;
-    //     let beta_method = FletcherReeves::new();
-    //     s.set_beta_update(Box::new(beta_method));
-    //     Ok(s)
-    // }
-    //
-    // /// New HestenesStiefel CG (HS-CG)
-    // pub fn new_hs(operator: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
-    //     let mut s = Self::new(operator, init_param)?;
-    //     let beta_method = HestenesStiefel::new();
-    //     s.set_beta_update(Box::new(beta_method));
-    //     Ok(s)
-    // }
-    //
-    // /// Specify line search method
-    // pub fn set_linesearch(
-    //     &mut self,
-    //     linesearch: Box<
-    //         ArgminLineSearch<
-    //                 Param = <O as ArgminOp>::Param,
-    //                 Output = f64,
-    //                 Hessian = <O as ArgminOp>::Hessian,
-    //             > + 'a,
-    //     >,
-    // ) -> &mut Self {
-    //     self.linesearch = linesearch;
-    //     self
-    // }
-    //
-    // /// Specify beta update method
-    // pub fn set_beta_update(
-    //     &mut self,
-    //     beta_method: Box<ArgminNLCGBetaUpdate<<O as ArgminOp>::Param> + 'a>,
-    // ) -> &mut Self {
-    //     self.beta_method = beta_method;
-    //     self
-    // }
 
     /// Specifiy the number of iterations after which a restart should be performed
     /// This allows the algorithm to "forget" previous information which may not be helpful
