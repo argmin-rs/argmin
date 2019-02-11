@@ -17,8 +17,8 @@
 
 use crate::prelude::*;
 use argmin_codegen::ArgminSolver;
-use rand;
-use rand::Rng;
+use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// Temperature functions for Simulated Annealing.
 ///
@@ -42,6 +42,12 @@ pub enum SATempFunc {
     Custom(Box<Fn(f64, u64) -> f64>),
 }
 
+impl std::default::Default for SATempFunc {
+    fn default() -> Self {
+        SATempFunc::Boltzmann
+    }
+}
+
 /// Simulated Annealing
 ///
 /// # Example
@@ -54,8 +60,9 @@ pub enum SATempFunc {
 /// use argmin::testfunctions::rosenbrock;
 /// use rand::prelude::*;
 /// use std::sync::{Arc, Mutex};;
+/// use serde::{Deserialize, Serialize};
 ///
-/// #[derive(Clone)]
+/// #[derive(Clone, Serialize, Deserialize)]
 /// struct Rosenbrock {
 ///     /// Parameter a, usually 1.0
 ///     a: f64,
@@ -68,7 +75,13 @@ pub enum SATempFunc {
 ///     /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
 ///     /// `self` to be passed as an immutable reference. This gives us thread safe interior
 ///     /// mutability.
+///     #[serde(skip)]
+///     #[serde(default = "default_rng")]
 ///     rng: Arc<Mutex<SmallRng>>,
+/// }
+///
+/// fn default_rng() -> Arc<Mutex<SmallRng>> {
+///     Arc::new(Mutex::new(SmallRng::from_entropy()))
 /// }
 ///
 /// impl std::default::Default for Rosenbrock {
@@ -211,7 +224,7 @@ pub enum SATempFunc {
 /// [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 /// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 /// DOI: 10.1126/science.220.4598.671  
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 #[log("initial_temperature" => "self.init_temp")]
 #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
 #[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
@@ -225,6 +238,7 @@ where
     /// Initial temperature
     init_temp: f64,
     /// which temperature function?
+    #[serde(skip)]
     temp_func: SATempFunc,
     /// Number of iterations used for the caluclation of temperature. This is needed for
     /// reannealing!
@@ -254,9 +268,17 @@ where
     /// previous cost
     prev_cost: f64,
     /// random number generator
-    rng: rand::prelude::ThreadRng,
+    #[serde(skip)]
+    #[serde(default = "default_rng")]
+    rng: SmallRng,
     /// base
     base: ArgminBase<O>,
+}
+
+// fn default_rng() -> Arc<Mutex<SmallRng>> {
+fn default_rng() -> SmallRng {
+    // Arc::new(Mutex::new(SmallRng::from_entropy()))
+    SmallRng::from_entropy()
 }
 
 impl<O> SimulatedAnnealing<O>
@@ -298,7 +320,7 @@ where
                 reanneal_iter_best: 0,
                 cur_temp: init_temp,
                 prev_cost,
-                rng: rand::thread_rng(),
+                rng: SmallRng::from_entropy(),
                 base: ArgminBase::new(cost_function, init_param),
             })
         }

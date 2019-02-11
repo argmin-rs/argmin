@@ -11,10 +11,11 @@ use argmin::prelude::*;
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin::testfunctions::rosenbrock;
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::sync::Mutex;
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 struct Rosenbrock {
     /// Parameter a, usually 1.0
     a: f64,
@@ -27,7 +28,13 @@ struct Rosenbrock {
     /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
     /// `self` to be passed as an immutable reference. This gives us thread safe interior
     /// mutability.
+    #[serde(skip)]
+    #[serde(default = "default_rng")]
     rng: Arc<Mutex<SmallRng>>,
+}
+
+fn default_rng() -> Arc<Mutex<SmallRng>> {
+    Arc::new(Mutex::new(SmallRng::from_entropy()))
 }
 
 impl std::default::Default for Rosenbrock {
