@@ -31,9 +31,10 @@ use serde::{Deserialize, Serialize};
 /// use argmin::solver::linesearch::HagerZhangLineSearch;
 /// use argmin::solver::linesearch::MoreThuenteLineSearch;
 /// use argmin::solver::linesearch::BacktrackingLineSearch;
+/// # use serde::{Deserialize, Serialize};
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 ///
-/// # #[derive(Clone, Default)]
+/// # #[derive(Clone, Default, Serialize, Deserialize)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {
@@ -57,16 +58,14 @@ use serde::{Deserialize, Serialize};
 /// // Define initial parameter vector
 /// let init_param: Vec<f64> = vec![1.2, 1.2];
 ///
-/// // Pick a line search. If no line search algorithm is provided, SteepestDescent defaults to
-/// // HagerZhang.
-/// let linesearch = HagerZhangLineSearch::new(cost.clone());
-/// // let linesearch = MoreThuenteLineSearch::new(cost.clone());
+/// // Pick a line search.
+/// // let linesearch = HagerZhangLineSearch::new(cost.clone());
+/// let linesearch = MoreThuenteLineSearch::new(cost.clone());
 /// // let linesearch = BacktrackingLineSearch::new(cost.clone());
 ///
 /// // Set up solver
-/// let mut solver = SteepestDescent::new(cost, init_param)?;
-/// // Set linesearch. This can be omitted, which will then default to `HagerZhangLineSearch`
-/// solver.set_linesearch(Box::new(linesearch));
+/// let mut solver = SteepestDescent::new(cost, init_param, linesearch)?;
+///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(100);
 ///

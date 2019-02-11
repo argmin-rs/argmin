@@ -46,8 +46,7 @@ fn run() -> Result<(), Error> {
     // tough case
     // let init_param: Vec<f64> = vec![-1.2, 1.0];
 
-    // Pick a line search. If no line search algorithm is provided, SteepestDescent defaults to
-    // HagerZhang.
+    // Pick a line search.
     // let linesearch = HagerZhangLineSearch::new(cost.clone());
     let linesearch = MoreThuenteLineSearch::new(cost.clone());
     // let linesearch = BacktrackingLineSearch::new(cost.clone());
