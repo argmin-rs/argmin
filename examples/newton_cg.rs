@@ -8,11 +8,13 @@
 extern crate argmin;
 extern crate ndarray;
 use argmin::prelude::*;
+use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::solver::newton::NewtonCG;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 struct Rosenbrock {
     a: f64,
     b: f64,
@@ -49,8 +51,11 @@ fn run() -> Result<(), Error> {
     // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
     let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 
+    // set up line search
+    let linesearch = MoreThuenteLineSearch::new(cost.clone());
+
     // Set up solver
-    let mut solver = NewtonCG::new(cost, init_param);
+    let mut solver = NewtonCG::new(cost, init_param, linesearch);
 
     // Set maximum number of iterations
     solver.set_max_iters(80);

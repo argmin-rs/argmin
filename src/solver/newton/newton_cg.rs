@@ -14,8 +14,7 @@
 
 use crate::prelude::*;
 use crate::solver::conjugategradient::ConjugateGradient;
-use crate::solver::linesearch::MoreThuenteLineSearch;
-// use crate::solver::linesearch::HagerZhangLineSearch;
+use serde::{Deserialize, Serialize};
 
 /// The Newton-CG method (also called truncated Newton method) uses a modified CG to solve the
 /// Newton equations approximately. After a search direction is found, a line search is performed.
@@ -91,10 +90,10 @@ use crate::solver::linesearch::MoreThuenteLineSearch;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
-pub struct NewtonCG<'a, O>
+#[derive(ArgminSolver, Serialize, Deserialize)]
+pub struct NewtonCG<O, L>
 where
-    O: 'a + ArgminOp<Output = f64>,
+    O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
@@ -104,24 +103,19 @@ where
         + ArgminNorm<f64>,
     <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
         + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
 {
     /// line search
-    linesearch: Box<
-        ArgminLineSearch<
-                Param = <O as ArgminOp>::Param,
-                Output = <O as ArgminOp>::Output,
-                Hessian = <O as ArgminOp>::Hessian,
-            > + 'a,
-    >,
+    linesearch: Box<L>,
     /// curvature_threshold
     curvature_threshold: f64,
     /// Base stuff
     base: ArgminBase<O>,
 }
 
-impl<'a, O> NewtonCG<'a, O>
+impl<O, L> NewtonCG<O, L>
 where
-    O: 'a + ArgminOp<Output = f64>,
+    O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
@@ -131,31 +125,15 @@ where
         + ArgminNorm<f64>,
     <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
         + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
 {
     /// Constructor
-    pub fn new(cost_function: O, init_param: <O as ArgminOp>::Param) -> Self {
-        // let linesearch = HagerZhangLineSearch::new(cost_function.clone());
-        let linesearch = MoreThuenteLineSearch::new(cost_function.clone());
+    pub fn new(cost_function: O, init_param: <O as ArgminOp>::Param, linesearch: L) -> Self {
         NewtonCG {
             linesearch: Box::new(linesearch),
             curvature_threshold: 0.0,
             base: ArgminBase::new(cost_function, init_param),
         }
-    }
-
-    /// Specify line search method
-    pub fn set_linesearch(
-        &mut self,
-        linesearch: Box<
-            ArgminLineSearch<
-                    Param = <O as ArgminOp>::Param,
-                    Output = <O as ArgminOp>::Output,
-                    Hessian = <O as ArgminOp>::Hessian,
-                > + 'a,
-        >,
-    ) -> &mut Self {
-        self.linesearch = linesearch;
-        self
     }
 
     /// Set curvature threshold
@@ -165,9 +143,9 @@ where
     }
 }
 
-impl<'a, O> ArgminIter for NewtonCG<'a, O>
+impl<O, L> ArgminIter for NewtonCG<O, L>
 where
-    O: 'a + ArgminOp<Output = f64>,
+    O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
         + ArgminDot<<O as ArgminOp>::Param, f64>
@@ -177,6 +155,7 @@ where
         + ArgminNorm<f64>,
     <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
         + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
 {
     type Param = <O as ArgminOp>::Param;
     type Output = <O as ArgminOp>::Output;
@@ -249,7 +228,7 @@ where
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 struct CGSubProblem<T, H> {
     hessian: H,
     phantom: std::marker::PhantomData<T>,
@@ -271,8 +250,8 @@ where
 
 impl<T, H> ArgminOp for CGSubProblem<T, H>
 where
-    T: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned,
-    H: Clone + Default + ArgminDot<T, T> + Send + Sync,
+    T: Clone + Default + Send + Sync + Serialize + serde::de::DeserializeOwned,
+    H: Clone + Default + ArgminDot<T, T> + Send + Sync + Serialize + serde::de::DeserializeOwned,
 {
     type Param = T;
     type Output = T;

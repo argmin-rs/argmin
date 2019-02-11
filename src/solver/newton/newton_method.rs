@@ -11,6 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// Newton's method iteratively finds the stationary points of a function f by using a second order
 /// approximation of f at the current point.
@@ -86,7 +87,7 @@ use crate::prelude::*;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct Newton<O>
 where
     O: ArgminOp,
