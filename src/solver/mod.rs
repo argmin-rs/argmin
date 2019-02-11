@@ -7,7 +7,7 @@
 
 pub mod conjugategradient;
 pub mod gradientdescent;
-// pub mod landweber;
+pub mod landweber;
 pub mod linesearch;
 // pub mod newton;
 // pub mod quasinewton;

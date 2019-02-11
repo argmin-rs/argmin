@@ -16,6 +16,7 @@
 //! [1] https://en.wikipedia.org/wiki/Landweber_iteration
 
 use crate::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// The Landweber iteration is a solver for ill-posed linear inverse problems.
 ///
@@ -31,8 +32,9 @@ use crate::prelude::*;
 /// use argmin::prelude::*;
 /// use argmin::solver::landweber::Landweber;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+/// # use serde::{Deserialize, Serialize};
 ///
-/// # #[derive(Clone, Default)]
+/// # #[derive(Clone, Default, Serialize, Deserialize)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {
@@ -75,7 +77,7 @@ use crate::prelude::*;
 /// [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
 /// kind. Amer. J. Math. 73, 615–624
 /// [1] https://en.wikipedia.org/wiki/Landweber_iteration
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct Landweber<O>
 where
     <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,

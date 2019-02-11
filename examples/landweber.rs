@@ -9,8 +9,9 @@ extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::landweber::*;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 struct Rosenbrock {}
 
 impl ArgminOp for Rosenbrock {
