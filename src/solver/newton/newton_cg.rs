@@ -27,9 +27,12 @@ use serde::{Deserialize, Serialize};
 /// use argmin::prelude::*;
 /// use argmin::solver::newton::NewtonCG;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+/// use argmin::solver::linesearch::MoreThuenteLineSearch;
 /// use ndarray::{Array, Array1, Array2};
 ///
-/// # #[derive(Clone, Default)]
+/// # use serde::{Deserialize, Serialize};
+/// #
+/// # #[derive(Clone, Default, Serialize, Deserialize)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {
@@ -58,8 +61,11 @@ use serde::{Deserialize, Serialize};
 /// // Define initial parameter vector
 /// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 ///
+/// // set up line search
+/// let linesearch = MoreThuenteLineSearch::new(cost.clone());
+///
 /// // Set up solver
-/// let mut solver = NewtonCG::new(cost, init_param);
+/// let mut solver = NewtonCG::new(cost, init_param, linesearch);
 ///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(20);

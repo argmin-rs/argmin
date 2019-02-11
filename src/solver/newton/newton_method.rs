@@ -26,7 +26,9 @@ use serde::{Deserialize, Serialize};
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 /// use ndarray::{Array, Array1, Array2};
 ///
-/// # #[derive(Clone, Default)]
+/// # use serde::{Deserialize, Serialize};
+/// #
+/// # #[derive(Clone, Default, Serialize, Deserialize)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {

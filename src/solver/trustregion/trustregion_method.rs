@@ -81,11 +81,14 @@ use serde::{Deserialize, Serialize};
 /// // let mut subproblem = Dogleg::new(cost.clone());
 /// subproblem.set_max_iters(2);
 ///
-/// // Set up solver
-/// let mut solver = TrustRegion::new(cost.clone(), init_param);
+/// // Set up the subproblem
+/// let mut subproblem = Steihaug::new(cost.clone());
+/// // let mut subproblem = CauchyPoint::new(cost.clone());
+/// // let mut subproblem = Dogleg::new(cost.clone());
+/// subproblem.set_max_iters(2);
 ///
-/// // Set method for subproblem. Optional: If not provided, it will default to `Steihaug` method
-/// solver.set_subproblem(subproblem);
+/// // Set up solver
+/// let mut solver = TrustRegion::new(cost, init_param, subproblem);
 ///
 /// // Set the maximum number of iterations
 /// solver.set_max_iters(2_000);

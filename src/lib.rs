@@ -111,10 +111,11 @@
 //! # extern crate ndarray;
 //! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! # use argmin::prelude::*;
+//! # use serde::{Serialize, Deserialize};
 //! // [Imports omited]
 //!
 //! /// First, create a struct for your problem
-//! #[derive(Clone, Default)]
+//! #[derive(Clone, Default, Serialize, Deserialize)]
 //! struct Rosenbrock {
 //!     a: f64,
 //!     b: f64,
@@ -161,8 +162,10 @@
 //! use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! use argmin::prelude::*;
 //! use argmin::solver::gradientdescent::SteepestDescent;
+//! use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! use serde::{Serialize, Deserialize};
 //!
-//! #[derive(Clone, Default)]
+//! #[derive(Clone, Default, Serialize, Deserialize)]
 //! struct Rosenbrock {
 //!     a: f64,
 //!     b: f64,
@@ -189,8 +192,13 @@
 //!     // Define inital parameter vector
 //!     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);
 //!
+//!     // Pick a line search.
+//!     // let linesearch = HagerZhangLineSearch::new(cost.clone());
+//!     let linesearch = MoreThuenteLineSearch::new(cost.clone());
+//!     // let linesearch = BacktrackingLineSearch::new(cost.clone());
+//!
 //!     // Create solver
-//!     let mut solver = SteepestDescent::new(cost, init_param)?;
+//!     let mut solver = SteepestDescent::new(cost, init_param, linesearch)?;
 //!
 //!     // Set the maximum number of iterations to 1000
 //!     solver.set_max_iters(1000);
@@ -233,7 +241,10 @@
 //! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! # use argmin::prelude::*;
 //! # use argmin::solver::gradientdescent::SteepestDescent;
-//! # #[derive(Clone, Default)]
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use serde::{Serialize, Deserialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
 //! # struct Rosenbrock {
 //! #     a: f64,
 //! #     b: f64,
@@ -252,7 +263,8 @@
 //! # fn run() -> Result<(), Error> {
 //! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 //! #     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);
-//! let mut solver = SteepestDescent::new(cost, init_param)?;
+//! #     let linesearch = MoreThuenteLineSearch::new(cost.clone());
+//! let mut solver = SteepestDescent::new(cost, init_param, linesearch)?;
 //! #     solver.set_max_iters(10);
 //! // Log to the terminal
 //! solver.add_logger(ArgminSlogLogger::term());
@@ -298,6 +310,7 @@
 //! use argmin_codegen::ArgminSolver;
 //! use argmin::prelude::*;
 //! use std::default::Default;
+//! use serde::{Serialize, Deserialize};
 //!
 //! // The `Landweber` struct holds the `omega` parameter and has a field `base` which is of type
 //! // `ArgminBase`. The struct is generic over the ArgminOp `O` which holds type information about
@@ -305,7 +318,7 @@
 //! // `ArgminScaledSub<T, f64>`, which is neede for the update rule.
 //! // Deriving `ArgminSolver` implements a large portion of the API and provides many convenience
 //! // functions. It requires that `ArgminIter` is implemented on `Landweber` as well.
-//! #[derive(ArgminSolver)]
+//! #[derive(ArgminSolver, Serialize, Deserialize)]
 //! pub struct Landweber<O>
 //! where
 //!     <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
