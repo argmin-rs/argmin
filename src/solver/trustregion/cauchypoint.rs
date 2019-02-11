@@ -11,6 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// The Cauchy point is the minimum of the quadratic approximation of the cost function within the
 /// trust region along the direction given by the first derivative.
@@ -19,7 +20,7 @@ use crate::prelude::*;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct CauchyPoint<O>
 where
     O: ArgminOp<Output = f64>,

@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use std;
+use serde::{Deserialize, Serialize};
 
 /// The Dogleg method computes the intersection of the trust region boundary with a path given by
 /// the unconstraind minimum along the steepest descent direction and the optimum of the quadratic
@@ -21,7 +21,7 @@ use std;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct Dogleg<O>
 where
     O: ArgminOp<Output = f64>,

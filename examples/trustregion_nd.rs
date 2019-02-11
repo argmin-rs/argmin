@@ -12,8 +12,9 @@ use argmin::prelude::*;
 use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 struct Rosenbrock {
     a: f64,
     b: f64,
@@ -52,14 +53,14 @@ fn run() -> Result<(), Error> {
     // tough case
     let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 
-    // Set up solver
-    let mut solver = TrustRegion::new(cost.clone(), init_param);
+    // Set up the subproblem
+    let mut subproblem = Steihaug::new(cost.clone());
+    // let mut subproblem = CauchyPoint::new(cost.clone());
+    // let mut subproblem = Dogleg::new(cost.clone());
+    subproblem.set_max_iters(2);
 
-    // Set method for subproblem. Optional: If not provided, it will default to `Steihaug` method
-    // let subproblem = Box::new(CauchyPoint::new(cost));
-    let subproblem = Box::new(Dogleg::new(cost));
-    // let mut subproblem = Box::new(Steihaug::new(cost));
-    solver.set_subproblem(subproblem);
+    // Set up solver
+    let mut solver = TrustRegion::new(cost, init_param, subproblem);
 
     // Set the maximum number of iterations
     solver.set_max_iters(2_000);

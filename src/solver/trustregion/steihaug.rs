@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use std;
+use serde::{Deserialize, Serialize};
 
 /// The Steihaug method is a conjugate gradients based approach for finding an approximate solution
 /// to the second order approximation of the cost function within the trust region.
@@ -20,7 +20,7 @@ use std;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct Steihaug<O>
 where
     O: ArgminOp<Output = f64>,
