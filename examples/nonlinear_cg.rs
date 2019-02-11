@@ -8,9 +8,12 @@
 extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::conjugategradient::NonlinearConjugateGradient;
+use argmin::solver::conjugategradient::PolakRibiere;
+use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 struct Rosenbrock {}
 
 impl ArgminOp for Rosenbrock {
@@ -34,8 +37,13 @@ fn run() -> Result<(), Error> {
     // define inital parameter vector
     let init_param: Vec<f64> = vec![1.2, 1.2];
 
+    // set up line search
+    let linesearch = MoreThuenteLineSearch::new(operator.clone());
+    let beta_method = PolakRibiere::new();
+
     // Set up nonlinear conjugate gradient method
-    let mut solver = NonlinearConjugateGradient::new_pr(operator, init_param)?;
+    let mut solver =
+        NonlinearConjugateGradient::new(operator, init_param, linesearch, beta_method)?;
 
     // Set maximum number of iterations
     solver.set_max_iters(20);
