@@ -703,6 +703,8 @@
 <span id="703">703</span>
 <span id="704">704</span>
 <span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -725,6 +727,7 @@
 <span class="doccomment">//! DOI: https://doi.org/10.1145/192115.192132</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="doccomment">/// The More-Thuente line search is a method to find a step length which obeys the strong Wolfe</span>
 <span class="doccomment">/// conditions.</span>
@@ -736,8 +739,9 @@
 <span class="doccomment">/// # use argmin::prelude::*;</span>
 <span class="doccomment">/// # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
 <span class="doccomment">/// # use argmin::testfunctions::{sphere, sphere_derivative};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// # #[derive(Clone, Default)]</span>
+<span class="doccomment">/// # #[derive(Clone, Default, Serialize, Deserialize)]</span>
 <span class="doccomment">/// # struct MyProblem {}</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # impl ArgminOp for MyProblem {</span>
@@ -812,7 +816,7 @@
 <span class="doccomment">/// [0] Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient</span>
 <span class="doccomment">/// decrease.&quot; ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.</span>
 <span class="doccomment">/// DOI: https://doi.org/10.1145/192115.192132</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
@@ -876,7 +880,7 @@
     <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Step</span> {
     <span class="kw">pub</span> <span class="ident">x</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">fx</span>: <span class="ident">f64</span>,

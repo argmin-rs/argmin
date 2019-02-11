@@ -278,7 +278,6 @@
 <span id="278">278</span>
 <span id="279">279</span>
 <span id="280">280</span>
-<span id="281">281</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -291,6 +290,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">solver</span>::<span class="ident">linesearch</span>::<span class="ident">condition</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="doccomment">/// The Backtracking line search is a simple method to find a step length which obeys the Armijo</span>
 <span class="doccomment">/// (sufficient decrease) condition.</span>
@@ -300,10 +300,11 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # extern crate argmin;</span>
 <span class="doccomment">/// use argmin::prelude::*;</span>
-<span class="doccomment">/// use argmin::solver::linesearch::BacktrackingLineSearch;</span>
+<span class="doccomment">/// use argmin::solver::linesearch::{BacktrackingLineSearch, ArmijoCondition};</span>
 <span class="doccomment">/// # use argmin::testfunctions::{sphere, sphere_derivative};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # #[derive(Clone, Default)]</span>
+<span class="doccomment">/// # #[derive(Clone, Default, Serialize, Deserialize)]</span>
 <span class="doccomment">/// # struct Sphere {}</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # impl ArgminOp for Sphere {</span>
@@ -327,8 +328,11 @@
 <span class="doccomment">/// // Define problem</span>
 <span class="doccomment">/// let operator = Sphere {};</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// // Set condition</span>
+<span class="doccomment">/// let cond = ArmijoCondition::new(0.5)?;</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// // Set up Line Search method</span>
-<span class="doccomment">/// let mut solver = BacktrackingLineSearch::new(operator);</span>
+<span class="doccomment">/// let mut solver = BacktrackingLineSearch::new(operator, cond);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Set search direction</span>
 <span class="doccomment">/// solver.set_search_direction(vec![-2.0, 0.0]);</span>
@@ -384,14 +388,15 @@
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [1] Wikipedia: https://en.wikipedia.org/wiki/Backtracking_line_search</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">stop</span>(<span class="string">&quot;self.eval_condition()&quot;</span> <span class="op">=&gt;</span> <span class="ident">LineSearchConditionMet</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">L</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">L</span>: <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// initial parameter vector</span>
     <span class="ident">init_param</span>: <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>,
@@ -404,34 +409,34 @@
     <span class="doccomment">/// Contraction factor rho</span>
     <span class="ident">rho</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// Stopping condition</span>
-    <span class="ident">condition</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">LineSearchCondition</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">condition</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>,
     <span class="doccomment">/// alpha</span>
     <span class="ident">alpha</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// base</span>
     <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">L</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">L</span>: <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Constructor</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Parameters:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `operator`: Must implement `ArgminOp`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">operator</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="ident">ArmijoCondition</span>::<span class="ident">new</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">operator</span>: <span class="ident">O</span>, <span class="ident">condition</span>: <span class="ident">L</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">BacktrackingLineSearch</span> {
             <span class="ident">init_param</span>: <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>::<span class="ident">default</span>(),
             <span class="ident">init_cost</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>,
             <span class="ident">init_grad</span>: <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>::<span class="ident">default</span>(),
             <span class="ident">search_direction</span>: <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>::<span class="ident">default</span>(),
             <span class="ident">rho</span>: <span class="number">0.9</span>,
-            <span class="ident">condition</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">cond</span>),
+            <span class="ident">condition</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">condition</span>),
             <span class="ident">alpha</span>: <span class="number">1.0</span>,
             <span class="ident">base</span>: <span class="ident">ArgminBase</span>::<span class="ident">new</span>(<span class="ident">operator</span>, <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>::<span class="ident">default</span>()),
         }
@@ -456,15 +461,6 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set condition</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_condition</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">condition</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">LineSearchCondition</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;&gt;</span>,
-    ) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">condition</span> <span class="op">=</span> <span class="ident">condition</span>;
-        <span class="self">self</span>
-    }
-
     <span class="kw">fn</span> <span class="ident">eval_condition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">condition</span>.<span class="ident">eval</span>(
             <span class="self">self</span>.<span class="ident">cur_cost</span>(),
@@ -477,12 +473,13 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminLineSearch</span> <span class="kw">for</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">ArgminLineSearch</span> <span class="kw">for</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">L</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">L</span>: <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Set search direction</span>
     <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">search_direction</span>: <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>) {
@@ -532,12 +529,13 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminIter</span> <span class="kw">for</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">ArgminIter</span> <span class="kw">for</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">L</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">L</span>: <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">O</span> <span class="kw">as</span> <span class="ident">ArgminOp</span><span class="op">&gt;</span>::<span class="ident">Param</span>;
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;

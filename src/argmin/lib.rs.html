@@ -398,6 +398,19 @@
 <span id="398">398</span>
 <span id="399">399</span>
 <span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -467,7 +480,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! argmin = &quot;0.1.6&quot;</span>
+<span class="doccomment">//! argmin = &quot;0.1.7&quot;</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Optional features</span>
@@ -476,7 +489,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! argmin = { version = &quot;0.1.6&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;] }</span>
+<span class="doccomment">//! argmin = { version = &quot;0.1.7&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;] }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! These may become default features in the future. Without these features compilation to</span>
@@ -512,10 +525,11 @@
 <span class="doccomment">//! # extern crate ndarray;</span>
 <span class="doccomment">//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};</span>
 <span class="doccomment">//! # use argmin::prelude::*;</span>
+<span class="doccomment">//! # use serde::{Serialize, Deserialize};</span>
 <span class="doccomment">//! // [Imports omited]</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! /// First, create a struct for your problem</span>
-<span class="doccomment">//! #[derive(Clone, Default)]</span>
+<span class="doccomment">//! #[derive(Clone, Default, Serialize, Deserialize)]</span>
 <span class="doccomment">//! struct Rosenbrock {</span>
 <span class="doccomment">//!     a: f64,</span>
 <span class="doccomment">//!     b: f64,</span>
@@ -562,8 +576,10 @@
 <span class="doccomment">//! use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};</span>
 <span class="doccomment">//! use argmin::prelude::*;</span>
 <span class="doccomment">//! use argmin::solver::gradientdescent::SteepestDescent;</span>
+<span class="doccomment">//! use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
+<span class="doccomment">//! use serde::{Serialize, Deserialize};</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Clone, Default)]</span>
+<span class="doccomment">//! #[derive(Clone, Default, Serialize, Deserialize)]</span>
 <span class="doccomment">//! struct Rosenbrock {</span>
 <span class="doccomment">//!     a: f64,</span>
 <span class="doccomment">//!     b: f64,</span>
@@ -590,8 +606,13 @@
 <span class="doccomment">//!     // Define inital parameter vector</span>
 <span class="doccomment">//!     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//!     // Pick a line search.</span>
+<span class="doccomment">//!     // let linesearch = HagerZhangLineSearch::new(cost.clone());</span>
+<span class="doccomment">//!     let linesearch = MoreThuenteLineSearch::new(cost.clone());</span>
+<span class="doccomment">//!     // let linesearch = BacktrackingLineSearch::new(cost.clone());</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//!     // Create solver</span>
-<span class="doccomment">//!     let mut solver = SteepestDescent::new(cost, init_param)?;</span>
+<span class="doccomment">//!     let mut solver = SteepestDescent::new(cost, init_param, linesearch)?;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     // Set the maximum number of iterations to 1000</span>
 <span class="doccomment">//!     solver.set_max_iters(1000);</span>
@@ -634,7 +655,10 @@
 <span class="doccomment">//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};</span>
 <span class="doccomment">//! # use argmin::prelude::*;</span>
 <span class="doccomment">//! # use argmin::solver::gradientdescent::SteepestDescent;</span>
-<span class="doccomment">//! # #[derive(Clone, Default)]</span>
+<span class="doccomment">//! # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
+<span class="doccomment">//! # use serde::{Serialize, Deserialize};</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # #[derive(Clone, Default, Serialize, Deserialize)]</span>
 <span class="doccomment">//! # struct Rosenbrock {</span>
 <span class="doccomment">//! #     a: f64,</span>
 <span class="doccomment">//! #     b: f64,</span>
@@ -653,7 +677,8 @@
 <span class="doccomment">//! # fn run() -&gt; Result&lt;(), Error&gt; {</span>
 <span class="doccomment">//! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };</span>
 <span class="doccomment">//! #     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);</span>
-<span class="doccomment">//! let mut solver = SteepestDescent::new(cost, init_param)?;</span>
+<span class="doccomment">//! #     let linesearch = MoreThuenteLineSearch::new(cost.clone());</span>
+<span class="doccomment">//! let mut solver = SteepestDescent::new(cost, init_param, linesearch)?;</span>
 <span class="doccomment">//! #     solver.set_max_iters(10);</span>
 <span class="doccomment">//! // Log to the terminal</span>
 <span class="doccomment">//! solver.add_logger(ArgminSlogLogger::term());</span>
@@ -699,6 +724,7 @@
 <span class="doccomment">//! use argmin_codegen::ArgminSolver;</span>
 <span class="doccomment">//! use argmin::prelude::*;</span>
 <span class="doccomment">//! use std::default::Default;</span>
+<span class="doccomment">//! use serde::{Serialize, Deserialize};</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // The `Landweber` struct holds the `omega` parameter and has a field `base` which is of type</span>
 <span class="doccomment">//! // `ArgminBase`. The struct is generic over the ArgminOp `O` which holds type information about</span>
@@ -706,7 +732,7 @@
 <span class="doccomment">//! // `ArgminScaledSub&lt;T, f64&gt;`, which is neede for the update rule.</span>
 <span class="doccomment">//! // Deriving `ArgminSolver` implements a large portion of the API and provides many convenience</span>
 <span class="doccomment">//! // functions. It requires that `ArgminIter` is implemented on `Landweber` as well.</span>
-<span class="doccomment">//! #[derive(ArgminSolver)]</span>
+<span class="doccomment">//! #[derive(ArgminSolver, Serialize, Deserialize)]</span>
 <span class="doccomment">//! pub struct Landweber&lt;O&gt;</span>
 <span class="doccomment">//! where</span>
 <span class="doccomment">//!     &lt;O as ArgminOp&gt;::Param: ArgminScaledSub&lt;&lt;O as ArgminOp&gt;::Param, f64, &lt;O as ArgminOp&gt;::Param&gt;,</span>

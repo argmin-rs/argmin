@@ -148,6 +148,9 @@
 <span id="148">148</span>
 <span id="149">149</span>
 <span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -162,6 +165,7 @@
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="doccomment">/// Newton&#39;s method iteratively finds the stationary points of a function f by using a second order</span>
 <span class="doccomment">/// approximation of f at the current point.</span>
@@ -176,7 +180,9 @@
 <span class="doccomment">/// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};</span>
 <span class="doccomment">/// use ndarray::{Array, Array1, Array2};</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # #[derive(Clone, Default)]</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # #[derive(Clone, Default, Serialize, Deserialize)]</span>
 <span class="doccomment">/// # struct MyProblem {}</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # impl ArgminOp for MyProblem {</span>
@@ -237,7 +243,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span>,

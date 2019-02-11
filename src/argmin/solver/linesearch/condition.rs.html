@@ -203,6 +203,11 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -217,9 +222,10 @@
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminError</span>, <span class="ident">Error</span>};
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="doccomment">/// Needs to be implemented by everything that wants to be a LineSearchCondition</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>: <span class="ident">Serialize</span> {
     <span class="doccomment">/// Evaluate the condition</span>
     <span class="kw">fn</span> <span class="ident">eval</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -236,6 +242,7 @@
 }
 
 <span class="doccomment">/// Armijo Condition</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArmijoCondition</span> {
     <span class="ident">c</span>: <span class="ident">f64</span>,
 }
@@ -275,6 +282,7 @@
 }
 
 <span class="doccomment">/// Wolfe Condition</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WolfeCondition</span> {
     <span class="ident">c1</span>: <span class="ident">f64</span>,
     <span class="ident">c2</span>: <span class="ident">f64</span>,
@@ -323,6 +331,7 @@
 }
 
 <span class="doccomment">/// Strong Wolfe conditions</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StrongWolfeCondition</span> {
     <span class="ident">c1</span>: <span class="ident">f64</span>,
     <span class="ident">c2</span>: <span class="ident">f64</span>,
@@ -371,6 +380,7 @@
 }
 
 <span class="doccomment">/// Goldstein conditions</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GoldsteinCondition</span> {
     <span class="ident">c</span>: <span class="ident">f64</span>,
 }
