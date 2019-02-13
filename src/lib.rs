@@ -321,7 +321,7 @@
 //! #[derive(ArgminSolver, Serialize, Deserialize)]
 //! pub struct Landweber<O>
 //! where
-//!     <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+//!     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
 //!     O: ArgminOp,
 //! {
 //!     omega: f64,
@@ -331,13 +331,13 @@
 //! // For convenience, a constructor can/should be implemented
 //! impl<O> Landweber<O>
 //! where
-//!     <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+//!     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
 //!     O: ArgminOp,
 //! {
 //!     pub fn new(
 //!         cost_function: O,
 //!         omega: f64,
-//!         init_param: <O as ArgminOp>::Param,
+//!         init_param: O::Param,
 //!     ) -> Result<Self, Error> {
 //!         Ok(Landweber {
 //!             omega,
@@ -349,12 +349,12 @@
 //! // This implements a single iteration of the optimization algorithm.
 //! impl<O> ArgminIter for Landweber<O>
 //! where
-//!     <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+//!     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
 //!     O: ArgminOp,
 //! {
-//!     type Param = <O as ArgminOp>::Param;
-//!     type Output = <O as ArgminOp>::Output;
-//!     type Hessian = <O as ArgminOp>::Hessian;
+//!     type Param = O::Param;
+//!     type Output = O::Output;
+//!     type Hessian = O::Hessian;
 //!
 //!     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
 //!         // Obtain current parameter vector
