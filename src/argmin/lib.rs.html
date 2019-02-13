@@ -735,7 +735,7 @@
 <span class="doccomment">//! #[derive(ArgminSolver, Serialize, Deserialize)]</span>
 <span class="doccomment">//! pub struct Landweber&lt;O&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     &lt;O as ArgminOp&gt;::Param: ArgminScaledSub&lt;&lt;O as ArgminOp&gt;::Param, f64, &lt;O as ArgminOp&gt;::Param&gt;,</span>
+<span class="doccomment">//!     O::Param: ArgminScaledSub&lt;O::Param, f64, O::Param&gt;,</span>
 <span class="doccomment">//!     O: ArgminOp,</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     omega: f64,</span>
@@ -745,13 +745,13 @@
 <span class="doccomment">//! // For convenience, a constructor can/should be implemented</span>
 <span class="doccomment">//! impl&lt;O&gt; Landweber&lt;O&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     &lt;O as ArgminOp&gt;::Param: ArgminScaledSub&lt;&lt;O as ArgminOp&gt;::Param, f64, &lt;O as ArgminOp&gt;::Param&gt;,</span>
+<span class="doccomment">//!     O::Param: ArgminScaledSub&lt;O::Param, f64, O::Param&gt;,</span>
 <span class="doccomment">//!     O: ArgminOp,</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     pub fn new(</span>
 <span class="doccomment">//!         cost_function: O,</span>
 <span class="doccomment">//!         omega: f64,</span>
-<span class="doccomment">//!         init_param: &lt;O as ArgminOp&gt;::Param,</span>
+<span class="doccomment">//!         init_param: O::Param,</span>
 <span class="doccomment">//!     ) -&gt; Result&lt;Self, Error&gt; {</span>
 <span class="doccomment">//!         Ok(Landweber {</span>
 <span class="doccomment">//!             omega,</span>
@@ -763,12 +763,12 @@
 <span class="doccomment">//! // This implements a single iteration of the optimization algorithm.</span>
 <span class="doccomment">//! impl&lt;O&gt; ArgminIter for Landweber&lt;O&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     &lt;O as ArgminOp&gt;::Param: ArgminScaledSub&lt;&lt;O as ArgminOp&gt;::Param, f64, &lt;O as ArgminOp&gt;::Param&gt;,</span>
+<span class="doccomment">//!     O::Param: ArgminScaledSub&lt;O::Param, f64, O::Param&gt;,</span>
 <span class="doccomment">//!     O: ArgminOp,</span>
 <span class="doccomment">//! {</span>
-<span class="doccomment">//!     type Param = &lt;O as ArgminOp&gt;::Param;</span>
-<span class="doccomment">//!     type Output = &lt;O as ArgminOp&gt;::Output;</span>
-<span class="doccomment">//!     type Hessian = &lt;O as ArgminOp&gt;::Hessian;</span>
+<span class="doccomment">//!     type Param = O::Param;</span>
+<span class="doccomment">//!     type Output = O::Output;</span>
+<span class="doccomment">//!     type Hessian = O::Hessian;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     fn next_iter(&amp;mut self) -&gt; Result&lt;ArgminIterData&lt;Self::Param&gt;, Error&gt; {</span>
 <span class="doccomment">//!         // Obtain current parameter vector</span>
