@@ -292,11 +292,7 @@ where
     /// * `cost_function`: cost function
     /// * `init_param`: initial parameter vector
     /// * `init_temp`: initial temperature
-    pub fn new(
-        cost_function: O,
-        init_param: <O as ArgminOp>::Param,
-        init_temp: f64,
-    ) -> Result<Self, Error> {
+    pub fn new(cost_function: O, init_param: O::Param, init_temp: f64) -> Result<Self, Error> {
         let prev_cost = cost_function.apply(&init_param)?;
         if init_temp <= 0_f64 {
             Err(ArgminError::InvalidParameter {
@@ -370,7 +366,7 @@ where
     /// `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
     ///
     /// which will always be between 0 and 0.5.
-    fn accept(&mut self, next_param: &<O as ArgminOp>::Param, next_cost: f64) -> (bool, bool) {
+    fn accept(&mut self, next_param: &O::Param, next_cost: f64) -> (bool, bool) {
         let prob: f64 = self.rng.gen();
         let mut new_best = false;
         let accepted = if (next_cost < self.prev_cost)
@@ -406,7 +402,7 @@ where
     }
 
     /// Perform annealing
-    fn anneal(&mut self) -> Result<<O as ArgminOp>::Param, Error> {
+    fn anneal(&mut self) -> Result<O::Param, Error> {
         let tmp = self.cur_param();
         let cur_temp = self.cur_temp;
         self.modify(&tmp, cur_temp)
@@ -461,9 +457,9 @@ impl<O> ArgminIter for SimulatedAnnealing<O>
 where
     O: ArgminOp<Output = f64>,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {

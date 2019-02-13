@@ -24,31 +24,30 @@ use serde::{Deserialize, Serialize};
 pub struct Steihaug<O>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param:
-        ArgminMul<f64, <O as ArgminOp>::Param>
-            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
-            + ArgminNorm<f64>
-            + ArgminDot<<O as ArgminOp>::Param, f64>
-            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminZero
-            + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>
+        + ArgminDot<O::Param, f64>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminZero
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
 {
     /// Radius
     radius: f64,
     /// epsilon
     epsilon: f64,
     /// p
-    p: <O as ArgminOp>::Param,
+    p: O::Param,
     /// residual
-    r: <O as ArgminOp>::Param,
+    r: O::Param,
     /// r^Tr
     rtr: f64,
     /// initial residual
     r_0_norm: f64,
     /// direction
-    d: <O as ArgminOp>::Param,
+    d: O::Param,
     /// base
     base: ArgminBase<O>,
 }
@@ -56,16 +55,15 @@ where
 impl<O> Steihaug<O>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param:
-        ArgminMul<f64, <O as ArgminOp>::Param>
-            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
-            + ArgminNorm<f64>
-            + ArgminDot<<O as ArgminOp>::Param, f64>
-            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminZero
-            + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>
+        + ArgminDot<O::Param, f64>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminZero
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
 {
     /// Constructor
     ///
@@ -73,15 +71,15 @@ where
     ///
     /// `operator`: operator
     pub fn new(operator: O) -> Self {
-        let base = ArgminBase::new(operator, <O as ArgminOp>::Param::default());
+        let base = ArgminBase::new(operator, O::Param::default());
         Steihaug {
             radius: std::f64::NAN,
             epsilon: 10e-10,
-            p: <O as ArgminOp>::Param::default(),
-            r: <O as ArgminOp>::Param::default(),
+            p: O::Param::default(),
+            r: O::Param::default(),
             rtr: std::f64::NAN,
             r_0_norm: std::f64::NAN,
-            d: <O as ArgminOp>::Param::default(),
+            d: O::Param::default(),
             base,
         }
     }
@@ -99,7 +97,7 @@ where
     }
 
     /// evaluate m(p) (without considering f_init because it is not available)
-    fn eval_m(&self, p: &<O as ArgminOp>::Param) -> f64 {
+    fn eval_m(&self, p: &O::Param) -> f64 {
         self.cur_grad().dot(&p) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
     }
 
@@ -156,20 +154,19 @@ where
 impl<O> ArgminIter for Steihaug<O>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param:
-        ArgminMul<f64, <O as ArgminOp>::Param>
-            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
-            + ArgminNorm<f64>
-            + ArgminDot<<O as ArgminOp>::Param, f64>
-            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminZero
-            + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>
+        + ArgminDot<O::Param, f64>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminZero
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         self.base_reset();
@@ -231,26 +228,25 @@ where
 impl<O> ArgminTrustRegion for Steihaug<O>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param:
-        ArgminMul<f64, <O as ArgminOp>::Param>
-            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
-            + ArgminNorm<f64>
-            + ArgminDot<<O as ArgminOp>::Param, f64>
-            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminZero
-            + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>
+        + ArgminDot<O::Param, f64>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminZero
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
 {
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
     }
 
-    fn set_grad(&mut self, grad: <O as ArgminOp>::Param) {
+    fn set_grad(&mut self, grad: O::Param) {
         self.set_cur_grad(grad);
     }
 
-    fn set_hessian(&mut self, hessian: <O as ArgminOp>::Hessian) {
+    fn set_hessian(&mut self, hessian: O::Hessian) {
         self.set_cur_hessian(hessian);
     }
 }

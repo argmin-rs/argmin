@@ -97,23 +97,23 @@ use serde::{Deserialize, Serialize};
 pub struct BFGS<O, L>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Hessian>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminDot<O::Param, O::Hessian>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
-        + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminSub<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
-        + ArgminAdd<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
-        + ArgminMul<f64, <O as ArgminOp>::Hessian>
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
+        + ArgminDot<O::Param, O::Param>
+        + ArgminDot<O::Hessian, O::Hessian>
+        + ArgminAdd<O::Hessian, O::Hessian>
+        + ArgminMul<f64, O::Hessian>
         + ArgminTranspose
         + ArgminEye,
     L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
 {
     /// Inverse Hessian
-    inv_hessian: <O as ArgminOp>::Hessian,
+    inv_hessian: O::Hessian,
     /// line search
     linesearch: Box<L>,
     /// Base stuff
@@ -123,17 +123,17 @@ where
 impl<O, L> BFGS<O, L>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Hessian>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminDot<O::Param, O::Hessian>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
-        + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminSub<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
-        + ArgminAdd<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
-        + ArgminMul<f64, <O as ArgminOp>::Hessian>
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
+        + ArgminDot<O::Param, O::Param>
+        + ArgminDot<O::Hessian, O::Hessian>
+        + ArgminAdd<O::Hessian, O::Hessian>
+        + ArgminMul<f64, O::Hessian>
         + ArgminTranspose
         + ArgminEye,
     L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
@@ -141,8 +141,8 @@ where
     /// Constructor
     pub fn new(
         cost_function: O,
-        init_param: <O as ArgminOp>::Param,
-        init_inverse_hessian: <O as ArgminOp>::Hessian,
+        init_param: O::Param,
+        init_inverse_hessian: O::Hessian,
         linesearch: L,
     ) -> Self {
         BFGS {
@@ -156,24 +156,24 @@ where
 impl<O, L> ArgminIter for BFGS<O, L>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Hessian>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminDot<O::Param, O::Hessian>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
-        + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminSub<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
-        + ArgminAdd<<O as ArgminOp>::Hessian, <O as ArgminOp>::Hessian>
-        + ArgminMul<f64, <O as ArgminOp>::Hessian>
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
+        + ArgminDot<O::Param, O::Param>
+        + ArgminDot<O::Hessian, O::Hessian>
+        + ArgminAdd<O::Hessian, O::Hessian>
+        + ArgminMul<f64, O::Hessian>
         + ArgminTranspose
         + ArgminEye,
     L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         let cost = self.apply(&self.base.cur_param())?;

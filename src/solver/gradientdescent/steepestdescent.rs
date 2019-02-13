@@ -99,11 +99,11 @@ use serde::{Deserialize, Serialize};
 pub struct SteepestDescent<O, L>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminSub<O::Param, O::Param>
         + ArgminNorm<f64>,
     L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
@@ -116,20 +116,16 @@ where
 impl<O, L> SteepestDescent<O, L>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminSub<O::Param, O::Param>
         + ArgminNorm<f64>,
     L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
     /// Constructor
-    pub fn new(
-        cost_function: O,
-        init_param: <O as ArgminOp>::Param,
-        linesearch: L,
-    ) -> Result<Self, Error> {
+    pub fn new(cost_function: O, init_param: O::Param, linesearch: L) -> Result<Self, Error> {
         Ok(SteepestDescent {
             linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),
@@ -140,17 +136,17 @@ where
 impl<O, L> ArgminIter for SteepestDescent<O, L>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminSub<O::Param, O::Param>
         + ArgminNorm<f64>,
     L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
-    type Param = <O as ArgminOp>::Param;
+    type Param = O::Param;
     type Output = f64;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Hessian = O::Hessian;
 
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {

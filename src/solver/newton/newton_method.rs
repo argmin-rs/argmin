@@ -93,9 +93,8 @@ use serde::{Deserialize, Serialize};
 pub struct Newton<O>
 where
     O: ArgminOp,
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
     /// gamma
     gamma: f64,
@@ -106,12 +105,11 @@ where
 impl<O> Newton<O>
 where
     O: ArgminOp,
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
     /// Constructor
-    pub fn new(cost_function: O, init_param: <O as ArgminOp>::Param) -> Self {
+    pub fn new(cost_function: O, init_param: O::Param) -> Self {
         Newton {
             gamma: 1.0,
             base: ArgminBase::new(cost_function, init_param),
@@ -134,13 +132,12 @@ where
 impl<O> ArgminIter for Newton<O>
 where
     O: ArgminOp,
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         let param = self.cur_param();

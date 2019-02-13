@@ -80,7 +80,7 @@ use serde::{Deserialize, Serialize};
 #[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct Landweber<O>
 where
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
     O: ArgminOp,
 {
     /// omgea
@@ -91,15 +91,11 @@ where
 
 impl<O> Landweber<O>
 where
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
     O: ArgminOp,
 {
     /// Constructor
-    pub fn new(
-        cost_function: O,
-        omega: f64,
-        init_param: <O as ArgminOp>::Param,
-    ) -> Result<Self, Error> {
+    pub fn new(cost_function: O, omega: f64, init_param: O::Param) -> Result<Self, Error> {
         Ok(Landweber {
             omega,
             base: ArgminBase::new(cost_function, init_param),
@@ -109,12 +105,12 @@ where
 
 impl<O> ArgminIter for Landweber<O>
 where
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
     O: ArgminOp,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         let param = self.cur_param();

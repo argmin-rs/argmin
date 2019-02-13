@@ -123,16 +123,15 @@ use serde::{Deserialize, Serialize};
 pub struct TrustRegion<O, R>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param:
-        ArgminMul<f64, <O as ArgminOp>::Param>
-            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
-            + ArgminNorm<f64>
-            + ArgminDot<<O as ArgminOp>::Param, f64>
-            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminZero
-            + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>
+        + ArgminDot<O::Param, f64>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminZero
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
     R: ArgminTrustRegion<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
     /// Radius
@@ -154,16 +153,15 @@ where
 impl<O, R> TrustRegion<O, R>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param:
-        ArgminMul<f64, <O as ArgminOp>::Param>
-            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
-            + ArgminNorm<f64>
-            + ArgminDot<<O as ArgminOp>::Param, f64>
-            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminZero
-            + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>
+        + ArgminDot<O::Param, f64>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminZero
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
     R: ArgminTrustRegion<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
     /// Constructor
@@ -171,7 +169,7 @@ where
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(operator: O, param: <O as ArgminOp>::Param, subproblem: R) -> Self {
+    pub fn new(operator: O, param: O::Param, subproblem: R) -> Self {
         let base = ArgminBase::new(operator, param);
         TrustRegion {
             radius: 1.0,
@@ -208,7 +206,7 @@ where
         Ok(self)
     }
 
-    fn m(&self, p: &<O as ArgminOp>::Param) -> f64 {
+    fn m(&self, p: &O::Param) -> f64 {
         self.fxk + p.dot(&self.cur_grad()) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
     }
 }
@@ -216,21 +214,20 @@ where
 impl<O, R> ArgminIter for TrustRegion<O, R>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param:
-        ArgminMul<f64, <O as ArgminOp>::Param>
-            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
-            + ArgminNorm<f64>
-            + ArgminDot<<O as ArgminOp>::Param, f64>
-            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminZero
-            + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>
+        + ArgminDot<O::Param, f64>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminZero
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
     R: ArgminTrustRegion<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
-    type Param = <O as ArgminOp>::Param;
+    type Param = O::Param;
     type Output = f64;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Hessian = O::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         let param = self.cur_param();
