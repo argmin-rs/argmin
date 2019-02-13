@@ -114,18 +114,18 @@ use std::default::Default;
 pub struct NonlinearConjugateGradient<O, L, B>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminDot<O::Param, f64>
         + ArgminNorm<f64>,
     L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
     B: ArgminNLCGBetaUpdate<O::Param>,
 {
     /// p
-    p: <O as ArgminOp>::Param,
+    p: O::Param,
     /// beta
     beta: f64,
     /// line search
@@ -143,12 +143,12 @@ where
 impl<O, L, B> NonlinearConjugateGradient<O, L, B>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminDot<O::Param, f64>
         + ArgminNorm<f64>,
     L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
     B: ArgminNLCGBetaUpdate<O::Param>,
@@ -156,12 +156,12 @@ where
     /// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))
     pub fn new(
         operator: O,
-        init_param: <O as ArgminOp>::Param,
+        init_param: O::Param,
         linesearch: L,
         beta_method: B,
     ) -> Result<Self, Error> {
         Ok(NonlinearConjugateGradient {
-            p: <O as ArgminOp>::Param::default(),
+            p: O::Param::default(),
             beta: std::f64::NAN,
             linesearch: Box::new(linesearch),
             beta_method: Box::new(beta_method),
@@ -196,19 +196,19 @@ where
 impl<O, L, B> ArgminIter for NonlinearConjugateGradient<O, L, B>
 where
     O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminDot<O::Param, f64>
         + ArgminNorm<f64>,
     L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
     B: ArgminNLCGBetaUpdate<O::Param>,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         let param = self.cur_param();
