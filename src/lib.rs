@@ -285,6 +285,123 @@
 //! # }
 //! ```
 //!
+//! # Checkpoints
+//!
+//! The longer an optimization runs, the higher the probability that something crashes.
+//! Particularly for optimizations which are running for days, weeks or even longer, this can
+//! become a problem. To mitigate this problem, it is possible in argmin to save checkpoints.
+//! Such a checkpoint is a serialization of an `ArgminSolver` object and can be loaded again and
+//! resumed.
+//! The `CheckpointMode` defines how often checkpoints are saved and is either `Never` (default),
+//! `Always` (every iteration) or `Every(u64)` (every Nth iteration). It is set via the setter
+//! method `set_checkpoint_mode()` which is implemented for every `ArgminSolver`.
+//! In addition, the directory where the checkpoints and a prefix for every file can be set via
+//! `set_checkpoint_dir()` and `set_checkpoint_prefix`, respectively.
+//!
+//! The following example illustrates the usage. Note that this example is only for illustration
+//! and does not make much sense.
+//!
+//! ```
+//! // [Imports omited]
+//!
+//! # extern crate argmin;
+//! # extern crate ndarray;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::solver::quasinewton::BFGS;
+//! # use argmin::testfunctions::rosenbrock;
+//! # use argmin_core::finitediff::*;
+//! # use ndarray::{array, Array1, Array2};
+//! # use serde::{Deserialize, Serialize};
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Array1<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = Array2<f64>;
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock(&p.to_vec(), self.a, self.b))
+//! #     }
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
+//! #     }
+//! # }
+//! # fn run() -> Result<(), Error> {
+//! // Define cost function
+//! let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//! let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+//! let init_hessian: Array2<f64> = Array2::eye(8);
+//! let linesearch = MoreThuenteLineSearch::new(cost.clone());
+//!
+//! // Set up solver
+//! let mut solver = BFGS::new(cost, init_param, init_hessian, linesearch);
+//!
+//! // Set maximum number of iterations
+//! solver.set_max_iters(30);
+//!
+//! // Attach a logger
+//! solver.add_logger(ArgminSlogLogger::term());
+//!
+//! // --------------------------------------------------------------------------------------------
+//! // Set up checkpoints
+//! // --------------------------------------------------------------------------------------------
+//!
+//! // Specify the directory where the checkpoints are saved
+//! solver.set_checkpoint_dir(".checkpoints");
+//!
+//! // Specifiy the prefix for each file
+//! solver.set_checkpoint_prefix("bfgs");
+//!
+//! // Set the `CheckpointMode` which can be `Never` (default),
+//! // `Always` (every iteration) or `Every(u64)` (every Nth iteration).
+//! solver.set_checkpoint_mode(CheckpointMode::Every(10));
+//!
+//! // Run solver
+//! solver.run()?;
+//! # // Wait a second (lets the logger flush everything before printing again)
+//! # std::thread::sleep(std::time::Duration::from_secs(1));
+//!
+//! println!("-------------------------------------------");
+//! println!("LOADING CHECKPOINT AND RUNNING SOLVER AGAIN");
+//! println!("-------------------------------------------");
+//!
+//! // now load the same solver from a checkpoint
+//! // In order to properly deserialize, the exact type of
+//! // the solver needs to be specified.
+//! let mut loaded_solver: BFGS<Rosenbrock, MoreThuenteLineSearch<Rosenbrock>> =
+//!     BFGS::from_checkpoint(".checkpoints/test_20.arg")?;
+//!
+//! // Loggers cannot be serialized, therefore they need to be added again
+//! loaded_solver.add_logger(ArgminSlogLogger::term());
+//!
+//! // Run solver
+//! loaded_solver.run()?;
+//! # // Wait a second (lets the logger flush everything before printing again)
+//! # std::thread::sleep(std::time::Duration::from_secs(1));
+//!
+//! // Print result
+//! println!("-------------------------------------------");
+//! println!("Initial run");
+//! println!("-------------------------------------------");
+//! println!("{}", solver.result());
+//!
+//! println!("-------------------------------------------");
+//! println!("Run from checkpoint");
+//! println!("-------------------------------------------");
+//! println!("{}", loaded_solver.result());
+//! #     Ok(())
+//! # }
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//! ```
+//!
 //! # Implementing an optimization algorithm
 //!
 //! In this section we are going to implement the Landweber solver, which essentially is a special
