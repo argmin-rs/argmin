@@ -404,7 +404,9 @@
 //!
 //! A more practical way of using the checkpoints feature is shown in the following example.
 //! This will either load an existing checkpoint if one exists or it will create a new solver. Type
-//! inference takes care of the return type of `ArgminSolver::from_checkpoint(...)`.
+//! inference takes care of the return type of `ArgminSolver::from_checkpoint(...)`. This way, the
+//! binary can easily be restarted after a crash and will automatically resume from the latest
+//! checkpoint.
 //!
 //! ```rust
 //! # extern crate argmin;
