@@ -60,7 +60,7 @@ fn run() -> Result<(), Error> {
     // Set up checkpoints
     // --------------------------------------------------------------------------------------------
     solver.set_checkpoint_dir(".checkpoints");
-    solver.set_checkpoint_prefix("test");
+    solver.set_checkpoint_name("bfgs_test");
     solver.set_checkpoint_mode(CheckpointMode::Every(20));
 
     // Run solver
@@ -75,7 +75,7 @@ fn run() -> Result<(), Error> {
 
     // now load the same solver from a checkpoint
     let mut loaded_solver: BFGS<Rosenbrock, MoreThuenteLineSearch<Rosenbrock>> =
-        BFGS::from_checkpoint(".checkpoints/test_20.arg")?;
+        BFGS::from_checkpoint(".checkpoints/bfgs_test.arg")?;
 
     // Loggers cannot be serialized, therefore they need to be added again
     loaded_solver.add_logger(ArgminSlogLogger::term());

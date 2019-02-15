@@ -353,7 +353,7 @@
 //! solver.set_checkpoint_dir(".checkpoints");
 //!
 //! // Specifiy the prefix for each file
-//! solver.set_checkpoint_prefix("bfgs");
+//! solver.set_checkpoint_name("bfgs");
 //!
 //! // Set the `CheckpointMode` which can be `Never` (default),
 //! // `Always` (every iteration) or `Every(u64)` (every Nth iteration).
@@ -372,7 +372,7 @@
 //! // In order to properly deserialize, the exact type of
 //! // the solver needs to be specified.
 //! let mut loaded_solver: BFGS<Rosenbrock, MoreThuenteLineSearch<Rosenbrock>> =
-//!     BFGS::from_checkpoint(".checkpoints/test_20.arg")?;
+//!     BFGS::from_checkpoint(".checkpoints/bfgs.arg")?;
 //!
 //! // Loggers cannot be serialized, therefore they need to be added again
 //! loaded_solver.add_logger(ArgminSlogLogger::term());

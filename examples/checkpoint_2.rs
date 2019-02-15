@@ -38,8 +38,6 @@ impl ArgminOp for Rosenbrock {
 fn run() -> Result<(), Error> {
     // checkpoint directory
 
-    let checkpoint_dir = ".checkpoints";
-    let checkpoint_prefix = "bfgs";
     // Define cost function
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
@@ -52,19 +50,19 @@ fn run() -> Result<(), Error> {
     let linesearch = MoreThuenteLineSearch::new(cost.clone());
 
     // Set up solver
-    let mut solver = match BFGS::from_latest_checkpoint(checkpoint_dir, checkpoint_prefix) {
+    let mut solver = match BFGS::from_checkpoint(".checkpoints/bfgs.arg") {
         Ok(solver) => solver,
         Err(_) => BFGS::new(cost, init_param, init_hessian, linesearch),
     };
 
     // Set maximum number of iterations
-    solver.set_max_iters(40);
+    solver.set_max_iters(45);
 
     // Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
 
-    solver.set_checkpoint_dir(checkpoint_dir);
-    solver.set_checkpoint_prefix(checkpoint_prefix);
+    solver.set_checkpoint_dir(".checkpoints");
+    solver.set_checkpoint_name("bfgs");
     solver.set_checkpoint_mode(CheckpointMode::Every(20));
 
     // Run solver
