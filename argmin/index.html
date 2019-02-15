@@ -263,7 +263,7 @@ and does not make much sense.</p>
 <span class="ident">solver</span>.<span class="ident">set_checkpoint_dir</span>(<span class="string">&quot;.checkpoints&quot;</span>);
 
 <span class="comment">// Specifiy the prefix for each file</span>
-<span class="ident">solver</span>.<span class="ident">set_checkpoint_prefix</span>(<span class="string">&quot;bfgs&quot;</span>);
+<span class="ident">solver</span>.<span class="ident">set_checkpoint_name</span>(<span class="string">&quot;bfgs&quot;</span>);
 
 <span class="comment">// Set the `CheckpointMode` which can be `Never` (default),</span>
 <span class="comment">// `Always` (every iteration) or `Every(u64)` (every Nth iteration).</span>
@@ -280,7 +280,7 @@ and does not make much sense.</p>
 <span class="comment">// In order to properly deserialize, the exact type of</span>
 <span class="comment">// the solver needs to be specified.</span>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">loaded_solver</span>: <span class="ident">BFGS</span><span class="op">&lt;</span><span class="ident">Rosenbrock</span>, <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Rosenbrock</span><span class="op">&gt;&gt;</span> <span class="op">=</span>
-    <span class="ident">BFGS</span>::<span class="ident">from_checkpoint</span>(<span class="string">&quot;.checkpoints/test_20.arg&quot;</span>)<span class="question-mark">?</span>;
+    <span class="ident">BFGS</span>::<span class="ident">from_checkpoint</span>(<span class="string">&quot;.checkpoints/bfgs.arg&quot;</span>)<span class="question-mark">?</span>;
 
 <span class="comment">// Loggers cannot be serialized, therefore they need to be added again</span>
 <span class="ident">loaded_solver</span>.<span class="ident">add_logger</span>(<span class="ident">ArgminSlogLogger</span>::<span class="ident">term</span>());

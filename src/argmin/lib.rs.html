@@ -884,7 +884,7 @@
 <span class="doccomment">//! solver.set_checkpoint_dir(&quot;.checkpoints&quot;);</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // Specifiy the prefix for each file</span>
-<span class="doccomment">//! solver.set_checkpoint_prefix(&quot;bfgs&quot;);</span>
+<span class="doccomment">//! solver.set_checkpoint_name(&quot;bfgs&quot;);</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // Set the `CheckpointMode` which can be `Never` (default),</span>
 <span class="doccomment">//! // `Always` (every iteration) or `Every(u64)` (every Nth iteration).</span>
@@ -903,7 +903,7 @@
 <span class="doccomment">//! // In order to properly deserialize, the exact type of</span>
 <span class="doccomment">//! // the solver needs to be specified.</span>
 <span class="doccomment">//! let mut loaded_solver: BFGS&lt;Rosenbrock, MoreThuenteLineSearch&lt;Rosenbrock&gt;&gt; =</span>
-<span class="doccomment">//!     BFGS::from_checkpoint(&quot;.checkpoints/test_20.arg&quot;)?;</span>
+<span class="doccomment">//!     BFGS::from_checkpoint(&quot;.checkpoints/bfgs.arg&quot;)?;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // Loggers cannot be serialized, therefore they need to be added again</span>
 <span class="doccomment">//! loaded_solver.add_logger(ArgminSlogLogger::term());</span>
