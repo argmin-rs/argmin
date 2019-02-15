@@ -299,7 +299,7 @@
 //! `set_checkpoint_dir()` and `set_checkpoint_prefix`, respectively.
 //!
 //! The following example illustrates the usage. Note that this example is only for illustration
-//! and does not make much sense.
+//! and does not make much sense. Please scroll down for a more practical example.
 //!
 //! ```
 //! // [Imports omited]
@@ -400,6 +400,71 @@
 //! #         std::process::exit(1);
 //! #     }
 //! # }
+//! ```
+//!
+//! A more practical way of using the checkpoints feature is shown in the following example.
+//! This will either load an existing checkpoint if one exists or it will create a new solver. Type
+//! inference takes care of the return type of `ArgminSolver::from_checkpoint(...)`.
+//!
+//! ```rust
+//! # extern crate argmin;
+//! # extern crate ndarray;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::solver::quasinewton::BFGS;
+//! # use argmin::testfunctions::rosenbrock;
+//! # use argmin_core::finitediff::*;
+//! # use ndarray::{array, Array1, Array2};
+//! # use serde::{Deserialize, Serialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Array1<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = Array2<f64>;
+//! #
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock(&p.to_vec(), self.a, self.b))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #     // checkpoint directory
+//! #
+//! #     // Define cost function
+//! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//! #
+//! #     // Define initial parameter vector
+//! #     // let init_param: Array1<f64> = array![-1.2, 1.0];
+//! #     let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+//! #     let init_hessian: Array2<f64> = Array2::eye(8);
+//! #
+//! #     // set up a line search
+//! #     let linesearch = MoreThuenteLineSearch::new(cost.clone());
+//! #
+//! #     // Set up solver
+//! let mut solver = match BFGS::from_checkpoint(".checkpoints/bfgs.arg") {
+//!     Ok(solver) => solver,
+//!     Err(_) => BFGS::new(cost, init_param, init_hessian, linesearch),
+//! };
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//!
 //! ```
 //!
 //! # Implementing an optimization algorithm
