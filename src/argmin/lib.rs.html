@@ -594,6 +594,8 @@
 <span id="594">594</span>
 <span id="595">595</span>
 <span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -1001,7 +1003,9 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! A more practical way of using the checkpoints feature is shown in the following example.</span>
 <span class="doccomment">//! This will either load an existing checkpoint if one exists or it will create a new solver. Type</span>
-<span class="doccomment">//! inference takes care of the return type of `ArgminSolver::from_checkpoint(...)`.</span>
+<span class="doccomment">//! inference takes care of the return type of `ArgminSolver::from_checkpoint(...)`. This way, the</span>
+<span class="doccomment">//! binary can easily be restarted after a crash and will automatically resume from the latest</span>
+<span class="doccomment">//! checkpoint.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # extern crate argmin;</span>
