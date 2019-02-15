@@ -456,6 +456,7 @@
 //!     Ok(solver) => solver,
 //!     Err(_) => BFGS::new(cost, init_param, init_hessian, linesearch),
 //! };
+//! #    Ok(())
 //! # }
 //! #
 //! # fn main() {
