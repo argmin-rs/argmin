@@ -494,18 +494,6 @@
 <span id="494">494</span>
 <span id="495">495</span>
 <span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -527,6 +515,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">argmin_codegen</span>::<span class="ident">ArgminSolver</span>;
 <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">rand_xorshift</span>::<span class="ident">XorShiftRng</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="doccomment">/// Temperature functions for Simulated Annealing.</span>
@@ -568,6 +557,7 @@
 <span class="doccomment">/// use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};</span>
 <span class="doccomment">/// use argmin::testfunctions::rosenbrock;</span>
 <span class="doccomment">/// use rand::prelude::*;</span>
+<span class="doccomment">/// use rand_xorshift::XorShiftRng;</span>
 <span class="doccomment">/// use std::sync::{Arc, Mutex};;</span>
 <span class="doccomment">/// use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">///</span>
@@ -584,13 +574,7 @@
 <span class="doccomment">///     /// Random number generator. We use a `Arc&lt;Mutex&lt;_&gt;&gt;` here because `ArgminOperator` requires</span>
 <span class="doccomment">///     /// `self` to be passed as an immutable reference. This gives us thread safe interior</span>
 <span class="doccomment">///     /// mutability.</span>
-<span class="doccomment">///     #[serde(skip)]</span>
-<span class="doccomment">///     #[serde(default = &quot;default_rng&quot;)]</span>
-<span class="doccomment">///     rng: Arc&lt;Mutex&lt;SmallRng&gt;&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn default_rng() -&gt; Arc&lt;Mutex&lt;SmallRng&gt;&gt; {</span>
-<span class="doccomment">///     Arc::new(Mutex::new(SmallRng::from_entropy()))</span>
+<span class="doccomment">///     rng: Arc&lt;Mutex&lt;XorShiftRng&gt;&gt;,</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl std::default::Default for Rosenbrock {</span>
@@ -609,7 +593,7 @@
 <span class="doccomment">///             b,</span>
 <span class="doccomment">///             lower_bound,</span>
 <span class="doccomment">///             upper_bound,</span>
-<span class="doccomment">///             rng: Arc::new(Mutex::new(SmallRng::from_entropy())),</span>
+<span class="doccomment">///             rng: Arc::new(Mutex::new(XorShiftRng::from_entropy())),</span>
 <span class="doccomment">///         }</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
@@ -777,17 +761,9 @@
     <span class="doccomment">/// previous cost</span>
     <span class="ident">prev_cost</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// random number generator</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_rng&quot;</span>)]</span>
-    <span class="ident">rng</span>: <span class="ident">SmallRng</span>,
+    <span class="ident">rng</span>: <span class="ident">XorShiftRng</span>,
     <span class="doccomment">/// base</span>
     <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-}
-
-<span class="comment">// fn default_rng() -&gt; Arc&lt;Mutex&lt;SmallRng&gt;&gt; {</span>
-<span class="kw">fn</span> <span class="ident">default_rng</span>() <span class="op">-&gt;</span> <span class="ident">SmallRng</span> {
-    <span class="comment">// Arc::new(Mutex::new(SmallRng::from_entropy()))</span>
-    <span class="ident">SmallRng</span>::<span class="ident">from_entropy</span>()
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
@@ -825,7 +801,7 @@
                 <span class="ident">reanneal_iter_best</span>: <span class="number">0</span>,
                 <span class="ident">cur_temp</span>: <span class="ident">init_temp</span>,
                 <span class="ident">prev_cost</span>,
-                <span class="ident">rng</span>: <span class="ident">SmallRng</span>::<span class="ident">from_entropy</span>(),
+                <span class="ident">rng</span>: <span class="ident">XorShiftRng</span>::<span class="ident">from_entropy</span>(),
                 <span class="ident">base</span>: <span class="ident">ArgminBase</span>::<span class="ident">new</span>(<span class="ident">cost_function</span>, <span class="ident">init_param</span>),
             })
         }
