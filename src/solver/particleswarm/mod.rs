@@ -180,9 +180,11 @@ where
             p.velocity = momentum.add(&pull_to_optimum).add(&pull_to_global_optimum);
             let new_position = p.position.add(&p.velocity);
 
-            p.position = new_position.project_to_range(
-                &self.search_region.0,
-                &self.search_region.1);
+            // Limit to search window:
+            p.position = O::Param::min(
+                &O::Param::max(&new_position, &self.search_region.0),
+                &self.search_region.1
+            );
 
             p.cost = self.cost_function.apply(&p.position)?;
             if p.cost < p.best_cost {
@@ -213,37 +215,6 @@ where
 }
 
 
-// TODO: move
-pub trait ProjectToRange
-{
-    fn project_to_range(&self, min: &Self, max: &Self) -> Self;
-}
-
-// TODO: move
-impl<Scalar> ProjectToRange for Vec<Scalar>
-    where Scalar: std::cmp::PartialOrd + Clone
-{
-     fn project_to_range(&self, min: &Self, max: &Self) -> Self
-    {
-        assert!(min.len() > 0);
-        assert_eq!(min.len(), max.len());
-        assert_eq!(self.len(), max.len());
-
-        self.iter().zip(min.iter().zip(max.iter())).map(|(x, (a, b))| {
-            if x < a {
-                a.clone()
-            } else if x < b {
-                x.clone()
-            } else {
-                b.clone()
-            }
-        }).collect()
-    }
-}
-
-
-
-
 pub trait Position
 : Clone
 + Default
@@ -252,7 +223,7 @@ pub trait Position
 + ArgminMul<f64, Self>
 + ArgminZero
 + ArgminRandom
-+ ProjectToRange
++ ArgminMinMax
 + std::fmt::Debug
 {}
 
@@ -264,7 +235,7 @@ impl<T> Position for T where T
 + ArgminMul<f64, Self>
 + ArgminZero
 + ArgminRandom
-+ ProjectToRange
++ ArgminMinMax
 + std::fmt::Debug
 {}
 
