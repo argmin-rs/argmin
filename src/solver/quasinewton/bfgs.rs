@@ -230,3 +230,14 @@ where
         Ok(out)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+    use crate::solver::linesearch::MoreThuenteLineSearch;
+
+    type Operator = MinimalNoOperator;
+
+    send_sync_test!(bfgs, BFGS<Operator, MoreThuenteLineSearch<Operator>>);
+}
