@@ -47,14 +47,16 @@ fn run() -> Result<(), Error> {
             cost_function.clone(),
             init_param,
             (vec![-4.0, -4.0], vec![4.0, 4.0]),
-            5,
+            100,
+            0.5,
+            0.0,
+            0.5,
         )?;
 
         // Attach a logger
         solver.add_logger(ArgminSlogLogger::term());
 
-        solver.set_max_iters(20);
-
+        solver.set_max_iters(50);
 
         let mut callback = move |xy: &Vec<f64>, c: f64, v: &Particles| visualizer.iteration(xy, c, &v);
         solver.set_iter_callback(&mut callback);
@@ -143,6 +145,8 @@ impl Visualizer {
 
         use gnuplot::*;
 
+        self.fg.clear_axes();
+
         let options_optima = [Color("#ffff00"), PointSize(2.0)];
         let options_particles = [Color("#ff0000"), PointSize(2.0)];
         let window = Some(self.surface.window);
@@ -155,6 +159,7 @@ impl Visualizer {
             .points(&self.particles_x, &self.particles_y, &self.particles_z, &options_particles)
             // .set_size(8.0, 8.0)
             // .set_pos(-4.0, -4.0)
+            .set_view(0., 0.)
             ;
         self.fg.show();
 
@@ -163,6 +168,8 @@ impl Visualizer {
     }
 
     fn iteration(&mut self, xy: &Vec<f64>, cost: f64, particles: &Particles) {
+
+        // self.fg = gnuplot::Figure::new();
 
         self.optima_x.clear();
         self.optima_y.clear();

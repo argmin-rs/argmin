@@ -66,6 +66,9 @@ where
         init_param: O::Param,
         search_region: (O::Param, O::Param),
         num_particles: usize,
+        weight_momentum: f64,
+        weight_particle: f64,
+        weight_swarm: f64,
     ) -> Result<Self, Error> {
 
         let rng = rand::thread_rng();
@@ -81,9 +84,9 @@ where
                 &search_region.0,
                 &search_region.1),
             best_cost: f64::INFINITY,
-            weight_momentum: 1.0,
-            weight_particle: 1.0,
-            weight_swarm: 1.0, // TODO: add to parameter list
+            weight_momentum: weight_momentum,
+            weight_particle: weight_particle,
+            weight_swarm: weight_swarm,
             search_region: search_region
         };
 
