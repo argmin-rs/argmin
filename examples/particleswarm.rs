@@ -47,13 +47,13 @@ fn run() -> Result<(), Error> {
             cost_function.clone(),
             init_param,
             (vec![-4.0, -4.0], vec![4.0, 4.0]),
-            10,
+            5,
         )?;
 
         // Attach a logger
         solver.add_logger(ArgminSlogLogger::term());
 
-        solver.set_max_iters(5);
+        solver.set_max_iters(20);
 
 
         let mut callback = move |xy: &Vec<f64>, c: f64, v: &Particles| visualizer.iteration(xy, c, &v);
@@ -153,6 +153,8 @@ impl Visualizer {
                 self.surface.height, window, &[])
             .points(&self.optima_x, &self.optima_y, &self.optima_z, &options_optima)
             .points(&self.particles_x, &self.particles_y, &self.particles_z, &options_particles)
+            // .set_size(8.0, 8.0)
+            // .set_pos(-4.0, -4.0)
             ;
         self.fg.show();
 
@@ -162,6 +164,9 @@ impl Visualizer {
 
     fn iteration(&mut self, xy: &Vec<f64>, cost: f64, particles: &Particles) {
 
+        self.optima_x.clear();
+        self.optima_y.clear();
+        self.optima_z.clear();
         self.optima_x.push(xy[0]);
         self.optima_y.push(xy[1]);
         self.optima_z.push(cost);

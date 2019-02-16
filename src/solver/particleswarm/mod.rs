@@ -45,6 +45,8 @@ where
     weight_momentum: f64,
     weight_particle: f64,
     weight_swarm: f64,
+
+    search_region: (O::Param, O::Param)
 }
 
 impl<'a, O> ParticleSwarm<'a, O>
@@ -82,9 +84,10 @@ where
             weight_momentum: 1.0,
             weight_particle: 1.0,
             weight_swarm: 1.0, // TODO: add to parameter list
+            search_region: search_region
         };
 
-        particle_swarm.initialize_particles(num_particles, &search_region);
+        particle_swarm.initialize_particles(num_particles);
 
         Ok(particle_swarm)
     }
@@ -93,9 +96,9 @@ where
         self.iter_callback = Some(callback);
     }
 
-    fn initialize_particles(&mut self, num_particles: usize, search_region: &(O::Param, O::Param)) {
+    fn initialize_particles(&mut self, num_particles: usize) {
         self.particles = (0..num_particles).map(
-                |_| self.initialize_particle(search_region)
+                |_| self.initialize_particle()
         ).collect();
 
         self.best_position = self.get_best_position();
@@ -103,8 +106,8 @@ where
         // TODO unwrap evil
     }
 
-    fn initialize_particle(&mut self, search_region: &(O::Param, O::Param)) -> Particle<O::Param> {
-        let (min, max) = search_region;
+    fn initialize_particle(&mut self) -> Particle<O::Param> {
+        let (min, max) = &self.search_region;
         let delta = max.sub(min);
         let delta_neg = delta.mul(&-1.0);
 
@@ -180,7 +183,11 @@ where
                     &self.weight_swarm);
 
             p.velocity = momentum.add(&pull_to_optimum).add(&pull_to_global_optimum);
-            p.position = p.position.add(&p.velocity);
+            let new_position = p.position.add(&p.velocity);
+
+            p.position = new_position.project_to_range(
+                &self.search_region.0,
+                &self.search_region.1);
 
             p.cost = self.cost_function.apply(&p.position)?;
             if p.cost < p.best_cost {
@@ -228,14 +235,47 @@ impl<Scalar> RandFromRange for Vec<Scalar>
         assert!(min.len() > 0);
         assert_eq!(min.len(), max.len());
 
-        if min.iter().zip(max.iter()).any(|(a, b)| a >= b) {
-            min.clone()
-        } else {
-            min.iter().zip(max.iter()).map(|(a, b)| rng.gen_range(a, b)).collect()
-        }
-
+        min.iter().zip(max.iter()).map(|(a, b)| {
+            if a == b {
+                a.clone()
+            } else if a < b {
+                rng.gen_range(a, b)
+            } else {
+                rng.gen_range(b, a)
+            }
+        }).collect()
     }
 }
+
+// TODO: move
+pub trait ProjectToRange
+{
+    fn project_to_range(&self, min: &Self, max: &Self) -> Self;
+}
+
+// TODO: move
+impl<Scalar> ProjectToRange for Vec<Scalar>
+    where Scalar: std::cmp::PartialOrd + Clone
+{
+     fn project_to_range(&self, min: &Self, max: &Self) -> Self
+    {
+        assert!(min.len() > 0);
+        assert_eq!(min.len(), max.len());
+        assert_eq!(self.len(), max.len());
+
+        self.iter().zip(min.iter().zip(max.iter())).map(|(x, (a, b))| {
+            if x < a {
+                a.clone()
+            } else if x < b {
+                x.clone()
+            } else {
+                b.clone()
+            }
+        }).collect()
+    }
+}
+
+
 
 
 pub trait Position
@@ -246,6 +286,7 @@ pub trait Position
 + ArgminMul<f64, Self>
 + ArgminZero
 + RandFromRange
++ ProjectToRange
 + std::fmt::Debug
 {}
 
@@ -257,6 +298,7 @@ impl<T> Position for T where T
 + ArgminMul<f64, Self>
 + ArgminZero
 + RandFromRange
++ ProjectToRange
 + std::fmt::Debug
 {}
 
