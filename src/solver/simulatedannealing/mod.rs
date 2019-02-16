@@ -18,6 +18,7 @@
 use crate::prelude::*;
 use argmin_codegen::ArgminSolver;
 use rand::prelude::*;
+use rand_xorshift::XorShiftRng;
 use serde::{Deserialize, Serialize};
 
 /// Temperature functions for Simulated Annealing.
@@ -268,17 +269,9 @@ where
     /// previous cost
     prev_cost: f64,
     /// random number generator
-    #[serde(skip)]
-    #[serde(default = "default_rng")]
-    rng: SmallRng,
+    rng: XorShiftRng,
     /// base
     base: ArgminBase<O>,
-}
-
-// fn default_rng() -> Arc<Mutex<SmallRng>> {
-fn default_rng() -> SmallRng {
-    // Arc::new(Mutex::new(SmallRng::from_entropy()))
-    SmallRng::from_entropy()
 }
 
 impl<O> SimulatedAnnealing<O>
@@ -316,7 +309,7 @@ where
                 reanneal_iter_best: 0,
                 cur_temp: init_temp,
                 prev_cost,
-                rng: SmallRng::from_entropy(),
+                rng: XorShiftRng::from_entropy(),
                 base: ArgminBase::new(cost_function, init_param),
             })
         }
