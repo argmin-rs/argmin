@@ -264,3 +264,20 @@ where
         Ok(self.hessian.dot(&p))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+    use crate::solver::linesearch::MoreThuenteLineSearch;
+
+    // Only works with ndarray feature because of the required inverse of a matrix
+    #[cfg(feature = "ndarrayl")]
+    type Operator = NoOperator<ndarray::Array1<f64>, f64, ndarray::Array2<f64>>;
+
+    // Only works with ndarray feature because of the required inverse of a matrix
+    #[cfg(feature = "ndarrayl")]
+    send_sync_test!(newton_cg, NewtonCG<Operator, MoreThuenteLineSearch<Operator>>);
+
+    send_sync_test!(cg_subproblem, CGSubProblem<Vec<f64>, Vec<Vec<f64>>>);
+}

@@ -148,3 +148,17 @@ where
         Ok(out)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    // Only works with ndarray feature because of the required inverse of a matrix
+    #[cfg(feature = "ndarrayl")]
+    type Operator = NoOperator<ndarray::Array1<f64>, f64, ndarray::Array2<f64>>;
+
+    // Only works with ndarray feature because of the required inverse of a matrix
+    #[cfg(feature = "ndarrayl")]
+    send_sync_test!(newton_method, Newton<Operator>);
+}
