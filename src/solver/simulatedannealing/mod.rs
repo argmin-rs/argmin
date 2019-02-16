@@ -29,8 +29,9 @@ use serde::{Deserialize, Serialize};
 /// * `SATempFunc::TemperatureFast`: `t_i = t_init / i`
 /// * `SATempFunc::Boltzmann`: `t_i = t_init / ln(i)`
 /// * `SATempFunc::Exponential`: `t_i = t_init * 0.95^i`
-/// * `SATempFunc::Custom`: User provided temperature update function which must have the function
-///   signature `&Fn(init_temp: f64, iteration_number: u64) -> f64`
+// /// * `SATempFunc::Custom`: User provided temperature update function which must have the function
+// ///   signature `&Fn(init_temp: f64, iteration_number: u64) -> f64`
+#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
 pub enum SATempFunc {
     /// `t_i = t_init / i`
     TemperatureFast,
@@ -38,9 +39,9 @@ pub enum SATempFunc {
     Boltzmann,
     /// `t_i = t_init * x^i`
     Exponential(f64),
-    /// User-provided temperature function. The first parameter must be the current temperature and
-    /// the second parameter must be the iteration number.
-    Custom(Box<Fn(f64, u64) -> f64>),
+    // /// User-provided temperature function. The first parameter must be the current temperature and
+    // /// the second parameter must be the iteration number.
+    // Custom(Box<Fn(f64, u64) -> f64>),
 }
 
 impl std::default::Default for SATempFunc {
@@ -234,7 +235,7 @@ where
     /// Initial temperature
     init_temp: f64,
     /// which temperature function?
-    #[serde(skip)]
+    // #[serde(skip)]
     temp_func: SATempFunc,
     /// Number of iterations used for the caluclation of temperature. This is needed for
     /// reannealing!
@@ -385,7 +386,7 @@ where
             SATempFunc::TemperatureFast => self.init_temp / ((self.temp_iter + 1) as f64),
             SATempFunc::Boltzmann => self.init_temp / ((self.temp_iter + 1) as f64).ln(),
             SATempFunc::Exponential(x) => self.init_temp * x.powf((self.temp_iter + 1) as f64),
-            SATempFunc::Custom(ref func) => func(self.init_temp, self.temp_iter),
+            // SATempFunc::Custom(ref func) => func(self.init_temp, self.temp_iter),
         };
     }
 
@@ -493,4 +494,14 @@ where
         ));
         Ok(out)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    type Operator = MinimalNoOperator;
+
+    send_sync_test!(sa, SimulatedAnnealing<Operator>);
 }
