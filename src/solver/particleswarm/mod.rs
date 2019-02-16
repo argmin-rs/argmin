@@ -8,9 +8,6 @@
 
 use crate::prelude::*;
 use argmin_codegen::ArgminSolver;
-// use rand;
-use rand::Rng;
-use rand::distributions::uniform::SampleUniform;
 use std;
 use std::default::Default;
 use argmin_core::ArgminAdd;
@@ -35,7 +32,6 @@ where
 {
     cost_function: O, // TODO: would not be necessary if apply was immut
     base: ArgminBase<O>,
-    rng: rand::prelude::ThreadRng,
     iter_callback: Option<&'a mut Callback<O::Param>>,
     particles: Vec<Particle<O::Param>>,
     best_position: O::Param,
@@ -71,16 +67,12 @@ where
         weight_swarm: f64,
     ) -> Result<Self, Error> {
 
-        let rng = rand::thread_rng();
-
         let mut particle_swarm = ParticleSwarm {
             cost_function: cost_function.clone(),
             base: ArgminBase::new(cost_function, init_param),
-            rng: rng.clone(),
             iter_callback: None,
             particles: vec![],
             best_position: O::Param::rand_from_range( // FIXME: random smart?
-                &mut rng.clone(),
                 &search_region.0,
                 &search_region.1),
             best_cost: f64::INFINITY,
@@ -114,12 +106,12 @@ where
         let delta = max.sub(min);
         let delta_neg = delta.mul(&-1.0);
 
-        let initial_position = O::Param::rand_from_range(&mut self.rng, min, max);
+        let initial_position = O::Param::rand_from_range(min, max);
         let initial_cost = self.apply(&initial_position).unwrap(); // TODO: unwrap evil?
 
         Particle {
             position: initial_position.clone(),
-            velocity: O::Param::rand_from_range(&mut self.rng, &delta_neg, &delta),
+            velocity: O::Param::rand_from_range(&delta_neg, &delta),
             cost: initial_cost,
             best_position: initial_position,
             best_cost: initial_cost,
@@ -175,14 +167,14 @@ where
             // ad 2)
             let to_optimum = p.best_position.sub(&p.position);
             let pull_to_optimum = Self::Param::rand_from_range(
-                &mut self.rng, &zero, &to_optimum);
+                &zero, &to_optimum);
             let pull_to_optimum = pull_to_optimum.mul(
                     &self.weight_particle);
 
             // ad 3)
             let to_global_optimum = self.best_position.sub(&p.position);
             let pull_to_global_optimum =
-                Self::Param::rand_from_range(&mut self.rng, &zero, &to_global_optimum).mul(
+                Self::Param::rand_from_range(&zero, &to_global_optimum).mul(
                     &self.weight_swarm);
 
             p.velocity = momentum.add(&pull_to_optimum).add(&pull_to_global_optimum);
@@ -220,35 +212,6 @@ where
     }
 }
 
-
-// TODO: use a generic function
-pub trait RandFromRange
-{
-    fn rand_from_range(rng: &mut rand::prelude::ThreadRng,
-                       min: &Self, max: &Self) -> Self;
-}
-
-// TODO: move
-impl<Scalar> RandFromRange for Vec<Scalar>
-    where Scalar: SampleUniform + std::cmp::PartialOrd + Clone
-{
-    fn rand_from_range(rng: &mut rand::prelude::ThreadRng,
-                       min: &Self, max: &Self) -> Self
-    {
-        assert!(min.len() > 0);
-        assert_eq!(min.len(), max.len());
-
-        min.iter().zip(max.iter()).map(|(a, b)| {
-            if a == b {
-                a.clone()
-            } else if a < b {
-                rng.gen_range(a, b)
-            } else {
-                rng.gen_range(b, a)
-            }
-        }).collect()
-    }
-}
 
 // TODO: move
 pub trait ProjectToRange
@@ -288,7 +251,7 @@ pub trait Position
 + ArgminSub<Self, Self>
 + ArgminMul<f64, Self>
 + ArgminZero
-+ RandFromRange
++ ArgminRandom
 + ProjectToRange
 + std::fmt::Debug
 {}
@@ -300,7 +263,7 @@ impl<T> Position for T where T
 + ArgminSub<Self, Self>
 + ArgminMul<f64, Self>
 + ArgminZero
-+ RandFromRange
++ ArgminRandom
 + ProjectToRange
 + std::fmt::Debug
 {}
