@@ -104,3 +104,11 @@ where
         self.set_cur_hessian(hessian);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    send_sync_test!(cauchypoint, CauchyPoint<MinimalNoOperator>);
+}

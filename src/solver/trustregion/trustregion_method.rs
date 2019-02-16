@@ -280,3 +280,14 @@ where
         Ok(out)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+    use crate::solver::trustregion::steihaug::Steihaug;
+
+    type Operator = MinimalNoOperator;
+
+    send_sync_test!(trustregion, TrustRegion<Operator, Steihaug<Operator>>);
+}

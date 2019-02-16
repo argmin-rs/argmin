@@ -167,3 +167,16 @@ where
         self.set_cur_hessian(hessian);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    // because of the requirement of ArgminInv on the Hessian, this needs the ndarrayl feature.
+    #[cfg(feature = "ndarrayl")]
+    send_sync_test!(
+        dogleg,
+        Dogleg<NoOperator<ndarray::Array1<f64>, f64, ndarray::Array2<f64>>>
+    );
+}
