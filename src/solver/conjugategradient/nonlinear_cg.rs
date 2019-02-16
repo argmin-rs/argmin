@@ -274,3 +274,21 @@ where
         Ok(out)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+    use crate::solver::conjugategradient::beta::PolakRibiere;
+    use crate::solver::linesearch::MoreThuenteLineSearch;
+    use crate::MinimalNoOperator;
+
+    send_sync_test!(
+        nonlinear_cg,
+        NonlinearConjugateGradient<
+            MinimalNoOperator,
+            MoreThuenteLineSearch<MinimalNoOperator>,
+            PolakRibiere,
+        >
+    );
+}
