@@ -644,3 +644,12 @@ where
         Ok(out)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+    use crate::MinimalNoOperator;
+
+    send_sync_test!(hagerzhang, HagerZhangLineSearch<MinimalNoOperator>);
+}

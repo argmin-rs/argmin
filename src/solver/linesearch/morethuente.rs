@@ -705,3 +705,12 @@ fn cstep(
 
     (stx_o, sty_o, stp_o, brackt, stpmin, stpmax, info)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+    use crate::MinimalNoOperator;
+
+    send_sync_test!(morethuente, MoreThuenteLineSearch<MinimalNoOperator>);
+}

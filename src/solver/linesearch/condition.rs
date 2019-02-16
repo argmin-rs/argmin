@@ -208,3 +208,14 @@ where
         false
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    send_sync_test!(goldstein, GoldsteinCondition);
+    send_sync_test!(armijo, ArmijoCondition);
+    send_sync_test!(wolfe, WolfeCondition);
+    send_sync_test!(strongwolfe, StrongWolfeCondition);
+}
