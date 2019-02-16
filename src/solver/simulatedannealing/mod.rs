@@ -60,6 +60,7 @@ impl std::default::Default for SATempFunc {
 /// use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 /// use argmin::testfunctions::rosenbrock;
 /// use rand::prelude::*;
+/// use rand_xorshift::XorShiftRng;
 /// use std::sync::{Arc, Mutex};;
 /// use serde::{Deserialize, Serialize};
 ///
@@ -76,13 +77,7 @@ impl std::default::Default for SATempFunc {
 ///     /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
 ///     /// `self` to be passed as an immutable reference. This gives us thread safe interior
 ///     /// mutability.
-///     #[serde(skip)]
-///     #[serde(default = "default_rng")]
-///     rng: Arc<Mutex<SmallRng>>,
-/// }
-///
-/// fn default_rng() -> Arc<Mutex<SmallRng>> {
-///     Arc::new(Mutex::new(SmallRng::from_entropy()))
+///     rng: Arc<Mutex<XorShiftRng>>,
 /// }
 ///
 /// impl std::default::Default for Rosenbrock {
@@ -101,7 +96,7 @@ impl std::default::Default for SATempFunc {
 ///             b,
 ///             lower_bound,
 ///             upper_bound,
-///             rng: Arc::new(Mutex::new(SmallRng::from_entropy())),
+///             rng: Arc::new(Mutex::new(XorShiftRng::from_entropy())),
 ///         }
 ///     }
 /// }
