@@ -57,7 +57,10 @@ fn run() -> Result<(), Error> {
     solver.add_logger(ArgminSlogLogger::term());
 
     // Attach a writer
-    solver.add_writer(WriteToFile::new());
+    solver.add_writer(WriteToFile::new("params"));
+
+    // Set how often parameter should be saved
+    solver.set_writer_mode(WriterMode::Every(3));
 
     // Run solver
     solver.run()?;
