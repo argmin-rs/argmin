@@ -14,6 +14,7 @@ use argmin::testfunctions::rosenbrock;
 use argmin_core::finitediff::*;
 use ndarray::{array, Array1, Array2};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Clone, Default, Serialize, Deserialize)]
 struct Rosenbrock {
@@ -56,8 +57,14 @@ fn run() -> Result<(), Error> {
     // Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
 
+    // Create writer
+    let mut writer = WriteToFile::new("params");
+
+    // Set serializer to JSON
+    writer.set_serializer(WriteToFileSerializer::JSON);
+
     // Attach a writer
-    solver.add_writer(WriteToFile::new("params"));
+    solver.add_writer(Arc::new(writer));
 
     // Set how often parameter should be saved
     solver.set_writer_mode(WriterMode::Every(3));
