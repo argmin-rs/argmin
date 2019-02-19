@@ -58,16 +58,26 @@ fn run() -> Result<(), Error> {
     solver.add_logger(ArgminSlogLogger::term());
 
     // Create writer
-    let mut writer = WriteToFile::new("params");
+    let mut writer = WriteToFile::new("params", "param");
+
+    // Only save every 3 iterations
+    writer.set_mode(WriterMode::Every(3));
 
     // Set serializer to JSON
     writer.set_serializer(WriteToFileSerializer::JSON);
 
-    // Attach a writer
-    solver.add_writer(Arc::new(writer));
+    // Create writer which only saves new best ones
+    let mut writer2 = WriteToFile::new("params", "best");
 
-    // Set how often parameter should be saved
-    solver.set_writer_mode(WriterMode::Every(3));
+    // Only save new best
+    writer2.set_mode(WriterMode::NewBest);
+
+    // Set serializer to JSON
+    writer2.set_serializer(WriteToFileSerializer::JSON);
+
+    // Attach writers
+    solver.add_writer(Arc::new(writer));
+    solver.add_writer(Arc::new(writer2));
 
     // Run solver
     solver.run()?;
