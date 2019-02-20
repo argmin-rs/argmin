@@ -470,6 +470,120 @@
 //!
 //! ```
 //!
+//! # Writers
+//!
+//! Writers can be used to handle parameter vectors in some way during the optimization
+//! (suggestions for a better name are more than welcome!). Usually, this can be used to save the
+//! intermediate parameter vectors somewhere. Currently, different modes are supported:
+//!
+//! * `WriterMode::Never`: Don't do anything.
+//! * `WriterMode::Always`: Process parameter vector in every iteration.
+//! * `WriterMode::Every(i)`: Process parameter vector in every i-th iteration.
+//! * `WriterMode::NewBest`: Process parameter vector whenever there is a new best one.
+//!
+//! The following example creates two writers of the type `WriteToFile` which serializes the
+//! parameter vector using either `serde_json` or `bincode`. The first writer saves the parameters
+//! in every third iteration (as JSON), while the second one saves only the new best ones (using
+//! `bincode`).
+//! Both are attached to a solver using the `add_writer(...)` method of `ArgminSolver` before the
+//! solver is run.
+//!
+//! ```rust
+//! // [Imports omited]
+//! # extern crate argmin;
+//! # extern crate ndarray;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::solver::quasinewton::BFGS;
+//! # use argmin::testfunctions::rosenbrock;
+//! # use argmin_core::finitediff::*;
+//! # use ndarray::{array, Array1, Array2};
+//! # use serde::{Deserialize, Serialize};
+//! # use std::sync::Arc;
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Array1<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = Array2<f64>;
+//! #
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock(&p.to_vec(), self.a, self.b))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #     // Define cost function
+//! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//! #
+//! #     // Define initial parameter vector
+//! #     // let init_param: Array1<f64> = array![-1.2, 1.0];
+//! #     let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+//! #     let init_hessian: Array2<f64> = Array2::eye(8);
+//! #
+//! #     // set up a line search
+//! #     let linesearch = MoreThuenteLineSearch::new(cost.clone());
+//! #
+//! #     // Set up solver
+//! #     let mut solver = BFGS::new(cost, init_param, init_hessian, linesearch);
+//! #
+//! #     // Set maximum number of iterations
+//! #     solver.set_max_iters(10);
+//! #
+//! #     // Attach a logger
+//! #     solver.add_logger(ArgminSlogLogger::term());
+//! #
+//! // Create writer
+//! let mut writer1 = WriteToFile::new("params", "param");
+//!
+//! // Only save every 3 iterations
+//! writer1.set_mode(WriterMode::Every(3));
+//!  
+//! // Set serializer to JSON
+//! writer1.set_serializer(WriteToFileSerializer::JSON);
+//!  
+//! // Create writer which only saves new best ones
+//! let mut writer2 = WriteToFile::new("params", "best");
+//!  
+//! // Only save new best
+//! writer2.set_mode(WriterMode::NewBest);
+//!  
+//! // Set serializer to `bincode`
+//! writer2.set_serializer(WriteToFileSerializer::Bincode);
+//!  
+//! // Attach writers
+//! solver.add_writer(Arc::new(writer1));
+//! solver.add_writer(Arc::new(writer2));
+//! #
+//! #     // Run solver
+//! #     solver.run()?;
+//! #
+//! #     // Wait a second (lets the logger flush everything before printing again)
+//! #     std::thread::sleep(std::time::Duration::from_secs(1));
+//! #
+//! #     // Print result
+//! #     println!("{}", solver.result());
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//!
+//! ```
+//!
 //! # Implementing an optimization algorithm
 //!
 //! In this section we are going to implement the Landweber solver, which essentially is a special
