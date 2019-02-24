@@ -57,6 +57,7 @@
 //!   - [Newton-CG](solver/newton/newton_cg/struct.NewtonCG.html)
 //! - [Quasi-Newton methods](solver/quasinewton/index.html)
 //!   - [BFGS](solver/quasinewton/bfgs/struct.BFGS.html)
+//!   - [DFP](solver/quasinewton/dfp/struct.DFP.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
 //!

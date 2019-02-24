@@ -59,6 +59,7 @@ Any help is appreciated!
   - Newton-CG
 - Quasi-Newton methods
   - BFGS
+  - DFP
 - Landweber iteration
 - Simulated Annealing
 
