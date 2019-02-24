@@ -15,5 +15,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 pub mod bfgs;
+pub mod dfp;
 
 pub use self::bfgs::*;
+pub use self::dfp::*;
