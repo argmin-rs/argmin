@@ -12,7 +12,6 @@
 
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
 
 /// DFP method
 ///
@@ -98,16 +97,14 @@ use std::fmt::Debug;
 pub struct DFP<O, L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: Debug
-        + ArgminSub<O::Param, O::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
         + ArgminMul<f64, O::Param>
         + ArgminTranspose,
-    O::Hessian: Debug
-        + ArgminSub<O::Hessian, O::Hessian>
+    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
@@ -127,16 +124,14 @@ where
 impl<O, L> DFP<O, L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: Debug
-        + ArgminSub<O::Param, O::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
         + ArgminMul<f64, O::Param>
         + ArgminTranspose,
-    O::Hessian: Debug
-        + ArgminSub<O::Hessian, O::Hessian>
+    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
@@ -163,16 +158,14 @@ where
 impl<O, L> ArgminIter for DFP<O, L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: Debug
-        + ArgminSub<O::Param, O::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
         + ArgminMul<f64, O::Param>
         + ArgminTranspose,
-    O::Hessian: Debug
-        + ArgminSub<O::Hessian, O::Hessian>
+    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
