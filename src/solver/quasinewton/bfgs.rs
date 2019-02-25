@@ -195,9 +195,9 @@ where
         self.linesearch.set_initial_parameter(param.clone());
         self.linesearch.set_initial_gradient(prev_grad.clone());
         self.linesearch.set_initial_cost(cur_cost);
-        self.linesearch
-            .set_search_direction(p.mul(&(1.0 / p.norm())));
-        // self.linesearch.set_search_direction(p);
+        // self.linesearch
+        //     .set_search_direction(p.mul(&(1.0 / p.norm())));
+        self.linesearch.set_search_direction(p);
         self.linesearch.run_fast()?;
 
         let linesearch_result = self.linesearch.result();
