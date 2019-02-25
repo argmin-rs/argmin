@@ -53,7 +53,7 @@ fn run() -> Result<(), Error> {
     let mut solver = DFP::new(cost, init_param, init_hessian, linesearch);
 
     // Set maximum number of iterations
-    solver.set_max_iters(800);
+    solver.set_max_iters(50);
 
     // Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
