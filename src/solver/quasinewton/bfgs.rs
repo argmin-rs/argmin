@@ -12,6 +12,7 @@
 
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
 /// BFGS method
 ///
@@ -94,16 +95,19 @@ use serde::{Deserialize, Serialize};
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver, Serialize, Deserialize)]
 #[stop("self.cur_grad().norm() < std::f64::EPSILON.sqrt()" => TargetPrecisionReached)]
+#[stop("(self.prev_cost() - self.cur_cost()).abs() < std::f64::EPSILON" => NoChangeInCost)]
 pub struct BFGS<O, L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
+    O::Param: Debug
+        + ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
         + ArgminMul<f64, O::Param>,
-    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
+    O::Hessian: Debug
+        + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
@@ -123,13 +127,15 @@ where
 impl<O, L> BFGS<O, L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
+    O::Param: Debug
+        + ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
         + ArgminMul<f64, O::Param>,
-    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
+    O::Hessian: Debug
+        + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
@@ -156,13 +162,15 @@ where
 impl<O, L> ArgminIter for BFGS<O, L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
+    O::Param: Debug
+        + ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
         + ArgminMul<f64, O::Param>,
-    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
+    O::Hessian: Debug
+        + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
@@ -223,6 +231,12 @@ where
 
         let sksk: Self::Hessian = sk.dot(&sk);
         let sksk = sksk.mul(&rhok);
+
+        // if self.cur_iter() == 0 {
+        //     let ykyk: f64 = yk.dot(&yk);
+        //     self.inv_hessian = self.inv_hessian.eye_like().mul(&(yksk / ykyk));
+        //     println!("{:?}", self.inv_hessian);
+        // }
 
         self.inv_hessian = tmp1.dot(&self.inv_hessian.dot(&tmp2)).add(&sksk);
 
