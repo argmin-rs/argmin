@@ -215,29 +215,25 @@ where
 }
 
 
-pub trait Position
-: Clone
-+ Default
-+ ArgminAdd<Self, Self>
-+ ArgminSub<Self, Self>
-+ ArgminMul<f64, Self>
-+ ArgminZero
-+ ArgminRandom
-+ ArgminMinMax
-+ std::fmt::Debug
-{}
+macro_rules! supertrait {
+    ($name:ident: $head:path $(, $tail:path)*) => {
+        pub trait $name : $head $(+ $tail)* {}
+        impl<T> $name for T where T: $head $(+ $tail)* {}
+    };
+}
 
-impl<T> Position for T where T
+supertrait!(Position
 : Clone
-+ Default
-+ ArgminAdd<Self, Self>
-+ ArgminSub<Self, Self>
-+ ArgminMul<f64, Self>
-+ ArgminZero
-+ ArgminRandom
-+ ArgminMinMax
-+ std::fmt::Debug
-{}
+, Default
+, ArgminAdd<Self, Self>
+, ArgminSub<Self, Self>
+, ArgminMul<f64, Self>
+, ArgminZero
+, ArgminRandom
+, ArgminMinMax
+, std::fmt::Debug
+);
+
 
 pub struct Particle<T: Position> {
     pub position: T,
