@@ -16,6 +16,8 @@
 
 pub mod bfgs;
 pub mod dfp;
+pub mod sr1;
 
 pub use self::bfgs::*;
 pub use self::dfp::*;
+pub use self::sr1::*;
