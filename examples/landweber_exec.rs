@@ -41,9 +41,6 @@ fn run() -> Result<(), Error> {
         .add_logger(ArgminSlogLogger::term())
         .set_max_iters(iters)
         .run()?;
-    // solver.set_max_iters(iters);
-    // solver.add_logger(ArgminSlogLogger::term());
-    // solver.run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)
     std::thread::sleep(std::time::Duration::from_secs(1));

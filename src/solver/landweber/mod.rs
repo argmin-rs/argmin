@@ -93,7 +93,7 @@ impl Landweber {
 impl<O> Solver<O> for Landweber
 where
     O: ArgminOp,
-    O::Param: Clone + ArgminScaledSub<O::Param, f64, O::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
 {
     fn next_iter<'a>(
         &mut self,
