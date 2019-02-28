@@ -77,45 +77,32 @@ use serde::{Deserialize, Serialize};
 /// [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
 /// kind. Amer. J. Math. 73, 615–624
 /// [1] https://en.wikipedia.org/wiki/Landweber_iteration
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct Landweber<O>
-where
-    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
-    O: ArgminOp,
-{
+#[derive(Serialize, Deserialize)]
+pub struct Landweber {
     /// omgea
     omega: f64,
-    /// Base stuff
-    base: ArgminBase<O>,
 }
 
-impl<O> Landweber<O>
-where
-    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
-    O: ArgminOp,
-{
+impl Landweber {
     /// Constructor
-    pub fn new(cost_function: O, omega: f64, init_param: O::Param) -> Result<Self, Error> {
-        Ok(Landweber {
-            omega,
-            base: ArgminBase::new(cost_function, init_param),
-        })
+    pub fn new(omega: f64) -> Result<Self, Error> {
+        Ok(Landweber { omega })
     }
 }
 
-impl<O> ArgminIter for Landweber<O>
+impl<O> Solver<O> for Landweber
 where
-    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
     O: ArgminOp,
+    O::Param: Clone + ArgminScaledSub<O::Param, f64, O::Param>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let param = self.cur_param();
-        let grad = self.gradient(&param)?;
-        let new_param = param.scaled_sub(&self.omega, &grad);
+    fn next_iter<'a>(
+        &mut self,
+        op: &mut OpWrapper<'a, O>,
+        cur_param: &O::Param,
+    ) -> Result<ArgminIterData<O::Param>, Error> {
+        // let param = self.cur_param();
+        let grad = op.gradient(cur_param)?;
+        let new_param = cur_param.scaled_sub(&self.omega, &grad);
         let out = ArgminIterData::new(new_param, 0.0);
         Ok(out)
     }
@@ -126,5 +113,5 @@ mod tests {
     use super::*;
     use crate::send_sync_test;
 
-    send_sync_test!(landweber, Landweber<MinimalNoOperator>);
+    send_sync_test!(landweber, Landweber);
 }

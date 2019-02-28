@@ -684,8 +684,6 @@
 #![deny(clippy::float_cmp)]
 
 extern crate argmin_core;
-#[macro_use]
-extern crate argmin_codegen;
 extern crate argmin_testfunctions;
 extern crate rand;
 
