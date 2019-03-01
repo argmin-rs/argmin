@@ -98,11 +98,10 @@ where
     fn next_iter<'a>(
         &mut self,
         op: &mut OpWrapper<'a, O>,
-        cur_param: &O::Param,
+        state: IterState<O::Param, O::Hessian>,
     ) -> Result<ArgminIterData<O::Param>, Error> {
-        // let param = self.cur_param();
-        let grad = op.gradient(cur_param)?;
-        let new_param = cur_param.scaled_sub(&self.omega, &grad);
+        let grad = op.gradient(&state.cur_param)?;
+        let new_param = state.cur_param.scaled_sub(&self.omega, &grad);
         let out = ArgminIterData::new(new_param, 0.0);
         Ok(out)
     }
