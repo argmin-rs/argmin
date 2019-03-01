@@ -697,9 +697,6 @@ pub mod solver;
 #[macro_use]
 mod macros;
 
-// #[cfg(test)]
-// use macros::*;
-
 use argmin_core::*;
 
 /// Testfunctions

@@ -107,68 +107,58 @@ use serde::{Deserialize, Serialize};
 /// Springer. ISBN 0-387-30303-0.
 ///
 /// [1] Wikipedia: https://en.wikipedia.org/wiki/Backtracking_line_search
-#[derive(ArgminSolver, Serialize, Deserialize)]
-#[stop("self.eval_condition()" => LineSearchConditionMet)]
-pub struct BacktrackingLineSearch<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>,
-    L: LineSearchCondition<O::Param>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct BacktrackingLineSearch<P, L> {
     /// initial parameter vector
-    init_param: O::Param,
+    init_param: Option<P>,
     /// initial cost
-    init_cost: f64,
+    init_cost: Option<f64>,
     /// initial gradient
-    init_grad: O::Param,
+    init_grad: Option<P>,
     /// Search direction
-    search_direction: O::Param,
+    search_direction: Option<P>,
     /// Contraction factor rho
     rho: f64,
     /// Stopping condition
     condition: Box<L>,
     /// alpha
     alpha: f64,
-    /// base
-    base: ArgminBase<O>,
 }
 
-impl<O, L> BacktrackingLineSearch<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>,
-    L: LineSearchCondition<O::Param>,
-{
-    /// Constructor
-    ///
-    /// Parameters:
-    ///
-    /// `operator`: Must implement `ArgminOp`
-    pub fn new(operator: O, condition: L) -> Self {
+impl<P, L> BacktrackingLineSearch<P, L> {
+    pub fn new(condition: L) -> Self {
         BacktrackingLineSearch {
-            init_param: O::Param::default(),
-            init_cost: std::f64::INFINITY,
-            init_grad: O::Param::default(),
-            search_direction: O::Param::default(),
+            init_param: None,
+            init_cost: None,
+            init_grad: None,
+            search_direction: None,
             rho: 0.9,
             condition: Box::new(condition),
             alpha: 1.0,
-            base: ArgminBase::new(operator, O::Param::default()),
         }
     }
 
-    /// set current gradient value
-    pub fn set_cur_grad(&mut self, grad: O::Param) -> &mut Self {
-        self.base.set_cur_grad(grad);
+    pub fn init_param(mut self, param: P) -> Self {
+        self.init_param = Some(param);
         self
     }
 
-    /// Set contraction factor rho
-    pub fn set_rho(&mut self, rho: f64) -> Result<&mut Self, Error> {
+    pub fn init_grad(mut self, grad: P) -> Self {
+        self.init_grad = Some(grad);
+        self
+    }
+
+    pub fn search_direction(mut self, direction: P) -> Self {
+        self.search_direction = Some(direction);
+        self
+    }
+
+    pub fn init_cost(mut self, init_cost: f64) -> Self {
+        self.init_cost = Some(init_cost);
+        self
+    }
+
+    pub fn rho(mut self, rho: f64) -> Result<Self, Error> {
         if rho <= 0.0 || rho >= 1.0 {
             return Err(ArgminError::InvalidParameter {
                 text: "BacktrackingLineSearch: Contraction factor rho must be in (0, 1)."
@@ -180,39 +170,25 @@ where
         Ok(self)
     }
 
-    fn eval_condition(&self) -> bool {
-        self.condition.eval(
-            self.cur_cost(),
-            self.cur_grad(),
-            self.init_cost,
-            self.init_grad.clone(),
-            self.search_direction.clone(),
-            self.alpha,
-        )
+    pub fn alpha(mut self, alpha: f64) -> Self {
+        self.alpha = alpha;
+        self
     }
 }
 
-impl<O, L> ArgminLineSearch for BacktrackingLineSearch<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>,
-    L: LineSearchCondition<O::Param>,
-{
+impl<P, L> ArgminLineSearch<P> for BacktrackingLineSearch<P, L> {
     /// Set search direction
-    fn set_search_direction(&mut self, search_direction: O::Param) {
-        self.search_direction = search_direction;
+    fn set_search_direction(&mut self, search_direction: P) {
+        self.search_direction = Some(search_direction);
     }
 
     /// Set initial parameter
-    fn set_initial_parameter(&mut self, param: O::Param) {
-        self.init_param = param.clone();
-        self.set_cur_param(param);
+    fn set_init_param(&mut self, param: P) {
+        self.init_param = Some(param);
     }
 
     /// Set initial alpha value
-    fn set_initial_alpha(&mut self, alpha: f64) -> Result<(), Error> {
+    fn set_init_alpha(&mut self, alpha: f64) -> Result<(), Error> {
         if alpha <= 0.0 {
             return Err(ArgminError::InvalidParameter {
                 text: "LineSearch: Inital alpha must be > 0.".to_string(),
@@ -224,58 +200,88 @@ where
     }
 
     /// Set initial cost function value
-    fn set_initial_cost(&mut self, init_cost: f64) {
-        self.init_cost = init_cost;
+    fn set_init_cost(&mut self, init_cost: f64) {
+        self.init_cost = Some(init_cost);
     }
 
     /// Set initial gradient
-    fn set_initial_gradient(&mut self, init_grad: O::Param) {
-        self.init_grad = init_grad;
-    }
-
-    /// Calculate initial cost function value
-    fn calc_initial_cost(&mut self) -> Result<(), Error> {
-        let tmp = self.cur_param();
-        self.init_cost = self.apply(&tmp)?;
-        Ok(())
-    }
-
-    /// Calculate initial cost function value
-    fn calc_initial_gradient(&mut self) -> Result<(), Error> {
-        let tmp = self.cur_param();
-        self.init_grad = self.gradient(&tmp)?;
-        Ok(())
+    fn set_init_grad(&mut self, init_grad: P) {
+        self.init_grad = Some(init_grad);
     }
 }
 
-impl<O, L> ArgminIter for BacktrackingLineSearch<O, L>
+impl<O, P, L> Solver<O> for BacktrackingLineSearch<P, L>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>,
-    L: LineSearchCondition<O::Param>,
+    P: Clone + Serialize,
+    O: ArgminOp<Param = P, Output = f64>,
+    P: ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
+    L: LineSearchCondition<P>,
 {
-    type Param = O::Param;
-    type Output = f64;
-    type Hessian = O::Hessian;
-
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let new_param = self
-            .init_param
-            .scaled_add(&self.alpha, &self.search_direction);
-
-        let cur_cost = self.apply(&new_param)?;
-
-        if self.condition.requires_cur_grad() {
-            let grad = self.gradient(&new_param)?;
-            self.set_cur_grad(grad);
+    fn init(&mut self) -> Result<(), Error> {
+        if self.init_param.is_none() {
+            return Err(ArgminError::NotInitialized {
+                text: "BacktrackingLineSearch: init_param must be set.".to_string(),
+            }
+            .into());
         }
+        if self.init_cost.is_none() {
+            return Err(ArgminError::NotInitialized {
+                text: "BacktrackingLineSearch: init_cost must be set.".to_string(),
+            }
+            .into());
+        }
+        if self.init_grad.is_none() {
+            return Err(ArgminError::NotInitialized {
+                text: "BacktrackingLineSearch: init_grad must be set.".to_string(),
+            }
+            .into());
+        }
+        if self.search_direction.is_none() {
+            return Err(ArgminError::NotInitialized {
+                text: "BacktrackingLineSearch: search_direction must be set.".to_string(),
+            }
+            .into());
+        }
+        Ok(())
+    }
+
+    fn next_iter<'a>(
+        &mut self,
+        op: &mut OpWrapper<'a, O>,
+        _state: IterState<P, O::Hessian>,
+    ) -> Result<ArgminIterData<P, P>, Error> {
+        // this can't go wrong
+        let init_param = self.init_param.clone().unwrap();
+        let search_direction = self.search_direction.clone().unwrap();
+
+        let new_param = init_param.scaled_add(&self.alpha, &search_direction);
+
+        let cur_cost = op.apply(&new_param)?;
 
         self.alpha *= self.rho;
 
-        let out = ArgminIterData::new(new_param, cur_cost);
+        let mut out = ArgminIterData::new(new_param.clone(), cur_cost);
+
+        if self.condition.requires_cur_grad() {
+            let grad = op.gradient(&new_param)?;
+            out.set_grad(grad);
+        }
         Ok(out)
+    }
+
+    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        if self.condition.eval(
+            state.cur_cost,
+            state.cur_grad.clone(),
+            self.init_cost.clone().unwrap(),
+            self.init_grad.clone().unwrap(),
+            self.search_direction.clone().unwrap(),
+            self.alpha,
+        ) {
+            TerminationReason::LineSearchConditionMet
+        } else {
+            TerminationReason::NotTerminated
+        }
     }
 }
 

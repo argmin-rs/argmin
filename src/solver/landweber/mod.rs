@@ -99,7 +99,7 @@ where
         &mut self,
         op: &mut OpWrapper<'a, O>,
         state: IterState<O::Param, O::Hessian>,
-    ) -> Result<ArgminIterData<O::Param>, Error> {
+    ) -> Result<ArgminIterData<O::Param, O::Param>, Error> {
         let grad = op.gradient(&state.cur_param)?;
         let new_param = state.cur_param.scaled_sub(&self.omega, &grad);
         let out = ArgminIterData::new(new_param, 0.0);
