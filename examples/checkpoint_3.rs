@@ -37,16 +37,14 @@ fn run() -> Result<(), Error> {
     let iters = 35;
     let solver = Landweber::new(0.001)?;
 
-    let res = match Executor::from_checkpoint(".checkpoints/landweber_exec.arg") {
-        Ok(exec) => exec,
-        Err(_) => Executor::new(operator, solver, init_param)
-            .set_max_iters(iters)
-            .checkpoint_dir(".checkpoints")
-            .checkpoint_name("landweber_exec")
-            .checkpoint_mode(CheckpointMode::Every(20)),
-    }
-    .add_logger(ArgminSlogLogger::term())
-    .run()?;
+    let res = Executor::from_checkpoint(".checkpoints/landweber_exec.arg")
+        .unwrap_or(Executor::new(operator, solver, init_param))
+        .set_max_iters(iters)
+        .checkpoint_dir(".checkpoints")
+        .checkpoint_name("landweber_exec")
+        .checkpoint_mode(CheckpointMode::Every(20))
+        .add_logger(ArgminSlogLogger::term())
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)
     std::thread::sleep(std::time::Duration::from_secs(1));
