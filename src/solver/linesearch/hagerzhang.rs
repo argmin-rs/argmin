@@ -505,9 +505,6 @@ where
     }
 }
 
-// #[stop("self.best_f - self.finit < self.delta * self.best_x * self.dginit" => LineSearchConditionMet)]
-// #[stop("self.best_g > self.sigma * self.dginit" => LineSearchConditionMet)]
-// #[stop("(2.0*self.delta - 1.0)*self.dginit >= self.best_g && self.best_g >= self.sigma * self.dginit && self.best_f <= self.finit + self.epsilon_k" => LineSearchConditionMet)]
 impl<P, O> Solver<O> for HagerZhangLineSearch<P>
 where
     O: ArgminOp<Param = P, Output = f64>,
@@ -518,7 +515,10 @@ where
         + ArgminDot<P, f64>
         + ArgminScaledAdd<P, f64, P>,
 {
-    fn init<'a>(&mut self, op: &mut OpWrapper<'a, O>) -> Result<(), Error> {
+    fn init<'a>(
+        &mut self,
+        op: &mut OpWrapper<'a, O>,
+    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
                 text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),
@@ -568,11 +568,11 @@ where
         let new_param = self
             .init_param
             .scaled_add(&self.best_x, &self.search_direction);
-        self.set_best_param(new_param);
+        // self.set_best_param(new_param);
         let best_f = self.best_f;
-        self.set_best_cost(best_f);
+        // self.set_best_cost(best_f);
 
-        Ok(())
+        Ok(Some(ArgminIterData::new(new_param, best_f)))
     }
 
     fn next_iter<'a>(
@@ -617,6 +617,22 @@ where
             .scaled_add(&self.best_x, &self.search_direction);
         let out = ArgminIterData::new(new_param, self.best_f);
         Ok(out)
+    }
+
+    fn terminate(&mut self, _state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        if self.best_f - self.finit < self.delta * self.best_x * self.dginit {
+            return TerminationReason::LineSearchConditionMet;
+        }
+        if self.best_g > self.sigma * self.dginit {
+            return TerminationReason::LineSearchConditionMet;
+        }
+        if (2.0 * self.delta - 1.0) * self.dginit >= self.best_g
+            && self.best_g >= self.sigma * self.dginit
+            && self.best_f <= self.finit + self.epsilon_k
+        {
+            return TerminationReason::LineSearchConditionMet;
+        }
+        TerminationReason::NotTerminated
     }
 }
 

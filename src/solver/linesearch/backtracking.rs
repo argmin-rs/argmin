@@ -194,7 +194,10 @@ where
     P: ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
     L: LineSearchCondition<P>,
 {
-    fn init<'a>(&mut self, _op: &mut OpWrapper<'a, O>) -> Result<(), Error> {
+    fn init<'a>(
+        &mut self,
+        _op: &mut OpWrapper<'a, O>,
+    ) -> Result<Option<ArgminIterData<O::Param, O::Param>>, Error> {
         if self.init_param.is_none() {
             return Err(ArgminError::NotInitialized {
                 text: "BacktrackingLineSearch: init_param must be set.".to_string(),
@@ -219,7 +222,7 @@ where
             }
             .into());
         }
-        Ok(())
+        Ok(None)
     }
 
     fn next_iter<'a>(
