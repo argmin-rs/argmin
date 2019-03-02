@@ -28,12 +28,12 @@
 pub mod backtracking;
 /// Acceptance conditions
 pub mod condition;
-// /// Hager-Zhang line search algorithm
-// pub mod hagerzhang;
+/// Hager-Zhang line search algorithm
+pub mod hagerzhang;
 /// More-Thuente line search algorithm
 pub mod morethuente;
 
 pub use self::backtracking::*;
 pub use self::condition::*;
-// pub use self::hagerzhang::*;
+pub use self::hagerzhang::*;
 pub use self::morethuente::*;
