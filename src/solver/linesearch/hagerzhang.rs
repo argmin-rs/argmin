@@ -474,9 +474,8 @@ where
     }
 }
 
-impl<P, O> ArgminLineSearch<O> for HagerZhangLineSearch<P>
+impl<P> ArgminLineSearch<P> for HagerZhangLineSearch<P>
 where
-    O: ArgminOp<Param = P, Output = f64>,
     P: Clone
         + Default
         + Serialize

@@ -153,11 +153,10 @@ impl<P, L> BacktrackingLineSearch<P, L> {
     }
 }
 
-impl<P, L, O> ArgminLineSearch<O> for BacktrackingLineSearch<P, L>
+impl<P, L> ArgminLineSearch<P> for BacktrackingLineSearch<P, L>
 where
     P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
     L: LineSearchCondition<P>,
-    O: ArgminOp<Param = P, Output = f64>,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {

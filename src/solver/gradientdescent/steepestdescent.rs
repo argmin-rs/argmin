@@ -123,7 +123,7 @@ where
         + ArgminSub<O::Param, O::Param>
         + ArgminNorm<f64>,
     O::Hessian: Default,
-    L: Clone + ArgminLineSearch<OpWrapper<O>>,
+    L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
     /// Perform one iteration of SA algorithm
     fn next_iter(

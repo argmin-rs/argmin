@@ -255,9 +255,8 @@ impl<P: Default> MoreThuenteLineSearch<P> {
     }
 }
 
-impl<P, O> ArgminLineSearch<O> for MoreThuenteLineSearch<P>
+impl<P> ArgminLineSearch<P> for MoreThuenteLineSearch<P>
 where
-    O: ArgminOp<Param = P, Output = f64>,
     P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
 {
     /// Set search direction
