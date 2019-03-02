@@ -95,9 +95,9 @@ where
     O: ArgminOp,
     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
 {
-    fn next_iter<'a>(
+    fn next_iter(
         &mut self,
-        op: &mut OpWrapper<'a, O>,
+        op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
     ) -> Result<ArgminIterData<O::Param, O::Param>, Error> {
         let grad = op.gradient(&state.cur_param)?;

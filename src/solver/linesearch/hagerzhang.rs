@@ -332,9 +332,9 @@ where
         Ok(self)
     }
 
-    fn update<'a, O: ArgminOp<Param = P, Output = f64>>(
+    fn update<O: ArgminOp<Param = P, Output = f64>>(
         &mut self,
-        op: &mut OpWrapper<'a, O>,
+        op: &mut OpWrapper<O>,
         (a_x, a_f, a_g): Triplet,
         (b_x, b_f, b_g): Triplet,
         (c_x, c_f, c_g): Triplet,
@@ -392,9 +392,9 @@ where
     }
 
     /// double secant step
-    fn secant2<'a, O: ArgminOp<Param = P, Output = f64>>(
+    fn secant2<O: ArgminOp<Param = P, Output = f64>>(
         &mut self,
-        op: &mut OpWrapper<'a, O>,
+        op: &mut OpWrapper<O>,
         (a_x, a_f, a_g): Triplet,
         (b_x, b_f, b_g): Triplet,
     ) -> Result<(Triplet, Triplet), Error> {
@@ -434,18 +434,18 @@ where
         }
     }
 
-    fn calc<'a, O: ArgminOp<Param = P, Output = f64>>(
+    fn calc<O: ArgminOp<Param = P, Output = f64>>(
         &mut self,
-        op: &mut OpWrapper<'a, O>,
+        op: &mut OpWrapper<O>,
         alpha: f64,
     ) -> Result<f64, Error> {
         let tmp = self.init_param.scaled_add(&alpha, &self.search_direction);
         op.apply(&tmp)
     }
 
-    fn calc_grad<'a, O: ArgminOp<Param = P, Output = f64>>(
+    fn calc_grad<O: ArgminOp<Param = P, Output = f64>>(
         &mut self,
-        op: &mut OpWrapper<'a, O>,
+        op: &mut OpWrapper<O>,
         alpha: f64,
     ) -> Result<f64, Error> {
         let tmp = self.init_param.scaled_add(&alpha, &self.search_direction);
@@ -474,9 +474,15 @@ where
     }
 }
 
-impl<P> ArgminLineSearch<P> for HagerZhangLineSearch<P>
+impl<P, O> ArgminLineSearch<O> for HagerZhangLineSearch<P>
 where
-    P: Clone,
+    O: ArgminOp<Param = P, Output = f64>,
+    P: Clone
+        + Default
+        + Serialize
+        + ArgminSub<P, P>
+        + ArgminDot<P, f64>
+        + ArgminScaledAdd<P, f64, P>,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {
@@ -515,10 +521,7 @@ where
         + ArgminDot<P, f64>
         + ArgminScaledAdd<P, f64, P>,
 {
-    fn init<'a>(
-        &mut self,
-        op: &mut OpWrapper<'a, O>,
-    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
+    fn init(&mut self, op: &mut OpWrapper<O>) -> Result<Option<ArgminIterData<P, P>>, Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
                 text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),
@@ -575,9 +578,9 @@ where
         Ok(Some(ArgminIterData::new(new_param, best_f)))
     }
 
-    fn next_iter<'a>(
+    fn next_iter(
         &mut self,
-        op: &mut OpWrapper<'a, O>,
+        op: &mut OpWrapper<O>,
         _state: IterState<P, O::Hessian>,
     ) -> Result<ArgminIterData<P, P>, Error> {
         // L1

@@ -41,6 +41,9 @@ fn run() -> Result<(), Error> {
     // The following parameters do not follow the builder pattern because they are part of the
     // ArgminLineSearch trait which needs to be object safe.
 
+    // Set initial position
+    solver.set_init_param(init_param.clone());
+
     // Set search direction
     solver.set_search_direction(vec![-1.5, 0.0]);
 
@@ -49,9 +52,6 @@ fn run() -> Result<(), Error> {
 
     // Set initial gradient
     solver.set_init_grad(operator.gradient(&init_param)?);
-
-    // Set initial position
-    solver.set_init_param(init_param.clone());
 
     // Set initial step length
     solver.set_init_alpha(1.0)?;

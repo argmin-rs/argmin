@@ -153,7 +153,12 @@ impl<P, L> BacktrackingLineSearch<P, L> {
     }
 }
 
-impl<P, L> ArgminLineSearch<P> for BacktrackingLineSearch<P, L> {
+impl<P, L, O> ArgminLineSearch<O> for BacktrackingLineSearch<P, L>
+where
+    P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
+    L: LineSearchCondition<P>,
+    O: ArgminOp<Param = P, Output = f64>,
+{
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {
         self.search_direction = Some(search_direction);
@@ -189,14 +194,13 @@ impl<P, L> ArgminLineSearch<P> for BacktrackingLineSearch<P, L> {
 
 impl<O, P, L> Solver<O> for BacktrackingLineSearch<P, L>
 where
-    P: Clone + Serialize,
+    P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
     O: ArgminOp<Param = P, Output = f64>,
-    P: ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
     L: LineSearchCondition<P>,
 {
-    fn init<'a>(
+    fn init(
         &mut self,
-        _op: &mut OpWrapper<'a, O>,
+        _op: &mut OpWrapper<O>,
     ) -> Result<Option<ArgminIterData<O::Param, O::Param>>, Error> {
         if self.init_param.is_none() {
             return Err(ArgminError::NotInitialized {
@@ -225,9 +229,9 @@ where
         Ok(None)
     }
 
-    fn next_iter<'a>(
+    fn next_iter(
         &mut self,
-        op: &mut OpWrapper<'a, O>,
+        op: &mut OpWrapper<O>,
         _state: IterState<P, O::Hessian>,
     ) -> Result<ArgminIterData<P, P>, Error> {
         // this can't go wrong

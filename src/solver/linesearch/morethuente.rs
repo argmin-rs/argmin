@@ -255,7 +255,11 @@ impl<P: Default> MoreThuenteLineSearch<P> {
     }
 }
 
-impl<P: Clone> ArgminLineSearch<P> for MoreThuenteLineSearch<P> {
+impl<P, O> ArgminLineSearch<O> for MoreThuenteLineSearch<P>
+where
+    O: ArgminOp<Param = P, Output = f64>,
+    P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
+{
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {
         self.search_direction_b = Some(search_direction);
@@ -294,10 +298,7 @@ where
     O: ArgminOp<Param = P, Output = f64>,
     P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
 {
-    fn init<'a>(
-        &mut self,
-        _op: &mut OpWrapper<'a, O>,
-    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
+    fn init(&mut self, _op: &mut OpWrapper<O>) -> Result<Option<ArgminIterData<P, P>>, Error> {
         self.init_param = check_param!(
             self.init_param_b,
             "MoreThuenteLineSearch: Initial parameter not initialized. Call `set_initial_parameter`."
@@ -344,9 +345,9 @@ where
         Ok(None)
     }
 
-    fn next_iter<'a>(
+    fn next_iter(
         &mut self,
-        op: &mut OpWrapper<'a, O>,
+        op: &mut OpWrapper<O>,
         _state: IterState<P, O::Hessian>,
     ) -> Result<ArgminIterData<P, P>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty

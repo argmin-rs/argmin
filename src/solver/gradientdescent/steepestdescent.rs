@@ -95,79 +95,71 @@ use serde::{Deserialize, Serialize};
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct SteepestDescent<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminNorm<f64>,
-    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct SteepestDescent<L> {
     /// line search
-    linesearch: Box<L>,
-    /// Base stuff
-    base: ArgminBase<O>,
+    linesearch: L,
 }
 
-impl<O, L> SteepestDescent<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminNorm<f64>,
-    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
-{
+impl<L> SteepestDescent<L> {
     /// Constructor
-    pub fn new(cost_function: O, init_param: O::Param, linesearch: L) -> Result<Self, Error> {
+    pub fn new(linesearch: L) -> Result<Self, Error> {
         Ok(SteepestDescent {
-            linesearch: Box::new(linesearch),
-            base: ArgminBase::new(cost_function, init_param),
+            linesearch: linesearch,
         })
     }
 }
 
-impl<O, L> ArgminIter for SteepestDescent<O, L>
+impl<O, L> Solver<O> for SteepestDescent<L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
+    O::Param: Clone
+        + Default
+        + Serialize
+        + ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminMul<f64, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminNorm<f64>,
-    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
+    O::Hessian: Default,
+    L: Clone + ArgminLineSearch<OpWrapper<O>>,
 {
-    type Param = O::Param;
-    type Output = f64;
-    type Hessian = O::Hessian;
-
     /// Perform one iteration of SA algorithm
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        // reset line search
-        self.linesearch.base_reset();
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<ArgminIterData<O::Param, O::Param>, Error> {
+        // // reset line search
+        // should not be neccessary
+        // self.linesearch.base_reset();
 
-        let param_new = self.cur_param();
-        let new_cost = self.apply(&param_new)?;
-        let new_grad = self.gradient(&param_new)?;
+        let param_new = state.cur_param;
+        let new_cost = op.apply(&param_new)?;
+        let new_grad = op.gradient(&param_new)?;
 
         let norm = new_grad.norm();
 
-        self.linesearch.set_initial_parameter(param_new);
-        self.linesearch.set_initial_gradient(new_grad.clone());
-        self.linesearch.set_initial_cost(new_cost);
+        self.linesearch.set_init_param(param_new.clone());
+        self.linesearch.set_init_grad(new_grad.clone());
+        self.linesearch.set_init_cost(new_cost);
         self.linesearch
             .set_search_direction(new_grad.mul(&(-1.0 / norm)));
 
-        self.linesearch.run_fast()?;
+        // hack for now
+        let ls_op = op.clone();
 
-        let linesearch_result = self.linesearch.result();
+        // Run solver
+        let mut exec = Executor::new(ls_op, self.linesearch.clone(), param_new);
+        let linesearch_result = exec.run_fast()?;
+
+        // continuation of hack
+        op.cost_func_count += exec.cost_func_count;
+        op.grad_func_count += exec.grad_func_count;
+        op.hessian_func_count += exec.hessian_func_count;
+
+        // let linesearch_result = self.linesearch.result();
 
         let out = ArgminIterData::new(linesearch_result.param, linesearch_result.cost);
         Ok(out)
