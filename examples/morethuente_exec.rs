@@ -38,6 +38,9 @@ fn run() -> Result<(), Error> {
     // Set up line search method
     let mut solver = MoreThuenteLineSearch::new();
 
+    // The following parameters do not follow the builder pattern because they are part of the
+    // ArgminLineSearch trait which needs to be object safe.
+
     // Set search direction
     solver.set_search_direction(vec![-2.0, 0.0]);
 
