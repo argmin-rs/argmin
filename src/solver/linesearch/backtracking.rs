@@ -107,7 +107,7 @@ use serde::{Deserialize, Serialize};
 /// Springer. ISBN 0-387-30303-0.
 ///
 /// [1] Wikipedia: https://en.wikipedia.org/wiki/Backtracking_line_search
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct BacktrackingLineSearch<P, L> {
     /// initial parameter vector
     init_param: Option<P>,

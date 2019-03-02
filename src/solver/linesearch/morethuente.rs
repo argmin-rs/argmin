@@ -109,7 +109,7 @@ use std::default::Default;
 /// [0] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 /// decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
 /// DOI: https://doi.org/10.1145/192115.192132
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct MoreThuenteLineSearch<P> {
     /// initial parameter vector (builder)
     init_param_b: Option<P>,
