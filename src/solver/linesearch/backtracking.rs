@@ -126,6 +126,7 @@ pub struct BacktrackingLineSearch<P, L> {
 }
 
 impl<P, L> BacktrackingLineSearch<P, L> {
+    /// Constructor
     pub fn new(condition: L) -> Self {
         BacktrackingLineSearch {
             init_param: None,
@@ -138,26 +139,7 @@ impl<P, L> BacktrackingLineSearch<P, L> {
         }
     }
 
-    pub fn init_param(mut self, param: P) -> Self {
-        self.init_param = Some(param);
-        self
-    }
-
-    pub fn init_grad(mut self, grad: P) -> Self {
-        self.init_grad = Some(grad);
-        self
-    }
-
-    pub fn search_direction(mut self, direction: P) -> Self {
-        self.search_direction = Some(direction);
-        self
-    }
-
-    pub fn init_cost(mut self, init_cost: f64) -> Self {
-        self.init_cost = Some(init_cost);
-        self
-    }
-
+    /// Set rho
     pub fn rho(mut self, rho: f64) -> Result<Self, Error> {
         if rho <= 0.0 || rho >= 1.0 {
             return Err(ArgminError::InvalidParameter {
@@ -168,11 +150,6 @@ impl<P, L> BacktrackingLineSearch<P, L> {
         }
         self.rho = rho;
         Ok(self)
-    }
-
-    pub fn alpha(mut self, alpha: f64) -> Self {
-        self.alpha = alpha;
-        self
     }
 }
 
@@ -263,8 +240,7 @@ where
         let mut out = ArgminIterData::new(new_param.clone(), cur_cost);
 
         if self.condition.requires_cur_grad() {
-            let grad = op.gradient(&new_param)?;
-            out.set_grad(grad);
+            out = out.set_grad(op.gradient(&new_param)?);
         }
         Ok(out)
     }

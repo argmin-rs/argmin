@@ -39,7 +39,7 @@ fn run() -> Result<(), Error> {
     let cond = ArmijoCondition::new(0.5)?;
 
     // Set up Line Search method
-    let mut solver = BacktrackingLineSearch::new(cond).rho(0.9)?.alpha(1.0);
+    let mut solver = BacktrackingLineSearch::new(cond).rho(0.9)?;
 
     // The following parameters do not follow the builder pattern because they are part of the
     // ArgminLineSearch trait which needs to be object safe.
@@ -55,6 +55,9 @@ fn run() -> Result<(), Error> {
 
     // Set initial position
     solver.set_init_param(init_param.clone());
+
+    // Set initial position
+    solver.set_init_alpha(1.0)?;
 
     // Run solver
     let res = Executor::new(operator, solver, init_param)
