@@ -193,8 +193,6 @@ where
         let grad = op.gradient(&state.cur_param)?;
         self.p = grad.mul(&(-1.0));
         let out = ArgminIterData::new(state.cur_param.clone(), cost).set_grad(grad);
-        // self.set_cur_cost(cost);
-        // self.set_cur_grad(grad);
         Ok(Some(out))
     }
 

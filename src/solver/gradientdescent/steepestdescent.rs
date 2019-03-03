@@ -125,41 +125,28 @@ where
     O::Hessian: Default,
     L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
-    /// Perform one iteration of SA algorithm
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
     ) -> Result<ArgminIterData<O::Param, O::Param>, Error> {
-        // // reset line search
-        // should not be neccessary
-        // self.linesearch.base_reset();
-
         let param_new = state.cur_param;
         let new_cost = op.apply(&param_new)?;
         let new_grad = op.gradient(&param_new)?;
 
-        let norm = new_grad.norm();
-
         self.linesearch.set_init_param(param_new.clone());
         self.linesearch.set_init_grad(new_grad.clone());
         self.linesearch.set_init_cost(new_cost);
-        self.linesearch
-            .set_search_direction(new_grad.mul(&(-1.0 / norm)));
-
-        // hack for now
-        let ls_op = op.clone();
+        self.linesearch.set_search_direction(new_grad.mul(&(-1.0)));
 
         // Run solver
-        let mut exec = Executor::new(ls_op, self.linesearch.clone(), param_new);
+        let mut exec = Executor::new(op.clone(), self.linesearch.clone(), param_new);
         let linesearch_result = exec.run_fast()?;
 
-        // continuation of hack
+        // hack
         op.cost_func_count += exec.cost_func_count;
         op.grad_func_count += exec.grad_func_count;
         op.hessian_func_count += exec.hessian_func_count;
-
-        // let linesearch_result = self.linesearch.result();
 
         let out = ArgminIterData::new(linesearch_result.param, linesearch_result.cost);
         Ok(out)
