@@ -471,7 +471,16 @@ where
         ));
         Ok(out)
     }
+    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        TerminationReason::NotTerminated
+    }
 }
+// #[log("initial_temperature" => "self.init_temp")]
+// #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
+// #[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
+// #[log("reanneal_fixed" => "self.reanneal_fixed")]
+// #[log("reanneal_accepted" => "self.reanneal_accepted")]
+// #[log("reanneal_best" => "self.reanneal_best")]
 
 #[cfg(test)]
 mod tests {
