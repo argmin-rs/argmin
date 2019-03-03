@@ -449,9 +449,15 @@ where
         Ok(out)
     }
 
-    // fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
-    //     TerminationReason::NotTerminated
-    // }
+    fn terminate(&mut self, _state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        if self.stall_iter_accepted > self.stall_iter_accepted_limit {
+            return TerminationReason::AcceptedStallIterExceeded;
+        }
+        if self.stall_iter_best > self.stall_iter_best_limit {
+            return TerminationReason::BestStallIterExceeded;
+        }
+        TerminationReason::NotTerminated
+    }
 }
 // #[log("initial_temperature" => "self.init_temp")]
 // #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
