@@ -520,7 +520,11 @@ where
         + ArgminDot<P, f64>
         + ArgminScaledAdd<P, f64, P>,
 {
-    fn init(&mut self, op: &mut OpWrapper<O>) -> Result<Option<ArgminIterData<P, P>>, Error> {
+    fn init(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        _state: IterState<P, O::Hessian>,
+    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
                 text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),

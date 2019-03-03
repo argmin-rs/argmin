@@ -297,7 +297,11 @@ where
     O: ArgminOp<Param = P, Output = f64>,
     P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
 {
-    fn init(&mut self, _op: &mut OpWrapper<O>) -> Result<Option<ArgminIterData<P, P>>, Error> {
+    fn init(
+        &mut self,
+        _op: &mut OpWrapper<O>,
+        _state: IterState<P, O::Hessian>,
+    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
         self.init_param = check_param!(
             self.init_param_b,
             "MoreThuenteLineSearch: Initial parameter not initialized. Call `set_initial_parameter`."

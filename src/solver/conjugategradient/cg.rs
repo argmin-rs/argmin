@@ -79,44 +79,27 @@ use std::default::Default;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Clone, Serialize, Deserialize)]
-pub struct ConjugateGradient<O>
-where
-    O: ArgminOp<Output = <O as ArgminOp>::Param>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminDot<O::Param, f64>,
-{
+#[derive(Clone, Serialize, Deserialize)]
+pub struct ConjugateGradient<P> {
     /// b (right hand side)
-    b: O::Param,
+    b: P,
     /// residual
-    r: O::Param,
+    r: P,
     /// p
-    p: O::Param,
+    p: P,
     /// previous p
-    p_prev: O::Param,
+    p_prev: P,
     /// r^T * r
     rtr: f64,
     /// alpha
     alpha: f64,
     /// beta
     beta: f64,
-    /// base
-    base: ArgminBase<O>,
 }
 
-impl<O> ConjugateGradient<O>
+impl<P> ConjugateGradient<P>
 where
-    O: ArgminOp<Output = <O as ArgminOp>::Param>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminDot<O::Param, f64>,
+    P: Clone + Default,
 {
     /// Constructor
     ///
@@ -125,81 +108,79 @@ where
     /// `cost_function`: cost function
     ///
     /// `b`: right hand side of `A * x = b`
-    ///
-    /// `init_param`: Initial parameter vector
-    pub fn new(operator: O, b: O::Param, init_param: O::Param) -> Result<Self, Error> {
+    pub fn new(b: P) -> Result<Self, Error> {
         Ok(ConjugateGradient {
             b,
-            r: O::Param::default(),
-            p: O::Param::default(),
-            p_prev: O::Param::default(),
+            r: P::default(),
+            p: P::default(),
+            p_prev: P::default(),
             rtr: std::f64::NAN,
             alpha: std::f64::NAN,
             beta: std::f64::NAN,
-            base: ArgminBase::new(operator, init_param),
         })
     }
 
     /// Return the current search direction (This is needed by NewtonCG for instance)
-    pub fn p(&self) -> O::Param {
+    pub fn p(&self) -> P {
         self.p.clone()
     }
 
     /// Return the previous search direction (This is needed by NewtonCG for instance)
-    pub fn p_prev(&self) -> O::Param {
+    pub fn p_prev(&self) -> P {
         self.p_prev.clone()
     }
 
     /// Return the current residual (This is needed by NewtonCG for instance)
-    pub fn residual(&self) -> O::Param {
+    pub fn residual(&self) -> P {
         self.r.clone()
     }
 }
 
-impl<O> ArgminIter for ConjugateGradient<O>
+impl<P, O> Solver<O> for ConjugateGradient<P>
 where
-    O: ArgminOp<Output = <O as ArgminOp>::Param>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminDot<O::Param, f64>,
+    O: ArgminOp<Param = P, Output = P>,
+    P: Clone
+        + Serialize
+        + ArgminSub<P, P>
+        + ArgminDot<P, f64>
+        + ArgminScaledAdd<P, f64, P>
+        + ArgminAdd<P, P>
+        + ArgminMul<f64, P>
+        + ArgminDot<P, f64>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-
-    fn init(&mut self) -> Result<(), Error> {
-        let init_param = self.cur_param();
-        let ap = self.apply(&init_param)?;
+    fn init(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<P, O::Hessian>,
+    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
+        let init_param = state.cur_param;
+        let ap = op.apply(&init_param)?;
         let r0 = self.b.sub(&ap).mul(&(-1.0));
         self.r = r0.clone();
         self.p = r0.mul(&(-1.0));
         self.rtr = self.r.dot(&self.r);
-        Ok(())
+        Ok(None)
     }
 
     /// Perform one iteration of SA algorithm
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        // Still way too much cloning going on here
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<P, O::Hessian>,
+    ) -> Result<ArgminIterData<P, P>, Error> {
         self.p_prev = self.p.clone();
-        let p = self.p.clone();
-        let apk = self.apply(&p)?;
+        let apk = op.apply(&self.p)?;
         self.alpha = self.rtr / self.p.dot(&apk);
-        let new_param = self.cur_param().scaled_add(&self.alpha, &p);
+        let new_param = state.cur_param.scaled_add(&self.alpha, &self.p);
         self.r = self.r.scaled_add(&self.alpha, &apk);
         let rtr_n = self.r.dot(&self.r);
         self.beta = rtr_n / self.rtr;
         self.rtr = rtr_n;
-        self.p = self.r.mul(&(-1.0)).scaled_add(&self.beta, &p);
+        self.p = self.r.mul(&(-1.0)).scaled_add(&self.beta, &self.p);
         let norm = self.r.dot(&self.r);
 
-        let mut out = ArgminIterData::new(new_param, norm.sqrt());
-        out.add_kv(make_kv!(
-            "alpha" => self.alpha;
-            "beta" => self.beta;
-        ));
+        let out = ArgminIterData::new(new_param, norm.sqrt())
+            .add_kv(make_kv!("alpha" => self.alpha; "beta" => self.beta;));
         Ok(out)
     }
 }

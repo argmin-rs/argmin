@@ -200,7 +200,8 @@ where
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-    ) -> Result<Option<ArgminIterData<O::Param, O::Param>>, Error> {
+        _state: IterState<P, O::Hessian>,
+    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
         if self.init_param.is_none() {
             return Err(ArgminError::NotInitialized {
                 text: "BacktrackingLineSearch: init_param must be set.".to_string(),
