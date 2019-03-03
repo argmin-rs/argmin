@@ -129,7 +129,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
-    ) -> Result<ArgminIterData<O::Param, O::Param>, Error> {
+    ) -> Result<ArgminIterData<O>, Error> {
         let param_new = state.cur_param;
         let new_cost = op.apply(&param_new)?;
         let new_grad = op.gradient(&param_new)?;
@@ -148,8 +148,9 @@ where
         op.grad_func_count += exec.grad_func_count;
         op.hessian_func_count += exec.hessian_func_count;
 
-        let out = ArgminIterData::new(linesearch_result.param, linesearch_result.cost);
-        Ok(out)
+        Ok(ArgminIterData::new()
+            .param(linesearch_result.param)
+            .cost(linesearch_result.cost))
     }
 }
 

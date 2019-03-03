@@ -152,7 +152,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, O::Hessian>,
-    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         let init_param = state.cur_param;
         let ap = op.apply(&init_param)?;
         let r0 = self.b.sub(&ap).mul(&(-1.0));
@@ -167,7 +167,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, O::Hessian>,
-    ) -> Result<ArgminIterData<P, P>, Error> {
+    ) -> Result<ArgminIterData<O>, Error> {
         self.p_prev = self.p.clone();
         let apk = op.apply(&self.p)?;
         self.alpha = self.rtr / self.p.dot(&apk);
@@ -179,9 +179,10 @@ where
         self.p = self.r.mul(&(-1.0)).scaled_add(&self.beta, &self.p);
         let norm = self.r.dot(&self.r);
 
-        let out = ArgminIterData::new(new_param, norm.sqrt())
-            .add_kv(make_kv!("alpha" => self.alpha; "beta" => self.beta;));
-        Ok(out)
+        Ok(ArgminIterData::new()
+            .param(new_param)
+            .cost(norm.sqrt())
+            .kv(make_kv!("alpha" => self.alpha; "beta" => self.beta;)))
     }
 }
 

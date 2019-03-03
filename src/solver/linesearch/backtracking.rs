@@ -201,7 +201,7 @@ where
         &mut self,
         _op: &mut OpWrapper<O>,
         _state: IterState<P, O::Hessian>,
-    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         if self.init_param.is_none() {
             return Err(ArgminError::NotInitialized {
                 text: "BacktrackingLineSearch: init_param must be set.".to_string(),
@@ -233,7 +233,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         _state: IterState<P, O::Hessian>,
-    ) -> Result<ArgminIterData<P, P>, Error> {
+    ) -> Result<ArgminIterData<O>, Error> {
         // this can't go wrong
         let init_param = self.init_param.clone().unwrap();
         let search_direction = self.search_direction.clone().unwrap();
@@ -244,11 +244,14 @@ where
 
         self.alpha *= self.rho;
 
-        let mut out = ArgminIterData::new(new_param.clone(), cur_cost);
+        let mut out = ArgminIterData::new()
+            .param(new_param.clone())
+            .cost(cur_cost);
 
         if self.condition.requires_cur_grad() {
-            out = out.set_grad(op.gradient(&new_param)?);
+            out = out.grad(op.gradient(&new_param)?);
         }
+
         Ok(out)
     }
 

@@ -524,7 +524,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         _state: IterState<P, O::Hessian>,
-    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
                 text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),
@@ -578,14 +578,14 @@ where
         let best_f = self.best_f;
         // self.set_best_cost(best_f);
 
-        Ok(Some(ArgminIterData::new(new_param, best_f)))
+        Ok(Some(ArgminIterData::new().param(new_param).cost(best_f)))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
         _state: IterState<P, O::Hessian>,
-    ) -> Result<ArgminIterData<P, P>, Error> {
+    ) -> Result<ArgminIterData<O>, Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);
         let bb = (self.b_x, self.b_f, self.b_g);
@@ -621,8 +621,7 @@ where
         let new_param = self
             .init_param
             .scaled_add(&self.best_x, &self.search_direction);
-        let out = ArgminIterData::new(new_param, self.best_f);
-        Ok(out)
+        Ok(ArgminIterData::new().param(new_param).cost(self.best_f))
     }
 
     fn terminate(&mut self, _state: &IterState<O::Param, O::Hessian>) -> TerminationReason {

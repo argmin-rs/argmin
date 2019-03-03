@@ -60,7 +60,7 @@ where
         &mut self,
         _op: &mut OpWrapper<O>,
         state: IterState<P, H>,
-    ) -> Result<ArgminIterData<P, P>, Error> {
+    ) -> Result<ArgminIterData<O>, Error> {
         let grad_norm = state.cur_grad.norm();
         let wdp = state
             .cur_grad
@@ -72,8 +72,7 @@ where
         };
 
         let new_param = state.cur_grad.mul(&(-tau * self.radius / grad_norm));
-        let out = ArgminIterData::new(new_param, 0.0);
-        Ok(out)
+        Ok(ArgminIterData::new().param(new_param))
     }
 
     fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {

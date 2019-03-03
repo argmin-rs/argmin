@@ -390,7 +390,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
-    ) -> Result<ArgminIterData<O::Param, O::Param>, Error> {
+    ) -> Result<ArgminIterData<O>, Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
         // behaviour.
@@ -428,12 +428,14 @@ where
 
         self.update_temperature();
 
-        let out = if accepted {
-            ArgminIterData::new(new_param, new_cost)
+        Ok(if accepted {
+            ArgminIterData::new().param(new_param).cost(new_cost)
         } else {
-            ArgminIterData::new(state.cur_param, state.cur_cost)
+            ArgminIterData::new()
+                .param(state.cur_param)
+                .cost(state.cur_cost)
         }
-        .add_kv(make_kv!(
+        .kv(make_kv!(
             "t" => self.cur_temp;
             "new_be" => new_cost <= state.best_cost;
             "acc" => accepted;
@@ -445,8 +447,7 @@ where
             "ra_fi" => r_fixed;
             "ra_be" => r_best;
             "ra_ac" => r_accepted;
-        ));
-        Ok(out)
+        )))
     }
 
     fn terminate(&mut self, _state: &IterState<O::Param, O::Hessian>) -> TerminationReason {

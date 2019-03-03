@@ -119,21 +119,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct TrustRegion<O, R>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminZero
-        + ArgminMul<f64, O::Param>,
-    O::Hessian: ArgminDot<O::Param, O::Param>,
-    R: ArgminTrustRegion<Param = O::Param, Output = f64, Hessian = O::Hessian>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct TrustRegion<R> {
     /// Radius
     radius: f64,
     /// Maximum Radius
@@ -141,61 +128,44 @@ where
     /// eta \in [0, 1/4)
     eta: f64,
     /// subproblem
-    subproblem: Box<R>,
+    subproblem: R,
     /// f(xk)
     fxk: f64,
     /// mk(0)
     mk0: f64,
-    /// base
-    base: ArgminBase<O>,
 }
 
-impl<O, R> TrustRegion<O, R>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminZero
-        + ArgminMul<f64, O::Param>,
-    O::Hessian: ArgminDot<O::Param, O::Param>,
-    R: ArgminTrustRegion<Param = O::Param, Output = f64, Hessian = O::Hessian>,
-{
+impl<R> TrustRegion<R> where {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(operator: O, param: O::Param, subproblem: R) -> Self {
-        let base = ArgminBase::new(operator, param);
+    pub fn new(subproblem: R) -> Self {
         TrustRegion {
             radius: 1.0,
             max_radius: 100.0,
             eta: 0.125,
-            subproblem: Box::new(subproblem),
+            subproblem: subproblem,
             fxk: std::f64::NAN,
             mk0: std::f64::NAN,
-            base,
         }
     }
 
     /// set radius
-    pub fn set_radius(&mut self, radius: f64) -> &mut Self {
+    pub fn radius(mut self, radius: f64) -> Self {
         self.radius = radius;
         self
     }
 
     /// Set maximum radius
-    pub fn set_max_radius(&mut self, max_radius: f64) -> &mut Self {
+    pub fn max_radius(mut self, max_radius: f64) -> Self {
         self.max_radius = max_radius;
         self
     }
 
     /// Set eta
-    pub fn set_eta(&mut self, eta: f64) -> Result<&mut Self, Error> {
+    pub fn eta(mut self, eta: f64) -> Result<Self, Error> {
         if eta >= 0.25 || eta < 0.0 {
             return Err(ArgminError::InvalidParameter {
                 text: "TrustRegion: eta must be in [0, 1/4).".to_string(),
@@ -205,13 +175,9 @@ where
         self.eta = eta;
         Ok(self)
     }
-
-    fn m(&self, p: &O::Param) -> f64 {
-        self.fxk + p.dot(&self.cur_grad()) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
-    }
 }
 
-impl<O, R> ArgminIter for TrustRegion<O, R>
+impl<O, R> Solver<O> for TrustRegion<R>
 where
     O: ArgminOp<Output = f64>,
     O::Param: ArgminMul<f64, O::Param>
@@ -223,33 +189,38 @@ where
         + ArgminZero
         + ArgminMul<f64, O::Param>,
     O::Hessian: ArgminDot<O::Param, O::Param>,
-    R: ArgminTrustRegion<Param = O::Param, Output = f64, Hessian = O::Hessian>,
+    R: ArgminTrustRegion<O::Param, O::Hessian>,
 {
-    type Param = O::Param;
-    type Output = f64;
-    type Hessian = O::Hessian;
-
-    fn init(&mut self) -> Result<(), Error> {
-        let param = self.cur_param();
-        let grad = self.gradient(&param)?;
+    fn init(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<Option<ArgminIterData<O::Param, O::Param>>, Error> {
+        let grad = op.gradient(&state.cur_param)?;
         self.set_cur_grad(grad);
-        let hessian = self.hessian(&param)?;
+        let hessian = op.hessian(&state.cur_param)?;
         self.set_cur_hessian(hessian);
-        self.fxk = self.apply(&param)?;
+        self.fxk = op.apply(&state.cur_param)?;
         self.mk0 = self.fxk;
         Ok(())
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let g = self.cur_grad();
-        let h = self.cur_hessian();
-        self.subproblem.set_grad(g);
-        self.subproblem.set_hessian(h);
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<ArgminIterData<O::Param, O::Param>, Error> {
+        let g = state.cur_grad;
+        let h = state.cur_hessian;
+        self.subproblem.set_grad(state.cur_grad.clone());
+        self.subproblem.set_hessian(state.cur_hessian.clone());
         self.subproblem.set_radius(self.radius);
         let pk = self.subproblem.run_fast()?.param;
-        let new_param = pk.add(&self.cur_param());
-        let fxkpk = self.apply(&new_param)?;
-        let mkpk = self.m(&pk);
+        let new_param = pk.add(&state.cur_param);
+        let fxkpk = op.apply(&new_param)?;
+        let mkpk =
+            self.fxk + pk.dot(&state.cur_grad) + 0.5 * pk.weighted_dot(&state.cur_hessian, &pk);
+
         let rho = reduction_ratio(self.fxk, fxkpk, self.mk0, mkpk);
 
         let pk_norm = pk.norm();
@@ -263,19 +234,18 @@ where
             self.radius
         };
 
-        let mut out = if rho > self.eta {
+        let out = if rho > self.eta {
             self.fxk = fxkpk;
             self.mk0 = fxkpk;
-            let grad = self.gradient(&new_param)?;
+            let grad = op.gradient(&new_param)?;
             self.set_cur_grad(grad);
-            let hessian = self.hessian(&new_param)?;
+            let hessian = op.hessian(&new_param)?;
             self.set_cur_hessian(hessian);
             ArgminIterData::new(new_param, fxkpk)
         } else {
-            ArgminIterData::new(self.cur_param(), self.fxk)
-        };
-        let kv = make_kv!("radius" => cur_radius;);
-        out.add_kv(kv);
+            ArgminIterData::new(state.cur_param, self.fxk)
+        }
+        .add_kv(make_kv!("radius" => cur_radius;));
 
         Ok(out)
     }

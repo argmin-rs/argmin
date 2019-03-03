@@ -301,7 +301,7 @@ where
         &mut self,
         _op: &mut OpWrapper<O>,
         _state: IterState<P, O::Hessian>,
-    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.init_param = check_param!(
             self.init_param_b,
             "MoreThuenteLineSearch: Initial parameter not initialized. Call `set_initial_parameter`."
@@ -352,7 +352,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         _state: IterState<P, O::Hessian>,
-    ) -> Result<ArgminIterData<P, P>, Error> {
+    ) -> Result<ArgminIterData<O>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {
@@ -422,10 +422,11 @@ where
         }
 
         if info != 0 {
-            let out = ArgminIterData::new(cur_param, cur_cost)
-                .set_grad(cur_grad)
-                .set_termination_reason(TerminationReason::LineSearchConditionMet);
-            return Ok(out);
+            return Ok(ArgminIterData::new()
+                .param(cur_param)
+                .cost(cur_cost)
+                .grad(cur_grad)
+                .termination_reason(TerminationReason::LineSearchConditionMet));
         }
 
         if self.stage1 && self.f <= ftest1 && dg >= self.ftol.min(self.gtol) * self.dginit {
@@ -488,8 +489,7 @@ where
         let new_param = self
             .init_param
             .scaled_add(&self.stp.x, &self.search_direction);
-        let out = ArgminIterData::new(new_param, self.stp.fx);
-        Ok(out)
+        Ok(ArgminIterData::new().param(new_param).cost(self.stp.fx))
     }
 }
 

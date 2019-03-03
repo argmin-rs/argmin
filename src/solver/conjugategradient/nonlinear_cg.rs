@@ -188,12 +188,16 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, O::Hessian>,
-    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         let cost = op.apply(&state.cur_param)?;
         let grad = op.gradient(&state.cur_param)?;
         self.p = grad.mul(&(-1.0));
-        let out = ArgminIterData::new(state.cur_param.clone(), cost).set_grad(grad);
-        Ok(Some(out))
+        Ok(Some(
+            ArgminIterData::new()
+                .param(state.cur_param)
+                .cost(cost)
+                .grad(grad),
+        ))
     }
 
     /// Perform one iteration of SA algorithm
@@ -201,7 +205,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, O::Hessian>,
-    ) -> Result<ArgminIterData<P, P>, Error> {
+    ) -> Result<ArgminIterData<O>, Error> {
         let xk = state.cur_param;
         let grad = state.cur_grad;
         let cur_cost = state.cur_cost;
@@ -245,14 +249,14 @@ where
         // Housekeeping
         let cost = op.apply(&xk1)?;
 
-        let out =
-            ArgminIterData::new(xk1, cost)
-                .set_grad(new_grad)
-                .add_kv(make_kv!("beta" => self.beta;
-                 "restart_iter" => restart_iter;
-                 "restart_orthogonality" => restart_orthogonality;
-                ));
-        Ok(out)
+        Ok(ArgminIterData::new()
+            .param(xk1)
+            .cost(cost)
+            .grad(new_grad)
+            .kv(make_kv!("beta" => self.beta;
+             "restart_iter" => restart_iter;
+             "restart_orthogonality" => restart_orthogonality;
+            )))
     }
 }
 
