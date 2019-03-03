@@ -56,7 +56,7 @@ fn run() -> Result<(), Error> {
         // Attach a logger
         solver.add_logger(ArgminSlogLogger::term());
 
-        solver.set_max_iters(50);
+        solver.set_max_iters(15);
 
         let mut callback = move |xy: &Vec<f64>, c: f64, v: &Particles| visualizer.iteration(xy, c, &v);
         solver.set_iter_callback(&mut callback);

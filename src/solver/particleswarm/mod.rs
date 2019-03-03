@@ -215,15 +215,8 @@ where
 }
 
 
-macro_rules! supertrait {
-    ($name:ident: $head:path $(, $tail:path)*) => {
-        pub trait $name : $head $(+ $tail)* {}
-        impl<T> $name for T where T: $head $(+ $tail)* {}
-    };
-}
-
-supertrait!(Position
-: Clone
+trait_bound!(Position
+; Clone
 , Default
 , ArgminAdd<Self, Self>
 , ArgminSub<Self, Self>
