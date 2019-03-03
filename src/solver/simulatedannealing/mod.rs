@@ -16,7 +16,6 @@
 //! DOI: 10.1126/science.220.4598.671  
 
 use crate::prelude::*;
-use argmin_codegen::ArgminSolver;
 use rand::prelude::*;
 use rand_xorshift::XorShiftRng;
 use serde::{Deserialize, Serialize};
@@ -221,21 +220,17 @@ impl std::default::Default for SATempFunc {
 /// [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 /// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 /// DOI: 10.1126/science.220.4598.671  
-#[derive(ArgminSolver, Serialize, Deserialize)]
-#[log("initial_temperature" => "self.init_temp")]
-#[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
-#[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
-#[log("reanneal_fixed" => "self.reanneal_fixed")]
-#[log("reanneal_accepted" => "self.reanneal_accepted")]
-#[log("reanneal_best" => "self.reanneal_best")]
-pub struct SimulatedAnnealing<O>
-where
-    O: ArgminOp<Output = f64>,
-{
+#[derive(Serialize, Deserialize)]
+// #[log("initial_temperature" => "self.init_temp")]
+// #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
+// #[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
+// #[log("reanneal_fixed" => "self.reanneal_fixed")]
+// #[log("reanneal_accepted" => "self.reanneal_accepted")]
+// #[log("reanneal_best" => "self.reanneal_best")]
+pub struct SimulatedAnnealing {
     /// Initial temperature
     init_temp: f64,
     /// which temperature function?
-    // #[serde(skip)]
     temp_func: SATempFunc,
     /// Number of iterations used for the caluclation of temperature. This is needed for
     /// reannealing!
@@ -262,30 +257,22 @@ where
     reanneal_iter_best: u64,
     /// current temperature
     cur_temp: f64,
-    /// previous cost
-    prev_cost: f64,
     /// random number generator
     rng: XorShiftRng,
-    /// base
-    base: ArgminBase<O>,
 }
 
-impl<O> SimulatedAnnealing<O>
-where
-    O: ArgminOp<Output = f64>,
-{
+impl SimulatedAnnealing {
     /// Constructor
     ///
     /// Parameters:
     ///
-    /// * `cost_function`: cost function
     /// * `init_param`: initial parameter vector
     /// * `init_temp`: initial temperature
-    pub fn new(cost_function: O, init_param: O::Param, init_temp: f64) -> Result<Self, Error> {
-        let prev_cost = cost_function.apply(&init_param)?;
+    pub fn new(init_temp: f64) -> Result<Self, Error> {
+        // let prev_cost = cost_function.apply(&init_param)?;
         if init_temp <= 0_f64 {
             Err(ArgminError::InvalidParameter {
-                text: "initial temperature".to_string(),
+                text: "Initial temperature must be > 0.".to_string(),
             }
             .into())
         } else {
@@ -304,78 +291,45 @@ where
                 reanneal_best: std::u64::MAX,
                 reanneal_iter_best: 0,
                 cur_temp: init_temp,
-                prev_cost,
                 rng: XorShiftRng::from_entropy(),
-                base: ArgminBase::new(cost_function, init_param),
             })
         }
     }
 
     /// Set temperature function to one of the options in `SATempFunc`.
-    pub fn temp_func(&mut self, temperature_func: SATempFunc) -> &mut Self {
+    pub fn temp_func(mut self, temperature_func: SATempFunc) -> Self {
         self.temp_func = temperature_func;
         self
     }
 
     /// The optimization stops after there has been no accepted solution after `iter` iterations
-    pub fn stall_accepted(&mut self, iter: u64) -> &mut Self {
+    pub fn stall_accepted(mut self, iter: u64) -> Self {
         self.stall_iter_accepted_limit = iter;
         self
     }
 
     /// The optimization stops after there has been no new best solution after `iter` iterations
-    pub fn stall_best(&mut self, iter: u64) -> &mut Self {
+    pub fn stall_best(mut self, iter: u64) -> Self {
         self.stall_iter_best_limit = iter;
         self
     }
 
     /// Start reannealing after `iter` iterations
-    pub fn reannealing_fixed(&mut self, iter: u64) -> &mut Self {
+    pub fn reannealing_fixed(mut self, iter: u64) -> Self {
         self.reanneal_fixed = iter;
         self
     }
 
     /// Start reannealing after no accepted solution has been found for `iter` iterations
-    pub fn reannealing_accepted(&mut self, iter: u64) -> &mut Self {
+    pub fn reannealing_accepted(mut self, iter: u64) -> Self {
         self.reanneal_accepted = iter;
         self
     }
 
     /// Start reannealing after no new best solution has been found for `iter` iterations
-    pub fn reannealing_best(&mut self, iter: u64) -> &mut Self {
+    pub fn reannealing_best(mut self, iter: u64) -> Self {
         self.reanneal_best = iter;
         self
-    }
-
-    /// Acceptance function
-    ///
-    /// Any solution which satisfies `next_cost < prev_cost` will be accepted. Solutions worse than
-    /// the previous one are accepted with a probability given as:
-    ///
-    /// `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
-    ///
-    /// which will always be between 0 and 0.5.
-    fn accept(&mut self, next_param: &O::Param, next_cost: f64) -> (bool, bool) {
-        let prob: f64 = self.rng.gen();
-        let mut new_best = false;
-        let accepted = if (next_cost < self.prev_cost)
-            || (1.0 / (1.0 + ((next_cost - self.prev_cost) / self.cur_temp).exp()) > prob)
-        {
-            // If yes, update the parameter vector for the next iteration.
-            self.prev_cost = next_cost;
-            self.set_cur_param(next_param.clone());
-
-            // In case the new solution is better than the current best, update best as well.
-            if next_cost < self.best_cost() {
-                new_best = true;
-                self.set_best_cost(next_cost);
-                self.set_best_param(next_param.clone());
-            }
-            true
-        } else {
-            false
-        };
-        (accepted, new_best)
     }
 
     /// Update the temperature based on the current iteration number.
@@ -388,13 +342,6 @@ where
             SATempFunc::Exponential(x) => self.init_temp * x.powf((self.temp_iter + 1) as f64),
             // SATempFunc::Custom(ref func) => func(self.init_temp, self.temp_iter),
         };
-    }
-
-    /// Perform annealing
-    fn anneal(&mut self) -> Result<O::Param, Error> {
-        let tmp = self.cur_param();
-        let cur_temp = self.cur_temp;
-        self.modify(&tmp, cur_temp)
     }
 
     /// Perform reannealing
@@ -442,32 +389,58 @@ where
     }
 }
 
-impl<O> ArgminIter for SimulatedAnnealing<O>
+impl<O> Solver<O> for SimulatedAnnealing
 where
     O: ArgminOp<Output = f64>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-
     /// Perform one iteration of SA algorithm
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<ArgminIterData<O::Param, O::Param>, Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
-        // behaviour. None of these strange behaviour is dangerous, but still.
+        // behaviour.
 
         // Make a move
-        let new_param = self.anneal()?;
+        let new_param = op.modify(&state.cur_param, self.cur_temp)?;
 
         // Evaluate cost function with new parameter vector
-        let new_cost = self.apply(&new_param)?;
+        let new_cost = op.apply(&new_param)?;
 
+        // Acceptance function
+        //
         // Decide whether new parameter vector should be accepted.
         // If no, move on with old parameter vector.
-        let (accepted, new_best) = self.accept(&new_param, new_cost);
+        //
+        // Any solution which satisfies `next_cost < prev_cost` will be accepted. Solutions worse
+        // than the previous one are accepted with a probability given as:
+        //
+        // `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
+        //
+        // which will always be between 0 and 0.5.
+        let prob: f64 = self.rng.gen();
+        let accepted = if (new_cost < state.prev_cost)
+            || (1.0 / (1.0 + ((new_cost - state.prev_cost) / self.cur_temp).exp()) > prob)
+        {
+            // If yes, update the parameter vector for the next iteration.
+            // self.prev_cost = new_cost;
+            // self.set_cur_param(new_param.clone());
+
+            // In case the new solution is better than the current best, update best as well.
+            // if new_cost < self.best_cost() {
+            //     new_best = true;
+            //     self.set_best_cost(new_cost);
+            //     self.set_best_param(new_param.clone());
+            // }
+            true
+        } else {
+            false
+        };
 
         // Update stall iter variables
-        self.update_stall_and_reanneal_iter(accepted, new_best);
+        self.update_stall_and_reanneal_iter(accepted, new_cost <= state.best_cost);
 
         let (r_fixed, r_accepted, r_best) = self.reanneal();
 
@@ -478,10 +451,14 @@ where
 
         self.update_temperature();
 
-        let mut out = ArgminIterData::new(new_param, new_cost);
-        out.add_kv(make_kv!(
+        let out = if accepted {
+            ArgminIterData::new(new_param, new_cost)
+        } else {
+            ArgminIterData::new(state.cur_param, state.cur_cost)
+        }
+        .add_kv(make_kv!(
             "t" => self.cur_temp;
-            "new_be" => new_best;
+            "new_be" => new_cost <= state.best_cost;
             "acc" => accepted;
             "st_i_be" => self.stall_iter_best;
             "st_i_ac" => self.stall_iter_accepted;
