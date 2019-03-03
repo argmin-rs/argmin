@@ -110,71 +110,45 @@ use std::default::Default;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct NonlinearConjugateGradient<O, L, B>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminNorm<f64>,
-    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
-    B: ArgminNLCGBetaUpdate<O::Param>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct NonlinearConjugateGradient<P, L, B> {
     /// p
-    p: O::Param,
+    p: P,
     /// beta
     beta: f64,
     /// line search
-    linesearch: Box<L>,
+    linesearch: L,
     /// beta update method
-    beta_method: Box<B>,
+    beta_method: B,
     /// Number of iterations after which a restart is performed
     restart_iter: u64,
     /// Restart based on orthogonality
     restart_orthogonality: Option<f64>,
-    /// base
-    base: ArgminBase<O>,
 }
 
-impl<O, L, B> NonlinearConjugateGradient<O, L, B>
+impl<P, L, B> NonlinearConjugateGradient<P, L, B>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminNorm<f64>,
-    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
-    B: ArgminNLCGBetaUpdate<O::Param>,
+    P: Default,
+    // where
+    //     L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
+    //     B: ArgminNLCGBetaUpdate<O::Param>,
 {
     /// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))
-    pub fn new(
-        operator: O,
-        init_param: O::Param,
-        linesearch: L,
-        beta_method: B,
-    ) -> Result<Self, Error> {
+    pub fn new(linesearch: L, beta_method: B) -> Result<Self, Error> {
         Ok(NonlinearConjugateGradient {
-            p: O::Param::default(),
+            p: P::default(),
             beta: std::f64::NAN,
-            linesearch: Box::new(linesearch),
-            beta_method: Box::new(beta_method),
+            linesearch: linesearch,
+            beta_method: beta_method,
             restart_iter: std::u64::MAX,
             restart_orthogonality: None,
-            base: ArgminBase::new(operator, init_param),
         })
     }
 
     /// Specifiy the number of iterations after which a restart should be performed
     /// This allows the algorithm to "forget" previous information which may not be helpful
     /// anymore.
-    pub fn set_restart_iters(&mut self, iters: u64) -> &mut Self {
+    pub fn restart_iters(mut self, iters: u64) -> Self {
         self.restart_iter = iters;
         self
     }
@@ -187,90 +161,99 @@ where
     /// `|\nabla f_k^T * \nabla f_{k-1}| / | \nabla f_k ||^2 >= v`
     ///
     /// A typical value for `v` is 0.1.
-    pub fn set_restart_orthogonality(&mut self, v: f64) -> &mut Self {
+    pub fn restart_orthogonality(mut self, v: f64) -> Self {
         self.restart_orthogonality = Some(v);
         self
     }
 }
 
-impl<O, L, B> ArgminIter for NonlinearConjugateGradient<O, L, B>
+impl<O, P, L, B> Solver<O> for NonlinearConjugateGradient<P, L, B>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminDot<O::Param, f64>
+    O: ArgminOp<Param = P, Output = f64>,
+    P: Clone
+        + Default
+        + Serialize
+        + ArgminSub<P, P>
+        + ArgminDot<P, f64>
+        + ArgminScaledAdd<P, f64, P>
+        + ArgminAdd<P, P>
+        + ArgminMul<f64, P>
+        + ArgminDot<P, f64>
         + ArgminNorm<f64>,
-    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
-    B: ArgminNLCGBetaUpdate<O::Param>,
+    O::Hessian: Default,
+    L: Clone + ArgminLineSearch<P> + Solver<OpWrapper<O>>,
+    B: ArgminNLCGBetaUpdate<P>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-
-    fn init(&mut self) -> Result<(), Error> {
-        let param = self.cur_param();
-        let cost = self.apply(&param)?;
-        let grad = self.gradient(&param)?;
+    fn init(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<P, O::Hessian>,
+    ) -> Result<Option<ArgminIterData<P, P>>, Error> {
+        let cost = op.apply(&state.cur_param)?;
+        let grad = op.gradient(&state.cur_param)?;
         self.p = grad.mul(&(-1.0));
-        self.set_cur_cost(cost);
-        self.set_cur_grad(grad);
-        Ok(())
+        let out = ArgminIterData::new(state.cur_param.clone(), cost).set_grad(grad);
+        // self.set_cur_cost(cost);
+        // self.set_cur_grad(grad);
+        Ok(Some(out))
     }
 
     /// Perform one iteration of SA algorithm
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        // reset line search
-        self.linesearch.base_reset();
-
-        let xk = self.cur_param();
-        let grad = self.cur_grad();
-        let pk = self.p.clone();
-        let cur_cost = self.cur_cost();
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<P, O::Hessian>,
+    ) -> Result<ArgminIterData<P, P>, Error> {
+        let xk = state.cur_param;
+        let grad = state.cur_grad;
+        let cur_cost = state.cur_cost;
 
         // Linesearch
-        self.linesearch.set_initial_parameter(xk);
-        self.linesearch.set_search_direction(pk.clone());
-        self.linesearch.set_initial_gradient(grad.clone());
-        self.linesearch.set_initial_cost(cur_cost);
+        self.linesearch.set_init_param(xk.clone());
+        self.linesearch.set_search_direction(self.p.clone());
+        self.linesearch.set_init_grad(grad.clone());
+        self.linesearch.set_init_cost(cur_cost);
 
-        self.linesearch.run_fast()?;
+        // Run solver
+        let mut exec = Executor::new(op.clone(), self.linesearch.clone(), xk);
+        let linesearch_result = exec.run_fast()?;
 
-        let xk1 = self.linesearch.result().param;
+        // hack
+        op.cost_func_count += exec.cost_func_count;
+        op.grad_func_count += exec.grad_func_count;
+        op.hessian_func_count += exec.hessian_func_count;
+
+        let xk1 = linesearch_result.param;
 
         // Update of beta
-        let new_grad = self.gradient(&xk1)?;
+        let new_grad = op.gradient(&xk1)?;
 
         let restart_orthogonality = match self.restart_orthogonality {
             Some(v) => new_grad.dot(&grad).abs() / new_grad.norm().powi(2) >= v,
             None => false,
         };
 
-        let restart_iter: bool = (self.cur_iter() % self.restart_iter == 0) && self.cur_iter() != 0;
+        let restart_iter: bool = (state.cur_iter % self.restart_iter == 0) && state.cur_iter != 0;
 
         if restart_iter || restart_orthogonality {
             self.beta = 0.0;
         } else {
-            self.beta = self.beta_method.update(&grad, &new_grad, &pk);
+            self.beta = self.beta_method.update(&grad, &new_grad, &self.p);
         }
 
         // Update of p
         self.p = new_grad.mul(&(-1.0)).add(&self.p.mul(&self.beta));
 
         // Housekeeping
-        self.set_cur_param(xk1.clone());
-        self.set_cur_grad(new_grad);
-        let cost = self.apply(&xk1)?;
-        self.set_cur_cost(cost);
+        let cost = op.apply(&xk1)?;
 
-        let mut out = ArgminIterData::new(xk1, cost);
-        out.add_kv(make_kv!(
-            "beta" => self.beta;
-            "restart_iter" => restart_iter;
-            "restart_orthogonality" => restart_orthogonality;
-        ));
+        let out =
+            ArgminIterData::new(xk1, cost)
+                .set_grad(new_grad)
+                .add_kv(make_kv!("beta" => self.beta;
+                 "restart_iter" => restart_iter;
+                 "restart_orthogonality" => restart_orthogonality;
+                ));
         Ok(out)
     }
 }
