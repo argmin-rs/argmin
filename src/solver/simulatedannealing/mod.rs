@@ -221,12 +221,6 @@ impl std::default::Default for SATempFunc {
 /// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 /// DOI: 10.1126/science.220.4598.671  
 #[derive(Serialize, Deserialize)]
-// #[log("initial_temperature" => "self.init_temp")]
-// #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
-// #[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
-// #[log("reanneal_fixed" => "self.reanneal_fixed")]
-// #[log("reanneal_accepted" => "self.reanneal_accepted")]
-// #[log("reanneal_best" => "self.reanneal_best")]
 pub struct SimulatedAnnealing {
     /// Initial temperature
     init_temp: f64,
@@ -266,10 +260,8 @@ impl SimulatedAnnealing {
     ///
     /// Parameters:
     ///
-    /// * `init_param`: initial parameter vector
     /// * `init_temp`: initial temperature
     pub fn new(init_temp: f64) -> Result<Self, Error> {
-        // let prev_cost = cost_function.apply(&init_param)?;
         if init_temp <= 0_f64 {
             Err(ArgminError::InvalidParameter {
                 text: "Initial temperature must be > 0.".to_string(),
@@ -421,23 +413,8 @@ where
         //
         // which will always be between 0 and 0.5.
         let prob: f64 = self.rng.gen();
-        let accepted = if (new_cost < state.prev_cost)
-            || (1.0 / (1.0 + ((new_cost - state.prev_cost) / self.cur_temp).exp()) > prob)
-        {
-            // If yes, update the parameter vector for the next iteration.
-            // self.prev_cost = new_cost;
-            // self.set_cur_param(new_param.clone());
-
-            // In case the new solution is better than the current best, update best as well.
-            // if new_cost < self.best_cost() {
-            //     new_best = true;
-            //     self.set_best_cost(new_cost);
-            //     self.set_best_param(new_param.clone());
-            // }
-            true
-        } else {
-            false
-        };
+        let accepted = (new_cost < state.prev_cost)
+            || (1.0 / (1.0 + ((new_cost - state.prev_cost) / self.cur_temp).exp()) > prob);
 
         // Update stall iter variables
         self.update_stall_and_reanneal_iter(accepted, new_cost <= state.best_cost);
@@ -471,9 +448,10 @@ where
         ));
         Ok(out)
     }
-    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
-        TerminationReason::NotTerminated
-    }
+
+    // fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+    //     TerminationReason::NotTerminated
+    // }
 }
 // #[log("initial_temperature" => "self.init_temp")]
 // #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
