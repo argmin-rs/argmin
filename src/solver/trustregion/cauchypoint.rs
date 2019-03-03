@@ -12,6 +12,7 @@
 
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::default::Default;
 
 /// The Cauchy point is the minimum of the quadratic approximation of the cost function within the
 /// trust region along the direction given by the first derivative.
@@ -20,88 +21,85 @@ use serde::{Deserialize, Serialize};
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct CauchyPoint<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param:
-        ArgminMul<f64, O::Param> + ArgminWeightedDot<O::Param, f64, O::Hessian> + ArgminNorm<f64>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct CauchyPoint<P, H> {
     /// Radius
     radius: f64,
-    /// base
-    base: ArgminBase<O>,
+    /// Gradient
+    grad: P,
+    /// Hessian
+    hessian: H,
 }
 
-impl<O> CauchyPoint<O>
+impl<P, H> CauchyPoint<P, H>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param:
-        ArgminMul<f64, O::Param> + ArgminWeightedDot<O::Param, f64, O::Hessian> + ArgminNorm<f64>,
+    P: Default,
+    H: Default,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(operator: O) -> Self {
-        let base = ArgminBase::new(operator, O::Param::default());
+    pub fn new() -> Self {
         CauchyPoint {
             radius: std::f64::NAN,
-            base,
+            grad: P::default(),
+            hessian: H::default(),
         }
     }
 }
 
-impl<O> ArgminIter for CauchyPoint<O>
+impl<O, P, H> Solver<O> for CauchyPoint<P, H>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param:
-        ArgminMul<f64, O::Param> + ArgminWeightedDot<O::Param, f64, O::Hessian> + ArgminNorm<f64>,
+    O: ArgminOp<Param = P, Output = f64, Hessian = H>,
+    P: Clone + Serialize + ArgminMul<f64, P> + ArgminWeightedDot<P, f64, H> + ArgminNorm<f64>,
+    H: Clone + Serialize,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-
-    fn init(&mut self) -> Result<(), Error> {
-        self.base_reset();
-        // This is not an iterative method.
-        self.set_max_iters(1);
-        Ok(())
-    }
-
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let grad = self.cur_grad();
-        let grad_norm = grad.norm();
-        let wdp = grad.weighted_dot(&self.cur_hessian(), &grad);
+    fn next_iter(
+        &mut self,
+        _op: &mut OpWrapper<O>,
+        state: IterState<P, H>,
+    ) -> Result<ArgminIterData<P, P>, Error> {
+        let grad_norm = state.cur_grad.norm();
+        let wdp = state
+            .cur_grad
+            .weighted_dot(&state.cur_hessian, &state.cur_grad);
         let tau: f64 = if wdp <= 0.0 {
             1.0
         } else {
             1.0f64.min(grad_norm.powi(3) / (self.radius * wdp))
         };
 
-        let new_param = grad.mul(&(-tau * self.radius / grad_norm));
+        let new_param = state.cur_grad.mul(&(-tau * self.radius / grad_norm));
         let out = ArgminIterData::new(new_param, 0.0);
         Ok(out)
     }
+
+    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        if state.cur_iter >= 1 {
+            TerminationReason::MaxItersReached
+        } else {
+            TerminationReason::NotTerminated
+        }
+    }
 }
 
-impl<O> ArgminTrustRegion for CauchyPoint<O>
+impl<P, H> ArgminTrustRegion<P, H> for CauchyPoint<P, H>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param:
-        ArgminMul<f64, O::Param> + ArgminWeightedDot<O::Param, f64, O::Hessian> + ArgminNorm<f64>,
+    P: Serialize,
+    H: Serialize,
 {
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
     }
 
-    fn set_grad(&mut self, grad: O::Param) {
-        self.set_cur_grad(grad);
+    fn set_grad(&mut self, grad: P) {
+        self.grad = grad;
     }
 
-    fn set_hessian(&mut self, hessian: O::Hessian) {
-        self.set_cur_hessian(hessian);
+    fn set_hessian(&mut self, hessian: H) {
+        self.hessian = hessian;
     }
 }
 

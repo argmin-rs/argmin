@@ -459,6 +459,7 @@ where
         TerminationReason::NotTerminated
     }
 }
+// TODO: this
 // #[log("initial_temperature" => "self.init_temp")]
 // #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
 // #[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
