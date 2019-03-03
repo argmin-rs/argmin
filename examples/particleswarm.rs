@@ -8,11 +8,12 @@
 extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::particleswarm::*;
+use serde::{Deserialize, Serialize};
 
 use argmin_testfunctions::himmelblau;
 
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Serialize, Deserialize)]
 struct Himmelblau
 {
 

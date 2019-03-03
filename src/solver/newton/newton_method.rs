@@ -11,6 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// Newton's method iteratively finds the stationary points of a function f by using a second order
 /// approximation of f at the current point.
@@ -25,7 +26,9 @@ use crate::prelude::*;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 /// use ndarray::{Array, Array1, Array2};
 ///
-/// # #[derive(Clone, Default)]
+/// # use serde::{Deserialize, Serialize};
+/// #
+/// # #[derive(Clone, Default, Serialize, Deserialize)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {
@@ -86,13 +89,12 @@ use crate::prelude::*;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct Newton<O>
 where
     O: ArgminOp,
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
     /// gamma
     gamma: f64,
@@ -103,12 +105,11 @@ where
 impl<O> Newton<O>
 where
     O: ArgminOp,
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
     /// Constructor
-    pub fn new(cost_function: O, init_param: <O as ArgminOp>::Param) -> Self {
+    pub fn new(cost_function: O, init_param: O::Param) -> Self {
         Newton {
             gamma: 1.0,
             base: ArgminBase::new(cost_function, init_param),
@@ -131,13 +132,12 @@ where
 impl<O> ArgminIter for Newton<O>
 where
     O: ArgminOp,
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminInv<<O as ArgminOp>::Hessian>
-        + ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         let param = self.cur_param();
@@ -147,4 +147,18 @@ where
         let out = ArgminIterData::new(new_param, 0.0);
         Ok(out)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    // Only works with ndarray feature because of the required inverse of a matrix
+    #[cfg(feature = "ndarrayl")]
+    type Operator = NoOperator<ndarray::Array1<f64>, f64, ndarray::Array2<f64>>;
+
+    // Only works with ndarray feature because of the required inverse of a matrix
+    #[cfg(feature = "ndarrayl")]
+    send_sync_test!(newton_method, Newton<Operator>);
 }

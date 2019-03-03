@@ -8,8 +8,9 @@
 extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::conjugategradient::ConjugateGradient;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 struct MyProblem {}
 
 impl ArgminOp for MyProblem {

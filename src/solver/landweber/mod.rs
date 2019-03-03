@@ -16,6 +16,7 @@
 //! [1] https://en.wikipedia.org/wiki/Landweber_iteration
 
 use crate::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// The Landweber iteration is a solver for ill-posed linear inverse problems.
 ///
@@ -31,8 +32,9 @@ use crate::prelude::*;
 /// use argmin::prelude::*;
 /// use argmin::solver::landweber::Landweber;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+/// # use serde::{Deserialize, Serialize};
 ///
-/// # #[derive(Clone, Default)]
+/// # #[derive(Clone, Default, Serialize, Deserialize)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {
@@ -75,10 +77,10 @@ use crate::prelude::*;
 /// [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
 /// kind. Amer. J. Math. 73, 615–624
 /// [1] https://en.wikipedia.org/wiki/Landweber_iteration
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct Landweber<O>
 where
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
     O: ArgminOp,
 {
     /// omgea
@@ -89,15 +91,11 @@ where
 
 impl<O> Landweber<O>
 where
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
     O: ArgminOp,
 {
     /// Constructor
-    pub fn new(
-        cost_function: O,
-        omega: f64,
-        init_param: <O as ArgminOp>::Param,
-    ) -> Result<Self, Error> {
+    pub fn new(cost_function: O, omega: f64, init_param: O::Param) -> Result<Self, Error> {
         Ok(Landweber {
             omega,
             base: ArgminBase::new(cost_function, init_param),
@@ -107,12 +105,12 @@ where
 
 impl<O> ArgminIter for Landweber<O>
 where
-    <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
     O: ArgminOp,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
         let param = self.cur_param();
@@ -121,4 +119,12 @@ where
         let out = ArgminIterData::new(new_param, 0.0);
         Ok(out)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    send_sync_test!(landweber, Landweber<MinimalNoOperator>);
 }

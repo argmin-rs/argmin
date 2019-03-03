@@ -12,7 +12,6 @@
 
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
-use std;
 use std::default::Default;
 
 /// The conjugate gradient method is a solver for systems of linear equations with a symmetric and
@@ -24,8 +23,9 @@ use std::default::Default;
 /// extern crate argmin;
 /// use argmin::prelude::*;
 /// use argmin::solver::conjugategradient::ConjugateGradient;
+/// use serde::{Deserialize, Serialize};
 ///
-/// #[derive(Clone, Default)]
+/// #[derive(Clone, Default, Serialize, Deserialize)]
 /// struct MyProblem {}
 ///
 /// impl ArgminOp for MyProblem {
@@ -83,21 +83,21 @@ use std::default::Default;
 pub struct ConjugateGradient<O>
 where
     O: ArgminOp<Output = <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>,
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminDot<O::Param, f64>,
 {
     /// b (right hand side)
-    b: <O as ArgminOp>::Param,
+    b: O::Param,
     /// residual
-    r: <O as ArgminOp>::Param,
+    r: O::Param,
     /// p
-    p: <O as ArgminOp>::Param,
+    p: O::Param,
     /// previous p
-    p_prev: <O as ArgminOp>::Param,
+    p_prev: O::Param,
     /// r^T * r
     rtr: f64,
     /// alpha
@@ -111,12 +111,12 @@ where
 impl<O> ConjugateGradient<O>
 where
     O: ArgminOp<Output = <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>,
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminDot<O::Param, f64>,
 {
     /// Constructor
     ///
@@ -127,16 +127,12 @@ where
     /// `b`: right hand side of `A * x = b`
     ///
     /// `init_param`: Initial parameter vector
-    pub fn new(
-        operator: O,
-        b: <O as ArgminOp>::Param,
-        init_param: <O as ArgminOp>::Param,
-    ) -> Result<Self, Error> {
+    pub fn new(operator: O, b: O::Param, init_param: O::Param) -> Result<Self, Error> {
         Ok(ConjugateGradient {
             b,
-            r: <O as ArgminOp>::Param::default(),
-            p: <O as ArgminOp>::Param::default(),
-            p_prev: <O as ArgminOp>::Param::default(),
+            r: O::Param::default(),
+            p: O::Param::default(),
+            p_prev: O::Param::default(),
             rtr: std::f64::NAN,
             alpha: std::f64::NAN,
             beta: std::f64::NAN,
@@ -145,17 +141,17 @@ where
     }
 
     /// Return the current search direction (This is needed by NewtonCG for instance)
-    pub fn p(&self) -> <O as ArgminOp>::Param {
+    pub fn p(&self) -> O::Param {
         self.p.clone()
     }
 
     /// Return the previous search direction (This is needed by NewtonCG for instance)
-    pub fn p_prev(&self) -> <O as ArgminOp>::Param {
+    pub fn p_prev(&self) -> O::Param {
         self.p_prev.clone()
     }
 
     /// Return the current residual (This is needed by NewtonCG for instance)
-    pub fn residual(&self) -> <O as ArgminOp>::Param {
+    pub fn residual(&self) -> O::Param {
         self.r.clone()
     }
 }
@@ -163,16 +159,16 @@ where
 impl<O> ArgminIter for ConjugateGradient<O>
 where
     O: ArgminOp<Output = <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>,
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminDot<O::Param, f64>,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         let init_param = self.cur_param();

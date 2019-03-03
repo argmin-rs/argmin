@@ -9,9 +9,10 @@ extern crate argmin;
 extern crate ndarray;
 use argmin::prelude::*;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
-use argmin::solver::newton::NewtonCG;
-use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-use ndarray::{Array, Array1, Array2};
+use argmin::solver::quasinewton::BFGS;
+use argmin::testfunctions::rosenbrock;
+use argmin_core::finitediff::*;
+use ndarray::{array, Array1, Array2};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Serialize, Deserialize)]
@@ -26,42 +27,43 @@ impl ArgminOp for Rosenbrock {
     type Hessian = Array2<f64>;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
+        Ok(rosenbrock(&p.to_vec(), self.a, self.b))
     }
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-        Ok(Array1::from_vec(rosenbrock_2d_derivative(
-            &p.to_vec(),
-            self.a,
-            self.b,
-        )))
-    }
-
-    fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-        let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);
-        Ok(Array::from_shape_vec((2, 2), h)?)
+        Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
     }
 }
 
 fn run() -> Result<(), Error> {
+    // checkpoint directory
+
     // Define cost function
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
     // Define initial parameter vector
-    // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
-    let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
+    // let init_param: Array1<f64> = array![-1.2, 1.0];
+    let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+    let init_hessian: Array2<f64> = Array2::eye(8);
 
-    // set up line search
+    // set up a line search
     let linesearch = MoreThuenteLineSearch::new(cost.clone());
 
     // Set up solver
-    let mut solver = NewtonCG::new(cost, init_param, linesearch);
+    let mut solver = match BFGS::from_checkpoint(".checkpoints/bfgs.arg") {
+        Ok(solver) => solver,
+        Err(_) => BFGS::new(cost, init_param, init_hessian, linesearch),
+    };
 
     // Set maximum number of iterations
-    solver.set_max_iters(80);
+    solver.set_max_iters(45);
 
     // Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
+
+    solver.set_checkpoint_dir(".checkpoints");
+    solver.set_checkpoint_name("bfgs");
+    solver.set_checkpoint_mode(CheckpointMode::Every(20));
 
     // Run solver
     solver.run()?;
@@ -71,6 +73,7 @@ fn run() -> Result<(), Error> {
 
     // Print result
     println!("{}", solver.result());
+
     Ok(())
 }
 

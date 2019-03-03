@@ -17,8 +17,9 @@
 
 use crate::prelude::*;
 use argmin_codegen::ArgminSolver;
-use rand;
-use rand::Rng;
+use rand::prelude::*;
+use rand_xorshift::XorShiftRng;
+use serde::{Deserialize, Serialize};
 
 /// Temperature functions for Simulated Annealing.
 ///
@@ -28,8 +29,9 @@ use rand::Rng;
 /// * `SATempFunc::TemperatureFast`: `t_i = t_init / i`
 /// * `SATempFunc::Boltzmann`: `t_i = t_init / ln(i)`
 /// * `SATempFunc::Exponential`: `t_i = t_init * 0.95^i`
-/// * `SATempFunc::Custom`: User provided temperature update function which must have the function
-///   signature `&Fn(init_temp: f64, iteration_number: u64) -> f64`
+// /// * `SATempFunc::Custom`: User provided temperature update function which must have the function
+// ///   signature `&Fn(init_temp: f64, iteration_number: u64) -> f64`
+#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
 pub enum SATempFunc {
     /// `t_i = t_init / i`
     TemperatureFast,
@@ -37,9 +39,15 @@ pub enum SATempFunc {
     Boltzmann,
     /// `t_i = t_init * x^i`
     Exponential(f64),
-    /// User-provided temperature function. The first parameter must be the current temperature and
-    /// the second parameter must be the iteration number.
-    Custom(Box<Fn(f64, u64) -> f64>),
+    // /// User-provided temperature function. The first parameter must be the current temperature and
+    // /// the second parameter must be the iteration number.
+    // Custom(Box<Fn(f64, u64) -> f64>),
+}
+
+impl std::default::Default for SATempFunc {
+    fn default() -> Self {
+        SATempFunc::Boltzmann
+    }
 }
 
 /// Simulated Annealing
@@ -53,9 +61,11 @@ pub enum SATempFunc {
 /// use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 /// use argmin::testfunctions::rosenbrock;
 /// use rand::prelude::*;
+/// use rand_xorshift::XorShiftRng;
 /// use std::sync::{Arc, Mutex};;
+/// use serde::{Deserialize, Serialize};
 ///
-/// #[derive(Clone)]
+/// #[derive(Clone, Serialize, Deserialize)]
 /// struct Rosenbrock {
 ///     /// Parameter a, usually 1.0
 ///     a: f64,
@@ -68,7 +78,7 @@ pub enum SATempFunc {
 ///     /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
 ///     /// `self` to be passed as an immutable reference. This gives us thread safe interior
 ///     /// mutability.
-///     rng: Arc<Mutex<SmallRng>>,
+///     rng: Arc<Mutex<XorShiftRng>>,
 /// }
 ///
 /// impl std::default::Default for Rosenbrock {
@@ -87,7 +97,7 @@ pub enum SATempFunc {
 ///             b,
 ///             lower_bound,
 ///             upper_bound,
-///             rng: Arc::new(Mutex::new(SmallRng::from_entropy())),
+///             rng: Arc::new(Mutex::new(XorShiftRng::from_entropy())),
 ///         }
 ///     }
 /// }
@@ -211,7 +221,7 @@ pub enum SATempFunc {
 /// [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 /// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 /// DOI: 10.1126/science.220.4598.671  
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 #[log("initial_temperature" => "self.init_temp")]
 #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
 #[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
@@ -225,6 +235,7 @@ where
     /// Initial temperature
     init_temp: f64,
     /// which temperature function?
+    // #[serde(skip)]
     temp_func: SATempFunc,
     /// Number of iterations used for the caluclation of temperature. This is needed for
     /// reannealing!
@@ -254,7 +265,7 @@ where
     /// previous cost
     prev_cost: f64,
     /// random number generator
-    rng: rand::prelude::ThreadRng,
+    rng: XorShiftRng,
     /// base
     base: ArgminBase<O>,
 }
@@ -270,11 +281,7 @@ where
     /// * `cost_function`: cost function
     /// * `init_param`: initial parameter vector
     /// * `init_temp`: initial temperature
-    pub fn new(
-        cost_function: O,
-        init_param: <O as ArgminOp>::Param,
-        init_temp: f64,
-    ) -> Result<Self, Error> {
+    pub fn new(cost_function: O, init_param: O::Param, init_temp: f64) -> Result<Self, Error> {
         let prev_cost = cost_function.apply(&init_param)?;
         if init_temp <= 0_f64 {
             Err(ArgminError::InvalidParameter {
@@ -298,7 +305,7 @@ where
                 reanneal_iter_best: 0,
                 cur_temp: init_temp,
                 prev_cost,
-                rng: rand::thread_rng(),
+                rng: XorShiftRng::from_entropy(),
                 base: ArgminBase::new(cost_function, init_param),
             })
         }
@@ -348,7 +355,7 @@ where
     /// `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
     ///
     /// which will always be between 0 and 0.5.
-    fn accept(&mut self, next_param: &<O as ArgminOp>::Param, next_cost: f64) -> (bool, bool) {
+    fn accept(&mut self, next_param: &O::Param, next_cost: f64) -> (bool, bool) {
         let prob: f64 = self.rng.gen();
         let mut new_best = false;
         let accepted = if (next_cost < self.prev_cost)
@@ -379,12 +386,12 @@ where
             SATempFunc::TemperatureFast => self.init_temp / ((self.temp_iter + 1) as f64),
             SATempFunc::Boltzmann => self.init_temp / ((self.temp_iter + 1) as f64).ln(),
             SATempFunc::Exponential(x) => self.init_temp * x.powf((self.temp_iter + 1) as f64),
-            SATempFunc::Custom(ref func) => func(self.init_temp, self.temp_iter),
+            // SATempFunc::Custom(ref func) => func(self.init_temp, self.temp_iter),
         };
     }
 
     /// Perform annealing
-    fn anneal(&mut self) -> Result<<O as ArgminOp>::Param, Error> {
+    fn anneal(&mut self) -> Result<O::Param, Error> {
         let tmp = self.cur_param();
         let cur_temp = self.cur_temp;
         self.modify(&tmp, cur_temp)
@@ -439,9 +446,9 @@ impl<O> ArgminIter for SimulatedAnnealing<O>
 where
     O: ArgminOp<Output = f64>,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     /// Perform one iteration of SA algorithm
     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
@@ -487,4 +494,14 @@ where
         ));
         Ok(out)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+
+    type Operator = MinimalNoOperator;
+
+    send_sync_test!(sa, SimulatedAnnealing<Operator>);
 }

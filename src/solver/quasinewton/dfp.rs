@@ -12,9 +12,8 @@
 
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
 
-/// BFGS method
+/// DFP method
 ///
 /// # Example
 ///
@@ -22,7 +21,7 @@ use std::fmt::Debug;
 /// # extern crate argmin;
 /// # extern crate ndarray;
 /// use argmin::prelude::*;
-/// use argmin::solver::quasinewton::BFGS;
+/// use argmin::solver::quasinewton::DFP;
 /// use argmin::solver::linesearch::MoreThuenteLineSearch;
 /// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 /// use ndarray::{array, Array1, Array2};
@@ -62,7 +61,7 @@ use std::fmt::Debug;
 /// let linesearch = MoreThuenteLineSearch::new(cost.clone());
 ///
 /// // Set up solver
-/// let mut solver = BFGS::new(cost, init_param, init_hessian, linesearch);
+/// let mut solver = DFP::new(cost, init_param, init_hessian, linesearch);
 ///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(80);
@@ -95,19 +94,17 @@ use std::fmt::Debug;
 /// Springer. ISBN 0-387-30303-0.
 #[derive(ArgminSolver, Serialize, Deserialize)]
 #[stop("self.cur_grad().norm() < std::f64::EPSILON.sqrt()" => TargetPrecisionReached)]
-#[stop("(self.prev_cost() - self.cur_cost()).abs() < std::f64::EPSILON" => NoChangeInCost)]
-pub struct BFGS<O, L>
+pub struct DFP<O, L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: Debug
-        + ArgminSub<O::Param, O::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
-        + ArgminMul<f64, O::Param>,
-    O::Hessian: Debug
-        + ArgminSub<O::Hessian, O::Hessian>
+        + ArgminMul<f64, O::Param>
+        + ArgminTranspose,
+    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
@@ -124,18 +121,17 @@ where
     base: ArgminBase<O>,
 }
 
-impl<O, L> BFGS<O, L>
+impl<O, L> DFP<O, L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: Debug
-        + ArgminSub<O::Param, O::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
-        + ArgminMul<f64, O::Param>,
-    O::Hessian: Debug
-        + ArgminSub<O::Hessian, O::Hessian>
+        + ArgminMul<f64, O::Param>
+        + ArgminTranspose,
+    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
@@ -151,7 +147,7 @@ where
         init_inverse_hessian: O::Hessian,
         linesearch: L,
     ) -> Self {
-        BFGS {
+        DFP {
             inv_hessian: init_inverse_hessian,
             linesearch: Box::new(linesearch),
             base: ArgminBase::new(cost_function, init_param),
@@ -159,18 +155,17 @@ where
     }
 }
 
-impl<O, L> ArgminIter for BFGS<O, L>
+impl<O, L> ArgminIter for DFP<O, L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: Debug
-        + ArgminSub<O::Param, O::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
-        + ArgminMul<f64, O::Param>,
-    O::Hessian: Debug
-        + ArgminSub<O::Hessian, O::Hessian>
+        + ArgminMul<f64, O::Param>
+        + ArgminTranspose,
+    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
@@ -218,27 +213,15 @@ where
         let sk = xk1.sub(&param);
 
         let yksk: f64 = yk.dot(&sk);
-        let rhok = 1.0 / yksk;
-
-        let e = self.inv_hessian.eye_like();
-        let mat1: Self::Hessian = sk.dot(&yk);
-        let mat1 = mat1.mul(&rhok);
-
-        let mat2 = mat1.clone().t();
-
-        let tmp1 = e.sub(&mat1);
-        let tmp2 = e.sub(&mat2);
 
         let sksk: Self::Hessian = sk.dot(&sk);
-        let sksk = sksk.mul(&rhok);
 
-        // if self.cur_iter() == 0 {
-        //     let ykyk: f64 = yk.dot(&yk);
-        //     self.inv_hessian = self.inv_hessian.eye_like().mul(&(yksk / ykyk));
-        //     println!("{:?}", self.inv_hessian);
-        // }
+        let tmp3: O::Param = self.inv_hessian.dot(&yk);
+        let tmp4: f64 = tmp3.dot(&yk);
+        let tmp3: O::Hessian = tmp3.dot(&tmp3);
+        let tmp3: O::Hessian = tmp3.mul(&(1.0f64 / tmp4));
 
-        self.inv_hessian = tmp1.dot(&self.inv_hessian.dot(&tmp2)).add(&sksk);
+        self.inv_hessian = self.inv_hessian.sub(&tmp3).add(&sksk.mul(&(1.0f64 / yksk)));
 
         let out = ArgminIterData::new(xk1, linesearch_result.cost);
         Ok(out)
@@ -253,5 +236,5 @@ mod tests {
 
     type Operator = MinimalNoOperator;
 
-    send_sync_test!(bfgs, BFGS<Operator, MoreThuenteLineSearch<Operator>>);
+    send_sync_test!(dfp, DFP<Operator, MoreThuenteLineSearch<Operator>>);
 }

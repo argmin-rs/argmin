@@ -1,3 +1,5 @@
+.checkpoints/
+params/
 .*.swp
 Cargo.lock
 src/.*.swp

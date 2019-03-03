@@ -14,12 +14,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use crate::solver::conjugategradient::{
-    FletcherReeves, HestenesStiefel, PolakRibiere, PolakRibierePlus,
-};
-// use crate::solver::linesearch::HagerZhangLineSearch;
-use crate::solver::linesearch::MoreThuenteLineSearch;
-use std;
+use serde::{Deserialize, Serialize};
 use std::default::Default;
 
 /// The nonlinear conjugate gradient is a generalization of the conjugate gradient method for
@@ -30,10 +25,12 @@ use std::default::Default;
 /// ```
 /// # extern crate argmin;
 /// use argmin::prelude::*;
-/// use argmin::solver::conjugategradient::NonlinearConjugateGradient;
+/// use argmin::solver::conjugategradient::{NonlinearConjugateGradient, PolakRibiere};
+/// use argmin::solver::linesearch::MoreThuenteLineSearch;
 /// use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+/// # use serde::{Deserialize, Serialize};
 ///
-/// # #[derive(Clone, Default)]
+/// # #[derive(Clone, Default, Serialize, Deserialize)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {
@@ -57,8 +54,16 @@ use std::default::Default;
 /// // define inital parameter vector
 /// let init_param: Vec<f64> = vec![1.2, 1.2];
 ///
+/// // set up line search
+/// let linesearch = MoreThuenteLineSearch::new(operator.clone());
+/// // set up beta update method
+/// let beta_method = PolakRibiere::new();
+///
 /// // Set up nonlinear conjugate gradient method
-/// let mut solver = NonlinearConjugateGradient::new_pr(operator, init_param)?;
+/// let mut solver = NonlinearConjugateGradient::new(operator,
+///                                                  init_param,
+///                                                  linesearch,
+///                                                  beta_method)?;
 ///
 /// // Set maximum number of iterations
 /// solver.set_max_iters(20);
@@ -105,32 +110,28 @@ use std::default::Default;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
-pub struct NonlinearConjugateGradient<'a, O>
+#[derive(ArgminSolver, Serialize, Deserialize)]
+pub struct NonlinearConjugateGradient<O, L, B>
 where
-    O: 'a + ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
+    O: ArgminOp<Output = f64>,
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminDot<O::Param, f64>
         + ArgminNorm<f64>,
+    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
+    B: ArgminNLCGBetaUpdate<O::Param>,
 {
     /// p
-    p: <O as ArgminOp>::Param,
+    p: O::Param,
     /// beta
     beta: f64,
     /// line search
-    linesearch: Box<
-        ArgminLineSearch<
-                Param = <O as ArgminOp>::Param,
-                Output = f64,
-                Hessian = <O as ArgminOp>::Hessian,
-            > + 'a,
-    >,
+    linesearch: Box<L>,
     /// beta update method
-    beta_method: Box<ArgminNLCGBetaUpdate<<O as ArgminOp>::Param> + 'a>,
+    beta_method: Box<B>,
     /// Number of iterations after which a restart is performed
     restart_iter: u64,
     /// Restart based on orthogonality
@@ -139,85 +140,35 @@ where
     base: ArgminBase<O>,
 }
 
-impl<'a, O> NonlinearConjugateGradient<'a, O>
+impl<O, L, B> NonlinearConjugateGradient<O, L, B>
 where
-    O: 'a + ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
+    O: ArgminOp<Output = f64>,
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminDot<O::Param, f64>
         + ArgminNorm<f64>,
+    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
+    B: ArgminNLCGBetaUpdate<O::Param>,
 {
     /// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))
-    pub fn new(operator: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
-        let linesearch: Box<dyn ArgminLineSearch<Param = _, Output = _, Hessian = _>> =
-            Box::new(MoreThuenteLineSearch::new(operator.clone()));
-        // Box::new(HagerZhangLineSearch::new(operator.clone()));
-        let beta_method = PolakRibiere::new();
+    pub fn new(
+        operator: O,
+        init_param: O::Param,
+        linesearch: L,
+        beta_method: B,
+    ) -> Result<Self, Error> {
         Ok(NonlinearConjugateGradient {
-            p: <O as ArgminOp>::Param::default(),
+            p: O::Param::default(),
             beta: std::f64::NAN,
-            linesearch,
+            linesearch: Box::new(linesearch),
             beta_method: Box::new(beta_method),
             restart_iter: std::u64::MAX,
             restart_orthogonality: None,
             base: ArgminBase::new(operator, init_param),
         })
-    }
-
-    /// New PolakRibiere CG (PR-CG)
-    pub fn new_pr(operator: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
-        Self::new(operator, init_param)
-    }
-
-    /// New PolakRibierePlus CG (PR+-CG)
-    pub fn new_prplus(operator: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
-        let mut s = Self::new(operator, init_param)?;
-        let beta_method = PolakRibierePlus::new();
-        s.set_beta_update(Box::new(beta_method));
-        Ok(s)
-    }
-
-    /// New FletcherReeves CG (FR-CG)
-    pub fn new_fr(operator: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
-        let mut s = Self::new(operator, init_param)?;
-        let beta_method = FletcherReeves::new();
-        s.set_beta_update(Box::new(beta_method));
-        Ok(s)
-    }
-
-    /// New HestenesStiefel CG (HS-CG)
-    pub fn new_hs(operator: O, init_param: <O as ArgminOp>::Param) -> Result<Self, Error> {
-        let mut s = Self::new(operator, init_param)?;
-        let beta_method = HestenesStiefel::new();
-        s.set_beta_update(Box::new(beta_method));
-        Ok(s)
-    }
-
-    /// Specify line search method
-    pub fn set_linesearch(
-        &mut self,
-        linesearch: Box<
-            ArgminLineSearch<
-                    Param = <O as ArgminOp>::Param,
-                    Output = f64,
-                    Hessian = <O as ArgminOp>::Hessian,
-                > + 'a,
-        >,
-    ) -> &mut Self {
-        self.linesearch = linesearch;
-        self
-    }
-
-    /// Specify beta update method
-    pub fn set_beta_update(
-        &mut self,
-        beta_method: Box<ArgminNLCGBetaUpdate<<O as ArgminOp>::Param> + 'a>,
-    ) -> &mut Self {
-        self.beta_method = beta_method;
-        self
     }
 
     /// Specifiy the number of iterations after which a restart should be performed
@@ -242,20 +193,22 @@ where
     }
 }
 
-impl<'a, O> ArgminIter for NonlinearConjugateGradient<'a, O>
+impl<O, L, B> ArgminIter for NonlinearConjugateGradient<O, L, B>
 where
-    O: 'a + ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
-        + ArgminScaledAdd<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>
-        + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-        + ArgminMul<f64, <O as ArgminOp>::Param>
-        + ArgminDot<<O as ArgminOp>::Param, f64>
+    O: ArgminOp<Output = f64>,
+    O::Param: ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, f64>
+        + ArgminScaledAdd<O::Param, f64, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<f64, O::Param>
+        + ArgminDot<O::Param, f64>
         + ArgminNorm<f64>,
+    L: ArgminLineSearch<Param = O::Param, Output = f64, Hessian = O::Hessian>,
+    B: ArgminNLCGBetaUpdate<O::Param>,
 {
-    type Param = <O as ArgminOp>::Param;
-    type Output = <O as ArgminOp>::Output;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         let param = self.cur_param();
@@ -320,4 +273,22 @@ where
         ));
         Ok(out)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+    use crate::solver::conjugategradient::beta::PolakRibiere;
+    use crate::solver::linesearch::MoreThuenteLineSearch;
+    use crate::MinimalNoOperator;
+
+    send_sync_test!(
+        nonlinear_cg,
+        NonlinearConjugateGradient<
+            MinimalNoOperator,
+            MoreThuenteLineSearch<MinimalNoOperator>,
+            PolakRibiere,
+        >
+    );
 }

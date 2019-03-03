@@ -12,8 +12,7 @@
 
 use crate::prelude::*;
 use crate::solver::trustregion::reduction_ratio;
-use crate::solver::trustregion::Steihaug;
-use std;
+use serde::{Deserialize, Serialize};
 
 /// The trust region method approximates the cost function within a certain region around the
 /// current point in parameter space. Depending on the quality of this approximation, the region is
@@ -38,8 +37,9 @@ use std;
 /// use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
 /// use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 /// use ndarray::{Array, Array1, Array2};
+/// # use serde::{Deserialize, Serialize};
 ///
-/// # #[derive(Clone, Default)]
+/// # #[derive(Clone, Default, Serialize, Deserialize)]
 /// # struct MyProblem {}
 /// #
 /// # impl ArgminOp for MyProblem {
@@ -75,14 +75,20 @@ use std;
 /// // tough case
 /// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 ///
-/// // Set up solver
-/// let mut solver = TrustRegion::new(cost.clone(), init_param);
+/// // Set up the subproblem
+/// let mut subproblem = Steihaug::new(cost.clone());
+/// // let mut subproblem = CauchyPoint::new(cost.clone());
+/// // let mut subproblem = Dogleg::new(cost.clone());
+/// subproblem.set_max_iters(2);
 ///
-/// // Set method for subproblem. Optional: If not provided, it will default to `Steihaug` method
-/// // let subproblem = Box::new(CauchyPoint::new(cost));
-/// let subproblem = Box::new(Dogleg::new(cost));
-/// // let mut subproblem = Box::new(Steihaug::new(cost));
-/// solver.set_subproblem(subproblem);
+/// // Set up the subproblem
+/// let mut subproblem = Steihaug::new(cost.clone());
+/// // let mut subproblem = CauchyPoint::new(cost.clone());
+/// // let mut subproblem = Dogleg::new(cost.clone());
+/// subproblem.set_max_iters(2);
+///
+/// // Set up solver
+/// let mut solver = TrustRegion::new(cost, init_param, subproblem);
 ///
 /// // Set the maximum number of iterations
 /// solver.set_max_iters(2_000);
@@ -113,20 +119,20 @@ use std;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver)]
-pub struct TrustRegion<'a, O>
+#[derive(ArgminSolver, Serialize, Deserialize)]
+pub struct TrustRegion<O, R>
 where
-    O: 'a + ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param:
-        ArgminMul<f64, <O as ArgminOp>::Param>
-            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
-            + ArgminNorm<f64>
-            + ArgminDot<<O as ArgminOp>::Param, f64>
-            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminZero
-            + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O: ArgminOp<Output = f64>,
+    O::Param: ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>
+        + ArgminDot<O::Param, f64>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminZero
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
+    R: ArgminTrustRegion<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
     /// Radius
     radius: f64,
@@ -135,13 +141,7 @@ where
     /// eta \in [0, 1/4)
     eta: f64,
     /// subproblem
-    subproblem: Box<
-        ArgminTrustRegion<
-                Param = <O as ArgminOp>::Param,
-                Output = f64,
-                Hessian = <O as ArgminOp>::Hessian,
-            > + 'a,
-    >,
+    subproblem: Box<R>,
     /// f(xk)
     fxk: f64,
     /// mk(0)
@@ -150,34 +150,32 @@ where
     base: ArgminBase<O>,
 }
 
-impl<'a, O> TrustRegion<'a, O>
+impl<O, R> TrustRegion<O, R>
 where
-    O: 'a + ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param:
-        ArgminMul<f64, <O as ArgminOp>::Param>
-            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
-            + ArgminNorm<f64>
-            + ArgminDot<<O as ArgminOp>::Param, f64>
-            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminZero
-            + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O: ArgminOp<Output = f64>,
+    O::Param: ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>
+        + ArgminDot<O::Param, f64>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminZero
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
+    R: ArgminTrustRegion<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(operator: O, param: <O as ArgminOp>::Param) -> Self {
-        let base = ArgminBase::new(operator.clone(), param);
-        let mut subproblem = Box::new(Steihaug::new(operator));
-        subproblem.set_max_iters(2);
+    pub fn new(operator: O, param: O::Param, subproblem: R) -> Self {
+        let base = ArgminBase::new(operator, param);
         TrustRegion {
             radius: 1.0,
             max_radius: 100.0,
             eta: 0.125,
-            subproblem,
+            subproblem: Box::new(subproblem),
             fxk: std::f64::NAN,
             mk0: std::f64::NAN,
             base,
@@ -208,43 +206,28 @@ where
         Ok(self)
     }
 
-    /// Set subproblem
-    pub fn set_subproblem(
-        &mut self,
-        subproblem: Box<
-            ArgminTrustRegion<
-                    Param = <O as ArgminOp>::Param,
-                    Output = f64,
-                    Hessian = <O as ArgminOp>::Hessian,
-                > + 'a,
-        >,
-    ) -> &mut Self {
-        self.subproblem = subproblem;
-        self
-    }
-
-    fn m(&self, p: &<O as ArgminOp>::Param) -> f64 {
+    fn m(&self, p: &O::Param) -> f64 {
         self.fxk + p.dot(&self.cur_grad()) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
     }
 }
 
-impl<'a, O> ArgminIter for TrustRegion<'a, O>
+impl<O, R> ArgminIter for TrustRegion<O, R>
 where
-    O: 'a + ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param:
-        ArgminMul<f64, <O as ArgminOp>::Param>
-            + ArgminWeightedDot<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Hessian>
-            + ArgminNorm<f64>
-            + ArgminDot<<O as ArgminOp>::Param, f64>
-            + ArgminAdd<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminSub<<O as ArgminOp>::Param, <O as ArgminOp>::Param>
-            + ArgminZero
-            + ArgminMul<f64, <O as ArgminOp>::Param>,
-    <O as ArgminOp>::Hessian: ArgminDot<<O as ArgminOp>::Param, <O as ArgminOp>::Param>,
+    O: ArgminOp<Output = f64>,
+    O::Param: ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>
+        + ArgminDot<O::Param, f64>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminZero
+        + ArgminMul<f64, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
+    R: ArgminTrustRegion<Param = O::Param, Output = f64, Hessian = O::Hessian>,
 {
-    type Param = <O as ArgminOp>::Param;
+    type Param = O::Param;
     type Output = f64;
-    type Hessian = <O as ArgminOp>::Hessian;
+    type Hessian = O::Hessian;
 
     fn init(&mut self) -> Result<(), Error> {
         let param = self.cur_param();
@@ -296,4 +279,15 @@ where
 
         Ok(out)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::send_sync_test;
+    use crate::solver::trustregion::steihaug::Steihaug;
+
+    type Operator = MinimalNoOperator;
+
+    send_sync_test!(trustregion, TrustRegion<Operator, Steihaug<Operator>>);
 }

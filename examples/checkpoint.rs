@@ -41,22 +41,27 @@ fn run() -> Result<(), Error> {
 
     // Define initial parameter vector
     // let init_param: Array1<f64> = array![-1.2, 1.0];
-    // let init_hessian: Array2<f64> = Array2::eye(2);
     let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
     let init_hessian: Array2<f64> = Array2::eye(8);
 
     // set up a line search
-    let mut linesearch = MoreThuenteLineSearch::new(cost.clone());
-    linesearch.set_c(1e-4, 0.9)?;
+    let linesearch = MoreThuenteLineSearch::new(cost.clone());
 
     // Set up solver
     let mut solver = BFGS::new(cost, init_param, init_hessian, linesearch);
 
     // Set maximum number of iterations
-    solver.set_max_iters(50);
+    solver.set_max_iters(30);
 
     // Attach a logger
     solver.add_logger(ArgminSlogLogger::term());
+
+    // --------------------------------------------------------------------------------------------
+    // Set up checkpoints
+    // --------------------------------------------------------------------------------------------
+    solver.set_checkpoint_dir(".checkpoints");
+    solver.set_checkpoint_name("bfgs_test");
+    solver.set_checkpoint_mode(CheckpointMode::Every(20));
 
     // Run solver
     solver.run()?;
@@ -64,8 +69,33 @@ fn run() -> Result<(), Error> {
     // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
+    println!("-------------------------------------------");
+    println!("LOADING CHECKPOINT AND RUNNING SOLVER AGAIN");
+    println!("-------------------------------------------");
+
+    // now load the same solver from a checkpoint
+    let mut loaded_solver: BFGS<Rosenbrock, MoreThuenteLineSearch<Rosenbrock>> =
+        BFGS::from_checkpoint(".checkpoints/bfgs_test.arg")?;
+
+    // Loggers cannot be serialized, therefore they need to be added again
+    loaded_solver.add_logger(ArgminSlogLogger::term());
+
+    // Run solver
+    loaded_solver.run()?;
+
+    // Wait a second (lets the logger flush everything before printing again)
+    std::thread::sleep(std::time::Duration::from_secs(1));
+
     // Print result
+    println!("-------------------------------------------");
+    println!("Initial run");
+    println!("-------------------------------------------");
     println!("{}", solver.result());
+
+    println!("-------------------------------------------");
+    println!("Run from checkpoint");
+    println!("-------------------------------------------");
+    println!("{}", loaded_solver.result());
     Ok(())
 }
 

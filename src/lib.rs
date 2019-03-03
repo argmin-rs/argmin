@@ -57,6 +57,7 @@
 //!   - [Newton-CG](solver/newton/newton_cg/struct.NewtonCG.html)
 //! - [Quasi-Newton methods](solver/quasinewton/index.html)
 //!   - [BFGS](solver/quasinewton/bfgs/struct.BFGS.html)
+//!   - [DFP](solver/quasinewton/dfp/struct.DFP.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
 //!
@@ -66,7 +67,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = "0.1.7"
+//! argmin = "0.1.8"
 //! ```
 //!
 //! ## Optional features
@@ -75,7 +76,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = { version = "0.1.7", features = ["ctrlc", "ndarrayl"] }
+//! argmin = { version = "0.1.8", features = ["ctrlc", "ndarrayl"] }
 //! ```
 //!
 //! These may become default features in the future. Without these features compilation to
@@ -111,10 +112,11 @@
 //! # extern crate ndarray;
 //! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! # use argmin::prelude::*;
+//! # use serde::{Serialize, Deserialize};
 //! // [Imports omited]
 //!
 //! /// First, create a struct for your problem
-//! #[derive(Clone, Default)]
+//! #[derive(Clone, Default, Serialize, Deserialize)]
 //! struct Rosenbrock {
 //!     a: f64,
 //!     b: f64,
@@ -161,8 +163,10 @@
 //! use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! use argmin::prelude::*;
 //! use argmin::solver::gradientdescent::SteepestDescent;
+//! use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! use serde::{Serialize, Deserialize};
 //!
-//! #[derive(Clone, Default)]
+//! #[derive(Clone, Default, Serialize, Deserialize)]
 //! struct Rosenbrock {
 //!     a: f64,
 //!     b: f64,
@@ -189,8 +193,13 @@
 //!     // Define inital parameter vector
 //!     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);
 //!
+//!     // Pick a line search.
+//!     // let linesearch = HagerZhangLineSearch::new(cost.clone());
+//!     let linesearch = MoreThuenteLineSearch::new(cost.clone());
+//!     // let linesearch = BacktrackingLineSearch::new(cost.clone());
+//!
 //!     // Create solver
-//!     let mut solver = SteepestDescent::new(cost, init_param)?;
+//!     let mut solver = SteepestDescent::new(cost, init_param, linesearch)?;
 //!
 //!     // Set the maximum number of iterations to 1000
 //!     solver.set_max_iters(1000);
@@ -233,7 +242,10 @@
 //! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! # use argmin::prelude::*;
 //! # use argmin::solver::gradientdescent::SteepestDescent;
-//! # #[derive(Clone, Default)]
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use serde::{Serialize, Deserialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
 //! # struct Rosenbrock {
 //! #     a: f64,
 //! #     b: f64,
@@ -252,7 +264,8 @@
 //! # fn run() -> Result<(), Error> {
 //! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 //! #     let init_param = ndarray::Array1::from_vec(vec![-1.2, 1.0]);
-//! let mut solver = SteepestDescent::new(cost, init_param)?;
+//! #     let linesearch = MoreThuenteLineSearch::new(cost.clone());
+//! let mut solver = SteepestDescent::new(cost, init_param, linesearch)?;
 //! #     solver.set_max_iters(10);
 //! // Log to the terminal
 //! solver.add_logger(ArgminSlogLogger::term());
@@ -271,6 +284,305 @@
 //! #         std::process::exit(1);
 //! #     }
 //! # }
+//! ```
+//!
+//! # Checkpoints
+//!
+//! The longer an optimization runs, the higher the probability that something crashes.
+//! Particularly for optimizations which are running for days, weeks or even longer, this can
+//! become a problem. To mitigate this problem, it is possible in argmin to save checkpoints.
+//! Such a checkpoint is a serialization of an `ArgminSolver` object and can be loaded again and
+//! resumed.
+//! The `CheckpointMode` defines how often checkpoints are saved and is either `Never` (default),
+//! `Always` (every iteration) or `Every(u64)` (every Nth iteration). It is set via the setter
+//! method `set_checkpoint_mode()` which is implemented for every `ArgminSolver`.
+//! In addition, the directory where the checkpoints and a prefix for every file can be set via
+//! `set_checkpoint_dir()` and `set_checkpoint_prefix`, respectively.
+//!
+//! The following example illustrates the usage. Note that this example is only for illustration
+//! and does not make much sense. Please scroll down for a more practical example.
+//!
+//! ```
+//! // [Imports omited]
+//!
+//! # extern crate argmin;
+//! # extern crate ndarray;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::solver::quasinewton::BFGS;
+//! # use argmin::testfunctions::rosenbrock;
+//! # use argmin_core::finitediff::*;
+//! # use ndarray::{array, Array1, Array2};
+//! # use serde::{Deserialize, Serialize};
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Array1<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = Array2<f64>;
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock(&p.to_vec(), self.a, self.b))
+//! #     }
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
+//! #     }
+//! # }
+//! # fn run() -> Result<(), Error> {
+//! // Define cost function
+//! let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//! let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+//! let init_hessian: Array2<f64> = Array2::eye(8);
+//! let linesearch = MoreThuenteLineSearch::new(cost.clone());
+//!
+//! // Set up solver
+//! let mut solver = BFGS::new(cost, init_param, init_hessian, linesearch);
+//!
+//! // Set maximum number of iterations
+//! solver.set_max_iters(30);
+//!
+//! // Attach a logger
+//! solver.add_logger(ArgminSlogLogger::term());
+//!
+//! // --------------------------------------------------------------------------------------------
+//! // Set up checkpoints
+//! // --------------------------------------------------------------------------------------------
+//!
+//! // Specify the directory where the checkpoints are saved
+//! solver.set_checkpoint_dir(".checkpoints");
+//!
+//! // Specifiy the prefix for each file
+//! solver.set_checkpoint_name("bfgs");
+//!
+//! // Set the `CheckpointMode` which can be `Never` (default),
+//! // `Always` (every iteration) or `Every(u64)` (every Nth iteration).
+//! solver.set_checkpoint_mode(CheckpointMode::Every(10));
+//!
+//! // Run solver
+//! solver.run()?;
+//! # // Wait a second (lets the logger flush everything before printing again)
+//! # std::thread::sleep(std::time::Duration::from_secs(1));
+//!
+//! println!("-------------------------------------------");
+//! println!("LOADING CHECKPOINT AND RUNNING SOLVER AGAIN");
+//! println!("-------------------------------------------");
+//!
+//! // now load the same solver from a checkpoint
+//! // In order to properly deserialize, the exact type of
+//! // the solver needs to be specified.
+//! let mut loaded_solver: BFGS<Rosenbrock, MoreThuenteLineSearch<Rosenbrock>> =
+//!     BFGS::from_checkpoint(".checkpoints/bfgs.arg")?;
+//!
+//! // Loggers cannot be serialized, therefore they need to be added again
+//! loaded_solver.add_logger(ArgminSlogLogger::term());
+//!
+//! // Run solver
+//! loaded_solver.run()?;
+//! # // Wait a second (lets the logger flush everything before printing again)
+//! # std::thread::sleep(std::time::Duration::from_secs(1));
+//!
+//! // Print result
+//! println!("-------------------------------------------");
+//! println!("Initial run");
+//! println!("-------------------------------------------");
+//! println!("{}", solver.result());
+//!
+//! println!("-------------------------------------------");
+//! println!("Run from checkpoint");
+//! println!("-------------------------------------------");
+//! println!("{}", loaded_solver.result());
+//! #     Ok(())
+//! # }
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//! ```
+//!
+//! A more practical way of using the checkpoints feature is shown in the following example.
+//! This will either load an existing checkpoint if one exists or it will create a new solver. Type
+//! inference takes care of the return type of `ArgminSolver::from_checkpoint(...)`. This way, the
+//! binary can easily be restarted after a crash and will automatically resume from the latest
+//! checkpoint.
+//!
+//! ```rust
+//! # extern crate argmin;
+//! # extern crate ndarray;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::solver::quasinewton::BFGS;
+//! # use argmin::testfunctions::rosenbrock;
+//! # use argmin_core::finitediff::*;
+//! # use ndarray::{array, Array1, Array2};
+//! # use serde::{Deserialize, Serialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Array1<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = Array2<f64>;
+//! #
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock(&p.to_vec(), self.a, self.b))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #     // checkpoint directory
+//! #
+//! #     // Define cost function
+//! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//! #
+//! #     // Define initial parameter vector
+//! #     // let init_param: Array1<f64> = array![-1.2, 1.0];
+//! #     let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+//! #     let init_hessian: Array2<f64> = Array2::eye(8);
+//! #
+//! #     // set up a line search
+//! #     let linesearch = MoreThuenteLineSearch::new(cost.clone());
+//! #
+//! #     // Set up solver
+//! let mut solver = match BFGS::from_checkpoint(".checkpoints/bfgs.arg") {
+//!     Ok(solver) => solver,
+//!     Err(_) => BFGS::new(cost, init_param, init_hessian, linesearch),
+//! };
+//! #    Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//!
+//! ```
+//!
+//! # Writers
+//!
+//! Writers can be used to handle parameter vectors in some way during the optimization
+//! (suggestions for a better name are more than welcome!). Usually, this can be used to save the
+//! intermediate parameter vectors somewhere. Currently, different modes are supported:
+//!
+//! * `WriterMode::Never`: Don't do anything.
+//! * `WriterMode::Always`: Process parameter vector in every iteration.
+//! * `WriterMode::Every(i)`: Process parameter vector in every i-th iteration.
+//! * `WriterMode::NewBest`: Process parameter vector whenever there is a new best one.
+//!
+//! The following example creates two writers of the type `WriteToFile` which serializes the
+//! parameter vector using either `serde_json` or `bincode`. The first writer saves the parameters
+//! in every third iteration (as JSON), while the second one saves only the new best ones (using
+//! `bincode`).
+//! Both are attached to a solver using the `add_writer(...)` method of `ArgminSolver` before the
+//! solver is run.
+//!
+//! ```rust
+//! // [Imports omited]
+//! # extern crate argmin;
+//! # extern crate ndarray;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::solver::quasinewton::BFGS;
+//! # use argmin::testfunctions::rosenbrock;
+//! # use argmin_core::finitediff::*;
+//! # use ndarray::{array, Array1, Array2};
+//! # use serde::{Deserialize, Serialize};
+//! # use std::sync::Arc;
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Array1<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = Array2<f64>;
+//! #
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock(&p.to_vec(), self.a, self.b))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #     // Define cost function
+//! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//! #
+//! #     // Define initial parameter vector
+//! #     // let init_param: Array1<f64> = array![-1.2, 1.0];
+//! #     let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+//! #     let init_hessian: Array2<f64> = Array2::eye(8);
+//! #
+//! #     // set up a line search
+//! #     let linesearch = MoreThuenteLineSearch::new(cost.clone());
+//! #
+//! #     // Set up solver
+//! #     let mut solver = BFGS::new(cost, init_param, init_hessian, linesearch);
+//! #
+//! #     // Set maximum number of iterations
+//! #     solver.set_max_iters(10);
+//! #
+//! #     // Attach a logger
+//! #     solver.add_logger(ArgminSlogLogger::term());
+//! #
+//! // Create writer
+//! let mut writer1 = WriteToFile::new("params", "param");
+//!
+//! // Only save every 3 iterations
+//! writer1.set_mode(WriterMode::Every(3));
+//!  
+//! // Set serializer to JSON
+//! writer1.set_serializer(WriteToFileSerializer::JSON);
+//!  
+//! // Create writer which only saves new best ones
+//! let mut writer2 = WriteToFile::new("params", "best");
+//!  
+//! // Only save new best
+//! writer2.set_mode(WriterMode::NewBest);
+//!  
+//! // Set serializer to `bincode`
+//! writer2.set_serializer(WriteToFileSerializer::Bincode);
+//!  
+//! // Attach writers
+//! solver.add_writer(Arc::new(writer1));
+//! solver.add_writer(Arc::new(writer2));
+//! #
+//! #     // Run solver
+//! #     solver.run()?;
+//! #
+//! #     // Wait a second (lets the logger flush everything before printing again)
+//! #     std::thread::sleep(std::time::Duration::from_secs(1));
+//! #
+//! #     // Print result
+//! #     println!("{}", solver.result());
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//!
 //! ```
 //!
 //! # Implementing an optimization algorithm
@@ -298,6 +610,7 @@
 //! use argmin_codegen::ArgminSolver;
 //! use argmin::prelude::*;
 //! use std::default::Default;
+//! use serde::{Serialize, Deserialize};
 //!
 //! // The `Landweber` struct holds the `omega` parameter and has a field `base` which is of type
 //! // `ArgminBase`. The struct is generic over the ArgminOp `O` which holds type information about
@@ -305,10 +618,10 @@
 //! // `ArgminScaledSub<T, f64>`, which is neede for the update rule.
 //! // Deriving `ArgminSolver` implements a large portion of the API and provides many convenience
 //! // functions. It requires that `ArgminIter` is implemented on `Landweber` as well.
-//! #[derive(ArgminSolver)]
+//! #[derive(ArgminSolver, Serialize, Deserialize)]
 //! pub struct Landweber<O>
 //! where
-//!     <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+//!     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
 //!     O: ArgminOp,
 //! {
 //!     omega: f64,
@@ -318,13 +631,13 @@
 //! // For convenience, a constructor can/should be implemented
 //! impl<O> Landweber<O>
 //! where
-//!     <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+//!     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
 //!     O: ArgminOp,
 //! {
 //!     pub fn new(
 //!         cost_function: O,
 //!         omega: f64,
-//!         init_param: <O as ArgminOp>::Param,
+//!         init_param: O::Param,
 //!     ) -> Result<Self, Error> {
 //!         Ok(Landweber {
 //!             omega,
@@ -336,12 +649,12 @@
 //! // This implements a single iteration of the optimization algorithm.
 //! impl<O> ArgminIter for Landweber<O>
 //! where
-//!     <O as ArgminOp>::Param: ArgminScaledSub<<O as ArgminOp>::Param, f64, <O as ArgminOp>::Param>,
+//!     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
 //!     O: ArgminOp,
 //! {
-//!     type Param = <O as ArgminOp>::Param;
-//!     type Output = <O as ArgminOp>::Output;
-//!     type Hessian = <O as ArgminOp>::Hessian;
+//!     type Param = O::Param;
+//!     type Output = O::Output;
+//!     type Hessian = O::Hessian;
 //!
 //!     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
 //!         // Obtain current parameter vector

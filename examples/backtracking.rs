@@ -7,10 +7,11 @@
 
 extern crate argmin;
 use argmin::prelude::*;
-use argmin::solver::linesearch::BacktrackingLineSearch;
+use argmin::solver::linesearch::{ArmijoCondition, BacktrackingLineSearch};
 use argmin::testfunctions::{sphere, sphere_derivative};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 struct Sphere {}
 
 impl ArgminOp for Sphere {
@@ -34,8 +35,11 @@ fn run() -> Result<(), Error> {
     // Define problem
     let operator = Sphere {};
 
+    // Set condition
+    let cond = ArmijoCondition::new(0.5)?;
+
     // Set up Line Search method
-    let mut solver = BacktrackingLineSearch::new(operator);
+    let mut solver = BacktrackingLineSearch::new(operator, cond);
 
     // Set search direction
     solver.set_search_direction(vec![-2.0, 0.0]);

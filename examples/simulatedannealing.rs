@@ -7,14 +7,18 @@
 
 extern crate argmin;
 extern crate rand;
+extern crate rand_xorshift;
 use argmin::prelude::*;
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin::testfunctions::rosenbrock;
 use rand::prelude::*;
+use rand_xorshift::XorShiftRng;
+use serde::{Deserialize, Serialize};
+use std::default::Default;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 struct Rosenbrock {
     /// Parameter a, usually 1.0
     a: f64,
@@ -27,10 +31,10 @@ struct Rosenbrock {
     /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
     /// `self` to be passed as an immutable reference. This gives us thread safe interior
     /// mutability.
-    rng: Arc<Mutex<SmallRng>>,
+    rng: Arc<Mutex<XorShiftRng>>,
 }
 
-impl std::default::Default for Rosenbrock {
+impl Default for Rosenbrock {
     fn default() -> Self {
         let lower_bound: Vec<f64> = vec![-5.0, -5.0];
         let upper_bound: Vec<f64> = vec![5.0, 5.0];
@@ -46,7 +50,7 @@ impl Rosenbrock {
             b,
             lower_bound,
             upper_bound,
-            rng: Arc::new(Mutex::new(SmallRng::from_entropy())),
+            rng: Arc::new(Mutex::new(XorShiftRng::from_entropy())),
         }
     }
 }

@@ -13,18 +13,13 @@ use std::default::Default;
 use argmin_core::ArgminAdd;
 use argmin_core::ArgminOp;
 use std::f64;
+use serde::{Deserialize, Serialize};
 
 
 type Callback<T> = FnMut(&T, f64, &Vec<Particle<T>>) -> ();
 
 
-// #[log("initial_temperature" => "self.init_temp")]
-// #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
-// #[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
-// #[log("reanneal_fixed" => "self.reanneal_fixed")]
-// #[log("reanneal_accepted" => "self.reanneal_accepted")]
-// #[log("reanneal_best" => "self.reanneal_best")]
-#[derive(ArgminSolver)]
+#[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct ParticleSwarm<'a, O>
 where
     O: ArgminOp<Output = f64>,
@@ -32,7 +27,7 @@ where
 {
     cost_function: O, // TODO: would not be necessary if apply was immut
     base: ArgminBase<O>,
-    iter_callback: Option<&'a mut Callback<O::Param>>,
+    #[serde(skip)] iter_callback: Option<&'a mut Callback<O::Param>>,
     particles: Vec<Particle<O::Param>>,
     best_position: O::Param,
     best_cost: f64,
@@ -228,6 +223,7 @@ trait_bound!(Position
 );
 
 
+#[derive(Serialize, Deserialize)]
 pub struct Particle<T: Position> {
     pub position: T,
     velocity: T,
