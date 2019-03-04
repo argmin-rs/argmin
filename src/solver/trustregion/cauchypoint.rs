@@ -13,6 +13,7 @@
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
+use std::fmt::Debug;
 
 /// The Cauchy point is the minimum of the quadratic approximation of the cost function within the
 /// trust region along the direction given by the first derivative.
@@ -53,25 +54,28 @@ where
 impl<O, P, H> Solver<O> for CauchyPoint<P, H>
 where
     O: ArgminOp<Param = P, Output = f64, Hessian = H>,
-    P: Clone + Serialize + ArgminMul<f64, P> + ArgminWeightedDot<P, f64, H> + ArgminNorm<f64>,
+    P: Debug
+        + Clone
+        + Serialize
+        + ArgminMul<f64, P>
+        + ArgminWeightedDot<P, f64, H>
+        + ArgminNorm<f64>,
     H: Clone + Serialize,
 {
     fn next_iter(
         &mut self,
         _op: &mut OpWrapper<O>,
-        state: IterState<P, H>,
+        _state: IterState<P, H>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let grad_norm = state.cur_grad.norm();
-        let wdp = state
-            .cur_grad
-            .weighted_dot(&state.cur_hessian, &state.cur_grad);
+        let grad_norm = self.grad.norm();
+        let wdp = self.grad.weighted_dot(&self.hessian, &self.grad);
         let tau: f64 = if wdp <= 0.0 {
             1.0
         } else {
             1.0f64.min(grad_norm.powi(3) / (self.radius * wdp))
         };
 
-        let new_param = state.cur_grad.mul(&(-tau * self.radius / grad_norm));
+        let new_param = self.grad.mul(&(-tau * self.radius / grad_norm));
         Ok(ArgminIterData::new().param(new_param))
     }
 

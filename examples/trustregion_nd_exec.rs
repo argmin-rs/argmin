@@ -68,7 +68,7 @@ fn run() -> Result<(), Error> {
     // Run solver
     let res = Executor::new(cost, solver, init_param)
         .add_logger(ArgminSlogLogger::term())
-        .max_iters(20)
+        .max_iters(2_000)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)

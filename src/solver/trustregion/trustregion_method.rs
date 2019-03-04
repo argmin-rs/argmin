@@ -219,14 +219,14 @@ where
         op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
     ) -> Result<ArgminIterData<O>, Error> {
-        println!("{:?}", state);
+        // println!("{:?}", state);
         self.subproblem.set_grad(state.cur_grad.clone());
         self.subproblem.set_hessian(state.cur_hessian.clone());
         self.subproblem.set_radius(self.radius);
 
         let exec = Executor::new(op.clone(), self.subproblem.clone(), state.cur_param.clone());
         let pk = exec.max_iters(2).run_fast()?.param;
-        println!("pk: {:?}", pk);
+        // println!("pk: {:?}", pk);
 
         let new_param = pk.add(&state.cur_param);
         let fxkpk = op.apply(&new_param)?;
