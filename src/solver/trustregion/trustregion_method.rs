@@ -13,6 +13,7 @@
 use crate::prelude::*;
 use crate::solver::trustregion::reduction_ratio;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
 /// The trust region method approximates the cost function within a certain region around the
 /// current point in parameter space. Depending on the quality of this approximation, the region is
@@ -182,6 +183,7 @@ where
     O: ArgminOp<Output = f64>,
     O::Param: Default
         + Clone
+        + Debug
         + Serialize
         + ArgminMul<f64, O::Param>
         + ArgminWeightedDot<O::Param, f64, O::Hessian>
@@ -191,7 +193,7 @@ where
         + ArgminSub<O::Param, O::Param>
         + ArgminZero
         + ArgminMul<f64, O::Param>,
-    O::Hessian: Default + Clone + Serialize + ArgminDot<O::Param, O::Param>,
+    O::Hessian: Default + Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
     R: ArgminTrustRegion<O::Param, O::Hessian> + Solver<OpWrapper<O>>,
 {
     fn init(
@@ -217,12 +219,14 @@ where
         op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
     ) -> Result<ArgminIterData<O>, Error> {
+        println!("{:?}", state);
         self.subproblem.set_grad(state.cur_grad.clone());
         self.subproblem.set_hessian(state.cur_hessian.clone());
         self.subproblem.set_radius(self.radius);
 
-        let mut exec = Executor::new(op.clone(), self.subproblem.clone(), state.cur_param.clone());
-        let pk = exec.run_fast()?.param;
+        let exec = Executor::new(op.clone(), self.subproblem.clone(), state.cur_param.clone());
+        let pk = exec.max_iters(2).run_fast()?.param;
+        println!("pk: {:?}", pk);
 
         let new_param = pk.add(&state.cur_param);
         let fxkpk = op.apply(&new_param)?;
