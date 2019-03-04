@@ -180,7 +180,10 @@ impl<R> TrustRegion<R> where {
 impl<O, R> Solver<O> for TrustRegion<R>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
+    O::Param: Default
+        + Clone
+        + Serialize
+        + ArgminMul<f64, O::Param>
         + ArgminWeightedDot<O::Param, f64, O::Hessian>
         + ArgminNorm<f64>
         + ArgminDot<O::Param, f64>
@@ -188,34 +191,39 @@ where
         + ArgminSub<O::Param, O::Param>
         + ArgminZero
         + ArgminMul<f64, O::Param>,
-    O::Hessian: ArgminDot<O::Param, O::Param>,
-    R: ArgminTrustRegion<O::Param, O::Hessian>,
+    O::Hessian: Default + Clone + Serialize + ArgminDot<O::Param, O::Param>,
+    R: ArgminTrustRegion<O::Param, O::Hessian> + Solver<OpWrapper<O>>,
 {
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
-    ) -> Result<Option<ArgminIterData<O::Param, O::Param>>, Error> {
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         let grad = op.gradient(&state.cur_param)?;
-        self.set_cur_grad(grad);
         let hessian = op.hessian(&state.cur_param)?;
-        self.set_cur_hessian(hessian);
         self.fxk = op.apply(&state.cur_param)?;
         self.mk0 = self.fxk;
-        Ok(())
+        Ok(Some(
+            ArgminIterData::new()
+                .param(state.cur_param)
+                .cost(self.fxk)
+                .grad(grad)
+                .hessian(hessian),
+        ))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
-    ) -> Result<ArgminIterData<O::Param, O::Param>, Error> {
-        let g = state.cur_grad;
-        let h = state.cur_hessian;
+    ) -> Result<ArgminIterData<O>, Error> {
         self.subproblem.set_grad(state.cur_grad.clone());
         self.subproblem.set_hessian(state.cur_hessian.clone());
         self.subproblem.set_radius(self.radius);
-        let pk = self.subproblem.run_fast()?.param;
+
+        let mut exec = Executor::new(op.clone(), self.subproblem.clone(), state.cur_param.clone());
+        let pk = exec.run_fast()?.param;
+
         let new_param = pk.add(&state.cur_param);
         let fxkpk = op.apply(&new_param)?;
         let mkpk =
@@ -238,14 +246,16 @@ where
             self.fxk = fxkpk;
             self.mk0 = fxkpk;
             let grad = op.gradient(&new_param)?;
-            self.set_cur_grad(grad);
             let hessian = op.hessian(&new_param)?;
-            self.set_cur_hessian(hessian);
-            ArgminIterData::new(new_param, fxkpk)
+            ArgminIterData::new()
+                .param(new_param)
+                .cost(fxkpk)
+                .grad(grad)
+                .hessian(hessian)
         } else {
-            ArgminIterData::new(state.cur_param, self.fxk)
+            ArgminIterData::new().param(state.cur_param).cost(self.fxk)
         }
-        .add_kv(make_kv!("radius" => cur_radius;));
+        .kv(make_kv!("radius" => cur_radius;));
 
         Ok(out)
     }

@@ -21,7 +21,7 @@ use std::default::Default;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct CauchyPoint<P, H> {
     /// Radius
     radius: f64,
@@ -33,8 +33,8 @@ pub struct CauchyPoint<P, H> {
 
 impl<P, H> CauchyPoint<P, H>
 where
-    P: Default,
-    H: Default,
+    P: Clone + Default,
+    H: Clone + Default,
 {
     /// Constructor
     ///
@@ -86,8 +86,8 @@ where
 
 impl<P, H> ArgminTrustRegion<P, H> for CauchyPoint<P, H>
 where
-    P: Serialize,
-    H: Serialize,
+    P: Clone + Serialize,
+    H: Clone + Serialize,
 {
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
