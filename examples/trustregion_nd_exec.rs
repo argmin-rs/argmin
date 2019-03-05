@@ -9,8 +9,7 @@ extern crate argmin;
 extern crate ndarray;
 use argmin::prelude::*;
 #[allow(unused_imports)]
-// use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
-use argmin::solver::trustregion::{CauchyPoint, Dogleg, TrustRegion};
+use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
 use serde::{Deserialize, Serialize};
@@ -55,12 +54,9 @@ fn run() -> Result<(), Error> {
     let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 
     // Set up the subproblem
-    // let subproblem = Steihaug::new();
+    let subproblem = Steihaug::new().max_iters(2);
     // let subproblem = CauchyPoint::new();
-    let subproblem = Dogleg::new();
-
-    // TODO TODO TODO
-    // subproblem.set_max_iters(2);
+    // let subproblem = Dogleg::new();
 
     // Set up solver
     let solver = TrustRegion::new(subproblem);

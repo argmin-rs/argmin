@@ -20,72 +20,46 @@ use serde::{Deserialize, Serialize};
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct Steihaug<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminZero
-        + ArgminMul<f64, O::Param>,
-    O::Hessian: ArgminDot<O::Param, O::Param>,
-{
+#[derive(Clone, Serialize, Deserialize, Debug, Copy, PartialEq, PartialOrd, Default)]
+pub struct Steihaug<P> {
     /// Radius
     radius: f64,
     /// epsilon
     epsilon: f64,
     /// p
-    p: O::Param,
+    p: P,
     /// residual
-    r: O::Param,
+    r: P,
     /// r^Tr
     rtr: f64,
     /// initial residual
     r_0_norm: f64,
     /// direction
-    d: O::Param,
-    /// base
-    base: ArgminBase<O>,
+    d: P,
+    /// max iters
+    max_iters: u64,
 }
 
-impl<O> Steihaug<O>
+impl<P> Steihaug<P>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminZero
-        + ArgminMul<f64, O::Param>,
-    O::Hessian: ArgminDot<O::Param, O::Param>,
+    P: Default + Clone + ArgminMul<f64, P> + ArgminDot<P, f64> + ArgminAdd<P, P>,
 {
     /// Constructor
-    ///
-    /// Parameters:
-    ///
-    /// `operator`: operator
-    pub fn new(operator: O) -> Self {
-        let base = ArgminBase::new(operator, O::Param::default());
+    pub fn new() -> Self {
         Steihaug {
             radius: std::f64::NAN,
             epsilon: 10e-10,
-            p: O::Param::default(),
-            r: O::Param::default(),
+            p: P::default(),
+            r: P::default(),
             rtr: std::f64::NAN,
             r_0_norm: std::f64::NAN,
-            d: O::Param::default(),
-            base,
+            d: P::default(),
+            max_iters: std::u64::MAX,
         }
     }
 
     /// Set epsilon
-    pub fn set_epsilon(&mut self, epsilon: f64) -> Result<&mut Self, Error> {
+    pub fn epsilon(mut self, epsilon: f64) -> Result<Self, Error> {
         if epsilon <= 0.0 {
             return Err(ArgminError::InvalidParameter {
                 text: "Steihaug: epsilon must be > 0.0.".to_string(),
@@ -96,16 +70,27 @@ where
         Ok(self)
     }
 
+    /// set maximum number of iterations
+    pub fn max_iters(mut self, iters: u64) -> Self {
+        self.max_iters = iters;
+        self
+    }
+
     /// evaluate m(p) (without considering f_init because it is not available)
-    fn eval_m(&self, p: &O::Param) -> f64 {
-        self.cur_grad().dot(&p) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
+    fn eval_m<H>(&self, p: &P, g: &P, h: &H) -> f64
+    where
+        P: ArgminWeightedDot<P, f64, H>,
+    {
+        // self.cur_grad().dot(&p) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
+        g.dot(&p) + 0.5 * p.weighted_dot(&h, &p)
     }
 
     /// calculate all possible step lengths
     #[allow(clippy::many_single_char_names)]
-    fn tau<F>(&self, filter_func: F, eval: bool) -> f64
+    fn tau<F, H>(&self, filter_func: F, eval: bool, g: &P, h: &H) -> f64
     where
         F: Fn(f64) -> bool,
+        H: ArgminDot<P, P>,
     {
         let a = self.p.dot(&self.p);
         let b = self.d.dot(&self.d);
@@ -130,7 +115,7 @@ where
                 .filter(|(_, tau)| !tau.is_nan() && filter_func(*tau))
                 .map(|(i, tau)| {
                     let p = self.p.add(&self.d.mul(&tau));
-                    (i, self.eval_m(&p))
+                    (i, self.eval_m(&p, g, h))
                 })
                 .filter(|(_, m)| !m.is_nan())
                 .collect::<Vec<(usize, f64)>>();
@@ -151,50 +136,60 @@ where
     }
 }
 
-impl<O> ArgminIter for Steihaug<O>
+impl<P, O> Solver<O> for Steihaug<P>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+    O: ArgminOp<Param = P, Output = f64>,
+    P: Clone
+        + Serialize
+        + Default
+        + ArgminMul<f64, P>
+        + ArgminWeightedDot<P, f64, O::Hessian>
         + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>
+        + ArgminDot<P, f64>
+        + ArgminAdd<P, P>
+        + ArgminSub<P, P>
         + ArgminZero
-        + ArgminMul<f64, O::Param>,
-    O::Hessian: ArgminDot<O::Param, O::Param>,
+        + ArgminMul<f64, P>,
+    O::Hessian: ArgminDot<P, P>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-
-    fn init(&mut self) -> Result<(), Error> {
-        self.base_reset();
-
-        self.r = self.cur_grad();
+    fn init(
+        &mut self,
+        _op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        self.r = state.cur_grad;
         self.r_0_norm = self.r.norm();
         self.rtr = self.r.dot(&self.r);
         self.d = self.r.mul(&(-1.0));
         self.p = self.r.zero_like();
 
-        if self.r_0_norm < self.epsilon {
-            self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            let best = self.p.clone();
-            self.set_best_param(best);
-        }
+        let out = if self.r_0_norm < self.epsilon {
+            Some(
+                ArgminIterData::new()
+                    .param(self.p.clone())
+                    .termination_reason(TerminationReason::TargetPrecisionReached),
+            )
+        } else {
+            None
+        };
 
-        Ok(())
+        Ok(out)
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let h = self.cur_hessian();
+    fn next_iter(
+        &mut self,
+        _op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<ArgminIterData<O>, Error> {
+        let h = state.cur_hessian;
         let dhd = self.d.weighted_dot(&h, &self.d);
 
         // Current search direction d is a direction of zero curvature or negative curvature
         if dhd <= 0.0 {
-            let tau = self.tau(|_| true, true);
-            self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterData::new(self.p.add(&self.d.mul(&tau)), 0.0));
+            let tau = self.tau(|_| true, true, &state.cur_grad, &h);
+            return Ok(ArgminIterData::new()
+                .param(self.p.add(&self.d.mul(&tau)))
+                .termination_reason(TerminationReason::TargetPrecisionReached));
         }
 
         let alpha = self.rtr / dhd;
@@ -202,16 +197,18 @@ where
 
         // new p violates trust region bound
         if p_n.norm() >= self.radius {
-            let tau = self.tau(|x| x >= 0.0, false);
-            self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterData::new(self.p.add(&self.d.mul(&tau)), 0.0));
+            let tau = self.tau(|x| x >= 0.0, false, &state.cur_grad, &h);
+            return Ok(ArgminIterData::new()
+                .param(self.p.add(&self.d.mul(&tau)))
+                .termination_reason(TerminationReason::TargetPrecisionReached));
         }
 
         let r_n = self.r.add(&h.dot(&self.d).mul(&alpha));
 
         if r_n.norm() < self.epsilon * self.r_0_norm {
-            self.set_termination_reason(TerminationReason::TargetPrecisionReached);
-            return Ok(ArgminIterData::new(p_n, 0.0));
+            return Ok(ArgminIterData::new()
+                .param(p_n)
+                .termination_reason(TerminationReason::TargetPrecisionReached));
         }
 
         let rjtrj = r_n.dot(&r_n);
@@ -221,33 +218,21 @@ where
         self.p = p_n;
         self.rtr = rjtrj;
 
-        Ok(ArgminIterData::new(self.p.clone(), 0.0))
+        Ok(ArgminIterData::new().param(self.p.clone()).cost(self.rtr))
+    }
+
+    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        if state.cur_iter >= self.max_iters {
+            TerminationReason::MaxItersReached
+        } else {
+            TerminationReason::NotTerminated
+        }
     }
 }
 
-impl<O> ArgminTrustRegion for Steihaug<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminZero
-        + ArgminMul<f64, O::Param>,
-    O::Hessian: ArgminDot<O::Param, O::Param>,
-{
+impl<P: Clone + Serialize> ArgminTrustRegion for Steihaug<P> {
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
-    }
-
-    fn set_grad(&mut self, grad: O::Param) {
-        self.set_cur_grad(grad);
-    }
-
-    fn set_hessian(&mut self, hessian: O::Hessian) {
-        self.set_cur_hessian(hessian);
     }
 }
 
