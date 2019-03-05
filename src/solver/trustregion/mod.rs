@@ -9,15 +9,15 @@
 
 /// Cauchy Point
 pub mod cauchypoint;
-// /// Dogleg method
-// pub mod dogleg;
+/// Dogleg method
+pub mod dogleg;
 // /// Steihaug method
 // pub mod steihaug;
 /// Trust region solver
 pub mod trustregion_method;
 
 pub use self::cauchypoint::*;
-// pub use self::dogleg::*;
+pub use self::dogleg::*;
 // pub use self::steihaug::*;
 pub use self::trustregion_method::*;
 

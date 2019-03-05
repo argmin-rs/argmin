@@ -10,7 +10,7 @@ extern crate ndarray;
 use argmin::prelude::*;
 #[allow(unused_imports)]
 // use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
-use argmin::solver::trustregion::{CauchyPoint, TrustRegion};
+use argmin::solver::trustregion::{CauchyPoint, Dogleg, TrustRegion};
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
 use serde::{Deserialize, Serialize};
@@ -56,8 +56,8 @@ fn run() -> Result<(), Error> {
 
     // Set up the subproblem
     // let subproblem = Steihaug::new();
-    let subproblem = CauchyPoint::new();
-    // let subproblem = Dogleg::new();
+    // let subproblem = CauchyPoint::new();
+    let subproblem = Dogleg::new();
 
     // TODO TODO TODO
     // subproblem.set_max_iters(2);

@@ -21,50 +21,26 @@ use serde::{Deserialize, Serialize};
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct Dogleg<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-{
+#[derive(Clone, Serialize, Deserialize, Debug, Copy, PartialEq, PartialOrd, Default)]
+pub struct Dogleg {
     /// Radius
     radius: f64,
-    /// base
-    base: ArgminBase<O>,
 }
 
-impl<O> Dogleg<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-{
+impl Dogleg {
     /// Constructor
     ///
     /// Parameters:
     ///
     /// `operator`: operator
-    pub fn new(operator: O) -> Self {
-        let base = ArgminBase::new(operator, O::Param::default());
+    pub fn new() -> Self {
         Dogleg {
             radius: std::f64::NAN,
-            base,
         }
     }
 }
 
-impl<O> ArgminIter for Dogleg<O>
+impl<O> Solver<O> for Dogleg
 where
     O: ArgminOp<Output = f64>,
     O::Param: ArgminMul<f64, O::Param>
@@ -75,26 +51,17 @@ where
         + ArgminSub<O::Param, O::Param>,
     O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-
-    fn init(&mut self) -> Result<(), Error> {
-        self.base_reset();
-        // This is not an iterative method.
-        self.set_max_iters(1);
-        Ok(())
-    }
-
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let g = self.cur_grad();
-        let h = self.cur_hessian();
+    fn next_iter(
+        &mut self,
+        _op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<ArgminIterData<O>, Error> {
+        let g = state.cur_grad;
+        let h = state.cur_hessian;
         let pstar;
 
         // pb = -H^-1g
-        let pb = (self.cur_hessian().inv()?)
-            .dot(&self.cur_grad())
-            .mul(&(-1.0));
+        let pb = (h.inv()?).dot(&g).mul(&(-1.0));
 
         if pb.norm() <= self.radius {
             pstar = pb;
@@ -135,36 +102,22 @@ where
                 .into());
             }
         }
-        let out = ArgminIterData::new(pstar, 0.0);
+        let out = ArgminIterData::new().param(pstar);
         Ok(out)
+    }
+
+    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        if state.cur_iter >= 1 {
+            TerminationReason::MaxItersReached
+        } else {
+            TerminationReason::NotTerminated
+        }
     }
 }
 
-impl<O> ArgminTrustRegion for Dogleg<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-{
-    // fn set_initial_parameter(&mut self, param: T) {
-    //     self.set_cur_param(param);
-    // }
-
+impl ArgminTrustRegion for Dogleg {
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
-    }
-
-    fn set_grad(&mut self, grad: O::Param) {
-        self.set_cur_grad(grad);
-    }
-
-    fn set_hessian(&mut self, hessian: O::Hessian) {
-        self.set_cur_hessian(hessian);
     }
 }
 

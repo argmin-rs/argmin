@@ -262,6 +262,11 @@ where
 
         Ok(out)
     }
+
+    fn terminate(&mut self, _state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        // todo
+        TerminationReason::NotTerminated
+    }
 }
 
 #[cfg(test)]
