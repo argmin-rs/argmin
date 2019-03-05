@@ -194,7 +194,7 @@ where
         + ArgminZero
         + ArgminMul<f64, O::Param>,
     O::Hessian: Default + Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
-    R: ArgminTrustRegion<O::Param, O::Hessian> + Solver<OpWrapper<O>>,
+    R: ArgminTrustRegion + Solver<OpWrapper<O>>,
 {
     fn init(
         &mut self,
@@ -219,11 +219,11 @@ where
         op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
     ) -> Result<ArgminIterData<O>, Error> {
-        self.subproblem.set_grad(state.cur_grad.clone());
-        self.subproblem.set_hessian(state.cur_hessian.clone());
         self.subproblem.set_radius(self.radius);
 
         let pk = Executor::new(op.clone(), self.subproblem.clone(), state.cur_param.clone())
+            .grad(state.cur_grad.clone())
+            .hessian(state.cur_hessian.clone())
             .run_fast()?
             .param;
 

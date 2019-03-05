@@ -12,7 +12,6 @@
 
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::default::Default;
 use std::fmt::Debug;
 
 /// The Cauchy point is the minimum of the quadratic approximation of the cost function within the
@@ -22,21 +21,13 @@ use std::fmt::Debug;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
-pub struct CauchyPoint<P, H> {
+#[derive(Clone, Serialize, Deserialize, Debug, Copy, PartialEq, PartialOrd, Default)]
+pub struct CauchyPoint {
     /// Radius
     radius: f64,
-    /// Gradient
-    grad: P,
-    /// Hessian
-    hessian: H,
 }
 
-impl<P, H> CauchyPoint<P, H>
-where
-    P: Clone + Default,
-    H: Clone + Default,
-{
+impl CauchyPoint {
     /// Constructor
     ///
     /// Parameters:
@@ -45,37 +36,37 @@ where
     pub fn new() -> Self {
         CauchyPoint {
             radius: std::f64::NAN,
-            grad: P::default(),
-            hessian: H::default(),
         }
     }
 }
 
-impl<O, P, H> Solver<O> for CauchyPoint<P, H>
+impl<O> Solver<O> for CauchyPoint
 where
-    O: ArgminOp<Param = P, Output = f64, Hessian = H>,
-    P: Debug
+    O: ArgminOp<Output = f64>,
+    O::Param: Debug
         + Clone
         + Serialize
-        + ArgminMul<f64, P>
-        + ArgminWeightedDot<P, f64, H>
+        + ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
         + ArgminNorm<f64>,
-    H: Clone + Serialize,
+    O::Hessian: Clone + Serialize,
 {
     fn next_iter(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: IterState<P, H>,
+        state: IterState<O::Param, O::Hessian>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let grad_norm = self.grad.norm();
-        let wdp = self.grad.weighted_dot(&self.hessian, &self.grad);
+        let grad_norm = state.cur_grad.norm();
+        let wdp = state
+            .cur_grad
+            .weighted_dot(&state.cur_hessian, &state.cur_grad);
         let tau: f64 = if wdp <= 0.0 {
             1.0
         } else {
             1.0f64.min(grad_norm.powi(3) / (self.radius * wdp))
         };
 
-        let new_param = self.grad.mul(&(-tau * self.radius / grad_norm));
+        let new_param = state.cur_grad.mul(&(-tau * self.radius / grad_norm));
         Ok(ArgminIterData::new().param(new_param))
     }
 
@@ -88,21 +79,9 @@ where
     }
 }
 
-impl<P, H> ArgminTrustRegion<P, H> for CauchyPoint<P, H>
-where
-    P: Clone + Serialize,
-    H: Clone + Serialize,
-{
+impl ArgminTrustRegion for CauchyPoint {
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
-    }
-
-    fn set_grad(&mut self, grad: P) {
-        self.grad = grad;
-    }
-
-    fn set_hessian(&mut self, hessian: H) {
-        self.hessian = hessian;
     }
 }
 
