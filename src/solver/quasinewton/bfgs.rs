@@ -215,8 +215,6 @@ where
         TerminationReason::NotTerminated
     }
 }
-// #[stop("self.cur_grad().norm() < std::f64::EPSILON.sqrt()" => TargetPrecisionReached)]
-// #[stop("(self.prev_cost() - self.cur_cost()).abs() < std::f64::EPSILON" => NoChangeInCost)]
 
 #[cfg(test)]
 mod tests {
