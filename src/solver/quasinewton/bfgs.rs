@@ -93,8 +93,6 @@ use std::fmt::Debug;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-// #[stop("self.cur_grad().norm() < std::f64::EPSILON.sqrt()" => TargetPrecisionReached)]
-// #[stop("(self.prev_cost() - self.cur_cost()).abs() < std::f64::EPSILON" => NoChangeInCost)]
 #[derive(Serialize, Deserialize)]
 pub struct BFGS<L, H> {
     /// Inverse Hessian
@@ -206,7 +204,19 @@ where
             .cost(linesearch_result.cost)
             .grad(grad))
     }
+
+    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        if state.cur_grad.norm() < std::f64::EPSILON.sqrt() {
+            return TerminationReason::TargetPrecisionReached;
+        }
+        if (state.prev_cost - state.cur_cost).abs() < std::f64::EPSILON {
+            return TerminationReason::NoChangeInCost;
+        }
+        TerminationReason::NotTerminated
+    }
 }
+// #[stop("self.cur_grad().norm() < std::f64::EPSILON.sqrt()" => TargetPrecisionReached)]
+// #[stop("(self.prev_cost() - self.cur_cost()).abs() < std::f64::EPSILON" => NoChangeInCost)]
 
 #[cfg(test)]
 mod tests {
