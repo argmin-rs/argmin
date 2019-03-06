@@ -92,129 +92,90 @@ use serde::{Deserialize, Serialize};
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-#[stop("self.cur_grad().norm() < std::f64::EPSILON.sqrt()" => TargetPrecisionReached)]
-pub struct DFP<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminDot<O::Param, O::Hessian>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, O::Param>
-        + ArgminTranspose,
-    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
-        + ArgminDot<O::Param, O::Param>
-        + ArgminDot<O::Hessian, O::Hessian>
-        + ArgminAdd<O::Hessian, O::Hessian>
-        + ArgminMul<f64, O::Hessian>
-        + ArgminTranspose
-        + ArgminEye,
-    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct DFP<L, H> {
     /// Inverse Hessian
-    inv_hessian: O::Hessian,
+    inv_hessian: H,
     /// line search
-    linesearch: Box<L>,
-    /// Base stuff
-    base: ArgminBase<O>,
+    linesearch: L,
 }
 
-impl<O, L> DFP<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminDot<O::Param, O::Hessian>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, O::Param>
-        + ArgminTranspose,
-    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
-        + ArgminDot<O::Param, O::Param>
-        + ArgminDot<O::Hessian, O::Hessian>
-        + ArgminAdd<O::Hessian, O::Hessian>
-        + ArgminMul<f64, O::Hessian>
-        + ArgminTranspose
-        + ArgminEye,
-    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
-{
+impl<L, H> DFP<L, H> {
     /// Constructor
-    pub fn new(
-        cost_function: O,
-        init_param: O::Param,
-        init_inverse_hessian: O::Hessian,
-        linesearch: L,
-    ) -> Self {
+    pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         DFP {
             inv_hessian: init_inverse_hessian,
-            linesearch: Box::new(linesearch),
-            base: ArgminBase::new(cost_function, init_param),
+            linesearch: linesearch,
         }
     }
 }
 
-impl<O, L> ArgminIter for DFP<O, L>
+impl<O, L, H> Solver<O> for DFP<L, H>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
+    O: ArgminOp<Output = f64, Hessian = H>,
+    O::Param: Clone
+        + Default
+        + Serialize
+        + ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
         + ArgminMul<f64, O::Param>
         + ArgminTranspose,
-    O::Hessian: ArgminSub<O::Hessian, O::Hessian>
+    O::Hessian: Clone
+        + Default
+        + Serialize
+        + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<f64, O::Hessian>
         + ArgminTranspose
         + ArgminEye,
-    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
+    L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-
-    fn init(&mut self) -> Result<(), Error> {
-        let cost = self.apply(&self.base.cur_param())?;
-        let grad = self.gradient(&self.base.cur_param())?;
-        self.base.set_cur_grad(grad);
-        self.base.set_cur_cost(cost);
-        Ok(())
+    fn init(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        let cost = op.apply(&state.cur_param)?;
+        let grad = op.gradient(&state.cur_param)?;
+        Ok(Some(
+            ArgminIterData::new()
+                .param(state.cur_param)
+                .cost(cost)
+                .grad(grad),
+        ))
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        // reset line search
-        self.linesearch.base_reset();
-
-        let param = self.cur_param();
-        let cur_cost = self.cur_cost();
-        let prev_grad = self.base.cur_grad();
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<ArgminIterData<O>, Error> {
+        let prev_grad = state.cur_grad;
         let p = self.inv_hessian.dot(&prev_grad).mul(&(-1.0));
 
-        self.linesearch.set_initial_parameter(param.clone());
-        self.linesearch.set_initial_gradient(prev_grad.clone());
-        self.linesearch.set_initial_cost(cur_cost);
-        // self.linesearch
-        //     .set_search_direction(p.mul(&(1.0 / p.norm())));
+        self.linesearch.set_init_param(state.cur_param.clone());
+        self.linesearch.set_init_grad(prev_grad.clone());
+        self.linesearch.set_init_cost(state.cur_cost);
         self.linesearch.set_search_direction(p);
-        self.linesearch.run_fast()?;
+        let linesearch_result =
+            Executor::new(op.clone(), self.linesearch.clone(), state.cur_param.clone())
+                .run_fast()?;
 
-        let linesearch_result = self.linesearch.result();
         let xk1 = linesearch_result.param;
 
-        let grad = self.gradient(&xk1)?;
+        let grad = op.gradient(&xk1)?;
         let yk = grad.sub(&prev_grad);
-        self.base.set_cur_grad(grad);
 
-        let sk = xk1.sub(&param);
+        let sk = xk1.sub(&state.cur_param);
 
         let yksk: f64 = yk.dot(&sk);
 
-        let sksk: Self::Hessian = sk.dot(&sk);
+        let sksk: O::Hessian = sk.dot(&sk);
 
         let tmp3: O::Param = self.inv_hessian.dot(&yk);
         let tmp4: f64 = tmp3.dot(&yk);
@@ -223,8 +184,17 @@ where
 
         self.inv_hessian = self.inv_hessian.sub(&tmp3).add(&sksk.mul(&(1.0f64 / yksk)));
 
-        let out = ArgminIterData::new(xk1, linesearch_result.cost);
-        Ok(out)
+        Ok(ArgminIterData::new()
+            .param(xk1)
+            .cost(linesearch_result.cost)
+            .grad(grad))
+    }
+
+    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        if state.cur_grad.norm() < std::f64::EPSILON.sqrt() {
+            return TerminationReason::TargetPrecisionReached;
+        }
+        TerminationReason::NotTerminated
     }
 }
 
