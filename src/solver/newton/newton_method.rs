@@ -89,35 +89,20 @@ use serde::{Deserialize, Serialize};
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct Newton<O>
-where
-    O: ArgminOp,
-    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct Newton {
     /// gamma
     gamma: f64,
-    /// Base stuff
-    base: ArgminBase<O>,
 }
 
-impl<O> Newton<O>
-where
-    O: ArgminOp,
-    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-{
+impl Newton {
     /// Constructor
-    pub fn new(cost_function: O, init_param: O::Param) -> Self {
-        Newton {
-            gamma: 1.0,
-            base: ArgminBase::new(cost_function, init_param),
-        }
+    pub fn new() -> Self {
+        Newton { gamma: 1.0 }
     }
 
     /// set gamma
-    pub fn set_gamma(&mut self, gamma: f64) -> Result<&mut Self, Error> {
+    pub fn set_gamma(mut self, gamma: f64) -> Result<Self, Error> {
         if gamma <= 0.0 || gamma > 1.0 {
             return Err(ArgminError::InvalidParameter {
                 text: "Newton: gamma must be in  (0, 1].".to_string(),
@@ -129,23 +114,23 @@ where
     }
 }
 
-impl<O> ArgminIter for Newton<O>
+impl<O> Solver<O> for Newton
 where
     O: ArgminOp,
     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
     O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let param = self.cur_param();
-        let grad = self.gradient(&param)?;
-        let hessian = self.hessian(&param)?;
-        let new_param = param.scaled_sub(&self.gamma, &hessian.inv()?.dot(&grad));
-        let out = ArgminIterData::new(new_param, 0.0);
-        Ok(out)
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<ArgminIterData<O>, Error> {
+        let grad = op.gradient(&state.cur_param)?;
+        let hessian = op.hessian(&state.cur_param)?;
+        let new_param = state
+            .cur_param
+            .scaled_sub(&self.gamma, &hessian.inv()?.dot(&grad));
+        Ok(ArgminIterData::new().param(new_param))
     }
 }
 

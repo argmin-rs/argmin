@@ -12,10 +12,10 @@
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-/// Newton-CG method
-pub mod newton_cg;
+// /// Newton-CG method
+// pub mod newton_cg;
 /// Newton's method
 pub mod newton_method;
 
-pub use self::newton_cg::*;
+// pub use self::newton_cg::*;
 pub use self::newton_method::*;
