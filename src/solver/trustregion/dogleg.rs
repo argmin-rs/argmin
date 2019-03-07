@@ -53,11 +53,12 @@ where
 {
     fn next_iter(
         &mut self,
-        _op: &mut OpWrapper<O>,
-        state: IterState<O::Param, O::Hessian>,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let g = state.cur_grad;
-        let h = state.cur_hessian;
+        let param = state.get_param();
+        let g = state.get_grad().unwrap_or(op.gradient(&param)?);
+        let h = state.get_hessian().unwrap_or(op.hessian(&param)?);;
         let pstar;
 
         // pb = -H^-1g
@@ -106,8 +107,8 @@ where
         Ok(out)
     }
 
-    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
-        if state.cur_iter >= 1 {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+        if state.get_iter() >= 1 {
             TerminationReason::MaxItersReached
         } else {
             TerminationReason::NotTerminated

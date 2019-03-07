@@ -12,4 +12,4 @@ pub mod linesearch;
 // pub mod newton;
 pub mod quasinewton;
 pub mod simulatedannealing;
-// pub mod trustregion;
+pub mod trustregion;

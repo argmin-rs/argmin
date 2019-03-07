@@ -53,25 +53,27 @@ where
 {
     fn next_iter(
         &mut self,
-        _op: &mut OpWrapper<O>,
-        state: IterState<O::Param, O::Hessian>,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let grad_norm = state.cur_grad.norm();
-        let wdp = state
-            .cur_grad
-            .weighted_dot(&state.cur_hessian, &state.cur_grad);
+        let param = state.get_param();
+        let grad = state.get_grad().unwrap_or(op.gradient(&param)?);
+        let grad_norm = grad.norm();
+        let hessian = state.get_hessian().unwrap_or(op.hessian(&param)?);
+
+        let wdp = grad.weighted_dot(&hessian, &grad);
         let tau: f64 = if wdp <= 0.0 {
             1.0
         } else {
             1.0f64.min(grad_norm.powi(3) / (self.radius * wdp))
         };
 
-        let new_param = state.cur_grad.mul(&(-tau * self.radius / grad_norm));
+        let new_param = grad.mul(&(-tau * self.radius / grad_norm));
         Ok(ArgminIterData::new().param(new_param))
     }
 
-    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
-        if state.cur_iter >= 1 {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+        if state.get_iter() >= 1 {
             TerminationReason::MaxItersReached
         } else {
             TerminationReason::NotTerminated

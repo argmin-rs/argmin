@@ -11,6 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 /// The Steihaug method is a conjugate gradients based approach for finding an approximate solution
@@ -141,6 +142,7 @@ where
     O: ArgminOp<Param = P, Output = f64>,
     P: Clone
         + Serialize
+        + DeserializeOwned
         + Default
         + ArgminMul<f64, P>
         + ArgminWeightedDot<P, f64, O::Hessian>
@@ -154,16 +156,18 @@ where
 {
     fn init(
         &mut self,
-        _op: &mut OpWrapper<O>,
-        state: IterState<O::Param, O::Hessian>,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        self.r = state.cur_grad;
+        let param = state.get_param();
+        self.r = state.get_grad().unwrap_or(op.gradient(&param)?);
+
         self.r_0_norm = self.r.norm();
         self.rtr = self.r.dot(&self.r);
         self.d = self.r.mul(&(-1.0));
         self.p = self.r.zero_like();
 
-        let out = if self.r_0_norm < self.epsilon {
+        Ok(if self.r_0_norm < self.epsilon {
             Some(
                 ArgminIterData::new()
                     .param(self.p.clone())
@@ -171,22 +175,22 @@ where
             )
         } else {
             None
-        };
-
-        Ok(out)
+        })
     }
 
     fn next_iter(
         &mut self,
-        _op: &mut OpWrapper<O>,
-        state: IterState<O::Param, O::Hessian>,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let h = state.cur_hessian;
+        let param = state.get_param();
+        let grad = state.get_grad().unwrap_or(op.gradient(&param)?);
+        let h = state.get_hessian().unwrap_or(op.hessian(&param)?);
         let dhd = self.d.weighted_dot(&h, &self.d);
 
         // Current search direction d is a direction of zero curvature or negative curvature
         if dhd <= 0.0 {
-            let tau = self.tau(|_| true, true, &state.cur_grad, &h);
+            let tau = self.tau(|_| true, true, &grad, &h);
             return Ok(ArgminIterData::new()
                 .param(self.p.add(&self.d.mul(&tau)))
                 .termination_reason(TerminationReason::TargetPrecisionReached));
@@ -197,7 +201,7 @@ where
 
         // new p violates trust region bound
         if p_n.norm() >= self.radius {
-            let tau = self.tau(|x| x >= 0.0, false, &state.cur_grad, &h);
+            let tau = self.tau(|x| x >= 0.0, false, &grad, &h);
             return Ok(ArgminIterData::new()
                 .param(self.p.add(&self.d.mul(&tau)))
                 .termination_reason(TerminationReason::TargetPrecisionReached));
@@ -221,8 +225,8 @@ where
         Ok(ArgminIterData::new().param(self.p.clone()).cost(self.rtr))
     }
 
-    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
-        if state.cur_iter >= self.max_iters {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+        if state.get_iter() >= self.max_iters {
             TerminationReason::MaxItersReached
         } else {
             TerminationReason::NotTerminated
