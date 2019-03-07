@@ -389,14 +389,17 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O::Param, O::Hessian>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
         // behaviour.
 
+        let prev_param = state.get_param();
+        let prev_cost = state.get_cost();
+
         // Make a move
-        let new_param = op.modify(&state.cur_param, self.cur_temp)?;
+        let new_param = op.modify(&prev_param, self.cur_temp)?;
 
         // Evaluate cost function with new parameter vector
         let new_cost = op.apply(&new_param)?;
@@ -413,11 +416,11 @@ where
         //
         // which will always be between 0 and 0.5.
         let prob: f64 = self.rng.gen();
-        let accepted = (new_cost < state.prev_cost)
-            || (1.0 / (1.0 + ((new_cost - state.prev_cost) / self.cur_temp).exp()) > prob);
+        let accepted = (new_cost < state.get_prev_cost())
+            || (1.0 / (1.0 + ((new_cost - state.get_prev_cost()) / self.cur_temp).exp()) > prob);
 
         // Update stall iter variables
-        self.update_stall_and_reanneal_iter(accepted, new_cost <= state.best_cost);
+        self.update_stall_and_reanneal_iter(accepted, new_cost <= state.get_best_cost());
 
         let (r_fixed, r_accepted, r_best) = self.reanneal();
 
@@ -431,13 +434,11 @@ where
         Ok(if accepted {
             ArgminIterData::new().param(new_param).cost(new_cost)
         } else {
-            ArgminIterData::new()
-                .param(state.cur_param)
-                .cost(state.cur_cost)
+            ArgminIterData::new().param(prev_param).cost(prev_cost)
         }
         .kv(make_kv!(
             "t" => self.cur_temp;
-            "new_be" => new_cost <= state.best_cost;
+            "new_be" => new_cost <= state.get_best_cost();
             "acc" => accepted;
             "st_i_be" => self.stall_iter_best;
             "st_i_ac" => self.stall_iter_accepted;
@@ -450,7 +451,7 @@ where
         )))
     }
 
-    fn terminate(&mut self, _state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
         if self.stall_iter_accepted > self.stall_iter_accepted_limit {
             return TerminationReason::AcceptedStallIterExceeded;
         }
