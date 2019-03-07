@@ -14,6 +14,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -173,6 +174,7 @@ where
     P: Clone
         + Default
         + Serialize
+        + DeserializeOwned
         + ArgminSub<P, P>
         + ArgminDot<P, f64>
         + ArgminScaledAdd<P, f64, P>
@@ -187,16 +189,14 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<P, O::Hessian>,
+        state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let cost = op.apply(&state.cur_param)?;
-        let grad = op.gradient(&state.cur_param)?;
+        let param = state.get_param();
+        let cost = op.apply(&param)?;
+        let grad = op.gradient(&param)?;
         self.p = grad.mul(&(-1.0));
         Ok(Some(
-            ArgminIterData::new()
-                .param(state.cur_param)
-                .cost(cost)
-                .grad(grad),
+            ArgminIterData::new().param(param).cost(cost).grad(grad),
         ))
     }
 
@@ -204,11 +204,15 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<P, O::Hessian>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let xk = state.cur_param;
-        let grad = state.cur_grad;
-        let cur_cost = state.cur_cost;
+        let xk = state.get_param();
+        let grad = if let Some(grad) = state.get_grad() {
+            grad
+        } else {
+            op.gradient(&xk)?
+        };
+        let cur_cost = state.get_cost();
 
         // Linesearch
         self.linesearch.set_init_param(xk.clone());
@@ -235,7 +239,8 @@ where
             None => false,
         };
 
-        let restart_iter: bool = (state.cur_iter % self.restart_iter == 0) && state.cur_iter != 0;
+        let restart_iter: bool =
+            (state.get_iter() % self.restart_iter == 0) && state.get_iter() != 0;
 
         if restart_iter || restart_orthogonality {
             self.beta = 0.0;

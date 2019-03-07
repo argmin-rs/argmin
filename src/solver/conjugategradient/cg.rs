@@ -11,6 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -141,6 +142,7 @@ where
     O: ArgminOp<Param = P, Output = P>,
     P: Clone
         + Serialize
+        + DeserializeOwned
         + ArgminSub<P, P>
         + ArgminDot<P, f64>
         + ArgminScaledAdd<P, f64, P>
@@ -151,9 +153,9 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<P, O::Hessian>,
+        state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let init_param = state.cur_param;
+        let init_param = state.get_param();
         let ap = op.apply(&init_param)?;
         let r0 = self.b.sub(&ap).mul(&(-1.0));
         self.r = r0.clone();
@@ -166,12 +168,12 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<P, O::Hessian>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         self.p_prev = self.p.clone();
         let apk = op.apply(&self.p)?;
         self.alpha = self.rtr / self.p.dot(&apk);
-        let new_param = state.cur_param.scaled_add(&self.alpha, &self.p);
+        let new_param = state.get_param().scaled_add(&self.alpha, &self.p);
         self.r = self.r.scaled_add(&self.alpha, &apk);
         let rtr_n = self.r.dot(&self.r);
         self.beta = rtr_n / self.rtr;
