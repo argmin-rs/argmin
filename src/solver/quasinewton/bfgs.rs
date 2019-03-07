@@ -11,6 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
@@ -126,6 +127,7 @@ where
         + Default
         + Debug
         + Serialize
+        + DeserializeOwned
         + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
@@ -138,43 +140,46 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O::Param, O::Hessian>,
+        state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let cost = op.apply(&state.cur_param)?;
-        let grad = op.gradient(&state.cur_param)?;
+        let param = state.get_param();
+        let cost = op.apply(&param)?;
+        let grad = op.gradient(&param)?;
         Ok(Some(
-            ArgminIterData::new()
-                .param(state.cur_param)
-                .cost(cost)
-                .grad(grad),
+            ArgminIterData::new().param(param).cost(cost).grad(grad),
         ))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O::Param, O::Hessian>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let cur_cost = state.cur_cost;
-        let prev_grad = state.cur_grad;
+        let param = state.get_param();
+        let cur_cost = state.get_cost();
+        let prev_grad = if let Some(grad) = state.get_grad() {
+            grad
+        } else {
+            op.gradient(&param)?
+        };
+
         let p = self.inv_hessian.dot(&prev_grad).mul(&(-1.0));
 
-        self.linesearch.set_init_param(state.cur_param.clone());
+        self.linesearch.set_init_param(param.clone());
         self.linesearch.set_init_grad(prev_grad.clone());
         self.linesearch.set_init_cost(cur_cost);
         self.linesearch.set_search_direction(p);
 
         // Run solver
         let linesearch_result =
-            Executor::new(op.clone(), self.linesearch.clone(), state.cur_param.clone())
-                .run_fast()?;
+            Executor::new(op.clone(), self.linesearch.clone(), param.clone()).run_fast()?;
 
         let xk1 = linesearch_result.param;
 
         let grad = op.gradient(&xk1)?;
         let yk = grad.sub(&prev_grad);
 
-        let sk = xk1.sub(&state.cur_param);
+        let sk = xk1.sub(&param);
 
         let yksk: f64 = yk.dot(&sk);
         let rhok = 1.0 / yksk;
@@ -205,11 +210,11 @@ where
             .grad(grad))
     }
 
-    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
-        if state.cur_grad.norm() < std::f64::EPSILON.sqrt() {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+        if state.get_grad().unwrap().norm() < std::f64::EPSILON.sqrt() {
             return TerminationReason::TargetPrecisionReached;
         }
-        if (state.prev_cost - state.cur_cost).abs() < std::f64::EPSILON {
+        if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON {
             return TerminationReason::NoChangeInCost;
         }
         TerminationReason::NotTerminated
