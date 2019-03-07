@@ -96,87 +96,71 @@ use serde::{Deserialize, Serialize};
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct NewtonCG<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminZero
-        + ArgminNorm<f64>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct NewtonCG<L> {
     /// line search
-    linesearch: Box<L>,
+    linesearch: L,
     /// curvature_threshold
     curvature_threshold: f64,
-    /// Base stuff
-    base: ArgminBase<O>,
 }
 
-impl<O, L> NewtonCG<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminZero
-        + ArgminNorm<f64>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
-{
+impl<L> NewtonCG<L> {
     /// Constructor
-    pub fn new(cost_function: O, init_param: O::Param, linesearch: L) -> Self {
+    pub fn new(linesearch: L) -> Self {
         NewtonCG {
-            linesearch: Box::new(linesearch),
+            linesearch: linesearch,
             curvature_threshold: 0.0,
-            base: ArgminBase::new(cost_function, init_param),
         }
     }
 
     /// Set curvature threshold
-    pub fn set_curvature_threshold(&mut self, threshold: f64) -> &mut Self {
+    pub fn curvature_threshold(mut self, threshold: f64) -> Self {
         self.curvature_threshold = threshold;
         self
     }
 }
 
-impl<O, L> ArgminIter for NewtonCG<O, L>
+impl<O, L> Solver<O> for NewtonCG<L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
+    O::Param: Send
+        + Sync
+        + Clone
+        + Serialize
+        + Default
+        + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminMul<f64, O::Param>
         + ArgminZero
         + ArgminNorm<f64>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
+    O::Hessian: Send
+        + Sync
+        + Clone
+        + Serialize
+        + Default
+        + ArgminInv<O::Hessian>
+        + ArgminDot<O::Param, O::Param>,
+    L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let param = self.cur_param();
-        let grad = self.gradient(&param)?;
-        let hessian = self.hessian(&param)?;
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: IterState<O::Param, O::Hessian>,
+    ) -> Result<ArgminIterData<O>, Error> {
+        let param = state.cur_param;
+        let grad = op.gradient(&param)?;
+        let hessian = op.hessian(&param)?;
 
         // Solve CG subproblem
-        let op: CGSubProblem<Self::Param, Self::Hessian> = CGSubProblem::new(hessian.clone());
+        let op: CGSubProblem<O::Param, O::Hessian> = CGSubProblem::new(hessian.clone());
 
         let mut x_p = param.zero_like();
-        let mut x: Self::Param = param.zero_like();
+        let mut x: O::Param = param.zero_like();
         let mut cg = ConjugateGradient::new(op, grad.mul(&(-1.0)), x_p.clone())?;
 
-        cg.init()?;
+        cg.init(op)?;
         let grad_norm = grad.norm();
         for iter in 0.. {
             let data = cg.next_iter()?;
@@ -204,11 +188,10 @@ where
         }
 
         // perform line search
-        self.linesearch.base_reset();
-        self.linesearch.set_initial_parameter(param);
-        self.linesearch.set_initial_gradient(grad);
-        let cost = self.cur_cost();
-        self.linesearch.set_initial_cost(cost);
+        self.linesearch.set_init_param(param);
+        self.linesearch.set_init_grad(grad);
+        let cost = state.cur_cost;
+        self.linesearch.set_init_cost(cost);
         self.linesearch.set_search_direction(x);
 
         self.linesearch.run_fast()?;
@@ -226,7 +209,9 @@ where
         self.increase_grad_func_count(grad_count_cg + grad_count_ls);
         self.increase_hessian_func_count(hessian_count_cg + hessian_count_ls);
 
-        let out = ArgminIterData::new(linesearch_result.param, linesearch_result.cost);
+        let out = ArgminIterData::new()
+            .param(linesearch_result.param)
+            .cost(linesearch_result.cost);
         Ok(out)
     }
 }
