@@ -19,6 +19,7 @@
 //! DOI: https://doi.org/10.1145/192115.192132
 
 use crate::prelude::*;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -295,12 +296,17 @@ where
 impl<P, O> Solver<O> for MoreThuenteLineSearch<P>
 where
     O: ArgminOp<Param = P, Output = f64>,
-    P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
+    P: Clone
+        + Serialize
+        + DeserializeOwned
+        + ArgminSub<P, P>
+        + ArgminDot<P, f64>
+        + ArgminScaledAdd<P, f64, P>,
 {
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: IterState<P, O::Hessian>,
+        _state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.init_param = check_param!(
             self.init_param_b,
@@ -351,7 +357,7 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: IterState<P, O::Hessian>,
+        _state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;

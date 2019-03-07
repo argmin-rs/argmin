@@ -9,6 +9,7 @@
 
 use crate::prelude::*;
 use crate::solver::linesearch::condition::*;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 /// The Backtracking line search is a simple method to find a step length which obeys the Armijo
@@ -193,14 +194,19 @@ where
 
 impl<O, P, L> Solver<O> for BacktrackingLineSearch<P, L>
 where
-    P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
+    P: Clone
+        + Serialize
+        + DeserializeOwned
+        + ArgminSub<P, P>
+        + ArgminDot<P, f64>
+        + ArgminScaledAdd<P, f64, P>,
     O: ArgminOp<Param = P, Output = f64>,
     L: LineSearchCondition<P>,
 {
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: IterState<P, O::Hessian>,
+        _state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         if self.init_param.is_none() {
             return Err(ArgminError::NotInitialized {
@@ -232,7 +238,7 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: IterState<P, O::Hessian>,
+        _state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         // this can't go wrong
         let init_param = self.init_param.clone().unwrap();
@@ -255,10 +261,10 @@ where
         Ok(out)
     }
 
-    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if self.condition.eval(
-            state.cur_cost,
-            state.cur_grad.clone(),
+            state.get_cost(),
+            state.get_grad().unwrap(),
             self.init_cost.clone().unwrap(),
             self.init_grad.clone().unwrap(),
             self.search_direction.clone().unwrap(),

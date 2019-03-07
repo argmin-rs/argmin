@@ -16,6 +16,7 @@
 //! DOI: https://doi.org/10.1137/030601880
 
 use crate::prelude::*;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -174,7 +175,12 @@ pub struct HagerZhangLineSearch<P> {
 
 impl<P> HagerZhangLineSearch<P>
 where
-    P: Clone + Default + Serialize + ArgminScaledAdd<P, f64, P> + ArgminDot<P, f64>,
+    P: Clone
+        + Default
+        + Serialize
+        + DeserializeOwned
+        + ArgminScaledAdd<P, f64, P>
+        + ArgminDot<P, f64>,
 {
     /// Constructor
     ///
@@ -516,6 +522,7 @@ where
     P: Clone
         + Default
         + Serialize
+        + DeserializeOwned
         + ArgminSub<P, P>
         + ArgminDot<P, f64>
         + ArgminScaledAdd<P, f64, P>,
@@ -523,7 +530,7 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: IterState<P, O::Hessian>,
+        _state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
@@ -584,7 +591,7 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: IterState<P, O::Hessian>,
+        _state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);
@@ -624,7 +631,7 @@ where
         Ok(ArgminIterData::new().param(new_param).cost(self.best_f))
     }
 
-    fn terminate(&mut self, _state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
         if self.best_f - self.finit < self.delta * self.best_x * self.dginit {
             return TerminationReason::LineSearchConditionMet;
         }

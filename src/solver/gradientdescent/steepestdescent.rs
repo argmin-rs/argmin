@@ -128,9 +128,9 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O::Param, O::Hessian>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param_new = state.cur_param;
+        let param_new = state.get_param();
         let new_cost = op.apply(&param_new)?;
         let new_grad = op.gradient(&param_new)?;
 
