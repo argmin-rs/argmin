@@ -39,7 +39,7 @@ fn run() -> Result<(), Error> {
 
     let res = Executor::from_checkpoint(".checkpoints/landweber_exec.arg")
         .unwrap_or(Executor::new(operator, solver, init_param))
-        .set_max_iters(iters)
+        .max_iters(iters)
         .checkpoint_dir(".checkpoints")
         .checkpoint_name("landweber_exec")
         .checkpoint_mode(CheckpointMode::Every(20))
