@@ -10,7 +10,6 @@
 extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::gradientdescent::SteepestDescent;
-use argmin::solver::linesearch::BacktrackingLineSearch;
 use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -47,27 +46,23 @@ fn run() -> Result<(), Error> {
     // let init_param: Vec<f64> = vec![-1.2, 1.0];
 
     // Pick a line search.
-    // let linesearch = HagerZhangLineSearch::new(cost.clone());
-    let linesearch = MoreThuenteLineSearch::new(cost.clone());
-    // let linesearch = BacktrackingLineSearch::new(cost.clone());
+    // let linesearch = HagerZhangLineSearch::new();
+    let linesearch = MoreThuenteLineSearch::new();
 
     // Set up solver
-    let mut solver = SteepestDescent::new(cost, init_param, linesearch)?;
+    let solver = SteepestDescent::new(linesearch)?;
 
-    // Set maximum number of iterations
-    solver.set_max_iters(10_000);
-
-    // Attach a logger which will output information in each iteration.
-    solver.add_logger(ArgminSlogLogger::term_noblock());
-
-    // Run the solver
-    solver.run()?;
+    // Run solver
+    let res = Executor::new(cost, solver, init_param)
+        .add_logger(ArgminSlogLogger::term())
+        .max_iters(10)
+        .run()?;
 
     // Wait a second (lets the logger flush everything first)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // print result
-    println!("{}", solver.result());
+    println!("{}", res);
     Ok(())
 }
 
@@ -77,12 +72,3 @@ fn main() {
         std::process::exit(1);
     }
 }
-
-// DUMP (ignore)
-// #[derive(Clone, ArgminOperator)]
-// #[output_type(f64)]
-// #[parameters_type(Vec<f64>)]
-// #[hessian_type(())]
-// #[cost_function(rosenbrock)]
-// #[gradient(rosenbrock_gradient)]
-// struct MyProblem {}

@@ -36,38 +36,37 @@ fn run() -> Result<(), Error> {
     let operator = Sphere {};
 
     // Set up line search method
-    let mut solver = HagerZhangLineSearch::new(operator);
+    let mut solver = HagerZhangLineSearch::new();
 
-    // Set search direction
-    solver.set_search_direction(vec![-2.0, 0.0]);
+    // The following parameters do not follow the builder pattern because they are part of the
+    // ArgminLineSearch trait which needs to be object safe.
 
     // Set initial position
-    solver.set_initial_parameter(init_param);
+    solver.set_init_param(init_param.clone());
 
-    // Calculate initial cost ...
-    solver.calc_initial_cost()?;
-    // ... or, alternatively, set cost if it is already computed
-    // solver.set_initial_cost(...);
+    // Set search direction
+    solver.set_search_direction(vec![-1.5, 0.0]);
 
-    // Calculate initial gradient ...
-    solver.calc_initial_gradient()?;
-    // .. or, alternatively, set gradient if it is already computed
-    // solver.set_initial_gradient(...);
+    // Set initial cost
+    solver.set_init_cost(operator.apply(&init_param)?);
+
+    // Set initial gradient
+    solver.set_init_grad(operator.gradient(&init_param)?);
 
     // Set initial step length
-    solver.set_initial_alpha(1.0)?;
-
-    // Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
+    solver.set_init_alpha(1.0)?;
 
     // Run solver
-    solver.run()?;
+    let res = Executor::new(operator, solver, init_param)
+        .add_logger(ArgminSlogLogger::term())
+        .max_iters(10)
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print Result
-    println!("{}", solver.result());
+    println!("{}", res);
     Ok(())
 }
 

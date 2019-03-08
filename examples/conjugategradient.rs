@@ -34,22 +34,19 @@ fn run() -> Result<(), Error> {
     let operator = MyProblem {};
 
     // Set up the solver
-    let mut solver = ConjugateGradient::new(operator, b, init_param)?;
-
-    // Set maximum number of iterations
-    solver.set_max_iters(2);
-
-    // Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
+    let solver = ConjugateGradient::new(b)?;
 
     // Run solver
-    solver.run()?;
+    let res = Executor::new(operator, solver, init_param)
+        .add_logger(ArgminSlogLogger::term())
+        .max_iters(2)
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{}", solver.result());
+    println!("{}", res);
     Ok(())
 }
 

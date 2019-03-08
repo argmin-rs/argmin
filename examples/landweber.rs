@@ -9,6 +9,7 @@ extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::landweber::*;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use argmin_core::Error;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Serialize, Deserialize)]
@@ -33,15 +34,17 @@ fn run() -> Result<(), Error> {
     let init_param: Vec<f64> = vec![1.2, 1.2];
     let operator = Rosenbrock {};
 
-    let iters = 4000;
-    let mut solver = Landweber::new(operator, 0.001, init_param)?;
-    solver.set_max_iters(iters);
-    solver.add_logger(ArgminSlogLogger::term());
-    solver.run()?;
+    let iters = 10;
+    let solver = Landweber::new(0.001)?;
+
+    let res = Executor::new(operator, solver, init_param)
+        .add_logger(ArgminSlogLogger::term())
+        .max_iters(iters)
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)
     std::thread::sleep(std::time::Duration::from_secs(1));
-    println!("{}", solver.result());
+    println!("{}", res);
     Ok(())
 }
 
