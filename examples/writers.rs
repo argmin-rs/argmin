@@ -46,16 +46,10 @@ fn run() -> Result<(), Error> {
     let init_hessian: Array2<f64> = Array2::eye(8);
 
     // set up a line search
-    let linesearch = MoreThuenteLineSearch::new(cost.clone());
+    let linesearch = MoreThuenteLineSearch::new();
 
     // Set up solver
-    let mut solver = BFGS::new(cost, init_param, init_hessian, linesearch);
-
-    // Set maximum number of iterations
-    solver.set_max_iters(10);
-
-    // Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
+    let solver = BFGS::new(init_hessian, linesearch);
 
     // Create writer
     let mut writer = WriteToFile::new("params", "param");
@@ -75,18 +69,18 @@ fn run() -> Result<(), Error> {
     // Set serializer to JSON
     writer2.set_serializer(WriteToFileSerializer::JSON);
 
-    // Attach writers
-    solver.add_writer(Arc::new(writer));
-    solver.add_writer(Arc::new(writer2));
-
-    // Run solver
-    solver.run()?;
+    let res = Executor::new(cost, solver, init_param)
+        .max_iters(10)
+        .add_logger(ArgminSlogLogger::term())
+        .add_writer(Arc::new(writer))
+        .add_writer(Arc::new(writer2))
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{}", solver.result());
+    println!("{}", res);
     Ok(())
 }
 
