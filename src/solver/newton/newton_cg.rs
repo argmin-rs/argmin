@@ -147,31 +147,28 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O::Param, O::Hessian>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.cur_param;
+        let param = state.get_param();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
 
         // Solve CG subproblem
-        let op: CGSubProblem<O::Param, O::Hessian> = CGSubProblem::new(hessian.clone());
+        let cg_op: CGSubProblem<O::Param, O::Hessian> = CGSubProblem::new(hessian.clone());
+        let mut cg_op = OpWrapper::new(&cg_op);
 
         let mut x_p = param.zero_like();
         let mut x: O::Param = param.zero_like();
-        let mut cg = ConjugateGradient::new(op, grad.mul(&(-1.0)), x_p.clone())?;
+        let mut cg = ConjugateGradient::new(grad.mul(&(-1.0)))?;
 
-        cg.init(op)?;
+        let mut cg_state = IterState::new(x_p.clone());
+        cg.init(&mut cg_op, &cg_state)?;
         let grad_norm = grad.norm();
         for iter in 0.. {
-            let data = cg.next_iter()?;
-            x = data.param();
-            cg.increment_iter();
-            cg.set_cur_param(data.param());
-            cg.set_cur_cost(data.cost());
+            let data = cg.next_iter(&mut cg_op, &cg_state)?;
+            x = data.get_param().unwrap();
             let p = cg.p_prev();
-            // let p = cg.p();
             let curvature = p.dot(&hessian.dot(&p));
-            // println!("iter: {:?}, curv: {:?}", iter, curvature);
             if curvature <= self.curvature_threshold {
                 if iter == 0 {
                     x = grad.mul(&(-1.0));
@@ -181,38 +178,40 @@ where
                     break;
                 }
             }
-            if data.cost() <= (0.5f64).min(grad_norm.sqrt()) * grad_norm {
+            if data.get_cost().unwrap() <= (0.5f64).min(grad_norm.sqrt()) * grad_norm {
                 break;
             }
+            cg_state.param(x.clone());
+            cg_state.cost(data.get_cost().unwrap());
             x_p = x.clone();
         }
 
+        // take care of counting
+        op.consume_op(cg_op);
+
         // perform line search
-        self.linesearch.set_init_param(param);
+        self.linesearch.set_init_param(param.clone());
         self.linesearch.set_init_grad(grad);
-        let cost = state.cur_cost;
+        let cost = state.get_cost();
         self.linesearch.set_init_cost(cost);
         self.linesearch.set_search_direction(x);
 
-        self.linesearch.run_fast()?;
-
-        let linesearch_result = self.linesearch.result();
-
-        // take care of counting
-        let cost_count_cg = cg.cost_func_count();
-        let grad_count_cg = cg.grad_func_count();
-        let hessian_count_cg = cg.hessian_func_count();
-        let cost_count_ls = self.linesearch.cost_func_count();
-        let grad_count_ls = self.linesearch.grad_func_count();
-        let hessian_count_ls = self.linesearch.hessian_func_count();
-        self.increase_cost_func_count(cost_count_cg + cost_count_ls);
-        self.increase_grad_func_count(grad_count_cg + grad_count_ls);
-        self.increase_hessian_func_count(hessian_count_cg + hessian_count_ls);
+        // Run solver
+        let mut exec = Executor::new(op.clone(), self.linesearch.clone(), param);
+        let linesearch_result = exec.run_fast()?;
 
         let out = ArgminIterData::new()
             .param(linesearch_result.param)
             .cost(linesearch_result.cost);
         Ok(out)
+    }
+
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+        if (state.get_cost() - state.get_prev_cost()).abs() < std::f64::EPSILON {
+            TerminationReason::NoChangeInCost
+        } else {
+            TerminationReason::NotTerminated
+        }
     }
 }
 
