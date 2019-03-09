@@ -195,6 +195,7 @@ where
 impl<O, P, L> Solver<O> for BacktrackingLineSearch<P, L>
 where
     P: Clone
+        + Default
         + Serialize
         + DeserializeOwned
         + ArgminSub<P, P>
@@ -264,7 +265,7 @@ where
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if self.condition.eval(
             state.get_cost(),
-            state.get_grad().unwrap(),
+            state.get_grad().unwrap_or(O::Param::default()),
             self.init_cost.clone().unwrap(),
             self.init_grad.clone().unwrap(),
             self.search_direction.clone().unwrap(),
