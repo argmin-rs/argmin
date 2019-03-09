@@ -218,10 +218,11 @@ where
         self.linesearch.set_search_direction(self.p.clone());
 
         // Run solver
-        let linesearch_result = Executor::new(op.clone(), self.linesearch.clone(), xk)
-            .grad(grad.clone())
-            .cost(cur_cost)
-            .run_fast()?;
+        let linesearch_result =
+            Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), xk)
+                .grad(grad.clone())
+                .cost(cur_cost)
+                .run_fast()?;
 
         // takes care of the counts of function evaluations
         op.consume_op(linesearch_result.operator);

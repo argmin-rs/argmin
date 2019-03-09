@@ -137,10 +137,14 @@ where
         self.linesearch.set_search_direction(new_grad.mul(&(-1.0)));
 
         // Run solver
-        let linesearch_result = Executor::new(op.clone(), self.linesearch.clone(), param_new)
-            .grad(new_grad)
-            .cost(new_cost)
-            .run_fast()?;
+        let linesearch_result = Executor::new(
+            OpWrapper::new_from_op(&op),
+            self.linesearch.clone(),
+            param_new,
+        )
+        .grad(new_grad)
+        .cost(new_cost)
+        .run_fast()?;
 
         // hack
         op.consume_op(linesearch_result.operator);

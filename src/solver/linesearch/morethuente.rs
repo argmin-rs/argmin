@@ -365,9 +365,6 @@ where
         let cur_cost = f;
         let cur_param = new_param;
         let cur_grad = new_grad.clone();
-        // self.set_cur_cost(f);
-        // self.set_cur_param(new_param);
-        // self.set_cur_grad(new_grad.clone());
         // self.stx.fx = new_cost;
         let dg = self.search_direction.dot(&new_grad);
         let ftest1 = self.finit + self.stp.x * self.dgtest;
