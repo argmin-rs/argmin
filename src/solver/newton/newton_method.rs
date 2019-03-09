@@ -18,71 +18,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Example
 ///
-/// ```
-/// # extern crate argmin;
-/// # extern crate ndarray;
-/// use argmin::prelude::*;
-/// use argmin::solver::newton::Newton;
-/// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-/// use ndarray::{Array, Array1, Array2};
-///
-/// # use serde::{Deserialize, Serialize};
-/// #
-/// # #[derive(Clone, Default, Serialize, Deserialize)]
-/// # struct MyProblem {}
-/// #
-/// # impl ArgminOp for MyProblem {
-/// #     type Param= Array1<f64>;
-/// #     type Output = f64;
-/// #     type Hessian = Array2<f64>;
-/// #
-/// #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-/// #         Ok(rosenbrock_2d(&p.to_vec(), 1.0, 100.0))
-/// #     }
-/// #
-/// #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-/// #         Ok(Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), 1.0, 100.0)))
-/// #     }
-/// #
-/// #     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-/// #         let h = rosenbrock_2d_hessian(&p.to_vec(), 1.0, 100.0);
-/// #         Ok(Array::from_shape_vec((2, 2), h)?)
-/// #     }
-/// # }
-/// #
-/// # fn run() -> Result<(), Error> {
-/// // Define cost function
-/// let cost = MyProblem {};
-///
-/// // Define initial parameter vector
-/// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
-///
-/// // Set up solver
-/// let mut solver = Newton::new(cost, init_param);
-///
-/// // Set maximum number of iterations
-/// solver.set_max_iters(7);
-///
-/// // Attach a logger
-/// solver.add_logger(ArgminSlogLogger::term());
-///
-/// // Run solver
-/// solver.run()?;
-///
-/// // Wait a second (lets the logger flush everything before printing again)
-/// std::thread::sleep(std::time::Duration::from_secs(1));
-///
-/// // Print result
-/// println!("{:?}", solver.result());
-/// #     Ok(())
-/// # }
-/// #
-/// # fn main() {
-/// #     if let Err(ref e) = run() {
-/// #         println!("{} {}", e.as_fail(), e.backtrace());
-/// #         std::process::exit(1);
-/// #     }
-/// # }
+/// ```rust
+/// TODO
 /// ```
 ///
 /// # References:

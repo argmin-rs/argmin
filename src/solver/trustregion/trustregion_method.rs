@@ -31,89 +31,8 @@ use std::fmt::Debug;
 ///
 /// # Example
 ///
-/// ```
-/// extern crate argmin;
-/// extern crate ndarray;
-/// use argmin::prelude::*;
-/// use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
-/// use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-/// use ndarray::{Array, Array1, Array2};
-/// # use serde::{Deserialize, Serialize};
-///
-/// # #[derive(Clone, Default, Serialize, Deserialize)]
-/// # struct MyProblem {}
-/// #
-/// # impl ArgminOp for MyProblem {
-/// #     type Param = Array1<f64>;
-/// #     type Output = f64;
-/// #     type Hessian = Array2<f64>;
-/// #
-/// #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-/// #         Ok(rosenbrock_2d(&p.to_vec(), 1.0, 100.0))
-/// #     }
-/// #
-/// #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-/// #         Ok(Array1::from_vec(rosenbrock_2d_derivative(
-/// #             &p.to_vec(),
-/// #             1.0,
-/// #             100.0,
-/// #         )))
-/// #     }
-/// #
-/// #     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-/// #         let h = rosenbrock_2d_hessian(&p.to_vec(), 1.0, 100.0);
-/// #         Ok(Array::from_shape_vec((2, 2), h)?)
-/// #     }
-/// # }
-/// #
-/// # fn run() -> Result<(), Error> {
-/// // Define cost function
-/// let cost = MyProblem {};
-///
-/// // Define inital parameter vector
-/// // easy case
-/// // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
-/// // tough case
-/// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
-///
-/// // Set up the subproblem
-/// let mut subproblem = Steihaug::new(cost.clone());
-/// // let mut subproblem = CauchyPoint::new(cost.clone());
-/// // let mut subproblem = Dogleg::new(cost.clone());
-/// subproblem.set_max_iters(2);
-///
-/// // Set up the subproblem
-/// let mut subproblem = Steihaug::new(cost.clone());
-/// // let mut subproblem = CauchyPoint::new(cost.clone());
-/// // let mut subproblem = Dogleg::new(cost.clone());
-/// subproblem.set_max_iters(2);
-///
-/// // Set up solver
-/// let mut solver = TrustRegion::new(cost, init_param, subproblem);
-///
-/// // Set the maximum number of iterations
-/// solver.set_max_iters(2_000);
-///
-/// // Attach a logger
-/// solver.add_logger(ArgminSlogLogger::term());
-///
-/// // Run solver
-/// solver.run()?;
-///
-/// // Wait a second (lets the logger flush everything before printing again)
-/// std::thread::sleep(std::time::Duration::from_secs(1));
-///
-/// // Print result
-/// println!("{:?}", solver.result());
-/// #     Ok(())
-/// # }
-/// #
-/// # fn main() {
-/// #     if let Err(ref e) = run() {
-/// #         println!("{} {}", e.as_fail(), e.backtrace());
-/// #         std::process::exit(1);
-/// #     }
-/// # }
+/// ```rust
+/// TODO
 /// ```
 ///
 /// # References:
@@ -138,10 +57,6 @@ pub struct TrustRegion<R> {
 
 impl<R> TrustRegion<R> where {
     /// Constructor
-    ///
-    /// Parameters:
-    ///
-    /// `operator`: operator
     pub fn new(subproblem: R) -> Self {
         TrustRegion {
             radius: 1.0,

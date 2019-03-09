@@ -29,10 +29,6 @@ pub struct Dogleg {
 
 impl Dogleg {
     /// Constructor
-    ///
-    /// Parameters:
-    ///
-    /// `operator`: operator
     pub fn new() -> Self {
         Dogleg {
             radius: std::f64::NAN,

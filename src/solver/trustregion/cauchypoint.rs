@@ -29,10 +29,6 @@ pub struct CauchyPoint {
 
 impl CauchyPoint {
     /// Constructor
-    ///
-    /// Parameters:
-    ///
-    /// `operator`: operator
     pub fn new() -> Self {
         CauchyPoint {
             radius: std::f64::NAN,
