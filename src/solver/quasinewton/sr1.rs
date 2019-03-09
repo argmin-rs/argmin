@@ -167,16 +167,20 @@ where
 
         let p = self.inv_hessian.dot(&prev_grad).mul(&(-1.0));
 
-        self.linesearch.set_init_param(param.clone());
-        self.linesearch.set_init_grad(prev_grad.clone());
-        self.linesearch.set_init_cost(cost);
-        // self.linesearch
-        //     .set_search_direction(p.mul(&(1.0 / p.norm())));
         self.linesearch.set_search_direction(p);
 
         // Run solver
-        let linesearch_result =
-            Executor::new(op.clone(), self.linesearch.clone(), param.clone()).run_fast()?;
+        let linesearch_result = Executor::new(
+            OpWrapper::new_from_op(&op),
+            self.linesearch.clone(),
+            param.clone(),
+        )
+        .grad(prev_grad.clone())
+        .cost(cost)
+        .run_fast()?;
+
+        // take care of function eval counts
+        op.consume_op(linesearch_result.operator);
 
         let xk1 = linesearch_result.param;
 
