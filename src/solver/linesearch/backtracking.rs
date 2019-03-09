@@ -111,11 +111,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone)]
 pub struct BacktrackingLineSearch<P, L> {
     /// initial parameter vector
-    init_param: Option<P>,
+    init_param: P,
     /// initial cost
-    init_cost: Option<f64>,
+    init_cost: f64,
     /// initial gradient
-    init_grad: Option<P>,
+    init_grad: P,
     /// Search direction
     search_direction: Option<P>,
     /// Contraction factor rho
@@ -126,13 +126,13 @@ pub struct BacktrackingLineSearch<P, L> {
     alpha: f64,
 }
 
-impl<P, L> BacktrackingLineSearch<P, L> {
+impl<P: Default, L> BacktrackingLineSearch<P, L> {
     /// Constructor
     pub fn new(condition: L) -> Self {
         BacktrackingLineSearch {
-            init_param: None,
-            init_cost: None,
-            init_grad: None,
+            init_param: P::default(),
+            init_cost: std::f64::INFINITY,
+            init_grad: P::default(),
             search_direction: None,
             rho: 0.9,
             condition: Box::new(condition),
@@ -164,11 +164,6 @@ where
         self.search_direction = Some(search_direction);
     }
 
-    /// Set initial parameter
-    fn set_init_param(&mut self, param: P) {
-        self.init_param = Some(param);
-    }
-
     /// Set initial alpha value
     fn set_init_alpha(&mut self, alpha: f64) -> Result<(), Error> {
         if alpha <= 0.0 {
@@ -179,16 +174,6 @@ where
         }
         self.alpha = alpha;
         Ok(())
-    }
-
-    /// Set initial cost function value
-    fn set_init_cost(&mut self, init_cost: f64) {
-        self.init_cost = Some(init_cost);
-    }
-
-    /// Set initial gradient
-    fn set_init_grad(&mut self, init_grad: P) {
-        self.init_grad = Some(init_grad);
     }
 }
 
@@ -206,33 +191,26 @@ where
 {
     fn init(
         &mut self,
-        _op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        if self.init_param.is_none() {
-            return Err(ArgminError::NotInitialized {
-                text: "BacktrackingLineSearch: init_param must be set.".to_string(),
-            }
-            .into());
-        }
-        if self.init_cost.is_none() {
-            return Err(ArgminError::NotInitialized {
-                text: "BacktrackingLineSearch: init_cost must be set.".to_string(),
-            }
-            .into());
-        }
-        if self.init_grad.is_none() {
-            return Err(ArgminError::NotInitialized {
-                text: "BacktrackingLineSearch: init_grad must be set.".to_string(),
-            }
-            .into());
-        }
+        self.init_param = state.get_param();
+        let cost = state.get_cost();
+        self.init_cost = if cost == std::f64::INFINITY {
+            op.apply(&self.init_param)?
+        } else {
+            cost
+        };
+
+        self.init_grad = state.get_grad().unwrap_or(op.gradient(&self.init_param)?);
+
         if self.search_direction.is_none() {
             return Err(ArgminError::NotInitialized {
                 text: "BacktrackingLineSearch: search_direction must be set.".to_string(),
             }
             .into());
         }
+
         Ok(None)
     }
 
@@ -241,11 +219,11 @@ where
         op: &mut OpWrapper<O>,
         _state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        // this can't go wrong
-        let init_param = self.init_param.clone().unwrap();
-        let search_direction = self.search_direction.clone().unwrap();
+        // let search_direction = self.search_direction.clone().unwrap();
 
-        let new_param = init_param.scaled_add(&self.alpha, &search_direction);
+        let new_param = self
+            .init_param
+            .scaled_add(&self.alpha, self.search_direction.as_ref().unwrap());
 
         let cur_cost = op.apply(&new_param)?;
 
@@ -266,8 +244,8 @@ where
         if self.condition.eval(
             state.get_cost(),
             state.get_grad().unwrap_or(O::Param::default()),
-            self.init_cost.clone().unwrap(),
-            self.init_grad.clone().unwrap(),
+            self.init_cost,
+            self.init_grad.clone(),
             self.search_direction.clone().unwrap(),
             self.alpha,
         ) {
