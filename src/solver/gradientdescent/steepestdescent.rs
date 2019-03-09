@@ -134,19 +134,16 @@ where
         let new_cost = op.apply(&param_new)?;
         let new_grad = op.gradient(&param_new)?;
 
-        self.linesearch.set_init_param(param_new.clone());
-        self.linesearch.set_init_grad(new_grad.clone());
-        self.linesearch.set_init_cost(new_cost);
         self.linesearch.set_search_direction(new_grad.mul(&(-1.0)));
 
         // Run solver
-        let mut exec = Executor::new(op.clone(), self.linesearch.clone(), param_new);
-        let linesearch_result = exec.run_fast()?;
+        let linesearch_result = Executor::new(op.clone(), self.linesearch.clone(), param_new)
+            .grad(new_grad)
+            .cost(new_cost)
+            .run_fast()?;
 
         // hack
-        op.cost_func_count += exec.cost_func_count;
-        op.grad_func_count += exec.grad_func_count;
-        op.hessian_func_count += exec.hessian_func_count;
+        op.consume_op(linesearch_result.operator);
 
         Ok(ArgminIterData::new()
             .param(linesearch_result.param)
