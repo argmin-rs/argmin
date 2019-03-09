@@ -215,19 +215,16 @@ where
         let cur_cost = state.get_cost();
 
         // Linesearch
-        self.linesearch.set_init_param(xk.clone());
         self.linesearch.set_search_direction(self.p.clone());
-        self.linesearch.set_init_grad(grad.clone());
-        self.linesearch.set_init_cost(cur_cost);
 
         // Run solver
-        let mut exec = Executor::new(op.clone(), self.linesearch.clone(), xk);
-        let linesearch_result = exec.run_fast()?;
+        let linesearch_result = Executor::new(op.clone(), self.linesearch.clone(), xk)
+            .grad(grad.clone())
+            .cost(cur_cost)
+            .run_fast()?;
 
-        // hack
-        op.cost_func_count += exec.cost_func_count;
-        op.grad_func_count += exec.grad_func_count;
-        op.hessian_func_count += exec.hessian_func_count;
+        // takes care of the counts of function evaluations
+        op.consume_op(linesearch_result.operator);
 
         let xk1 = linesearch_result.param;
 
