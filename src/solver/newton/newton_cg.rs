@@ -190,20 +190,20 @@ where
         op.consume_op(cg_op);
 
         // perform line search
-        self.linesearch.set_init_param(param.clone());
-        self.linesearch.set_init_grad(grad);
-        let cost = state.get_cost();
-        self.linesearch.set_init_cost(cost);
         self.linesearch.set_search_direction(x);
 
         // Run solver
-        let mut exec = Executor::new(op.clone(), self.linesearch.clone(), param);
-        let linesearch_result = exec.run_fast()?;
+        let linesearch_result =
+            Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
+                .grad(grad)
+                .cost(state.get_cost())
+                .run_fast()?;
 
-        let out = ArgminIterData::new()
+        op.consume_op(linesearch_result.operator);
+
+        Ok(ArgminIterData::new()
             .param(linesearch_result.param)
-            .cost(linesearch_result.cost);
-        Ok(out)
+            .cost(linesearch_result.cost))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
