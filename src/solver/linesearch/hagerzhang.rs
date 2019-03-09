@@ -153,12 +153,6 @@ pub struct HagerZhangLineSearch<P> {
     best_f: f64,
     /// best slope
     best_g: f64,
-    /// initial parameter vector (builder)
-    init_param_b: Option<P>,
-    /// initial cost (builder)
-    finit_b: Option<f64>,
-    /// initial gradient (builder)
-    init_grad_b: Option<P>,
     /// Search direction (builder)
     search_direction_b: Option<P>,
     /// initial parameter vector
@@ -211,9 +205,6 @@ where
             best_x: 0.0,
             best_f: std::f64::INFINITY,
             best_g: std::f64::NAN,
-            init_param_b: None,
-            finit_b: None,
-            init_grad_b: None,
             search_direction_b: None,
             init_param: P::default(),
             init_grad: P::default(),
@@ -494,21 +485,6 @@ where
         self.search_direction_b = Some(search_direction);
     }
 
-    /// Set initial parameter
-    fn set_init_param(&mut self, param: P) {
-        self.init_param_b = Some(param.clone());
-    }
-
-    /// Set initial cost function value
-    fn set_init_cost(&mut self, init_cost: f64) {
-        self.finit_b = Some(init_cost);
-    }
-
-    /// Set initial gradient
-    fn set_init_grad(&mut self, init_grad: P) {
-        self.init_grad_b = Some(init_grad);
-    }
-
     /// Set initial alpha value
     fn set_init_alpha(&mut self, alpha: f64) -> Result<(), Error> {
         self.c_x_init = alpha;
@@ -530,7 +506,7 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
@@ -539,25 +515,21 @@ where
             .into());
         }
 
-        self.init_param = check_param!(
-            self.init_param_b,
-            "HagerZhangLineSearch: Initial parameter not initialized. Call `set_initial_parameter`."
-        );
-
-        self.finit = check_param!(
-            self.finit_b,
-            "HagerZhangLineSearch: Initial cost not computed. Call `set_initial_cost` or `calc_inital_cost`."
-        );
-
-        self.init_grad = check_param!(
-            self.init_grad_b,
-            "HagerZhangLineSearch: Initial gradient not computed. Call `set_initial_grad` or `calc_inital_grad`."
-        );
-
         self.search_direction = check_param!(
             self.search_direction_b,
             "HagerZhangLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
+
+        self.init_param = state.get_param();
+
+        let cost = state.get_cost();
+        self.finit = if cost == std::f64::INFINITY {
+            op.apply(&self.init_param)?
+        } else {
+            cost
+        };
+
+        self.init_grad = state.get_grad().unwrap_or(op.gradient(&self.init_param)?);
 
         self.a_x = self.a_x_init;
         self.b_x = self.b_x_init;
@@ -581,9 +553,7 @@ where
         let new_param = self
             .init_param
             .scaled_add(&self.best_x, &self.search_direction);
-        // self.set_best_param(new_param);
         let best_f = self.best_f;
-        // self.set_best_cost(best_f);
 
         Ok(Some(ArgminIterData::new().param(new_param).cost(best_f)))
     }
