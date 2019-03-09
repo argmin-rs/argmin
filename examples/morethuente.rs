@@ -44,22 +44,19 @@ fn run() -> Result<(), Error> {
     // Set search direction
     solver.set_search_direction(vec![-2.0, 0.0]);
 
-    // Set initial cost
-    solver.set_init_cost(operator.apply(&init_param)?);
-
-    // Set initial gradient
-    solver.set_init_grad(operator.gradient(&init_param)?);
-
-    // Set initial position
-    solver.set_init_param(init_param.clone());
-
     // Set initial step length
     solver.set_init_alpha(1.0)?;
+
+    let init_cost = operator.apply(&init_param)?;
+    let init_grad = operator.gradient(&init_param)?;
 
     // Run solver
     let res = Executor::new(operator, solver, init_param)
         .add_logger(ArgminSlogLogger::term())
         .max_iters(10)
+        // the following two are optional. If they are not provided, they will be computed
+        .cost(init_cost)
+        .grad(init_grad)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
