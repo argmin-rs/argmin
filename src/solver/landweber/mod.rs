@@ -54,6 +54,8 @@ where
     O: ArgminOp,
     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
 {
+    const NAME: &'static str = "Landweber";
+
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,

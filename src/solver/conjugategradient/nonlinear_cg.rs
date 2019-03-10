@@ -103,6 +103,8 @@ where
     L: Clone + ArgminLineSearch<P> + Solver<OpWrapper<O>>,
     B: ArgminNLCGBetaUpdate<P>,
 {
+    const NAME: &'static str = "Nonlinear Conjugate Gradient";
+
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,

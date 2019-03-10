@@ -47,6 +47,8 @@ where
         + ArgminNorm<f64>,
     O::Hessian: Clone + Serialize,
 {
+    const NAME: &'static str = "Cauchy Point";
+
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,

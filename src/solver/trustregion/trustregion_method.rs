@@ -111,6 +111,8 @@ where
     O::Hessian: Default + Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
     R: ArgminTrustRegion + Solver<OpWrapper<O>>,
 {
+    const NAME: &'static str = "Trust region";
+
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,

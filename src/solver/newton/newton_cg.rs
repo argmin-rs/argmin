@@ -77,6 +77,8 @@ where
         + ArgminDot<O::Param, O::Param>,
     L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
+    const NAME: &'static str = "Newton-CG";
+
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,

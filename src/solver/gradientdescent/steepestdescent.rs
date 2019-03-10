@@ -58,6 +58,8 @@ where
     O::Hessian: Default,
     L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
+    const NAME: &'static str = "Steepest Descent";
+
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,

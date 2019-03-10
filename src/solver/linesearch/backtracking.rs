@@ -108,6 +108,8 @@ where
     O: ArgminOp<Param = P, Output = f64>,
     L: LineSearchCondition<P>,
 {
+    const NAME: &'static str = "Backtracking Line search";
+
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,

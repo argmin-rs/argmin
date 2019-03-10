@@ -47,6 +47,8 @@ where
         + ArgminSub<O::Param, O::Param>,
     O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
+    const NAME: &'static str = "Dogleg";
+
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,

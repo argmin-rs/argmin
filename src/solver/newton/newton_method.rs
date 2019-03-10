@@ -64,6 +64,8 @@ where
     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
     O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
+    const NAME: &'static str = "Newton method";
+
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,

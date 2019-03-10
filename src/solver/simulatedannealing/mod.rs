@@ -228,6 +228,8 @@ impl<O> Solver<O> for SimulatedAnnealing
 where
     O: ArgminOp<Output = f64>,
 {
+    const NAME: &'static str = "Simulated Annealing";
+
     /// Perform one iteration of SA algorithm
     fn next_iter(
         &mut self,

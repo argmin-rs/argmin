@@ -96,6 +96,8 @@ where
         + ArgminMul<f64, P>
         + ArgminDot<P, f64>,
 {
+    const NAME: &'static str = "Conjugate Gradient";
+
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,

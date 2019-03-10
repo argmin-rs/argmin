@@ -72,6 +72,8 @@ where
         + ArgminEye,
     L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
+    const NAME: &'static str = "SR1";
+
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,

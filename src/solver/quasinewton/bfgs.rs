@@ -70,6 +70,8 @@ where
         + ArgminEye,
     L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
+    const NAME: &'static str = "BFGS";
+
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,

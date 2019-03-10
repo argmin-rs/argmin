@@ -437,6 +437,8 @@ where
         + ArgminDot<P, f64>
         + ArgminScaledAdd<P, f64, P>,
 {
+    const NAME: &'static str = "Hager-Zhang Line search";
+
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,

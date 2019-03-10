@@ -154,6 +154,8 @@ where
         + ArgminMul<f64, P>,
     O::Hessian: ArgminDot<P, P>,
 {
+    const NAME: &'static str = "Steihaug";
+
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
