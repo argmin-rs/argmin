@@ -5,7 +5,7 @@ authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
 description = "A pure Rust toolbox/framework for numerical optimization"
-documentation = "https://argmin-rs.github.io/argmin/argmin/"
+documentation = "https://docs.rs/argmin/0.1.8/argmin/"
 homepage = "https://github.com/argmin-rs/argmin"
 repository = "https://github.com/argmin-rs/argmin"
 readme = "README.md"
@@ -19,17 +19,17 @@ exclude = [
 
 [dependencies]
 # argmin_core = { path = "../argmin-core"}
-# argmin_codegen = { path = "../argmin-codegen"}
 # argmin_testfunctions = { path = "../argmin-testfunctions" }
 argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git", branch = "master"}
-# argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
 argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git", branch = "master"}
 # argmin_core = "0.1.8"
-# argmin_codegen = "0.1.8"
 # argmin_testfunctions = "0.1.1"
 rand = { version = "0.6.1", features = ["serde1"] }
 rand_xorshift = { version = "0.1.1", features = ["serde1"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
+# argmin_codegen = "0.1.8"
+# argmin_codegen = { path = "../argmin-codegen"}
+# argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
 
 [dev-dependencies]
 ndarray = { version = "0.12.1", features = ["serde-1"] }
