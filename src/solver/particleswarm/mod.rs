@@ -5,19 +5,16 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-
 use crate::prelude::*;
 use argmin_codegen::ArgminSolver;
-use std;
-use std::default::Default;
 use argmin_core::ArgminAdd;
 use argmin_core::ArgminOp;
-use std::f64;
 use serde::{Deserialize, Serialize};
-
+use std;
+use std::default::Default;
+use std::f64;
 
 type Callback<T> = FnMut(&T, f64, &Vec<Particle<T>>) -> ();
-
 
 #[derive(ArgminSolver, Serialize, Deserialize)]
 pub struct ParticleSwarm<'a, O>
@@ -27,7 +24,8 @@ where
 {
     cost_function: O, // TODO: would not be necessary if apply was immut
     base: ArgminBase<O>,
-    #[serde(skip)] iter_callback: Option<&'a mut Callback<O::Param>>,
+    #[serde(skip)]
+    iter_callback: Option<&'a mut Callback<O::Param>>,
     particles: Vec<Particle<O::Param>>,
     best_position: O::Param,
     best_cost: f64,
@@ -37,7 +35,7 @@ where
     weight_particle: f64,
     weight_swarm: f64,
 
-    search_region: (O::Param, O::Param)
+    search_region: (O::Param, O::Param),
 }
 
 impl<'a, O> ParticleSwarm<'a, O>
@@ -61,20 +59,21 @@ where
         weight_particle: f64,
         weight_swarm: f64,
     ) -> Result<Self, Error> {
-
         let mut particle_swarm = ParticleSwarm {
             cost_function: cost_function.clone(),
             base: ArgminBase::new(cost_function, init_param),
             iter_callback: None,
             particles: vec![],
-            best_position: O::Param::rand_from_range( // FIXME: random smart?
+            best_position: O::Param::rand_from_range(
+                // FIXME: random smart?
                 &search_region.0,
-                &search_region.1),
+                &search_region.1,
+            ),
             best_cost: f64::INFINITY,
             weight_momentum: weight_momentum,
             weight_particle: weight_particle,
             weight_swarm: weight_swarm,
-            search_region: search_region
+            search_region: search_region,
         };
 
         particle_swarm.initialize_particles(num_particles);
@@ -87,9 +86,9 @@ where
     }
 
     fn initialize_particles(&mut self, num_particles: usize) {
-        self.particles = (0..num_particles).map(
-                |_| self.initialize_particle()
-        ).collect();
+        self.particles = (0..num_particles)
+            .map(|_| self.initialize_particle())
+            .collect();
 
         self.best_position = self.get_best_position();
         self.best_cost = self.cost_function.apply(&self.best_position).unwrap();
@@ -122,18 +121,17 @@ where
                     if p.cost < best_sofar.1 {
                         best = Some((&p.position, p.cost))
                     }
-                },
-                None => best = Some((&p.position, p.cost))
+                }
+                None => best = Some((&p.position, p.cost)),
             }
         }
 
         match best {
             Some(best_sofar) => best_sofar.0.clone(),
-            None => panic!("Particles not initialized")
+            None => panic!("Particles not initialized"),
         }
     }
 }
-
 
 impl<'a, O> ArgminIter for ParticleSwarm<'a, O>
 where
@@ -147,7 +145,6 @@ where
 
     /// Perform one iteration of algorithm
     fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-
         let zero = Self::Param::zero_like(&self.best_position);
 
         for p in self.particles.iter_mut() {
@@ -161,16 +158,13 @@ where
 
             // ad 2)
             let to_optimum = p.best_position.sub(&p.position);
-            let pull_to_optimum = Self::Param::rand_from_range(
-                &zero, &to_optimum);
-            let pull_to_optimum = pull_to_optimum.mul(
-                    &self.weight_particle);
+            let pull_to_optimum = Self::Param::rand_from_range(&zero, &to_optimum);
+            let pull_to_optimum = pull_to_optimum.mul(&self.weight_particle);
 
             // ad 3)
             let to_global_optimum = self.best_position.sub(&p.position);
             let pull_to_global_optimum =
-                Self::Param::rand_from_range(&zero, &to_global_optimum).mul(
-                    &self.weight_swarm);
+                Self::Param::rand_from_range(&zero, &to_global_optimum).mul(&self.weight_swarm);
 
             p.velocity = momentum.add(&pull_to_optimum).add(&pull_to_global_optimum);
             let new_position = p.position.add(&p.velocity);
@@ -178,7 +172,7 @@ where
             // Limit to search window:
             p.position = O::Param::min(
                 &O::Param::max(&new_position, &self.search_region.0),
-                &self.search_region.1
+                &self.search_region.1,
             );
 
             p.cost = self.cost_function.apply(&p.position)?;
@@ -195,9 +189,8 @@ where
 
         match &mut self.iter_callback {
             Some(callback) => (*callback)(&self.best_position, self.best_cost, &self.particles),
-            None => ()
+            None => (),
         };
-
 
         let out = ArgminIterData::new(self.best_position.clone(), self.best_cost);
         // out.add_kv(make_kv!(
@@ -208,7 +201,6 @@ where
         Ok(out)
     }
 }
-
 
 trait_bound!(Position
 ; Clone
@@ -222,7 +214,6 @@ trait_bound!(Position
 , std::fmt::Debug
 );
 
-
 #[derive(Serialize, Deserialize)]
 pub struct Particle<T: Position> {
     pub position: T,
@@ -231,4 +222,3 @@ pub struct Particle<T: Position> {
     best_position: T,
     best_cost: f64,
 }
-
