@@ -21,173 +21,89 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Example
 ///
-/// ```
-/// # extern crate argmin;
-/// # extern crate ndarray;
-/// use argmin::prelude::*;
-/// use argmin::solver::newton::NewtonCG;
-/// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-/// use argmin::solver::linesearch::MoreThuenteLineSearch;
-/// use ndarray::{Array, Array1, Array2};
-///
-/// # use serde::{Deserialize, Serialize};
-/// #
-/// # #[derive(Clone, Default, Serialize, Deserialize)]
-/// # struct MyProblem {}
-/// #
-/// # impl ArgminOp for MyProblem {
-/// #     type Param = Array1<f64>;
-/// #     type Output = f64;
-/// #     type Hessian = Array2<f64>;
-/// #
-/// #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-/// #         Ok(rosenbrock_2d(&p.to_vec(), 1.0, 100.0))
-/// #     }
-/// #
-/// #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-/// #         Ok(Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), 1.0, 100.0)))
-/// #     }
-/// #
-/// #     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-/// #         let h = rosenbrock_2d_hessian(&p.to_vec(), 1.0, 100.0);
-/// #         Ok(Array::from_shape_vec((2, 2), h)?)
-/// #     }
-/// # }
-/// #
-/// # fn run() -> Result<(), Error> {
-/// // Define cost function
-/// let cost = MyProblem {};
-///
-/// // Define initial parameter vector
-/// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
-///
-/// // set up line search
-/// let linesearch = MoreThuenteLineSearch::new(cost.clone());
-///
-/// // Set up solver
-/// let mut solver = NewtonCG::new(cost, init_param, linesearch);
-///
-/// // Set maximum number of iterations
-/// solver.set_max_iters(20);
-///
-/// // Attach a logger
-/// solver.add_logger(ArgminSlogLogger::term());
-///
-/// // Run solver
-/// solver.run()?;
-///
-/// // Wait a second (lets the logger flush everything before printing again)
-/// std::thread::sleep(std::time::Duration::from_secs(1));
-///
-/// // Print result
-/// println!("{:?}", solver.result());
-/// #     Ok(())
-/// # }
-/// #
-/// # fn main() {
-/// #     if let Err(ref e) = run() {
-/// #         println!("{} {}", e.as_fail(), e.backtrace());
-/// #         std::process::exit(1);
-/// #     }
-/// # }
+/// ```rust
+/// TODO
 /// ```
 ///
 /// # References:
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct NewtonCG<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminZero
-        + ArgminNorm<f64>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct NewtonCG<L> {
     /// line search
-    linesearch: Box<L>,
+    linesearch: L,
     /// curvature_threshold
     curvature_threshold: f64,
-    /// Base stuff
-    base: ArgminBase<O>,
 }
 
-impl<O, L> NewtonCG<O, L>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminMul<f64, O::Param>
-        + ArgminZero
-        + ArgminNorm<f64>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
-{
+impl<L> NewtonCG<L> {
     /// Constructor
-    pub fn new(cost_function: O, init_param: O::Param, linesearch: L) -> Self {
+    pub fn new(linesearch: L) -> Self {
         NewtonCG {
-            linesearch: Box::new(linesearch),
+            linesearch,
             curvature_threshold: 0.0,
-            base: ArgminBase::new(cost_function, init_param),
         }
     }
 
     /// Set curvature threshold
-    pub fn set_curvature_threshold(&mut self, threshold: f64) -> &mut Self {
+    pub fn curvature_threshold(mut self, threshold: f64) -> Self {
         self.curvature_threshold = threshold;
         self
     }
 }
 
-impl<O, L> ArgminIter for NewtonCG<O, L>
+impl<O, L> Solver<O> for NewtonCG<L>
 where
     O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
+    O::Param: Send
+        + Sync
+        + Clone
+        + Serialize
+        + Default
+        + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminMul<f64, O::Param>
         + ArgminZero
         + ArgminNorm<f64>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-    L: ArgminLineSearch<Param = O::Param, Output = O::Output, Hessian = O::Hessian>,
+    O::Hessian: Send
+        + Sync
+        + Clone
+        + Serialize
+        + Default
+        + ArgminInv<O::Hessian>
+        + ArgminDot<O::Param, O::Param>,
+    L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
+    const NAME: &'static str = "Newton-CG";
 
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let param = self.cur_param();
-        let grad = self.gradient(&param)?;
-        let hessian = self.hessian(&param)?;
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
+        let param = state.get_param();
+        let grad = op.gradient(&param)?;
+        let hessian = op.hessian(&param)?;
 
         // Solve CG subproblem
-        let op: CGSubProblem<Self::Param, Self::Hessian> = CGSubProblem::new(hessian.clone());
+        let cg_op: CGSubProblem<O::Param, O::Hessian> = CGSubProblem::new(hessian.clone());
+        let mut cg_op = OpWrapper::new(&cg_op);
 
         let mut x_p = param.zero_like();
-        let mut x: Self::Param = param.zero_like();
-        let mut cg = ConjugateGradient::new(op, grad.mul(&(-1.0)), x_p.clone())?;
+        let mut x: O::Param = param.zero_like();
+        let mut cg = ConjugateGradient::new(grad.mul(&(-1.0)))?;
 
-        cg.init()?;
+        let mut cg_state = IterState::new(x_p.clone());
+        cg.init(&mut cg_op, &cg_state)?;
         let grad_norm = grad.norm();
         for iter in 0.. {
-            let data = cg.next_iter()?;
-            x = data.param();
-            cg.increment_iter();
-            cg.set_cur_param(data.param());
-            cg.set_cur_cost(data.cost());
+            let data = cg.next_iter(&mut cg_op, &cg_state)?;
+            x = data.get_param().unwrap();
             let p = cg.p_prev();
-            // let p = cg.p();
             let curvature = p.dot(&hessian.dot(&p));
-            // println!("iter: {:?}, curv: {:?}", iter, curvature);
             if curvature <= self.curvature_threshold {
                 if iter == 0 {
                     x = grad.mul(&(-1.0));
@@ -197,37 +113,40 @@ where
                     break;
                 }
             }
-            if data.cost() <= (0.5f64).min(grad_norm.sqrt()) * grad_norm {
+            if data.get_cost().unwrap() <= (0.5f64).min(grad_norm.sqrt()) * grad_norm {
                 break;
             }
+            cg_state.param(x.clone());
+            cg_state.cost(data.get_cost().unwrap());
             x_p = x.clone();
         }
 
+        // take care of counting
+        op.consume_op(cg_op);
+
         // perform line search
-        self.linesearch.base_reset();
-        self.linesearch.set_initial_parameter(param);
-        self.linesearch.set_initial_gradient(grad);
-        let cost = self.cur_cost();
-        self.linesearch.set_initial_cost(cost);
         self.linesearch.set_search_direction(x);
 
-        self.linesearch.run_fast()?;
+        // Run solver
+        let linesearch_result =
+            Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
+                .grad(grad)
+                .cost(state.get_cost())
+                .run_fast()?;
 
-        let linesearch_result = self.linesearch.result();
+        op.consume_op(linesearch_result.operator);
 
-        // take care of counting
-        let cost_count_cg = cg.cost_func_count();
-        let grad_count_cg = cg.grad_func_count();
-        let hessian_count_cg = cg.hessian_func_count();
-        let cost_count_ls = self.linesearch.cost_func_count();
-        let grad_count_ls = self.linesearch.grad_func_count();
-        let hessian_count_ls = self.linesearch.hessian_func_count();
-        self.increase_cost_func_count(cost_count_cg + cost_count_ls);
-        self.increase_grad_func_count(grad_count_cg + grad_count_ls);
-        self.increase_hessian_func_count(hessian_count_cg + hessian_count_ls);
+        Ok(ArgminIterData::new()
+            .param(linesearch_result.param)
+            .cost(linesearch_result.cost))
+    }
 
-        let out = ArgminIterData::new(linesearch_result.param, linesearch_result.cost);
-        Ok(out)
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+        if (state.get_cost() - state.get_prev_cost()).abs() < std::f64::EPSILON {
+            TerminationReason::NoChangeInCost
+        } else {
+            TerminationReason::NotTerminated
+        }
     }
 }
 

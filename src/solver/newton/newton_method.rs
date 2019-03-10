@@ -12,112 +12,35 @@
 
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::default::Default;
 
 /// Newton's method iteratively finds the stationary points of a function f by using a second order
 /// approximation of f at the current point.
 ///
 /// # Example
 ///
-/// ```
-/// # extern crate argmin;
-/// # extern crate ndarray;
-/// use argmin::prelude::*;
-/// use argmin::solver::newton::Newton;
-/// # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-/// use ndarray::{Array, Array1, Array2};
-///
-/// # use serde::{Deserialize, Serialize};
-/// #
-/// # #[derive(Clone, Default, Serialize, Deserialize)]
-/// # struct MyProblem {}
-/// #
-/// # impl ArgminOp for MyProblem {
-/// #     type Param= Array1<f64>;
-/// #     type Output = f64;
-/// #     type Hessian = Array2<f64>;
-/// #
-/// #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-/// #         Ok(rosenbrock_2d(&p.to_vec(), 1.0, 100.0))
-/// #     }
-/// #
-/// #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-/// #         Ok(Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), 1.0, 100.0)))
-/// #     }
-/// #
-/// #     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-/// #         let h = rosenbrock_2d_hessian(&p.to_vec(), 1.0, 100.0);
-/// #         Ok(Array::from_shape_vec((2, 2), h)?)
-/// #     }
-/// # }
-/// #
-/// # fn run() -> Result<(), Error> {
-/// // Define cost function
-/// let cost = MyProblem {};
-///
-/// // Define initial parameter vector
-/// let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
-///
-/// // Set up solver
-/// let mut solver = Newton::new(cost, init_param);
-///
-/// // Set maximum number of iterations
-/// solver.set_max_iters(7);
-///
-/// // Attach a logger
-/// solver.add_logger(ArgminSlogLogger::term());
-///
-/// // Run solver
-/// solver.run()?;
-///
-/// // Wait a second (lets the logger flush everything before printing again)
-/// std::thread::sleep(std::time::Duration::from_secs(1));
-///
-/// // Print result
-/// println!("{:?}", solver.result());
-/// #     Ok(())
-/// # }
-/// #
-/// # fn main() {
-/// #     if let Err(ref e) = run() {
-/// #         println!("{} {}", e.as_fail(), e.backtrace());
-/// #         std::process::exit(1);
-/// #     }
-/// # }
+/// ```rust
+/// TODO
 /// ```
 ///
 /// # References:
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct Newton<O>
-where
-    O: ArgminOp,
-    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct Newton {
     /// gamma
     gamma: f64,
-    /// Base stuff
-    base: ArgminBase<O>,
 }
 
-impl<O> Newton<O>
-where
-    O: ArgminOp,
-    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
-{
+impl Newton {
     /// Constructor
-    pub fn new(cost_function: O, init_param: O::Param) -> Self {
-        Newton {
-            gamma: 1.0,
-            base: ArgminBase::new(cost_function, init_param),
-        }
+    pub fn new() -> Self {
+        Newton { gamma: 1.0 }
     }
 
     /// set gamma
-    pub fn set_gamma(&mut self, gamma: f64) -> Result<&mut Self, Error> {
+    pub fn set_gamma(mut self, gamma: f64) -> Result<Self, Error> {
         if gamma <= 0.0 || gamma > 1.0 {
             return Err(ArgminError::InvalidParameter {
                 text: "Newton: gamma must be in  (0, 1].".to_string(),
@@ -129,23 +52,30 @@ where
     }
 }
 
-impl<O> ArgminIter for Newton<O>
+impl Default for Newton {
+    fn default() -> Newton {
+        Newton::new()
+    }
+}
+
+impl<O> Solver<O> for Newton
 where
     O: ArgminOp,
     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
     O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
+    const NAME: &'static str = "Newton method";
 
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let param = self.cur_param();
-        let grad = self.gradient(&param)?;
-        let hessian = self.hessian(&param)?;
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
+        let param = state.get_param();
+        let grad = op.gradient(&param)?;
+        let hessian = op.hessian(&param)?;
         let new_param = param.scaled_sub(&self.gamma, &hessian.inv()?.dot(&grad));
-        let out = ArgminIterData::new(new_param, 0.0);
-        Ok(out)
+        Ok(ArgminIterData::new().param(new_param))
     }
 }
 

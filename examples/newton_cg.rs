@@ -52,25 +52,22 @@ fn run() -> Result<(), Error> {
     let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 
     // set up line search
-    let linesearch = MoreThuenteLineSearch::new(cost.clone());
+    let linesearch = MoreThuenteLineSearch::new();
 
     // Set up solver
-    let mut solver = NewtonCG::new(cost, init_param, linesearch);
-
-    // Set maximum number of iterations
-    solver.set_max_iters(80);
-
-    // Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
+    let solver = NewtonCG::new(linesearch);
 
     // Run solver
-    solver.run()?;
+    let res = Executor::new(cost, solver, init_param)
+        .add_logger(ArgminSlogLogger::term())
+        .max_iters(100)
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{}", solver.result());
+    println!("{}", res);
     Ok(())
 }
 

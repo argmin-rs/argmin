@@ -16,14 +16,13 @@ use std::f64;
 
 type Callback<T> = FnMut(&T, f64, &Vec<Particle<T>>) -> ();
 
-#[derive(ArgminSolver, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct ParticleSwarm<'a, O>
 where
     O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: Position,
 {
     cost_function: O, // TODO: would not be necessary if apply was immut
-    base: ArgminBase<O>,
     #[serde(skip)]
     iter_callback: Option<&'a mut Callback<O::Param>>,
     particles: Vec<Particle<O::Param>>,
@@ -48,11 +47,9 @@ where
     /// Parameters:
     ///
     /// * `cost_function`: cost function
-    /// * `init_param`: initial parameter vector
     /// * `init_temp`: initial temperature
     pub fn new(
         cost_function: O,
-        init_param: O::Param,
         search_region: (O::Param, O::Param),
         num_particles: usize,
         weight_momentum: f64,
@@ -61,7 +58,6 @@ where
     ) -> Result<Self, Error> {
         let mut particle_swarm = ParticleSwarm {
             cost_function: cost_function.clone(),
-            base: ArgminBase::new(cost_function, init_param),
             iter_callback: None,
             particles: vec![],
             best_position: O::Param::rand_from_range(
@@ -76,18 +72,22 @@ where
             search_region: search_region,
         };
 
-        particle_swarm.initialize_particles(num_particles);
+        // FIXME: Should not be necessary to create new OpWrapper here.
+        let mut op = OpWrapper::new(&cost_function);
+
+        particle_swarm.initialize_particles(&mut op, num_particles);
 
         Ok(particle_swarm)
     }
 
+    // TODO: implement iter_callback as logger
     pub fn set_iter_callback(&mut self, callback: &'a mut Callback<O::Param>) {
         self.iter_callback = Some(callback);
     }
 
-    fn initialize_particles(&mut self, num_particles: usize) {
+    fn initialize_particles(&mut self, op: &mut OpWrapper<O>, num_particles: usize) {
         self.particles = (0..num_particles)
-            .map(|_| self.initialize_particle())
+            .map(|_| self.initialize_particle(op))
             .collect();
 
         self.best_position = self.get_best_position();
@@ -95,13 +95,13 @@ where
         // TODO unwrap evil
     }
 
-    fn initialize_particle(&mut self) -> Particle<O::Param> {
+    fn initialize_particle(&mut self, op: &mut OpWrapper<O>) -> Particle<O::Param> {
         let (min, max) = &self.search_region;
         let delta = max.sub(min);
         let delta_neg = delta.mul(&-1.0);
 
         let initial_position = O::Param::rand_from_range(min, max);
-        let initial_cost = self.apply(&initial_position).unwrap(); // TODO: unwrap evil?
+        let initial_cost = op.apply(&initial_position).unwrap(); // FIXME do not unwrap
 
         Particle {
             position: initial_position.clone(),
@@ -133,19 +133,21 @@ where
     }
 }
 
-impl<'a, O> ArgminIter for ParticleSwarm<'a, O>
+impl<'a, O> Solver<O> for ParticleSwarm<'a, O>
 where
     O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: Position,
     <O as ArgminOp>::Hessian: Clone + Default,
 {
-    type Param = O::Param;
-    type Output = f64;
-    type Hessian = <O as ArgminOp>::Hessian;
+    const NAME: &'static str = "Particle Swarm Optimization";
 
     /// Perform one iteration of algorithm
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let zero = Self::Param::zero_like(&self.best_position);
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
+        let zero = O::Param::zero_like(&self.best_position);
 
         for p in self.particles.iter_mut() {
             // New velocity is composed of
@@ -158,13 +160,13 @@ where
 
             // ad 2)
             let to_optimum = p.best_position.sub(&p.position);
-            let pull_to_optimum = Self::Param::rand_from_range(&zero, &to_optimum);
+            let pull_to_optimum = O::Param::rand_from_range(&zero, &to_optimum);
             let pull_to_optimum = pull_to_optimum.mul(&self.weight_particle);
 
             // ad 3)
             let to_global_optimum = self.best_position.sub(&p.position);
             let pull_to_global_optimum =
-                Self::Param::rand_from_range(&zero, &to_global_optimum).mul(&self.weight_swarm);
+                O::Param::rand_from_range(&zero, &to_global_optimum).mul(&self.weight_swarm);
 
             p.velocity = momentum.add(&pull_to_optimum).add(&pull_to_global_optimum);
             let new_position = p.position.add(&p.velocity);
@@ -192,7 +194,9 @@ where
             None => (),
         };
 
-        let out = ArgminIterData::new(self.best_position.clone(), self.best_cost);
+        let out = ArgminIterData::new()
+            .param(self.best_position.clone())
+            .cost(self.best_cost);
         // out.add_kv(make_kv!(
         //     "t" => self.cur_temp;
 

@@ -16,7 +16,6 @@
 //! DOI: 10.1126/science.220.4598.671  
 
 use crate::prelude::*;
-use argmin_codegen::ArgminSolver;
 use rand::prelude::*;
 use rand_xorshift::XorShiftRng;
 use serde::{Deserialize, Serialize};
@@ -54,164 +53,7 @@ impl std::default::Default for SATempFunc {
 ///
 /// # Example
 ///
-/// ```
-/// extern crate argmin;
-/// extern crate rand;
-/// use argmin::prelude::*;
-/// use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
-/// use argmin::testfunctions::rosenbrock;
-/// use rand::prelude::*;
-/// use rand_xorshift::XorShiftRng;
-/// use std::sync::{Arc, Mutex};;
-/// use serde::{Deserialize, Serialize};
-///
-/// #[derive(Clone, Serialize, Deserialize)]
-/// struct Rosenbrock {
-///     /// Parameter a, usually 1.0
-///     a: f64,
-///     /// Parameter b, usually 100.0
-///     b: f64,
-///     /// lower bound
-///     lower_bound: Vec<f64>,
-///     /// upper bound
-///     upper_bound: Vec<f64>,
-///     /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
-///     /// `self` to be passed as an immutable reference. This gives us thread safe interior
-///     /// mutability.
-///     rng: Arc<Mutex<XorShiftRng>>,
-/// }
-///
-/// impl std::default::Default for Rosenbrock {
-///     fn default() -> Self {
-///         let lower_bound: Vec<f64> = vec![-5.0, -5.0];
-///         let upper_bound: Vec<f64> = vec![5.0, 5.0];
-///         Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound)
-///     }
-/// }
-///
-/// impl Rosenbrock {
-///     /// Constructor
-///     pub fn new(a: f64, b: f64, lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> Self {
-///         Rosenbrock {
-///             a,
-///             b,
-///             lower_bound,
-///             upper_bound,
-///             rng: Arc::new(Mutex::new(XorShiftRng::from_entropy())),
-///         }
-///     }
-/// }
-///
-/// impl ArgminOp for Rosenbrock {
-///     type Param= Vec<f64>;
-///     type Output = f64;
-///     type Hessian = ();
-///
-///     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
-///         Ok(rosenbrock(param, self.a, self.b))
-///     }
-///
-///     /// This function is called by the annealing function
-///     fn modify(&self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
-///         let mut param_n = param.clone();
-///         // Perform modifications to a degree proportional to the current temperature `temp`.
-///         for _ in 0..(temp.floor() as u64 + 1) {
-///             // Compute random index of the parameter vector using the supplied random number
-///             // generator.
-///             let mut rng = self.rng.lock().unwrap();
-///             let idx = (*rng).gen_range(0, param.len());
-///
-///             // Compute random number in [0.01, 0.01].
-///             let val = 0.01 * (*rng).gen_range(-1.0, 1.0);
-///
-///             // modify previous parameter value at random position `idx` by `val`
-///             let tmp = param[idx] + val;
-///
-///             // check if bounds are violated. If yes, project onto bound.
-///             if tmp > self.upper_bound[idx] {
-///                 param_n[idx] = self.upper_bound[idx];
-///             } else if tmp < self.lower_bound[idx] {
-///                 param_n[idx] = self.lower_bound[idx];
-///             } else {
-///                 param_n[idx] = param[idx] + val;
-///             }
-///         }
-///         Ok(param_n)
-///     }
-/// }
-///
-/// fn run() -> Result<(), Error> {
-///     // Define bounds
-///     let lower_bound: Vec<f64> = vec![-5.0, -5.0];
-///     let upper_bound: Vec<f64> = vec![5.0, 5.0];
-///
-///     // Define cost function
-///     let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
-///
-///     // definie inital parameter vector
-///     let init_param: Vec<f64> = vec![1.0, 1.2];
-///
-///     // Define initial temperature
-///     let temp = 15.0;
-///
-///     // Set up simulated annealing solver
-///     let mut solver = SimulatedAnnealing::new(operator, init_param, temp)?;
-///
-///     // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
-///     solver.temp_func(SATempFunc::Boltzmann);
-///
-///     // Optional: Attach a logger
-///     solver.add_logger(ArgminSlogLogger::term());
-///
-///     /////////////////////////
-///     // Stopping criteria   //
-///     /////////////////////////
-///
-///     // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-///     solver.set_max_iters(1_000);
-///
-///     // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
-///     solver.set_target_cost(0.0);
-///
-///     // Optional: stop if there was no new best solution after 100 iterations
-///     solver.stall_best(100);
-///
-///     // Optional: stop if there was no accepted solution after 100 iterations
-///     solver.stall_accepted(100);
-///
-///     /////////////////////////
-///     // Reannealing         //
-///     /////////////////////////
-///
-///     // Optional: Reanneal after 100 iterations (resets temperature to initial temperature)
-///     solver.reannealing_fixed(100);
-///
-///     // Optional: Reanneal after no accepted solution has been found for 50 iterations
-///     solver.reannealing_accepted(50);
-///
-///     // Optional: Start reannealing after no new best solution has been found for 80 iterations
-///     solver.reannealing_best(80);
-///
-///     /////////////////////////
-///     // Run solver          //
-///     /////////////////////////
-///
-///     solver.run()?;
-///
-///     // Wait a second (lets the logger flush everything before printing again)
-///     std::thread::sleep(std::time::Duration::from_secs(1));
-///
-///     // Print result
-///     println!("{:?}", solver.result());
-///     Ok(())
-/// }
-///
-/// fn main() {
-///     if let Err(ref e) = run() {
-///         println!("{} {}", e.as_fail(), e.backtrace());
-///         std::process::exit(1);
-///     }
-/// }
+/// ```rust
 /// ```
 ///
 /// # References
@@ -221,21 +63,11 @@ impl std::default::Default for SATempFunc {
 /// [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 /// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 /// DOI: 10.1126/science.220.4598.671  
-#[derive(ArgminSolver, Serialize, Deserialize)]
-#[log("initial_temperature" => "self.init_temp")]
-#[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
-#[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
-#[log("reanneal_fixed" => "self.reanneal_fixed")]
-#[log("reanneal_accepted" => "self.reanneal_accepted")]
-#[log("reanneal_best" => "self.reanneal_best")]
-pub struct SimulatedAnnealing<O>
-where
-    O: ArgminOp<Output = f64>,
-{
+#[derive(Serialize, Deserialize)]
+pub struct SimulatedAnnealing {
     /// Initial temperature
     init_temp: f64,
     /// which temperature function?
-    // #[serde(skip)]
     temp_func: SATempFunc,
     /// Number of iterations used for the caluclation of temperature. This is needed for
     /// reannealing!
@@ -262,30 +94,20 @@ where
     reanneal_iter_best: u64,
     /// current temperature
     cur_temp: f64,
-    /// previous cost
-    prev_cost: f64,
     /// random number generator
     rng: XorShiftRng,
-    /// base
-    base: ArgminBase<O>,
 }
 
-impl<O> SimulatedAnnealing<O>
-where
-    O: ArgminOp<Output = f64>,
-{
+impl SimulatedAnnealing {
     /// Constructor
     ///
-    /// Parameters:
+    /// Parameter:
     ///
-    /// * `cost_function`: cost function
-    /// * `init_param`: initial parameter vector
     /// * `init_temp`: initial temperature
-    pub fn new(cost_function: O, init_param: O::Param, init_temp: f64) -> Result<Self, Error> {
-        let prev_cost = cost_function.apply(&init_param)?;
+    pub fn new(init_temp: f64) -> Result<Self, Error> {
         if init_temp <= 0_f64 {
             Err(ArgminError::InvalidParameter {
-                text: "initial temperature".to_string(),
+                text: "Initial temperature must be > 0.".to_string(),
             }
             .into())
         } else {
@@ -304,78 +126,45 @@ where
                 reanneal_best: std::u64::MAX,
                 reanneal_iter_best: 0,
                 cur_temp: init_temp,
-                prev_cost,
                 rng: XorShiftRng::from_entropy(),
-                base: ArgminBase::new(cost_function, init_param),
             })
         }
     }
 
     /// Set temperature function to one of the options in `SATempFunc`.
-    pub fn temp_func(&mut self, temperature_func: SATempFunc) -> &mut Self {
+    pub fn temp_func(mut self, temperature_func: SATempFunc) -> Self {
         self.temp_func = temperature_func;
         self
     }
 
     /// The optimization stops after there has been no accepted solution after `iter` iterations
-    pub fn stall_accepted(&mut self, iter: u64) -> &mut Self {
+    pub fn stall_accepted(mut self, iter: u64) -> Self {
         self.stall_iter_accepted_limit = iter;
         self
     }
 
     /// The optimization stops after there has been no new best solution after `iter` iterations
-    pub fn stall_best(&mut self, iter: u64) -> &mut Self {
+    pub fn stall_best(mut self, iter: u64) -> Self {
         self.stall_iter_best_limit = iter;
         self
     }
 
     /// Start reannealing after `iter` iterations
-    pub fn reannealing_fixed(&mut self, iter: u64) -> &mut Self {
+    pub fn reannealing_fixed(mut self, iter: u64) -> Self {
         self.reanneal_fixed = iter;
         self
     }
 
     /// Start reannealing after no accepted solution has been found for `iter` iterations
-    pub fn reannealing_accepted(&mut self, iter: u64) -> &mut Self {
+    pub fn reannealing_accepted(mut self, iter: u64) -> Self {
         self.reanneal_accepted = iter;
         self
     }
 
     /// Start reannealing after no new best solution has been found for `iter` iterations
-    pub fn reannealing_best(&mut self, iter: u64) -> &mut Self {
+    pub fn reannealing_best(mut self, iter: u64) -> Self {
         self.reanneal_best = iter;
         self
-    }
-
-    /// Acceptance function
-    ///
-    /// Any solution which satisfies `next_cost < prev_cost` will be accepted. Solutions worse than
-    /// the previous one are accepted with a probability given as:
-    ///
-    /// `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
-    ///
-    /// which will always be between 0 and 0.5.
-    fn accept(&mut self, next_param: &O::Param, next_cost: f64) -> (bool, bool) {
-        let prob: f64 = self.rng.gen();
-        let mut new_best = false;
-        let accepted = if (next_cost < self.prev_cost)
-            || (1.0 / (1.0 + ((next_cost - self.prev_cost) / self.cur_temp).exp()) > prob)
-        {
-            // If yes, update the parameter vector for the next iteration.
-            self.prev_cost = next_cost;
-            self.set_cur_param(next_param.clone());
-
-            // In case the new solution is better than the current best, update best as well.
-            if next_cost < self.best_cost() {
-                new_best = true;
-                self.set_best_cost(next_cost);
-                self.set_best_param(next_param.clone());
-            }
-            true
-        } else {
-            false
-        };
-        (accepted, new_best)
     }
 
     /// Update the temperature based on the current iteration number.
@@ -388,13 +177,6 @@ where
             SATempFunc::Exponential(x) => self.init_temp * x.powf((self.temp_iter + 1) as f64),
             // SATempFunc::Custom(ref func) => func(self.init_temp, self.temp_iter),
         };
-    }
-
-    /// Perform annealing
-    fn anneal(&mut self) -> Result<O::Param, Error> {
-        let tmp = self.cur_param();
-        let cur_temp = self.cur_temp;
-        self.modify(&tmp, cur_temp)
     }
 
     /// Perform reannealing
@@ -442,32 +224,48 @@ where
     }
 }
 
-impl<O> ArgminIter for SimulatedAnnealing<O>
+impl<O> Solver<O> for SimulatedAnnealing
 where
     O: ArgminOp<Output = f64>,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
+    const NAME: &'static str = "Simulated Annealing";
 
     /// Perform one iteration of SA algorithm
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
-        // behaviour. None of these strange behaviour is dangerous, but still.
+        // behaviour.
+
+        let prev_param = state.get_param();
+        let prev_cost = state.get_cost();
 
         // Make a move
-        let new_param = self.anneal()?;
+        let new_param = op.modify(&prev_param, self.cur_temp)?;
 
         // Evaluate cost function with new parameter vector
-        let new_cost = self.apply(&new_param)?;
+        let new_cost = op.apply(&new_param)?;
 
+        // Acceptance function
+        //
         // Decide whether new parameter vector should be accepted.
         // If no, move on with old parameter vector.
-        let (accepted, new_best) = self.accept(&new_param, new_cost);
+        //
+        // Any solution which satisfies `next_cost < prev_cost` will be accepted. Solutions worse
+        // than the previous one are accepted with a probability given as:
+        //
+        // `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
+        //
+        // which will always be between 0 and 0.5.
+        let prob: f64 = self.rng.gen();
+        let accepted = (new_cost < state.get_prev_cost())
+            || (1.0 / (1.0 + ((new_cost - state.get_prev_cost()) / self.cur_temp).exp()) > prob);
 
         // Update stall iter variables
-        self.update_stall_and_reanneal_iter(accepted, new_best);
+        self.update_stall_and_reanneal_iter(accepted, new_cost <= state.get_best_cost());
 
         let (r_fixed, r_accepted, r_best) = self.reanneal();
 
@@ -478,10 +276,14 @@ where
 
         self.update_temperature();
 
-        let mut out = ArgminIterData::new(new_param, new_cost);
-        out.add_kv(make_kv!(
+        Ok(if accepted {
+            ArgminIterData::new().param(new_param).cost(new_cost)
+        } else {
+            ArgminIterData::new().param(prev_param).cost(prev_cost)
+        }
+        .kv(make_kv!(
             "t" => self.cur_temp;
-            "new_be" => new_best;
+            "new_be" => new_cost <= state.get_best_cost();
             "acc" => accepted;
             "st_i_be" => self.stall_iter_best;
             "st_i_ac" => self.stall_iter_accepted;
@@ -491,10 +293,26 @@ where
             "ra_fi" => r_fixed;
             "ra_be" => r_best;
             "ra_ac" => r_accepted;
-        ));
-        Ok(out)
+        )))
+    }
+
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
+        if self.stall_iter_accepted > self.stall_iter_accepted_limit {
+            return TerminationReason::AcceptedStallIterExceeded;
+        }
+        if self.stall_iter_best > self.stall_iter_best_limit {
+            return TerminationReason::BestStallIterExceeded;
+        }
+        TerminationReason::NotTerminated
     }
 }
+// TODO: this
+// #[log("initial_temperature" => "self.init_temp")]
+// #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
+// #[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
+// #[log("reanneal_fixed" => "self.reanneal_fixed")]
+// #[log("reanneal_accepted" => "self.reanneal_accepted")]
+// #[log("reanneal_best" => "self.reanneal_best")]
 
 #[cfg(test)]
 mod tests {

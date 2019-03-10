@@ -7,45 +7,47 @@
 
 extern crate argmin;
 use argmin::prelude::*;
-use argmin::solver::conjugategradient::ConjugateGradient;
+use argmin::solver::landweber::*;
+use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use argmin_core::Error;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-struct MyProblem {}
+struct Rosenbrock {}
 
-impl ArgminOp for MyProblem {
+impl ArgminOp for Rosenbrock {
     type Param = Vec<f64>;
-    type Output = Vec<f64>;
+    type Output = f64;
     type Hessian = ();
 
-    fn apply(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
-        Ok(vec![4.0 * p[0] + 1.0 * p[1], 1.0 * p[0] + 3.0 * p[1]])
+    fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
+        Ok(rosenbrock_2d(p, 1.0, 100.0))
+    }
+
+    fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
+        Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
     }
 }
 
 fn run() -> Result<(), Error> {
-    // Define inital parameter vector
-    let init_param: Vec<f64> = vec![2.0, 1.0];
+    // define inital parameter vector
+    let init_param: Vec<f64> = vec![1.2, 1.2];
+    let operator = Rosenbrock {};
 
-    // Define the right hand side `b` of `A * x = b`
-    let b = vec![1.0, 2.0];
+    let iters = 35;
+    let solver = Landweber::new(0.001)?;
 
-    // Set up operator
-    let operator = MyProblem {};
-
-    // Set up the solver
-    let solver = ConjugateGradient::new(b)?;
-
-    // Run solver
-    let res = Executor::new(operator, solver, init_param)
+    let res = Executor::from_checkpoint(".checkpoints/landweber_exec.arg")
+        .unwrap_or(Executor::new(operator, solver, init_param))
+        .max_iters(iters)
+        .checkpoint_dir(".checkpoints")
+        .checkpoint_name("landweber_exec")
+        .checkpoint_mode(CheckpointMode::Every(20))
         .add_logger(ArgminSlogLogger::term())
-        .max_iters(2)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)
     std::thread::sleep(std::time::Duration::from_secs(1));
-
-    // Print result
     println!("{}", res);
     Ok(())
 }

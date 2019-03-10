@@ -12,6 +12,7 @@
 
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
 /// The Cauchy point is the minimum of the quadratic approximation of the cost function within the
 /// trust region along the direction given by the first derivative.
@@ -20,60 +21,45 @@ use serde::{Deserialize, Serialize};
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct CauchyPoint<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param:
-        ArgminMul<f64, O::Param> + ArgminWeightedDot<O::Param, f64, O::Hessian> + ArgminNorm<f64>,
-{
+#[derive(Clone, Serialize, Deserialize, Debug, Copy, PartialEq, PartialOrd, Default)]
+pub struct CauchyPoint {
     /// Radius
     radius: f64,
-    /// base
-    base: ArgminBase<O>,
 }
 
-impl<O> CauchyPoint<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param:
-        ArgminMul<f64, O::Param> + ArgminWeightedDot<O::Param, f64, O::Hessian> + ArgminNorm<f64>,
-{
+impl CauchyPoint {
     /// Constructor
-    ///
-    /// Parameters:
-    ///
-    /// `operator`: operator
-    pub fn new(operator: O) -> Self {
-        let base = ArgminBase::new(operator, O::Param::default());
+    pub fn new() -> Self {
         CauchyPoint {
             radius: std::f64::NAN,
-            base,
         }
     }
 }
 
-impl<O> ArgminIter for CauchyPoint<O>
+impl<O> Solver<O> for CauchyPoint
 where
     O: ArgminOp<Output = f64>,
-    O::Param:
-        ArgminMul<f64, O::Param> + ArgminWeightedDot<O::Param, f64, O::Hessian> + ArgminNorm<f64>,
+    O::Param: Debug
+        + Clone
+        + Serialize
+        + ArgminMul<f64, O::Param>
+        + ArgminWeightedDot<O::Param, f64, O::Hessian>
+        + ArgminNorm<f64>,
+    O::Hessian: Clone + Serialize,
 {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
+    const NAME: &'static str = "Cauchy Point";
 
-    fn init(&mut self) -> Result<(), Error> {
-        self.base_reset();
-        // This is not an iterative method.
-        self.set_max_iters(1);
-        Ok(())
-    }
-
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
-        let grad = self.cur_grad();
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
+        let param = state.get_param();
+        let grad = state.get_grad().unwrap_or(op.gradient(&param)?);
         let grad_norm = grad.norm();
-        let wdp = grad.weighted_dot(&self.cur_hessian(), &grad);
+        let hessian = state.get_hessian().unwrap_or(op.hessian(&param)?);
+
+        let wdp = grad.weighted_dot(&hessian, &grad);
         let tau: f64 = if wdp <= 0.0 {
             1.0
         } else {
@@ -81,27 +67,21 @@ where
         };
 
         let new_param = grad.mul(&(-tau * self.radius / grad_norm));
-        let out = ArgminIterData::new(new_param, 0.0);
-        Ok(out)
+        Ok(ArgminIterData::new().param(new_param))
+    }
+
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+        if state.get_iter() >= 1 {
+            TerminationReason::MaxItersReached
+        } else {
+            TerminationReason::NotTerminated
+        }
     }
 }
 
-impl<O> ArgminTrustRegion for CauchyPoint<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param:
-        ArgminMul<f64, O::Param> + ArgminWeightedDot<O::Param, f64, O::Hessian> + ArgminNorm<f64>,
-{
+impl ArgminTrustRegion for CauchyPoint {
     fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
-    }
-
-    fn set_grad(&mut self, grad: O::Param) {
-        self.set_cur_grad(grad);
-    }
-
-    fn set_hessian(&mut self, hessian: O::Hessian) {
-        self.set_cur_hessian(hessian);
     }
 }
 

@@ -40,32 +40,28 @@ fn run() -> Result<(), Error> {
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
     // Define initial parameter vector
-    let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
-    let init_hessian: Array2<f64> = Array2::eye(8);
-    // let init_param: Array1<f64> = array![-1.2, 1.0];
-    // let init_hessian: Array2<f64> = Array2::eye(2);
+    let init_param: Array1<f64> = array![-1.2, 1.0];
+    let init_hessian: Array2<f64> = Array2::eye(2);
+    // let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+    // let init_hessian: Array2<f64> = Array2::eye(8);
 
     // set up a line search
-    let mut linesearch = MoreThuenteLineSearch::new(cost.clone());
-    linesearch.set_c(1e-4, 0.9)?;
+    let linesearch = MoreThuenteLineSearch::new().c(1e-4, 0.9)?;
 
     // Set up solver
-    let mut solver = DFP::new(cost, init_param, init_hessian, linesearch);
-
-    // Set maximum number of iterations
-    solver.set_max_iters(50);
-
-    // Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
+    let solver = DFP::new(init_hessian, linesearch);
 
     // Run solver
-    solver.run()?;
+    let res = Executor::new(cost, solver, init_param)
+        .add_logger(ArgminSlogLogger::term())
+        .max_iters(1000)
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{}", solver.result());
+    println!("{}", res);
     Ok(())
 }
 

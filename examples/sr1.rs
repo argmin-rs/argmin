@@ -46,26 +46,22 @@ fn run() -> Result<(), Error> {
     let init_hessian: Array2<f64> = Array2::eye(8);
 
     // set up a line search
-    let mut linesearch = MoreThuenteLineSearch::new(cost.clone());
-    linesearch.set_c(1e-4, 0.9)?;
+    let linesearch = MoreThuenteLineSearch::new().c(1e-4, 0.9)?;
 
     // Set up solver
-    let mut solver = SR1::new(cost, init_param, init_hessian, linesearch);
-
-    // Set maximum number of iterations
-    solver.set_max_iters(50);
-
-    // Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
+    let solver = SR1::new(init_hessian, linesearch);
 
     // Run solver
-    solver.run()?;
+    let res = Executor::new(cost, solver, init_param)
+        .add_logger(ArgminSlogLogger::term())
+        .max_iters(100)
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{}", solver.result());
+    println!("{}", res);
     Ok(())
 }
 

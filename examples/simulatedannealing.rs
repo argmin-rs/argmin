@@ -108,54 +108,43 @@ fn run() -> Result<(), Error> {
     let temp = 15.0;
 
     // Set up simulated annealing solver
-    let mut solver = SimulatedAnnealing::new(operator, init_param, temp)?;
-
-    // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
-    solver.temp_func(SATempFunc::Boltzmann);
-
-    // Optional: Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
-
-    /////////////////////////
-    // Stopping criteria   //
-    /////////////////////////
-
-    // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-    solver.set_max_iters(10_000);
-
-    // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
-    solver.set_target_cost(0.0);
-
-    // Optional: stop if there was no new best solution after 1000 iterations
-    solver.stall_best(1000);
-
-    // Optional: stop if there was no accepted solution after 1000 iterations
-    solver.stall_accepted(1000);
-
-    /////////////////////////
-    // Reannealing         //
-    /////////////////////////
-
-    // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
-    solver.reannealing_fixed(1000);
-
-    // Optional: Reanneal after no accepted solution has been found for `iter` iterations
-    solver.reannealing_accepted(500);
-
-    // Optional: Start reannealing after no new best solution has been found for 800 iterations
-    solver.reannealing_best(800);
+    let solver = SimulatedAnnealing::new(temp)?
+        // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
+        .temp_func(SATempFunc::Boltzmann)
+        /////////////////////////
+        // Stopping criteria   //
+        /////////////////////////
+        // Optional: stop if there was no new best solution after 1000 iterations
+        .stall_best(1000)
+        // Optional: stop if there was no accepted solution after 1000 iterations
+        .stall_accepted(1000)
+        /////////////////////////
+        // Reannealing         //
+        /////////////////////////
+        // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
+        .reannealing_fixed(1000)
+        // Optional: Reanneal after no accepted solution has been found for `iter` iterations
+        .reannealing_accepted(500)
+        // Optional: Start reannealing after no new best solution has been found for 800 iterations
+        .reannealing_best(800);
 
     /////////////////////////
     // Run solver          //
     /////////////////////////
-
-    solver.run()?;
+    let res = Executor::new(operator, solver, init_param)
+        // Optional: Attach a logger
+        .add_logger(ArgminSlogLogger::term())
+        // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
+        .max_iters(10_000)
+        // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
+        .target_cost(0.0)
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{}", solver.result());
+    println!("{}", res);
     Ok(())
 }
 

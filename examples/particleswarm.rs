@@ -38,7 +38,6 @@ fn run() -> Result<(), Error> {
     {
         let mut solver = ParticleSwarm::new(
             cost_function.clone(),
-            init_param,
             (vec![-4.0, -4.0], vec![4.0, 4.0]),
             100,
             0.5,
@@ -46,23 +45,20 @@ fn run() -> Result<(), Error> {
             0.5,
         )?;
 
-        // Attach a logger
-        solver.add_logger(ArgminSlogLogger::term());
-
-        solver.set_max_iters(15);
-
         let mut callback =
             move |xy: &Vec<f64>, c: f64, v: &Particles| visualizer.iteration(xy, c, &v);
         solver.set_iter_callback(&mut callback);
 
-        // Run solver
-        solver.run()?;
+        let res = Executor::new(cost_function, solver, init_param)
+            .add_logger(ArgminSlogLogger::term())
+            .max_iters(15)
+            .run()?;
 
         // Wait a second (lets the logger flush everything before printing again)
         std::thread::sleep(std::time::Duration::from_secs(100));
 
         // Print Result
-        println!("{:?}", solver.result());
+        println!("{}", res);
     }
     Ok(())
 }

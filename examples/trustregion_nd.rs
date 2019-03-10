@@ -54,28 +54,24 @@ fn run() -> Result<(), Error> {
     let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
 
     // Set up the subproblem
-    let mut subproblem = Steihaug::new(cost.clone());
-    // let mut subproblem = CauchyPoint::new(cost.clone());
-    // let mut subproblem = Dogleg::new(cost.clone());
-    subproblem.set_max_iters(2);
+    // let subproblem = Steihaug::new().max_iters(2);
+    // let subproblem = CauchyPoint::new();
+    let subproblem = Dogleg::new();
 
     // Set up solver
-    let mut solver = TrustRegion::new(cost, init_param, subproblem);
-
-    // Set the maximum number of iterations
-    solver.set_max_iters(2_000);
-
-    // Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
+    let solver = TrustRegion::new(subproblem);
 
     // Run solver
-    solver.run()?;
+    let res = Executor::new(cost, solver, init_param)
+        .add_logger(ArgminSlogLogger::term())
+        .max_iters(2_000)
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{}", solver.result());
+    println!("{}", res);
     Ok(())
 }
 

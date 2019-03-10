@@ -8,9 +8,11 @@
 extern crate argmin;
 extern crate ndarray;
 use argmin::prelude::*;
-use argmin::solver::newton::Newton;
-use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-use ndarray::{Array, Array1, Array2};
+use argmin::solver::linesearch::MoreThuenteLineSearch;
+use argmin::solver::quasinewton::SR1;
+use argmin::testfunctions::rosenbrock;
+use argmin_core::finitediff::*;
+use ndarray::{array, Array1, Array2};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Serialize, Deserialize)]
@@ -25,20 +27,11 @@ impl ArgminOp for Rosenbrock {
     type Hessian = Array2<f64>;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
+        Ok(rosenbrock(&p.to_vec(), self.a, self.b))
     }
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-        Ok(Array1::from_vec(rosenbrock_2d_derivative(
-            &p.to_vec(),
-            self.a,
-            self.b,
-        )))
-    }
-
-    fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-        let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);
-        Ok(Array::from_shape_vec((2, 2), h)?)
+        Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
     }
 }
 
@@ -47,16 +40,21 @@ fn run() -> Result<(), Error> {
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
     // Define initial parameter vector
-    // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
-    let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
+    let init_param: Array1<f64> = array![-1.2, 1.0];
+    let init_hessian: Array2<f64> = Array2::eye(2);
+    // let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+    // let init_hessian: Array2<f64> = Array2::eye(8);
+
+    // set up a line search
+    let linesearch = MoreThuenteLineSearch::new().c(1e-4, 0.9)?;
 
     // Set up solver
-    let solver = Newton::new();
+    let solver = SR1::new(init_hessian, linesearch);
 
     // Run solver
     let res = Executor::new(cost, solver, init_param)
         .add_logger(ArgminSlogLogger::term())
-        .max_iters(8)
+        .max_iters(1000)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)

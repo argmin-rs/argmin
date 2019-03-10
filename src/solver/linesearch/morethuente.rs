@@ -19,85 +19,16 @@
 //! DOI: https://doi.org/10.1145/192115.192132
 
 use crate::prelude::*;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use std::default::Default;
 
 /// The More-Thuente line search is a method to find a step length which obeys the strong Wolfe
 /// conditions.
 ///
 /// # Example
 ///
-/// ```
-/// # extern crate argmin;
-/// # use argmin::prelude::*;
-/// # use argmin::solver::linesearch::MoreThuenteLineSearch;
-/// # use argmin::testfunctions::{sphere, sphere_derivative};
-/// # use serde::{Deserialize, Serialize};
-/// #
-/// # #[derive(Clone, Default, Serialize, Deserialize)]
-/// # struct MyProblem {}
-/// #
-/// # impl ArgminOp for MyProblem {
-/// #     type Param = Vec<f64>;
-/// #     type Output = f64;
-/// #     type Hessian = ();
-/// #
-/// #     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
-/// #         Ok(sphere(param))
-/// #     }
-/// #
-/// #     fn gradient(&self, param: &Vec<f64>) -> Result<Vec<f64>, Error> {
-/// #         Ok(sphere_derivative(param))
-/// #     }
-/// # }
-/// #
-/// # fn run() -> Result<(), Error> {
-/// // Define inital parameter vector
-/// let init_param: Vec<f64> = vec![1.0, 0.0];
-///
-/// // Problem definition
-/// let operator = MyProblem {};
-///
-/// // Set up line search method
-/// let mut solver = MoreThuenteLineSearch::new(operator);
-///
-/// // Set search direction
-/// solver.set_search_direction(vec![-2.0, 0.0]);
-///
-/// // Set initial position
-/// solver.set_initial_parameter(init_param);
-///
-/// // Calculate initial cost ...
-/// solver.calc_initial_cost()?;
-/// // ... or, alternatively, set cost if it is already computed
-/// // solver.set_initial_cost(...);
-///
-/// // Calculate initial gradient ...
-/// solver.calc_initial_gradient()?;
-/// // .. or, alternatively, set gradient if it is already computed
-/// // solver.set_initial_gradient(...);
-///
-/// // Set initial step length
-/// solver.set_initial_alpha(1.0)?;
-///
-/// // Attach a logger
-/// solver.add_logger(ArgminSlogLogger::term());
-///
-/// // Run solver
-/// solver.run()?;
-///
-/// // Wait a second (lets the logger flush everything before printing again)
-/// std::thread::sleep(std::time::Duration::from_secs(1));
-///
-/// // Print Result
-/// println!("{:?}", solver.result());
-/// #     Ok(())
-/// # }
-/// #
-/// # fn main() {
-/// #     if let Err(ref e) = run() {
-/// #         println!("{} {}", e.as_fail(), e.backtrace());
-/// #     }
-/// # }
+/// ```rust
 /// ```
 ///
 /// # References
@@ -108,30 +39,18 @@ use serde::{Deserialize, Serialize};
 /// [0] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 /// decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
 /// DOI: https://doi.org/10.1145/192115.192132
-#[derive(ArgminSolver, Serialize, Deserialize)]
-pub struct MoreThuenteLineSearch<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>,
-{
-    /// initial parameter vector (builder)
-    init_param_b: Option<O::Param>,
-    /// initial cost (builder)
-    finit_b: Option<f64>,
-    /// initial gradient (builder)
-    init_grad_b: Option<O::Param>,
+#[derive(Serialize, Deserialize, Clone)]
+pub struct MoreThuenteLineSearch<P> {
     /// Search direction (builder)
-    search_direction_b: Option<O::Param>,
+    search_direction_b: Option<P>,
     /// initial parameter vector
-    init_param: O::Param,
+    init_param: P,
     /// initial cost
     finit: f64,
     /// initial gradient
-    init_grad: O::Param,
+    init_grad: P,
     /// Search direction
-    search_direction: O::Param,
+    search_direction: P,
     /// Search direction in 1D
     dginit: f64,
     /// dgtest
@@ -168,8 +87,6 @@ where
     stage1: bool,
     /// infoc
     infoc: usize,
-    /// base
-    base: ArgminBase<O>,
 }
 
 #[derive(Default, Clone, Serialize, Deserialize)]
@@ -185,28 +102,15 @@ impl Step {
     }
 }
 
-impl<O> MoreThuenteLineSearch<O>
-where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>,
-{
+impl<P: Default> MoreThuenteLineSearch<P> {
     /// Constructor
-    ///
-    /// Parameters:
-    ///
-    /// `operator`: operator
-    pub fn new(operator: O) -> Self {
+    pub fn new() -> Self {
         MoreThuenteLineSearch {
-            init_param_b: None,
-            finit_b: None,
-            init_grad_b: None,
             search_direction_b: None,
-            init_param: O::Param::default(),
+            init_param: P::default(),
             finit: std::f64::INFINITY,
-            init_grad: O::Param::default(),
-            search_direction: O::Param::default(),
+            init_grad: P::default(),
+            search_direction: P::default(),
             dginit: 0.0,
             dgtest: 0.0,
             ftol: 1e-4,
@@ -225,18 +129,11 @@ where
             brackt: false,
             stage1: true,
             infoc: 1,
-            base: ArgminBase::new(operator, O::Param::default()),
         }
     }
 
-    /// set current gradient value
-    pub fn set_cur_grad(&mut self, grad: O::Param) -> &mut Self {
-        self.base.set_cur_grad(grad);
-        self
-    }
-
     /// Set c1 and c2 where 0 < c1 < c2 < 1.
-    pub fn set_c(&mut self, c1: f64, c2: f64) -> Result<&mut Self, Error> {
+    pub fn c(mut self, c1: f64, c2: f64) -> Result<Self, Error> {
         if c1 <= 0.0 || c1 >= c2 {
             return Err(ArgminError::InvalidParameter {
                 text: "MoreThuenteLineSearch: Parameter c1 must be in (0, c2).".to_string(),
@@ -255,11 +152,7 @@ where
     }
 
     /// set alpha limits
-    pub fn set_alpha_min_max(
-        &mut self,
-        alpha_min: f64,
-        alpha_max: f64,
-    ) -> Result<&mut Self, Error> {
+    pub fn alpha(mut self, alpha_min: f64, alpha_max: f64) -> Result<Self, Error> {
         if alpha_min < 0.0 {
             return Err(ArgminError::InvalidParameter {
                 text: "MoreThuenteLineSearch: alpha_min must be >= 0.0.".to_string(),
@@ -279,50 +172,23 @@ where
     }
 }
 
-impl<O> ArgminLineSearch for MoreThuenteLineSearch<O>
+impl<P: Default> Default for MoreThuenteLineSearch<P> {
+    fn default() -> Self {
+        MoreThuenteLineSearch::new()
+    }
+}
+
+impl<P> ArgminLineSearch<P> for MoreThuenteLineSearch<P>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>,
+    P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
 {
     /// Set search direction
-    fn set_search_direction(&mut self, search_direction: O::Param) {
+    fn set_search_direction(&mut self, search_direction: P) {
         self.search_direction_b = Some(search_direction);
     }
 
-    /// Set initial parameter
-    fn set_initial_parameter(&mut self, param: O::Param) {
-        self.init_param_b = Some(param.clone());
-        self.set_cur_param(param);
-    }
-
-    /// Set initial cost function value
-    fn set_initial_cost(&mut self, init_cost: f64) {
-        self.finit_b = Some(init_cost);
-    }
-
-    /// Set initial gradient
-    fn set_initial_gradient(&mut self, init_grad: O::Param) {
-        self.init_grad_b = Some(init_grad);
-    }
-
-    /// Calculate initial cost function value
-    fn calc_initial_cost(&mut self) -> Result<(), Error> {
-        let tmp = self.cur_param();
-        self.finit_b = Some(self.apply(&tmp)?);
-        Ok(())
-    }
-
-    /// Calculate initial cost function value
-    fn calc_initial_gradient(&mut self) -> Result<(), Error> {
-        let tmp = self.cur_param();
-        self.init_grad_b = Some(self.gradient(&tmp)?);
-        Ok(())
-    }
-
     /// Set initial alpha value
-    fn set_initial_alpha(&mut self, alpha: f64) -> Result<(), Error> {
+    fn set_init_alpha(&mut self, alpha: f64) -> Result<(), Error> {
         if alpha <= 0.0 {
             return Err(ArgminError::InvalidParameter {
                 text: "MoreThuenteLineSearch: Initial alpha must be > 0.".to_string(),
@@ -334,37 +200,38 @@ where
     }
 }
 
-impl<O> ArgminIter for MoreThuenteLineSearch<O>
+impl<P, O> Solver<O> for MoreThuenteLineSearch<P>
 where
-    O: ArgminOp<Output = f64>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>,
+    O: ArgminOp<Param = P, Output = f64>,
+    P: Clone
+        + Serialize
+        + DeserializeOwned
+        + ArgminSub<P, P>
+        + ArgminDot<P, f64>
+        + ArgminScaledAdd<P, f64, P>,
 {
-    type Param = O::Param;
-    type Output = f64;
-    type Hessian = O::Hessian;
+    const NAME: &'static str = "More-Thuente Line search";
 
-    fn init(&mut self) -> Result<(), Error> {
-        self.init_param = check_param!(
-            self.init_param_b,
-            "MoreThuenteLineSearch: Initial parameter not initialized. Call `set_initial_parameter`."
-        );
-
-        self.finit = check_param!(
-            self.finit_b,
-            "MoreThuenteLineSearch: Initial cost not computed. Call `set_initial_cost` or `calc_inital_cost`."
-        );
-
-        self.init_grad = check_param!(
-            self.init_grad_b,
-            "MoreThuenteLineSearch: Initial gradient not computed. Call `set_initial_grad` or `calc_inital_grad`."
-        );
-
+    fn init(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.search_direction = check_param!(
             self.search_direction_b,
             "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
+
+        self.init_param = state.get_param();
+
+        let cost = state.get_cost();
+        self.finit = if cost == std::f64::INFINITY {
+            op.apply(&self.init_param)?
+        } else {
+            cost
+        };
+
+        self.init_grad = state.get_grad().unwrap_or(op.gradient(&self.init_param)?);
 
         self.dginit = self.init_grad.dot(&self.search_direction);
 
@@ -389,10 +256,14 @@ where
         self.stx = Step::new(0.0, self.finit, self.dginit);
         self.sty = Step::new(0.0, self.finit, self.dginit);
 
-        Ok(())
+        Ok(None)
     }
 
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        _state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {
@@ -421,12 +292,12 @@ where
         let new_param = self
             .init_param
             .scaled_add(&self.stp.x, &self.search_direction);
-        self.f = self.apply(&new_param)?;
-        let new_grad = self.gradient(&new_param)?;
+        self.f = op.apply(&new_param)?;
+        let new_grad = op.gradient(&new_param)?;
         let f = self.f;
-        self.set_cur_cost(f);
-        self.set_cur_param(new_param);
-        self.set_cur_grad(new_grad.clone());
+        let cur_cost = f;
+        let cur_param = new_param;
+        let cur_grad = new_grad.clone();
         // self.stx.fx = new_cost;
         let dg = self.search_direction.dot(&new_grad);
         let ftest1 = self.finit + self.stp.x * self.dgtest;
@@ -459,9 +330,11 @@ where
         }
 
         if info != 0 {
-            self.set_termination_reason(TerminationReason::LineSearchConditionMet);
-            let out = ArgminIterData::new(self.cur_param(), self.cur_cost());
-            return Ok(out);
+            return Ok(ArgminIterData::new()
+                .param(cur_param)
+                .cost(cur_cost)
+                .grad(cur_grad)
+                .termination_reason(TerminationReason::LineSearchConditionMet));
         }
 
         if self.stage1 && self.f <= ftest1 && dg >= self.ftol.min(self.gtol) * self.dginit {
@@ -524,8 +397,7 @@ where
         let new_param = self
             .init_param
             .scaled_add(&self.stp.x, &self.search_direction);
-        let out = ArgminIterData::new(new_param, self.stp.fx);
-        Ok(out)
+        Ok(ArgminIterData::new().param(new_param).cost(self.stp.fx))
     }
 }
 
