@@ -212,7 +212,7 @@ trait_bound!(Position
 , ArgminAdd<Self, Self>
 , ArgminSub<Self, Self>
 , ArgminMul<f64, Self>
-, ArgminZero
+, ArgminZeroLike
 , ArgminRandom
 , ArgminMinMax
 , std::fmt::Debug

@@ -66,7 +66,7 @@ where
         + ArgminDot<O::Param, f64>
         + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminMul<f64, O::Param>
-        + ArgminZero
+        + ArgminZeroLike
         + ArgminNorm<f64>,
     O::Hessian: Send
         + Sync
