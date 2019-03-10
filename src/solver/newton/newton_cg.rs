@@ -41,7 +41,7 @@ impl<L> NewtonCG<L> {
     /// Constructor
     pub fn new(linesearch: L) -> Self {
         NewtonCG {
-            linesearch: linesearch,
+            linesearch,
             curvature_threshold: 0.0,
         }
     }

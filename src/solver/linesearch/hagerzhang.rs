@@ -97,15 +97,7 @@ pub struct HagerZhangLineSearch<P> {
     dginit: f64,
 }
 
-impl<P> HagerZhangLineSearch<P>
-where
-    P: Clone
-        + Default
-        + Serialize
-        + DeserializeOwned
-        + ArgminScaledAdd<P, f64, P>
-        + ArgminDot<P, f64>,
-{
+impl<P: Default> HagerZhangLineSearch<P> {
     /// Constructor
     pub fn new() -> Self {
         HagerZhangLineSearch {
@@ -139,7 +131,17 @@ where
             finit: std::f64::INFINITY,
         }
     }
+}
 
+impl<P> HagerZhangLineSearch<P>
+where
+    P: Clone
+        + Default
+        + Serialize
+        + DeserializeOwned
+        + ArgminScaledAdd<P, f64, P>
+        + ArgminDot<P, f64>,
+{
     /// set delta
     pub fn delta(mut self, delta: f64) -> Result<Self, Error> {
         if delta <= 0.0 {
@@ -394,6 +396,12 @@ where
             self.best_f = self.c_f;
             self.best_g = self.c_g;
         }
+    }
+}
+
+impl<P: Default> Default for HagerZhangLineSearch<P> {
+    fn default() -> Self {
+        HagerZhangLineSearch::new()
     }
 }
 

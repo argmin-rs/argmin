@@ -12,6 +12,7 @@
 
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::default::Default;
 
 /// Newton's method iteratively finds the stationary points of a function f by using a second order
 /// approximation of f at the current point.
@@ -48,6 +49,12 @@ impl Newton {
         }
         self.gamma = gamma;
         Ok(self)
+    }
+}
+
+impl Default for Newton {
+    fn default() -> Newton {
+        Newton::new()
     }
 }
 

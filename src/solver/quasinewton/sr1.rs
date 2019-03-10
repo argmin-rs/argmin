@@ -40,7 +40,7 @@ impl<L, H> SR1<L, H> {
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         SR1 {
             inv_hessian: init_inverse_hessian,
-            linesearch: linesearch,
+            linesearch,
         }
     }
 }

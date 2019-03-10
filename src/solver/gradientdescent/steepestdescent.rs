@@ -39,9 +39,7 @@ pub struct SteepestDescent<L> {
 impl<L> SteepestDescent<L> {
     /// Constructor
     pub fn new(linesearch: L) -> Result<Self, Error> {
-        Ok(SteepestDescent {
-            linesearch: linesearch,
-        })
+        Ok(SteepestDescent { linesearch })
     }
 }
 

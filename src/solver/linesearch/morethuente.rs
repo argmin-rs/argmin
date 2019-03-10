@@ -172,6 +172,12 @@ impl<P: Default> MoreThuenteLineSearch<P> {
     }
 }
 
+impl<P: Default> Default for MoreThuenteLineSearch<P> {
+    fn default() -> Self {
+        MoreThuenteLineSearch::new()
+    }
+}
+
 impl<P> ArgminLineSearch<P> for MoreThuenteLineSearch<P>
 where
     P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,

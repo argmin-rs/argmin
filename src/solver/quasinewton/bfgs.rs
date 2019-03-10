@@ -40,7 +40,7 @@ impl<L, H> BFGS<L, H> {
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         BFGS {
             inv_hessian: init_inverse_hessian,
-            linesearch: linesearch,
+            linesearch,
         }
     }
 }

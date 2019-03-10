@@ -62,7 +62,7 @@ impl<R> TrustRegion<R> where {
             radius: 1.0,
             max_radius: 100.0,
             eta: 0.125,
-            subproblem: subproblem,
+            subproblem,
             fxk: std::f64::NAN,
             mk0: std::f64::NAN,
         }

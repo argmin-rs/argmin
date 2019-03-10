@@ -39,7 +39,7 @@ impl<L, H> DFP<L, H> {
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         DFP {
             inv_hessian: init_inverse_hessian,
-            linesearch: linesearch,
+            linesearch,
         }
     }
 }

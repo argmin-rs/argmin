@@ -56,8 +56,8 @@ where
         Ok(NonlinearConjugateGradient {
             p: P::default(),
             beta: std::f64::NAN,
-            linesearch: linesearch,
-            beta_method: beta_method,
+            linesearch,
+            beta_method,
             restart_iter: std::u64::MAX,
             restart_orthogonality: None,
         })
