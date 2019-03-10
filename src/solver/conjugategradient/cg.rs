@@ -54,8 +54,6 @@ where
     ///
     /// Parameters:
     ///
-    /// `cost_function`: cost function
-    ///
     /// `b`: right hand side of `A * x = b`
     pub fn new(b: P) -> Result<Self, Error> {
         Ok(ConjugateGradient {

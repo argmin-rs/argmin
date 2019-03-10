@@ -23,12 +23,11 @@
 //! particular, as a developer of optimization algorithms you should not need to worry about
 //! usability features (such as logging, dealing with different types, setters and getters for
 //! certain common parameters, counting cost function and gradient evaluations, termination, and so
-//! on). Instead you can focus on implementing your algorithm and let `argmin-codegen` do the rest.
+//! on). Instead you can focus on implementing your algorithm.
 //!
 //! - Easy framework for the implementation of optimization algorithms: Define a struct to hold your
-//!   data, implement a single iteration of your method and let argmin generate the rest with
-//!   `#[derive(ArgminSolver)]`. This lead to similar interfaces for different solvers, making it
-//!   easy for users.
+//!   data, implement a single iteration of your method and let the framework do the rest. This
+//!   leads to similar interfaces for different solvers, making it easy for users.
 //! - Pure Rust implementations of a wide range of optimization methods: This avoids the need to
 //!   compile and interface C/C++/Fortran code.
 //! - Type-agnostic: Many problems require data structures that go beyond simple vectors to
