@@ -72,8 +72,8 @@ fn run() -> Result<(), Error> {
     let res = Executor::new(cost, solver, init_param)
         .max_iters(10)
         .add_observer(ArgminSlogLogger::term())
-        .add_writer(Arc::new(writer))
-        .add_writer(Arc::new(writer2))
+        .add_observer(Arc::new(writer))
+        .add_observer(Arc::new(writer2))
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
