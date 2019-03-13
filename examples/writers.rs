@@ -71,7 +71,7 @@ fn run() -> Result<(), Error> {
 
     let res = Executor::new(cost, solver, init_param)
         .max_iters(10)
-        .add_logger(ArgminSlogLogger::term())
+        .add_observer(ArgminSlogLogger::term())
         .add_writer(Arc::new(writer))
         .add_writer(Arc::new(writer2))
         .run()?;

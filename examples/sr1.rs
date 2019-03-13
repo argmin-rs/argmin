@@ -53,11 +53,11 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(cost, solver, init_param)
-        .add_logger(ArgminSlogLogger::term())
+        .add_observer(ArgminSlogLogger::term())
         .max_iters(100)
         .run()?;
 
-    // Wait a second (lets the logger flush everything before printing again)
+    // Wait a second (lets the observer flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result

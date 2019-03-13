@@ -59,7 +59,7 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(cost, solver, init_param)
-        .add_logger(ArgminSlogLogger::term())
+        .add_observer(ArgminSlogLogger::term())
         .max_iters(100)
         .run()?;
 

@@ -59,7 +59,7 @@ fn run() -> Result<(), Error> {
     solver.set_max_iters(45);
 
     // Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
+    solver.add_observer(ArgminSlogLogger::term());
 
     solver.set_checkpoint_dir(".checkpoints");
     solver.set_checkpoint_name("bfgs");
