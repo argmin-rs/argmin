@@ -43,7 +43,7 @@ fn run() -> Result<(), Error> {
         .checkpoint_dir(".checkpoints")
         .checkpoint_name("landweber_exec")
         .checkpoint_mode(CheckpointMode::Every(20))
-        .add_observer(ArgminSlogLogger::term())
+        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)

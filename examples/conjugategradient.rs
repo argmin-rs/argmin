@@ -38,7 +38,7 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(operator, solver, init_param)
-        .add_observer(ArgminSlogLogger::term())
+        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(2)
         .run()?;
 

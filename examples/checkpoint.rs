@@ -54,7 +54,7 @@ fn run() -> Result<(), Error> {
     solver.set_max_iters(30);
 
     // Attach a logger
-    solver.add_observer(ArgminSlogLogger::term());
+    solver.add_observer(ArgminSlogLogger::term(), ObserverMode::Always);
 
     // --------------------------------------------------------------------------------------------
     // Set up checkpoints
