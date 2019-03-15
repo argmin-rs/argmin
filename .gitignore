@@ -6,3 +6,4 @@ src/.*.swp
 target/
 target/*
 *.log
+justfile

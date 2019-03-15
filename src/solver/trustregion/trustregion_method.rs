@@ -106,7 +106,7 @@ where
         + ArgminDot<O::Param, f64>
         + ArgminAdd<O::Param, O::Param>
         + ArgminSub<O::Param, O::Param>
-        + ArgminZero
+        + ArgminZeroLike
         + ArgminMul<f64, O::Param>,
     O::Hessian: Default + Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
     R: ArgminTrustRegion + Solver<OpWrapper<O>>,

@@ -150,7 +150,7 @@ where
         + ArgminDot<P, f64>
         + ArgminAdd<P, P>
         + ArgminSub<P, P>
-        + ArgminZero
+        + ArgminZeroLike
         + ArgminMul<f64, P>,
     O::Hessian: ArgminDot<P, P>,
 {
