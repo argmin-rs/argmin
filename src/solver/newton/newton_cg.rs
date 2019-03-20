@@ -128,17 +128,22 @@ where
         self.linesearch.set_search_direction(x);
 
         // Run solver
-        let linesearch_result =
-            Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
-                .grad(grad)
-                .cost(state.get_cost())
-                .run_fast()?;
+        let ArgminResult {
+            operator: line_op,
+            state:
+                IterState {
+                    param: next_param,
+                    cost: next_cost,
+                    ..
+                },
+        } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
+            .grad(grad)
+            .cost(state.get_cost())
+            .run_fast()?;
 
-        op.consume_op(linesearch_result.operator);
+        op.consume_op(line_op);
 
-        Ok(ArgminIterData::new()
-            .param(linesearch_result.param)
-            .cost(linesearch_result.cost))
+        Ok(ArgminIterData::new().param(next_param).cost(next_cost))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

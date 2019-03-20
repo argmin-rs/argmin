@@ -72,7 +72,15 @@ where
         self.linesearch.set_search_direction(new_grad.mul(&(-1.0)));
 
         // Run solver
-        let linesearch_result = Executor::new(
+        let ArgminResult {
+            operator: line_op,
+            state:
+                IterState {
+                    param: next_param,
+                    cost: next_cost,
+                    ..
+                },
+        } = Executor::new(
             OpWrapper::new_from_op(&op),
             self.linesearch.clone(),
             param_new,
@@ -82,11 +90,9 @@ where
         .run_fast()?;
 
         // hack
-        op.consume_op(linesearch_result.operator);
+        op.consume_op(line_op);
 
-        Ok(ArgminIterData::new()
-            .param(linesearch_result.param)
-            .cost(linesearch_result.cost))
+        Ok(ArgminIterData::new().param(next_param).cost(next_cost))
     }
 }
 

@@ -143,11 +143,15 @@ where
 
         self.subproblem.set_radius(self.radius);
 
-        let pk = Executor::new(op.clone(), self.subproblem.clone(), param.clone())
+        let ArgminResult {
+            operator: sub_op,
+            state: IterState { param: pk, .. },
+        } = Executor::new(op.clone(), self.subproblem.clone(), param.clone())
             .grad(grad.clone())
             .hessian(hessian.clone())
-            .run_fast()?
-            .param;
+            .run_fast()?;
+
+        op.consume_op(sub_op);
 
         let new_param = pk.add(&param);
         let fxkpk = op.apply(&new_param)?;
