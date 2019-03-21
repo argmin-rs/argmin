@@ -87,7 +87,8 @@ where
         )
         .grad(new_grad)
         .cost(new_cost)
-        .run_fast()?;
+        .ctrlc(false)
+        .run()?;
 
         // hack
         op.consume_op(line_op);

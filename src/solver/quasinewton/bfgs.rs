@@ -118,7 +118,8 @@ where
         )
         .grad(prev_grad.clone())
         .cost(cur_cost)
-        .run_fast()?;
+        .ctrlc(false)
+        .run()?;
 
         // take care of function eval counts
         op.consume_op(line_op);

@@ -146,10 +146,15 @@ where
         let ArgminResult {
             operator: sub_op,
             state: IterState { param: pk, .. },
-        } = Executor::new(op.clone(), self.subproblem.clone(), param.clone())
-            .grad(grad.clone())
-            .hessian(hessian.clone())
-            .run_fast()?;
+        } = Executor::new(
+            OpWrapper::new_from_op(&op),
+            self.subproblem.clone(),
+            param.clone(),
+        )
+        .grad(grad.clone())
+        .hessian(hessian.clone())
+        .ctrlc(false)
+        .run()?;
 
         op.consume_op(sub_op);
 

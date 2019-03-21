@@ -142,7 +142,8 @@ where
         } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), xk)
             .grad(grad.clone())
             .cost(cur_cost)
-            .run_fast()?;
+            .ctrlc(false)
+            .run()?;
 
         // takes care of the counts of function evaluations
         op.consume_op(line_op);

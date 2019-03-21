@@ -139,7 +139,8 @@ where
         } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
             .grad(grad)
             .cost(state.get_cost())
-            .run_fast()?;
+            .ctrlc(false)
+            .run()?;
 
         op.consume_op(line_op);
 
