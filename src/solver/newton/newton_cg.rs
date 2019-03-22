@@ -121,9 +121,6 @@ where
             x_p = x.clone();
         }
 
-        // take care of counting
-        op.consume_op(cg_op);
-
         // perform line search
         self.linesearch.set_search_direction(x);
 
