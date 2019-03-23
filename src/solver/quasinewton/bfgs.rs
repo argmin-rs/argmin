@@ -19,9 +19,9 @@ use std::fmt::Debug;
 ///
 /// # Example
 ///
-/// ```rust
-/// TODO
-/// ```
+// /// ```rust
+// /// TODO
+// /// ```
 ///
 /// # References:
 ///

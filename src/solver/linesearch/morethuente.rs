@@ -28,8 +28,9 @@ use std::default::Default;
 ///
 /// # Example
 ///
-/// ```rust
-/// ```
+// /// ```rust
+// /// TODO
+// /// ```
 ///
 /// # References
 ///

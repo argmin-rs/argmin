@@ -20,9 +20,9 @@ use std::default::Default;
 ///
 /// # Example
 ///
-/// ```rust
-/// TODO
-/// ```
+// /// ```rust
+// /// TODO
+// /// ```
 ///
 /// # References:
 ///

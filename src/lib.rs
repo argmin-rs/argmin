@@ -161,9 +161,9 @@
 //! The following example shows how to use the previously shown definition of a problem in a
 //! Steepest Descent (Gradient Descent) solver.
 //!
-//! ```
-//! TODO
-//! ```
+// //! ```rust
+// //! unimplemented!()
+// //! ```
 //!
 //! Executing `solver.run()?` performs the actual optimization. In addition, there is
 //! `solver.run_fast()?`, which only executes the optimization algorithm and avoids all convenience
@@ -178,9 +178,9 @@
 //! version which does not block the execution for logging, but may drop log entries when the
 //! buffer fills up.
 //!
-//! ```
-//! TODO
-//! ```
+// //! ```
+// //! unimplemented!()
+// //! ```
 //!
 //! # Checkpoints
 //!
@@ -198,11 +198,10 @@
 //! The following example illustrates the usage. Note that this example is only for illustration
 //! and does not make much sense. Please scroll down for a more practical example.
 //!
-//! ```
-//! // [Imports omited]
-//!
-//! TODO
-//! ```
+// //! ```
+// //! // [Imports omited]
+// //! TODO
+// //! ```
 //!
 //! A more practical way of using the checkpoints feature is shown in the following example.
 //! This will either load an existing checkpoint if one exists or it will create a new solver. Type
@@ -210,9 +209,9 @@
 //! binary can easily be restarted after a crash and will automatically resume from the latest
 //! checkpoint.
 //!
-//! ```rust
-//! TODO
-//! ```
+// //! ```rust
+// //! unimplemented!()
+// //! ```
 //!
 //! # Writers
 //!
@@ -232,10 +231,10 @@
 //! Both are attached to a solver using the `add_writer(...)` method of `ArgminSolver` before the
 //! solver is run.
 //!
-//! ```rust
-//! // [Imports omited]
-//! TODO
-//! ```
+// //! ```rust
+// //! // [Imports omited]
+// //! TODO
+// //! ```
 //!
 //! # Implementing an optimization algorithm
 //!
@@ -256,9 +255,10 @@
 //! API. What remains to be implemented for the struct is a constructor and `ArgminNextIter`. The
 //! latter is essentially an implementation of a single iteration of the algorithm.
 //!
-//! ```
-//! TODO
-//! ```
+// //! ```rust
+// //! // [Imports omited]
+// //! TODO
+// //! ```
 
 #![warn(missing_docs)]
 #![allow(unused_attributes)]

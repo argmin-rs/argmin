@@ -27,9 +27,9 @@ type Triplet = (f64, f64, f64);
 ///
 /// # Example
 ///
-/// ```rust
-/// TODO
-/// ```
+// /// ```rust
+// /// TODO
+// /// ```
 ///
 /// # References
 ///
