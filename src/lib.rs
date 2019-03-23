@@ -8,8 +8,8 @@
 //! A pure Rust optimization framework
 //!
 //! This crate offers a (work in progress) numerical optimization toolbox/framework written entirely
-//! in Rust. It is at the moment quite unstable and potentially very buggy. Please use with care and
-//! report any bugs you encounter. This crate is looking for contributors!
+//! in Rust. It is at the moment potentially very buggy. Please use with care and report any bugs
+//! you encounter. This crate is looking for contributors!
 //!
 //! NOTE: The design has changed substantially in the recent past and the documentation is not yet
 //! up to date. If you are using a version available on
@@ -25,17 +25,17 @@
 //! certain common parameters, counting cost function and gradient evaluations, termination, and so
 //! on). Instead you can focus on implementing your algorithm.
 //!
-//! - Easy framework for the implementation of optimization algorithms: Define a struct to hold your
-//!   data, implement a single iteration of your method and let the framework do the rest. This
-//!   leads to similar interfaces for different solvers, making it easy for users.
+//! - Easy framework for the implementation of optimization algorithms: Implement a single iteration
+//!   of your method and let the framework do the rest. This leads to similar interfaces for
+//!   different solvers, making it easy for users.
 //! - Pure Rust implementations of a wide range of optimization methods: This avoids the need to
 //!   compile and interface C/C++/Fortran code.
 //! - Type-agnostic: Many problems require data structures that go beyond simple vectors to
 //!   represent the parameters. In argmin, everything is generic: All that needs to be done is
 //!   implementing certain traits on your data type. For common types, these traits are already
 //!   implemented.
-//! - Convenient: Automatic and consistent logging of anything that may be important. Log to the
-//!   terminal, to a file or implement your own loggers. Future plans include sending metrics to
+//! - Convenient: Easy and consistent logging of anything that may be important. Log to the
+//!   terminal, to a file or implement your own observers. Future plans include sending metrics to
 //!   databases and connecting to big data piplines.
 //! - Algorithm evaluation: Methods to assess the performance of an algorithm for different
 //!   parameter settings, problem classes, ...
@@ -88,7 +88,7 @@
 //!
 //! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
 //!    result) after pressing Ctrl+C.
-//! - `ndarrayl`: Support for `ndarray` and `ndarray-linalg`.
+//! - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.
 //!
 //! # Defining a problem
 //!
