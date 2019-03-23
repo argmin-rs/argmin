@@ -326,7 +326,5 @@ mod tests {
     use super::*;
     use crate::send_sync_test;
 
-    type Operator = MinimalNoOperator;
-
-    send_sync_test!(sa, SimulatedAnnealing<Operator>);
+    send_sync_test!(sa, SimulatedAnnealing);
 }

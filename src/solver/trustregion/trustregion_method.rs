@@ -205,5 +205,5 @@ mod tests {
 
     type Operator = MinimalNoOperator;
 
-    send_sync_test!(trustregion, TrustRegion<Operator, Steihaug<Operator>>);
+    send_sync_test!(trustregion, TrustRegion<Steihaug<Operator>>);
 }

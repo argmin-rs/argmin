@@ -105,6 +105,6 @@ mod tests {
 
     send_sync_test!(
         steepest_descent,
-        SteepestDescent<MinimalNoOperator, MoreThuenteLineSearch<MinimalNoOperator>>
+        SteepestDescent<MoreThuenteLineSearch<Vec<f64>>>
     );
 }
