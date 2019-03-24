@@ -38,8 +38,8 @@ pub struct SteepestDescent<L> {
 
 impl<L> SteepestDescent<L> {
     /// Constructor
-    pub fn new(linesearch: L) -> Result<Self, Error> {
-        Ok(SteepestDescent { linesearch })
+    pub fn new(linesearch: L) -> Self {
+        SteepestDescent { linesearch }
     }
 }
 
