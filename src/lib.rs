@@ -114,10 +114,9 @@
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
 //! # extern crate ndarray;
-//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-//! # use argmin::prelude::*;
-//! # use serde::{Serialize, Deserialize};
-//! // [Imports omited]
+//! use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+//! use argmin::prelude::*;
+//! use serde::{Serialize, Deserialize};
 //!
 //! /// First, create a struct for your problem
 //! #[derive(Clone, Default, Serialize, Deserialize)]
@@ -129,32 +128,33 @@
 //! /// Implement `ArgminOp` for `Rosenbrock`
 //! impl ArgminOp for Rosenbrock {
 //!     /// Type of the parameter vector
-//!     type Param = ndarray::Array1<f64>;
+//!     type Param = Vec<f64>;
 //!     /// Type of the return value computed by the cost function
 //!     type Output = f64;
-//!     /// Type of the Hessian. If no Hessian is available or needed for the used solver, this can
-//!     /// be set to `()`
-//!     type Hessian = ndarray::Array2<f64>;
+//!     /// Type of the Hessian. Can be `()` if not needed.
+//!     type Hessian = Vec<Vec<f64>>;
 //!
 //!     /// Apply the cost function to a parameter `p`
 //!     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-//!         Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
+//!         Ok(rosenbrock_2d(p, self.a, self.b))
 //!     }
 //!
-//!     /// Compute the gradient at parameter `p`. This is optional: If not implemented, this
-//!     /// method will return an `Err` when called.
+//!     /// Compute the gradient at parameter `p`.
 //!     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-//!         Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), self.a, self.b)))
+//!         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
 //!     }
 //!
-//!     /// Compute the Hessian at parameter `p`. This is optional: If not implemented, this method
-//!     /// will return an `Err` when called.
+//!     /// Compute the Hessian at parameter `p`.
 //!     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-//!         let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);
-//!         Ok(ndarray::Array::from_shape_vec((2, 2), h).unwrap())
+//!         let t = rosenbrock_2d_hessian(p, self.a, self.b);
+//!         Ok(vec![vec![t[0], t[1]], vec![t[2], t[3]]])
 //!     }
 //! }
 //! ```
+//!
+//! It is optional to implement any of these methods, as there are default implementations which
+//! will return an `Err` when called. What needs to be implemented is defined by the requirements
+//! of the solver that is to be used.
 //!
 //! # Running a solver
 //!
