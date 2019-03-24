@@ -101,11 +101,9 @@
 //! - `apply(&self, p: &Self::Param) -> Result<Self::Output, Error>`: Applys the cost
 //!   function to parameters `p` of type `Self::Param` and returns the cost function value.
 //! - `gradient(&self, p: &Self::Param) -> Result<Self::Param, Error>`: Computes the
-//!   gradient at `p`. Optional. By default returns an `Err` if not implemented.
+//!   gradient at `p`.
 //! - `hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error>`: Computes the Hessian
-//!   at `p`. Optional. By default returns an `Err` if not implemented. The type of `Hessian` can
-//!   be set to `()` if this method is not implemented.
-//!
+//!   at `p`.
 //!
 //! The following code snippet shows an example of how to use the Rosenbrock test functions from
 //! `argmin-testfunctions` in argmin:
@@ -161,13 +159,73 @@
 //! The following example shows how to use the previously shown definition of a problem in a
 //! Steepest Descent (Gradient Descent) solver.
 //!
-// //! ```rust
-// //! unimplemented!()
-// //! ```
+//! ```rust
+//! # #![allow(unused_imports)]
+//! # extern crate argmin;
+//! use argmin::prelude::*;
+//! use argmin::solver::gradientdescent::SteepestDescent;
+//! use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use serde::{Deserialize, Serialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Vec<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = ();
+//! #
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock_2d(p, self.a, self.b))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
 //!
-//! Executing `solver.run()?` performs the actual optimization. In addition, there is
-//! `solver.run_fast()?`, which only executes the optimization algorithm and avoids all convenience
-//! functionality such as logging.
+//! // Define cost function (must implement `ArgminOperator`)
+//! let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//!  
+//! // Define initial parameter vector
+//! let init_param: Vec<f64> = vec![-1.2, 1.0];
+//!  
+//! // Set up line search
+//! let linesearch = MoreThuenteLineSearch::new();
+//!  
+//! // Set up solver
+//! let solver = SteepestDescent::new(linesearch)?;
+//!  
+//! // Run solver
+//! let res = Executor::new(cost, solver, init_param)
+//!     // Add an observer which will log all iterations to the terminal
+//!     .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+//!     // Set maximum iterations to 10
+//!     .max_iters(10)
+//!     // run the solver on the defined problem
+//!     .run()?;
+//! #
+//! #     // Wait a second (lets the logger flush everything first)
+//! #     std::thread::sleep(std::time::Duration::from_secs(1));
+//!  
+//! // print result
+//! println!("{}", res);
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//! ```
 //!
 //! # Logging
 //!
