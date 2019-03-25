@@ -338,29 +338,6 @@
 // //! unimplemented!()
 // //! ```
 //!
-//! # Writers
-//!
-//! Writers can be used to handle parameter vectors in some way during the optimization
-//! (suggestions for a better name are more than welcome!). Usually, this can be used to save the
-//! intermediate parameter vectors somewhere. Currently, different modes are supported:
-//!
-//! * `WriterMode::Never`: Don't do anything.
-//! * `WriterMode::Always`: Process parameter vector in every iteration.
-//! * `WriterMode::Every(i)`: Process parameter vector in every i-th iteration.
-//! * `WriterMode::NewBest`: Process parameter vector whenever there is a new best one.
-//!
-//! The following example creates two writers of the type `WriteToFile` which serializes the
-//! parameter vector using either `serde_json` or `bincode`. The first writer saves the parameters
-//! in every third iteration (as JSON), while the second one saves only the new best ones (using
-//! `bincode`).
-//! Both are attached to a solver using the `add_writer(...)` method of `ArgminSolver` before the
-//! solver is run.
-//!
-// //! ```rust
-// //! // [Imports omited]
-// //! TODO
-// //! ```
-//!
 //! # Implementing an optimization algorithm
 //!
 //! In this section we are going to implement the Landweber solver, which essentially is a special
