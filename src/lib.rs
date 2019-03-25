@@ -227,18 +227,85 @@
 //! # }
 //! ```
 //!
-//! # Logging
+//! # Observing iterations
 //!
-//! Information such as the current iteration number, cost function value, and other metrics can be
-//! logged using any object which implements `argmin_core::ArgminLogger`. So far loggers based on
-//! the `slog` crate have been implemented: `ArgminSlogLogger::term` logs to the terminal and
-//! `ArgminSlogLogger::file` logs to a file in JSON format. Both loggers come with a `*_noblock`
-//! version which does not block the execution for logging, but may drop log entries when the
-//! buffer fills up.
+//! Argmin offers an interface to observe the state of the iteration at initialization as well as
+//! after every iteration. This includes the parameter vector, gradient, Hessian, iteration number,
+//! cost values and many more as well as solver-specific metrics. This interface can be used to
+//! implement loggers, send the information to a storage or to plot metrics.
+//! Observers need to implment the `Observe` trait.
+//! Argmin ships with a logger based on the `slog` crate. `ArgminSlogLogger::term` logs to the
+//! terminal and `ArgminSlogLogger::file` logs to a file in JSON format. Both loggers also come
+//! with a `*_noblock` version which does not block the execution of logging, but may drop some
+//! messages if the buffer is full.
+//! Parameter vectors can be written to disc using `WriteToFile`.
+//! For each observer it can be defined how often it will observe the progress of the solver. This
+//! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`
+//! (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.
 //!
-// //! ```
-// //! unimplemented!()
-// //! ```
+//! ```rust
+//! # #![allow(unused_imports)]
+//! # extern crate argmin;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::gradientdescent::SteepestDescent;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use serde::{Deserialize, Serialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Vec<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = ();
+//! #
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock_2d(p, self.a, self.b))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #
+//! # // Define cost function (must implement `ArgminOperator`)
+//! # let problem = Rosenbrock { a: 1.0, b: 100.0 };
+//! #
+//! # // Define initial parameter vector
+//! # let init_param: Vec<f64> = vec![-1.2, 1.0];
+//! #
+//! # // Set up line search
+//! # let linesearch = MoreThuenteLineSearch::new();
+//! #
+//! # // Set up solver
+//! # let solver = SteepestDescent::new(linesearch);
+//! #
+//! let res = Executor::new(problem, solver, init_param)
+//!     // Add an observer which will log all iterations to the terminal (without blocking)
+//!     .add_observer(ArgminSlogLogger::term_noblock(), ObserverMode::Always)
+//!     // Log to file whenever a new best solution is found
+//!     .add_observer(ArgminSlogLogger::file("solver.log")?, ObserverMode::NewBest)
+//!     // Write parameter vector to `params/param.arg` every 20th iteration
+//!     .add_observer(WriteToFile::new("params", "param"), ObserverMode::Every(20))
+//! #     .max_iters(2)
+//!     // run the solver on the defined problem
+//!     .run()?;
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//! ```
 //!
 //! # Checkpoints
 //!
