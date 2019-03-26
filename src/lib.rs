@@ -386,19 +386,67 @@
 //! `x_{k+1} = x_k - omega * \nabla f(x_k)`
 //!
 //! In order to implement this using the argmin framework, one first needs to define a struct which
-//! holds data/parameters needed during the execution of the algorithm. In addition a field with
-//! the name `base` and type `ArgminBase<'a, T, U, H>` is needed, where `T` is the type of the
-//! parameter vector, `U` is the type of the return values of the cost function and `H` is the type
-//! of the Hessian (which can be `()` if not available).
+//! holds data specific to the solver. Then, the `Solver` trait needs to be implemented for the
+//! struct. This requires setting the associated constant `NAME` which gives your solver a name.
+//! The `next_iter` method defines the computations performed in a single iteration of the solver.
+//! Via the parameters `op` and `state` one has access to the operator (cost function, gradient
+//! computation, Hessian, ...) and to the current state of the optimization (parameter vectors,
+//! cost function values, iteration number, ...), respectively.
 //!
-//! Deriving `ArgminSolver` for the struct using `#[derive(ArgminSolver)]` implements most of the
-//! API. What remains to be implemented for the struct is a constructor and `ArgminNextIter`. The
-//! latter is essentially an implementation of a single iteration of the algorithm.
+//! ```rust
+//! use argmin::prelude::*;
+//! use serde::{Deserialize, Serialize};
 //!
-// //! ```rust
-// //! // [Imports omited]
-// //! TODO
-// //! ```
+//! // Define a struct which holds any parameters/data which are needed during the execution of the
+//! // solver. Note that this does not include parameter vectors, gradients, Hessians, cost
+//! // function values and so on, as those will be handled by the `Executor`.
+//! #[derive(Serialize, Deserialize)]
+//! pub struct Landweber {
+//!     /// omega
+//!     omega: f64,
+//! }
+//!
+//! impl Landweber {
+//!     /// Constructor
+//!     pub fn new(omega: f64) -> Result<Self, Error> {
+//!         Ok(Landweber { omega })
+//!     }
+//! }
+//!
+//! impl<O> Solver<O> for Landweber
+//! where
+//!     // `O` always needs to implement `ArgminOp`
+//!     O: ArgminOp,
+//!     // `O::Param` needs to implement `ArgminScaledSub` because of the update formula
+//!     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+//! {
+//!     // This gives the solver a name which will be used for logging
+//!     const NAME: &'static str = "Landweber";
+//!
+//!     // Defines the computations performed in a single iteration.
+//!     fn next_iter(
+//!         &mut self,
+//!         // This gives access to the operator supplied to the `Executor`. `O` implements
+//!         // `ArgminOp` and `OpWrapper` takes care of counting the calls to the respective
+//!         // functions.
+//!         op: &mut OpWrapper<O>,
+//!         // Current state of the optimization. This gives access to the parameter vector,
+//!         // gradient, Hessian and cost function value of the current, previous and best
+//!         // iteration as well as current iteration number, and many more.
+//!         state: &IterState<O>,
+//!     ) -> Result<ArgminIterData<O>, Error> {
+//!         // First we obtain the current parameter vector from the `state` struct (`x_k`).
+//!         let xk = state.get_param();
+//!         // Then we compute the gradient at `x_k` (`\nabla f(x_k)`)
+//!         let grad = op.gradient(&xk)?;
+//!         // Now subtract `\nabla f(x_k)` scaled by `omega` from `x_k` to compute `x_{k+1}`
+//!         let xkp1 = xk.scaled_sub(&self.omega, &grad);
+//!         // Return new paramter vector which will then be used by the `Executor` to update
+//!         // `state`.
+//!         Ok(ArgminIterData::new().param(xkp1))
+//!     }
+//! }
+//! ```
 
 #![warn(missing_docs)]
 #![allow(unused_attributes)]

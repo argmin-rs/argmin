@@ -38,7 +38,7 @@ use serde::{Deserialize, Serialize};
 /// [1] https://en.wikipedia.org/wiki/Landweber_iteration
 #[derive(Serialize, Deserialize)]
 pub struct Landweber {
-    /// omgea
+    /// omega
     omega: f64,
 }
 
