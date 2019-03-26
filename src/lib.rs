@@ -309,34 +309,72 @@
 //!
 //! # Checkpoints
 //!
-//! The longer an optimization runs, the higher the probability that something crashes.
-//! Particularly for optimizations which are running for days, weeks or even longer, this can
-//! become a problem. To mitigate this problem, it is possible in argmin to save checkpoints.
-//! Such a checkpoint is a serialization of an `ArgminSolver` object and can be loaded again and
-//! resumed.
+//! The probability of crashes increases with runtime, therefore one may want to save checkpoints
+//! in order to be able to resume the optimization after a crash.
 //! The `CheckpointMode` defines how often checkpoints are saved and is either `Never` (default),
 //! `Always` (every iteration) or `Every(u64)` (every Nth iteration). It is set via the setter
-//! method `set_checkpoint_mode()` which is implemented for every `ArgminSolver`.
+//! method `checkpoint_mode` of `Executor`.
 //! In addition, the directory where the checkpoints and a prefix for every file can be set via
-//! `set_checkpoint_dir()` and `set_checkpoint_prefix`, respectively.
+//! `checkpoint_dir` and `checkpoint_name`, respectively.
 //!
-//! The following example illustrates the usage. Note that this example is only for illustration
-//! and does not make much sense. Please scroll down for a more practical example.
+//! The following example shows how the `from_checkpoint` method can be used to resume from a
+//! checkpoint. In case this fails (for instance because the file does not exist, which could mean
+//! that this is the first run and there is nothing to resume from), it will resort to creating a
+//! new `Executor`, thus starting from scratch.
 //!
-// //! ```
-// //! // [Imports omited]
-// //! TODO
-// //! ```
-//!
-//! A more practical way of using the checkpoints feature is shown in the following example.
-//! This will either load an existing checkpoint if one exists or it will create a new solver. Type
-//! inference takes care of the return type of `ArgminSolver::from_checkpoint(...)`. This way, the
-//! binary can easily be restarted after a crash and will automatically resume from the latest
-//! checkpoint.
-//!
-// //! ```rust
-// //! unimplemented!()
-// //! ```
+//! ```rust
+//! # extern crate argmin;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::landweber::*;
+//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use argmin_core::Error;
+//! # use serde::{Deserialize, Serialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {}
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Vec<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = ();
+//! #
+//! #     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
+//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #     // define inital parameter vector
+//! #     let init_param: Vec<f64> = vec![1.2, 1.2];
+//! #     let operator = Rosenbrock {};
+//! #
+//! #     let iters = 35;
+//! #     let solver = Landweber::new(0.001)?;
+//! #
+//! let res = Executor::from_checkpoint(".checkpoints/optim.arg")
+//!     .unwrap_or(Executor::new(operator, solver, init_param))
+//!     .max_iters(iters)
+//!     .checkpoint_dir(".checkpoints")
+//!     .checkpoint_name("optim")
+//!     .checkpoint_mode(CheckpointMode::Every(20))
+//!     .run()?;
+//! #
+//! #     // Wait a second (lets the logger flush everything before printing to screen again)
+//! #     std::thread::sleep(std::time::Duration::from_secs(1));
+//! #     println!("{}", res);
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #     }
+//! # }
+//! ```
 //!
 //! # Implementing an optimization algorithm
 //!
