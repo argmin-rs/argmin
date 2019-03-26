@@ -68,10 +68,6 @@
 //!
 //! Add this to your `Cargo.toml`:
 //!
-// //! ```toml
-// //! [dependencies]
-// //! argmin = "0.1.8"
-// //! ```
 //! ```toml
 //! [dependencies]
 //! argmin = { git = "https://github.com/argmin-rs/argmin.git", branch = "master"}
@@ -81,7 +77,6 @@
 //!
 //! There are additional features which can be activated in `Cargo.toml`:
 //!
-// //! argmin = { version = "0.1.8", features = ["ctrlc", "ndarrayl"] }
 //! ```toml
 //! [dependencies]
 //! argmin = { git = "https://github.com/argmin-rs/argmin.git",
