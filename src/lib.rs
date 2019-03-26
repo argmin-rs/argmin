@@ -11,9 +11,8 @@
 //! in Rust. It is at the moment potentially very buggy. Please use with care and report any bugs
 //! you encounter. This crate is looking for contributors!
 //!
-//! NOTE: The design has changed substantially in the recent past and the documentation is not yet
-//! up to date. If you are using a version available on
-//! [crates.io](https://crates.io/crates/argmin) please have a look at the correspoding
+//! NOTE: This is the documentation of the development version of argmin. If you are using a version
+//! available on [crates.io](https://crates.io/crates/argmin) please have a look at the correspoding
 //! [documentation](https://docs.rs/argmin/0.1.8/argmin/).
 //!
 //! # Design goals
@@ -69,18 +68,25 @@
 //!
 //! Add this to your `Cargo.toml`:
 //!
+// //! ```toml
+// //! [dependencies]
+// //! argmin = "0.1.8"
+// //! ```
 //! ```toml
 //! [dependencies]
-//! argmin = "0.1.8"
+//! argmin = { git = "https://github.com/argmin-rs/argmin.git", branch = "master"}
 //! ```
 //!
-//! ## Optional features
+//! ## Optional features (recommended)
 //!
 //! There are additional features which can be activated in `Cargo.toml`:
 //!
+// //! argmin = { version = "0.1.8", features = ["ctrlc", "ndarrayl"] }
 //! ```toml
 //! [dependencies]
-//! argmin = { version = "0.1.8", features = ["ctrlc", "ndarrayl"] }
+//! argmin = { git = "https://github.com/argmin-rs/argmin.git",
+//!            branch = "master",
+//!            features = ["ctrlc", "ndarrayl"] }
 //! ```
 //!
 //! These may become default features in the future. Without these features compilation to
