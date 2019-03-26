@@ -158,11 +158,6 @@ Steepest Descent (Gradient Descent) solver.
 use argmin::prelude::*;
 use argmin::solver::gradientdescent::SteepestDescent;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
-#
-#
-#
-#
-#
 
 // Define cost function (must implement `ArgminOperator`)
 let cost = Rosenbrock { a: 1.0, b: 100.0 };
@@ -184,11 +179,9 @@ let res = Executor::new(cost, solver, init_param)
     .max_iters(10)
     // run the solver on the defined problem
     .run()?;
-#
 
 // print result
 println!("{}", res);
-#
 ```
 
 ## Observing iterations
@@ -208,16 +201,6 @@ is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, 
 (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.
 
 ```rust
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
 let res = Executor::new(problem, solver, init_param)
     // Add an observer which will log all iterations to the terminal (without blocking)
     .add_observer(ArgminSlogLogger::term_noblock(), ObserverMode::Always)
@@ -227,7 +210,6 @@ let res = Executor::new(problem, solver, init_param)
     .add_observer(WriteToFile::new("params", "param"), ObserverMode::Every(20))
     // run the solver on the defined problem
     .run()?;
-#
 ```
 
 ## Checkpoints
@@ -246,13 +228,6 @@ that this is the first run and there is nothing to resume from), it will resort 
 new `Executor`, thus starting from scratch.
 
 ```rust
-#
-#
-#
-#
-#
-#
-#
 let res = Executor::from_checkpoint(".checkpoints/optim.arg")
     .unwrap_or(Executor::new(operator, solver, init_param))
     .max_iters(iters)
@@ -260,8 +235,6 @@ let res = Executor::from_checkpoint(".checkpoints/optim.arg")
     .checkpoint_name("optim")
     .checkpoint_mode(CheckpointMode::Every(20))
     .run()?;
-#
-#
 ```
 
 ## Implementing an optimization algorithm
