@@ -587,133 +587,6 @@
 <span id="587">587</span>
 <span id="588">588</span>
 <span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
-<span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
-<span id="641">641</span>
-<span id="642">642</span>
-<span id="643">643</span>
-<span id="644">644</span>
-<span id="645">645</span>
-<span id="646">646</span>
-<span id="647">647</span>
-<span id="648">648</span>
-<span id="649">649</span>
-<span id="650">650</span>
-<span id="651">651</span>
-<span id="652">652</span>
-<span id="653">653</span>
-<span id="654">654</span>
-<span id="655">655</span>
-<span id="656">656</span>
-<span id="657">657</span>
-<span id="658">658</span>
-<span id="659">659</span>
-<span id="660">660</span>
-<span id="661">661</span>
-<span id="662">662</span>
-<span id="663">663</span>
-<span id="664">664</span>
-<span id="665">665</span>
-<span id="666">666</span>
-<span id="667">667</span>
-<span id="668">668</span>
-<span id="669">669</span>
-<span id="670">670</span>
-<span id="671">671</span>
-<span id="672">672</span>
-<span id="673">673</span>
-<span id="674">674</span>
-<span id="675">675</span>
-<span id="676">676</span>
-<span id="677">677</span>
-<span id="678">678</span>
-<span id="679">679</span>
-<span id="680">680</span>
-<span id="681">681</span>
-<span id="682">682</span>
-<span id="683">683</span>
-<span id="684">684</span>
-<span id="685">685</span>
-<span id="686">686</span>
-<span id="687">687</span>
-<span id="688">688</span>
-<span id="689">689</span>
-<span id="690">690</span>
-<span id="691">691</span>
-<span id="692">692</span>
-<span id="693">693</span>
-<span id="694">694</span>
-<span id="695">695</span>
-<span id="696">696</span>
-<span id="697">697</span>
-<span id="698">698</span>
-<span id="699">699</span>
-<span id="700">700</span>
-<span id="701">701</span>
-<span id="702">702</span>
-<span id="703">703</span>
-<span id="704">704</span>
-<span id="705">705</span>
-<span id="706">706</span>
-<span id="707">707</span>
-<span id="708">708</span>
-<span id="709">709</span>
-<span id="710">710</span>
-<span id="711">711</span>
-<span id="712">712</span>
-<span id="713">713</span>
-<span id="714">714</span>
-<span id="715">715</span>
-<span id="716">716</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -736,86 +609,18 @@
 <span class="doccomment">//! DOI: https://doi.org/10.1145/192115.192132</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">DeserializeOwned</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>;
 
 <span class="doccomment">/// The More-Thuente line search is a method to find a step length which obeys the strong Wolfe</span>
 <span class="doccomment">/// conditions.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate argmin;</span>
-<span class="doccomment">/// # use argmin::prelude::*;</span>
-<span class="doccomment">/// # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
-<span class="doccomment">/// # use argmin::testfunctions::{sphere, sphere_derivative};</span>
-<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # #[derive(Clone, Default, Serialize, Deserialize)]</span>
-<span class="doccomment">/// # struct MyProblem {}</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # impl ArgminOp for MyProblem {</span>
-<span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">/// #     type Output = f64;</span>
-<span class="doccomment">/// #     type Hessian = ();</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// #     fn apply(&amp;self, param: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;f64, Error&gt; {</span>
-<span class="doccomment">/// #         Ok(sphere(param))</span>
-<span class="doccomment">/// #     }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// #     fn gradient(&amp;self, param: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;Vec&lt;f64&gt;, Error&gt; {</span>
-<span class="doccomment">/// #         Ok(sphere_derivative(param))</span>
-<span class="doccomment">/// #     }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # fn run() -&gt; Result&lt;(), Error&gt; {</span>
-<span class="doccomment">/// // Define inital parameter vector</span>
-<span class="doccomment">/// let init_param: Vec&lt;f64&gt; = vec![1.0, 0.0];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Problem definition</span>
-<span class="doccomment">/// let operator = MyProblem {};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Set up line search method</span>
-<span class="doccomment">/// let mut solver = MoreThuenteLineSearch::new(operator);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Set search direction</span>
-<span class="doccomment">/// solver.set_search_direction(vec![-2.0, 0.0]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Set initial position</span>
-<span class="doccomment">/// solver.set_initial_parameter(init_param);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Calculate initial cost ...</span>
-<span class="doccomment">/// solver.calc_initial_cost()?;</span>
-<span class="doccomment">/// // ... or, alternatively, set cost if it is already computed</span>
-<span class="doccomment">/// // solver.set_initial_cost(...);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Calculate initial gradient ...</span>
-<span class="doccomment">/// solver.calc_initial_gradient()?;</span>
-<span class="doccomment">/// // .. or, alternatively, set gradient if it is already computed</span>
-<span class="doccomment">/// // solver.set_initial_gradient(...);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Set initial step length</span>
-<span class="doccomment">/// solver.set_initial_alpha(1.0)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Attach a logger</span>
-<span class="doccomment">/// solver.add_logger(ArgminSlogLogger::term());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Run solver</span>
-<span class="doccomment">/// solver.run()?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Wait a second (lets the logger flush everything before printing again)</span>
-<span class="doccomment">/// std::thread::sleep(std::time::Duration::from_secs(1));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Print Result</span>
-<span class="doccomment">/// println!(&quot;{:?}&quot;, solver.result());</span>
-<span class="doccomment">/// #     Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// #     if let Err(ref e) = run() {</span>
-<span class="doccomment">/// #         println!(&quot;{} {}&quot;, e.as_fail(), e.backtrace());</span>
-<span class="doccomment">/// #     }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
+<span class="comment">// /// ```rust</span>
+<span class="comment">// /// TODO</span>
+<span class="comment">// /// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # References</span>
 <span class="doccomment">///</span>
@@ -825,30 +630,18 @@
 <span class="doccomment">/// [0] Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient</span>
 <span class="doccomment">/// decrease.&quot; ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.</span>
 <span class="doccomment">/// DOI: https://doi.org/10.1145/192115.192132</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
-{
-    <span class="doccomment">/// initial parameter vector (builder)</span>
-    <span class="ident">init_param_b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// initial cost (builder)</span>
-    <span class="ident">finit_b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// initial gradient (builder)</span>
-    <span class="ident">init_grad_b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Search direction (builder)</span>
-    <span class="ident">search_direction_b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">search_direction_b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
     <span class="doccomment">/// initial parameter vector</span>
-    <span class="ident">init_param</span>: <span class="ident">O</span>::<span class="ident">Param</span>,
+    <span class="ident">init_param</span>: <span class="ident">P</span>,
     <span class="doccomment">/// initial cost</span>
     <span class="ident">finit</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// initial gradient</span>
-    <span class="ident">init_grad</span>: <span class="ident">O</span>::<span class="ident">Param</span>,
+    <span class="ident">init_grad</span>: <span class="ident">P</span>,
     <span class="doccomment">/// Search direction</span>
-    <span class="ident">search_direction</span>: <span class="ident">O</span>::<span class="ident">Param</span>,
+    <span class="ident">search_direction</span>: <span class="ident">P</span>,
     <span class="doccomment">/// Search direction in 1D</span>
     <span class="ident">dginit</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// dgtest</span>
@@ -885,8 +678,6 @@
     <span class="ident">stage1</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// infoc</span>
     <span class="ident">infoc</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// base</span>
-    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
@@ -902,28 +693,15 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
-{
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Constructor</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Parameters:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `operator`: operator</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">operator</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">MoreThuenteLineSearch</span> {
-            <span class="ident">init_param_b</span>: <span class="prelude-val">None</span>,
-            <span class="ident">finit_b</span>: <span class="prelude-val">None</span>,
-            <span class="ident">init_grad_b</span>: <span class="prelude-val">None</span>,
             <span class="ident">search_direction_b</span>: <span class="prelude-val">None</span>,
-            <span class="ident">init_param</span>: <span class="ident">O</span>::<span class="ident">Param</span>::<span class="ident">default</span>(),
+            <span class="ident">init_param</span>: <span class="ident">P</span>::<span class="ident">default</span>(),
             <span class="ident">finit</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>,
-            <span class="ident">init_grad</span>: <span class="ident">O</span>::<span class="ident">Param</span>::<span class="ident">default</span>(),
-            <span class="ident">search_direction</span>: <span class="ident">O</span>::<span class="ident">Param</span>::<span class="ident">default</span>(),
+            <span class="ident">init_grad</span>: <span class="ident">P</span>::<span class="ident">default</span>(),
+            <span class="ident">search_direction</span>: <span class="ident">P</span>::<span class="ident">default</span>(),
             <span class="ident">dginit</span>: <span class="number">0.0</span>,
             <span class="ident">dgtest</span>: <span class="number">0.0</span>,
             <span class="ident">ftol</span>: <span class="number">1e-4</span>,
@@ -942,18 +720,11 @@
             <span class="ident">brackt</span>: <span class="bool-val">false</span>,
             <span class="ident">stage1</span>: <span class="bool-val">true</span>,
             <span class="ident">infoc</span>: <span class="number">1</span>,
-            <span class="ident">base</span>: <span class="ident">ArgminBase</span>::<span class="ident">new</span>(<span class="ident">operator</span>, <span class="ident">O</span>::<span class="ident">Param</span>::<span class="ident">default</span>()),
         }
     }
 
-    <span class="doccomment">/// set current gradient value</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_cur_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="ident">O</span>::<span class="ident">Param</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_cur_grad</span>(<span class="ident">grad</span>);
-        <span class="self">self</span>
-    }
-
     <span class="doccomment">/// Set c1 and c2 where 0 &lt; c1 &lt; c2 &lt; 1.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_c</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">c1</span>: <span class="ident">f64</span>, <span class="ident">c2</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">c</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">c1</span>: <span class="ident">f64</span>, <span class="ident">c2</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;=</span> <span class="number">0.0</span> <span class="op">||</span> <span class="ident">c1</span> <span class="op">&gt;=</span> <span class="ident">c2</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;MoreThuenteLineSearch: Parameter c1 must be in (0, c2).&quot;</span>.<span class="ident">to_string</span>(),
@@ -972,11 +743,7 @@
     }
 
     <span class="doccomment">/// set alpha limits</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_alpha_min_max</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">alpha_min</span>: <span class="ident">f64</span>,
-        <span class="ident">alpha_max</span>: <span class="ident">f64</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alpha</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha_min</span>: <span class="ident">f64</span>, <span class="ident">alpha_max</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">alpha_min</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;MoreThuenteLineSearch: alpha_min must be &gt;= 0.0.&quot;</span>.<span class="ident">to_string</span>(),
@@ -996,50 +763,23 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminLineSearch</span> <span class="kw">for</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">MoreThuenteLineSearch</span>::<span class="ident">new</span>()
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="ident">ArgminLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Serialize</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span>, <span class="ident">P</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Set search direction</span>
-    <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">search_direction</span>: <span class="ident">O</span>::<span class="ident">Param</span>) {
+    <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">search_direction</span>: <span class="ident">P</span>) {
         <span class="self">self</span>.<span class="ident">search_direction_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">search_direction</span>);
     }
 
-    <span class="doccomment">/// Set initial parameter</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_parameter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="ident">O</span>::<span class="ident">Param</span>) {
-        <span class="self">self</span>.<span class="ident">init_param_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">param</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">set_cur_param</span>(<span class="ident">param</span>);
-    }
-
-    <span class="doccomment">/// Set initial cost function value</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init_cost</span>: <span class="ident">f64</span>) {
-        <span class="self">self</span>.<span class="ident">finit_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">init_cost</span>);
-    }
-
-    <span class="doccomment">/// Set initial gradient</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init_grad</span>: <span class="ident">O</span>::<span class="ident">Param</span>) {
-        <span class="self">self</span>.<span class="ident">init_grad_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">init_grad</span>);
-    }
-
-    <span class="doccomment">/// Calculate initial cost function value</span>
-    <span class="kw">fn</span> <span class="ident">calc_initial_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_param</span>();
-        <span class="self">self</span>.<span class="ident">finit_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>);
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Calculate initial cost function value</span>
-    <span class="kw">fn</span> <span class="ident">calc_initial_gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_param</span>();
-        <span class="self">self</span>.<span class="ident">init_grad_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>);
-        <span class="prelude-val">Ok</span>(())
-    }
-
     <span class="doccomment">/// Set initial alpha value</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_alpha</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">set_init_alpha</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;MoreThuenteLineSearch: Initial alpha must be &gt; 0.&quot;</span>.<span class="ident">to_string</span>(),
@@ -1051,37 +791,38 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminIter</span> <span class="kw">for</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class="ident">Clone</span>
+        <span class="op">+</span> <span class="ident">Serialize</span>
+        <span class="op">+</span> <span class="ident">DeserializeOwned</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span>, <span class="ident">P</span><span class="op">&gt;</span>,
 {
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">O</span>::<span class="ident">Param</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
-    <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">O</span>::<span class="ident">Hessian</span>;
+    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;More-Thuente Line search&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="macro">check_param</span><span class="macro">!</span>(
-            <span class="self">self</span>.<span class="ident">init_param_b</span>,
-            <span class="string">&quot;MoreThuenteLineSearch: Initial parameter not initialized. Call `set_initial_parameter`.&quot;</span>
-        );
-
-        <span class="self">self</span>.<span class="ident">finit</span> <span class="op">=</span> <span class="macro">check_param</span><span class="macro">!</span>(
-            <span class="self">self</span>.<span class="ident">finit_b</span>,
-            <span class="string">&quot;MoreThuenteLineSearch: Initial cost not computed. Call `set_initial_cost` or `calc_inital_cost`.&quot;</span>
-        );
-
-        <span class="self">self</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="macro">check_param</span><span class="macro">!</span>(
-            <span class="self">self</span>.<span class="ident">init_grad_b</span>,
-            <span class="string">&quot;MoreThuenteLineSearch: Initial gradient not computed. Call `set_initial_grad` or `calc_inital_grad`.&quot;</span>
-        );
-
+    <span class="kw">fn</span> <span class="ident">init</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">search_direction</span> <span class="op">=</span> <span class="macro">check_param</span><span class="macro">!</span>(
             <span class="self">self</span>.<span class="ident">search_direction_b</span>,
             <span class="string">&quot;MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`.&quot;</span>
         );
+
+        <span class="self">self</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
+
+        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
+        <span class="self">self</span>.<span class="ident">finit</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cost</span> <span class="op">==</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span> {
+            <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">init_param</span>)<span class="question-mark">?</span>
+        } <span class="kw">else</span> {
+            <span class="ident">cost</span>
+        };
+
+        <span class="self">self</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap_or</span>(<span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">init_param</span>)<span class="question-mark">?</span>);
 
         <span class="self">self</span>.<span class="ident">dginit</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">init_grad</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
 
@@ -1106,10 +847,14 @@
         <span class="self">self</span>.<span class="ident">stx</span> <span class="op">=</span> <span class="ident">Step</span>::<span class="ident">new</span>(<span class="number">0.0</span>, <span class="self">self</span>.<span class="ident">finit</span>, <span class="self">self</span>.<span class="ident">dginit</span>);
         <span class="self">self</span>.<span class="ident">sty</span> <span class="op">=</span> <span class="ident">Step</span>::<span class="ident">new</span>(<span class="number">0.0</span>, <span class="self">self</span>.<span class="ident">finit</span>, <span class="self">self</span>.<span class="ident">dginit</span>);
 
-        <span class="prelude-val">Ok</span>(())
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Param</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_iter</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// set the minimum and maximum steps to correspond to the present interval of uncertainty</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> (<span class="ident">stmin</span>, <span class="ident">stmax</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">brackt</span> {
@@ -1138,12 +883,12 @@
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">init_param</span>
             .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
-        <span class="self">self</span>.<span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">f</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>;
-        <span class="self">self</span>.<span class="ident">set_cur_cost</span>(<span class="ident">f</span>);
-        <span class="self">self</span>.<span class="ident">set_cur_param</span>(<span class="ident">new_param</span>);
-        <span class="self">self</span>.<span class="ident">set_cur_grad</span>(<span class="ident">new_grad</span>.<span class="ident">clone</span>());
+        <span class="kw">let</span> <span class="ident">cur_cost</span> <span class="op">=</span> <span class="ident">f</span>;
+        <span class="kw">let</span> <span class="ident">cur_param</span> <span class="op">=</span> <span class="ident">new_param</span>;
+        <span class="kw">let</span> <span class="ident">cur_grad</span> <span class="op">=</span> <span class="ident">new_grad</span>.<span class="ident">clone</span>();
         <span class="comment">// self.stx.fx = new_cost;</span>
         <span class="kw">let</span> <span class="ident">dg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">new_grad</span>);
         <span class="kw">let</span> <span class="ident">ftest1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
@@ -1176,9 +921,11 @@
         }
 
         <span class="kw">if</span> <span class="ident">info</span> <span class="op">!=</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">set_termination_reason</span>(<span class="ident">TerminationReason</span>::<span class="ident">LineSearchConditionMet</span>);
-            <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">ArgminIterData</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">cur_param</span>(), <span class="self">self</span>.<span class="ident">cur_cost</span>());
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">out</span>);
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData</span>::<span class="ident">new</span>()
+                .<span class="ident">param</span>(<span class="ident">cur_param</span>)
+                .<span class="ident">cost</span>(<span class="ident">cur_cost</span>)
+                .<span class="ident">grad</span>(<span class="ident">cur_grad</span>)
+                .<span class="ident">termination_reason</span>(<span class="ident">TerminationReason</span>::<span class="ident">LineSearchConditionMet</span>));
         }
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage1</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">f</span> <span class="op">&lt;=</span> <span class="ident">ftest1</span> <span class="op">&amp;&amp;</span> <span class="ident">dg</span> <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">ftol</span>.<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">gtol</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span> {
@@ -1241,8 +988,7 @@
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">init_param</span>
             .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
-        <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">ArgminIterData</span>::<span class="ident">new</span>(<span class="ident">new_param</span>, <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">fx</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">out</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData</span>::<span class="ident">new</span>().<span class="ident">param</span>(<span class="ident">new_param</span>).<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">fx</span>))
     }
 }
 

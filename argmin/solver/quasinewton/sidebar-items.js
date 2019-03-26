@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["bfgs","References:"]]});
+initSidebarItems({"mod":[["bfgs","References:"],["dfp","References:"],["sr1","References:"]]});

@@ -562,97 +562,6 @@
 <span id="562">562</span>
 <span id="563">563</span>
 <span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-<span id="577">577</span>
-<span id="578">578</span>
-<span id="579">579</span>
-<span id="580">580</span>
-<span id="581">581</span>
-<span id="582">582</span>
-<span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
-<span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
-<span id="641">641</span>
-<span id="642">642</span>
-<span id="643">643</span>
-<span id="644">644</span>
-<span id="645">645</span>
-<span id="646">646</span>
-<span id="647">647</span>
-<span id="648">648</span>
-<span id="649">649</span>
-<span id="650">650</span>
-<span id="651">651</span>
-<span id="652">652</span>
-<span id="653">653</span>
-<span id="654">654</span>
-<span id="655">655</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -672,7 +581,9 @@
 <span class="doccomment">//! DOI: https://doi.org/10.1137/030601880</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">DeserializeOwned</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>;
 
 <span class="kw">type</span> <span class="ident">Triplet</span> <span class="op">=</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>);
 
@@ -681,96 +592,17 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate argmin;</span>
-<span class="doccomment">/// # use argmin::prelude::*;</span>
-<span class="doccomment">/// # use argmin::solver::linesearch::HagerZhangLineSearch;</span>
-<span class="doccomment">/// # use argmin::testfunctions::{sphere, sphere_derivative};</span>
-<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # #[derive(Clone, Default, Serialize, Deserialize)]</span>
-<span class="doccomment">/// # struct MyProblem {}</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # impl ArgminOp for MyProblem {</span>
-<span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">/// #     type Output = f64;</span>
-<span class="doccomment">/// #     type Hessian = ();</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// #     fn apply(&amp;self, param: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;f64, Error&gt; {</span>
-<span class="doccomment">/// #         Ok(sphere(param))</span>
-<span class="doccomment">/// #     }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// #     fn gradient(&amp;self, param: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;Vec&lt;f64&gt;, Error&gt; {</span>
-<span class="doccomment">/// #         Ok(sphere_derivative(param))</span>
-<span class="doccomment">/// #     }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # fn run() -&gt; Result&lt;(), Error&gt; {</span>
-<span class="doccomment">/// // Define inital parameter vector</span>
-<span class="doccomment">/// let init_param: Vec&lt;f64&gt; = vec![1.0, 0.0];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Problem definition</span>
-<span class="doccomment">/// let operator = MyProblem {};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Set up line search method</span>
-<span class="doccomment">/// let mut solver = HagerZhangLineSearch::new(operator);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Set search direction</span>
-<span class="doccomment">/// solver.set_search_direction(vec![-2.0, 0.0]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Set initial position</span>
-<span class="doccomment">/// solver.set_initial_parameter(init_param);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Calculate initial cost ...</span>
-<span class="doccomment">/// solver.calc_initial_cost()?;</span>
-<span class="doccomment">/// // ... or, alternatively, set cost if it is already computed</span>
-<span class="doccomment">/// // solver.set_initial_cost(...);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Calculate initial gradient ...</span>
-<span class="doccomment">/// solver.calc_initial_gradient()?;</span>
-<span class="doccomment">/// // .. or, alternatively, set gradient if it is already computed</span>
-<span class="doccomment">/// // solver.set_initial_gradient(...);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Set initial step length</span>
-<span class="doccomment">/// solver.set_initial_alpha(1.0)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Attach a logger</span>
-<span class="doccomment">/// solver.add_logger(ArgminSlogLogger::term());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Run solver</span>
-<span class="doccomment">/// solver.run()?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Wait a second (lets the logger flush everything before printing again)</span>
-<span class="doccomment">/// std::thread::sleep(std::time::Duration::from_secs(1));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Print Result</span>
-<span class="doccomment">/// println!(&quot;{:?}&quot;, solver.result());</span>
-<span class="doccomment">/// #     Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// #     if let Err(ref e) = run() {</span>
-<span class="doccomment">/// #         println!(&quot;{} {}&quot;, e.as_fail(), e.backtrace());</span>
-<span class="doccomment">/// #     }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
+<span class="comment">// /// ```rust</span>
+<span class="comment">// /// TODO</span>
+<span class="comment">// /// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # References</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [0] William W. Hager and Hongchao Zhang. &quot;A new conjugate gradient method with guaranteed</span>
 <span class="doccomment">/// descent and an efficient line search.&quot; SIAM J. Optim. 16(1), 2006, 170-192.</span>
 <span class="doccomment">/// DOI: https://doi.org/10.1137/030601880</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ArgminSolver</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">stop</span>(<span class="string">&quot;self.best_f - self.finit &lt; self.delta * self.best_x * self.dginit&quot;</span> <span class="op">=&gt;</span> <span class="ident">LineSearchConditionMet</span>)]</span>
-<span class="attribute">#[<span class="ident">stop</span>(<span class="string">&quot;self.best_g &gt; self.sigma * self.dginit&quot;</span> <span class="op">=&gt;</span> <span class="ident">LineSearchConditionMet</span>)]</span>
-<span class="attribute">#[<span class="ident">stop</span>(<span class="string">&quot;(2.0*self.delta - 1.0)*self.dginit &gt;= self.best_g &amp;&amp; self.best_g &gt;= self.sigma * self.dginit &amp;&amp; self.best_f &lt;= self.finit + self.epsilon_k&quot;</span> <span class="op">=&gt;</span> <span class="ident">LineSearchConditionMet</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
-{
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
     <span class="doccomment">/// delta: (0, 0.5), used in the Wolve conditions</span>
     <span class="ident">delta</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// sigma: [delta, 1), used in the Wolfe conditions</span>
@@ -816,41 +648,23 @@
     <span class="ident">best_f</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// best slope</span>
     <span class="ident">best_g</span>: <span class="ident">f64</span>,
-    <span class="doccomment">/// initial parameter vector (builder)</span>
-    <span class="ident">init_param_b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// initial cost (builder)</span>
-    <span class="ident">finit_b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// initial gradient (builder)</span>
-    <span class="ident">init_grad_b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Search direction (builder)</span>
-    <span class="ident">search_direction_b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">search_direction_b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
     <span class="doccomment">/// initial parameter vector</span>
-    <span class="ident">init_param</span>: <span class="ident">O</span>::<span class="ident">Param</span>,
+    <span class="ident">init_param</span>: <span class="ident">P</span>,
     <span class="doccomment">/// initial cost</span>
     <span class="ident">finit</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// initial gradient (builder)</span>
-    <span class="ident">init_grad</span>: <span class="ident">O</span>::<span class="ident">Param</span>,
+    <span class="ident">init_grad</span>: <span class="ident">P</span>,
     <span class="doccomment">/// Search direction (builder)</span>
-    <span class="ident">search_direction</span>: <span class="ident">O</span>::<span class="ident">Param</span>,
+    <span class="ident">search_direction</span>: <span class="ident">P</span>,
     <span class="doccomment">/// Search direction in 1D</span>
     <span class="ident">dginit</span>: <span class="ident">f64</span>,
-    <span class="doccomment">/// base</span>
-    <span class="ident">base</span>: <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
-{
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Constructor</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Parameters:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `operator`: operator</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">operator</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">HagerZhangLineSearch</span> {
             <span class="ident">delta</span>: <span class="number">0.1</span>,
             <span class="ident">sigma</span>: <span class="number">0.9</span>,
@@ -874,27 +688,27 @@
             <span class="ident">best_x</span>: <span class="number">0.0</span>,
             <span class="ident">best_f</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>,
             <span class="ident">best_g</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
-            <span class="ident">init_param_b</span>: <span class="prelude-val">None</span>,
-            <span class="ident">finit_b</span>: <span class="prelude-val">None</span>,
-            <span class="ident">init_grad_b</span>: <span class="prelude-val">None</span>,
             <span class="ident">search_direction_b</span>: <span class="prelude-val">None</span>,
-            <span class="ident">init_param</span>: <span class="ident">O</span>::<span class="ident">Param</span>::<span class="ident">default</span>(),
-            <span class="ident">init_grad</span>: <span class="ident">O</span>::<span class="ident">Param</span>::<span class="ident">default</span>(),
-            <span class="ident">search_direction</span>: <span class="ident">O</span>::<span class="ident">Param</span>::<span class="ident">default</span>(),
+            <span class="ident">init_param</span>: <span class="ident">P</span>::<span class="ident">default</span>(),
+            <span class="ident">init_grad</span>: <span class="ident">P</span>::<span class="ident">default</span>(),
+            <span class="ident">search_direction</span>: <span class="ident">P</span>::<span class="ident">default</span>(),
             <span class="ident">dginit</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
             <span class="ident">finit</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>,
-            <span class="ident">base</span>: <span class="ident">ArgminBase</span>::<span class="ident">new</span>(<span class="ident">operator</span>, <span class="ident">O</span>::<span class="ident">Param</span>::<span class="ident">default</span>()),
         }
     }
+}
 
-    <span class="doccomment">/// set current gradient value</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_cur_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="ident">O</span>::<span class="ident">Param</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">set_cur_grad</span>(<span class="ident">grad</span>);
-        <span class="self">self</span>
-    }
-
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">P</span>: <span class="ident">Clone</span>
+        <span class="op">+</span> <span class="ident">Default</span>
+        <span class="op">+</span> <span class="ident">Serialize</span>
+        <span class="op">+</span> <span class="ident">DeserializeOwned</span>
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span>, <span class="ident">P</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
+{
     <span class="doccomment">/// set delta</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_delta</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delta</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: delta must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
@@ -912,7 +726,7 @@
     }
 
     <span class="doccomment">/// set sigma</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sigma</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sigma</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sigma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sigma</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">sigma</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">delta</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: sigma must be &gt;= delta.&quot;</span>.<span class="ident">to_string</span>(),
@@ -930,7 +744,7 @@
     }
 
     <span class="doccomment">/// set epsilon</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_epsilon</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">epsilon</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">epsilon</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">epsilon</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">epsilon</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: epsilon must be &gt;= 0.0.&quot;</span>.<span class="ident">to_string</span>(),
@@ -942,7 +756,7 @@
     }
 
     <span class="doccomment">/// set theta</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_theta</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">theta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">theta</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">theta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">theta</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: theta must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
@@ -960,7 +774,7 @@
     }
 
     <span class="doccomment">/// set gamma</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_gamma</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: gamma must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
@@ -978,7 +792,7 @@
     }
 
     <span class="doccomment">/// set eta</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_eta</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eta</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">eta</span> <span class="op">&lt;=</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: eta must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
@@ -990,11 +804,7 @@
     }
 
     <span class="doccomment">/// set alpha limits</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_alpha_min_max</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">alpha_min</span>: <span class="ident">f64</span>,
-        <span class="ident">alpha_max</span>: <span class="ident">f64</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alpha</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha_min</span>: <span class="ident">f64</span>, <span class="ident">alpha_max</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">alpha_min</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: alpha_min must be &gt;= 0.0.&quot;</span>.<span class="ident">to_string</span>(),
@@ -1012,8 +822,9 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">update</span>(
+    <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         (<span class="ident">a_x</span>, <span class="ident">a_f</span>, <span class="ident">a_g</span>): <span class="ident">Triplet</span>,
         (<span class="ident">b_x</span>, <span class="ident">b_f</span>, <span class="ident">b_g</span>): <span class="ident">Triplet</span>,
         (<span class="ident">c_x</span>, <span class="ident">c_f</span>, <span class="ident">c_g</span>): <span class="ident">Triplet</span>,
@@ -1042,8 +853,8 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bh_x</span> <span class="op">=</span> <span class="ident">c_x</span>;
             <span class="kw">loop</span> {
                 <span class="kw">let</span> <span class="ident">d_x</span> <span class="op">=</span> (<span class="number">1.0</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">theta</span>) <span class="op">*</span> <span class="ident">ah_x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">theta</span> <span class="op">*</span> <span class="ident">bh_x</span>;
-                <span class="kw">let</span> <span class="ident">d_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">d_x</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">d_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">d_x</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">d_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">op</span>, <span class="ident">d_x</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">d_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">op</span>, <span class="ident">d_x</span>)<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="ident">d_g</span> <span class="op">&gt;=</span> <span class="number">0.0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(((<span class="ident">ah_x</span>, <span class="ident">ah_f</span>, <span class="ident">ah_g</span>), (<span class="ident">d_x</span>, <span class="ident">d_f</span>, <span class="ident">d_g</span>)));
                 }
@@ -1071,19 +882,20 @@
     }
 
     <span class="doccomment">/// double secant step</span>
-    <span class="kw">fn</span> <span class="ident">secant2</span>(
+    <span class="kw">fn</span> <span class="ident">secant2</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         (<span class="ident">a_x</span>, <span class="ident">a_f</span>, <span class="ident">a_g</span>): <span class="ident">Triplet</span>,
         (<span class="ident">b_x</span>, <span class="ident">b_f</span>, <span class="ident">b_g</span>): <span class="ident">Triplet</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Triplet</span>, <span class="ident">Triplet</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// S1</span>
         <span class="kw">let</span> <span class="ident">c_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">secant</span>(<span class="ident">a_x</span>, <span class="ident">a_g</span>, <span class="ident">b_x</span>, <span class="ident">b_g</span>);
-        <span class="kw">let</span> <span class="ident">c_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">c_x</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">c_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">c_x</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">c_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">op</span>, <span class="ident">c_x</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">c_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">op</span>, <span class="ident">c_x</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c_bar_x</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.0</span>;
 
         <span class="kw">let</span> ((<span class="ident">aa_x</span>, <span class="ident">aa_f</span>, <span class="ident">aa_g</span>), (<span class="ident">bb_x</span>, <span class="ident">bb_f</span>, <span class="ident">bb_g</span>)) <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">update</span>((<span class="ident">a_x</span>, <span class="ident">a_f</span>, <span class="ident">a_g</span>), (<span class="ident">b_x</span>, <span class="ident">b_f</span>, <span class="ident">b_g</span>), (<span class="ident">c_x</span>, <span class="ident">c_f</span>, <span class="ident">c_g</span>))<span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">update</span>(<span class="ident">op</span>, (<span class="ident">a_x</span>, <span class="ident">a_f</span>, <span class="ident">a_g</span>), (<span class="ident">b_x</span>, <span class="ident">b_f</span>, <span class="ident">b_g</span>), (<span class="ident">c_x</span>, <span class="ident">c_f</span>, <span class="ident">c_g</span>))<span class="question-mark">?</span>;
 
         <span class="comment">// S2</span>
         <span class="kw">if</span> (<span class="ident">c_x</span> <span class="op">-</span> <span class="ident">bb_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span> {
@@ -1097,10 +909,11 @@
 
         <span class="comment">// S4</span>
         <span class="kw">if</span> (<span class="ident">c_x</span> <span class="op">-</span> <span class="ident">aa_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span> <span class="op">||</span> (<span class="ident">c_x</span> <span class="op">-</span> <span class="ident">bb_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span> {
-            <span class="kw">let</span> <span class="ident">c_bar_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">c_bar_x</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">c_bar_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">c_bar_x</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">c_bar_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">op</span>, <span class="ident">c_bar_x</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">c_bar_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">op</span>, <span class="ident">c_bar_x</span>)<span class="question-mark">?</span>;
 
             <span class="kw">let</span> (<span class="ident">a_bar</span>, <span class="ident">b_bar</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">update</span>(
+                <span class="ident">op</span>,
                 (<span class="ident">aa_x</span>, <span class="ident">aa_f</span>, <span class="ident">aa_g</span>),
                 (<span class="ident">bb_x</span>, <span class="ident">bb_f</span>, <span class="ident">bb_g</span>),
                 (<span class="ident">c_bar_x</span>, <span class="ident">c_bar_f</span>, <span class="ident">c_bar_g</span>),
@@ -1111,14 +924,22 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">calc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">calc</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">alpha</span>: <span class="ident">f64</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">init_param</span>.<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="ident">alpha</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
-        <span class="self">self</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)
+        <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">calc_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">calc_grad</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">alpha</span>: <span class="ident">f64</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">init_param</span>.<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="ident">alpha</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>))
     }
 
@@ -1143,67 +964,51 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminLineSearch</span> <span class="kw">for</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">HagerZhangLineSearch</span>::<span class="ident">new</span>()
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="ident">ArgminLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class="ident">Clone</span>
+        <span class="op">+</span> <span class="ident">Default</span>
+        <span class="op">+</span> <span class="ident">Serialize</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span>, <span class="ident">P</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Set search direction</span>
-    <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">search_direction</span>: <span class="ident">O</span>::<span class="ident">Param</span>) {
+    <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">search_direction</span>: <span class="ident">P</span>) {
         <span class="self">self</span>.<span class="ident">search_direction_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">search_direction</span>);
     }
 
-    <span class="doccomment">/// Set initial parameter</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_parameter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="ident">O</span>::<span class="ident">Param</span>) {
-        <span class="self">self</span>.<span class="ident">init_param_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">param</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">set_cur_param</span>(<span class="ident">param</span>);
-    }
-
-    <span class="doccomment">/// Set initial cost function value</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init_cost</span>: <span class="ident">f64</span>) {
-        <span class="self">self</span>.<span class="ident">finit_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">init_cost</span>);
-    }
-
-    <span class="doccomment">/// Set initial gradient</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init_grad</span>: <span class="ident">O</span>::<span class="ident">Param</span>) {
-        <span class="self">self</span>.<span class="ident">init_grad_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">init_grad</span>);
-    }
-
-    <span class="doccomment">/// Calculate initial cost function value</span>
-    <span class="kw">fn</span> <span class="ident">calc_initial_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_param</span>();
-        <span class="self">self</span>.<span class="ident">finit_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>);
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Calculate initial cost function value</span>
-    <span class="kw">fn</span> <span class="ident">calc_initial_gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_param</span>();
-        <span class="self">self</span>.<span class="ident">init_grad_b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>);
-        <span class="prelude-val">Ok</span>(())
-    }
-
     <span class="doccomment">/// Set initial alpha value</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_alpha</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">set_init_alpha</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">c_x_init</span> <span class="op">=</span> <span class="ident">alpha</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ArgminIter</span> <span class="kw">for</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class="ident">Clone</span>
+        <span class="op">+</span> <span class="ident">Default</span>
+        <span class="op">+</span> <span class="ident">Serialize</span>
+        <span class="op">+</span> <span class="ident">DeserializeOwned</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span>, <span class="ident">P</span><span class="op">&gt;</span>,
 {
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">O</span>::<span class="ident">Param</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
-    <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">O</span>::<span class="ident">Hessian</span>;
+    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Hager-Zhang Line search&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">init</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sigma</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">delta</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;HagerZhangLineSearch: sigma must be &gt;= delta.&quot;</span>.<span class="ident">to_string</span>(),
@@ -1211,39 +1016,35 @@
             .<span class="ident">into</span>());
         }
 
-        <span class="self">self</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="macro">check_param</span><span class="macro">!</span>(
-            <span class="self">self</span>.<span class="ident">init_param_b</span>,
-            <span class="string">&quot;HagerZhangLineSearch: Initial parameter not initialized. Call `set_initial_parameter`.&quot;</span>
-        );
-
-        <span class="self">self</span>.<span class="ident">finit</span> <span class="op">=</span> <span class="macro">check_param</span><span class="macro">!</span>(
-            <span class="self">self</span>.<span class="ident">finit_b</span>,
-            <span class="string">&quot;HagerZhangLineSearch: Initial cost not computed. Call `set_initial_cost` or `calc_inital_cost`.&quot;</span>
-        );
-
-        <span class="self">self</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="macro">check_param</span><span class="macro">!</span>(
-            <span class="self">self</span>.<span class="ident">init_grad_b</span>,
-            <span class="string">&quot;HagerZhangLineSearch: Initial gradient not computed. Call `set_initial_grad` or `calc_inital_grad`.&quot;</span>
-        );
-
         <span class="self">self</span>.<span class="ident">search_direction</span> <span class="op">=</span> <span class="macro">check_param</span><span class="macro">!</span>(
             <span class="self">self</span>.<span class="ident">search_direction_b</span>,
             <span class="string">&quot;HagerZhangLineSearch: Search direction not initialized. Call `set_search_direction`.&quot;</span>
         );
+
+        <span class="self">self</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
+
+        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
+        <span class="self">self</span>.<span class="ident">finit</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cost</span> <span class="op">==</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span> {
+            <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">init_param</span>)<span class="question-mark">?</span>
+        } <span class="kw">else</span> {
+            <span class="ident">cost</span>
+        };
+
+        <span class="self">self</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap_or</span>(<span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">init_param</span>)<span class="question-mark">?</span>);
 
         <span class="self">self</span>.<span class="ident">a_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a_x_init</span>;
         <span class="self">self</span>.<span class="ident">b_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b_x_init</span>;
         <span class="self">self</span>.<span class="ident">c_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c_x_init</span>;
 
         <span class="kw">let</span> <span class="ident">at</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a_x</span>;
-        <span class="self">self</span>.<span class="ident">a_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">at</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">a_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">at</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">a_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">op</span>, <span class="ident">at</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">a_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">op</span>, <span class="ident">at</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">bt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b_x</span>;
-        <span class="self">self</span>.<span class="ident">b_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">bt</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">b_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">bt</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">b_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">op</span>, <span class="ident">bt</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">b_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">op</span>, <span class="ident">bt</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c_x</span>;
-        <span class="self">self</span>.<span class="ident">c_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">ct</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">c_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">ct</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">c_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">op</span>, <span class="ident">ct</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">c_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">op</span>, <span class="ident">ct</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">epsilon_k</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">epsilon</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">finit</span>.<span class="ident">abs</span>();
 
@@ -1253,29 +1054,31 @@
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">init_param</span>
             .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">best_x</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
-        <span class="self">self</span>.<span class="ident">set_best_param</span>(<span class="ident">new_param</span>);
         <span class="kw">let</span> <span class="ident">best_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">best_f</span>;
-        <span class="self">self</span>.<span class="ident">set_best_cost</span>(<span class="ident">best_f</span>);
 
-        <span class="prelude-val">Ok</span>(())
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ArgminIterData</span>::<span class="ident">new</span>().<span class="ident">param</span>(<span class="ident">new_param</span>).<span class="ident">cost</span>(<span class="ident">best_f</span>)))
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Param</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_iter</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// L1</span>
         <span class="kw">let</span> <span class="ident">aa</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">a_x</span>, <span class="self">self</span>.<span class="ident">a_f</span>, <span class="self">self</span>.<span class="ident">a_g</span>);
         <span class="kw">let</span> <span class="ident">bb</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">b_x</span>, <span class="self">self</span>.<span class="ident">b_f</span>, <span class="self">self</span>.<span class="ident">b_g</span>);
         <span class="kw">let</span> ((<span class="kw-2">mut</span> <span class="ident">at_x</span>, <span class="kw-2">mut</span> <span class="ident">at_f</span>, <span class="kw-2">mut</span> <span class="ident">at_g</span>), (<span class="kw-2">mut</span> <span class="ident">bt_x</span>, <span class="kw-2">mut</span> <span class="ident">bt_f</span>, <span class="kw-2">mut</span> <span class="ident">bt_g</span>)) <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">secant2</span>(<span class="ident">aa</span>, <span class="ident">bb</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">secant2</span>(<span class="ident">op</span>, <span class="ident">aa</span>, <span class="ident">bb</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// L2</span>
         <span class="kw">if</span> <span class="ident">bt_x</span> <span class="op">-</span> <span class="ident">at_x</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">b_x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">a_x</span>) {
             <span class="kw">let</span> <span class="ident">c_x</span> <span class="op">=</span> (<span class="ident">at_x</span> <span class="op">+</span> <span class="ident">bt_x</span>) <span class="op">/</span> <span class="number">2.0</span>;
             <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">init_param</span>.<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="ident">c_x</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
-            <span class="kw">let</span> <span class="ident">c_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">c_f</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">c_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>);
             <span class="kw">let</span> ((<span class="ident">an_x</span>, <span class="ident">an_f</span>, <span class="ident">an_g</span>), (<span class="ident">bn_x</span>, <span class="ident">bn_f</span>, <span class="ident">bn_g</span>)) <span class="op">=</span>
-                <span class="self">self</span>.<span class="ident">update</span>((<span class="ident">at_x</span>, <span class="ident">at_f</span>, <span class="ident">at_g</span>), (<span class="ident">bt_x</span>, <span class="ident">bt_f</span>, <span class="ident">bt_g</span>), (<span class="ident">c_x</span>, <span class="ident">c_f</span>, <span class="ident">c_g</span>))<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">update</span>(<span class="ident">op</span>, (<span class="ident">at_x</span>, <span class="ident">at_f</span>, <span class="ident">at_g</span>), (<span class="ident">bt_x</span>, <span class="ident">bt_f</span>, <span class="ident">bt_g</span>), (<span class="ident">c_x</span>, <span class="ident">c_f</span>, <span class="ident">c_g</span>))<span class="question-mark">?</span>;
             <span class="ident">at_x</span> <span class="op">=</span> <span class="ident">an_x</span>;
             <span class="ident">at_f</span> <span class="op">=</span> <span class="ident">an_f</span>;
             <span class="ident">at_g</span> <span class="op">=</span> <span class="ident">an_g</span>;
@@ -1296,8 +1099,23 @@
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">init_param</span>
             .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">best_x</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search_direction</span>);
-        <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">ArgminIterData</span>::<span class="ident">new</span>(<span class="ident">new_param</span>, <span class="self">self</span>.<span class="ident">best_f</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">out</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData</span>::<span class="ident">new</span>().<span class="ident">param</span>(<span class="ident">new_param</span>).<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">best_f</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">TerminationReason</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">best_f</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">delta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">best_x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span> {
+            <span class="kw">return</span> <span class="ident">TerminationReason</span>::<span class="ident">LineSearchConditionMet</span>;
+        }
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">best_g</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">sigma</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span> {
+            <span class="kw">return</span> <span class="ident">TerminationReason</span>::<span class="ident">LineSearchConditionMet</span>;
+        }
+        <span class="kw">if</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">delta</span> <span class="op">-</span> <span class="number">1.0</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span> <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">best_g</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">best_g</span> <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">sigma</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">best_f</span> <span class="op">&lt;=</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">epsilon_k</span>
+        {
+            <span class="kw">return</span> <span class="ident">TerminationReason</span>::<span class="ident">LineSearchConditionMet</span>;
+        }
+        <span class="ident">TerminationReason</span>::<span class="ident">NotTerminated</span>
     }
 }
 

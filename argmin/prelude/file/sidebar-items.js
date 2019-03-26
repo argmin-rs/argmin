@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["WriteToFileSerializer",""]],"struct":[["WriteToFile",""]]});
+initSidebarItems({"enum":[["WriteToFileSerializer",""]]});
