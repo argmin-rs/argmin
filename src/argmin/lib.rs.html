@@ -513,6 +513,8 @@
 <span id="513">513</span>
 <span id="514">514</span>
 <span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -586,7 +588,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! argmin = { git = &quot;https://github.com/argmin-rs/argmin.git&quot;, branch = &quot;master&quot;}</span>
+<span class="doccomment">//! argmin = &quot;0.2.0&quot;</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Optional features (recommended)</span>
@@ -595,9 +597,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! argmin = { git = &quot;https://github.com/argmin-rs/argmin.git&quot;,</span>
-<span class="doccomment">//!            branch = &quot;master&quot;,</span>
-<span class="doccomment">//!            features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;] }</span>
+<span class="doccomment">//! argmin = { version = &quot;0.2.0&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;] }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! These may become default features in the future. Without these features compilation to</span>
@@ -999,6 +999,10 @@
 <span class="doccomment">//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion</span>
 <span class="doccomment">//! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,</span>
 <span class="doccomment">//! without any additional terms or conditions.</span>
+<span class="comment">// //! argmin = { git = &quot;https://github.com/argmin-rs/argmin.git&quot;, branch = &quot;master&quot;}</span>
+<span class="comment">// //! argmin = { git = &quot;https://github.com/argmin-rs/argmin.git&quot;,</span>
+<span class="comment">// //!            branch = &quot;master&quot;,</span>
+<span class="comment">// //!            features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;] }</span>
 
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_attributes</span>)]</span>
