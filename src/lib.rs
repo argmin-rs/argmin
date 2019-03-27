@@ -70,7 +70,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = { git = "https://github.com/argmin-rs/argmin.git", branch = "master"}
+//! argmin = "0.2.0"
 //! ```
 //!
 //! ## Optional features (recommended)
@@ -79,9 +79,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = { git = "https://github.com/argmin-rs/argmin.git",
-//!            branch = "master",
-//!            features = ["ctrlc", "ndarrayl"] }
+//! argmin = { version = "0.2.0", features = ["ctrlc", "ndarrayl"] }
 //! ```
 //!
 //! These may become default features in the future. Without these features compilation to
@@ -483,6 +481,10 @@
 //! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
 //! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
 //! without any additional terms or conditions.
+// //! argmin = { git = "https://github.com/argmin-rs/argmin.git", branch = "master"}
+// //! argmin = { git = "https://github.com/argmin-rs/argmin.git",
+// //!            branch = "master",
+// //!            features = ["ctrlc", "ndarrayl"] }
 
 #![warn(missing_docs)]
 #![allow(unused_attributes)]
