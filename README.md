@@ -10,7 +10,7 @@ you encounter. This crate is looking for contributors!
 
 NOTE: This is the documentation of the development version of argmin. If you are using a version
 available on [crates.io](https://crates.io/crates/argmin) please have a look at the correspoding
-[documentation](https://docs.rs/argmin/0.1.8/argmin/).
+[documentation](https://docs.rs/argmin/latest/argmin/).
 
 ## Design goals
 
