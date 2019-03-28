@@ -51,11 +51,7 @@ impl std::default::Default for SATempFunc {
 
 /// Simulated Annealing
 ///
-/// # Example
-///
-// /// ```rust
-// /// TODO
-// /// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/simulatedannealing.rs)
 ///
 /// # References
 ///

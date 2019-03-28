@@ -17,11 +17,7 @@ use std::fmt::Debug;
 
 /// BFGS method
 ///
-/// # Example
-///
-// /// ```rust
-// /// TODO
-// /// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/bfgs.rs)
 ///
 /// # References:
 ///

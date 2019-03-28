@@ -15,11 +15,7 @@ use serde::{Deserialize, Serialize};
 /// The Backtracking line search is a simple method to find a step length which obeys the Armijo
 /// (sufficient decrease) condition.
 ///
-/// # Example
-///
-// /// ```rust
-// /// TODO
-// /// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/backtracking.rs)
 ///
 /// # References:
 ///

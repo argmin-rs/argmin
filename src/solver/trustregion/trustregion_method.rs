@@ -29,11 +29,7 @@ use std::fmt::Debug;
 /// This subproblem can be set via `set_subproblem(...)`. If this is not provided, it will default
 /// to the Steihaug method.
 ///
-/// # Example
-///
-// /// ```rust
-// /// TODO
-// /// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/trustregion_nd.rs)
 ///
 /// # References:
 ///

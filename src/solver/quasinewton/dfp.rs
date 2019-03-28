@@ -16,11 +16,7 @@ use serde::{Deserialize, Serialize};
 
 /// DFP method
 ///
-/// # Example
-///
-// /// ```rust
-// /// TODO
-// /// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/dfp.rs)
 ///
 /// # References:
 ///

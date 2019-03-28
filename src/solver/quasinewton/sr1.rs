@@ -17,11 +17,7 @@ use std::fmt::Debug;
 
 /// SR1 method
 ///
-/// # Example
-///
-// /// ```rust
-// /// TODO
-// /// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/sr1.rs)
 ///
 /// # References:
 ///

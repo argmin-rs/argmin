@@ -25,11 +25,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// `x_{k+1} = x_k - omega * \nabla f(x_k)`
 ///
-/// # Example
-///
-// /// ```rust
-// /// TODO
-// /// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/landweber.rs)
 ///
 /// # References
 ///

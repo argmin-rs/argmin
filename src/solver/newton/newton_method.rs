@@ -17,11 +17,7 @@ use std::default::Default;
 /// Newton's method iteratively finds the stationary points of a function f by using a second order
 /// approximation of f at the current point.
 ///
-/// # Example
-///
-// /// ```rust
-// /// TODO
-// /// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/newton.rs)
 ///
 /// # References:
 ///

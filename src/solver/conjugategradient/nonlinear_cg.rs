@@ -21,11 +21,7 @@ use std::default::Default;
 /// The nonlinear conjugate gradient is a generalization of the conjugate gradient method for
 /// nonlinear optimization problems.
 ///
-/// # Example
-///
-// /// ```rust
-// /// TODO
-// /// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/nonlinear_cg.rs)
 ///
 /// # References:
 ///
