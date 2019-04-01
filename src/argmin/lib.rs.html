@@ -870,7 +870,7 @@
 <span class="doccomment">//! #     let operator = Rosenbrock {};</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! #     let iters = 35;</span>
-<span class="doccomment">//! #     let solver = Landweber::new(0.001)?;</span>
+<span class="doccomment">//! #     let solver = Landweber::new(0.001);</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! let res = Executor::from_checkpoint(&quot;.checkpoints/optim.arg&quot;)</span>
 <span class="doccomment">//!     .unwrap_or(Executor::new(operator, solver, init_param))</span>
@@ -925,8 +925,8 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! impl Landweber {</span>
 <span class="doccomment">//!     /// Constructor</span>
-<span class="doccomment">//!     pub fn new(omega: f64) -&gt; Result&lt;Self, Error&gt; {</span>
-<span class="doccomment">//!         Ok(Landweber { omega })</span>
+<span class="doccomment">//!     pub fn new(omega: f64) -&gt; Self {</span>
+<span class="doccomment">//!         Landweber { omega }</span>
 <span class="doccomment">//!     }</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
