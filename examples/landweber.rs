@@ -35,7 +35,7 @@ fn run() -> Result<(), Error> {
     let operator = Rosenbrock {};
 
     let iters = 10;
-    let solver = Landweber::new(0.001)?;
+    let solver = Landweber::new(0.001);
 
     let res = Executor::new(operator, solver, init_param)
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)

@@ -352,7 +352,7 @@
 //! #     let operator = Rosenbrock {};
 //! #
 //! #     let iters = 35;
-//! #     let solver = Landweber::new(0.001)?;
+//! #     let solver = Landweber::new(0.001);
 //! #
 //! let res = Executor::from_checkpoint(".checkpoints/optim.arg")
 //!     .unwrap_or(Executor::new(operator, solver, init_param))
@@ -407,8 +407,8 @@
 //!
 //! impl Landweber {
 //!     /// Constructor
-//!     pub fn new(omega: f64) -> Result<Self, Error> {
-//!         Ok(Landweber { omega })
+//!     pub fn new(omega: f64) -> Self {
+//!         Landweber { omega }
 //!     }
 //! }
 //!

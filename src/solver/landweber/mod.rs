@@ -40,8 +40,8 @@ pub struct Landweber {
 
 impl Landweber {
     /// Constructor
-    pub fn new(omega: f64) -> Result<Self, Error> {
-        Ok(Landweber { omega })
+    pub fn new(omega: f64) -> Self {
+        Landweber { omega }
     }
 }
 
