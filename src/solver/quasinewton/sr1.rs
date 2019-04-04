@@ -15,7 +15,7 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-/// SR1 method
+/// SR1 method (broken!)
 ///
 /// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/sr1.rs)
 ///
@@ -127,17 +127,24 @@ where
 
         let sk = xk1.sub(&param);
 
-        let skmhkyk = sk.sub(&self.inv_hessian.dot(&yk));
+        let skmhkyk: O::Param = sk.sub(&self.inv_hessian.dot(&yk));
         let a: O::Hessian = skmhkyk.dot(&skmhkyk);
         let b: f64 = skmhkyk.dot(&yk);
 
-        let sk_norm: f64 = sk.dot(&sk);
+        let yk_norm: f64 = yk.dot(&yk);
         let skmhkyk_norm: f64 = skmhkyk.dot(&skmhkyk);
-        if b.abs() >= 10e-8 * sk_norm * skmhkyk_norm {
+        let hessian_updated = if b.abs() >= 1e-8 * yk_norm.sqrt() * skmhkyk_norm.sqrt() {
             self.inv_hessian = self.inv_hessian.add(&a.mul(&(1.0 / b)));
-        }
+            true
+        } else {
+            false
+        };
 
-        Ok(ArgminIterData::new().param(xk1).cost(next_cost).grad(grad))
+        Ok(ArgminIterData::new()
+            .param(xk1)
+            .cost(next_cost)
+            .grad(grad)
+            .kv(make_kv!["denom" => b; "hessian_update" => hessian_updated;]))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
