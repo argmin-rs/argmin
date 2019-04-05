@@ -149,18 +149,25 @@ where
 
         let yk_norm: f64 = yk.dot(&yk);
         let skmhkyk_norm: f64 = skmhkyk.dot(&skmhkyk);
-        let hessian_updated = if b.abs() >= self.r * yk_norm.sqrt() * skmhkyk_norm.sqrt() {
+        let hessian_update = b.abs() >= self.r * yk_norm.sqrt() * skmhkyk_norm.sqrt();
+
+        // a try to see whether the skipping rule based on B_k makes any difference (seems not)
+        // let bk = self.inv_hessian.inv()?;
+        // let ykmbksk = yk.sub(&bk.dot(&sk));
+        // let tmp: f64 = sk.dot(&ykmbksk);
+        // let sksk: f64 = sk.dot(&sk);
+        // let fuckit: f64 = ykmbksk.dot(&ykmbksk);
+        // let hessian_update = tmp.abs() >= self.r * sksk.sqrt() * fuckit.sqrt();
+
+        if hessian_update {
             self.inv_hessian = self.inv_hessian.add(&a.mul(&(1.0 / b)));
-            true
-        } else {
-            false
-        };
+        }
 
         Ok(ArgminIterData::new()
             .param(xk1)
             .cost(next_cost)
             .grad(grad)
-            .kv(make_kv!["denom" => b; "hessian_update" => hessian_updated;]))
+            .kv(make_kv!["denom" => b; "hessian_update" => hessian_update;]))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
