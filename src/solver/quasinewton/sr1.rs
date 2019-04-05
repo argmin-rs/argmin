@@ -67,7 +67,6 @@ where
         + ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
         + ArgminNorm<f64>
         + ArgminMul<f64, O::Param>,
     O::Hessian: Debug
@@ -79,9 +78,7 @@ where
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
-        + ArgminMul<f64, O::Hessian>
-        + ArgminTranspose
-        + ArgminEye,
+        + ArgminMul<f64, O::Hessian>,
     L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
     const NAME: &'static str = "SR1";
@@ -147,17 +144,15 @@ where
         let a: O::Hessian = skmhkyk.dot(&skmhkyk);
         let b: f64 = skmhkyk.dot(&yk);
 
-        let yk_norm: f64 = yk.dot(&yk);
-        let skmhkyk_norm: f64 = skmhkyk.dot(&skmhkyk);
-        let hessian_update = b.abs() >= self.r * yk_norm.sqrt() * skmhkyk_norm.sqrt();
+        let hessian_update = b.abs() >= self.r * yk.norm() * skmhkyk.norm();
 
         // a try to see whether the skipping rule based on B_k makes any difference (seems not)
         // let bk = self.inv_hessian.inv()?;
         // let ykmbksk = yk.sub(&bk.dot(&sk));
         // let tmp: f64 = sk.dot(&ykmbksk);
         // let sksk: f64 = sk.dot(&sk);
-        // let fuckit: f64 = ykmbksk.dot(&ykmbksk);
-        // let hessian_update = tmp.abs() >= self.r * sksk.sqrt() * fuckit.sqrt();
+        // let blah: f64 = ykmbksk.dot(&ykmbksk);
+        // let hessian_update = tmp.abs() >= self.r * sksk.sqrt() * blah.sqrt();
 
         if hessian_update {
             self.inv_hessian = self.inv_hessian.add(&a.mul(&(1.0 / b)));
