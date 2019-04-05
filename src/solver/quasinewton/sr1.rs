@@ -25,6 +25,8 @@ use std::fmt::Debug;
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Serialize, Deserialize)]
 pub struct SR1<L, H> {
+    /// parameter for skipping rule
+    r: f64,
     /// Inverse Hessian
     inv_hessian: H,
     /// line search
@@ -35,8 +37,22 @@ impl<L, H> SR1<L, H> {
     /// Constructor
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         SR1 {
+            r: 1e-8,
             inv_hessian: init_inverse_hessian,
             linesearch,
+        }
+    }
+
+    /// Set r
+    pub fn r(mut self, r: f64) -> Result<Self, Error> {
+        if r < 0.0 || r > 1.0 {
+            Err(ArgminError::InvalidParameter {
+                text: "SR1: r must be between 0 and 1.".to_string(),
+            }
+            .into())
+        } else {
+            self.r = r;
+            Ok(self)
         }
     }
 }
@@ -133,7 +149,7 @@ where
 
         let yk_norm: f64 = yk.dot(&yk);
         let skmhkyk_norm: f64 = skmhkyk.dot(&skmhkyk);
-        let hessian_updated = if b.abs() >= 1e-8 * yk_norm.sqrt() * skmhkyk_norm.sqrt() {
+        let hessian_updated = if b.abs() >= self.r * yk_norm.sqrt() * skmhkyk_norm.sqrt() {
             self.inv_hessian = self.inv_hessian.add(&a.mul(&(1.0 / b)));
             true
         } else {
