@@ -134,8 +134,12 @@ where
         state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
-        let grad = state.get_grad().unwrap_or(op.gradient(&param)?);
-        let hessian = state.get_hessian().unwrap_or(op.hessian(&param)?);
+        let grad = state
+            .get_grad()
+            .unwrap_or_else(|| op.gradient(&param).unwrap());
+        let hessian = state
+            .get_hessian()
+            .unwrap_or_else(|| op.hessian(&param).unwrap());
 
         self.subproblem.set_radius(self.radius);
 

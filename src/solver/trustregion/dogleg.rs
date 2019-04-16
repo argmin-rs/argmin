@@ -55,8 +55,12 @@ where
         state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
-        let g = state.get_grad().unwrap_or(op.gradient(&param)?);
-        let h = state.get_hessian().unwrap_or(op.hessian(&param)?);;
+        let g = state
+            .get_grad()
+            .unwrap_or_else(|| op.gradient(&param).unwrap());
+        let h = state
+            .get_hessian()
+            .unwrap_or_else(|| op.hessian(&param).unwrap());;
         let pstar;
 
         // pb = -H^-1g

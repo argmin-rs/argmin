@@ -109,6 +109,7 @@ where
         + ArgminDot<O::Param, f64>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminNorm<f64>
+        + ArgminZeroLike
         + ArgminMul<f64, O::Param>,
     O::Hessian: Debug
         + Clone
@@ -132,17 +133,15 @@ where
         let param = state.get_param();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
+        let hessian = state
+            .get_hessian()
+            .unwrap_or_else(|| op.hessian(&param).unwrap());
         Ok(Some(
             ArgminIterData::new()
-                .param(param.clone())
+                .param(param)
                 .cost(cost)
                 .grad(grad)
-                .hessian(
-                    self.init_hessian
-                        .as_ref()
-                        .unwrap_or(&op.hessian(&param)?)
-                        .clone(),
-                ),
+                .hessian(hessian),
         ))
     }
 
@@ -153,7 +152,9 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         let xk = state.get_param();
         let cost = state.get_cost();
-        let prev_grad = state.get_grad().unwrap_or(op.gradient(&xk)?);
+        let prev_grad = state
+            .get_grad()
+            .unwrap_or_else(|| op.gradient(&xk).unwrap());
         let hessian: O::Hessian = state.get_hessian().unwrap();
 
         self.subproblem.set_radius(self.radius);
@@ -169,7 +170,8 @@ where
         } = Executor::new(
             OpWrapper::new_from_op(&op),
             self.subproblem.clone(),
-            xk.clone(),
+            // xk.clone(),
+            xk.zero_like(),
         )
         .grad(prev_grad.clone())
         .hessian(hessian.clone())
@@ -221,38 +223,25 @@ where
             hessian
         };
 
-        // let p = self.inv_hessian.dot(&prev_grad).mul(&(-1.0));
-
-        // let grad = op.gradient(&xk1)?;
-        // let yk = grad.sub(&prev_grad);
-        //
-        // let sk = xk1.sub(&param);
-        //
-        // let skmhkyk: O::Param = sk.sub(&self.inv_hessian.dot(&yk));
-        // let a: O::Hessian = skmhkyk.dot(&skmhkyk);
-        // let b: f64 = skmhkyk.dot(&yk);
-        //
-        // let hessian_update = b.abs() >= self.r * yk.norm() * skmhkyk.norm();
-        //
-        // if hessian_update {
-        //     self.inv_hessian = self.inv_hessian.add(&a.mul(&(1.0 / b)));
-        // }
-
         Ok(ArgminIterData::new()
             .param(xk1)
             .cost(fk1)
             .grad(dfk1)
             .hessian(hessian)
-            .kv(make_kv!["hessian_update" => hessian_update;]))
+            .kv(make_kv!["ared" => ared;
+                         "pred" => pred;
+                         "ap" => ap;
+                         "radius" => self.radius;
+                         "hessian_update" => hessian_update;]))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if state.get_grad().unwrap().norm() < std::f64::EPSILON.sqrt() {
             return TerminationReason::TargetPrecisionReached;
         }
-        if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON {
-            return TerminationReason::NoChangeInCost;
-        }
+        // if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON {
+        //     return TerminationReason::NoChangeInCost;
+        // }
         TerminationReason::NotTerminated
     }
 }
@@ -261,8 +250,9 @@ where
 mod tests {
     use super::*;
     use crate::send_sync_test;
+    use crate::solver::trustregion::CauchyPoint;
 
     type Operator = MinimalNoOperator;
 
-    send_sync_test!(sr1, SR1TrustRegion<Operator>);
+    send_sync_test!(sr1, SR1TrustRegion<Operator, CauchyPoint>);
 }

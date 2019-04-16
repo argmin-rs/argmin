@@ -162,7 +162,9 @@ where
         state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         let param = state.get_param();
-        self.r = state.get_grad().unwrap_or(op.gradient(&param)?);
+        self.r = state
+            .get_grad()
+            .unwrap_or_else(|| op.gradient(&param).unwrap());
 
         self.r_0_norm = self.r.norm();
         self.rtr = self.r.dot(&self.r);
@@ -186,8 +188,12 @@ where
         state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
-        let grad = state.get_grad().unwrap_or(op.gradient(&param)?);
-        let h = state.get_hessian().unwrap_or(op.hessian(&param)?);
+        let grad = state
+            .get_grad()
+            .unwrap_or_else(|| op.gradient(&param).unwrap());
+        let h = state
+            .get_hessian()
+            .unwrap_or_else(|| op.hessian(&param).unwrap());
         let dhd = self.d.weighted_dot(&h, &self.d);
 
         // Current search direction d is a direction of zero curvature or negative curvature
