@@ -39,7 +39,8 @@ impl Dogleg {
 impl<O> Solver<O> for Dogleg
 where
     O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
+    O::Param: std::fmt::Debug
+        + ArgminMul<f64, O::Param>
         + ArgminWeightedDot<O::Param, f64, O::Hessian>
         + ArgminNorm<f64>
         + ArgminDot<O::Param, f64>
@@ -71,6 +72,7 @@ where
         } else {
             // pu = - (g^Tg)/(g^THg) * g
             let pu = g.mul(&(-g.dot(&g) / g.weighted_dot(&h, &g)));
+            println!("pb: {:?}, pu: {:?}", pb, pu);
 
             let utu = pu.dot(&pu);
             let btb = pb.dot(&pb);
@@ -89,9 +91,13 @@ where
             let mut tau = tau1.max(tau2);
 
             // if calculation failed because t3 is too small, use the third option
-            if tau.is_nan() {
+            // println!("t1: {:?}", tau);
+            if tau.is_nan() || tau.is_infinite() {
                 tau = (delta + btb - 2.0 * utu) / (btb - utu);
+                // println!("btb: {:?}", btb);
+                // println!("utu: {:?}", utu);
             }
+            // println!("t2: {:?}", tau);
 
             if tau >= 0.0 && tau < 1.0 {
                 pstar = pu.mul(&tau);
@@ -99,6 +105,7 @@ where
                 // pstar = pu + (tau - 1.0) * (pb - pu)
                 pstar = pu.add(&pb.sub(&pu).mul(&(tau - 1.0)));
             } else {
+                // println!("{:?}", tau);
                 return Err(ArgminError::ImpossibleError {
                     text: "tau is bigger than 2, this is not supposed to happen.".to_string(),
                 }

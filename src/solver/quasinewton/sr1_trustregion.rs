@@ -33,8 +33,8 @@ pub struct SR1TrustRegion<B, R> {
     subproblem: R,
     /// Radius
     radius: f64,
-    /// Maximum Radius
-    max_radius: f64,
+    // /// Maximum Radius
+    // max_radius: f64,
     /// eta \in [0, 1/4)
     eta: f64,
 }
@@ -47,7 +47,7 @@ impl<B, R> SR1TrustRegion<B, R> {
             init_hessian: None,
             subproblem,
             radius: 1.0,
-            max_radius: 100.0,
+            // max_radius: 100.0,
             eta: 0.5 * 1e-3,
         }
     }
@@ -78,11 +78,11 @@ impl<B, R> SR1TrustRegion<B, R> {
         self
     }
 
-    /// Set maximum radius
-    pub fn max_radius(mut self, max_radius: f64) -> Self {
-        self.max_radius = max_radius.abs();
-        self
-    }
+    // /// Set maximum radius
+    // pub fn max_radius(mut self, max_radius: f64) -> Self {
+    //     self.max_radius = max_radius.abs();
+    //     self
+    // }
 
     /// Set eta
     pub fn eta(mut self, eta: f64) -> Result<Self, Error> {
@@ -161,18 +161,13 @@ where
 
         let ArgminResult {
             operator: sub_op,
-            state:
-                IterState {
-                    param: sk,
-                    // cost: next_cost,
-                    ..
-                },
+            state: IterState { param: sk, .. },
         } = Executor::new(
             OpWrapper::new_from_op(&op),
             self.subproblem.clone(),
-            // xk.clone(),
-            xk.zero_like(),
+            xk.clone(),
         )
+        .cost(cost)
         .grad(prev_grad.clone())
         .hessian(hessian.clone())
         .ctrlc(false)
@@ -236,7 +231,8 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if state.get_grad().unwrap().norm() < std::f64::EPSILON.sqrt() {
+        /*std::f64::EPSILON.sqrt()*/
+        if state.get_grad().unwrap().norm() < 1e-3 {
             return TerminationReason::TargetPrecisionReached;
         }
         // if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON {
