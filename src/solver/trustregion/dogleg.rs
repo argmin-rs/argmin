@@ -72,7 +72,7 @@ where
         } else {
             // pu = - (g^Tg)/(g^THg) * g
             let pu = g.mul(&(-g.dot(&g) / g.weighted_dot(&h, &g)));
-            println!("pb: {:?}, pu: {:?}", pb, pu);
+            // println!("pb: {:?}, pu: {:?}", pb, pu);
 
             let utu = pu.dot(&pu);
             let btb = pb.dot(&pb);

@@ -102,7 +102,7 @@ where
         let tau2 = (t1 - c) / b;
         let mut t = vec![tau1, tau2];
         // Maybe calculating tau3 should only be done if b is close to zero?
-        if b.abs() < 2.0 * std::f64::EPSILON || tau1.is_nan() || tau2.is_nan() {
+        if tau1.is_nan() || tau2.is_nan() || tau1.is_infinite() || tau2.is_infinite() {
             let tau3 = (delta - a) / (2.0 * c);
             t.push(tau3);
         }
@@ -113,12 +113,12 @@ where
                 .iter()
                 .cloned()
                 .enumerate()
-                .filter(|(_, tau)| !tau.is_nan() && filter_func(*tau))
+                .filter(|(_, tau)| (!tau.is_nan() || !tau.is_infinite()) && filter_func(*tau))
                 .map(|(i, tau)| {
                     let p = self.p.add(&self.d.mul(&tau));
                     (i, self.eval_m(&p, g, h))
                 })
-                .filter(|(_, m)| !m.is_nan())
+                .filter(|(_, m)| !m.is_nan() || !m.is_infinite())
                 .collect::<Vec<(usize, f64)>>();
             v.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
             v
@@ -127,7 +127,7 @@ where
                 .iter()
                 .cloned()
                 .enumerate()
-                .filter(|(_, tau)| !tau.is_nan() && filter_func(*tau))
+                .filter(|(_, tau)| (!tau.is_nan() || !tau.is_infinite()) && filter_func(*tau))
                 .collect::<Vec<(usize, f64)>>();
             v.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
             v
@@ -158,13 +158,12 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        _op: &mut OpWrapper<O>,
         state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let param = state.get_param();
-        self.r = state
-            .get_grad()
-            .unwrap_or_else(|| op.gradient(&param).unwrap());
+        // let param = state.get_param();
+        self.r = state.get_grad().unwrap();
+        // .unwrap_or_else(|| op.gradient(&param).unwrap());
 
         self.r_0_norm = self.r.norm();
         self.rtr = self.r.dot(&self.r);
@@ -184,16 +183,11 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        _op: &mut OpWrapper<O>,
         state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
-        let grad = state
-            .get_grad()
-            .unwrap_or_else(|| op.gradient(&param).unwrap());
-        let h = state
-            .get_hessian()
-            .unwrap_or_else(|| op.hessian(&param).unwrap());
+        let grad = state.get_grad().unwrap();
+        let h = state.get_hessian().unwrap();
         let dhd = self.d.weighted_dot(&h, &self.d);
 
         // Current search direction d is a direction of zero curvature or negative curvature
@@ -225,12 +219,16 @@ where
 
         let rjtrj = r_n.dot(&r_n);
         let beta = rjtrj / self.rtr;
-        self.d = r_n.add(&self.d.mul(&beta));
+        self.d = r_n.mul(&-1.0).add(&self.d.mul(&beta));
         self.r = r_n;
         self.p = p_n;
         self.rtr = rjtrj;
 
-        Ok(ArgminIterData::new().param(self.p.clone()).cost(self.rtr))
+        Ok(ArgminIterData::new()
+            .param(self.p.clone())
+            .cost(self.rtr)
+            .grad(grad)
+            .hessian(h))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

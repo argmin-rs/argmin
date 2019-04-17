@@ -165,7 +165,8 @@ where
         } = Executor::new(
             OpWrapper::new_from_op(&op),
             self.subproblem.clone(),
-            xk.clone(),
+            // xk.clone(),
+            xk.zero_like(),
         )
         .cost(cost)
         .grad(prev_grad.clone())
