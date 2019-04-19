@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["LBFGS","L-BFGS method"]]});

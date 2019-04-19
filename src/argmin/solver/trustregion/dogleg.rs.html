@@ -127,6 +127,17 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -169,7 +180,8 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Dogleg</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
+    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Hessian</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
@@ -185,8 +197,12 @@
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap_or</span>(<span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>);
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_hessian</span>().<span class="ident">unwrap_or</span>(<span class="ident">op</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>);;
+        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">state</span>
+            .<span class="ident">get_grad</span>()
+            .<span class="ident">unwrap_or_else</span>(<span class="op">||</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>).<span class="ident">unwrap</span>());
+        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">state</span>
+            .<span class="ident">get_hessian</span>()
+            .<span class="ident">unwrap_or_else</span>(<span class="op">||</span> <span class="ident">op</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>).<span class="ident">unwrap</span>());;
         <span class="kw">let</span> <span class="ident">pstar</span>;
 
         <span class="comment">// pb = -H^-1g</span>
@@ -197,6 +213,7 @@
         } <span class="kw">else</span> {
             <span class="comment">// pu = - (g^Tg)/(g^THg) * g</span>
             <span class="kw">let</span> <span class="ident">pu</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="op">-</span><span class="ident">g</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>) <span class="op">/</span> <span class="ident">g</span>.<span class="ident">weighted_dot</span>(<span class="kw-2">&amp;</span><span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">g</span>)));
+            <span class="comment">// println!(&quot;pb: {:?}, pu: {:?}&quot;, pb, pu);</span>
 
             <span class="kw">let</span> <span class="ident">utu</span> <span class="op">=</span> <span class="ident">pu</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">pu</span>);
             <span class="kw">let</span> <span class="ident">btb</span> <span class="op">=</span> <span class="ident">pb</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">pb</span>);
@@ -215,9 +232,13 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tau</span> <span class="op">=</span> <span class="ident">tau1</span>.<span class="ident">max</span>(<span class="ident">tau2</span>);
 
             <span class="comment">// if calculation failed because t3 is too small, use the third option</span>
-            <span class="kw">if</span> <span class="ident">tau</span>.<span class="ident">is_nan</span>() {
+            <span class="comment">// println!(&quot;t1: {:?}&quot;, tau);</span>
+            <span class="kw">if</span> <span class="ident">tau</span>.<span class="ident">is_nan</span>() <span class="op">||</span> <span class="ident">tau</span>.<span class="ident">is_infinite</span>() {
                 <span class="ident">tau</span> <span class="op">=</span> (<span class="ident">delta</span> <span class="op">+</span> <span class="ident">btb</span> <span class="op">-</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">utu</span>) <span class="op">/</span> (<span class="ident">btb</span> <span class="op">-</span> <span class="ident">utu</span>);
+                <span class="comment">// println!(&quot;btb: {:?}&quot;, btb);</span>
+                <span class="comment">// println!(&quot;utu: {:?}&quot;, utu);</span>
             }
+            <span class="comment">// println!(&quot;t2: {:?}&quot;, tau);</span>
 
             <span class="kw">if</span> <span class="ident">tau</span> <span class="op">&gt;=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">tau</span> <span class="op">&lt;</span> <span class="number">1.0</span> {
                 <span class="ident">pstar</span> <span class="op">=</span> <span class="ident">pu</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">tau</span>);
@@ -225,6 +246,7 @@
                 <span class="comment">// pstar = pu + (tau - 1.0) * (pb - pu)</span>
                 <span class="ident">pstar</span> <span class="op">=</span> <span class="ident">pu</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">pb</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">pu</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">tau</span> <span class="op">-</span> <span class="number">1.0</span>)));
             } <span class="kw">else</span> {
+                <span class="comment">// println!(&quot;{:?}&quot;, tau);</span>
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">ImpossibleError</span> {
                     <span class="ident">text</span>: <span class="string">&quot;tau is bigger than 2, this is not supposed to happen.&quot;</span>.<span class="ident">to_string</span>(),
                 }

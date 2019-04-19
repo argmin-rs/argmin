@@ -106,7 +106,7 @@
 <span class="doccomment">/// [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first</span>
 <span class="doccomment">/// kind. Amer. J. Math. 73, 615–624</span>
 <span class="doccomment">/// [1] https://en.wikipedia.org/wiki/Landweber_iteration</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Landweber</span> {
     <span class="doccomment">/// omega</span>
     <span class="ident">omega</span>: <span class="ident">f64</span>,
