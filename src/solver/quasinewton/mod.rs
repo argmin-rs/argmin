@@ -16,10 +16,12 @@
 
 pub mod bfgs;
 pub mod dfp;
+pub mod lbfgs;
 pub mod sr1;
 pub mod sr1_trustregion;
 
 pub use self::bfgs::*;
 pub use self::dfp::*;
+pub use self::lbfgs::*;
 pub use self::sr1::*;
 pub use self::sr1_trustregion::*;
