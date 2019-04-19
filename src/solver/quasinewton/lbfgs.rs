@@ -180,5 +180,5 @@ mod tests {
 
     type Operator = MinimalNoOperator;
 
-    send_sync_test!(bfgs, BFGS<Operator, MoreThuenteLineSearch<Operator>>);
+    send_sync_test!(lbfgs, LBFGS<Operator, MoreThuenteLineSearch<Operator>>);
 }
