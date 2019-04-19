@@ -57,7 +57,10 @@ remain future plans.
   - [Newton-CG](https://argmin-rs.github.io/argmin/argmin/solver/newton/newton_cg/struct.NewtonCG.html)
 - [Quasi-Newton methods](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/index.html)
   - [BFGS](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/bfgs/struct.BFGS.html)
+  - [L-BFGS](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/lbfgs/struct.LBFGS.html)
   - [DFP](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/dfp/struct.DFP.html)
+  - [SR1](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/sr1/struct.SR1.html)
+  - [SR1-TrustRegion](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
 - [Landweber iteration](https://argmin-rs.github.io/argmin/argmin/solver/landweber/struct.Landweber.html)
 - [Simulated Annealing](https://argmin-rs.github.io/argmin/argmin/solver/simulatedannealing/struct.SimulatedAnnealing.html)
 
@@ -267,8 +270,8 @@ pub struct Landweber {
 
 impl Landweber {
     /// Constructor
-    pub fn new(omega: f64) -> Result<Self, Error> {
-        Ok(Landweber { omega })
+    pub fn new(omega: f64) -> Self {
+        Landweber { omega }
     }
 }
 

@@ -15,7 +15,7 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-/// SR1 Trust Region method (UNTESTED)
+/// SR1 Trust Region method
 ///
 /// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/sr1_trustregion.rs)
 ///

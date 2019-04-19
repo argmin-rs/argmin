@@ -60,7 +60,10 @@
 //!   - [Newton-CG](solver/newton/newton_cg/struct.NewtonCG.html)
 //! - [Quasi-Newton methods](solver/quasinewton/index.html)
 //!   - [BFGS](solver/quasinewton/bfgs/struct.BFGS.html)
+//!   - [L-BFGS](solver/quasinewton/lbfgs/struct.LBFGS.html)
 //!   - [DFP](solver/quasinewton/dfp/struct.DFP.html)
+//!   - [SR1](solver/quasinewton/sr1/struct.SR1.html)
+//!   - [SR1-TrustRegion](solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
 //!
