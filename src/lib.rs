@@ -11,9 +11,9 @@
 //! in Rust. It is at the moment potentially very buggy. Please use with care and report any bugs
 //! you encounter. This crate is looking for contributors!
 //!
-//! NOTE: This is the documentation of the development version of argmin. If you are using a version
-//! available on [crates.io](https://crates.io/crates/argmin) please have a look at the correspoding
-//! [documentation](https://docs.rs/argmin/latest/argmin/).
+//! [Documentation of most recent release](https://docs.rs/argmin/latest/argmin/)
+//!
+//! [Documentation of master](https://argmin-rs.github.io/argmin/argmin/)
 //!
 //! # Design goals
 //!
@@ -73,7 +73,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = "0.2.0"
+//! argmin = "0.2.1"
 //! ```
 //!
 //! ## Optional features (recommended)
@@ -82,7 +82,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = { version = "0.2.0", features = ["ctrlc", "ndarrayl"] }
+//! argmin = { version = "0.2.1", features = ["ctrlc", "ndarrayl"] }
 //! ```
 //!
 //! These may become default features in the future. Without these features compilation to
