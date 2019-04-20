@@ -2,9 +2,8 @@
 <p>This crate offers a (work in progress) numerical optimization toolbox/framework written entirely
 in Rust. It is at the moment potentially very buggy. Please use with care and report any bugs
 you encounter. This crate is looking for contributors!</p>
-<p>NOTE: This is the documentation of the development version of argmin. If you are using a version
-available on <a href="https://crates.io/crates/argmin">crates.io</a> please have a look at the correspoding
-<a href="https://docs.rs/argmin/latest/argmin/">documentation</a>.</p>
+<p><a href="https://docs.rs/argmin/latest/argmin/">Documentation of most recent release</a></p>
+<p><a href="https://argmin-rs.github.io/argmin/argmin/">Documentation of master</a></p>
 <h1 id="design-goals" class="section-header"><a href="#design-goals">Design goals</a></h1>
 <p>This crate's intention is to be useful to users as well as developers of optimization
 algorithms, meaning that it should be both easy to apply and easy to implement algorithms. In
@@ -70,12 +69,12 @@ remain future plans.</p>
 <h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
 <p>Add this to your <code>Cargo.toml</code>:</p>
 <pre><code class="language-toml">[dependencies]
-argmin = &quot;0.2.0&quot;
+argmin = &quot;0.2.1&quot;
 </code></pre>
 <h2 id="optional-features-recommended" class="section-header"><a href="#optional-features-recommended">Optional features (recommended)</a></h2>
 <p>There are additional features which can be activated in <code>Cargo.toml</code>:</p>
 <pre><code class="language-toml">[dependencies]
-argmin = { version = &quot;0.2.0&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;] }
+argmin = { version = &quot;0.2.1&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;] }
 </code></pre>
 <p>These may become default features in the future. Without these features compilation to
 <code>wasm32-unknown-unkown</code> seems to be possible.</p>
