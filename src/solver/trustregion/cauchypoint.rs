@@ -55,9 +55,13 @@ where
         state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
-        let grad = state.get_grad().unwrap_or(op.gradient(&param)?);
+        let grad = state
+            .get_grad()
+            .unwrap_or_else(|| op.gradient(&param).unwrap());
         let grad_norm = grad.norm();
-        let hessian = state.get_hessian().unwrap_or(op.hessian(&param)?);
+        let hessian = state
+            .get_hessian()
+            .unwrap_or_else(|| op.hessian(&param).unwrap());
 
         let wdp = grad.weighted_dot(&hessian, &grad);
         let tau: f64 = if wdp <= 0.0 {
@@ -90,5 +94,5 @@ mod tests {
     use super::*;
     use crate::send_sync_test;
 
-    send_sync_test!(cauchypoint, CauchyPoint<MinimalNoOperator>);
+    send_sync_test!(cauchypoint, CauchyPoint);
 }

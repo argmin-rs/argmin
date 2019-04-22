@@ -51,10 +51,7 @@ impl std::default::Default for SATempFunc {
 
 /// Simulated Annealing
 ///
-/// # Example
-///
-/// ```rust
-/// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/simulatedannealing.rs)
 ///
 /// # References
 ///
@@ -229,6 +226,20 @@ where
     O: ArgminOp<Output = f64>,
 {
     const NAME: &'static str = "Simulated Annealing";
+    fn init(
+        &mut self,
+        _op: &mut OpWrapper<O>,
+        _state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        Ok(Some(ArgminIterData::new().kv(make_kv!(
+            "initial_temperature" => self.init_temp;
+            "stall_iter_accepted_limit" => self.stall_iter_accepted_limit;
+            "stall_iter_best_limit" => self.stall_iter_best_limit;
+            "reanneal_fixed" => self.reanneal_fixed;
+            "reanneal_accepted" => self.reanneal_accepted;
+            "reanneal_best" => self.reanneal_best;
+        ))))
+    }
 
     /// Perform one iteration of SA algorithm
     fn next_iter(
@@ -306,20 +317,11 @@ where
         TerminationReason::NotTerminated
     }
 }
-// TODO: this
-// #[log("initial_temperature" => "self.init_temp")]
-// #[log("stall_iter_accepted_limit" => "self.stall_iter_accepted_limit")]
-// #[log("stall_iter_best_limit" => "self.stall_iter_best_limit")]
-// #[log("reanneal_fixed" => "self.reanneal_fixed")]
-// #[log("reanneal_accepted" => "self.reanneal_accepted")]
-// #[log("reanneal_best" => "self.reanneal_best")]
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::send_sync_test;
 
-    type Operator = MinimalNoOperator;
-
-    send_sync_test!(sa, SimulatedAnnealing<Operator>);
+    send_sync_test!(sa, SimulatedAnnealing);
 }

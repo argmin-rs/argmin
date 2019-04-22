@@ -25,27 +25,23 @@ use serde::{Deserialize, Serialize};
 ///
 /// `x_{k+1} = x_k - omega * \nabla f(x_k)`
 ///
-/// # Example
-///
-/// ```rust
-/// TODO
-/// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/landweber.rs)
 ///
 /// # References
 ///
 /// [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
 /// kind. Amer. J. Math. 73, 615–624
 /// [1] https://en.wikipedia.org/wiki/Landweber_iteration
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Landweber {
-    /// omgea
+    /// omega
     omega: f64,
 }
 
 impl Landweber {
     /// Constructor
-    pub fn new(omega: f64) -> Result<Self, Error> {
-        Ok(Landweber { omega })
+    pub fn new(omega: f64) -> Self {
+        Landweber { omega }
     }
 }
 

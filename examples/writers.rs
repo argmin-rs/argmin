@@ -14,7 +14,6 @@ use argmin::testfunctions::rosenbrock;
 use argmin_core::finitediff::*;
 use ndarray::{array, Array1, Array2};
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
 #[derive(Clone, Default, Serialize, Deserialize)]
 struct Rosenbrock {
@@ -52,28 +51,20 @@ fn run() -> Result<(), Error> {
     let solver = BFGS::new(init_hessian, linesearch);
 
     // Create writer
-    let mut writer = WriteToFile::new("params", "param");
-
-    // Only save every 3 iterations
-    writer.set_mode(WriterMode::Every(3));
-
-    // Set serializer to JSON
-    writer.set_serializer(WriteToFileSerializer::JSON);
+    let writer = WriteToFile::new("params", "param")
+        // Set serializer to JSON
+        .serializer(WriteToFileSerializer::JSON);
 
     // Create writer which only saves new best ones
-    let mut writer2 = WriteToFile::new("params", "best");
-
-    // Only save new best
-    writer2.set_mode(WriterMode::NewBest);
-
-    // Set serializer to JSON
-    writer2.set_serializer(WriteToFileSerializer::JSON);
+    let writer2 = WriteToFile::new("params", "best")
+        // Set serializer to JSON
+        .serializer(WriteToFileSerializer::JSON);
 
     let res = Executor::new(cost, solver, init_param)
         .max_iters(10)
-        .add_logger(ArgminSlogLogger::term())
-        .add_writer(Arc::new(writer))
-        .add_writer(Arc::new(writer2))
+        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .add_observer(writer, ObserverMode::Every(3))
+        .add_observer(writer2, ObserverMode::NewBest)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)

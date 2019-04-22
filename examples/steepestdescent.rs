@@ -50,11 +50,11 @@ fn run() -> Result<(), Error> {
     let linesearch = MoreThuenteLineSearch::new();
 
     // Set up solver
-    let solver = SteepestDescent::new(linesearch)?;
+    let solver = SteepestDescent::new(linesearch);
 
     // Run solver
     let res = Executor::new(cost, solver, init_param)
-        .add_logger(ArgminSlogLogger::term())
+        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(10)
         .run()?;
 

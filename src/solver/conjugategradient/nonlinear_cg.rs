@@ -21,11 +21,7 @@ use std::default::Default;
 /// The nonlinear conjugate gradient is a generalization of the conjugate gradient method for
 /// nonlinear optimization problems.
 ///
-/// # Example
-///
-/// ```rust
-/// TODO
-/// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/nonlinear_cg.rs)
 ///
 /// # References:
 ///
@@ -136,16 +132,19 @@ where
         self.linesearch.set_search_direction(self.p.clone());
 
         // Run solver
-        let linesearch_result =
-            Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), xk)
-                .grad(grad.clone())
-                .cost(cur_cost)
-                .run_fast()?;
+        let ArgminResult {
+            operator: line_op,
+            state: line_state,
+        } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), xk)
+            .grad(grad.clone())
+            .cost(cur_cost)
+            .ctrlc(false)
+            .run()?;
 
         // takes care of the counts of function evaluations
-        op.consume_op(linesearch_result.operator);
+        op.consume_op(line_op);
 
-        let xk1 = linesearch_result.param;
+        let xk1 = line_state.get_param();
 
         // Update of beta
         let new_grad = op.gradient(&xk1)?;

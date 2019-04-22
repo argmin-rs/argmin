@@ -25,11 +25,7 @@ type Triplet = (f64, f64, f64);
 /// The Hager-Zhang line search is a method to find a step length which obeys the strong Wolfe
 /// conditions.
 ///
-/// # Example
-///
-/// ```rust
-/// TODO
-/// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/hagerzhang.rs)
 ///
 /// # References
 ///

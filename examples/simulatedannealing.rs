@@ -132,8 +132,8 @@ fn run() -> Result<(), Error> {
     // Run solver          //
     /////////////////////////
     let res = Executor::new(operator, solver, init_param)
-        // Optional: Attach a logger
-        .add_logger(ArgminSlogLogger::term())
+        // Optional: Attach a observer
+        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
         .max_iters(10_000)
         // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)

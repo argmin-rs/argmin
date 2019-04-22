@@ -20,11 +20,7 @@ use serde::{Deserialize, Serialize};
 /// Steepest descent iteratively takes steps in the direction of the strongest negative gradient.
 /// In each iteration, a line search is employed to obtain an appropriate step length.
 ///
-/// # Example
-///
-/// ```rust
-/// TODO
-/// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/steepestdescent.rs)
 ///
 /// # References:
 ///
@@ -38,8 +34,8 @@ pub struct SteepestDescent<L> {
 
 impl<L> SteepestDescent<L> {
     /// Constructor
-    pub fn new(linesearch: L) -> Result<Self, Error> {
-        Ok(SteepestDescent { linesearch })
+    pub fn new(linesearch: L) -> Self {
+        SteepestDescent { linesearch }
     }
 }
 
@@ -72,21 +68,28 @@ where
         self.linesearch.set_search_direction(new_grad.mul(&(-1.0)));
 
         // Run solver
-        let linesearch_result = Executor::new(
+        let ArgminResult {
+            operator: line_op,
+            state:
+                IterState {
+                    param: next_param,
+                    cost: next_cost,
+                    ..
+                },
+        } = Executor::new(
             OpWrapper::new_from_op(&op),
             self.linesearch.clone(),
             param_new,
         )
         .grad(new_grad)
         .cost(new_cost)
-        .run_fast()?;
+        .ctrlc(false)
+        .run()?;
 
         // hack
-        op.consume_op(linesearch_result.operator);
+        op.consume_op(line_op);
 
-        Ok(ArgminIterData::new()
-            .param(linesearch_result.param)
-            .cost(linesearch_result.cost))
+        Ok(ArgminIterData::new().param(next_param).cost(next_cost))
     }
 }
 
@@ -98,6 +101,6 @@ mod tests {
 
     send_sync_test!(
         steepest_descent,
-        SteepestDescent<MinimalNoOperator, MoreThuenteLineSearch<MinimalNoOperator>>
+        SteepestDescent<MoreThuenteLineSearch<Vec<f64>>>
     );
 }

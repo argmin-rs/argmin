@@ -17,11 +17,7 @@ use std::default::Default;
 /// Newton's method iteratively finds the stationary points of a function f by using a second order
 /// approximation of f at the current point.
 ///
-/// # Example
-///
-/// ```rust
-/// TODO
-/// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/newton.rs)
 ///
 /// # References:
 ///
@@ -84,11 +80,5 @@ mod tests {
     use super::*;
     use crate::send_sync_test;
 
-    // Only works with ndarray feature because of the required inverse of a matrix
-    #[cfg(feature = "ndarrayl")]
-    type Operator = NoOperator<ndarray::Array1<f64>, f64, ndarray::Array2<f64>>;
-
-    // Only works with ndarray feature because of the required inverse of a matrix
-    #[cfg(feature = "ndarrayl")]
-    send_sync_test!(newton_method, Newton<Operator>);
+    send_sync_test!(newton_method, Newton);
 }

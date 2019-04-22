@@ -9,7 +9,7 @@ extern crate argmin;
 extern crate ndarray;
 use argmin::prelude::*;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
-use argmin::solver::quasinewton::BFGS;
+use argmin::solver::quasinewton::LBFGS;
 use argmin::testfunctions::rosenbrock;
 use argmin_core::finitediff::*;
 use ndarray::{array, Array1, Array2};
@@ -36,44 +36,30 @@ impl ArgminOp for Rosenbrock {
 }
 
 fn run() -> Result<(), Error> {
-    // checkpoint directory
-
     // Define cost function
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
     // Define initial parameter vector
-    // let init_param: Array1<f64> = array![-1.2, 1.0];
-    let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
-    let init_hessian: Array2<f64> = Array2::eye(8);
+    let init_param: Array1<f64> = array![-1.2, 1.0];
+    // let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
 
     // set up a line search
-    let linesearch = MoreThuenteLineSearch::new(cost.clone());
+    let linesearch = MoreThuenteLineSearch::new().c(1e-4, 0.9)?;
 
     // Set up solver
-    let mut solver = match BFGS::from_checkpoint(".checkpoints/bfgs.arg") {
-        Ok(solver) => solver,
-        Err(_) => BFGS::new(cost, init_param, init_hessian, linesearch),
-    };
-
-    // Set maximum number of iterations
-    solver.set_max_iters(45);
-
-    // Attach a logger
-    solver.add_logger(ArgminSlogLogger::term());
-
-    solver.set_checkpoint_dir(".checkpoints");
-    solver.set_checkpoint_name("bfgs");
-    solver.set_checkpoint_mode(CheckpointMode::Every(20));
+    let solver = LBFGS::new(linesearch, 7);
 
     // Run solver
-    solver.run()?;
+    let res = Executor::new(cost, solver, init_param)
+        // .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .max_iters(100)
+        .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
-    println!("{}", solver.result());
-
+    println!("{}", res);
     Ok(())
 }
 

@@ -18,11 +18,7 @@ use std::default::Default;
 /// The conjugate gradient method is a solver for systems of linear equations with a symmetric and
 /// positive-definite matrix.
 ///
-/// # Example
-///
-/// ```rust
-/// TODO
-/// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/conjugategradient.rs)
 ///
 /// # References:
 ///

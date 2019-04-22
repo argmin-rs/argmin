@@ -32,6 +32,11 @@ impl ArgminOp for Rosenbrock {
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
         Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
+        // Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(
+        //     &p.to_vec(),
+        //     self.a,
+        //     self.b,
+        // )))
     }
 }
 
@@ -53,11 +58,11 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(cost, solver, init_param)
-        .add_logger(ArgminSlogLogger::term())
-        .max_iters(100)
+        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .max_iters(1000)
         .run()?;
 
-    // Wait a second (lets the logger flush everything before printing again)
+    // Wait a second (lets the observer flush everything before printing again)
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result

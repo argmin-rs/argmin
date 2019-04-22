@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::prelude::*;
-use argmin_codegen::ArgminSolver;
 use argmin_core::ArgminAdd;
 use argmin_core::ArgminOp;
 use serde::{Deserialize, Serialize};

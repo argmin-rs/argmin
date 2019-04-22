@@ -8,13 +8,12 @@
 //! A pure Rust optimization framework
 //!
 //! This crate offers a (work in progress) numerical optimization toolbox/framework written entirely
-//! in Rust. It is at the moment quite unstable and potentially very buggy. Please use with care and
-//! report any bugs you encounter. This crate is looking for contributors!
+//! in Rust. It is at the moment potentially very buggy. Please use with care and report any bugs
+//! you encounter. This crate is looking for contributors!
 //!
-//! NOTE: The design has changed substantially in the recent past and the documentation is not yet
-//! up to date. If you are using a version available on
-//! [crates.io](https://crates.io/crates/argmin) please have a look at the correspoding
-//! [documentation](https://docs.rs/argmin/0.1.8/argmin/).
+//! [Documentation of most recent release](https://docs.rs/argmin/latest/argmin/)
+//!
+//! [Documentation of master](https://argmin-rs.github.io/argmin/argmin/)
 //!
 //! # Design goals
 //!
@@ -25,17 +24,17 @@
 //! certain common parameters, counting cost function and gradient evaluations, termination, and so
 //! on). Instead you can focus on implementing your algorithm.
 //!
-//! - Easy framework for the implementation of optimization algorithms: Define a struct to hold your
-//!   data, implement a single iteration of your method and let the framework do the rest. This
-//!   leads to similar interfaces for different solvers, making it easy for users.
+//! - Easy framework for the implementation of optimization algorithms: Implement a single iteration
+//!   of your method and let the framework do the rest. This leads to similar interfaces for
+//!   different solvers, making it easy for users.
 //! - Pure Rust implementations of a wide range of optimization methods: This avoids the need to
 //!   compile and interface C/C++/Fortran code.
 //! - Type-agnostic: Many problems require data structures that go beyond simple vectors to
 //!   represent the parameters. In argmin, everything is generic: All that needs to be done is
 //!   implementing certain traits on your data type. For common types, these traits are already
 //!   implemented.
-//! - Convenient: Automatic and consistent logging of anything that may be important. Log to the
-//!   terminal, to a file or implement your own loggers. Future plans include sending metrics to
+//! - Convenient: Easy and consistent logging of anything that may be important. Log to the
+//!   terminal, to a file or implement your own observers. Future plans include sending metrics to
 //!   databases and connecting to big data piplines.
 //! - Algorithm evaluation: Methods to assess the performance of an algorithm for different
 //!   parameter settings, problem classes, ...
@@ -61,7 +60,10 @@
 //!   - [Newton-CG](solver/newton/newton_cg/struct.NewtonCG.html)
 //! - [Quasi-Newton methods](solver/quasinewton/index.html)
 //!   - [BFGS](solver/quasinewton/bfgs/struct.BFGS.html)
+//!   - [L-BFGS](solver/quasinewton/lbfgs/struct.LBFGS.html)
 //!   - [DFP](solver/quasinewton/dfp/struct.DFP.html)
+//!   - [SR1](solver/quasinewton/sr1/struct.SR1.html)
+//!   - [SR1-TrustRegion](solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
 //!
@@ -71,16 +73,16 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = "0.1.8"
+//! argmin = "0.2.1"
 //! ```
 //!
-//! ## Optional features
+//! ## Optional features (recommended)
 //!
 //! There are additional features which can be activated in `Cargo.toml`:
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = { version = "0.1.8", features = ["ctrlc", "ndarrayl"] }
+//! argmin = { version = "0.2.1", features = ["ctrlc", "ndarrayl"] }
 //! ```
 //!
 //! These may become default features in the future. Without these features compilation to
@@ -88,7 +90,7 @@
 //!
 //! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
 //!    result) after pressing Ctrl+C.
-//! - `ndarrayl`: Support for `ndarray` and `ndarray-linalg`.
+//! - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.
 //!
 //! # Defining a problem
 //!
@@ -101,11 +103,9 @@
 //! - `apply(&self, p: &Self::Param) -> Result<Self::Output, Error>`: Applys the cost
 //!   function to parameters `p` of type `Self::Param` and returns the cost function value.
 //! - `gradient(&self, p: &Self::Param) -> Result<Self::Param, Error>`: Computes the
-//!   gradient at `p`. Optional. By default returns an `Err` if not implemented.
+//!   gradient at `p`.
 //! - `hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error>`: Computes the Hessian
-//!   at `p`. Optional. By default returns an `Err` if not implemented. The type of `Hessian` can
-//!   be set to `()` if this method is not implemented.
-//!
+//!   at `p`.
 //!
 //! The following code snippet shows an example of how to use the Rosenbrock test functions from
 //! `argmin-testfunctions` in argmin:
@@ -114,10 +114,9 @@
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
 //! # extern crate ndarray;
-//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-//! # use argmin::prelude::*;
-//! # use serde::{Serialize, Deserialize};
-//! // [Imports omited]
+//! use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+//! use argmin::prelude::*;
+//! use serde::{Serialize, Deserialize};
 //!
 //! /// First, create a struct for your problem
 //! #[derive(Clone, Default, Serialize, Deserialize)]
@@ -129,112 +128,254 @@
 //! /// Implement `ArgminOp` for `Rosenbrock`
 //! impl ArgminOp for Rosenbrock {
 //!     /// Type of the parameter vector
-//!     type Param = ndarray::Array1<f64>;
+//!     type Param = Vec<f64>;
 //!     /// Type of the return value computed by the cost function
 //!     type Output = f64;
-//!     /// Type of the Hessian. If no Hessian is available or needed for the used solver, this can
-//!     /// be set to `()`
-//!     type Hessian = ndarray::Array2<f64>;
+//!     /// Type of the Hessian. Can be `()` if not needed.
+//!     type Hessian = Vec<Vec<f64>>;
 //!
 //!     /// Apply the cost function to a parameter `p`
 //!     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-//!         Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
+//!         Ok(rosenbrock_2d(p, self.a, self.b))
 //!     }
 //!
-//!     /// Compute the gradient at parameter `p`. This is optional: If not implemented, this
-//!     /// method will return an `Err` when called.
+//!     /// Compute the gradient at parameter `p`.
 //!     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-//!         Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(&p.to_vec(), self.a, self.b)))
+//!         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
 //!     }
 //!
-//!     /// Compute the Hessian at parameter `p`. This is optional: If not implemented, this method
-//!     /// will return an `Err` when called.
+//!     /// Compute the Hessian at parameter `p`.
 //!     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-//!         let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);
-//!         Ok(ndarray::Array::from_shape_vec((2, 2), h).unwrap())
+//!         let t = rosenbrock_2d_hessian(p, self.a, self.b);
+//!         Ok(vec![vec![t[0], t[1]], vec![t[2], t[3]]])
 //!     }
 //! }
 //! ```
+//!
+//! It is optional to implement any of these methods, as there are default implementations which
+//! will return an `Err` when called. What needs to be implemented is defined by the requirements
+//! of the solver that is to be used.
 //!
 //! # Running a solver
 //!
 //! The following example shows how to use the previously shown definition of a problem in a
 //! Steepest Descent (Gradient Descent) solver.
 //!
+//! ```rust
+//! # #![allow(unused_imports)]
+//! # extern crate argmin;
+//! use argmin::prelude::*;
+//! use argmin::solver::gradientdescent::SteepestDescent;
+//! use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use serde::{Deserialize, Serialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Vec<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = ();
+//! #
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock_2d(p, self.a, self.b))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//!
+//! // Define cost function (must implement `ArgminOperator`)
+//! let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//!  
+//! // Define initial parameter vector
+//! let init_param: Vec<f64> = vec![-1.2, 1.0];
+//!  
+//! // Set up line search
+//! let linesearch = MoreThuenteLineSearch::new();
+//!  
+//! // Set up solver
+//! let solver = SteepestDescent::new(linesearch);
+//!  
+//! // Run solver
+//! let res = Executor::new(cost, solver, init_param)
+//!     // Add an observer which will log all iterations to the terminal
+//!     .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+//!     // Set maximum iterations to 10
+//!     .max_iters(10)
+//!     // run the solver on the defined problem
+//!     .run()?;
+//! #
+//! #     // Wait a second (lets the logger flush everything first)
+//! #     std::thread::sleep(std::time::Duration::from_secs(1));
+//!  
+//! // print result
+//! println!("{}", res);
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
 //! ```
-//! TODO
-//! ```
 //!
-//! Executing `solver.run()?` performs the actual optimization. In addition, there is
-//! `solver.run_fast()?`, which only executes the optimization algorithm and avoids all convenience
-//! functionality such as logging.
+//! # Observing iterations
 //!
-//! # Logging
+//! Argmin offers an interface to observe the state of the iteration at initialization as well as
+//! after every iteration. This includes the parameter vector, gradient, Hessian, iteration number,
+//! cost values and many more as well as solver-specific metrics. This interface can be used to
+//! implement loggers, send the information to a storage or to plot metrics.
+//! Observers need to implment the `Observe` trait.
+//! Argmin ships with a logger based on the `slog` crate. `ArgminSlogLogger::term` logs to the
+//! terminal and `ArgminSlogLogger::file` logs to a file in JSON format. Both loggers also come
+//! with a `*_noblock` version which does not block the execution of logging, but may drop some
+//! messages if the buffer is full.
+//! Parameter vectors can be written to disc using `WriteToFile`.
+//! For each observer it can be defined how often it will observe the progress of the solver. This
+//! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`
+//! (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.
 //!
-//! Information such as the current iteration number, cost function value, and other metrics can be
-//! logged using any object which implements `argmin_core::ArgminLogger`. So far loggers based on
-//! the `slog` crate have been implemented: `ArgminSlogLogger::term` logs to the terminal and
-//! `ArgminSlogLogger::file` logs to a file in JSON format. Both loggers come with a `*_noblock`
-//! version which does not block the execution for logging, but may drop log entries when the
-//! buffer fills up.
-//!
-//! ```
-//! TODO
+//! ```rust
+//! # #![allow(unused_imports)]
+//! # extern crate argmin;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::gradientdescent::SteepestDescent;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use serde::{Deserialize, Serialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Vec<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = ();
+//! #
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock_2d(p, self.a, self.b))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #
+//! # // Define cost function (must implement `ArgminOperator`)
+//! # let problem = Rosenbrock { a: 1.0, b: 100.0 };
+//! #
+//! # // Define initial parameter vector
+//! # let init_param: Vec<f64> = vec![-1.2, 1.0];
+//! #
+//! # // Set up line search
+//! # let linesearch = MoreThuenteLineSearch::new();
+//! #
+//! # // Set up solver
+//! # let solver = SteepestDescent::new(linesearch);
+//! #
+//! let res = Executor::new(problem, solver, init_param)
+//!     // Add an observer which will log all iterations to the terminal (without blocking)
+//!     .add_observer(ArgminSlogLogger::term_noblock(), ObserverMode::Always)
+//!     // Log to file whenever a new best solution is found
+//!     .add_observer(ArgminSlogLogger::file("solver.log")?, ObserverMode::NewBest)
+//!     // Write parameter vector to `params/param.arg` every 20th iteration
+//!     .add_observer(WriteToFile::new("params", "param"), ObserverMode::Every(20))
+//! #     .max_iters(2)
+//!     // run the solver on the defined problem
+//!     .run()?;
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #         std::process::exit(1);
+//! #     }
+//! # }
 //! ```
 //!
 //! # Checkpoints
 //!
-//! The longer an optimization runs, the higher the probability that something crashes.
-//! Particularly for optimizations which are running for days, weeks or even longer, this can
-//! become a problem. To mitigate this problem, it is possible in argmin to save checkpoints.
-//! Such a checkpoint is a serialization of an `ArgminSolver` object and can be loaded again and
-//! resumed.
+//! The probability of crashes increases with runtime, therefore one may want to save checkpoints
+//! in order to be able to resume the optimization after a crash.
 //! The `CheckpointMode` defines how often checkpoints are saved and is either `Never` (default),
 //! `Always` (every iteration) or `Every(u64)` (every Nth iteration). It is set via the setter
-//! method `set_checkpoint_mode()` which is implemented for every `ArgminSolver`.
+//! method `checkpoint_mode` of `Executor`.
 //! In addition, the directory where the checkpoints and a prefix for every file can be set via
-//! `set_checkpoint_dir()` and `set_checkpoint_prefix`, respectively.
+//! `checkpoint_dir` and `checkpoint_name`, respectively.
 //!
-//! The following example illustrates the usage. Note that this example is only for illustration
-//! and does not make much sense. Please scroll down for a more practical example.
-//!
-//! ```
-//! // [Imports omited]
-//!
-//! TODO
-//! ```
-//!
-//! A more practical way of using the checkpoints feature is shown in the following example.
-//! This will either load an existing checkpoint if one exists or it will create a new solver. Type
-//! inference takes care of the return type of `ArgminSolver::from_checkpoint(...)`. This way, the
-//! binary can easily be restarted after a crash and will automatically resume from the latest
-//! checkpoint.
+//! The following example shows how the `from_checkpoint` method can be used to resume from a
+//! checkpoint. In case this fails (for instance because the file does not exist, which could mean
+//! that this is the first run and there is nothing to resume from), it will resort to creating a
+//! new `Executor`, thus starting from scratch.
 //!
 //! ```rust
-//! TODO
-//! ```
-//!
-//! # Writers
-//!
-//! Writers can be used to handle parameter vectors in some way during the optimization
-//! (suggestions for a better name are more than welcome!). Usually, this can be used to save the
-//! intermediate parameter vectors somewhere. Currently, different modes are supported:
-//!
-//! * `WriterMode::Never`: Don't do anything.
-//! * `WriterMode::Always`: Process parameter vector in every iteration.
-//! * `WriterMode::Every(i)`: Process parameter vector in every i-th iteration.
-//! * `WriterMode::NewBest`: Process parameter vector whenever there is a new best one.
-//!
-//! The following example creates two writers of the type `WriteToFile` which serializes the
-//! parameter vector using either `serde_json` or `bincode`. The first writer saves the parameters
-//! in every third iteration (as JSON), while the second one saves only the new best ones (using
-//! `bincode`).
-//! Both are attached to a solver using the `add_writer(...)` method of `ArgminSolver` before the
-//! solver is run.
-//!
-//! ```rust
-//! // [Imports omited]
-//! TODO
+//! # extern crate argmin;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::landweber::*;
+//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use argmin_core::Error;
+//! # use serde::{Deserialize, Serialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {}
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Vec<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = ();
+//! #
+//! #     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
+//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #     // define inital parameter vector
+//! #     let init_param: Vec<f64> = vec![1.2, 1.2];
+//! #     let operator = Rosenbrock {};
+//! #
+//! #     let iters = 35;
+//! #     let solver = Landweber::new(0.001);
+//! #
+//! let res = Executor::from_checkpoint(".checkpoints/optim.arg")
+//!     .unwrap_or(Executor::new(operator, solver, init_param))
+//!     .max_iters(iters)
+//!     .checkpoint_dir(".checkpoints")
+//!     .checkpoint_name("optim")
+//!     .checkpoint_mode(CheckpointMode::Every(20))
+//!     .run()?;
+//! #
+//! #     // Wait a second (lets the logger flush everything before printing to screen again)
+//! #     std::thread::sleep(std::time::Duration::from_secs(1));
+//! #     println!("{}", res);
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{} {}", e.as_fail(), e.backtrace());
+//! #     }
+//! # }
 //! ```
 //!
 //! # Implementing an optimization algorithm
@@ -247,18 +388,106 @@
 //! `x_{k+1} = x_k - omega * \nabla f(x_k)`
 //!
 //! In order to implement this using the argmin framework, one first needs to define a struct which
-//! holds data/parameters needed during the execution of the algorithm. In addition a field with
-//! the name `base` and type `ArgminBase<'a, T, U, H>` is needed, where `T` is the type of the
-//! parameter vector, `U` is the type of the return values of the cost function and `H` is the type
-//! of the Hessian (which can be `()` if not available).
+//! holds data specific to the solver. Then, the `Solver` trait needs to be implemented for the
+//! struct. This requires setting the associated constant `NAME` which gives your solver a name.
+//! The `next_iter` method defines the computations performed in a single iteration of the solver.
+//! Via the parameters `op` and `state` one has access to the operator (cost function, gradient
+//! computation, Hessian, ...) and to the current state of the optimization (parameter vectors,
+//! cost function values, iteration number, ...), respectively.
 //!
-//! Deriving `ArgminSolver` for the struct using `#[derive(ArgminSolver)]` implements most of the
-//! API. What remains to be implemented for the struct is a constructor and `ArgminNextIter`. The
-//! latter is essentially an implementation of a single iteration of the algorithm.
+//! ```rust
+//! use argmin::prelude::*;
+//! use serde::{Deserialize, Serialize};
 //!
+//! // Define a struct which holds any parameters/data which are needed during the execution of the
+//! // solver. Note that this does not include parameter vectors, gradients, Hessians, cost
+//! // function values and so on, as those will be handled by the `Executor`.
+//! #[derive(Serialize, Deserialize)]
+//! pub struct Landweber {
+//!     /// omega
+//!     omega: f64,
+//! }
+//!
+//! impl Landweber {
+//!     /// Constructor
+//!     pub fn new(omega: f64) -> Self {
+//!         Landweber { omega }
+//!     }
+//! }
+//!
+//! impl<O> Solver<O> for Landweber
+//! where
+//!     // `O` always needs to implement `ArgminOp`
+//!     O: ArgminOp,
+//!     // `O::Param` needs to implement `ArgminScaledSub` because of the update formula
+//!     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+//! {
+//!     // This gives the solver a name which will be used for logging
+//!     const NAME: &'static str = "Landweber";
+//!
+//!     // Defines the computations performed in a single iteration.
+//!     fn next_iter(
+//!         &mut self,
+//!         // This gives access to the operator supplied to the `Executor`. `O` implements
+//!         // `ArgminOp` and `OpWrapper` takes care of counting the calls to the respective
+//!         // functions.
+//!         op: &mut OpWrapper<O>,
+//!         // Current state of the optimization. This gives access to the parameter vector,
+//!         // gradient, Hessian and cost function value of the current, previous and best
+//!         // iteration as well as current iteration number, and many more.
+//!         state: &IterState<O>,
+//!     ) -> Result<ArgminIterData<O>, Error> {
+//!         // First we obtain the current parameter vector from the `state` struct (`x_k`).
+//!         let xk = state.get_param();
+//!         // Then we compute the gradient at `x_k` (`\nabla f(x_k)`)
+//!         let grad = op.gradient(&xk)?;
+//!         // Now subtract `\nabla f(x_k)` scaled by `omega` from `x_k` to compute `x_{k+1}`
+//!         let xkp1 = xk.scaled_sub(&self.omega, &grad);
+//!         // Return new paramter vector which will then be used by the `Executor` to update
+//!         // `state`.
+//!         Ok(ArgminIterData::new().param(xkp1))
+//!     }
+//! }
 //! ```
-//! TODO
-//! ```
+//!
+//! # TODOs
+//!
+//!   * More optimization methods
+//!   * Automatic differentiation
+//!   * Parallelization
+//!   * Tests
+//!   * Evaluation on real problems
+//!   * Evaluation framework
+//!   * Documentation & Tutorials
+//!   * C interface
+//!   * Python wrapper
+//!   * Solver and problem definition via a config file
+//!
+//! Please open an [issue](https://github.com/argmin-rs/argmin/issues) if you want to contribute!
+//! Any help is appreciated!
+//!
+//! # License
+//!
+//! Licensed under either of
+//!
+//!   * Apache License, Version 2.0,
+//!     ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/master/LICENSE-APACHE) or
+//!     http://www.apache.org/licenses/LICENSE-2.0)
+//!   * MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/master/LICENSE-MIT) or
+//!     http://opensource.org/licenses/MIT)
+//!
+//! at your option.
+//!
+//!
+//! ## Contribution
+//!
+//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
+//! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
+//! without any additional terms or conditions.
+// //! argmin = { git = "https://github.com/argmin-rs/argmin.git", branch = "master"}
+// //! argmin = { git = "https://github.com/argmin-rs/argmin.git",
+// //!            branch = "master",
+// //!            features = ["ctrlc", "ndarrayl"] }
 
 #![warn(missing_docs)]
 #![allow(unused_attributes)]

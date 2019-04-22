@@ -39,7 +39,8 @@ impl Dogleg {
 impl<O> Solver<O> for Dogleg
 where
     O: ArgminOp<Output = f64>,
-    O::Param: ArgminMul<f64, O::Param>
+    O::Param: std::fmt::Debug
+        + ArgminMul<f64, O::Param>
         + ArgminWeightedDot<O::Param, f64, O::Hessian>
         + ArgminNorm<f64>
         + ArgminDot<O::Param, f64>
@@ -55,8 +56,12 @@ where
         state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
-        let g = state.get_grad().unwrap_or(op.gradient(&param)?);
-        let h = state.get_hessian().unwrap_or(op.hessian(&param)?);;
+        let g = state
+            .get_grad()
+            .unwrap_or_else(|| op.gradient(&param).unwrap());
+        let h = state
+            .get_hessian()
+            .unwrap_or_else(|| op.hessian(&param).unwrap());;
         let pstar;
 
         // pb = -H^-1g
@@ -67,6 +72,7 @@ where
         } else {
             // pu = - (g^Tg)/(g^THg) * g
             let pu = g.mul(&(-g.dot(&g) / g.weighted_dot(&h, &g)));
+            // println!("pb: {:?}, pu: {:?}", pb, pu);
 
             let utu = pu.dot(&pu);
             let btb = pb.dot(&pb);
@@ -85,9 +91,13 @@ where
             let mut tau = tau1.max(tau2);
 
             // if calculation failed because t3 is too small, use the third option
-            if tau.is_nan() {
+            // println!("t1: {:?}", tau);
+            if tau.is_nan() || tau.is_infinite() {
                 tau = (delta + btb - 2.0 * utu) / (btb - utu);
+                // println!("btb: {:?}", btb);
+                // println!("utu: {:?}", utu);
             }
+            // println!("t2: {:?}", tau);
 
             if tau >= 0.0 && tau < 1.0 {
                 pstar = pu.mul(&tau);
@@ -95,6 +105,7 @@ where
                 // pstar = pu + (tau - 1.0) * (pb - pu)
                 pstar = pu.add(&pb.sub(&pu).mul(&(tau - 1.0)));
             } else {
+                // println!("{:?}", tau);
                 return Err(ArgminError::ImpossibleError {
                     text: "tau is bigger than 2, this is not supposed to happen.".to_string(),
                 }
@@ -125,10 +136,5 @@ mod tests {
     use super::*;
     use crate::send_sync_test;
 
-    // because of the requirement of ArgminInv on the Hessian, this needs the ndarrayl feature.
-    #[cfg(feature = "ndarrayl")]
-    send_sync_test!(
-        dogleg,
-        Dogleg<NoOperator<ndarray::Array1<f64>, f64, ndarray::Array2<f64>>>
-    );
+    send_sync_test!(dogleg, Dogleg);
 }

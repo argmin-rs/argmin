@@ -35,7 +35,7 @@ fn run() -> Result<(), Error> {
     let operator = Rosenbrock {};
 
     let iters = 35;
-    let solver = Landweber::new(0.001)?;
+    let solver = Landweber::new(0.001);
 
     let res = Executor::from_checkpoint(".checkpoints/landweber_exec.arg")
         .unwrap_or(Executor::new(operator, solver, init_param))
@@ -43,7 +43,7 @@ fn run() -> Result<(), Error> {
         .checkpoint_dir(".checkpoints")
         .checkpoint_name("landweber_exec")
         .checkpoint_mode(CheckpointMode::Every(20))
-        .add_logger(ArgminSlogLogger::term())
+        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)

@@ -50,7 +50,7 @@ fn run() -> Result<(), Error> {
         solver.set_iter_callback(&mut callback);
 
         let res = Executor::new(cost_function, solver, init_param)
-            .add_logger(ArgminSlogLogger::term())
+            .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
             .max_iters(15)
             .run()?;
 

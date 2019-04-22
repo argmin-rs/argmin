@@ -29,11 +29,7 @@ use std::fmt::Debug;
 /// This subproblem can be set via `set_subproblem(...)`. If this is not provided, it will default
 /// to the Steihaug method.
 ///
-/// # Example
-///
-/// ```rust
-/// TODO
-/// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/trustregion_nd.rs)
 ///
 /// # References:
 ///
@@ -106,7 +102,7 @@ where
         + ArgminDot<O::Param, f64>
         + ArgminAdd<O::Param, O::Param>
         + ArgminSub<O::Param, O::Param>
-        + ArgminZero
+        + ArgminZeroLike
         + ArgminMul<f64, O::Param>,
     O::Hessian: Default + Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
     R: ArgminTrustRegion + Solver<OpWrapper<O>>,
@@ -138,16 +134,29 @@ where
         state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
-        let grad = state.get_grad().unwrap_or(op.gradient(&param)?);
-        let hessian = state.get_hessian().unwrap_or(op.hessian(&param)?);
+        let grad = state
+            .get_grad()
+            .unwrap_or_else(|| op.gradient(&param).unwrap());
+        let hessian = state
+            .get_hessian()
+            .unwrap_or_else(|| op.hessian(&param).unwrap());
 
         self.subproblem.set_radius(self.radius);
 
-        let pk = Executor::new(op.clone(), self.subproblem.clone(), param.clone())
-            .grad(grad.clone())
-            .hessian(hessian.clone())
-            .run_fast()?
-            .param;
+        let ArgminResult {
+            operator: sub_op,
+            state: IterState { param: pk, .. },
+        } = Executor::new(
+            OpWrapper::new_from_op(&op),
+            self.subproblem.clone(),
+            param.clone(),
+        )
+        .grad(grad.clone())
+        .hessian(hessian.clone())
+        .ctrlc(false)
+        .run()?;
+
+        op.consume_op(sub_op);
 
         let new_param = pk.add(&param);
         let fxkpk = op.apply(&new_param)?;
@@ -196,5 +205,5 @@ mod tests {
 
     type Operator = MinimalNoOperator;
 
-    send_sync_test!(trustregion, TrustRegion<Operator, Steihaug<Operator>>);
+    send_sync_test!(trustregion, TrustRegion<Steihaug<Operator>>);
 }

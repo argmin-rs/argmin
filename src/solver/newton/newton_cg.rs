@@ -19,11 +19,7 @@ use serde::{Deserialize, Serialize};
 /// The Newton-CG method (also called truncated Newton method) uses a modified CG to solve the
 /// Newton equations approximately. After a search direction is found, a line search is performed.
 ///
-/// # Example
-///
-/// ```rust
-/// TODO
-/// ```
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/newton_cg.rs)
 ///
 /// # References:
 ///
@@ -121,24 +117,27 @@ where
             x_p = x.clone();
         }
 
-        // take care of counting
-        op.consume_op(cg_op);
-
         // perform line search
         self.linesearch.set_search_direction(x);
 
         // Run solver
-        let linesearch_result =
-            Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
-                .grad(grad)
-                .cost(state.get_cost())
-                .run_fast()?;
+        let ArgminResult {
+            operator: line_op,
+            state:
+                IterState {
+                    param: next_param,
+                    cost: next_cost,
+                    ..
+                },
+        } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
+            .grad(grad)
+            .cost(state.get_cost())
+            .ctrlc(false)
+            .run()?;
 
-        op.consume_op(linesearch_result.operator);
+        op.consume_op(line_op);
 
-        Ok(ArgminIterData::new()
-            .param(linesearch_result.param)
-            .cost(linesearch_result.cost))
+        Ok(ArgminIterData::new().param(next_param).cost(next_cost))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
@@ -190,13 +189,7 @@ mod tests {
     use crate::send_sync_test;
     use crate::solver::linesearch::MoreThuenteLineSearch;
 
-    // Only works with ndarray feature because of the required inverse of a matrix
-    #[cfg(feature = "ndarrayl")]
-    type Operator = NoOperator<ndarray::Array1<f64>, f64, ndarray::Array2<f64>>;
-
-    // Only works with ndarray feature because of the required inverse of a matrix
-    #[cfg(feature = "ndarrayl")]
-    send_sync_test!(newton_cg, NewtonCG<Operator, MoreThuenteLineSearch<Operator>>);
+    send_sync_test!(newton_cg, NewtonCG<MoreThuenteLineSearch<Vec<f64>>>);
 
     send_sync_test!(cg_subproblem, CGSubProblem<Vec<f64>, Vec<Vec<f64>>>);
 }
