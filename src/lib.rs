@@ -66,6 +66,7 @@
 //!   - [SR1-TrustRegion](solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
+//! - [Particle Swarm Optimization (PSO)](solver/simulatedannealing/struct.ParticleSwarm.html)
 //!
 //! # Usage
 //!

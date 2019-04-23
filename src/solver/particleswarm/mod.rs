@@ -5,6 +5,10 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+//! # References:
+//!
+//! TODO
+
 use crate::prelude::*;
 use argmin_core::ArgminAdd;
 use argmin_core::ArgminOp;
@@ -15,6 +19,13 @@ use std::f64;
 
 type Callback<T> = FnMut(&T, f64, &Vec<Particle<T>>) -> ();
 
+/// Particle Swarm Optimization (PSO)
+///
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/particleswarm.rs)
+///
+/// # References:
+///
+/// TODO
 #[derive(Serialize, Deserialize)]
 pub struct ParticleSwarm<'a, O>
 where
@@ -72,6 +83,10 @@ where
         };
 
         // FIXME: Should not be necessary to create new OpWrapper here.
+        // COMMENT by stefan-k: If you initialize your particles in the `init` method of the
+        // `Solver` trait, then I think there is no need to carry around the cost function at all.
+        // This allows you to use the `OpWrapper` provided by the `Executor`, which also takes care
+        // of counting the cost function evaluations.
         let mut op = OpWrapper::new(&cost_function);
 
         particle_swarm.initialize_particles(&mut op, num_particles);
@@ -80,6 +95,7 @@ where
     }
 
     // TODO: implement iter_callback as logger
+    /// Set callback
     pub fn set_iter_callback(&mut self, callback: &'a mut Callback<O::Param>) {
         self.iter_callback = Some(callback);
     }
@@ -143,8 +159,8 @@ where
     /// Perform one iteration of algorithm
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        _op: &mut OpWrapper<O>,
+        _state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let zero = O::Param::zero_like(&self.best_position);
 
@@ -217,11 +233,17 @@ trait_bound!(Position
 , std::fmt::Debug
 );
 
+/// A single particle
 #[derive(Serialize, Deserialize)]
 pub struct Particle<T: Position> {
+    /// Position of particle
     pub position: T,
+    /// Velocity of particle
     velocity: T,
+    /// Cost of particle
     pub cost: f64,
+    /// Best position of particle so far
     best_position: T,
+    /// Best cost of particle so far
     best_cost: f64,
 }
