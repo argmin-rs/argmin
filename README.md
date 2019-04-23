@@ -63,6 +63,7 @@ remain future plans.
   - [SR1-TrustRegion](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
 - [Landweber iteration](https://argmin-rs.github.io/argmin/argmin/solver/landweber/struct.Landweber.html)
 - [Simulated Annealing](https://argmin-rs.github.io/argmin/argmin/solver/simulatedannealing/struct.SimulatedAnnealing.html)
+- [Particle Swarm Optimization](https://argmin-rs.github.io/argmin/argmin/solver/particleswarm/struct.ParticleSwarm.html)
 
 ## Usage
 
