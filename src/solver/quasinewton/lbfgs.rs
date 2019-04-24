@@ -20,6 +20,8 @@ use std::fmt::Debug;
 ///
 /// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/lbfgs.rs)
 ///
+/// TODO: Implement compact representation of BFGS updating (Nocedal/Wright p.230)
+///
 /// # References:
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
