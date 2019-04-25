@@ -228,7 +228,9 @@ where
             cost
         };
 
-        self.init_grad = state.get_grad().unwrap_or(op.gradient(&self.init_param)?);
+        self.init_grad = state
+            .get_grad()
+            .unwrap_or_else(|| op.gradient(&self.init_param).unwrap());
 
         self.dginit = self.init_grad.dot(&self.search_direction);
 
@@ -291,8 +293,7 @@ where
             .scaled_add(&self.stp.x, &self.search_direction);
         self.f = op.apply(&new_param)?;
         let new_grad = op.gradient(&new_param)?;
-        let f = self.f;
-        let cur_cost = f;
+        let cur_cost = self.f;
         let cur_param = new_param;
         let cur_grad = new_grad.clone();
         // self.stx.fx = new_cost;
@@ -391,10 +392,11 @@ where
             self.width = (self.sty.x - self.stx.x).abs();
         }
 
-        let new_param = self
-            .init_param
-            .scaled_add(&self.stp.x, &self.search_direction);
-        Ok(ArgminIterData::new().param(new_param).cost(self.stp.fx))
+        // let new_param = self
+        //     .init_param
+        //     .scaled_add(&self.stp.x, &self.search_direction);
+        // Ok(ArgminIterData::new().param(new_param))
+        Ok(ArgminIterData::new())
     }
 }
 

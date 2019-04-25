@@ -88,11 +88,12 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let cur_cost = state.get_cost();
-        let prev_grad = if let Some(grad) = state.get_grad() {
-            grad
-        } else {
-            op.gradient(&param)?
-        };
+        let prev_grad = state.get_grad().unwrap();
+        // let prev_grad = if let Some(grad) = state.get_grad() {
+        //     grad
+        // } else {
+        //     op.gradient(&param)?
+        // };
 
         let p = self.inv_hessian.dot(&prev_grad).mul(&(-1.0));
 
@@ -121,6 +122,8 @@ where
         op.consume_op(line_op);
 
         let grad = op.gradient(&xk1)?;
+        // let next_cost = op.apply(&xk1)?;
+
         let yk = grad.sub(&prev_grad);
 
         let sk = xk1.sub(&param);
@@ -140,7 +143,7 @@ where
         let sksk: O::Hessian = sk.dot(&sk);
         let sksk = sksk.mul(&rhok);
 
-        // if self.cur_iter() == 0 {
+        // if state.get_iter() == 0 {
         //     let ykyk: f64 = yk.dot(&yk);
         //     self.inv_hessian = self.inv_hessian.eye_like().mul(&(yksk / ykyk));
         //     println!("{:?}", self.inv_hessian);
