@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["ArgminSlogLogger","A logger based on `slog`"]]});
+initSidebarItems({"struct":[["ArgminSlogKV","This type is necessary in order to be able to implement `slog::KV` on `ArgminKV`"],["ArgminSlogLogger","A logger based on `slog`"]]});

@@ -519,6 +519,14 @@
 <span id="519">519</span>
 <span id="520">520</span>
 <span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -620,7 +628,8 @@
 <span class="doccomment">//! A problem can be defined by implementing the `ArgminOp` trait which comes with the</span>
 <span class="doccomment">//! associated types `Param`, `Output` and `Hessian`. `Param` is the type of your</span>
 <span class="doccomment">//! parameter vector (i.e. the input to your cost function), `Output` is the type returned</span>
-<span class="doccomment">//! by the cost function and `Hessian` is the type of the Hessian.</span>
+<span class="doccomment">//! by the cost function, `Hessian` is the type of the Hessian and `Jacobian` is the type of the</span>
+<span class="doccomment">//! Jacobian.</span>
 <span class="doccomment">//! The trait provides the following methods:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! - `apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt;`: Applys the cost</span>
@@ -628,6 +637,8 @@
 <span class="doccomment">//! - `gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Param, Error&gt;`: Computes the</span>
 <span class="doccomment">//!   gradient at `p`.</span>
 <span class="doccomment">//! - `hessian(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt;`: Computes the Hessian</span>
+<span class="doccomment">//!   at `p`.</span>
+<span class="doccomment">//! - `jacobian(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Jacobian, Error&gt;`: Computes the Jacobian</span>
 <span class="doccomment">//!   at `p`.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The following code snippet shows an example of how to use the Rosenbrock test functions from</span>
@@ -656,6 +667,8 @@
 <span class="doccomment">//!     type Output = f64;</span>
 <span class="doccomment">//!     /// Type of the Hessian. Can be `()` if not needed.</span>
 <span class="doccomment">//!     type Hessian = Vec&lt;Vec&lt;f64&gt;&gt;;</span>
+<span class="doccomment">//!     /// Type of the Jacobian. Can be `()` if not needed.</span>
+<span class="doccomment">//!     type Jacobian = ();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     /// Apply the cost function to a parameter `p`</span>
 <span class="doccomment">//!     fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
@@ -703,6 +716,7 @@
 <span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
 <span class="doccomment">//! #     type Output = f64;</span>
 <span class="doccomment">//! #     type Hessian = ();</span>
+<span class="doccomment">//! #     type Jacobian = ();</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! #     fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
 <span class="doccomment">//! #         Ok(rosenbrock_2d(p, self.a, self.b))</span>
@@ -787,6 +801,7 @@
 <span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
 <span class="doccomment">//! #     type Output = f64;</span>
 <span class="doccomment">//! #     type Hessian = ();</span>
+<span class="doccomment">//! #     type Jacobian = ();</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! #     fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
 <span class="doccomment">//! #         Ok(rosenbrock_2d(p, self.a, self.b))</span>
@@ -862,6 +877,7 @@
 <span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
 <span class="doccomment">//! #     type Output = f64;</span>
 <span class="doccomment">//! #     type Hessian = ();</span>
+<span class="doccomment">//! #     type Jacobian = ();</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! #     fn apply(&amp;self, p: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;f64, Error&gt; {</span>
 <span class="doccomment">//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))</span>
