@@ -98,7 +98,8 @@
 //! A problem can be defined by implementing the `ArgminOp` trait which comes with the
 //! associated types `Param`, `Output` and `Hessian`. `Param` is the type of your
 //! parameter vector (i.e. the input to your cost function), `Output` is the type returned
-//! by the cost function and `Hessian` is the type of the Hessian.
+//! by the cost function, `Hessian` is the type of the Hessian and `Jacobian` is the type of the
+//! Jacobian.
 //! The trait provides the following methods:
 //!
 //! - `apply(&self, p: &Self::Param) -> Result<Self::Output, Error>`: Applys the cost
@@ -106,6 +107,8 @@
 //! - `gradient(&self, p: &Self::Param) -> Result<Self::Param, Error>`: Computes the
 //!   gradient at `p`.
 //! - `hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error>`: Computes the Hessian
+//!   at `p`.
+//! - `jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error>`: Computes the Jacobian
 //!   at `p`.
 //!
 //! The following code snippet shows an example of how to use the Rosenbrock test functions from
@@ -134,6 +137,8 @@
 //!     type Output = f64;
 //!     /// Type of the Hessian. Can be `()` if not needed.
 //!     type Hessian = Vec<Vec<f64>>;
+//!     /// Type of the Jacobian. Can be `()` if not needed.
+//!     type Jacobian = ();
 //!
 //!     /// Apply the cost function to a parameter `p`
 //!     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
@@ -181,6 +186,7 @@
 //! #     type Param = Vec<f64>;
 //! #     type Output = f64;
 //! #     type Hessian = ();
+//! #     type Jacobian = ();
 //! #
 //! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 //! #         Ok(rosenbrock_2d(p, self.a, self.b))
@@ -265,6 +271,7 @@
 //! #     type Param = Vec<f64>;
 //! #     type Output = f64;
 //! #     type Hessian = ();
+//! #     type Jacobian = ();
 //! #
 //! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 //! #         Ok(rosenbrock_2d(p, self.a, self.b))
@@ -340,6 +347,7 @@
 //! #     type Param = Vec<f64>;
 //! #     type Output = f64;
 //! #     type Hessian = ();
+//! #     type Jacobian = ();
 //! #
 //! #     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
 //! #         Ok(rosenbrock_2d(p, 1.0, 100.0))

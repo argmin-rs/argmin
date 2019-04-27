@@ -139,6 +139,6 @@ mod tests {
 
     send_sync_test!(
         conjugate_gradient,
-        ConjugateGradient<NoOperator<Vec<f64>, Vec<f64>, ()>>
+        ConjugateGradient<NoOperator<Vec<f64>, Vec<f64>, (), ()>>
     );
 }

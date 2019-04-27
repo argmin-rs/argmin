@@ -23,6 +23,7 @@ impl ArgminOp for Rosenbrock {
     type Param = Array1<f64>;
     type Output = f64;
     type Hessian = Array2<f64>;
+    type Jacobian = ();
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))

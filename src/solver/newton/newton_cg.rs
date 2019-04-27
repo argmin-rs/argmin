@@ -177,6 +177,7 @@ where
     type Param = T;
     type Output = T;
     type Hessian = ();
+    type Jacobian = ();
 
     fn apply(&self, p: &T) -> Result<T, Error> {
         Ok(self.hessian.dot(&p))
