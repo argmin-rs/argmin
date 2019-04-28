@@ -6,11 +6,12 @@
 // copied, modified, or distributed except according to those terms.
 
 pub mod conjugategradient;
+pub mod gaussnewton;
 pub mod gradientdescent;
 pub mod landweber;
 pub mod linesearch;
 pub mod newton;
+pub mod particleswarm;
 pub mod quasinewton;
 pub mod simulatedannealing;
 pub mod trustregion;
-pub mod particleswarm;
