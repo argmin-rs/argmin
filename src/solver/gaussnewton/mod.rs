@@ -64,6 +64,7 @@ where
     O::Param: Default
         + ArgminScaledSub<O::Param, f64, O::Param>
         + ArgminDot<O::Param, O::Param>
+        + ArgminAdd<O::Param, O::Param>
         + ArgminMul<f64, O::Param>,
     O::Output: ArgminNorm<f64>,
     O::Jacobian: ArgminTranspose
@@ -83,38 +84,41 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let residuals = op.apply(&param)?;
-        let grad = op.gradient(&param)?;
+        // let grad = op.gradient(&param)?;
         let jacobian = op.jacobian(&param)?;
         let jacobian_t = jacobian.clone().t();
 
         let p = jacobian_t
             .dot(&jacobian)
             .inv()?
-            .dot(&jacobian.t().dot(&residuals))
-            .mul(&1.0);
+            .dot(&jacobian.t().dot(&residuals));
+        // .mul(&1.0);
 
-        self.linesearch.set_search_direction(p);
+        // self.linesearch.set_search_direction(p);
 
         // TODO: Need to build another operator which does not return the residuals when calling
         // `apply`, but instead returns the norm of the residuals. Otherwise this may not work....
-        let ArgminResult {
-            operator: line_op,
-            state:
-                IterState {
-                    param: new_param,
-                    cost: new_cost,
-                    ..
-                },
-        } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
-            .grad(grad)
-            .cost(residuals.norm())
-            .ctrlc(false)
-            .run()?;
-
-        op.consume_op(line_op);
+        // let ArgminResult {
+        //     operator: line_op,
+        //     state:
+        //         IterState {
+        //             param: new_param,
+        //             cost: new_cost,
+        //             ..
+        //         },
+        // } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
+        //     .grad(grad)
+        //     .cost(residuals.norm())
+        //     .ctrlc(false)
+        //     .run()?;
+        // op.consume_op(line_op);
         // let new_param = param.scaled_sub(&self.gamma, &p.dot(&grad));
 
-        Ok(ArgminIterData::new().param(new_param).cost(new_cost))
+        let new_param = param.add(&p.dot(&param));
+
+        Ok(ArgminIterData::new()
+            .param(new_param)
+            .cost(residuals.norm()))
     }
 }
 
