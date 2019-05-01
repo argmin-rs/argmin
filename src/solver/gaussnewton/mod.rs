@@ -27,17 +27,25 @@ pub struct GaussNewton<L> {
     /// gamma
     gamma: f64,
     /// line search
-    linesearch: L,
+    #[serde(skip)]
+    #[allow(dead_code)]
+    linesearch: Option<L>,
 }
 
 impl<L> GaussNewton<L> {
     /// Constructor
-    pub fn new(linesearch: L) -> Self {
+    pub fn new() -> Self {
         GaussNewton {
             gamma: 1.0,
-            linesearch,
+            linesearch: None,
         }
     }
+    // pub fn new(linesearch: L) -> Self {
+    //     GaussNewton {
+    //         gamma: 1.0,
+    //         linesearch: Some(linesearch),
+    //     }
+    // }
 
     /// set gamma
     pub fn gamma(mut self, gamma: f64) -> Result<Self, Error> {
@@ -58,13 +66,13 @@ impl<L> GaussNewton<L> {
 //     }
 // }
 
+// L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 impl<O, L> Solver<O> for GaussNewton<L>
 where
     O: ArgminOp,
     O::Param: Default
         + ArgminScaledSub<O::Param, f64, O::Param>
-        + ArgminDot<O::Param, O::Param>
-        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
         + ArgminMul<f64, O::Param>,
     O::Output: ArgminNorm<f64>,
     O::Jacobian: ArgminTranspose
@@ -73,7 +81,6 @@ where
         + ArgminDot<O::Output, O::Param>
         + ArgminDot<O::Param, O::Param>,
     O::Hessian: Default,
-    L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
 {
     const NAME: &'static str = "Gauss-Newton method";
 
@@ -114,11 +121,19 @@ where
         // op.consume_op(line_op);
         // let new_param = param.scaled_sub(&self.gamma, &p.dot(&grad));
 
-        let new_param = param.add(&p.dot(&param));
+        // let new_param = param.add(&p.dot(&param));
+        let new_param = param.sub(&p);
 
         Ok(ArgminIterData::new()
             .param(new_param)
             .cost(residuals.norm()))
+    }
+
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+        if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON.sqrt() {
+            return TerminationReason::NoChangeInCost;
+        }
+        TerminationReason::NotTerminated
     }
 }
 
