@@ -23,29 +23,16 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Serialize, Deserialize)]
-pub struct GaussNewton<L> {
+pub struct GaussNewton {
     /// gamma
     gamma: f64,
-    /// line search
-    #[serde(skip)]
-    #[allow(dead_code)]
-    linesearch: Option<L>,
 }
 
-impl<L> GaussNewton<L> {
+impl GaussNewton {
     /// Constructor
     pub fn new() -> Self {
-        GaussNewton {
-            gamma: 1.0,
-            linesearch: None,
-        }
+        GaussNewton { gamma: 1.0 }
     }
-    // pub fn new(linesearch: L) -> Self {
-    //     GaussNewton {
-    //         gamma: 1.0,
-    //         linesearch: Some(linesearch),
-    //     }
-    // }
 
     /// set gamma
     pub fn gamma(mut self, gamma: f64) -> Result<Self, Error> {
@@ -60,14 +47,13 @@ impl<L> GaussNewton<L> {
     }
 }
 
-// impl Default for GaussNewton {
-//     fn default() -> GaussNewton {
-//         GaussNewton::new()
-//     }
-// }
+impl Default for GaussNewton {
+    fn default() -> GaussNewton {
+        GaussNewton::new()
+    }
+}
 
-// L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
-impl<O, L> Solver<O> for GaussNewton<L>
+impl<O> Solver<O> for GaussNewton
 where
     O: ArgminOp,
     O::Param: Default
@@ -91,7 +77,6 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let residuals = op.apply(&param)?;
-        // let grad = op.gradient(&param)?;
         let jacobian = op.jacobian(&param)?;
         let jacobian_t = jacobian.clone().t();
 
@@ -99,30 +84,8 @@ where
             .dot(&jacobian)
             .inv()?
             .dot(&jacobian.t().dot(&residuals));
-        // .mul(&1.0);
 
-        // self.linesearch.set_search_direction(p);
-
-        // TODO: Need to build another operator which does not return the residuals when calling
-        // `apply`, but instead returns the norm of the residuals. Otherwise this may not work....
-        // let ArgminResult {
-        //     operator: line_op,
-        //     state:
-        //         IterState {
-        //             param: new_param,
-        //             cost: new_cost,
-        //             ..
-        //         },
-        // } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
-        //     .grad(grad)
-        //     .cost(residuals.norm())
-        //     .ctrlc(false)
-        //     .run()?;
-        // op.consume_op(line_op);
-        // let new_param = param.scaled_sub(&self.gamma, &p.dot(&grad));
-
-        // let new_param = param.add(&p.dot(&param));
-        let new_param = param.sub(&p);
+        let new_param = param.sub(&p.mul(&self.gamma));
 
         Ok(ArgminIterData::new()
             .param(new_param)
@@ -141,10 +104,6 @@ where
 mod tests {
     use super::*;
     use crate::send_sync_test;
-    use crate::solver::linesearch::MoreThuenteLineSearch;
 
-    send_sync_test!(
-        gauss_newton_method,
-        GaussNewton<MoreThuenteLineSearch<Vec<f64>>>
-    );
+    send_sync_test!(gauss_newton_method, GaussNewton);
 }
