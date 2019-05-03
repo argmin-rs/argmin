@@ -81,37 +81,6 @@ fn run() -> Result<(), Error> {
     Ok(())
 }
 
-#[derive(Clone, Default, Serialize, Deserialize)]
-struct<O> LineSearchOP<O> {
-    op: O,
-}
-
-impl ArgminOp for Problem {
-    type Param = Array1<f64>;
-    type Output = Array1<f64>;
-    type Hessian = ();
-    type Jacobian = Array2<f64>;
-
-    fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(self
-            .data
-            .iter()
-            .map(|(s, rate)| rate - (p[0] * s) / (p[1] + s))
-            .collect::<Array1<f64>>())
-    }
-
-    fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {
-        Ok(Array2::from_shape_fn((7, 2), |(si, i)| {
-            if i == 0 {
-                -self.data[si].0 / (p[1] + self.data[si].0)
-            } else {
-                p[0] * self.data[si].0 / (p[1] + self.data[si].0).powi(2)
-            }
-        }))
-    }
-}
-
-
 fn main() {
     if let Err(ref e) = run() {
         println!("{} {}", e.as_fail(), e.backtrace());
