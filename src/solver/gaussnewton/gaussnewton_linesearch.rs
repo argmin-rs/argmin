@@ -143,6 +143,10 @@ where
 mod tests {
     use super::*;
     use crate::send_sync_test;
+    use crate::solver::linesearch::MoreThuenteLineSearch;
 
-    send_sync_test!(gauss_newton_method, GaussNewton);
+    send_sync_test!(
+        gauss_newton_linesearch_method,
+        GaussNewtonLinesearch<MoreThuenteLineSearch<Vec<f64>>>
+    );
 }
