@@ -14,7 +14,7 @@ use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
-/// Gauss-Newton method (untested!)
+/// Gauss-Newton method
 ///
 /// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/gaussnewton.rs)
 ///

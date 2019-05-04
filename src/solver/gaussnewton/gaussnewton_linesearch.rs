@@ -14,37 +14,32 @@ use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
-/// Gauss-Newton method (untested!)
+/// Gauss-Newton method with linesearch
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/gaussnewton.rs)
+/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/gaussnewton_linesearch.rs)
 ///
 /// # References:
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Serialize, Deserialize)]
-pub struct GaussNewtonLinesearch<L> {
+pub struct GaussNewtonLineSearch<L> {
     /// linesearch
     linesearch: L,
 }
 
-impl<L> GaussNewtonLinesearch<L> {
+impl<L> GaussNewtonLineSearch<L> {
     /// Constructor
     pub fn new(linesearch: L) -> Self {
-        GaussNewtonLinesearch { linesearch }
+        GaussNewtonLineSearch { linesearch }
     }
 }
 
-// impl Default for GaussNewton {
-//     fn default() -> GaussNewton {
-//         GaussNewton::new()
-//     }
-// }
-
-impl<O, L> Solver<O> for GaussNewtonLinesearch<L>
+impl<O, L> Solver<O> for GaussNewtonLineSearch<L>
 where
     O: ArgminOp,
     O::Param: Default
+        + std::fmt::Debug
         + ArgminScaledSub<O::Param, f64, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminMul<f64, O::Param>,
@@ -55,7 +50,7 @@ where
         + ArgminDot<O::Output, O::Param>
         + ArgminDot<O::Param, O::Param>,
     O::Hessian: Default,
-    L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
+    L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<LineSearchOP<O>>>,
 {
     const NAME: &'static str = "Gauss-Newton method with Linesearch";
 
@@ -78,6 +73,7 @@ where
         self.linesearch.set_search_direction(p.mul(&(-1.0)));
 
         // create operator for linesearch
+        let line_op = OpWrapper::new_move(LineSearchOP { op: op.clone_op() });
 
         // perform linesearch
         let ArgminResult {
@@ -88,7 +84,7 @@ where
                     cost: next_cost,
                     ..
                 },
-        } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
+        } = Executor::new(line_op, self.linesearch.clone(), param)
             .grad(grad)
             .cost(residuals.norm())
             .ctrlc(false)
@@ -108,12 +104,13 @@ where
     }
 }
 
+#[doc(hidden)]
 #[derive(Clone, Default, Serialize, Deserialize)]
-struct LinesearchOP<O> {
+pub struct LineSearchOP<O> {
     op: O,
 }
 
-impl<O: ArgminOp> ArgminOp for LinesearchOP<O>
+impl<O: ArgminOp> ArgminOp for LineSearchOP<O>
 where
     O::Output: ArgminNorm<f64>,
 {
@@ -147,6 +144,6 @@ mod tests {
 
     send_sync_test!(
         gauss_newton_linesearch_method,
-        GaussNewtonLinesearch<MoreThuenteLineSearch<Vec<f64>>>
+        GaussNewtonLineSearch<MoreThuenteLineSearch<Vec<f64>>>
     );
 }
