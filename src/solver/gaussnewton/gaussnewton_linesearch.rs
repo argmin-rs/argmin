@@ -61,14 +61,11 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let residuals = op.apply(&param)?;
-        let grad = op.gradient(&param)?;
         let jacobian = op.jacobian(&param)?;
         let jacobian_t = jacobian.clone().t();
+        let grad = jacobian_t.dot(&residuals);
 
-        let p = jacobian_t
-            .dot(&jacobian)
-            .inv()?
-            .dot(&jacobian.t().dot(&residuals));
+        let p = jacobian_t.dot(&jacobian).inv()?.dot(&grad);
 
         self.linesearch.set_search_direction(p.mul(&(-1.0)));
 
@@ -91,7 +88,6 @@ where
             .run()?;
 
         op.consume_op(line_op);
-        // let new_param = param.sub(&p);
 
         Ok(ArgminIterData::new().param(next_param).cost(next_cost))
     }
@@ -112,6 +108,7 @@ pub struct LineSearchOP<O> {
 
 impl<O: ArgminOp> ArgminOp for LineSearchOP<O>
 where
+    O::Jacobian: ArgminTranspose + ArgminDot<O::Output, O::Param>,
     O::Output: ArgminNorm<f64>,
 {
     type Param = O::Param;
@@ -124,7 +121,7 @@ where
     }
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-        self.op.gradient(p)
+        Ok(self.op.jacobian(p)?.t().dot(&self.op.apply(p)?))
     }
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {

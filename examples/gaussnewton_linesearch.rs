@@ -10,7 +10,6 @@ extern crate ndarray;
 use argmin::prelude::*;
 use argmin::solver::gaussnewton::GaussNewtonLineSearch;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
-use argmin_core::finitediff::*;
 use ndarray::{Array1, Array2};
 use serde::{Deserialize, Serialize};
 
@@ -32,17 +31,6 @@ impl ArgminOp for Problem {
             .iter()
             .map(|(s, rate)| rate - (p[0] * s) / (p[1] + s))
             .collect::<Array1<f64>>())
-    }
-
-    fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-        Ok((*p).forward_diff(&|x| self.apply(&x).unwrap().norm()))
-        // Ok(array![
-        //     self.data.iter().map(|(_r, s)| -s / (p[1] + s)).sum(),
-        //     self.data
-        //         .iter()
-        //         .map(|(_r, s)| p[0] * s / (p[1] + s).powi(2))
-        //         .sum(),
-        // ])
     }
 
     fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {
