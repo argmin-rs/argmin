@@ -61,6 +61,8 @@ remain future plans.
   - [DFP](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/dfp/struct.DFP.html)
   - [SR1](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/sr1/struct.SR1.html)
   - [SR1-TrustRegion](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
+- [Gauss-Newton method](https://argmin-rs.github.io/argmin/argmin/solver/gaussnewton/gaussnewton/struct.GaussNewton.html)
+- [Gauss-Newton method with linesearch](https://argmin-rs.github.io/argmin/argmin/solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLineSearch.html)
 - [Landweber iteration](https://argmin-rs.github.io/argmin/argmin/solver/landweber/struct.Landweber.html)
 - [Simulated Annealing](https://argmin-rs.github.io/argmin/argmin/solver/simulatedannealing/struct.SimulatedAnnealing.html)
 - [Particle Swarm Optimization](https://argmin-rs.github.io/argmin/argmin/solver/particleswarm/struct.ParticleSwarm.html)
