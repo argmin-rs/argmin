@@ -8,7 +8,7 @@
 extern crate argmin;
 extern crate ndarray;
 use argmin::prelude::*;
-use argmin::solver::gaussnewton::GaussNewtonLineSearch;
+use argmin::solver::gaussnewton::GaussNewtonLS;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use ndarray::{Array1, Array2};
 use serde::{Deserialize, Serialize};
@@ -65,7 +65,7 @@ fn run() -> Result<(), Error> {
     let init_param: Array1<f64> = Array1::from_vec(vec![0.9, 0.2]);
 
     // Set up solver
-    let solver = GaussNewtonLineSearch::new(linesearch);
+    let solver = GaussNewtonLS::new(linesearch);
 
     // Run solver
     let res = Executor::new(cost, solver, init_param)

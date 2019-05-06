@@ -23,19 +23,19 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Serialize, Deserialize)]
-pub struct GaussNewtonLineSearch<L> {
+pub struct GaussNewtonLS<L> {
     /// linesearch
     linesearch: L,
 }
 
-impl<L> GaussNewtonLineSearch<L> {
+impl<L> GaussNewtonLS<L> {
     /// Constructor
     pub fn new(linesearch: L) -> Self {
-        GaussNewtonLineSearch { linesearch }
+        GaussNewtonLS { linesearch }
     }
 }
 
-impl<O, L> Solver<O> for GaussNewtonLineSearch<L>
+impl<O, L> Solver<O> for GaussNewtonLS<L>
 where
     O: ArgminOp,
     O::Param: Default
@@ -141,6 +141,6 @@ mod tests {
 
     send_sync_test!(
         gauss_newton_linesearch_method,
-        GaussNewtonLineSearch<MoreThuenteLineSearch<Vec<f64>>>
+        GaussNewtonLS<MoreThuenteLineSearch<Vec<f64>>>
     );
 }

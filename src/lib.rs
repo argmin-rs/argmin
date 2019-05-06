@@ -65,7 +65,7 @@
 //!   - [SR1](solver/quasinewton/sr1/struct.SR1.html)
 //!   - [SR1-TrustRegion](solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
 //! - [Gauss-Newton method](solver/gaussnewton/gaussnewton/struct.GaussNewton.html)
-//! - [Gauss-Newton method with linesearch](solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLineSearch.html)
+//! - [Gauss-Newton method with linesearch](solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLS.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
 //! - [Particle Swarm Optimization](solver/particleswarm/struct.ParticleSwarm.html)
