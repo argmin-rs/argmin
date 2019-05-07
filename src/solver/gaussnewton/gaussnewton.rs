@@ -78,9 +78,10 @@ where
         let param = state.get_param();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;
-        let jacobian_t = jacobian.clone().t();
 
-        let p = jacobian_t
+        let p = jacobian
+            .clone()
+            .t()
             .dot(&jacobian)
             .inv()?
             .dot(&jacobian.t().dot(&residuals));
