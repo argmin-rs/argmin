@@ -76,10 +76,10 @@ where
                 &search_region.1,
             ),
             best_cost: f64::INFINITY,
-            weight_momentum: weight_momentum,
-            weight_particle: weight_particle,
-            weight_swarm: weight_swarm,
-            search_region: search_region,
+            weight_momentum,
+            weight_particle,
+            weight_swarm,
+            search_region,
         };
 
         // FIXME: Should not be necessary to create new OpWrapper here.

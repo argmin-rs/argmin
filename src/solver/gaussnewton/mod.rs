@@ -12,10 +12,10 @@
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-/// Gauss-Newton method
-pub mod gaussnewton;
 /// Gauss-Newton method with linesearch
 pub mod gaussnewton_linesearch;
+/// Gauss-Newton method
+pub mod gaussnewton_method;
 
-pub use self::gaussnewton::*;
 pub use self::gaussnewton_linesearch::*;
+pub use self::gaussnewton_method::*;
