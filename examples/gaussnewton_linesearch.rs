@@ -13,10 +13,17 @@ use argmin::solver::linesearch::MoreThuenteLineSearch;
 use ndarray::{Array1, Array2};
 use serde::{Deserialize, Serialize};
 
+type Rate = f64;
+type S = f64;
+type Measurement = (S, Rate);
+
 // Example taken from Wikipedia: https://en.wikipedia.org/wiki/Gauss%E2%80%93Newton_algorithm
+// Model used in this example:
+// `rate = (V_{max} * [S]) / (K_M + [S]) `
+// where `V_{max}` and `K_M` are the sought parameters and `[S]` and `rate` is the measured data.
 #[derive(Clone, Default, Serialize, Deserialize)]
 struct Problem {
-    data: Vec<(f64, f64)>,
+    data: Vec<Measurement>,
 }
 
 impl ArgminOp for Problem {
@@ -59,7 +66,7 @@ fn run() -> Result<(), Error> {
         ],
     };
 
-    let linesearch = MoreThuenteLineSearch::new();
+    let linesearch = MoreThuenteLineSearch::new().alpha(0.0, 1.0)?;
 
     // Define initial parameter vector
     let init_param: Array1<f64> = Array1::from_vec(vec![0.9, 0.2]);
