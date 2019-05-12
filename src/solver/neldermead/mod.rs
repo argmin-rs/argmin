@@ -52,7 +52,7 @@ pub struct NelderMead<O: ArgminOp> {
 
 impl<O: ArgminOp> NelderMead<O>
 where
-    O: ArgminOp,
+    O: ArgminOp<Output = f64>,
     O::Param: Default
         + ArgminAdd<O::Param, O::Param>
         + ArgminSub<O::Param, O::Param>
@@ -147,6 +147,21 @@ where
     fn contract(&self, x0: &O::Param, x: &O::Param) -> O::Param {
         x0.add(&x.sub(&x0).mul(&self.rho))
     }
+
+    /// Shrink
+    fn shrink(&mut self, cost: &Fn(&O::Param) -> O::Output) {
+        let mut out = Vec::with_capacity(self.params.len());
+        out.push(self.params[0].clone());
+
+        for idx in 1..self.params.len() {
+            let xi = out[0]
+                .0
+                .add(&self.params[idx].0.sub(&out[0].0).mul(&self.sigma));
+            let ci = (cost)(&xi);
+            out.push((xi, ci));
+        }
+        self.params = out;
+    }
 }
 
 // impl<O> Default for NelderMead<O> {
@@ -157,13 +172,21 @@ where
 
 impl<O> Solver<O> for NelderMead<O>
 where
-    O: ArgminOp,
+    O: ArgminOp<Output = f64>,
     O::Param: Default
         + ArgminScaledSub<O::Param, f64, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminMul<f64, O::Param>,
 {
     const NAME: &'static str = "Nelder-Mead method";
+
+    fn init(
+        &mut self,
+        _op: &mut OpWrapper<O>,
+        _state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        unimplemented!()
+    }
 
     fn next_iter(
         &mut self,
