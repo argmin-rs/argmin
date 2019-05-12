@@ -13,7 +13,7 @@ use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
-/// Nelder-Mead method
+/// Nelder-Mead method (UNTESTED)
 ///
 /// The Nelder-Mead method a heuristic search method for nonlinear optimization problems which does
 /// not require derivatives.
@@ -67,6 +67,12 @@ where
             sigma: 0.5,
             params: vec![],
         }
+    }
+
+    /// Add initial parameters
+    pub fn with_initial_params(mut self, params: Vec<O::Param>) -> Self {
+        self.params = params.into_iter().map(|p| (p, std::f64::NAN)).collect();
+        self
     }
 
     /// set alpha
@@ -149,7 +155,10 @@ where
     }
 
     /// Shrink
-    fn shrink(&mut self, cost: &Fn(&O::Param) -> O::Output) {
+    fn shrink<F>(&mut self, mut cost: F) -> Result<(), Error>
+    where
+        F: FnMut(&O::Param) -> Result<O::Output, Error>,
+    {
         let mut out = Vec::with_capacity(self.params.len());
         out.push(self.params[0].clone());
 
@@ -157,10 +166,11 @@ where
             let xi = out[0]
                 .0
                 .add(&self.params[idx].0.sub(&out[0].0).mul(&self.sigma));
-            let ci = (cost)(&xi);
+            let ci = (cost)(&xi)?;
             out.push((xi, ci));
         }
         self.params = out;
+        Ok(())
     }
 }
 
@@ -176,31 +186,79 @@ where
     O::Param: Default
         + ArgminScaledSub<O::Param, f64, O::Param>
         + ArgminSub<O::Param, O::Param>
+        + ArgminAdd<O::Param, O::Param>
         + ArgminMul<f64, O::Param>,
 {
     const NAME: &'static str = "Nelder-Mead method";
 
     fn init(
         &mut self,
-        _op: &mut OpWrapper<O>,
+        op: &mut OpWrapper<O>,
         _state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        unimplemented!()
+        self.params = self
+            .params
+            .iter()
+            .cloned()
+            .map(|(p, _)| {
+                let c = op.apply(&p).unwrap();
+                (p, c)
+            })
+            .collect();
+        self.sort_param_vecs();
+
+        Ok(Some(
+            ArgminIterData::new()
+                .param(self.params[0].0.clone())
+                .cost(self.params[0].1),
+        ))
     }
 
     fn next_iter(
         &mut self,
-        _op: &mut OpWrapper<O>,
+        op: &mut OpWrapper<O>,
         _state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        // let param = state.get_param();
-        // let residuals = op.apply(&param)?;
-        // let jacobian = op.jacobian(&param)?;
-        //
-        // Ok(ArgminIterData::new()
-        //     .param(new_param)
-        //     .cost(residuals.norm()))
-        unimplemented!()
+        self.sort_param_vecs();
+
+        let num_param = self.params.len();
+
+        let x0 = self.calculate_centroid();
+        let xr = self.reflect(&x0, &self.params[num_param - 1].0);
+        let xr_cost = op.apply(&xr)?;
+
+        if xr_cost < self.params[num_param - 2].1 && xr_cost >= self.params[0].1 {
+            // reflection
+            self.params.last_mut().unwrap().0 = xr;
+            self.params.last_mut().unwrap().1 = xr_cost;
+        } else if xr_cost < self.params[0].1 {
+            // expansion
+            let xe = self.expand(&x0, &xr);
+            let xe_cost = op.apply(&xe)?;
+            if xe_cost < xr_cost {
+                self.params.last_mut().unwrap().0 = xe;
+                self.params.last_mut().unwrap().1 = xe_cost;
+            } else {
+                self.params.last_mut().unwrap().0 = xr;
+                self.params.last_mut().unwrap().1 = xr_cost;
+            }
+        } else if xr_cost >= self.params[num_param - 2].1 {
+            // contraction
+            let xc = self.contract(&x0, &self.params[num_param - 1].0);
+            let xc_cost = op.apply(&xc)?;
+            if xc_cost < self.params[num_param - 1].1 {
+                self.params.last_mut().unwrap().0 = xc;
+                self.params.last_mut().unwrap().1 = xc_cost;
+            }
+        } else {
+            self.shrink(|x| op.apply(x))?;
+        }
+
+        self.sort_param_vecs();
+
+        Ok(ArgminIterData::new()
+            .param(self.params[0].0.clone())
+            .cost(self.params[0].1))
     }
 
     fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
