@@ -67,6 +67,7 @@
 //! - [Gauss-Newton method](solver/gaussnewton/gaussnewton/struct.GaussNewton.html)
 //! - [Gauss-Newton method with linesearch](solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLS.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
+//! - [Nelder-Mead method](solver/neldermead/struct.NelderMead.html)
 //! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
 //! - [Particle Swarm Optimization](solver/particleswarm/struct.ParticleSwarm.html)
 //!

@@ -64,6 +64,7 @@ remain future plans.
 - [Gauss-Newton method](https://argmin-rs.github.io/argmin/argmin/solver/gaussnewton/gaussnewton/struct.GaussNewton.html)
 - [Gauss-Newton method with linesearch](https://argmin-rs.github.io/argmin/argmin/solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLineSearch.html)
 - [Landweber iteration](https://argmin-rs.github.io/argmin/argmin/solver/landweber/struct.Landweber.html)
+- [Nelder-Mead method](https://argmin-rs.github.io/argmin/argmin/solver/neldermead/struct.NelderMead.html)
 - [Simulated Annealing](https://argmin-rs.github.io/argmin/argmin/solver/simulatedannealing/struct.SimulatedAnnealing.html)
 - [Particle Swarm Optimization](https://argmin-rs.github.io/argmin/argmin/solver/particleswarm/struct.ParticleSwarm.html)
 
