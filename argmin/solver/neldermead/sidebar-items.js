@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["NelderMead","Nelder-Mead method"]]});
