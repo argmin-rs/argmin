@@ -13,7 +13,7 @@ use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
-/// Nelder-Mead method (UNTESTED)
+/// Nelder-Mead method
 ///
 /// The Nelder-Mead method a heuristic search method for nonlinear optimization problems which does
 /// not require derivatives.
@@ -184,6 +184,7 @@ impl<O> Solver<O> for NelderMead<O>
 where
     O: ArgminOp<Output = f64>,
     O::Param: Default
+        + std::fmt::Debug
         + ArgminScaledSub<O::Param, f64, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
@@ -219,13 +220,15 @@ where
         op: &mut OpWrapper<O>,
         _state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        self.sort_param_vecs();
+        // self.sort_param_vecs();
 
         let num_param = self.params.len();
 
         let x0 = self.calculate_centroid();
+
         let xr = self.reflect(&x0, &self.params[num_param - 1].0);
         let xr_cost = op.apply(&xr)?;
+        // println!("{:?}", self.params);
 
         if xr_cost < self.params[num_param - 2].1 && xr_cost >= self.params[0].1 {
             // reflection
@@ -251,6 +254,7 @@ where
                 self.params.last_mut().unwrap().1 = xc_cost;
             }
         } else {
+            // shrink
             self.shrink(|x| op.apply(x))?;
         }
 
