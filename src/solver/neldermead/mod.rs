@@ -230,10 +230,11 @@ where
         let xr_cost = op.apply(&xr)?;
         // println!("{:?}", self.params);
 
-        if xr_cost < self.params[num_param - 2].1 && xr_cost >= self.params[0].1 {
+        let action = if xr_cost < self.params[num_param - 2].1 && xr_cost >= self.params[0].1 {
             // reflection
             self.params.last_mut().unwrap().0 = xr;
             self.params.last_mut().unwrap().1 = xr_cost;
+            "reflection"
         } else if xr_cost < self.params[0].1 {
             // expansion
             let xe = self.expand(&x0, &xr);
@@ -245,6 +246,7 @@ where
                 self.params.last_mut().unwrap().0 = xr;
                 self.params.last_mut().unwrap().1 = xr_cost;
             }
+            "expansion"
         } else if xr_cost >= self.params[num_param - 2].1 {
             // contraction
             let xc = self.contract(&x0, &self.params[num_param - 1].0);
@@ -253,16 +255,19 @@ where
                 self.params.last_mut().unwrap().0 = xc;
                 self.params.last_mut().unwrap().1 = xc_cost;
             }
+            "contraction"
         } else {
             // shrink
             self.shrink(|x| op.apply(x))?;
-        }
+            "shrink"
+        };
 
         self.sort_param_vecs();
 
         Ok(ArgminIterData::new()
             .param(self.params[0].0.clone())
-            .cost(self.params[0].1))
+            .cost(self.params[0].1)
+            .kv(make_kv!("action" => action;)))
     }
 
     fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
