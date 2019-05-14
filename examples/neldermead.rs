@@ -35,14 +35,16 @@ fn run() -> Result<(), Error> {
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
     // Set up solver -- note that the proper choice of the vertices is very important!
-    let solver = NelderMead::new().with_initial_params(vec![
-        // array![-2.0, 3.0],
-        // array![-2.0, -1.0],
-        // array![2.0, -1.0],
-        array![-1.0, 3.0],
-        array![2.0, 1.5],
-        array![2.0, -1.0],
-    ]);
+    let solver = NelderMead::new()
+        .with_initial_params(vec![
+            // array![-2.0, 3.0],
+            // array![-2.0, -1.0],
+            // array![2.0, -1.0],
+            array![-1.0, 3.0],
+            array![2.0, 1.5],
+            array![2.0, -1.0],
+        ])
+        .sd_tolerance(0.0001);
 
     // Run solver
     let res = Executor::new(cost, solver, array![])

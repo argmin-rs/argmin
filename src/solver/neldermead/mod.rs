@@ -48,6 +48,8 @@ pub struct NelderMead<O: ArgminOp> {
     sigma: f64,
     /// parameters
     params: Vec<(O::Param, f64)>,
+    /// Sample standard deviation tolerance
+    sd_tolerance: f64,
 }
 
 impl<O: ArgminOp> NelderMead<O>
@@ -66,12 +68,19 @@ where
             rho: 0.5,
             sigma: 0.5,
             params: vec![],
+            sd_tolerance: std::f64::EPSILON,
         }
     }
 
     /// Add initial parameters
     pub fn with_initial_params(mut self, params: Vec<O::Param>) -> Self {
         self.params = params.into_iter().map(|p| (p, std::f64::NAN)).collect();
+        self
+    }
+
+    /// Set Sample standard deviation tolerance
+    pub fn sd_tolerance(mut self, tol: f64) -> Self {
+        self.sd_tolerance = tol;
         self
     }
 
@@ -271,9 +280,18 @@ where
     }
 
     fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
-        // if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON.sqrt() {
-        //     return TerminationReason::NoChangeInCost;
-        // }
+        let n = self.params.len() as f64;
+        let c0: f64 = self.params.iter().map(|(_, c)| c).sum::<f64>() / n;
+        let s: f64 = (1.0 / (n - 1.0)
+            * self
+                .params
+                .iter()
+                .map(|(_, c)| (c - c0).powi(2))
+                .sum::<f64>())
+        .sqrt();
+        if s < self.sd_tolerance {
+            return TerminationReason::TargetToleranceReached;
+        }
         TerminationReason::NotTerminated
     }
 }
