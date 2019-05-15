@@ -1,6 +1,6 @@
 [package]
 name = "argmin"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -20,11 +20,11 @@ exclude = [
 [dependencies]
 # argmin_core = { path = "../argmin-core"}
 # argmin_testfunctions = { path = "../argmin-testfunctions" }
-argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git", branch = "master"}
-argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git", branch = "master"}
-# argmin_core = "0.2.1"
-# argmin_testfunctions = "0.1.1"
-rand = { version = "0.6.1", features = ["serde1"] }
+# argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git", branch = "master"}
+# argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git", branch = "master"}
+argmin_core = "0.2.2"
+argmin_testfunctions = "0.1.1"
+rand = { version = "0.6.5", features = ["serde1"] }
 rand_xorshift = { version = "0.1.1", features = ["serde1"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 # argmin_codegen = "0.1.8"
@@ -35,7 +35,7 @@ serde = { version = "1.0", features = ["derive", "rc"] }
 ndarray = { version = "0.12.1", features = ["serde-1"] }
 ndarray-linalg = { version = "0.10.0", features = ["openblas"] }
 gnuplot = "0.0.27"
-paste = "0.1.4"
+paste = "0.1.5"
 
 
 [features]
