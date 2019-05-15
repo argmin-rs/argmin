@@ -300,6 +300,7 @@ where
 mod tests {
     use super::*;
     use crate::send_sync_test;
+    type Operator = MinimalNoOperator;
 
-    send_sync_test!(nelder_mead, NelderMead);
+    send_sync_test!(nelder_mead, NelderMead<Operator>);
 }
