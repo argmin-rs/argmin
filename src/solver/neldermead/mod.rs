@@ -183,11 +183,18 @@ where
     }
 }
 
-// impl<O> Default for NelderMead<O> {
-//     fn default() -> NelderMead<O> {
-//         NelderMead::new()
-//     }
-// }
+impl<O: ArgminOp> Default for NelderMead<O>
+where
+    O: ArgminOp<Output = f64>,
+    O::Param: Default
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminMul<f64, O::Param>,
+{
+    fn default() -> NelderMead<O> {
+        NelderMead::new()
+    }
+}
 
 impl<O> Solver<O> for NelderMead<O>
 where
