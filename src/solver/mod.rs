@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 pub mod conjugategradient;
+pub mod cuckoo;
 pub mod gaussnewton;
 pub mod gradientdescent;
 pub mod landweber;
