@@ -28,8 +28,8 @@ use std::default::Default;
 pub struct CuckooSearch<O: ArgminOp> {
     /// Nests
     nests: Vec<Nest<O>>,
-    /// gamma
-    gamma: f64,
+    // /// gamma
+    // gamma: f64,
 }
 
 /// A nest with eggs
@@ -43,7 +43,31 @@ struct Nest<O: ArgminOp> {
 #[derive(Serialize, Deserialize)]
 struct Egg<O: ArgminOp> {
     param: O::Param,
-    cost: O::Output,
+    cost: Option<O::Output>,
+}
+
+impl<O: ArgminOp> Egg<O> {
+    /// Lay an egg
+    pub fn lay(param: O::Param) -> Self {
+        Egg { param, cost: None }
+    }
+
+    /// Add cost to egg
+    pub fn with_cost(mut self, cost: O::Output) -> Self {
+        self.cost = Some(cost);
+        self
+    }
+
+    /// compute cost
+    pub fn compute_cost<F>(&mut self, mut cost_fun: F) -> Result<(), Error>
+    where
+        F: FnMut(&O::Param) -> Result<O::Output, Error>,
+    {
+        if self.cost.is_none() {
+            self.cost = Some((cost_fun)(&self.param)?);
+        }
+        Ok(())
+    }
 }
 
 impl<O: ArgminOp> CuckooSearch<O> {
@@ -51,21 +75,21 @@ impl<O: ArgminOp> CuckooSearch<O> {
     pub fn new() -> Self {
         CuckooSearch {
             nests: vec![],
-            gamma: 1.0,
+            // gamma: 1.0,
         }
     }
 
-    /// set gamma
-    pub fn gamma(mut self, gamma: f64) -> Result<Self, Error> {
-        if gamma <= 0.0 || gamma > 1.0 {
-            return Err(ArgminError::InvalidParameter {
-                text: "CuckooSearch: gamma must be in  (0, 1].".to_string(),
-            }
-            .into());
-        }
-        self.gamma = gamma;
-        Ok(self)
-    }
+    // /// set gamma
+    // pub fn gamma(mut self, gamma: f64) -> Result<Self, Error> {
+    //     if gamma <= 0.0 || gamma > 1.0 {
+    //         return Err(ArgminError::InvalidParameter {
+    //             text: "CuckooSearch: gamma must be in  (0, 1].".to_string(),
+    //         }
+    //         .into());
+    //     }
+    //     self.gamma = gamma;
+    //     Ok(self)
+    // }
 }
 
 impl<O: ArgminOp> Default for CuckooSearch<O> {
