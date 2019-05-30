@@ -148,14 +148,13 @@ impl ParticleSwarmVisualizer {
                 &self.optima_z,
                 &options_optima,
             )
-            .points(
-                &self.particles_x,
-                &self.particles_y,
-                &self.particles_z,
-                &options_particles,
-            )
+            // .points(
+            //     &self.particles_x,
+            //     &self.particles_y,
+            //     &self.particles_z,
+            //     &options_particles,
+            // )
             .set_view(0., 0.);
-        println!("Show figure");
         figure.show();
 
         std::thread::sleep(std::time::Duration::from_secs(1));
@@ -189,7 +188,7 @@ where
     fn observe_iter(&mut self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
         // TODO: get particles from `state` or `kv`
 
-        self.iteration(&state.best_param, state.best_cost, &vec![]);
+        self.iteration(&state.param, state.best_cost, &vec![]);
 
         Ok(())
     }
