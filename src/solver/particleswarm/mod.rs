@@ -17,8 +17,6 @@ use std;
 use std::default::Default;
 use std::f64;
 
-type Callback<T> = FnMut(&T, f64, &Vec<Particle<T>>) -> ();
-
 /// Particle Swarm Optimization (PSO)
 ///
 /// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/particleswarm.rs)
@@ -27,13 +25,11 @@ type Callback<T> = FnMut(&T, f64, &Vec<Particle<T>>) -> ();
 ///
 /// TODO
 #[derive(Serialize, Deserialize)]
-pub struct ParticleSwarm<'a, O>
+pub struct ParticleSwarm<O>
 where
     O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: Position,
 {
-    #[serde(skip)]
-    iter_callback: Option<&'a mut Callback<O::Param>>,
     particles: Vec<Particle<O::Param>>,
     best_position: O::Param,
     best_cost: f64,
@@ -47,7 +43,7 @@ where
     num_particles: usize,
 }
 
-impl<'a, O> ParticleSwarm<'a, O>
+impl<O> ParticleSwarm<O>
 where
     O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: Position,
@@ -65,8 +61,7 @@ where
         weight_particle: f64,
         weight_swarm: f64,
     ) -> Result<Self, Error> {
-        let mut particle_swarm = ParticleSwarm {
-            iter_callback: None,
+        let particle_swarm = ParticleSwarm {
             particles: vec![],
             best_position: O::Param::rand_from_range(
                 // FIXME: random smart?
@@ -82,12 +77,6 @@ where
         };
 
         Ok(particle_swarm)
-    }
-
-    // TODO: implement iter_callback as logger
-    /// Set callback
-    pub fn set_iter_callback(&mut self, callback: &'a mut Callback<O::Param>) {
-        self.iter_callback = Some(callback);
     }
 
     fn initialize_particles(&mut self, op: &mut OpWrapper<O>) {
@@ -138,7 +127,7 @@ where
     }
 }
 
-impl<'a, O> Solver<O> for ParticleSwarm<'a, O>
+impl<O> Solver<O> for ParticleSwarm<O>
 where
     O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: Position,
@@ -204,14 +193,12 @@ where
             }
         }
 
-        match &mut self.iter_callback {
-            Some(callback) => (*callback)(&self.best_position, self.best_cost, &self.particles),
-            None => (),
-        };
-
         let out = ArgminIterData::new()
             .param(self.best_position.clone())
-            .cost(self.best_cost);
+            .cost(self.best_cost)
+            .kv(make_kv!(
+                "particles" => &self.particles;
+            ));
         // out.add_kv(make_kv!(
         //     "t" => self.cur_temp;
 
@@ -234,7 +221,7 @@ trait_bound!(Position
 );
 
 /// A single particle
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Particle<T: Position> {
     /// Position of particle
     pub position: T,

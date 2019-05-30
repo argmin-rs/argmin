@@ -34,18 +34,14 @@ fn run() -> Result<(), Error> {
 
     let cost_function = Himmelblau {};
 
-    let mut visualizer = Visualizer::new();
+    let visualizer = ParticleSwarmVisualizer::new();
 
     {
-        let mut solver =
-            ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
-
-        let mut callback =
-            move |xy: &Vec<f64>, c: f64, v: &Particles| visualizer.iteration(xy, c, &v);
-        solver.set_iter_callback(&mut callback);
+        let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
 
         let res = Executor::new(cost_function, solver, init_param)
             .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+            .add_observer(visualizer, ObserverMode::Always)
             .max_iters(15)
             .run()?;
 
@@ -98,9 +94,8 @@ impl Surface {
     }
 }
 
-struct Visualizer {
-    fg: gnuplot::Figure,
-
+struct ParticleSwarmVisualizer {
+    // fg: Box<gnuplot::Figure>,
     optima_x: Vec<f64>,
     optima_y: Vec<f64>,
     optima_z: Vec<f64>,
@@ -112,10 +107,10 @@ struct Visualizer {
 }
 
 // TODO: destroy window
-impl Visualizer {
+impl ParticleSwarmVisualizer {
     fn new() -> Self {
         Self {
-            fg: gnuplot::Figure::new(),
+            // fg: gnuplot::Figure::new(),
             optima_x: vec![],
             optima_y: vec![],
             optima_z: vec![],
@@ -129,36 +124,36 @@ impl Visualizer {
     fn draw(&mut self) {
         use gnuplot::*;
 
-        self.fg.clear_axes();
+        // self.fg.clear_axes();
 
         let options_optima = [Color("#ffff00"), PointSize(2.0)];
         let options_particles = [Color("#ff0000"), PointSize(2.0)];
         let window = Some(self.surface.window);
-        self.fg
-            .axes3d()
-            .surface(
-                self.surface.zvalues.iter(),
-                self.surface.width,
-                self.surface.height,
-                window,
-                &[],
-            )
-            .points(
-                &self.optima_x,
-                &self.optima_y,
-                &self.optima_z,
-                &options_optima,
-            )
-            .points(
-                &self.particles_x,
-                &self.particles_y,
-                &self.particles_z,
-                &options_particles,
-            )
-            // .set_size(8.0, 8.0)
-            // .set_pos(-4.0, -4.0)
-            .set_view(0., 0.);
-        self.fg.show();
+        // self.fg
+        //     .axes3d()
+        //     .surface(
+        //         self.surface.zvalues.iter(),
+        //         self.surface.width,
+        //         self.surface.height,
+        //         window,
+        //         &[],
+        //     )
+        //     .points(
+        //         &self.optima_x,
+        //         &self.optima_y,
+        //         &self.optima_z,
+        //         &options_optima,
+        //     )
+        //     .points(
+        //         &self.particles_x,
+        //         &self.particles_y,
+        //         &self.particles_z,
+        //         &options_particles,
+        //     )
+        //     // .set_size(8.0, 8.0)
+        //     // .set_pos(-4.0, -4.0)
+        //     .set_view(0., 0.);
+        // self.fg.show();
 
         std::thread::sleep(std::time::Duration::from_secs(1));
     }
@@ -183,5 +178,18 @@ impl Visualizer {
         }
 
         self.draw();
+    }
+}
+
+impl<O> Observe<O> for ParticleSwarmVisualizer
+where
+    O: ArgminOp<Param = Vec<f64>>,
+{
+    fn observe_iter(&mut self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
+        // TODO: get particles from `state` or `kv`
+
+        self.iteration(&state.best_param, state.best_cost, &vec![]);
+
+        Ok(())
     }
 }
