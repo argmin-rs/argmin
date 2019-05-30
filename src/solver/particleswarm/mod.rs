@@ -32,7 +32,6 @@ where
     O: ArgminOp<Output = f64>,
     <O as ArgminOp>::Param: Position,
 {
-    cost_function: O, // TODO: would not be necessary if apply was immut
     #[serde(skip)]
     iter_callback: Option<&'a mut Callback<O::Param>>,
     particles: Vec<Particle<O::Param>>,
@@ -45,6 +44,7 @@ where
     weight_swarm: f64,
 
     search_region: (O::Param, O::Param),
+    num_particles: usize,
 }
 
 impl<'a, O> ParticleSwarm<'a, O>
@@ -59,7 +59,6 @@ where
     /// * `cost_function`: cost function
     /// * `init_temp`: initial temperature
     pub fn new(
-        cost_function: O,
         search_region: (O::Param, O::Param),
         num_particles: usize,
         weight_momentum: f64,
@@ -67,7 +66,6 @@ where
         weight_swarm: f64,
     ) -> Result<Self, Error> {
         let mut particle_swarm = ParticleSwarm {
-            cost_function: cost_function.clone(),
             iter_callback: None,
             particles: vec![],
             best_position: O::Param::rand_from_range(
@@ -80,16 +78,8 @@ where
             weight_particle,
             weight_swarm,
             search_region,
+            num_particles,
         };
-
-        // FIXME: Should not be necessary to create new OpWrapper here.
-        // COMMENT by stefan-k: If you initialize your particles in the `init` method of the
-        // `Solver` trait, then I think there is no need to carry around the cost function at all.
-        // This allows you to use the `OpWrapper` provided by the `Executor`, which also takes care
-        // of counting the cost function evaluations.
-        let mut op = OpWrapper::new(&cost_function);
-
-        particle_swarm.initialize_particles(&mut op, num_particles);
 
         Ok(particle_swarm)
     }
@@ -100,13 +90,13 @@ where
         self.iter_callback = Some(callback);
     }
 
-    fn initialize_particles(&mut self, op: &mut OpWrapper<O>, num_particles: usize) {
-        self.particles = (0..num_particles)
+    fn initialize_particles(&mut self, op: &mut OpWrapper<O>) {
+        self.particles = (0..self.num_particles)
             .map(|_| self.initialize_particle(op))
             .collect();
 
         self.best_position = self.get_best_position();
-        self.best_cost = self.cost_function.apply(&self.best_position).unwrap();
+        self.best_cost = op.apply(&self.best_position).unwrap();
         // TODO unwrap evil
     }
 
@@ -156,6 +146,16 @@ where
 {
     const NAME: &'static str = "Particle Swarm Optimization";
 
+    fn init(
+        &mut self,
+        _op: &mut OpWrapper<O>,
+        _state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        self.initialize_particles(_op);
+
+        Ok(None)
+    }
+
     /// Perform one iteration of algorithm
     fn next_iter(
         &mut self,
@@ -192,7 +192,7 @@ where
                 &self.search_region.1,
             );
 
-            p.cost = self.cost_function.apply(&p.position)?;
+            p.cost = _op.apply(&p.position)?;
             if p.cost < p.best_cost {
                 p.best_position = p.position.clone();
                 p.best_cost = p.cost;
