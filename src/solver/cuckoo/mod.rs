@@ -12,6 +12,8 @@
 //!    & Biologically Inspired Computing (NaBIC 2009). IEEE Publications. pp. 210–214.
 
 use crate::prelude::*;
+use rand::prelude::*;
+use rand_xorshift::XorShiftRng;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -28,8 +30,10 @@ use std::default::Default;
 pub struct CuckooSearch<O: ArgminOp> {
     /// Nests
     nests: Vec<Nest<O>>,
-    // /// gamma
-    // gamma: f64,
+    /// step length for parameter modification
+    alpha: f64,
+    /// random number generator
+    rng: XorShiftRng,
 }
 
 /// A nest with eggs
@@ -37,6 +41,17 @@ pub struct CuckooSearch<O: ArgminOp> {
 struct Nest<O: ArgminOp> {
     eggs: Vec<Egg<O>>,
     cost: O::Output,
+}
+
+impl<O: ArgminOp> Nest<O> {
+    pub fn get_cost(&self) -> O::Output {
+        self.cost.clone()
+    }
+
+    pub fn replace_best(&mut self, egg: Egg<O>) {
+        self.eggs[0] = egg;
+        self.cost = egg.get_cost();
+    }
 }
 
 /// An egg is round
@@ -58,6 +73,15 @@ impl<O: ArgminOp> Egg<O> {
         self
     }
 
+    /// Get cost
+    pub fn get_cost(&self) -> O::Output {
+        if let Some(cost) = self.cost {
+            cost
+        } else {
+            panic!("fix me");
+        }
+    }
+
     /// compute cost
     pub fn compute_cost<F>(&mut self, mut cost_fun: F) -> Result<(), Error>
     where
@@ -75,21 +99,22 @@ impl<O: ArgminOp> CuckooSearch<O> {
     pub fn new() -> Self {
         CuckooSearch {
             nests: vec![],
-            // gamma: 1.0,
+            alpha: 1.0,
+            rng: XorShiftRng::from_entropy(),
         }
     }
 
-    // /// set gamma
-    // pub fn gamma(mut self, gamma: f64) -> Result<Self, Error> {
-    //     if gamma <= 0.0 || gamma > 1.0 {
-    //         return Err(ArgminError::InvalidParameter {
-    //             text: "CuckooSearch: gamma must be in  (0, 1].".to_string(),
-    //         }
-    //         .into());
-    //     }
-    //     self.gamma = gamma;
-    //     Ok(self)
-    // }
+    /// set alpha
+    pub fn alpha(mut self, alpha: f64) -> Result<Self, Error> {
+        if alpha <= 0.0 {
+            return Err(ArgminError::InvalidParameter {
+                text: "CuckooSearch: alpha must be > 0.".to_string(),
+            }
+            .into());
+        }
+        self.alpha = alpha;
+        Ok(self)
+    }
 }
 
 impl<O: ArgminOp> Default for CuckooSearch<O> {
@@ -110,9 +135,18 @@ where
 
     fn next_iter(
         &mut self,
-        _op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
+        let param = state.get_param();
+        let param_new = op.modify(&param, 1.0)?;
+        let cost_new = op.apply(&param_new)?;
+        let nest_idx = self.rng.gen_range(0, self.nests.len());
+
+        if cost_new < self.nests[nest_idx].get_cost() {
+            self.nests[nest_idx].replace_best(Egg::lay(param_new).with_cost(cost_new));
+        }
+
         unimplemented!()
 
         // Ok(ArgminIterData::new()
