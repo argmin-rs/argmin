@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+// TODO: Need a way to create new solutions
+
 //! # References:
 //!
 //! 0. [Wikipedia](https://en.wikipedia.org/wiki/Cuckoo_search)
@@ -49,8 +51,8 @@ impl<O: ArgminOp> Nest<O> {
     }
 
     pub fn replace_best(&mut self, egg: Egg<O>) {
-        self.eggs[0] = egg;
         self.cost = egg.get_cost();
+        self.eggs[0] = egg;
     }
 }
 
@@ -75,7 +77,7 @@ impl<O: ArgminOp> Egg<O> {
 
     /// Get cost
     pub fn get_cost(&self) -> O::Output {
-        if let Some(cost) = self.cost {
+        if let Some(cost) = self.cost.clone() {
             cost
         } else {
             panic!("fix me");
@@ -126,6 +128,7 @@ impl<O: ArgminOp> Default for CuckooSearch<O> {
 impl<O> Solver<O> for CuckooSearch<O>
 where
     O: ArgminOp,
+    O::Output: PartialOrd,
     O::Param: Default
         + ArgminScaledSub<O::Param, f64, O::Param>
         + ArgminSub<O::Param, O::Param>
