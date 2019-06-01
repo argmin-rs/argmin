@@ -37,14 +37,8 @@ fn run() -> Result<(), Error> {
     let mut visualizer = Visualizer::new();
 
     {
-        let mut solver = ParticleSwarm::new(
-            cost_function.clone(),
-            (vec![-4.0, -4.0], vec![4.0, 4.0]),
-            100,
-            0.5,
-            0.0,
-            0.5,
-        )?;
+        let mut solver =
+            ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
 
         let mut callback =
             move |xy: &Vec<f64>, c: f64, v: &Particles| visualizer.iteration(xy, c, &v);
