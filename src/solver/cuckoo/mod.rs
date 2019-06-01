@@ -40,25 +40,38 @@ pub struct CuckooSearch<O: ArgminOp> {
 
 /// A nest with eggs
 #[derive(Serialize, Deserialize)]
-struct Nest<O: ArgminOp> {
+pub struct Nest<O: ArgminOp> {
     eggs: Vec<Egg<O>>,
     cost: O::Output,
 }
 
 impl<O: ArgminOp> Nest<O> {
+    /// Get best cost in nest
     pub fn get_cost(&self) -> O::Output {
         self.cost.clone()
     }
 
+    /// Replace best egg in nest
     pub fn replace_best(&mut self, egg: Egg<O>) {
         self.cost = egg.get_cost();
         self.eggs[0] = egg;
+    }
+
+    /// compute cost
+    pub fn compute_cost<F>(&mut self, cost_fun: &mut F) -> Result<(), Error>
+    where
+        F: FnMut(&O::Param) -> Result<O::Output, Error>,
+    {
+        for idx in 0..self.eggs.len() {
+            self.eggs[idx].compute_cost(cost_fun)?;
+        }
+        Ok(())
     }
 }
 
 /// An egg is round
 #[derive(Serialize, Deserialize)]
-struct Egg<O: ArgminOp> {
+pub struct Egg<O: ArgminOp> {
     param: O::Param,
     cost: Option<O::Output>,
 }
@@ -85,12 +98,12 @@ impl<O: ArgminOp> Egg<O> {
     }
 
     /// compute cost
-    pub fn compute_cost<F>(&mut self, mut cost_fun: F) -> Result<(), Error>
+    pub fn compute_cost<F>(&mut self, cost_fun: &mut F) -> Result<(), Error>
     where
         F: FnMut(&O::Param) -> Result<O::Output, Error>,
     {
         if self.cost.is_none() {
-            self.cost = Some((cost_fun)(&self.param)?);
+            self.cost = Some((*cost_fun)(&self.param)?);
         }
         Ok(())
     }
@@ -106,6 +119,12 @@ impl<O: ArgminOp> CuckooSearch<O> {
         }
     }
 
+    /// Add a nest
+    pub fn with_nest(mut self, nest: Nest<O>) -> Self {
+        self.nests.push(nest);
+        self
+    }
+
     /// set alpha
     pub fn alpha(mut self, alpha: f64) -> Result<Self, Error> {
         if alpha <= 0.0 {
@@ -116,6 +135,17 @@ impl<O: ArgminOp> CuckooSearch<O> {
         }
         self.alpha = alpha;
         Ok(self)
+    }
+
+    /// compute cost
+    pub fn compute_cost<F>(&mut self, cost_fun: &mut F) -> Result<(), Error>
+    where
+        F: FnMut(&O::Param) -> Result<O::Output, Error>,
+    {
+        for idx in 0..self.nests.len() {
+            self.nests[idx].compute_cost(cost_fun)?;
+        }
+        Ok(())
     }
 }
 
@@ -135,6 +165,15 @@ where
         + ArgminMul<f64, O::Param>,
 {
     const NAME: &'static str = "Cuckoo search";
+
+    fn init(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        _state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        self.compute_cost(&mut |x| op.apply(&x))?;
+        Ok(None)
+    }
 
     fn next_iter(
         &mut self,
