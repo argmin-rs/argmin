@@ -17,6 +17,7 @@ use crate::prelude::*;
 use rand::prelude::*;
 use rand_xorshift::XorShiftRng;
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use std::default::Default;
 
 /// Cuckoo search
@@ -106,6 +107,45 @@ impl<O: ArgminOp> Egg<O> {
             self.cost = Some((*cost_fun)(&self.param)?);
         }
         Ok(())
+    }
+}
+
+impl<O: ArgminOp> PartialEq for Egg<O>
+where
+    O::Param: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.param == other.param
+    }
+}
+
+impl<O: ArgminOp> Eq for Egg<O> where O::Param: PartialEq {}
+
+impl<O: ArgminOp> PartialOrd for Egg<O>
+where
+    O::Param: PartialEq,
+    O::Output: Ord,
+{
+    fn partial_cmp(&self, other: &Egg<O>) -> Option<Ordering> {
+        if let (Some(a), Some(b)) = (&self.cost, &other.cost) {
+            Some(a.cmp(&b))
+        } else {
+            None
+        }
+    }
+}
+
+impl<O: ArgminOp> Ord for Egg<O>
+where
+    O::Param: PartialEq,
+    O::Output: Ord,
+{
+    fn cmp(&self, other: &Egg<O>) -> Ordering {
+        if let (Some(a), Some(b)) = (&self.cost, &other.cost) {
+            a.cmp(&b)
+        } else {
+            panic!()
+        }
     }
 }
 
