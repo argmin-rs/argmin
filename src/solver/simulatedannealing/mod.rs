@@ -13,7 +13,7 @@
 //!
 //! [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 //! Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
-//! DOI: 10.1126/science.220.4598.671  
+//! DOI: 10.1126/science.220.4598.671
 
 use crate::prelude::*;
 use rand::prelude::*;
