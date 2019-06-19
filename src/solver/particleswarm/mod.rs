@@ -65,7 +65,7 @@ where
         weight_particle: f64,
         weight_swarm: f64,
     ) -> Result<Self, Error> {
-        let mut particle_swarm = ParticleSwarm {
+        let particle_swarm = ParticleSwarm {
             iter_callback: None,
             particles: vec![],
             best_position: O::Param::rand_from_range(
