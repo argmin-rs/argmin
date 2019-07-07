@@ -304,6 +304,13 @@
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2019 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -490,11 +497,18 @@
     }
 }
 
-<span class="comment">// impl&lt;O&gt; Default for NelderMead&lt;O&gt; {</span>
-<span class="comment">//     fn default() -&gt; NelderMead&lt;O&gt; {</span>
-<span class="comment">//         NelderMead::new()</span>
-<span class="comment">//     }</span>
-<span class="comment">// }</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">Default</span>
+        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+{
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
+        <span class="ident">NelderMead</span>::<span class="ident">new</span>()
+    }
+}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
