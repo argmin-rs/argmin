@@ -95,8 +95,9 @@ where
         + ArgminSub<P, P>
         + ArgminScaledAdd<P, S, P>
         + ArgminAdd<P, P>
+        + ArgminConj
         + ArgminMul<f64, P>,
-    S: Debug + ArgminDiv<S, S> + ArgminNorm<f64>,
+    S: Debug + ArgminDiv<S, S> + ArgminNorm<f64> + ArgminConj,
 {
     const NAME: &'static str = "Conjugate Gradient";
 
@@ -110,7 +111,7 @@ where
         let r0 = self.b.sub(&ap).mul(&(-1.0));
         self.r = r0.clone();
         self.p = r0.mul(&(-1.0));
-        self.rtr = self.r.dot(&self.r);
+        self.rtr = self.r.dot(&self.r.conj());
         Ok(None)
     }
 
@@ -122,14 +123,14 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         self.p_prev = self.p.clone();
         let apk = op.apply(&self.p)?;
-        self.alpha = self.rtr.div(&self.p.dot(&apk));
+        self.alpha = self.rtr.div(&self.p.dot(&apk.conj()));
         let new_param = state.get_param().scaled_add(&self.alpha, &self.p);
         self.r = self.r.scaled_add(&self.alpha, &apk);
-        let rtr_n = self.r.dot(&self.r);
+        let rtr_n = self.r.dot(&self.r.conj());
         self.beta = rtr_n.div(&self.rtr);
         self.rtr = rtr_n;
         self.p = self.r.mul(&(-1.0)).scaled_add(&self.beta, &self.p);
-        let norm = self.r.dot(&self.r);
+        let norm = self.r.dot(&self.r.conj());
 
         Ok(ArgminIterData::new()
             .param(new_param)
