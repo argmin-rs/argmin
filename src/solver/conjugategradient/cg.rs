@@ -85,7 +85,6 @@ where
     }
 }
 
-// + ArgminDot<P, f64>,
 impl<P, O, S> Solver<O> for ConjugateGradient<P, S>
 where
     O: ArgminOp<Param = P, Output = P>,
@@ -96,9 +95,8 @@ where
         + ArgminSub<P, P>
         + ArgminScaledAdd<P, S, P>
         + ArgminAdd<P, P>
-        + ArgminNorm<f64>
         + ArgminMul<f64, P>,
-    S: Debug + ArgminDiv<S, S>,
+    S: Debug + ArgminDiv<S, S> + ArgminNorm<f64>,
 {
     const NAME: &'static str = "Conjugate Gradient";
 
@@ -112,12 +110,11 @@ where
         let r0 = self.b.sub(&ap).mul(&(-1.0));
         self.r = r0.clone();
         self.p = r0.mul(&(-1.0));
-        // self.rtr = self.r.norm().powi(2);
         self.rtr = self.r.dot(&self.r);
         Ok(None)
     }
 
-    /// Perform one iteration of SA algorithm
+    /// Perform one iteration of CG algorithm
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
@@ -128,17 +125,16 @@ where
         self.alpha = self.rtr.div(&self.p.dot(&apk));
         let new_param = state.get_param().scaled_add(&self.alpha, &self.p);
         self.r = self.r.scaled_add(&self.alpha, &apk);
-        // let rtr_n = self.r.norm().powi(2);
         let rtr_n = self.r.dot(&self.r);
         self.beta = rtr_n.div(&self.rtr);
         self.rtr = rtr_n;
         self.p = self.r.mul(&(-1.0)).scaled_add(&self.beta, &self.p);
-        // let norm = self.r.dot(&self.r);
-        let norm = self.r.norm().powi(2);
+        let norm = self.r.dot(&self.r);
 
         Ok(ArgminIterData::new()
             .param(new_param)
-            .cost(norm.sqrt())
+            // .cost(norm.sqrt())
+            .cost(norm.norm())
             .kv(make_kv!("alpha" => self.alpha; "beta" => self.beta;)))
     }
 }
