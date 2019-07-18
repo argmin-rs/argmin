@@ -3,9 +3,14 @@ version: 2
 jobs:
   lint:
     docker:
-      - image: rust:1.36.0-slim-buster
+      - image: rust:1.36.0-buster
     steps:
       - checkout
+      - run:
+          name: dependencies
+          command: |
+            rustup component add rustfmt
+            rustup component add clippy
       - run:
           name: cargo fmt
           command: |
