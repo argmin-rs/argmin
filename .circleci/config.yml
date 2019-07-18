@@ -1,0 +1,23 @@
+version: 2
+
+jobs:
+  lint:
+    docker:
+      - image: rust:1.36.0-slim-buster
+    steps:
+      - checkout
+      - run:
+          name: cargo fmt
+          command: |
+            cargo fmt -- --check
+      - run:
+          name: cargo clippy
+          command: |
+            cargo clippy || true
+
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - lint
