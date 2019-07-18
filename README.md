@@ -93,6 +93,14 @@ These may become default features in the future. Without these features compilat
    result) after pressing Ctrl+C.
 - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.
 
+### Running the tests
+
+Running the tests requires the `ndarrayl` feature to be enabled
+
+```bash
+cargo test --features "ndarrayl"
+```
+
 ## Defining a problem
 
 A problem can be defined by implementing the `ArgminOp` trait which comes with the
