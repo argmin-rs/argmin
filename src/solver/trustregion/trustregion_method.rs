@@ -35,7 +35,7 @@ use std::fmt::Debug;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct TrustRegion<R> {
     /// Radius
     radius: f64,
@@ -200,10 +200,10 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
     use crate::solver::trustregion::steihaug::Steihaug;
 
     type Operator = MinimalNoOperator;
 
-    send_sync_test!(trustregion, TrustRegion<Steihaug<Operator>>);
+    test_trait_impl!(trustregion, TrustRegion<Steihaug<Operator>>);
 }

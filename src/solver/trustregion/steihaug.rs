@@ -249,7 +249,7 @@ impl<P: Clone + Serialize> ArgminTrustRegion for Steihaug<P> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
 
-    send_sync_test!(steihaug, Steihaug<MinimalNoOperator>);
+    test_trait_impl!(steihaug, Steihaug<MinimalNoOperator>);
 }

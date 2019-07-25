@@ -10,7 +10,7 @@
 /// This macro crates a test for send an sync
 #[cfg(test)]
 #[macro_export]
-macro_rules! send_sync_test {
+macro_rules! test_trait_impl {
     ($n:ident, $t:ty) => {
         paste::item! {
             #[test]
@@ -29,5 +29,15 @@ macro_rules! send_sync_test {
                 assert_sync::<$t>();
             }
         }
+
+        paste::item! {
+            #[test]
+            #[allow(non_snake_case)]
+            fn [<test_clone_ $n>]() {
+                fn assert_clone<T: Clone>() {}
+                assert_clone::<$t>();
+            }
+        }
+
     };
 }

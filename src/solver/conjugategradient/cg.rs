@@ -143,9 +143,9 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
 
-    send_sync_test!(
+    test_trait_impl!(
         conjugate_gradient,
         ConjugateGradient<NoOperator<Vec<f64>, Vec<f64>, (), ()>, f64>
     );

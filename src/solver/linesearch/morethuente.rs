@@ -580,8 +580,8 @@ fn cstep(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
     use crate::MinimalNoOperator;
 
-    send_sync_test!(morethuente, MoreThuenteLineSearch<MinimalNoOperator>);
+    test_trait_impl!(morethuente, MoreThuenteLineSearch<MinimalNoOperator>);
 }

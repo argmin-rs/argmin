@@ -23,7 +23,7 @@ use std::fmt::Debug;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct SR1<L, H> {
     /// parameter for skipping rule
     r: f64,
@@ -179,10 +179,10 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
     use crate::solver::linesearch::MoreThuenteLineSearch;
 
     type Operator = MinimalNoOperator;
 
-    send_sync_test!(sr1, SR1<Operator, MoreThuenteLineSearch<Operator>>);
+    test_trait_impl!(sr1, SR1<Operator, MoreThuenteLineSearch<Operator>>);
 }

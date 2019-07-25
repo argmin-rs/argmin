@@ -27,7 +27,7 @@ use std::default::Default;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct NonlinearConjugateGradient<P, L, B> {
     /// p
     p: P,
@@ -183,12 +183,12 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
     use crate::solver::conjugategradient::beta::PolakRibiere;
     use crate::solver::linesearch::MoreThuenteLineSearch;
     use crate::MinimalNoOperator;
 
-    send_sync_test!(
+    test_trait_impl!(
         nonlinear_cg,
         NonlinearConjugateGradient<
             MinimalNoOperator,
