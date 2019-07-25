@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct NewtonCG<L> {
     /// line search
     linesearch: L,
@@ -188,10 +188,10 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
     use crate::solver::linesearch::MoreThuenteLineSearch;
+    use crate::test_trait_impl;
 
-    send_sync_test!(newton_cg, NewtonCG<MoreThuenteLineSearch<Vec<f64>>>);
+    test_trait_impl!(newton_cg, NewtonCG<MoreThuenteLineSearch<Vec<f64>>>);
 
-    send_sync_test!(cg_subproblem, CGSubProblem<Vec<f64>, Vec<Vec<f64>>>);
+    test_trait_impl!(cg_subproblem, CGSubProblem<Vec<f64>, Vec<Vec<f64>>>);
 }

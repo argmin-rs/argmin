@@ -60,7 +60,7 @@ impl std::default::Default for SATempFunc {
 /// [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 /// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 /// DOI: 10.1126/science.220.4598.671  
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct SimulatedAnnealing {
     /// Initial temperature
     init_temp: f64,
@@ -321,7 +321,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
 
-    send_sync_test!(sa, SimulatedAnnealing);
+    test_trait_impl!(sa, SimulatedAnnealing);
 }

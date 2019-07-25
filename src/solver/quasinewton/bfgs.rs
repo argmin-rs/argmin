@@ -23,7 +23,7 @@ use std::fmt::Debug;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct BFGS<L, H> {
     /// Inverse Hessian
     inv_hessian: H,
@@ -168,10 +168,10 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
     use crate::solver::linesearch::MoreThuenteLineSearch;
+    use crate::test_trait_impl;
 
     type Operator = MinimalNoOperator;
 
-    send_sync_test!(bfgs, BFGS<Operator, MoreThuenteLineSearch<Operator>>);
+    test_trait_impl!(bfgs, BFGS<Operator, MoreThuenteLineSearch<Operator>>);
 }

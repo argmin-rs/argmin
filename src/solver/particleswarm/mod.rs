@@ -234,7 +234,7 @@ trait_bound!(Position
 );
 
 /// A single particle
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Particle<T: Position> {
     /// Position of particle
     pub position: T,
