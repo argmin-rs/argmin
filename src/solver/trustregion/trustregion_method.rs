@@ -200,8 +200,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_trait_impl;
     use crate::solver::trustregion::steihaug::Steihaug;
+    use crate::test_trait_impl;
 
     type Operator = MinimalNoOperator;
 

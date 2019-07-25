@@ -168,8 +168,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_trait_impl;
     use crate::solver::linesearch::MoreThuenteLineSearch;
+    use crate::test_trait_impl;
 
     type Operator = MinimalNoOperator;
 

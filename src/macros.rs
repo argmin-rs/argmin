@@ -38,6 +38,5 @@ macro_rules! test_trait_impl {
                 assert_clone::<$t>();
             }
         }
-
     };
 }
