@@ -518,8 +518,6 @@
 extern crate argmin_core;
 extern crate argmin_testfunctions;
 extern crate rand;
-#[macro_use]
-extern crate approx;
 
 /// Definition of all relevant traits and types
 pub mod prelude;

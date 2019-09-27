@@ -7,6 +7,7 @@
 
 #![allow(non_snake_case)]
 
+use approx::assert_relative_eq;
 use ndarray::prelude::*;
 use ndarray::{Array1, Array2};
 
