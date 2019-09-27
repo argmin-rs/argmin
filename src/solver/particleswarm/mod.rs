@@ -17,7 +17,7 @@ use std;
 use std::default::Default;
 use std::f64;
 
-type Callback<T> = FnMut(&T, f64, &Vec<Particle<T>>) -> ();
+type Callback<T> = dyn FnMut(&T, f64, &Vec<Particle<T>>) -> ();
 
 /// Particle Swarm Optimization (PSO)
 ///
