@@ -26,7 +26,7 @@ argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunction
 # argmin_testfunctions = "0.1.1"
 rand = { version = "0.6.5", features = ["serde1"] }
 rand_xorshift = { version = "0.1.1", features = ["serde1"] }
-serde = { version = "1.0", features = ["derive", "rc"] }
+serde = { version = "1.0", features = ["rc"] }
 approx = "0.3.2"
 # argmin_codegen = "0.1.8"
 # argmin_codegen = { path = "../argmin-codegen"}
