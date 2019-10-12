@@ -27,8 +27,6 @@ impl ArgminOp for Himmelblau {
     }
 }
 
-type Particles = Vec<Particle<Vec<f64>>>;
-
 fn run() -> Result<(), Error> {
     // Define inital parameter vector
     let init_param: Vec<f64> = vec![0.1, 0.1];
@@ -51,6 +49,7 @@ fn run() -> Result<(), Error> {
         // Print Result
         println!("{}", res);
     }
+
     Ok(())
 }
 
@@ -160,7 +159,7 @@ impl ParticleSwarmVisualizer {
         std::thread::sleep(std::time::Duration::from_secs(1));
     }
 
-    fn iteration(&mut self, xy: &Vec<f64>, cost: f64, particles: &Particles) {
+    fn iteration(&mut self, xy: &Vec<f64>, cost: f64, population: Option<&Vec<(Vec<f64>, f64)>>) {
         self.optima_x.clear();
         self.optima_y.clear();
         self.optima_z.clear();
@@ -171,10 +170,13 @@ impl ParticleSwarmVisualizer {
         self.particles_x.clear();
         self.particles_y.clear();
         self.particles_z.clear();
-        for particle in particles {
-            self.particles_x.push(particle.position[0]);
-            self.particles_y.push(particle.position[1]);
-            self.particles_z.push(particle.cost);
+
+        if let Some(population) = population {
+            for (param, cost) in population {
+                self.particles_x.push(param[0]);
+                self.particles_y.push(param[1]);
+                self.particles_z.push(*cost);
+            }
         }
 
         self.draw();
@@ -188,7 +190,7 @@ where
     fn observe_iter(&mut self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
         // TODO: get particles from `state` or `kv`
 
-        self.iteration(&state.param, state.best_cost, &vec![]);
+        self.iteration(&state.param, state.best_cost, state.get_population());
 
         Ok(())
     }
