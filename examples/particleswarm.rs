@@ -147,12 +147,12 @@ impl ParticleSwarmVisualizer {
                 &self.optima_z,
                 &options_optima,
             )
-            // .points(
-            //     &self.particles_x,
-            //     &self.particles_y,
-            //     &self.particles_z,
-            //     &options_particles,
-            // )
+            .points(
+                &self.particles_x,
+                &self.particles_y,
+                &self.particles_z,
+                &options_particles,
+            )
             .set_view(0., 0.);
         figure.show();
 

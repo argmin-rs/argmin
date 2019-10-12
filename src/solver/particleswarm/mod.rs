@@ -193,17 +193,20 @@ where
             }
         }
 
-        // TODO: add population here
+        // Store particles as population
+        let population = self
+            .particles
+            .iter()
+            .map(|particle| (particle.position.clone(), particle.cost))
+            .collect();
+
         let out = ArgminIterData::new()
             .param(self.best_position.clone())
             .cost(self.best_cost)
+            .population(population)
             .kv(make_kv!(
                 "particles" => &self.particles;
             ));
-        // out.add_kv(make_kv!(
-        //     "t" => self.cur_temp;
-
-        // ));
 
         Ok(out)
     }
