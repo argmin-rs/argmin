@@ -33,9 +33,13 @@ fn run() -> Result<(), Error> {
 
     let cost_function = Himmelblau {};
 
-    let visualizer = Visualizer3d::new()
+    let visualizer = Visualizer3d::<Himmelblau>::new()
         .delay(std::time::Duration::from_secs(1))
-        .surface(Surface::new((-4.0, -4.0, 4.0, 4.0), 0.1));
+        .surface(Surface::new(
+            cost_function.clone(),
+            (-4.0, -4.0, 4.0, 4.0),
+            0.1,
+        ));
 
     {
         let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
@@ -62,15 +66,19 @@ fn main() {
 }
 
 /// Helper class for visualized surface
-struct Surface {
+struct Surface<O: ArgminOp> {
+    op: O, // TODO: get rid of useless member
     window: (f64, f64, f64, f64),
     width: usize,
     height: usize,
     zvalues: Vec<f64>,
 }
 
-impl Surface {
-    fn new(window: (f64, f64, f64, f64), resolution: f64) -> Self {
+impl<O> Surface<O>
+where
+    O: ArgminOp<Param = Vec<f64>, Output = f64>,
+{
+    fn new(op: O, window: (f64, f64, f64, f64), resolution: f64) -> Self {
         let width = window.2 - window.0;
         let height = window.3 - window.1;
         let num_x = (width / resolution) as usize;
@@ -82,7 +90,9 @@ impl Surface {
             for j in 0..num_x {
                 let y = height * (i as f64) / num_y as f64 - (0.5 * height);
                 let x = width * (j as f64) / num_x as f64 - (0.5 * width);
-                zvalues.push(himmelblau(&vec![x, y]));
+                if let Ok(zvalue) = op.apply(&vec![x, y]) {
+                    zvalues.push(zvalue);
+                }
             }
         }
 
@@ -91,6 +101,7 @@ impl Surface {
             width: num_x,
             height: num_y,
             zvalues,
+            op,
         }
     }
 }
@@ -99,7 +110,7 @@ impl Surface {
 /// (x,y) -> cost
 /// . If the solver is population-based,
 /// The current population is also visualized.
-struct Visualizer3d {
+struct Visualizer3d<O: ArgminOp> {
     // Need mutex because `Figure` contains `Cell`
     fg: Mutex<gnuplot::Figure>,
     optima_x: Vec<f64>,
@@ -109,14 +120,14 @@ struct Visualizer3d {
     particles_y: Vec<f64>,
     particles_z: Vec<f64>,
     /// Optional visualized surface of cost function
-    surface: Option<Surface>,
+    surface: Option<Surface<O>>,
     /// Optional delay between iterations
     delay: Option<std::time::Duration>,
 }
 
 // TODO: destroy window
 // TODO: end process on window close
-impl Visualizer3d {
+impl<O: ArgminOp> Visualizer3d<O> {
     fn new() -> Self {
         Self {
             fg: Mutex::new(gnuplot::Figure::new()),
@@ -137,7 +148,7 @@ impl Visualizer3d {
         self
     }
 
-    fn surface(mut self, surface: Surface) -> Self {
+    fn surface(mut self, surface: Surface<O>) -> Self {
         self.surface = Some(surface);
 
         self
@@ -213,7 +224,7 @@ impl Visualizer3d {
     }
 }
 
-impl<O> Observe<O> for Visualizer3d
+impl<O> Observe<O> for Visualizer3d<O>
 where
     O: ArgminOp<Param = Vec<f64>>,
 {
