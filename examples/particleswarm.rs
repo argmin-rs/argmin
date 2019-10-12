@@ -33,7 +33,9 @@ fn run() -> Result<(), Error> {
 
     let cost_function = Himmelblau {};
 
-    let visualizer = ParticleSwarmVisualizer::new();
+    let visualizer = Visualizer3d::new()
+        .delay(std::time::Duration::from_secs(1))
+        .surface(Surface::new((-4.0, -4.0, 4.0, 4.0), 0.1));
 
     {
         let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
@@ -93,7 +95,11 @@ impl Surface {
     }
 }
 
-struct ParticleSwarmVisualizer {
+/// Visualize iterations of a solver for cost functions of type
+/// (x,y) -> cost
+/// . If the solver is population-based,
+/// The current population is also visualized.
+struct Visualizer3d {
     // Need mutex because `Figure` contains `Cell`
     fg: Mutex<gnuplot::Figure>,
     optima_x: Vec<f64>,
@@ -102,12 +108,15 @@ struct ParticleSwarmVisualizer {
     particles_x: Vec<f64>,
     particles_y: Vec<f64>,
     particles_z: Vec<f64>,
-
-    surface: Surface,
+    /// Optional visualized surface of cost function
+    surface: Option<Surface>,
+    /// Optional delay between iterations
+    delay: Option<std::time::Duration>,
 }
 
 // TODO: destroy window
-impl ParticleSwarmVisualizer {
+// TODO: end process on window close
+impl Visualizer3d {
     fn new() -> Self {
         Self {
             fg: Mutex::new(gnuplot::Figure::new()),
@@ -117,8 +126,21 @@ impl ParticleSwarmVisualizer {
             particles_x: vec![],
             particles_y: vec![],
             particles_z: vec![],
-            surface: Surface::new((-4.0, -4.0, 4.0, 4.0), 0.1),
+            surface: None,
+            delay: None,
         }
+    }
+
+    fn delay(mut self, duration: std::time::Duration) -> Self {
+        self.delay = Some(duration);
+
+        self
+    }
+
+    fn surface(mut self, surface: Surface) -> Self {
+        self.surface = Some(surface);
+
+        self
     }
 
     fn draw(&mut self) {
@@ -131,16 +153,21 @@ impl ParticleSwarmVisualizer {
 
         let options_optima = [Color("#ffff00"), PointSize(2.0)];
         let options_particles = [Color("#ff0000"), PointSize(2.0)];
-        let window = Some(self.surface.window);
-        figure
-            .axes3d()
-            .surface(
-                self.surface.zvalues.iter(),
-                self.surface.width,
-                self.surface.height,
+        let axes3d = figure.axes3d();
+
+        // Draw surface before points
+        if let Some(surface) = &self.surface {
+            let window = Some(surface.window);
+            axes3d.surface(
+                surface.zvalues.iter(),
+                surface.width,
+                surface.height,
                 window,
                 &[],
-            )
+            );
+        }
+
+        axes3d
             .points(
                 &self.optima_x,
                 &self.optima_y,
@@ -153,10 +180,13 @@ impl ParticleSwarmVisualizer {
                 &self.particles_z,
                 &options_particles,
             )
-            .set_view(0., 0.);
+            .set_view(30.0, 30.0); // TODO: do not reset view on new iteration
+
         figure.show();
 
-        std::thread::sleep(std::time::Duration::from_secs(1));
+        if let Some(delay) = self.delay {
+            std::thread::sleep(delay);
+        };
     }
 
     fn iteration(&mut self, xy: &Vec<f64>, cost: f64, population: Option<&Vec<(Vec<f64>, f64)>>) {
@@ -183,7 +213,7 @@ impl ParticleSwarmVisualizer {
     }
 }
 
-impl<O> Observe<O> for ParticleSwarmVisualizer
+impl<O> Observe<O> for Visualizer3d
 where
     O: ArgminOp<Param = Vec<f64>>,
 {
