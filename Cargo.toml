@@ -42,6 +42,7 @@ paste = "0.1.5"
 default = []
 ctrlc = ["argmin_core/ctrlc"]
 ndarrayl = ["argmin_core/ndarrayl"]
+visualizer = ["argmin_core/visualizer"]
 
 [badges]
 travis-ci = { repository = "argmin-rs/argmin", branch = "master" }
