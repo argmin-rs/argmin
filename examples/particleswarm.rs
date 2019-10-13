@@ -33,9 +33,9 @@ fn run() -> Result<(), Error> {
 
     let cost_function = Himmelblau {};
 
-    let visualizer = Visualizer3d::<Himmelblau>::new()
+    let visualizer = Visualizer3d::new()
         .delay(std::time::Duration::from_secs(1))
-        .surface(Surface::new(
+        .surface(Surface::new::<Himmelblau>(
             cost_function.clone(),
             (-4.0, -4.0, 4.0, 4.0),
             0.1,
@@ -66,19 +66,18 @@ fn main() {
 }
 
 /// Helper class for visualized surface
-struct Surface<O: ArgminOp> {
-    op: O, // TODO: get rid of useless member
+struct Surface {
     window: (f64, f64, f64, f64),
     width: usize,
     height: usize,
     zvalues: Vec<f64>,
 }
 
-impl<O> Surface<O>
-where
-    O: ArgminOp<Param = Vec<f64>, Output = f64>,
-{
-    fn new(op: O, window: (f64, f64, f64, f64), resolution: f64) -> Self {
+impl Surface {
+    fn new<O>(op: O, window: (f64, f64, f64, f64), resolution: f64) -> Self
+    where
+        O: ArgminOp<Param = Vec<f64>, Output = f64>,
+    {
         let width = window.2 - window.0;
         let height = window.3 - window.1;
         let num_x = (width / resolution) as usize;
@@ -101,16 +100,15 @@ where
             width: num_x,
             height: num_y,
             zvalues,
-            op,
         }
     }
 }
 
 /// Visualize iterations of a solver for cost functions of type
 /// (x,y) -> cost
-/// . If the solver is population-based,
+/// , where x and y are real numbers. If the solver is population-based,
 /// The current population is also visualized.
-struct Visualizer3d<O: ArgminOp> {
+struct Visualizer3d {
     // Need mutex because `Figure` contains `Cell`
     fg: Mutex<gnuplot::Figure>,
     optima_x: Vec<f64>,
@@ -120,14 +118,12 @@ struct Visualizer3d<O: ArgminOp> {
     particles_y: Vec<f64>,
     particles_z: Vec<f64>,
     /// Optional visualized surface of cost function
-    surface: Option<Surface<O>>,
+    surface: Option<Surface>,
     /// Optional delay between iterations
     delay: Option<std::time::Duration>,
 }
 
-// TODO: destroy window
-// TODO: end process on window close
-impl<O: ArgminOp> Visualizer3d<O> {
+impl Visualizer3d {
     fn new() -> Self {
         Self {
             fg: Mutex::new(gnuplot::Figure::new()),
@@ -148,7 +144,7 @@ impl<O: ArgminOp> Visualizer3d<O> {
         self
     }
 
-    fn surface(mut self, surface: Surface<O>) -> Self {
+    fn surface(mut self, surface: Surface) -> Self {
         self.surface = Some(surface);
 
         self
@@ -224,7 +220,7 @@ impl<O: ArgminOp> Visualizer3d<O> {
     }
 }
 
-impl<O> Observe<O> for Visualizer3d<O>
+impl<O> Observe<O> for Visualizer3d
 where
     O: ArgminOp<Param = Vec<f64>>,
 {
