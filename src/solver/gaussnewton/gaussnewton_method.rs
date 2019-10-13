@@ -22,7 +22,7 @@ use std::default::Default;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct GaussNewton {
     /// gamma
     gamma: f64,
@@ -104,7 +104,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
 
-    send_sync_test!(gauss_newton_method, GaussNewton);
+    test_trait_impl!(gauss_newton_method, GaussNewton);
 }

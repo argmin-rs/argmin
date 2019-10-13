@@ -26,7 +26,7 @@ use std::fmt::Debug;
 ///
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct LBFGS<L, P> {
     /// line search
     linesearch: L,
@@ -177,10 +177,10 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
     use crate::solver::linesearch::MoreThuenteLineSearch;
+    use crate::test_trait_impl;
 
     type Operator = MinimalNoOperator;
 
-    send_sync_test!(lbfgs, LBFGS<Operator, MoreThuenteLineSearch<Operator>>);
+    test_trait_impl!(lbfgs, LBFGS<Operator, MoreThuenteLineSearch<Operator>>);
 }

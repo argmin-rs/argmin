@@ -74,7 +74,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-argmin = "0.2.2"
+argmin = "0.2.4"
 ```
 
 ### Optional features (recommended)
@@ -83,7 +83,7 @@ There are additional features which can be activated in `Cargo.toml`:
 
 ```toml
 [dependencies]
-argmin = { version = "0.2.2", features = ["ctrlc", "ndarrayl"] }
+argmin = { version = "0.2.4", features = ["ctrlc", "ndarrayl"] }
 ```
 
 These may become default features in the future. Without these features compilation to
@@ -92,6 +92,14 @@ These may become default features in the future. Without these features compilat
 - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
    result) after pressing Ctrl+C.
 - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.
+
+### Running the tests
+
+Running the tests requires the `ndarrayl` feature to be enabled
+
+```bash
+cargo test --features "ndarrayl"
+```
 
 ## Defining a problem
 

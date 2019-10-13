@@ -11,9 +11,11 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+// use num_complex::Complex;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
+use std::fmt::Debug;
 
 /// The conjugate gradient method is a solver for systems of linear equations with a symmetric and
 /// positive-definite matrix.
@@ -25,7 +27,7 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct ConjugateGradient<P> {
+pub struct ConjugateGradient<P, S> {
     /// b (right hand side)
     b: P,
     /// residual
@@ -35,16 +37,20 @@ pub struct ConjugateGradient<P> {
     /// previous p
     p_prev: P,
     /// r^T * r
-    rtr: f64,
+    #[serde(skip)]
+    rtr: S,
     /// alpha
-    alpha: f64,
+    #[serde(skip)]
+    alpha: S,
     /// beta
-    beta: f64,
+    #[serde(skip)]
+    beta: S,
 }
 
-impl<P> ConjugateGradient<P>
+impl<P, S> ConjugateGradient<P, S>
 where
     P: Clone + Default,
+    S: Default,
 {
     /// Constructor
     ///
@@ -57,9 +63,9 @@ where
             r: P::default(),
             p: P::default(),
             p_prev: P::default(),
-            rtr: std::f64::NAN,
-            alpha: std::f64::NAN,
-            beta: std::f64::NAN,
+            rtr: S::default(),
+            alpha: S::default(),
+            beta: S::default(),
         })
     }
 
@@ -79,18 +85,19 @@ where
     }
 }
 
-impl<P, O> Solver<O> for ConjugateGradient<P>
+impl<P, O, S> Solver<O> for ConjugateGradient<P, S>
 where
     O: ArgminOp<Param = P, Output = P>,
     P: Clone
         + Serialize
         + DeserializeOwned
+        + ArgminDot<P, S>
         + ArgminSub<P, P>
-        + ArgminDot<P, f64>
-        + ArgminScaledAdd<P, f64, P>
+        + ArgminScaledAdd<P, S, P>
         + ArgminAdd<P, P>
-        + ArgminMul<f64, P>
-        + ArgminDot<P, f64>,
+        + ArgminConj
+        + ArgminMul<f64, P>,
+    S: Debug + ArgminDiv<S, S> + ArgminNorm<f64> + ArgminConj,
 {
     const NAME: &'static str = "Conjugate Gradient";
 
@@ -104,11 +111,11 @@ where
         let r0 = self.b.sub(&ap).mul(&(-1.0));
         self.r = r0.clone();
         self.p = r0.mul(&(-1.0));
-        self.rtr = self.r.dot(&self.r);
+        self.rtr = self.r.dot(&self.r.conj());
         Ok(None)
     }
 
-    /// Perform one iteration of SA algorithm
+    /// Perform one iteration of CG algorithm
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
@@ -116,18 +123,19 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         self.p_prev = self.p.clone();
         let apk = op.apply(&self.p)?;
-        self.alpha = self.rtr / self.p.dot(&apk);
+        self.alpha = self.rtr.div(&self.p.dot(&apk.conj()));
         let new_param = state.get_param().scaled_add(&self.alpha, &self.p);
         self.r = self.r.scaled_add(&self.alpha, &apk);
-        let rtr_n = self.r.dot(&self.r);
-        self.beta = rtr_n / self.rtr;
+        let rtr_n = self.r.dot(&self.r.conj());
+        self.beta = rtr_n.div(&self.rtr);
         self.rtr = rtr_n;
         self.p = self.r.mul(&(-1.0)).scaled_add(&self.beta, &self.p);
-        let norm = self.r.dot(&self.r);
+        let norm = self.r.dot(&self.r.conj());
 
         Ok(ArgminIterData::new()
             .param(new_param)
-            .cost(norm.sqrt())
+            // .cost(norm.sqrt())
+            .cost(norm.norm())
             .kv(make_kv!("alpha" => self.alpha; "beta" => self.beta;)))
     }
 }
@@ -135,10 +143,10 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
 
-    send_sync_test!(
+    test_trait_impl!(
         conjugate_gradient,
-        ConjugateGradient<NoOperator<Vec<f64>, Vec<f64>, (), ()>>
+        ConjugateGradient<NoOperator<Vec<f64>, Vec<f64>, (), ()>, f64>
     );
 }

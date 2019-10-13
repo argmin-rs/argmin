@@ -1,11 +1,30 @@
 language: rust
 rust:
-        - stable
-        - beta
-        - nightly
-matrix:
-        allow_failures:
-                - rust: beta
+  - stable
+  - beta
+  - nightly
+
+# matrix:
+#   allow_failures:
+#     - rust: beta
+
 cache: cargo
+
 script:
-        - cargo build --verbose --all
+  - cargo build --verbose --all --all-features
+  - cargo clean
+  - cargo test --verbose --all --all-features
+
+addons:
+  apt:
+    packages:
+      - cmake
+      - gfortran
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
+      - binutils-dev
+      - libiberty-dev
+      - liblapacke-dev
+      - libopenblas-dev
+      - gcc

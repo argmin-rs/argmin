@@ -116,10 +116,10 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
 
-    send_sync_test!(fletcher_reeves, FletcherReeves);
-    send_sync_test!(polak_ribiere, PolakRibiere);
-    send_sync_test!(polak_ribiere_plus, PolakRibierePlus);
-    send_sync_test!(hestenes_stiefel, HestenesStiefel);
+    test_trait_impl!(fletcher_reeves, FletcherReeves);
+    test_trait_impl!(polak_ribiere, PolakRibiere);
+    test_trait_impl!(polak_ribiere_plus, PolakRibierePlus);
+    test_trait_impl!(hestenes_stiefel, HestenesStiefel);
 }

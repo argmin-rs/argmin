@@ -553,8 +553,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::send_sync_test;
+    use crate::test_trait_impl;
     use crate::MinimalNoOperator;
 
-    send_sync_test!(hagerzhang, HagerZhangLineSearch<MinimalNoOperator>);
+    test_trait_impl!(hagerzhang, HagerZhangLineSearch<MinimalNoOperator>);
 }
