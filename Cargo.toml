@@ -33,7 +33,7 @@ approx = "0.3.2"
 # argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
 
 [dev-dependencies]
-ndarray = { version = "0.12.1", features = ["serde-1"] }
+ndarray = { version = "0.13.0", features = ["serde-1"] }
 ndarray-linalg = { version = "0.11.1", features = ["openblas"] }
 gnuplot = "0.0.32"
 paste = "0.1.5"
