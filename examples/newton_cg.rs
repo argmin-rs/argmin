@@ -31,7 +31,7 @@ impl ArgminOp for Rosenbrock {
     }
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-        Ok(Array1::from_vec(rosenbrock_2d_derivative(
+        Ok(Array1::from(rosenbrock_2d_derivative(
             &p.to_vec(),
             self.a,
             self.b,
@@ -49,8 +49,8 @@ fn run() -> Result<(), Error> {
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
     // Define initial parameter vector
-    // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
-    let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
+    // let init_param: Array1<f64> = Array1::from(vec![1.2, 1.2]);
+    let init_param: Array1<f64> = Array1::from(vec![-1.2, 1.0]);
 
     // set up line search
     let linesearch = MoreThuenteLineSearch::new();

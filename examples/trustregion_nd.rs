@@ -31,7 +31,7 @@ impl ArgminOp for Rosenbrock {
     }
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-        Ok(Array1::from_vec(rosenbrock_2d_derivative(
+        Ok(Array1::from(rosenbrock_2d_derivative(
             &p.to_vec(),
             self.a,
             self.b,
@@ -52,7 +52,7 @@ fn run() -> Result<(), Error> {
     // easy case
     // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
     // tough case
-    let init_param: Array1<f64> = Array1::from_vec(vec![-1.2, 1.0]);
+    let init_param: Array1<f64> = Array1::from(vec![-1.2, 1.0]);
 
     // Set up the subproblem
     // let subproblem = Steihaug::new().max_iters(2);
