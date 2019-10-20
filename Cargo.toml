@@ -25,7 +25,7 @@ exclude = [
 argmin_core = "0.2.5"
 argmin_testfunctions = "0.1.1"
 rand = { version = "0.6.5", features = ["serde1"] }
-rand_xorshift = { version = "0.1.1", features = ["serde1"] }
+rand_xorshift = { version = "0.2.0", features = ["serde1"] }
 serde = { version = "1.0", features = ["rc"] }
 approx = "0.3.2"
 
