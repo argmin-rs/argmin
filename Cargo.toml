@@ -1,6 +1,6 @@
 [package]
 name = "argmin"
-version = "0.2.4"
+version = "0.2.5"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
