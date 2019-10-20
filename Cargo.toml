@@ -20,10 +20,10 @@ exclude = [
 [dependencies]
 # argmin_core = { path = "../argmin-core"}
 # argmin_testfunctions = { path = "../argmin-testfunctions" }
-# argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git", branch = "master"}
-# argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git", branch = "master"}
-argmin_core = "0.2.5"
-argmin_testfunctions = "0.1.1"
+argmin_core = { git = "https://github.com/argmin-rs/argmin-core.git", branch = "master"}
+argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git", branch = "master"}
+# argmin_core = "0.2.5"
+# argmin_testfunctions = "0.1.1"
 rand = { version = "0.7.2", features = ["serde1"] }
 rand_xorshift = { version = "0.2.0", features = ["serde1"] }
 serde = { version = "1.0", features = ["rc"] }
