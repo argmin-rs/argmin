@@ -6,5 +6,4 @@ implementors["argmin"] = [];
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

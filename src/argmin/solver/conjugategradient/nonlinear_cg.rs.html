@@ -227,7 +227,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">L</span>, <span class="ident">B</span><span class="op">&gt;</span> {
     <span class="doccomment">/// p</span>
     <span class="ident">p</span>: <span class="ident">P</span>,
@@ -248,7 +248,7 @@
     <span class="ident">P</span>: <span class="ident">Default</span>,
 {
     <span class="doccomment">/// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">linesearch</span>: <span class="ident">L</span>, <span class="ident">beta_method</span>: <span class="ident">B</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">linesearch</span>: <span class="ident">L</span>, <span class="ident">beta_method</span>: <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">NonlinearConjugateGradient</span> {
             <span class="ident">p</span>: <span class="ident">P</span>::<span class="ident">default</span>(),
             <span class="ident">beta</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
@@ -262,7 +262,7 @@
     <span class="doccomment">/// Specifiy the number of iterations after which a restart should be performed</span>
     <span class="doccomment">/// This allows the algorithm to &quot;forget&quot; previous information which may not be helpful</span>
     <span class="doccomment">/// anymore.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart_iters</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iters</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart_iters</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iters</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">restart_iter</span> <span class="op">=</span> <span class="ident">iters</span>;
         <span class="self">self</span>
     }
@@ -275,7 +275,7 @@
     <span class="doccomment">/// `|\nabla f_k^T * \nabla f_{k-1}| / | \nabla f_k ||^2 &gt;= v`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A typical value for `v` is 0.1.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart_orthogonality</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart_orthogonality</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">restart_orthogonality</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>);
         <span class="self">self</span>
     }
@@ -296,7 +296,7 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="ident">O</span>::<span class="ident">Hessian</span>: <span class="ident">Default</span>,
-    <span class="ident">L</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">L</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminLineSearch</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">B</span>: <span class="ident">ArgminNLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
 {
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Nonlinear Conjugate Gradient&quot;</span>;
@@ -305,7 +305,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
         <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
@@ -319,7 +319,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>) <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_grad</span>() {
             <span class="ident">grad</span>
@@ -350,14 +350,14 @@
         <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk1</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">restart_orthogonality</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">restart_orthogonality</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=&gt;</span> <span class="ident">new_grad</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>).<span class="ident">abs</span>() <span class="op">/</span> <span class="ident">new_grad</span>.<span class="ident">norm</span>().<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">&gt;=</span> <span class="ident">v</span>,
-            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">new_grad</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>).<span class="ident">abs</span>() <span class="op">/</span> <span class="ident">new_grad</span>.<span class="ident">norm</span>().<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">v</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
         };
 
         <span class="kw">let</span> <span class="ident">restart_iter</span>: <span class="ident">bool</span> <span class="op">=</span>
-            (<span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">%</span> <span class="self">self</span>.<span class="ident">restart_iter</span> <span class="op">==</span> <span class="number">0</span>) <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">!=</span> <span class="number">0</span>;
+            (<span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">%</span> <span class="self">self</span>.<span class="ident">restart_iter</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>) <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
 
-        <span class="kw">if</span> <span class="ident">restart_iter</span> <span class="op">||</span> <span class="ident">restart_orthogonality</span> {
+        <span class="kw">if</span> <span class="ident">restart_iter</span> <span class="op">|</span><span class="op">|</span> <span class="ident">restart_orthogonality</span> {
             <span class="self">self</span>.<span class="ident">beta</span> <span class="op">=</span> <span class="number">0.0</span>;
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_method</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">new_grad</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">p</span>);
@@ -373,9 +373,9 @@
             .<span class="ident">param</span>(<span class="ident">xk1</span>)
             .<span class="ident">cost</span>(<span class="ident">cost</span>)
             .<span class="ident">grad</span>(<span class="ident">new_grad</span>)
-            .<span class="ident">kv</span>(<span class="macro">make_kv</span><span class="macro">!</span>(<span class="string">&quot;beta&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">beta</span>;
-             <span class="string">&quot;restart_iter&quot;</span> <span class="op">=&gt;</span> <span class="ident">restart_iter</span>;
-             <span class="string">&quot;restart_orthogonality&quot;</span> <span class="op">=&gt;</span> <span class="ident">restart_orthogonality</span>;
+            .<span class="ident">kv</span>(<span class="macro">make_kv</span><span class="macro">!</span>(<span class="string">&quot;beta&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">beta</span>;
+             <span class="string">&quot;restart_iter&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">restart_iter</span>;
+             <span class="string">&quot;restart_orthogonality&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">restart_orthogonality</span>;
             )))
     }
 }
@@ -383,12 +383,12 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">send_sync_test</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">solver</span>::<span class="ident">conjugategradient</span>::<span class="ident">beta</span>::<span class="ident">PolakRibiere</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">solver</span>::<span class="ident">linesearch</span>::<span class="ident">MoreThuenteLineSearch</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">test_trait_impl</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">MinimalNoOperator</span>;
 
-    <span class="macro">send_sync_test</span><span class="macro">!</span>(
+    <span class="macro">test_trait_impl</span><span class="macro">!</span>(
         <span class="ident">nonlinear_cg</span>,
         <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span>
             <span class="ident">MinimalNoOperator</span>,

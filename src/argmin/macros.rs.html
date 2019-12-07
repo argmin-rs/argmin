@@ -31,6 +31,15 @@
 <span id="31">31</span>
 <span id="32">32</span>
 <span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -44,8 +53,8 @@
 <span class="doccomment">/// This macro crates a test for send an sync</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">send_sync_test</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> {
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">test_trait_impl</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="ident">paste</span>::<span class="macro">item</span><span class="macro">!</span> {
             <span class="attribute">#[<span class="ident">test</span>]</span>
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
@@ -61,6 +70,15 @@
             <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">test_sync_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span>]() {
                 <span class="kw">fn</span> <span class="ident">assert_sync</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sync</span><span class="op">&gt;</span>() {}
                 <span class="ident">assert_sync</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>();
+            }
+        }
+
+        <span class="ident">paste</span>::<span class="macro">item</span><span class="macro">!</span> {
+            <span class="attribute">#[<span class="ident">test</span>]</span>
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+            <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">test_clone_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span>]() {
+                <span class="kw">fn</span> <span class="ident">assert_clone</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span>() {}
+                <span class="ident">assert_clone</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>();
             }
         }
     };

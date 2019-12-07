@@ -341,7 +341,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). &quot;Optimization by Simulated Annealing&quot;.</span>
 <span class="doccomment">//! Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680</span>
-<span class="doccomment">//! DOI: 10.1126/science.220.4598.671  </span>
+<span class="doccomment">//! DOI: 10.1126/science.220.4598.671</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -372,7 +372,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SATempFunc</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">SATempFunc</span>::<span class="ident">Boltzmann</span>
     }
 }
@@ -388,7 +388,7 @@
 <span class="doccomment">/// [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). &quot;Optimization by Simulated Annealing&quot;.</span>
 <span class="doccomment">/// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680</span>
 <span class="doccomment">/// DOI: 10.1126/science.220.4598.671  </span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimulatedAnnealing</span> {
     <span class="doccomment">/// Initial temperature</span>
     <span class="ident">init_temp</span>: <span class="ident">f64</span>,
@@ -429,8 +429,8 @@
     <span class="doccomment">/// Parameter:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `init_temp`: initial temperature</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">init_temp</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">init_temp</span> <span class="op">&lt;=</span> <span class="number">0_f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">init_temp</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">init_temp</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0_f64</span> {
             <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;Initial temperature must be &gt; 0.&quot;</span>.<span class="ident">to_string</span>(),
             }
@@ -457,37 +457,37 @@
     }
 
     <span class="doccomment">/// Set temperature function to one of the options in `SATempFunc`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">temp_func</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">temperature_func</span>: <span class="ident">SATempFunc</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">temp_func</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">temperature_func</span>: <span class="ident">SATempFunc</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">temp_func</span> <span class="op">=</span> <span class="ident">temperature_func</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The optimization stops after there has been no accepted solution after `iter` iterations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stall_accepted</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stall_accepted</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">stall_iter_accepted_limit</span> <span class="op">=</span> <span class="ident">iter</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The optimization stops after there has been no new best solution after `iter` iterations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stall_best</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stall_best</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">stall_iter_best_limit</span> <span class="op">=</span> <span class="ident">iter</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Start reannealing after `iter` iterations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reannealing_fixed</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reannealing_fixed</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">reanneal_fixed</span> <span class="op">=</span> <span class="ident">iter</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Start reannealing after no accepted solution has been found for `iter` iterations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reannealing_accepted</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reannealing_accepted</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">reanneal_accepted</span> <span class="op">=</span> <span class="ident">iter</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Start reannealing after no new best solution has been found for `iter` iterations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reannealing_best</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reannealing_best</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">reanneal_best</span> <span class="op">=</span> <span class="ident">iter</span>;
         <span class="self">self</span>
     }
@@ -497,21 +497,21 @@
     <span class="doccomment">/// Updates are performed based on specific update functions. See `SATempFunc` for details.</span>
     <span class="kw">fn</span> <span class="ident">update_temperature</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">cur_temp</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">temp_func</span> {
-            <span class="ident">SATempFunc</span>::<span class="ident">TemperatureFast</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">init_temp</span> <span class="op">/</span> ((<span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">f64</span>),
-            <span class="ident">SATempFunc</span>::<span class="ident">Boltzmann</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">init_temp</span> <span class="op">/</span> ((<span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">ln</span>(),
-            <span class="ident">SATempFunc</span>::<span class="ident">Exponential</span>(<span class="ident">x</span>) <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">init_temp</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powf</span>((<span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">f64</span>),
+            <span class="ident">SATempFunc</span>::<span class="ident">TemperatureFast</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">init_temp</span> <span class="op">/</span> ((<span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">f64</span>),
+            <span class="ident">SATempFunc</span>::<span class="ident">Boltzmann</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">init_temp</span> <span class="op">/</span> ((<span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">ln</span>(),
+            <span class="ident">SATempFunc</span>::<span class="ident">Exponential</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">init_temp</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powf</span>((<span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">f64</span>),
             <span class="comment">// SATempFunc::Custom(ref func) =&gt; func(self.init_temp, self.temp_iter),</span>
         };
     }
 
     <span class="doccomment">/// Perform reannealing</span>
-    <span class="kw">fn</span> <span class="ident">reanneal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">bool</span>, <span class="ident">bool</span>, <span class="ident">bool</span>) {
+    <span class="kw">fn</span> <span class="ident">reanneal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">bool</span>, <span class="ident">bool</span>, <span class="ident">bool</span>) {
         <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> (
-            <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span> <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">reanneal_fixed</span>,
-            <span class="self">self</span>.<span class="ident">reanneal_iter_accepted</span> <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">reanneal_accepted</span>,
-            <span class="self">self</span>.<span class="ident">reanneal_iter_best</span> <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">reanneal_best</span>,
+            <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">reanneal_fixed</span>,
+            <span class="self">self</span>.<span class="ident">reanneal_iter_accepted</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">reanneal_accepted</span>,
+            <span class="self">self</span>.<span class="ident">reanneal_iter_best</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">reanneal_best</span>,
         );
-        <span class="kw">if</span> <span class="ident">out</span>.<span class="number">0</span> <span class="op">||</span> <span class="ident">out</span>.<span class="number">1</span> <span class="op">||</span> <span class="ident">out</span>.<span class="number">2</span> {
+        <span class="kw">if</span> <span class="ident">out</span>.<span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">out</span>.<span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">out</span>.<span class="number">2</span> {
             <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span> <span class="op">=</span> <span class="number">0</span>;
             <span class="self">self</span>.<span class="ident">reanneal_iter_accepted</span> <span class="op">=</span> <span class="number">0</span>;
             <span class="self">self</span>.<span class="ident">reanneal_iter_best</span> <span class="op">=</span> <span class="number">0</span>;
@@ -558,14 +558,14 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">_op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ArgminIterData</span>::<span class="ident">new</span>().<span class="ident">kv</span>(<span class="macro">make_kv</span><span class="macro">!</span>(
-            <span class="string">&quot;initial_temperature&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">init_temp</span>;
-            <span class="string">&quot;stall_iter_accepted_limit&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_accepted_limit</span>;
-            <span class="string">&quot;stall_iter_best_limit&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_best_limit</span>;
-            <span class="string">&quot;reanneal_fixed&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_fixed</span>;
-            <span class="string">&quot;reanneal_accepted&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_accepted</span>;
-            <span class="string">&quot;reanneal_best&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_best</span>;
+            <span class="string">&quot;initial_temperature&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">init_temp</span>;
+            <span class="string">&quot;stall_iter_accepted_limit&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_accepted_limit</span>;
+            <span class="string">&quot;stall_iter_best_limit&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_best_limit</span>;
+            <span class="string">&quot;reanneal_fixed&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_fixed</span>;
+            <span class="string">&quot;reanneal_accepted&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_accepted</span>;
+            <span class="string">&quot;reanneal_best&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_best</span>;
         ))))
     }
 
@@ -574,7 +574,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// Careful: The order in here is *very* important, even if it may not seem so. Everything</span>
         <span class="comment">// is linked to the iteration number, and getting things mixed up will lead to strange</span>
         <span class="comment">// behaviour.</span>
@@ -601,17 +601,17 @@
         <span class="comment">// which will always be between 0 and 0.5.</span>
         <span class="kw">let</span> <span class="ident">prob</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">gen</span>();
         <span class="kw">let</span> <span class="ident">accepted</span> <span class="op">=</span> (<span class="ident">new_cost</span> <span class="op">&lt;</span> <span class="ident">state</span>.<span class="ident">get_prev_cost</span>())
-            <span class="op">||</span> (<span class="number">1.0</span> <span class="op">/</span> (<span class="number">1.0</span> <span class="op">+</span> ((<span class="ident">new_cost</span> <span class="op">-</span> <span class="ident">state</span>.<span class="ident">get_prev_cost</span>()) <span class="op">/</span> <span class="self">self</span>.<span class="ident">cur_temp</span>).<span class="ident">exp</span>()) <span class="op">&gt;</span> <span class="ident">prob</span>);
+            <span class="op">|</span><span class="op">|</span> (<span class="number">1.0</span> <span class="op">/</span> (<span class="number">1.0</span> <span class="op">+</span> ((<span class="ident">new_cost</span> <span class="op">-</span> <span class="ident">state</span>.<span class="ident">get_prev_cost</span>()) <span class="op">/</span> <span class="self">self</span>.<span class="ident">cur_temp</span>).<span class="ident">exp</span>()) <span class="op">&gt;</span> <span class="ident">prob</span>);
 
         <span class="comment">// Update stall iter variables</span>
-        <span class="self">self</span>.<span class="ident">update_stall_and_reanneal_iter</span>(<span class="ident">accepted</span>, <span class="ident">new_cost</span> <span class="op">&lt;=</span> <span class="ident">state</span>.<span class="ident">get_best_cost</span>());
+        <span class="self">self</span>.<span class="ident">update_stall_and_reanneal_iter</span>(<span class="ident">accepted</span>, <span class="ident">new_cost</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_best_cost</span>());
 
         <span class="kw">let</span> (<span class="ident">r_fixed</span>, <span class="ident">r_accepted</span>, <span class="ident">r_best</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">reanneal</span>();
 
         <span class="comment">// Update temperature for next iteration.</span>
-        <span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+=</span> <span class="number">1</span>;
+        <span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="comment">// Todo: this variable may not be necessary (temp_iter does the same?)</span>
-        <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span> <span class="op">+=</span> <span class="number">1</span>;
+        <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
         <span class="self">self</span>.<span class="ident">update_temperature</span>();
 
@@ -621,21 +621,21 @@
             <span class="ident">ArgminIterData</span>::<span class="ident">new</span>().<span class="ident">param</span>(<span class="ident">prev_param</span>).<span class="ident">cost</span>(<span class="ident">prev_cost</span>)
         }
         .<span class="ident">kv</span>(<span class="macro">make_kv</span><span class="macro">!</span>(
-            <span class="string">&quot;t&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">cur_temp</span>;
-            <span class="string">&quot;new_be&quot;</span> <span class="op">=&gt;</span> <span class="ident">new_cost</span> <span class="op">&lt;=</span> <span class="ident">state</span>.<span class="ident">get_best_cost</span>();
-            <span class="string">&quot;acc&quot;</span> <span class="op">=&gt;</span> <span class="ident">accepted</span>;
-            <span class="string">&quot;st_i_be&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_best</span>;
-            <span class="string">&quot;st_i_ac&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_accepted</span>;
-            <span class="string">&quot;ra_i_fi&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span>;
-            <span class="string">&quot;ra_i_be&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_iter_best</span>;
-            <span class="string">&quot;ra_i_ac&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_iter_accepted</span>;
-            <span class="string">&quot;ra_fi&quot;</span> <span class="op">=&gt;</span> <span class="ident">r_fixed</span>;
-            <span class="string">&quot;ra_be&quot;</span> <span class="op">=&gt;</span> <span class="ident">r_best</span>;
-            <span class="string">&quot;ra_ac&quot;</span> <span class="op">=&gt;</span> <span class="ident">r_accepted</span>;
+            <span class="string">&quot;t&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">cur_temp</span>;
+            <span class="string">&quot;new_be&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">new_cost</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_best_cost</span>();
+            <span class="string">&quot;acc&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">accepted</span>;
+            <span class="string">&quot;st_i_be&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_best</span>;
+            <span class="string">&quot;st_i_ac&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_accepted</span>;
+            <span class="string">&quot;ra_i_fi&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span>;
+            <span class="string">&quot;ra_i_be&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_iter_best</span>;
+            <span class="string">&quot;ra_i_ac&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">reanneal_iter_accepted</span>;
+            <span class="string">&quot;ra_fi&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r_fixed</span>;
+            <span class="string">&quot;ra_be&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r_best</span>;
+            <span class="string">&quot;ra_ac&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r_accepted</span>;
         )))
     }
 
-    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">TerminationReason</span> {
+    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TerminationReason</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stall_iter_accepted</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_accepted_limit</span> {
             <span class="kw">return</span> <span class="ident">TerminationReason</span>::<span class="ident">AcceptedStallIterExceeded</span>;
         }
@@ -649,9 +649,9 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">send_sync_test</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">test_trait_impl</span>;
 
-    <span class="macro">send_sync_test</span><span class="macro">!</span>(<span class="ident">sa</span>, <span class="ident">SimulatedAnnealing</span>);
+    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">sa</span>, <span class="ident">SimulatedAnnealing</span>);
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>
