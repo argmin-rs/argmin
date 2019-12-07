@@ -43,3 +43,4 @@ visualizer = ["argmin_core/visualizer"]
 
 [badges]
 travis-ci = { repository = "argmin-rs/argmin", branch = "master" }
+maintenance = { status = "actively-developed" }
