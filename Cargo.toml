@@ -11,7 +11,6 @@ repository = "https://github.com/argmin-rs/argmin"
 readme = "README.md"
 keywords = ["optimization", "math", "science"]
 categories = ["science"]
-#license-file = "LICENSE-APACHE"
 exclude = [
 	".travis.yml",
 	"push_docs",
