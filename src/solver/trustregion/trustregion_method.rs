@@ -1,4 +1,4 @@
-// Copyright 2018 Stefan Kroboth
+// Copyright 2018-2020 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
@@ -51,7 +51,7 @@ pub struct TrustRegion<R> {
     mk0: f64,
 }
 
-impl<R> TrustRegion<R> where {
+impl<R> TrustRegion<R> {
     /// Constructor
     pub fn new(subproblem: R) -> Self {
         TrustRegion {
