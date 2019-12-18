@@ -62,7 +62,7 @@ pub struct Brent {
     c: f64,
     /// helper variable
     d: f64,
-    /// helper variable 
+    /// helper variable
     e: f64,
     /// function value at `a`
     fa: f64,
@@ -188,7 +188,6 @@ where
         Ok(ArgminIterData::new().param(self.b).cost(self.fb.abs()))
     }
 }
-
 
 #[cfg(test)]
 mod tests {
