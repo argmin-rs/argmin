@@ -58,11 +58,11 @@ pub struct Brent {
     a: f64,
     /// currently proposed best guess
     b: f64,
-    // left or right boundary of current interval
+    /// left or right boundary of current interval
     c: f64,
-    // helper variable
+    /// helper variable
     d: f64,
-    // helper variable 
+    /// helper variable 
     e: f64,
     /// function value at `a`
     fa: f64,
@@ -135,7 +135,7 @@ where
             self.fc = self.fa;
         }
         // effective tolerance is double machine precision plus half tolerance as given.
-        let eff_tol = 2.0 * f64::MIN_POSITIVE * self.b.abs() + 0.5 * self.tol;
+        let eff_tol = 2.0 * f64::EPSILON * self.b.abs() + 0.5 * self.tol;
         let mid = 0.5 * (self.c - self.b);
         if mid.abs() <= eff_tol || self.fb == 0.0 {
             return Ok(ArgminIterData::new()
@@ -187,4 +187,13 @@ where
         self.fb = op.apply(&self.b)?;
         Ok(ArgminIterData::new().param(self.b).cost(self.fb.abs()))
     }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_trait_impl;
+
+    test_trait_impl!(brent, Brent);
 }
