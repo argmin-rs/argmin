@@ -67,6 +67,7 @@
 //! - [Gauss-Newton method](solver/gaussnewton/gaussnewton/struct.GaussNewton.html)
 //! - [Gauss-Newton method with linesearch](solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLS.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
+//! - [Brent's method](solver/brent/struct.Brent.html)
 //! - [Nelder-Mead method](solver/neldermead/struct.NelderMead.html)
 //! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
 //! - [Particle Swarm Optimization](solver/particleswarm/struct.ParticleSwarm.html)
@@ -77,7 +78,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = "0.2.5"
+//! argmin = "0.2.6"
 //! ```
 //!
 //! ## Optional features (recommended)
@@ -86,7 +87,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = { version = "0.2.5", features = ["ctrlc", "ndarrayl"] }
+//! argmin = { version = "0.2.6", features = ["ctrlc", "ndarrayl"] }
 //! ```
 //!
 //! These may become default features in the future. Without these features compilation to

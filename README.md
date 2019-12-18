@@ -66,6 +66,7 @@ remain future plans.
 - [Gauss-Newton method](https://argmin-rs.github.io/argmin/argmin/solver/gaussnewton/gaussnewton_method/struct.GaussNewton.html)
 - [Gauss-Newton method with linesearch](https://argmin-rs.github.io/argmin/argmin/solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLS.html)
 - [Landweber iteration](https://argmin-rs.github.io/argmin/argmin/solver/landweber/struct.Landweber.html)
+- [Brent's method](https://argmin-rs.github.io/argmin/argmin/solver/brent/index.html)
 - [Nelder-Mead method](https://argmin-rs.github.io/argmin/argmin/solver/neldermead/struct.NelderMead.html)
 - [Simulated Annealing](https://argmin-rs.github.io/argmin/argmin/solver/simulatedannealing/struct.SimulatedAnnealing.html)
 - [Particle Swarm Optimization](https://argmin-rs.github.io/argmin/argmin/solver/particleswarm/struct.ParticleSwarm.html)
@@ -76,7 +77,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-argmin = "0.2.5"
+argmin = "0.2.6"
 ```
 
 ### Optional features (recommended)
@@ -85,7 +86,7 @@ There are additional features which can be activated in `Cargo.toml`:
 
 ```toml
 [dependencies]
-argmin = { version = "0.2.5", features = ["ctrlc", "ndarrayl"] }
+argmin = { version = "0.2.6", features = ["ctrlc", "ndarrayl"] }
 ```
 
 These may become default features in the future. Without these features compilation to
