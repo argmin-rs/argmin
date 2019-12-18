@@ -62,7 +62,7 @@ pub struct Brent {
     c: f64,
     /// helper variable
     d: f64,
-    /// helper variable
+    /// another helper variable
     e: f64,
     /// function value at `a`
     fa: f64,
