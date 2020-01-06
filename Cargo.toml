@@ -31,7 +31,7 @@ approx = "0.3.2"
 [dev-dependencies]
 ndarray = { version = "0.13", features = ["serde-1"] }
 ndarray-linalg = { version = "0.12", features = ["openblas"] }
-gnuplot = "0.0.32"
+gnuplot = "0.0.33"
 paste = "0.1.5"
 
 [features]
