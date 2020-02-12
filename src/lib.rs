@@ -312,7 +312,7 @@
 //!     // Add an observer which will log all iterations to the terminal (without blocking)
 //!     .add_observer(ArgminSlogLogger::term_noblock(), ObserverMode::Always)
 //!     // Log to file whenever a new best solution is found
-//!     .add_observer(ArgminSlogLogger::file("solver.log")?, ObserverMode::NewBest)
+//!     .add_observer(ArgminSlogLogger::file("solver.log", false)?, ObserverMode::NewBest)
 //!     // Write parameter vector to `params/param.arg` every 20th iteration
 //!     .add_observer(WriteToFile::new("params", "param"), ObserverMode::Every(20))
 //! #     .max_iters(2)
