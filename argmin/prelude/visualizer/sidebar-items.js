@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Visualizer3d","Visualize iterations of a solver for cost functions of type (x,y) -> cost , where x and y are real numbers. If the solver is population-based, The current population is also visualized."]]});
+initSidebarItems({"struct":[["Surface","Helper class for visualized surface"]]});

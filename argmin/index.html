@@ -206,7 +206,7 @@ is indicated via the enum <code>ObserverMode</code> which can be either <code>Al
     <span class="comment">// Add an observer which will log all iterations to the terminal (without blocking)</span>
     .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger</span>::<span class="ident">term_noblock</span>(), <span class="ident">ObserverMode</span>::<span class="ident">Always</span>)
     <span class="comment">// Log to file whenever a new best solution is found</span>
-    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger</span>::<span class="ident">file</span>(<span class="string">&quot;solver.log&quot;</span>)<span class="question-mark">?</span>, <span class="ident">ObserverMode</span>::<span class="ident">NewBest</span>)
+    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger</span>::<span class="ident">file</span>(<span class="string">&quot;solver.log&quot;</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">ObserverMode</span>::<span class="ident">NewBest</span>)
     <span class="comment">// Write parameter vector to `params/param.arg` every 20th iteration</span>
     .<span class="ident">add_observer</span>(<span class="ident">WriteToFile</span>::<span class="ident">new</span>(<span class="string">&quot;params&quot;</span>, <span class="string">&quot;param&quot;</span>), <span class="ident">ObserverMode</span>::<span class="ident">Every</span>(<span class="number">20</span>))
     <span class="comment">// run the solver on the defined problem</span>
