@@ -6,7 +6,7 @@
 
 A pure Rust optimization framework
 
-This crate offers a (work in progress) numerical optimization toolbox/framework written entirely
+This crate offers a numerical optimization toolbox/framework written entirely
 in Rust. It is at the moment potentially very buggy. Please use with care and report any bugs
 you encounter. This crate is looking for contributors!
 
