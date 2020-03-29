@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Surface","Helper class for visualized surface"]]});

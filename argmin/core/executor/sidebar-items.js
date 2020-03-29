@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Executor","Executes a solver"]]});
