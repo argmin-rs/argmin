@@ -10,7 +10,7 @@
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::{ArgminDot, ArgminError, Error};
+use crate::core::{ArgminDot, ArgminError, Error};
 use serde::{Deserialize, Serialize};
 
 /// Needs to be implemented by everything that wants to be a LineSearchCondition

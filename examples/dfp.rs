@@ -6,12 +6,13 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
+extern crate finitediff;
 extern crate ndarray;
 use argmin::prelude::*;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::solver::quasinewton::DFP;
 use argmin::testfunctions::rosenbrock;
-use argmin_core::finitediff::*;
+use finitediff::*;
 use ndarray::{array, Array1, Array2};
 use serde::{Deserialize, Serialize};
 

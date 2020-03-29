@@ -553,8 +553,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::MinimalNoOperator;
     use crate::test_trait_impl;
-    use crate::MinimalNoOperator;
 
     test_trait_impl!(hagerzhang, HagerZhangLineSearch<MinimalNoOperator>);
 }
