@@ -349,7 +349,7 @@
 //! # use argmin::prelude::*;
 //! # use argmin::solver::landweber::*;
 //! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-//! # use argmin_core::Error;
+//! # use argmin::core::Error;
 //! # use serde::{Deserialize, Serialize};
 //! #
 //! # #[derive(Clone, Default, Serialize, Deserialize)]
@@ -516,9 +516,12 @@
 // this is just to make sure that it will always stay this way.)
 #![deny(clippy::float_cmp)]
 
-extern crate argmin_core;
 extern crate argmin_testfunctions;
 extern crate rand;
+
+/// Core functionality
+#[macro_use]
+pub mod core;
 
 /// Definition of all relevant traits and types
 pub mod prelude;
@@ -529,8 +532,6 @@ pub mod solver;
 /// Macros
 #[macro_use]
 mod macros;
-
-use argmin_core::*;
 
 /// Testfunctions
 pub mod testfunctions {
