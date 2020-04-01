@@ -27,7 +27,7 @@ pub use slog_logger::*;
 pub use visualizer::*;
 
 /// Defines the interface every Observer needs to expose
-pub trait Observe<O: ArgminOp>: Send + Sync {
+pub trait Observe<O: ArgminOp> {
     /// Called once at the beginning of the execution of the solver.
     ///
     /// Parameters:
@@ -128,11 +128,11 @@ impl Default for ObserverMode {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::core::MinimalNoOperator;
-
-    send_sync_test!(observer, Observer<MinimalNoOperator>);
-    send_sync_test!(observermode, ObserverMode);
-}
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     use crate::core::MinimalNoOperator;
+//
+//     send_sync_test!(observer, Observer<MinimalNoOperator>);
+//     send_sync_test!(observermode, ObserverMode);
+// }
