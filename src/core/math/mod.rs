@@ -132,14 +132,6 @@ pub use crate::core::math::minmax_vec::*;
 
 use crate::core::Error;
 
-/// Modified Cholesky decompositions
-pub mod modcholesky {
-    //! Modified Cholesky decompositions
-    //!
-    //! Reexport of `modcholesky` crate.
-    pub use modcholesky::*;
-}
-
 /// Dot/scalar product of `T` and `self`
 pub trait ArgminDot<T, U> {
     /// Dot/scalar product of `T` and `self`
