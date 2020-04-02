@@ -62,7 +62,7 @@ pub use termination::TerminationReason;
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOp: Clone + Serialize {
+pub trait ArgminOp: Clone {
     // TODO: Once associated type defaults are stable, it hopefully will be possible to define
     // default types for `Hessian` and `Jacobian`.
     /// Type of the parameter vector
