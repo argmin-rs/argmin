@@ -434,7 +434,7 @@ fn cstep(
         bound = true;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
-        let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        let s = tmp.iter().cloned().fold(std::f64::NAN, f64::max);
         let mut gamma = s * ((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s)).sqrt();
         if stp.x < stx.x {
             gamma = -gamma;
@@ -460,7 +460,7 @@ fn cstep(
         bound = false;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
-        let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        let s = tmp.iter().cloned().fold(std::f64::NAN, f64::max);
         let mut gamma = s * ((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s)).sqrt();
         if stp.x > stx.x {
             gamma = -gamma;
@@ -487,7 +487,7 @@ fn cstep(
         bound = true;
         let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
-        let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        let s = tmp.iter().cloned().fold(std::f64::NAN, f64::max);
         // the case gamma == 0 only arises if the cubic does not tend to infinity in the direction
         // of the step.
 
@@ -529,7 +529,7 @@ fn cstep(
         if brackt {
             let theta = 3.0 * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
             let tmp = vec![theta, sty.gx, stp.gx];
-            let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+            let s = tmp.iter().cloned().fold(std::f64::NAN, f64::max);
             let mut gamma = s * ((theta / s).powi(2) - (sty.gx / s) * (stp.gx / s)).sqrt();
             if stp.x > sty.x {
                 gamma = -gamma;
