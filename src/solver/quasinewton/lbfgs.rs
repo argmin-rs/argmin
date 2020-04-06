@@ -36,9 +36,9 @@ pub struct LBFGS<L, P> {
     s: VecDeque<P>,
     /// y_{k-1}
     y: VecDeque<P>,
-    /// Stopping criterion tolerance for precision
-    tol_precision: f64,
-    /// Stopping criterion tolerance for change in cost
+    /// Tolerance for the stopping criterion based on the change of the norm on the gradient
+    tol_grad: f64,
+    /// Tolerance for the stopping criterion based on the change of the cost stopping criterion
     tol_cost: f64,
 }
 
@@ -50,18 +50,18 @@ impl<L, P> LBFGS<L, P> {
             m,
             s: VecDeque::with_capacity(m),
             y: VecDeque::with_capacity(m),
-            tol_precision: std::f64::EPSILON.sqrt(),
+            tol_grad: std::f64::EPSILON.sqrt(),
             tol_cost: std::f64::EPSILON,
         }
     }
 
-    /// Sets tolerance for precision stopping criterion
-    pub fn with_tol_precision(mut self, tol_precision: f64) -> Self {
-        self.tol_precision = tol_precision;
+    /// Sets tolerance for the stopping criterion based on the change of the norm on the gradient
+    pub fn with_tol_grad(mut self, tol_grad: f64) -> Self {
+        self.tol_grad = tol_grad;
         self
     }
 
-    /// Sets tolerance for change in cost stopping criterion
+    /// Sets tolerance for the stopping criterion based on the change of the cost stopping criterion
     pub fn with_tol_cost(mut self, tol_cost: f64) -> Self {
         self.tol_cost = tol_cost;
         self
@@ -182,7 +182,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if state.get_grad().unwrap().norm() < self.tol_precision {
+        if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol_cost {
@@ -211,11 +211,11 @@ mod tests {
         let tol2 = 1e-2;
 
         let LBFGS {
-            tol_precision: t1,
+            tol_grad: t1,
             tol_cost: t2,
             ..
         }: LBFGS<_, f64> = LBFGS::new(linesearch, 7)
-            .with_tol_precision(tol1)
+            .with_tol_grad(tol1)
             .with_tol_cost(tol2);
 
         assert!((t1 - tol1).abs() < std::f64::EPSILON);
