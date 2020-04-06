@@ -36,6 +36,10 @@ pub struct LBFGS<L, P> {
     s: VecDeque<P>,
     /// y_{k-1}
     y: VecDeque<P>,
+    /// Stopping criterion tolerance for precision
+    tol_precision: f64,
+    /// Stopping criterion tolerance for change in cost
+    tol_cost: f64,
 }
 
 impl<L, P> LBFGS<L, P> {
@@ -46,7 +50,21 @@ impl<L, P> LBFGS<L, P> {
             m,
             s: VecDeque::with_capacity(m),
             y: VecDeque::with_capacity(m),
+            tol_precision: std::f64::EPSILON.sqrt(),
+            tol_cost: std::f64::EPSILON,
         }
+    }
+
+    /// Sets tolerance for precision stopping criterion
+    pub fn with_tol_precision(mut self, tol_precision: f64) -> Self {
+        self.tol_precision = tol_precision;
+        self
+    }
+
+    /// Sets tolerance for change in cost stopping criterion
+    pub fn with_tol_cost(mut self, tol_cost: f64) -> Self {
+        self.tol_cost = tol_cost;
+        self
     }
 }
 
@@ -164,10 +182,10 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if state.get_grad().unwrap().norm() < std::f64::EPSILON.sqrt() {
+        if state.get_grad().unwrap().norm() < self.tol_precision {
             return TerminationReason::TargetPrecisionReached;
         }
-        if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON {
+        if (state.get_prev_cost() - state.get_cost()).abs() < self.tol_cost {
             return TerminationReason::NoChangeInCost;
         }
         TerminationReason::NotTerminated
@@ -183,4 +201,24 @@ mod tests {
     type Operator = MinimalNoOperator;
 
     test_trait_impl!(lbfgs, LBFGS<Operator, MoreThuenteLineSearch<Operator>>);
+
+    #[test]
+    fn test_tolerances() {
+        let linesearch: MoreThuenteLineSearch<f64> =
+            MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
+
+        let tol1 = 1e-4;
+        let tol2 = 1e-2;
+
+        let LBFGS {
+            tol_precision: t1,
+            tol_cost: t2,
+            ..
+        }: LBFGS<_, f64> = LBFGS::new(linesearch, 7)
+            .with_tol_precision(tol1)
+            .with_tol_cost(tol2);
+
+        assert!((t1 - tol1).abs() < std::f64::EPSILON);
+        assert!((t2 - tol2).abs() < std::f64::EPSILON);
+    }
 }
