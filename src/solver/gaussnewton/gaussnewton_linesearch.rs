@@ -26,12 +26,29 @@ use std::default::Default;
 pub struct GaussNewtonLS<L> {
     /// linesearch
     linesearch: L,
+    /// Tolerance for the stopping criterion based on cost difference
+    tol: f64,
 }
 
 impl<L> GaussNewtonLS<L> {
     /// Constructor
     pub fn new(linesearch: L) -> Self {
-        GaussNewtonLS { linesearch }
+        GaussNewtonLS {
+            linesearch,
+            tol: std::f64::EPSILON.sqrt(),
+        }
+    }
+
+    /// Set tolerance for the stopping criterion based on cost difference
+    pub fn with_tol(mut self, tol: f64) -> Result<Self, Error> {
+        if tol <= 0.0 {
+            return Err(ArgminError::InvalidParameter {
+                text: "Gauss-Newton-Linesearch: tol must be positive.".to_string(),
+            }
+            .into());
+        }
+        self.tol = tol;
+        Ok(self)
     }
 }
 
@@ -93,7 +110,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON.sqrt() {
+        if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
             return TerminationReason::NoChangeInCost;
         }
         TerminationReason::NotTerminated
@@ -143,4 +160,14 @@ mod tests {
         gauss_newton_linesearch_method,
         GaussNewtonLS<MoreThuenteLineSearch<Vec<f64>>>
     );
+
+    #[test]
+    fn test_tolerance() {
+        let tol1 = 1e-4;
+
+        let linesearch: MoreThuenteLineSearch<Vec<f64>> = MoreThuenteLineSearch::new();
+        let GaussNewtonLS { tol: t1, .. } = GaussNewtonLS::new(linesearch).with_tol(tol1).unwrap();
+
+        assert!((t1 - tol1).abs() < std::f64::EPSILON);
+    }
 }
