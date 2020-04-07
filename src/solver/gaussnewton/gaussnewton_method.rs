@@ -26,16 +26,21 @@ use std::default::Default;
 pub struct GaussNewton {
     /// gamma
     gamma: f64,
+    /// Tolerance for the stopping criterion based on cost difference
+    tol: f64,
 }
 
 impl GaussNewton {
     /// Constructor
     pub fn new() -> Self {
-        GaussNewton { gamma: 1.0 }
+        GaussNewton {
+            gamma: 1.0,
+            tol: std::f64::EPSILON.sqrt(),
+        }
     }
 
     /// set gamma
-    pub fn gamma(mut self, gamma: f64) -> Result<Self, Error> {
+    pub fn with_gamma(mut self, gamma: f64) -> Result<Self, Error> {
         if gamma <= 0.0 || gamma > 1.0 {
             return Err(ArgminError::InvalidParameter {
                 text: "Gauss-Newton: gamma must be in  (0, 1].".to_string(),
@@ -43,6 +48,18 @@ impl GaussNewton {
             .into());
         }
         self.gamma = gamma;
+        Ok(self)
+    }
+
+    /// Set tolerance for the stopping criterion based on cost difference
+    pub fn with_tol(mut self, tol: f64) -> Result<Self, Error> {
+        if tol <= 0.0 {
+            return Err(ArgminError::InvalidParameter {
+                text: "Gauss-Newton: tol must be positive.".to_string(),
+            }
+            .into());
+        }
+        self.tol = tol;
         Ok(self)
     }
 }
@@ -94,7 +111,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON.sqrt() {
+        if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
             return TerminationReason::NoChangeInCost;
         }
         TerminationReason::NotTerminated
@@ -107,4 +124,22 @@ mod tests {
     use crate::test_trait_impl;
 
     test_trait_impl!(gauss_newton_method, GaussNewton);
+
+    #[test]
+    fn test_tolerance() {
+        let tol1 = 1e-4;
+
+        let GaussNewton { tol: t, .. } = GaussNewton::new().with_tol(tol1).unwrap();
+
+        assert!((t - tol1).abs() < std::f64::EPSILON);
+    }
+
+    #[test]
+    fn test_gamma() {
+        let gamma = 0.5;
+
+        let GaussNewton { gamma: g, .. } = GaussNewton::new().with_gamma(gamma).unwrap();
+
+        assert!((g - gamma).abs() < std::f64::EPSILON);
+    }
 }
