@@ -31,6 +31,8 @@ pub struct NewtonCG<L> {
     linesearch: L,
     /// curvature_threshold
     curvature_threshold: f64,
+    /// Tolerance for the stopping criterion based on cost difference
+    tol: f64,
 }
 
 impl<L> NewtonCG<L> {
@@ -39,6 +41,7 @@ impl<L> NewtonCG<L> {
         NewtonCG {
             linesearch,
             curvature_threshold: 0.0,
+            tol: std::f64::EPSILON,
         }
     }
 
@@ -46,6 +49,18 @@ impl<L> NewtonCG<L> {
     pub fn curvature_threshold(mut self, threshold: f64) -> Self {
         self.curvature_threshold = threshold;
         self
+    }
+
+    /// Set tolerance for the stopping criterion based on cost difference
+    pub fn with_tol(mut self, tol: f64) -> Result<Self, Error> {
+        if tol <= 0.0 {
+            return Err(ArgminError::InvalidParameter {
+                text: "Newton-CG: tol must be positive.".to_string(),
+            }
+            .into());
+        }
+        self.tol = tol;
+        Ok(self)
     }
 }
 
@@ -142,7 +157,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if (state.get_cost() - state.get_prev_cost()).abs() < std::f64::EPSILON {
+        if (state.get_cost() - state.get_prev_cost()).abs() < self.tol {
             TerminationReason::NoChangeInCost
         } else {
             TerminationReason::NotTerminated
@@ -194,4 +209,16 @@ mod tests {
     test_trait_impl!(newton_cg, NewtonCG<MoreThuenteLineSearch<Vec<f64>>>);
 
     test_trait_impl!(cg_subproblem, CGSubProblem<Vec<f64>, Vec<Vec<f64>>>);
+
+    #[test]
+    fn test_tolerance() {
+        let tol1 = 1e-4;
+
+        let linesearch: MoreThuenteLineSearch<Vec<f64>> = MoreThuenteLineSearch::new();
+
+        let NewtonCG { tol: t, .. }: NewtonCG<MoreThuenteLineSearch<Vec<f64>>> =
+            NewtonCG::new(linesearch).with_tol(tol1).unwrap();
+
+        assert!((t - tol1).abs() < std::f64::EPSILON);
+    }
 }
