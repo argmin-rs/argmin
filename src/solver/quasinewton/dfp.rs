@@ -28,6 +28,8 @@ pub struct DFP<L, H> {
     inv_hessian: H,
     /// line search
     linesearch: L,
+    /// Tolerance for the stopping criterion based on the change of the norm on the gradient
+    tol_grad: f64,
 }
 
 impl<L, H> DFP<L, H> {
@@ -36,7 +38,14 @@ impl<L, H> DFP<L, H> {
         DFP {
             inv_hessian: init_inverse_hessian,
             linesearch,
+            tol_grad: std::f64::EPSILON.sqrt(),
         }
+    }
+
+    /// Sets tolerance for the stopping criterion based on the change of the norm on the gradient
+    pub fn with_tol_grad(mut self, tol_grad: f64) -> Self {
+        self.tol_grad = tol_grad;
+        self
     }
 }
 
@@ -138,7 +147,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if state.get_grad().unwrap().norm() < std::f64::EPSILON.sqrt() {
+        if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         TerminationReason::NotTerminated
@@ -154,4 +163,17 @@ mod tests {
     type Operator = MinimalNoOperator;
 
     test_trait_impl!(dfp, DFP<Operator, MoreThuenteLineSearch<Operator>>);
+
+    #[test]
+    fn test_tolerances() {
+        let linesearch: MoreThuenteLineSearch<f64> =
+            MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
+        let init_hessian: Vec<Vec<f64>> = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+
+        let tol = 1e-4;
+
+        let DFP { tol_grad: t, .. } = DFP::new(init_hessian, linesearch).with_tol_grad(tol);
+
+        assert!((t - tol).abs() < std::f64::EPSILON);
+    }
 }
