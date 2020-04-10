@@ -10,9 +10,8 @@ extern crate argmin_testfunctions;
 use argmin::prelude::*;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin_testfunctions::{sphere, sphere_derivative};
-use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default)]
 struct Sphere {}
 
 impl ArgminOp for Sphere {

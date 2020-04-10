@@ -7,15 +7,16 @@
 
 use crate::core::{ArgminOp, Error};
 use serde::{Deserialize, Serialize};
+use std::default::Default;
 
 /// This wraps an operator and keeps track of how often the cost, gradient and Hessian have been
 /// computed and how often the modify function has been called. Usually, this is an implementation
 /// detail unless a solver is needed within another solver (such as a line search within a gradient
 /// descent method), then it may be necessary to wrap the operator in an OpWrapper.
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct OpWrapper<O: ArgminOp> {
     /// Operator
-    op: O,
+    op: Option<O>,
     /// Number of cost function evaluations
     pub cost_func_count: u64,
     /// Number of gradient function evaluations
@@ -32,7 +33,7 @@ impl<O: ArgminOp> OpWrapper<O> {
     /// Constructor
     pub fn new(op: &O) -> Self {
         OpWrapper {
-            op: op.clone(),
+            op: Some(op.clone()),
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
@@ -44,7 +45,7 @@ impl<O: ArgminOp> OpWrapper<O> {
     /// Constructor (moves op)
     pub fn new_move(op: O) -> Self {
         OpWrapper {
-            op,
+            op: Some(op),
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
@@ -56,31 +57,31 @@ impl<O: ArgminOp> OpWrapper<O> {
     /// Calls the `apply` method of `op` and increments `cost_func_count`.
     pub fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
         self.cost_func_count += 1;
-        self.op.apply(param)
+        self.op.as_ref().unwrap().apply(param)
     }
 
     /// Calls the `gradient` method of `op` and increments `gradient_func_count`.
     pub fn gradient(&mut self, param: &O::Param) -> Result<O::Param, Error> {
         self.grad_func_count += 1;
-        self.op.gradient(param)
+        self.op.as_ref().unwrap().gradient(param)
     }
 
     /// Calls the `hessian` method of `op` and increments `hessian_func_count`.
     pub fn hessian(&mut self, param: &O::Param) -> Result<O::Hessian, Error> {
         self.hessian_func_count += 1;
-        self.op.hessian(param)
+        self.op.as_ref().unwrap().hessian(param)
     }
 
     /// Calls the `jacobian` method of `op` and increments `jacobian_func_count`.
     pub fn jacobian(&mut self, param: &O::Param) -> Result<O::Jacobian, Error> {
         self.jacobian_func_count += 1;
-        self.op.jacobian(param)
+        self.op.as_ref().unwrap().jacobian(param)
     }
 
     /// Calls the `modify` method of `op` and increments `modify_func_count`.
     pub fn modify(&mut self, param: &O::Param, extent: f64) -> Result<O::Param, Error> {
         self.modify_func_count += 1;
-        self.op.modify(param, extent)
+        self.op.as_ref().unwrap().modify(param, extent)
     }
 
     /// Consumes an operator by increasing the function call counts of `self` by the ones in
@@ -105,12 +106,12 @@ impl<O: ArgminOp> OpWrapper<O> {
 
     /// Returns the operator `op` by taking ownership of `self`.
     pub fn get_op(self) -> O {
-        self.op
+        self.op.unwrap()
     }
 
     /// Returns a clone of the operator `op`.
     pub fn clone_op(&self) -> O {
-        self.op.clone()
+        self.op.as_ref().unwrap().clone()
     }
 
     /// Creates a new `OpWrapper<O>` from another `OpWrapper<O>` by cloning the `op` and
@@ -128,22 +129,22 @@ impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
     type Jacobian = O::Jacobian;
 
     fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
-        self.op.apply(param)
+        self.op.as_ref().unwrap().apply(param)
     }
 
     fn gradient(&self, param: &Self::Param) -> Result<Self::Param, Error> {
-        self.op.gradient(param)
+        self.op.as_ref().unwrap().gradient(param)
     }
 
     fn hessian(&self, param: &Self::Param) -> Result<Self::Hessian, Error> {
-        self.op.hessian(param)
+        self.op.as_ref().unwrap().hessian(param)
     }
 
     fn jacobian(&self, param: &Self::Param) -> Result<Self::Jacobian, Error> {
-        self.op.jacobian(param)
+        self.op.as_ref().unwrap().jacobian(param)
     }
 
     fn modify(&self, param: &Self::Param, extent: f64) -> Result<Self::Param, Error> {
-        self.op.modify(param, extent)
+        self.op.as_ref().unwrap().modify(param, extent)
     }
 }

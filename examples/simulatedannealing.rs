@@ -14,12 +14,11 @@ use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin_testfunctions::rosenbrock;
 use rand::prelude::*;
 use rand_xorshift::XorShiftRng;
-use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
 struct Rosenbrock {
     /// Parameter a, usually 1.0
     a: f64,

@@ -24,8 +24,10 @@ pub struct Executor<O: ArgminOp, S> {
     /// solver
     solver: S,
     /// operator
-    op: OpWrapper<O>,
+    #[serde(skip)]
+    pub op: OpWrapper<O>,
     /// State
+    #[serde(bound = "IterState<O>: Serialize")]
     state: IterState<O>,
     /// Storage for observers
     #[serde(skip)]
@@ -39,8 +41,6 @@ pub struct Executor<O: ArgminOp, S> {
 impl<O, S> Executor<O, S>
 where
     O: ArgminOp,
-    O::Param: Clone + Default,
-    O::Hessian: Default,
     S: Solver<O>,
 {
     /// Create a new executor with a `solver` and an initial parameter `init_param`
@@ -57,11 +57,14 @@ where
     }
 
     /// Create a new executor from a checkpoint
-    pub fn from_checkpoint<P: AsRef<Path>>(path: P) -> Result<Self, Error>
+    pub fn from_checkpoint<P: AsRef<Path>>(path: P, op: &O) -> Result<Self, Error>
     where
         Self: Sized + DeserializeOwned,
     {
-        load_checkpoint(path)
+        let mut executor: Self = load_checkpoint(path)?;
+        executor.op = OpWrapper::new(op);
+        Ok(executor)
+        // load_checkpoint(path)
     }
 
     fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {

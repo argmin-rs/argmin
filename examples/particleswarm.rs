@@ -9,11 +9,10 @@ extern crate argmin;
 extern crate argmin_testfunctions;
 use argmin::prelude::*;
 use argmin::solver::particleswarm::*;
-use serde::{Deserialize, Serialize};
 
 use argmin_testfunctions::himmelblau;
 
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Default, Clone)]
 struct Himmelblau {}
 
 impl ArgminOp for Himmelblau {

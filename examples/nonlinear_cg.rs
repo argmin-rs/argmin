@@ -12,9 +12,8 @@ use argmin::solver::conjugategradient::NonlinearConjugateGradient;
 use argmin::solver::conjugategradient::PolakRibiere;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default)]
 struct Rosenbrock {}
 
 impl ArgminOp for Rosenbrock {

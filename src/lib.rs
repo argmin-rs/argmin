@@ -132,10 +132,9 @@
 //! # extern crate ndarray;
 //! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! use argmin::prelude::*;
-//! use serde::{Serialize, Deserialize};
 //!
 //! /// First, create a struct for your problem
-//! #[derive(Clone, Default, Serialize, Deserialize)]
+//! #[derive(Clone, Default)]
 //! struct Rosenbrock {
 //!     a: f64,
 //!     b: f64,
@@ -187,9 +186,8 @@
 //! use argmin::solver::gradientdescent::SteepestDescent;
 //! use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-//! # use serde::{Deserialize, Serialize};
 //! #
-//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # #[derive(Clone, Default)]
 //! # struct Rosenbrock {
 //! #     a: f64,
 //! #     b: f64,
@@ -273,9 +271,8 @@
 //! # use argmin::solver::gradientdescent::SteepestDescent;
 //! # use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-//! # use serde::{Deserialize, Serialize};
 //! #
-//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # #[derive(Clone, Default)]
 //! # struct Rosenbrock {
 //! #     a: f64,
 //! #     b: f64,
@@ -353,9 +350,8 @@
 //! # use argmin::solver::landweber::*;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! # use argmin::core::Error;
-//! # use serde::{Deserialize, Serialize};
 //! #
-//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # #[derive(Clone, Default)]
 //! # struct Rosenbrock {}
 //! #
 //! # impl ArgminOp for Rosenbrock {
@@ -381,7 +377,7 @@
 //! #     let iters = 35;
 //! #     let solver = Landweber::new(0.001);
 //! #
-//! let res = Executor::from_checkpoint(".checkpoints/optim.arg")
+//! let res = Executor::from_checkpoint(".checkpoints/optim.arg", &operator)
 //!     .unwrap_or(Executor::new(operator, solver, init_param))
 //!     .max_iters(iters)
 //!     .checkpoint_dir(".checkpoints")

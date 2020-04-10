@@ -111,7 +111,7 @@ impl ArgminCheckpoint {
 
     /// Write checkpoint to disk
     #[inline]
-    pub fn store<T: Serialize>(&self, solver: &T, filename: String) -> Result<(), Error> {
+    pub fn store<T: Serialize>(&self, executor: &T, filename: String) -> Result<(), Error> {
         let dir = Path::new(&self.directory);
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?
@@ -119,18 +119,18 @@ impl ArgminCheckpoint {
         let fname = dir.join(Path::new(&filename));
 
         let f = BufWriter::new(File::create(fname)?);
-        bincode::serialize_into(f, solver)?;
+        bincode::serialize_into(f, executor)?;
         Ok(())
     }
 
     /// Write checkpoint based on the desired `CheckpointMode`
     #[inline]
-    pub fn store_cond<T: Serialize>(&self, solver: &T, iter: u64) -> Result<(), Error> {
+    pub fn store_cond<T: Serialize>(&self, executor: &T, iter: u64) -> Result<(), Error> {
         let mut filename = self.name();
         filename.push_str(".arg");
         match self.mode {
-            CheckpointMode::Always => self.store(solver, filename)?,
-            CheckpointMode::Every(it) if iter % it == 0 => self.store(solver, filename)?,
+            CheckpointMode::Always => self.store(executor, filename)?,
+            CheckpointMode::Every(it) if iter % it == 0 => self.store(executor, filename)?,
             CheckpointMode::Never | CheckpointMode::Every(_) => {}
         };
         Ok(())

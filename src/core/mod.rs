@@ -62,7 +62,7 @@ pub use termination::TerminationReason;
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOp: Clone + Serialize {
+pub trait ArgminOp: Clone {
     // TODO: Once associated type defaults are stable, it hopefully will be possible to define
     // default types for `Hessian` and `Jacobian`.
     /// Type of the parameter vector
@@ -174,7 +174,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
 /// The datastructure which is returned by the `next_iter` method of the `Solver` trait.
 ///
 /// TODO: Rename to IterResult?
-#[derive(Clone, Serialize, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
     param: Option<O::Param>,
