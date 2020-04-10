@@ -27,7 +27,7 @@ pub struct Executor<O: ArgminOp, S> {
     #[serde(skip)]
     pub op: OpWrapper<O>,
     /// State
-    // #[serde(skip_serializing)]
+    #[serde(bound = "IterState<O>: Serialize")]
     state: IterState<O>,
     /// Storage for observers
     #[serde(skip)]

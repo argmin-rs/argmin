@@ -10,7 +10,6 @@ use argmin::core::Error;
 use argmin::prelude::*;
 use argmin::solver::landweber::*;
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default)]
 struct Rosenbrock {}
@@ -38,7 +37,7 @@ fn run() -> Result<(), Error> {
     let iters = 35;
     let solver = Landweber::new(0.001);
 
-    let res = Executor::from_checkpoint(".checkpoints/landweber_exec.arg")
+    let res = Executor::from_checkpoint(".checkpoints/landweber_exec.arg", &operator)
         .unwrap_or(Executor::new(operator, solver, init_param))
         .max_iters(iters)
         .checkpoint_dir(".checkpoints")

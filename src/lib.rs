@@ -378,7 +378,7 @@
 //! #     let iters = 35;
 //! #     let solver = Landweber::new(0.001);
 //! #
-//! let res = Executor::from_checkpoint(".checkpoints/optim.arg")
+//! let res = Executor::from_checkpoint(".checkpoints/optim.arg", &operator)
 //!     .unwrap_or(Executor::new(operator, solver, init_param))
 //!     .max_iters(iters)
 //!     .checkpoint_dir(".checkpoints")
