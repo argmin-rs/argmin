@@ -6,10 +6,11 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
+extern crate argmin_testfunctions;
 use argmin::core::Error;
 use argmin::prelude::*;
 use argmin::solver::landweber::*;
-use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Serialize, Deserialize)]

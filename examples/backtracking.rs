@@ -6,9 +6,10 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
+extern crate argmin_testfunctions;
 use argmin::prelude::*;
 use argmin::solver::linesearch::{ArmijoCondition, BacktrackingLineSearch};
-use argmin::testfunctions::{sphere, sphere_derivative};
+use argmin_testfunctions::{sphere, sphere_derivative};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Serialize, Deserialize)]

@@ -130,7 +130,7 @@
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
 //! # extern crate ndarray;
-//! use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+//! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! use argmin::prelude::*;
 //! use serde::{Serialize, Deserialize};
 //!
@@ -182,10 +182,11 @@
 //! ```rust
 //! # #![allow(unused_imports)]
 //! # extern crate argmin;
+//! # extern crate argmin_testfunctions;
 //! use argmin::prelude::*;
 //! use argmin::solver::gradientdescent::SteepestDescent;
 //! use argmin::solver::linesearch::MoreThuenteLineSearch;
-//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! # use serde::{Deserialize, Serialize};
 //! #
 //! # #[derive(Clone, Default, Serialize, Deserialize)]
@@ -267,10 +268,11 @@
 //! ```rust
 //! # #![allow(unused_imports)]
 //! # extern crate argmin;
+//! # extern crate argmin_testfunctions;
 //! # use argmin::prelude::*;
 //! # use argmin::solver::gradientdescent::SteepestDescent;
 //! # use argmin::solver::linesearch::MoreThuenteLineSearch;
-//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! # use serde::{Deserialize, Serialize};
 //! #
 //! # #[derive(Clone, Default, Serialize, Deserialize)]
@@ -346,9 +348,10 @@
 //!
 //! ```rust
 //! # extern crate argmin;
+//! # extern crate argmin_testfunctions;
 //! # use argmin::prelude::*;
 //! # use argmin::solver::landweber::*;
-//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! # use argmin::core::Error;
 //! # use serde::{Deserialize, Serialize};
 //! #
@@ -505,10 +508,6 @@
 //! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
 //! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
 //! without any additional terms or conditions.
-// //! argmin = { git = "https://github.com/argmin-rs/argmin.git", branch = "master"}
-// //! argmin = { git = "https://github.com/argmin-rs/argmin.git",
-// //!            branch = "master",
-// //!            features = ["ctrlc", "ndarrayl"] }
 
 #![warn(missing_docs)]
 #![allow(unused_attributes)]
@@ -516,7 +515,6 @@
 // this is just to make sure that it will always stay this way.)
 #![deny(clippy::float_cmp)]
 
-extern crate argmin_testfunctions;
 extern crate rand;
 
 /// Core functionality
@@ -532,14 +530,6 @@ pub mod solver;
 /// Macros
 #[macro_use]
 mod macros;
-
-/// Testfunctions
-pub mod testfunctions {
-    //! # Testfunctions
-    //!
-    //! Reexport of `argmin-testfunctions`.
-    pub use argmin_testfunctions::*;
-}
 
 #[cfg(test)]
 mod tests;
