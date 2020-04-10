@@ -11,7 +11,6 @@ use argmin::prelude::*;
 use argmin::solver::gaussnewton::GaussNewtonLS;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use ndarray::{Array1, Array2};
-use serde::{Deserialize, Serialize};
 
 type Rate = f64;
 type S = f64;
@@ -21,7 +20,7 @@ type Measurement = (S, Rate);
 // Model used in this example:
 // `rate = (V_{max} * [S]) / (K_M + [S]) `
 // where `V_{max}` and `K_M` are the sought parameters and `[S]` and `rate` is the measured data.
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default)]
 struct Problem {
     data: Vec<Measurement>,
 }

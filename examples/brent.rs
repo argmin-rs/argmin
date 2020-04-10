@@ -8,10 +8,9 @@
 extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::brent::Brent;
-use serde::{Deserialize, Serialize};
 
 /// Test function generalise from Wikipedia example
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default)]
 struct TestFunc {
     zero1: f64,
     zero2: f64,

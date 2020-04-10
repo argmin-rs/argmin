@@ -12,9 +12,8 @@ use argmin::prelude::*;
 use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
 use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
-use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default)]
 struct Rosenbrock {
     a: f64,
     b: f64,

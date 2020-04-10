@@ -11,9 +11,8 @@ use argmin::prelude::*;
 use argmin::solver::neldermead::NelderMead;
 use argmin::testfunctions::rosenbrock;
 use ndarray::{array, Array1, Array2};
-use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default)]
 struct Rosenbrock {
     a: f64,
     b: f64,

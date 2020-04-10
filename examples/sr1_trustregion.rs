@@ -15,9 +15,8 @@ use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
 use argmin::testfunctions::rosenbrock;
 use finitediff::*;
 use ndarray::{array, Array1, Array2};
-use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default)]
 struct Rosenbrock {
     a: f64,
     b: f64,
