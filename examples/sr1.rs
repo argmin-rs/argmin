@@ -6,12 +6,13 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
+extern crate argmin_testfunctions;
 extern crate finitediff;
 extern crate ndarray;
 use argmin::prelude::*;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::solver::quasinewton::SR1;
-use argmin::testfunctions::rosenbrock;
+use argmin_testfunctions::rosenbrock;
 use finitediff::*;
 use ndarray::{array, Array1, Array2};
 
@@ -33,11 +34,6 @@ impl ArgminOp for Rosenbrock {
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
         Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec(), self.a, self.b)))
-        // Ok(ndarray::Array1::from_vec(rosenbrock_2d_derivative(
-        //     &p.to_vec(),
-        //     self.a,
-        //     self.b,
-        // )))
     }
 }
 

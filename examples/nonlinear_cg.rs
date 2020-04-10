@@ -6,11 +6,12 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
+extern crate argmin_testfunctions;
 use argmin::prelude::*;
 use argmin::solver::conjugategradient::NonlinearConjugateGradient;
 use argmin::solver::conjugategradient::PolakRibiere;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
-use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
 #[derive(Clone, Default)]
 struct Rosenbrock {}

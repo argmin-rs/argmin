@@ -6,10 +6,11 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
+extern crate argmin_testfunctions;
 extern crate ndarray;
 use argmin::prelude::*;
 use argmin::solver::newton::Newton;
-use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
 
 #[derive(Clone, Default)]

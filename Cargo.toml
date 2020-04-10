@@ -19,7 +19,7 @@ exclude = [
 [dependencies]
 # argmin_testfunctions = { path = "../argmin-testfunctions" }
 # argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git", branch = "master"}
-argmin_testfunctions = "0.1.1"
+# argmin_testfunctions = "0.1.1"
 rand = { version = "0.7.2", features = ["serde1"] }
 rand_xorshift = { version = "0.2.0", features = ["serde1"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
@@ -44,6 +44,7 @@ num-complex = "0.2"
 [dev-dependencies]
 ndarray-linalg = { version = "0.12", features = ["openblas"] }
 finitediff = "0.1.2"
+argmin_testfunctions = "0.1.1"
 
 [features]
 default = []

@@ -6,13 +6,14 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
+extern crate argmin_testfunctions;
 extern crate finitediff;
 extern crate ndarray;
 use argmin::prelude::*;
 use argmin::solver::quasinewton::SR1TrustRegion;
 #[allow(unused_imports)]
 use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
-use argmin::testfunctions::rosenbrock;
+use argmin_testfunctions::rosenbrock;
 use finitediff::*;
 use ndarray::{array, Array1, Array2};
 
