@@ -174,7 +174,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
 /// The datastructure which is returned by the `next_iter` method of the `Solver` trait.
 ///
 /// TODO: Rename to IterResult?
-#[derive(Clone, Serialize, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
     param: Option<O::Param>,
