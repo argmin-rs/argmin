@@ -6,10 +6,11 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
+extern crate argmin_testfunctions;
 extern crate ndarray;
 use argmin::prelude::*;
 use argmin::solver::neldermead::NelderMead;
-use argmin::testfunctions::rosenbrock;
+use argmin_testfunctions::rosenbrock;
 use ndarray::{array, Array1, Array2};
 use serde::{Deserialize, Serialize};
 

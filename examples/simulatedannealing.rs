@@ -6,11 +6,12 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate argmin;
+extern crate argmin_testfunctions;
 extern crate rand;
 extern crate rand_xorshift;
 use argmin::prelude::*;
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
-use argmin::testfunctions::rosenbrock;
+use argmin_testfunctions::rosenbrock;
 use rand::prelude::*;
 use rand_xorshift::XorShiftRng;
 use serde::{Deserialize, Serialize};
