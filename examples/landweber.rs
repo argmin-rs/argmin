@@ -51,6 +51,6 @@ fn run() -> Result<(), Error> {
 
 fn main() {
     if let Err(ref e) = run() {
-        println!("{} {}", e.as_fail(), e.backtrace());
+        println!("{}", e);
     }
 }

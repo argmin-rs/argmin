@@ -29,6 +29,10 @@ pub struct BFGS<L, H> {
     inv_hessian: H,
     /// line search
     linesearch: L,
+    /// Tolerance for the stopping criterion based on the change of the norm on the gradient
+    tol_grad: f64,
+    /// Tolerance for the stopping criterion based on the change of the cost stopping criterion
+    tol_cost: f64,
 }
 
 impl<L, H> BFGS<L, H> {
@@ -37,7 +41,21 @@ impl<L, H> BFGS<L, H> {
         BFGS {
             inv_hessian: init_inverse_hessian,
             linesearch,
+            tol_grad: std::f64::EPSILON.sqrt(),
+            tol_cost: std::f64::EPSILON,
         }
+    }
+
+    /// Sets tolerance for the stopping criterion based on the change of the norm on the gradient
+    pub fn with_tol_grad(mut self, tol_grad: f64) -> Self {
+        self.tol_grad = tol_grad;
+        self
+    }
+
+    /// Sets tolerance for the stopping criterion based on the change of the cost stopping criterion
+    pub fn with_tol_cost(mut self, tol_cost: f64) -> Self {
+        self.tol_cost = tol_cost;
+        self
     }
 }
 
@@ -155,10 +173,10 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if state.get_grad().unwrap().norm() < std::f64::EPSILON.sqrt() {
+        if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
-        if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON {
+        if (state.get_prev_cost() - state.get_cost()).abs() < self.tol_cost {
             return TerminationReason::NoChangeInCost;
         }
         TerminationReason::NotTerminated
@@ -174,4 +192,25 @@ mod tests {
     type Operator = MinimalNoOperator;
 
     test_trait_impl!(bfgs, BFGS<Operator, MoreThuenteLineSearch<Operator>>);
+
+    #[test]
+    fn test_tolerances() {
+        let linesearch: MoreThuenteLineSearch<f64> =
+            MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
+        let init_hessian: Vec<Vec<f64>> = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+
+        let tol1 = 1e-4;
+        let tol2 = 1e-2;
+
+        let BFGS {
+            tol_grad: t1,
+            tol_cost: t2,
+            ..
+        } = BFGS::new(init_hessian, linesearch)
+            .with_tol_grad(tol1)
+            .with_tol_cost(tol2);
+
+        assert!((t1 - tol1).abs() < std::f64::EPSILON);
+        assert!((t2 - tol2).abs() < std::f64::EPSILON);
+    }
 }

@@ -21,25 +21,14 @@
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::f64;
-use std::fmt;
+use thiserror::Error;
 
 /// Error to be thrown if Brent is initialized with improper parameters.
-#[derive(Debug)]
-pub struct BrentError;
-
-impl fmt::Display for BrentError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Brent error: f(min) and f(max) must have different signs."
-        )
-    }
-}
-
-impl std::error::Error for BrentError {
-    fn description(&self) -> &str {
-        "Brent requires a min and max value bracketing the root of the function."
-    }
+#[derive(Debug, Error)]
+pub enum BrentError {
+    /// f(min) and f(max) must have different signs
+    #[error("Brent error: f(min) and f(max) must have different signs.")]
+    WrongSign,
 }
 
 /// Brent's method
@@ -106,7 +95,7 @@ where
         self.fa = op.apply(&self.a)?;
         self.fb = op.apply(&self.b)?;
         if self.fa * self.fb > 0.0 {
-            return Err(Error::from_boxed_compat(Box::new(BrentError)));
+            return Err(BrentError::WrongSign.into());
         }
         self.fc = self.fb;
         Ok(Some(

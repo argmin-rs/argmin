@@ -6,51 +6,49 @@
 // copied, modified, or distributed except according to those terms.
 
 //! # Errors
-//!
-//! Gigantic TODO: Remove `failure` dependency and implement own error handling.
 
-use failure_derive::Fail;
+use thiserror::Error;
 
 /// Argmin error type
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum ArgminError {
     /// Indicates and invalid parameter
-    #[fail(display = "Invalid parameter: {}", text)]
+    #[error("Invalid parameter: {text:?}")]
     InvalidParameter {
         /// Text
         text: String,
     },
 
     /// Indicates that a function is not implemented
-    #[fail(display = "Not implemented: {}", text)]
+    #[error("Not implemented: {text:?}")]
     NotImplemented {
         /// Text
         text: String,
     },
 
     /// Indicates that a function is not initialized
-    #[fail(display = "Not initialized: {}", text)]
+    #[error("Not initialized: {text:?}")]
     NotInitialized {
         /// Text
         text: String,
     },
 
     /// Indicates that a condition is violated
-    #[fail(display = "Condition violated: {}", text)]
+    #[error("Condition violated: {text:?}")]
     ConditionViolated {
         /// Text
         text: String,
     },
 
     /// Checkpoint was not found
-    #[fail(display = "Checkpoint not found: {}", text)]
+    #[error("Checkpoint not found: {text:?}")]
     CheckpointNotFound {
         /// Text
         text: String,
     },
 
     /// Indicates an impossible error
-    #[fail(display = "Impossible Error: {}", text)]
+    #[error("Impossible Error: {text:?}")]
     ImpossibleError {
         /// Text
         text: String,

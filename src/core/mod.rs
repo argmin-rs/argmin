@@ -41,9 +41,9 @@ mod serialization;
 /// Definition of termination reasons
 mod termination;
 
+pub use anyhow::Error;
 pub use errors::*;
 pub use executor::*;
-pub use failure::Error;
 pub use iterstate::*;
 pub use kv::ArgminKV;
 pub use math::*;

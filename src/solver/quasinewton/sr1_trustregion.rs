@@ -33,10 +33,10 @@ pub struct SR1TrustRegion<B, R> {
     subproblem: R,
     /// Radius
     radius: f64,
-    // /// Maximum Radius
-    // max_radius: f64,
     /// eta \in [0, 1/4)
     eta: f64,
+    /// Tolerance for the stopping criterion based on the change of the norm on the gradient
+    tol_grad: f64,
 }
 
 impl<B, R> SR1TrustRegion<B, R> {
@@ -47,8 +47,8 @@ impl<B, R> SR1TrustRegion<B, R> {
             init_hessian: None,
             subproblem,
             radius: 1.0,
-            // max_radius: 100.0,
             eta: 0.5 * 1e-3,
+            tol_grad: 1e-3,
         }
     }
 
@@ -78,12 +78,6 @@ impl<B, R> SR1TrustRegion<B, R> {
         self
     }
 
-    // /// Set maximum radius
-    // pub fn max_radius(mut self, max_radius: f64) -> Self {
-    //     self.max_radius = max_radius.abs();
-    //     self
-    // }
-
     /// Set eta
     pub fn eta(mut self, eta: f64) -> Result<Self, Error> {
         if eta >= 10e-3 || eta <= 0.0 {
@@ -94,6 +88,12 @@ impl<B, R> SR1TrustRegion<B, R> {
         }
         self.eta = eta;
         Ok(self)
+    }
+
+    /// Sets tolerance for the stopping criterion based on the change of the norm on the gradient
+    pub fn with_tol_grad(mut self, tol_grad: f64) -> Self {
+        self.tol_grad = tol_grad;
+        self
     }
 }
 
@@ -232,8 +232,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        /*std::f64::EPSILON.sqrt()*/
-        if state.get_grad().unwrap().norm() < 1e-3 {
+        if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         // if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON {
@@ -252,4 +251,16 @@ mod tests {
     type Operator = MinimalNoOperator;
 
     test_trait_impl!(sr1, SR1TrustRegion<Operator, CauchyPoint>);
+
+    #[test]
+    fn test_tolerances() {
+        let subproblem = CauchyPoint::new();
+
+        let tol = 1e-4;
+
+        let SR1TrustRegion { tol_grad: t, .. }: SR1TrustRegion<MinimalNoOperator, CauchyPoint> =
+            SR1TrustRegion::new(subproblem).with_tol_grad(tol);
+
+        assert!((t - tol).abs() < std::f64::EPSILON);
+    }
 }
