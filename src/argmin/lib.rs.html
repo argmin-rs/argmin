@@ -529,20 +529,6 @@
 <span id="529">529</span>
 <span id="530">530</span>
 <span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -676,12 +662,11 @@
 <span class="doccomment">//! # extern crate argmin;</span>
 <span class="doccomment">//! # extern crate argmin_testfunctions;</span>
 <span class="doccomment">//! # extern crate ndarray;</span>
-<span class="doccomment">//! use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};</span>
+<span class="doccomment">//! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};</span>
 <span class="doccomment">//! use argmin::prelude::*;</span>
-<span class="doccomment">//! use serde::{Serialize, Deserialize};</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! /// First, create a struct for your problem</span>
-<span class="doccomment">//! #[derive(Clone, Default, Serialize, Deserialize)]</span>
+<span class="doccomment">//! #[derive(Clone, Default)]</span>
 <span class="doccomment">//! struct Rosenbrock {</span>
 <span class="doccomment">//!     a: f64,</span>
 <span class="doccomment">//!     b: f64,</span>
@@ -728,13 +713,13 @@
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # #![allow(unused_imports)]</span>
 <span class="doccomment">//! # extern crate argmin;</span>
+<span class="doccomment">//! # extern crate argmin_testfunctions;</span>
 <span class="doccomment">//! use argmin::prelude::*;</span>
 <span class="doccomment">//! use argmin::solver::gradientdescent::SteepestDescent;</span>
 <span class="doccomment">//! use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
-<span class="doccomment">//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
-<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[derive(Clone, Default, Serialize, Deserialize)]</span>
+<span class="doccomment">//! # #[derive(Clone, Default)]</span>
 <span class="doccomment">//! # struct Rosenbrock {</span>
 <span class="doccomment">//! #     a: f64,</span>
 <span class="doccomment">//! #     b: f64,</span>
@@ -788,7 +773,7 @@
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! # fn main() {</span>
 <span class="doccomment">//! #     if let Err(ref e) = run() {</span>
-<span class="doccomment">//! #         println!(&quot;{} {}&quot;, e.as_fail(), e.backtrace());</span>
+<span class="doccomment">//! #         println!(&quot;{}&quot;, e);</span>
 <span class="doccomment">//! #         std::process::exit(1);</span>
 <span class="doccomment">//! #     }</span>
 <span class="doccomment">//! # }</span>
@@ -813,13 +798,13 @@
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # #![allow(unused_imports)]</span>
 <span class="doccomment">//! # extern crate argmin;</span>
+<span class="doccomment">//! # extern crate argmin_testfunctions;</span>
 <span class="doccomment">//! # use argmin::prelude::*;</span>
 <span class="doccomment">//! # use argmin::solver::gradientdescent::SteepestDescent;</span>
 <span class="doccomment">//! # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
-<span class="doccomment">//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
-<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[derive(Clone, Default, Serialize, Deserialize)]</span>
+<span class="doccomment">//! # #[derive(Clone, Default)]</span>
 <span class="doccomment">//! # struct Rosenbrock {</span>
 <span class="doccomment">//! #     a: f64,</span>
 <span class="doccomment">//! #     b: f64,</span>
@@ -869,7 +854,7 @@
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! # fn main() {</span>
 <span class="doccomment">//! #     if let Err(ref e) = run() {</span>
-<span class="doccomment">//! #         println!(&quot;{} {}&quot;, e.as_fail(), e.backtrace());</span>
+<span class="doccomment">//! #         println!(&quot;{}&quot;, e);</span>
 <span class="doccomment">//! #         std::process::exit(1);</span>
 <span class="doccomment">//! #     }</span>
 <span class="doccomment">//! # }</span>
@@ -892,13 +877,13 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # extern crate argmin;</span>
+<span class="doccomment">//! # extern crate argmin_testfunctions;</span>
 <span class="doccomment">//! # use argmin::prelude::*;</span>
 <span class="doccomment">//! # use argmin::solver::landweber::*;</span>
-<span class="doccomment">//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
+<span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
 <span class="doccomment">//! # use argmin::core::Error;</span>
-<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[derive(Clone, Default, Serialize, Deserialize)]</span>
+<span class="doccomment">//! # #[derive(Clone, Default)]</span>
 <span class="doccomment">//! # struct Rosenbrock {}</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! # impl ArgminOp for Rosenbrock {</span>
@@ -924,7 +909,7 @@
 <span class="doccomment">//! #     let iters = 35;</span>
 <span class="doccomment">//! #     let solver = Landweber::new(0.001);</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! let res = Executor::from_checkpoint(&quot;.checkpoints/optim.arg&quot;)</span>
+<span class="doccomment">//! let res = Executor::from_checkpoint(&quot;.checkpoints/optim.arg&quot;, &amp;operator)</span>
 <span class="doccomment">//!     .unwrap_or(Executor::new(operator, solver, init_param))</span>
 <span class="doccomment">//!     .max_iters(iters)</span>
 <span class="doccomment">//!     .checkpoint_dir(&quot;.checkpoints&quot;)</span>
@@ -940,7 +925,7 @@
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! # fn main() {</span>
 <span class="doccomment">//! #     if let Err(ref e) = run() {</span>
-<span class="doccomment">//! #         println!(&quot;{} {}&quot;, e.as_fail(), e.backtrace());</span>
+<span class="doccomment">//! #         println!(&quot;{}&quot;, e);</span>
 <span class="doccomment">//! #     }</span>
 <span class="doccomment">//! # }</span>
 <span class="doccomment">//! ```</span>
@@ -1051,10 +1036,6 @@
 <span class="doccomment">//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion</span>
 <span class="doccomment">//! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,</span>
 <span class="doccomment">//! without any additional terms or conditions.</span>
-<span class="comment">// //! argmin = { git = &quot;https://github.com/argmin-rs/argmin.git&quot;, branch = &quot;master&quot;}</span>
-<span class="comment">// //! argmin = { git = &quot;https://github.com/argmin-rs/argmin.git&quot;,</span>
-<span class="comment">// //!            branch = &quot;master&quot;,</span>
-<span class="comment">// //!            features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;] }</span>
 
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_attributes</span>)]</span>
@@ -1062,7 +1043,6 @@
 <span class="comment">// this is just to make sure that it will always stay this way.)</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">clippy</span>::<span class="ident">float_cmp</span>)]</span>
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">argmin_testfunctions</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rand</span>;
 
 <span class="doccomment">/// Core functionality</span>
@@ -1078,14 +1058,6 @@
 <span class="doccomment">/// Macros</span>
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">macros</span>;
-
-<span class="doccomment">/// Testfunctions</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">testfunctions</span> {
-    <span class="doccomment">//! # Testfunctions</span>
-    <span class="doccomment">//!</span>
-    <span class="doccomment">//! Reexport of `argmin-testfunctions`.</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">argmin_testfunctions</span>::<span class="kw-2">*</span>;
-}
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;

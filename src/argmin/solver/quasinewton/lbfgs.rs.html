@@ -184,6 +184,44 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -223,6 +261,10 @@
     <span class="ident">s</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
     <span class="doccomment">/// y_{k-1}</span>
     <span class="ident">y</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Tolerance for the stopping criterion based on the change of the norm on the gradient</span>
+    <span class="ident">tol_grad</span>: <span class="ident">f64</span>,
+    <span class="doccomment">/// Tolerance for the stopping criterion based on the change of the cost stopping criterion</span>
+    <span class="ident">tol_cost</span>: <span class="ident">f64</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">LBFGS</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">P</span><span class="op">&gt;</span> {
@@ -233,7 +275,21 @@
             <span class="ident">m</span>,
             <span class="ident">s</span>: <span class="ident">VecDeque</span>::<span class="ident">with_capacity</span>(<span class="ident">m</span>),
             <span class="ident">y</span>: <span class="ident">VecDeque</span>::<span class="ident">with_capacity</span>(<span class="ident">m</span>),
+            <span class="ident">tol_grad</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>.<span class="ident">sqrt</span>(),
+            <span class="ident">tol_cost</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>,
         }
+    }
+
+    <span class="doccomment">/// Sets tolerance for the stopping criterion based on the change of the norm on the gradient</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tol_grad</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol_grad</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">tol_grad</span> <span class="op">=</span> <span class="ident">tol_grad</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets tolerance for the stopping criterion based on the change of the cost stopping criterion</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tol_cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol_cost</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">tol_cost</span> <span class="op">=</span> <span class="ident">tol_cost</span>;
+        <span class="self">self</span>
     }
 }
 
@@ -351,10 +407,10 @@
     }
 
     <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TerminationReason</span> {
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap</span>().<span class="ident">norm</span>() <span class="op">&lt;</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>.<span class="ident">sqrt</span>() {
+        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap</span>().<span class="ident">norm</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tol_grad</span> {
             <span class="kw">return</span> <span class="ident">TerminationReason</span>::<span class="ident">TargetPrecisionReached</span>;
         }
-        <span class="kw">if</span> (<span class="ident">state</span>.<span class="ident">get_prev_cost</span>() <span class="op">-</span> <span class="ident">state</span>.<span class="ident">get_cost</span>()).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span> {
+        <span class="kw">if</span> (<span class="ident">state</span>.<span class="ident">get_prev_cost</span>() <span class="op">-</span> <span class="ident">state</span>.<span class="ident">get_cost</span>()).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tol_cost</span> {
             <span class="kw">return</span> <span class="ident">TerminationReason</span>::<span class="ident">NoChangeInCost</span>;
         }
         <span class="ident">TerminationReason</span>::<span class="ident">NotTerminated</span>
@@ -370,6 +426,26 @@
     <span class="kw">type</span> <span class="ident">Operator</span> <span class="op">=</span> <span class="ident">MinimalNoOperator</span>;
 
     <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">lbfgs</span>, <span class="ident">LBFGS</span><span class="op">&lt;</span><span class="ident">Operator</span>, <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Operator</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_tolerances</span>() {
+        <span class="kw">let</span> <span class="ident">linesearch</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
+            <span class="ident">MoreThuenteLineSearch</span>::<span class="ident">new</span>().<span class="ident">c</span>(<span class="number">1e-4</span>, <span class="number">0.9</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">tol1</span> <span class="op">=</span> <span class="number">1e-4</span>;
+        <span class="kw">let</span> <span class="ident">tol2</span> <span class="op">=</span> <span class="number">1e-2</span>;
+
+        <span class="kw">let</span> <span class="ident">LBFGS</span> {
+            <span class="ident">tol_grad</span>: <span class="ident">t1</span>,
+            <span class="ident">tol_cost</span>: <span class="ident">t2</span>,
+            ..
+        }: <span class="ident">LBFGS</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">LBFGS</span>::<span class="ident">new</span>(<span class="ident">linesearch</span>, <span class="number">7</span>)
+            .<span class="ident">with_tol_grad</span>(<span class="ident">tol1</span>)
+            .<span class="ident">with_tol_cost</span>(<span class="ident">tol2</span>);
+
+        <span class="macro">assert</span><span class="macro">!</span>((<span class="ident">t1</span> <span class="op">-</span> <span class="ident">tol1</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>);
+        <span class="macro">assert</span><span class="macro">!</span>((<span class="ident">t2</span> <span class="op">-</span> <span class="ident">tol2</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>);
+    }
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

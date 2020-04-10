@@ -166,7 +166,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">visualizer</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Defines the interface every Observer needs to expose</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&gt;</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Called once at the beginning of the execution of the solver.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Parameters:</span>
@@ -267,13 +267,13 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::<span class="ident">MinimalNoOperator</span>;
-
-    <span class="macro">send_sync_test</span><span class="macro">!</span>(<span class="ident">observer</span>, <span class="ident">Observer</span><span class="op">&lt;</span><span class="ident">MinimalNoOperator</span><span class="op">&gt;</span>);
-    <span class="macro">send_sync_test</span><span class="macro">!</span>(<span class="ident">observermode</span>, <span class="ident">ObserverMode</span>);
-}
+<span class="comment">// #[cfg(test)]</span>
+<span class="comment">// mod tests {</span>
+<span class="comment">//     use super::*;</span>
+<span class="comment">//     use crate::core::MinimalNoOperator;</span>
+<span class="comment">//</span>
+<span class="comment">//     send_sync_test!(observer, Observer&lt;MinimalNoOperator&gt;);</span>
+<span class="comment">//     send_sync_test!(observermode, ObserverMode);</span>
+<span class="comment">// }</span>
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

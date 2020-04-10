@@ -61,8 +61,6 @@
 <span id="61">61</span>
 <span id="62">62</span>
 <span id="63">63</span>
-<span id="64">64</span>
-<span id="65">65</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -72,51 +70,49 @@
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
 <span class="doccomment">//! # Errors</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Gigantic TODO: Remove `failure` dependency and implement own error handling.</span>
 
-<span class="kw">use</span> <span class="ident">failure_derive</span>::<span class="ident">Fail</span>;
+<span class="kw">use</span> <span class="ident">thiserror</span>::<span class="ident">Error</span>;
 
 <span class="doccomment">/// Argmin error type</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Fail</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ArgminError</span> {
     <span class="doccomment">/// Indicates and invalid parameter</span>
-    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Invalid parameter: {}&quot;</span>, <span class="ident">text</span>)]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid parameter: {text:?}&quot;</span>)]</span>
     <span class="ident">InvalidParameter</span> {
         <span class="doccomment">/// Text</span>
         <span class="ident">text</span>: <span class="ident">String</span>,
     },
 
     <span class="doccomment">/// Indicates that a function is not implemented</span>
-    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Not implemented: {}&quot;</span>, <span class="ident">text</span>)]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Not implemented: {text:?}&quot;</span>)]</span>
     <span class="ident">NotImplemented</span> {
         <span class="doccomment">/// Text</span>
         <span class="ident">text</span>: <span class="ident">String</span>,
     },
 
     <span class="doccomment">/// Indicates that a function is not initialized</span>
-    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Not initialized: {}&quot;</span>, <span class="ident">text</span>)]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Not initialized: {text:?}&quot;</span>)]</span>
     <span class="ident">NotInitialized</span> {
         <span class="doccomment">/// Text</span>
         <span class="ident">text</span>: <span class="ident">String</span>,
     },
 
     <span class="doccomment">/// Indicates that a condition is violated</span>
-    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Condition violated: {}&quot;</span>, <span class="ident">text</span>)]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Condition violated: {text:?}&quot;</span>)]</span>
     <span class="ident">ConditionViolated</span> {
         <span class="doccomment">/// Text</span>
         <span class="ident">text</span>: <span class="ident">String</span>,
     },
 
     <span class="doccomment">/// Checkpoint was not found</span>
-    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Checkpoint not found: {}&quot;</span>, <span class="ident">text</span>)]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Checkpoint not found: {text:?}&quot;</span>)]</span>
     <span class="ident">CheckpointNotFound</span> {
         <span class="doccomment">/// Text</span>
         <span class="ident">text</span>: <span class="ident">String</span>,
     },
 
     <span class="doccomment">/// Indicates an impossible error</span>
-    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Impossible Error: {}&quot;</span>, <span class="ident">text</span>)]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Impossible Error: {text:?}&quot;</span>)]</span>
     <span class="ident">ImpossibleError</span> {
         <span class="doccomment">/// Text</span>
         <span class="ident">text</span>: <span class="ident">String</span>,

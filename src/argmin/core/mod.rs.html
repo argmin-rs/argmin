@@ -370,9 +370,9 @@
 <span class="doccomment">/// Definition of termination reasons</span>
 <span class="kw">mod</span> <span class="ident">termination</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">anyhow</span>::<span class="ident">Error</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">errors</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">executor</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">iterstate</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">kv</span>::<span class="ident">ArgminKV</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">math</span>::<span class="kw-2">*</span>;
@@ -391,7 +391,7 @@
 <span class="doccomment">/// implementation which is essentially returning an error which indicates that the method has not</span>
 <span class="doccomment">/// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the</span>
 <span class="doccomment">/// uses solver requires it.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminOp</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Serialize</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminOp</span>: <span class="ident">Clone</span> {
     <span class="comment">// TODO: Once associated type defaults are stable, it hopefully will be possible to define</span>
     <span class="comment">// default types for `Hessian` and `Jacobian`.</span>
     <span class="doccomment">/// Type of the parameter vector</span>
@@ -503,7 +503,7 @@
 <span class="doccomment">/// The datastructure which is returned by the `next_iter` method of the `Solver` trait.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// TODO: Rename to IterResult?</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Current parameter vector</span>
     <span class="ident">param</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
