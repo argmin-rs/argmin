@@ -7,17 +7,85 @@
 
 //! # `ArgminResult`
 //!
-//! Return type of the solvers. Includes the final parameter vector, the final cost, the number of
-//! iterations, whether it terminated and the reason of termination.
+//! Returned by a solver and consists of the used operator and the last `IterState` of the solver.
+//! Both can be accessed by the methods `operator()` and `state()`.
+//!
+//! The reference to the struct returned by `state()` allows one to for instance access the final
+//! parameter vector or the final cost function value.
+//!
+//! ## Examples:
+//!
+//! ```
+//! # #![allow(unused_imports)]
+//! # extern crate argmin;
+//! # use argmin::prelude::*;
+//! # use argmin::solver::gradientdescent::SteepestDescent;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use serde::{Deserialize, Serialize};
+//! #
+//! # #[derive(Clone, Default, Serialize, Deserialize)]
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # impl ArgminOp for Rosenbrock {
+//! #     type Param = Vec<f64>;
+//! #     type Output = f64;
+//! #     type Hessian = ();
+//! #     type Jacobian = ();
+//! #
+//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock_2d(p, self.a, self.b))
+//! #     }
+//! #
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #     // Define cost function (must implement `ArgminOperator`)
+//! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
+//! #     // Define initial parameter vector
+//! #     let init_param: Vec<f64> = vec![-1.2, 1.0];
+//! #     // Set up line search
+//! #     let linesearch = MoreThuenteLineSearch::new();
+//! #     // Set up solver
+//! #     let solver = SteepestDescent::new(linesearch);
+//! #     // Run solver
+//! #     let result = Executor::new(cost, solver, init_param)
+//! #         // Set maximum iterations to 10
+//! #         .max_iters(1)
+//! #         // run the solver on the defined problem
+//! #         .run()?;
+//! // Get best parameter vector
+//! let best_parameter = result.state().get_best_param();
+//!
+//! // Get best cost function value
+//! let best_cost = result.state().get_best_cost();
+//!
+//! // Get the number of iterations
+//! let num_iters = result.state().get_iter();
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{}", e);
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//! ```
+//!
+//! More details can be found in the `IterState` documentation.
 
 use crate::core::{ArgminOp, IterState};
-use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 
-/// This is returned by the `Executor` after the solver is run on the operator.
-///
-/// TODO: Think about removing this, as returning the IterState may be much better
-#[derive(Clone, Serialize, Deserialize)]
+/// Final struct returned by the `run` method of `Executor`.
+#[derive(Clone)]
 pub struct ArgminResult<O: ArgminOp> {
     /// operator
     pub operator: O,
@@ -30,6 +98,16 @@ impl<O: ArgminOp> ArgminResult<O> {
     pub fn new(operator: O, state: IterState<O>) -> Self {
         ArgminResult { operator, state }
     }
+
+    /// Return handle to operator
+    pub fn operator(&self) -> &O {
+        &self.operator
+    }
+
+    /// Return handle to state
+    pub fn state(&self) -> &IterState<O> {
+        &self.state
+    }
 }
 
 impl<O> std::fmt::Display for ArgminResult<O>
@@ -41,7 +119,6 @@ where
         writeln!(f, "ArgminResult:")?;
         writeln!(f, "    param (best):  {:?}", self.state.get_best_param())?;
         writeln!(f, "    cost (best):   {}", self.state.get_best_cost())?;
-        writeln!(f, "    iters (best):  {}", self.state.get_last_best_iter())?;
         writeln!(f, "    iters (best):  {}", self.state.get_last_best_iter())?;
         writeln!(f, "    iters (total): {}", self.state.get_iter())?;
         writeln!(
