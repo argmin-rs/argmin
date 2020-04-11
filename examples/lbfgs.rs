@@ -16,7 +16,7 @@ use argmin_testfunctions::rosenbrock;
 use finitediff::*;
 use ndarray::{array, Array1, Array2};
 
-#[derive(Clone, Default)]
+#[derive(Default)]
 struct Rosenbrock {
     a: f64,
     b: f64,
