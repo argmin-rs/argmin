@@ -152,7 +152,7 @@ where
                     ..
                 },
         } = Executor::new(
-            OpWrapper::new_from_op(&op),
+            OpWrapper::new(op.op.take().unwrap()),
             self.linesearch.clone(),
             param.clone(),
         )

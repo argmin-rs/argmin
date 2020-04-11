@@ -48,7 +48,7 @@ where
         let state = IterState::new(init_param);
         Executor {
             solver,
-            op: OpWrapper::new(&op),
+            op: OpWrapper::new(op),
             state,
             observers: Observer::new(),
             checkpoint: ArgminCheckpoint::default(),
@@ -57,7 +57,7 @@ where
     }
 
     /// Create a new executor from a checkpoint
-    pub fn from_checkpoint<P: AsRef<Path>>(path: P, op: &O) -> Result<Self, Error>
+    pub fn from_checkpoint<P: AsRef<Path>>(path: P, op: O) -> Result<Self, Error>
     where
         Self: Sized + DeserializeOwned,
     {

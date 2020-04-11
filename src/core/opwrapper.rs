@@ -16,7 +16,7 @@ use std::default::Default;
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct OpWrapper<O: ArgminOp> {
     /// Operator
-    op: Option<O>,
+    pub op: Option<O>,
     /// Number of cost function evaluations
     pub cost_func_count: u64,
     /// Number of gradient function evaluations
@@ -31,9 +31,9 @@ pub struct OpWrapper<O: ArgminOp> {
 
 impl<O: ArgminOp> OpWrapper<O> {
     /// Constructor
-    pub fn new(op: &O) -> Self {
+    pub fn new(op: O) -> Self {
         OpWrapper {
-            op: Some(op.clone()),
+            op: Some(op),
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
@@ -86,7 +86,8 @@ impl<O: ArgminOp> OpWrapper<O> {
 
     /// Consumes an operator by increasing the function call counts of `self` by the ones in
     /// `other`.
-    pub fn consume_op<O2: ArgminOp>(&mut self, other: OpWrapper<O2>) {
+    pub fn consume_op(&mut self, other: OpWrapper<O>) {
+        self.op = other.op;
         self.cost_func_count += other.cost_func_count;
         self.grad_func_count += other.grad_func_count;
         self.hessian_func_count += other.hessian_func_count;
@@ -107,17 +108,6 @@ impl<O: ArgminOp> OpWrapper<O> {
     /// Returns the operator `op` by taking ownership of `self`.
     pub fn get_op(self) -> O {
         self.op.unwrap()
-    }
-
-    /// Returns a clone of the operator `op`.
-    pub fn clone_op(&self) -> O {
-        self.op.as_ref().unwrap().clone()
-    }
-
-    /// Creates a new `OpWrapper<O>` from another `OpWrapper<O>` by cloning the `op` and
-    /// initializing all counts with `0`.
-    pub fn new_from_op(op: &OpWrapper<O>) -> Self {
-        Self::new(&op.clone_op())
     }
 }
 

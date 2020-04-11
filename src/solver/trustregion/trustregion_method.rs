@@ -147,7 +147,7 @@ where
             operator: sub_op,
             state: IterState { param: pk, .. },
         } = Executor::new(
-            OpWrapper::new_from_op(&op),
+            OpWrapper::new(op.op.take().unwrap()),
             self.subproblem.clone(),
             param.clone(),
         )
@@ -156,6 +156,7 @@ where
         .ctrlc(false)
         .run()?;
 
+        // What is happening with the function counts??
         op.consume_op(sub_op);
 
         let new_param = pk.add(&param);
