@@ -525,10 +525,6 @@
 <span id="525">525</span>
 <span id="526">526</span>
 <span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -666,7 +662,6 @@
 <span class="doccomment">//! use argmin::prelude::*;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! /// First, create a struct for your problem</span>
-<span class="doccomment">//! #[derive(Clone, Default)]</span>
 <span class="doccomment">//! struct Rosenbrock {</span>
 <span class="doccomment">//!     a: f64,</span>
 <span class="doccomment">//!     b: f64,</span>
@@ -719,7 +714,6 @@
 <span class="doccomment">//! use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
 <span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[derive(Clone, Default)]</span>
 <span class="doccomment">//! # struct Rosenbrock {</span>
 <span class="doccomment">//! #     a: f64,</span>
 <span class="doccomment">//! #     b: f64,</span>
@@ -804,7 +798,6 @@
 <span class="doccomment">//! # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
 <span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[derive(Clone, Default)]</span>
 <span class="doccomment">//! # struct Rosenbrock {</span>
 <span class="doccomment">//! #     a: f64,</span>
 <span class="doccomment">//! #     b: f64,</span>
@@ -883,7 +876,7 @@
 <span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
 <span class="doccomment">//! # use argmin::core::Error;</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[derive(Clone, Default)]</span>
+<span class="doccomment">//! # #[derive(Default)]</span>
 <span class="doccomment">//! # struct Rosenbrock {}</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! # impl ArgminOp for Rosenbrock {</span>
@@ -904,13 +897,12 @@
 <span class="doccomment">//! # fn run() -&gt; Result&lt;(), Error&gt; {</span>
 <span class="doccomment">//! #     // define inital parameter vector</span>
 <span class="doccomment">//! #     let init_param: Vec&lt;f64&gt; = vec![1.2, 1.2];</span>
-<span class="doccomment">//! #     let operator = Rosenbrock {};</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! #     let iters = 35;</span>
 <span class="doccomment">//! #     let solver = Landweber::new(0.001);</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! let res = Executor::from_checkpoint(&quot;.checkpoints/optim.arg&quot;, &amp;operator)</span>
-<span class="doccomment">//!     .unwrap_or(Executor::new(operator, solver, init_param))</span>
+<span class="doccomment">//! let res = Executor::from_checkpoint(&quot;.checkpoints/optim.arg&quot;, Rosenbrock {})</span>
+<span class="doccomment">//!     .unwrap_or(Executor::new(Rosenbrock {}, solver, init_param))</span>
 <span class="doccomment">//!     .max_iters(iters)</span>
 <span class="doccomment">//!     .checkpoint_dir(&quot;.checkpoints&quot;)</span>
 <span class="doccomment">//!     .checkpoint_name(&quot;optim&quot;)</span>

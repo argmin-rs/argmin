@@ -207,6 +207,8 @@
 <span id="207">207</span>
 <span id="208">208</span>
 <span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -357,7 +359,7 @@
             <span class="ident">operator</span>: <span class="ident">sub_op</span>,
             <span class="ident">state</span>: <span class="ident">IterState</span> { <span class="ident">param</span>: <span class="ident">pk</span>, .. },
         } <span class="op">=</span> <span class="ident">Executor</span>::<span class="ident">new</span>(
-            <span class="ident">OpWrapper</span>::<span class="ident">new_from_op</span>(<span class="kw-2">&amp;</span><span class="ident">op</span>),
+            <span class="ident">OpWrapper</span>::<span class="ident">new_from_wrapper</span>(<span class="ident">op</span>),
             <span class="self">self</span>.<span class="ident">subproblem</span>.<span class="ident">clone</span>(),
             <span class="ident">param</span>.<span class="ident">clone</span>(),
         )
@@ -366,6 +368,8 @@
         .<span class="ident">ctrlc</span>(<span class="bool-val">false</span>)
         .<span class="ident">run</span>()<span class="question-mark">?</span>;
 
+        <span class="comment">// Operator must be consumed again, otherwise the operator, which moved into the subproblem</span>
+        <span class="comment">// executor as well as the function evaluation counts are lost.</span>
         <span class="ident">op</span>.<span class="ident">consume_op</span>(<span class="ident">sub_op</span>);
 
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>);

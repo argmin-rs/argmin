@@ -171,6 +171,12 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -261,11 +267,13 @@
         <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">set_search_direction</span>(<span class="ident">p</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="op">-</span><span class="number">1.0</span>)));
 
         <span class="comment">// create operator for linesearch</span>
-        <span class="kw">let</span> <span class="ident">line_op</span> <span class="op">=</span> <span class="ident">OpWrapper</span>::<span class="ident">new_move</span>(<span class="ident">LineSearchOP</span> { <span class="ident">op</span>: <span class="ident">op</span>.<span class="ident">clone_op</span>() });
+        <span class="kw">let</span> <span class="ident">line_op</span> <span class="op">=</span> <span class="ident">OpWrapper</span>::<span class="ident">new</span>(<span class="ident">LineSearchOP</span> {
+            <span class="ident">op</span>: <span class="ident">op</span>.<span class="ident">take_op</span>().<span class="ident">unwrap</span>(),
+        });
 
         <span class="comment">// perform linesearch</span>
         <span class="kw">let</span> <span class="ident">ArgminResult</span> {
-            <span class="ident">operator</span>: <span class="ident">line_op</span>,
+            <span class="ident">operator</span>: <span class="kw-2">mut</span> <span class="ident">line_op</span>,
             <span class="ident">state</span>:
                 <span class="ident">IterState</span> {
                     <span class="ident">param</span>: <span class="ident">next_param</span>,
@@ -278,7 +286,11 @@
             .<span class="ident">ctrlc</span>(<span class="bool-val">false</span>)
             .<span class="ident">run</span>()<span class="question-mark">?</span>;
 
-        <span class="ident">op</span>.<span class="ident">consume_op</span>(<span class="ident">line_op</span>);
+        <span class="comment">// Here we cannot use `consume_op` because the operator we need is hidden inside a</span>
+        <span class="comment">// `LineSearchOP` hidden inside a `OpWrapper`. Therefore we have to split this in two</span>
+        <span class="comment">// separate tasks: first getting the operator, then dealing with the function counts.</span>
+        <span class="ident">op</span>.<span class="ident">op</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">line_op</span>.<span class="ident">take_op</span>().<span class="ident">unwrap</span>().<span class="ident">op</span>);
+        <span class="ident">op</span>.<span class="ident">consume_func_counts</span>(<span class="ident">line_op</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData</span>::<span class="ident">new</span>().<span class="ident">param</span>(<span class="ident">next_param</span>).<span class="ident">cost</span>(<span class="ident">next_cost</span>))
     }
@@ -294,7 +306,7 @@
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LineSearchOP</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="ident">op</span>: <span class="ident">O</span>,
+    <span class="kw">pub</span> <span class="ident">op</span>: <span class="ident">O</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&gt;</span> <span class="ident">ArgminOp</span> <span class="kw">for</span> <span class="ident">LineSearchOP</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
