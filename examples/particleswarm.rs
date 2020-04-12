@@ -12,7 +12,6 @@ use argmin::solver::particleswarm::*;
 
 use argmin_testfunctions::himmelblau;
 
-#[derive(Default, Clone)]
 struct Himmelblau {}
 
 impl ArgminOp for Himmelblau {
@@ -35,11 +34,7 @@ fn run() -> Result<(), Error> {
     #[cfg(feature = "visualizer")]
     let visualizer = Visualizer3d::new()
         .delay(std::time::Duration::from_secs(1))
-        .surface(Surface::new::<Himmelblau>(
-            cost_function.clone(),
-            (-4.0, -4.0, 4.0, 4.0),
-            0.1,
-        ));
+        .surface(Surface::new(Himmelblau {}, (-4.0, -4.0, 4.0, 4.0), 0.1));
 
     {
         let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;

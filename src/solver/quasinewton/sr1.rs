@@ -141,7 +141,7 @@ where
                     ..
                 },
         } = Executor::new(
-            OpWrapper::new_from_op(&op),
+            OpWrapper::new_from_wrapper(op),
             self.linesearch.clone(),
             param.clone(),
         )

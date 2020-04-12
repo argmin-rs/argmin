@@ -20,7 +20,6 @@ type Measurement = (S, Rate);
 // Model used in this example:
 // `rate = (V_{max} * [S]) / (K_M + [S]) `
 // where `V_{max}` and `K_M` are the sought parameters and `[S]` and `rate` is the measured data.
-#[derive(Clone, Default)]
 struct Problem {
     data: Vec<Measurement>,
 }

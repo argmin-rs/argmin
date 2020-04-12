@@ -77,7 +77,7 @@ where
                     ..
                 },
         } = Executor::new(
-            OpWrapper::new_from_op(&op),
+            OpWrapper::new_from_wrapper(op),
             self.linesearch.clone(),
             param_new,
         )
@@ -86,7 +86,7 @@ where
         .ctrlc(false)
         .run()?;
 
-        // hack
+        // Get back operator and function evaluation counts
         op.consume_op(line_op);
 
         Ok(ArgminIterData::new().param(next_param).cost(next_cost))

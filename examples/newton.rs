@@ -13,7 +13,6 @@ use argmin::solver::newton::Newton;
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
 
-#[derive(Clone, Default)]
 struct Rosenbrock {
     a: f64,
     b: f64,

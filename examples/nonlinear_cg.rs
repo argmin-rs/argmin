@@ -13,7 +13,6 @@ use argmin::solver::conjugategradient::PolakRibiere;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
-#[derive(Clone, Default)]
 struct Rosenbrock {}
 
 impl ArgminOp for Rosenbrock {

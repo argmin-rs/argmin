@@ -135,7 +135,7 @@ where
         let ArgminResult {
             operator: line_op,
             state: line_state,
-        } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), xk)
+        } = Executor::new(OpWrapper::new_from_wrapper(op), self.linesearch.clone(), xk)
             .grad(grad.clone())
             .cost(cur_cost)
             .ctrlc(false)

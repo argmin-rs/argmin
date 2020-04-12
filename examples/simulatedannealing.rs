@@ -18,7 +18,6 @@ use std::default::Default;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-#[derive(Clone)]
 struct Rosenbrock {
     /// Parameter a, usually 1.0
     a: f64,

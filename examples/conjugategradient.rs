@@ -9,7 +9,6 @@ extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::conjugategradient::ConjugateGradient;
 
-#[derive(Clone, Default)]
 struct MyProblem {}
 
 impl ArgminOp for MyProblem {

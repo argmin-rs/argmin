@@ -152,7 +152,7 @@ where
                     ..
                 },
         } = Executor::new(
-            OpWrapper::new_from_op(&op),
+            OpWrapper::new_from_wrapper(op),
             self.linesearch.clone(),
             param.clone(),
         )
@@ -161,7 +161,7 @@ where
         .ctrlc(false)
         .run()?;
 
-        // take care of function eval counts
+        // take back operator and take care of function evaluation counts
         op.consume_op(line_op);
 
         if state.get_iter() >= self.m as u64 {
