@@ -10,7 +10,6 @@ use argmin::prelude::*;
 use argmin::solver::brent::Brent;
 
 /// Test function generalise from Wikipedia example
-#[derive(Clone, Default)]
 struct TestFunc {
     zero1: f64,
     zero2: f64,

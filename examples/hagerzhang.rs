@@ -11,7 +11,6 @@ use argmin::prelude::*;
 use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin_testfunctions::{sphere, sphere_derivative};
 
-#[derive(Clone, Default)]
 struct Sphere {}
 
 impl ArgminOp for Sphere {

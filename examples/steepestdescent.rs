@@ -15,7 +15,6 @@ use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
-#[derive(Clone, Default)]
 struct Rosenbrock {
     a: f64,
     b: f64,
