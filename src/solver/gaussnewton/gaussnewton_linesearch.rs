@@ -87,11 +87,13 @@ where
         self.linesearch.set_search_direction(p.mul(&(-1.0)));
 
         // create operator for linesearch
-        let line_op = OpWrapper::new_move(LineSearchOP { op: op.clone_op() });
+        let line_op = OpWrapper::new(LineSearchOP {
+            op: op.take_op().unwrap(),
+        });
 
         // perform linesearch
         let ArgminResult {
-            operator: line_op,
+            operator: mut line_op,
             state:
                 IterState {
                     param: next_param,
@@ -104,7 +106,11 @@ where
             .ctrlc(false)
             .run()?;
 
-        op.consume_op(line_op);
+        // Here we cannot use `consume_op` because the operator we need is hidden inside a
+        // `LineSearchOP` hidden inside a `OpWrapper`. Therefore we have to split this in two
+        // separate tasks: first getting the operator, then dealing with the function counts.
+        op.op = Some(line_op.take_op().unwrap().op);
+        op.consume_func_counts(line_op);
 
         Ok(ArgminIterData::new().param(next_param).cost(next_cost))
     }
@@ -120,7 +126,7 @@ where
 #[doc(hidden)]
 #[derive(Clone, Default, Serialize, Deserialize)]
 pub struct LineSearchOP<O> {
-    op: O,
+    pub op: O,
 }
 
 impl<O: ArgminOp> ArgminOp for LineSearchOP<O>

@@ -102,7 +102,7 @@ where
 
         // Solve CG subproblem
         let cg_op: CGSubProblem<O::Param, O::Hessian> = CGSubProblem::new(hessian.clone());
-        let mut cg_op = OpWrapper::new(&cg_op);
+        let mut cg_op = OpWrapper::new(cg_op);
 
         let mut x_p = param.zero_like();
         let mut x: O::Param = param.zero_like();
@@ -145,11 +145,15 @@ where
                     cost: next_cost,
                     ..
                 },
-        } = Executor::new(OpWrapper::new_from_op(&op), self.linesearch.clone(), param)
-            .grad(grad)
-            .cost(state.get_cost())
-            .ctrlc(false)
-            .run()?;
+        } = Executor::new(
+            OpWrapper::new_from_wrapper(op),
+            self.linesearch.clone(),
+            param,
+        )
+        .grad(grad)
+        .cost(state.get_cost())
+        .ctrlc(false)
+        .run()?;
 
         op.consume_op(line_op);
 

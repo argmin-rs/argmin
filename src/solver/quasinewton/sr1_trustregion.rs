@@ -163,7 +163,7 @@ where
             operator: sub_op,
             state: IterState { param: sk, .. },
         } = Executor::new(
-            OpWrapper::new_from_op(&op),
+            OpWrapper::new_from_wrapper(op),
             self.subproblem.clone(),
             // xk.clone(),
             xk.zero_like(),

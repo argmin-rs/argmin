@@ -42,10 +42,11 @@ impl<O: ArgminOp> OpWrapper<O> {
         }
     }
 
-    /// Constructor (moves op)
-    pub fn new_move(op: O) -> Self {
+    /// Construct struct from other `OpWrapper`. Takes the operator from `op` (replaces it with
+    /// `None`) and crates a new `OpWrapper`
+    pub fn new_from_wrapper(op: &mut OpWrapper<O>) -> Self {
         OpWrapper {
-            op: Some(op),
+            op: op.take_op(),
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
@@ -84,6 +85,11 @@ impl<O: ArgminOp> OpWrapper<O> {
         self.op.as_ref().unwrap().modify(param, extent)
     }
 
+    /// Moves the operator out of the struct and replaces it with `None`
+    pub fn take_op(&mut self) -> Option<O> {
+        self.op.take()
+    }
+
     /// Consumes an operator by increasing the function call counts of `self` by the ones in
     /// `other`.
     pub fn consume_op(&mut self, other: OpWrapper<O>) {
@@ -95,7 +101,16 @@ impl<O: ArgminOp> OpWrapper<O> {
         self.modify_func_count += other.modify_func_count;
     }
 
-    /// Reset the cost function counts to zero
+    /// Adds function evaluation counts of another operator.
+    pub fn consume_func_counts<O2: ArgminOp>(&mut self, other: OpWrapper<O2>) {
+        self.cost_func_count += other.cost_func_count;
+        self.grad_func_count += other.grad_func_count;
+        self.hessian_func_count += other.hessian_func_count;
+        self.jacobian_func_count += other.jacobian_func_count;
+        self.modify_func_count += other.modify_func_count;
+    }
+
+    /// Reset the cost function counts to zero.
     pub fn reset(mut self) -> Self {
         self.cost_func_count = 0;
         self.grad_func_count = 0;

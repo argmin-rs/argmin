@@ -134,7 +134,6 @@
 //! use argmin::prelude::*;
 //!
 //! /// First, create a struct for your problem
-//! #[derive(Clone, Default)]
 //! struct Rosenbrock {
 //!     a: f64,
 //!     b: f64,
@@ -187,7 +186,6 @@
 //! use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! #
-//! # #[derive(Clone, Default)]
 //! # struct Rosenbrock {
 //! #     a: f64,
 //! #     b: f64,
@@ -272,7 +270,6 @@
 //! # use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! #
-//! # #[derive(Clone, Default)]
 //! # struct Rosenbrock {
 //! #     a: f64,
 //! #     b: f64,
@@ -351,7 +348,7 @@
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! # use argmin::core::Error;
 //! #
-//! # #[derive(Clone, Default)]
+//! # #[derive(Default)]
 //! # struct Rosenbrock {}
 //! #
 //! # impl ArgminOp for Rosenbrock {
@@ -372,13 +369,12 @@
 //! # fn run() -> Result<(), Error> {
 //! #     // define inital parameter vector
 //! #     let init_param: Vec<f64> = vec![1.2, 1.2];
-//! #     let operator = Rosenbrock {};
 //! #
 //! #     let iters = 35;
 //! #     let solver = Landweber::new(0.001);
 //! #
-//! let res = Executor::from_checkpoint(".checkpoints/optim.arg", &operator)
-//!     .unwrap_or(Executor::new(operator, solver, init_param))
+//! let res = Executor::from_checkpoint(".checkpoints/optim.arg", Rosenbrock {})
+//!     .unwrap_or(Executor::new(Rosenbrock {}, solver, init_param))
 //!     .max_iters(iters)
 //!     .checkpoint_dir(".checkpoints")
 //!     .checkpoint_name("optim")
