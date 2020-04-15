@@ -106,18 +106,23 @@ where
             self.x2 = x2;
             self.f1 = op.apply(&self.x1)?;
             self.f2 = op.apply(&self.x2)?;
-            Ok(Some(ArgminIterData::new()))
+            if self.f1 < self.f2 {
+                Ok(Some(ArgminIterData::new().param(self.x1).cost(self.f1)))
+            } else {
+                Ok(Some(ArgminIterData::new().param(self.x2).cost(self.f2)))
+            }
         }
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         if self.tolerance * (self.x1.abs() + self.x2.abs()) >= (self.x3 - self.x0).abs() {
             return Ok(ArgminIterData::new()
-                .param(if self.f1 < self.f2 { self.x1 } else { self.x2 })
+                .param(state.param)
+                .cost(state.cost)
                 .termination_reason(TerminationReason::TargetToleranceReached));
         }
 
@@ -134,6 +139,10 @@ where
             self.f2 = self.f1;
             self.f1 = op.apply(&self.x1)?;
         }
-        Ok(ArgminIterData::new())
+        if self.f1 < self.f2 {
+            Ok(ArgminIterData::new().param(self.x1).cost(self.f1))
+        } else {
+            Ok(ArgminIterData::new().param(self.x2).cost(self.f2))
+        }
     }
 }
