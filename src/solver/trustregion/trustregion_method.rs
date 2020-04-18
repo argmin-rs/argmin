@@ -36,49 +36,49 @@ use std::fmt::Debug;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct TrustRegion<R> {
+pub struct TrustRegion<R, F> {
     /// Radius
-    radius: f64,
+    radius: F,
     /// Maximum Radius
-    max_radius: f64,
+    max_radius: F,
     /// eta \in [0, 1/4)
-    eta: f64,
+    eta: F,
     /// subproblem
     subproblem: R,
     /// f(xk)
-    fxk: f64,
+    fxk: F,
     /// mk(0)
-    mk0: f64,
+    mk0: F,
 }
 
-impl<R> TrustRegion<R> {
+impl<R, F: ArgminFloat> TrustRegion<R, F> {
     /// Constructor
     pub fn new(subproblem: R) -> Self {
         TrustRegion {
-            radius: 1.0,
-            max_radius: 100.0,
-            eta: 0.125,
+            radius: F::from_f64(1.0).unwrap(),
+            max_radius: F::from_f64(100.0).unwrap(),
+            eta: F::from_f64(0.125).unwrap(),
             subproblem,
-            fxk: std::f64::NAN,
-            mk0: std::f64::NAN,
+            fxk: F::nan(),
+            mk0: F::nan(),
         }
     }
 
     /// set radius
-    pub fn radius(mut self, radius: f64) -> Self {
+    pub fn radius(mut self, radius: F) -> Self {
         self.radius = radius;
         self
     }
 
     /// Set maximum radius
-    pub fn max_radius(mut self, max_radius: f64) -> Self {
+    pub fn max_radius(mut self, max_radius: F) -> Self {
         self.max_radius = max_radius;
         self
     }
 
     /// Set eta
-    pub fn eta(mut self, eta: f64) -> Result<Self, Error> {
-        if eta >= 0.25 || eta < 0.0 {
+    pub fn eta(mut self, eta: F) -> Result<Self, Error> {
+        if eta >= F::from_f64(0.25).unwrap() || eta < F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "TrustRegion: eta must be in [0, 1/4).".to_string(),
             }
@@ -89,31 +89,32 @@ impl<R> TrustRegion<R> {
     }
 }
 
-impl<O, R> Solver<O> for TrustRegion<R>
+impl<O, R, F> Solver<O, F> for TrustRegion<R, F>
 where
-    O: ArgminOp<Output = f64>,
+    O: ArgminOp<Output = F>,
     O::Param: Default
         + Clone
         + Debug
         + Serialize
-        + ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
+        + ArgminMul<F, O::Param>
+        + ArgminWeightedDot<O::Param, F, O::Hessian>
+        + ArgminNorm<F>
+        + ArgminDot<O::Param, F>
         + ArgminAdd<O::Param, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminZeroLike
-        + ArgminMul<f64, O::Param>,
+        + ArgminMul<F, O::Param>,
     O::Hessian: Default + Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
-    R: ArgminTrustRegion + Solver<OpWrapper<O>>,
+    R: ArgminTrustRegion<F> + Solver<OpWrapper<O>, F>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Trust region";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
         let param = state.get_param();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
@@ -131,8 +132,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<ArgminIterData<O, F>, Error> {
         let param = state.get_param();
         let grad = state
             .get_grad()
@@ -162,17 +163,20 @@ where
 
         let new_param = pk.add(&param);
         let fxkpk = op.apply(&new_param)?;
-        let mkpk = self.fxk + pk.dot(&grad) + 0.5 * pk.weighted_dot(&hessian, &pk);
+        let mkpk =
+            self.fxk + pk.dot(&grad) + F::from_f64(0.5).unwrap() * pk.weighted_dot(&hessian, &pk);
 
         let rho = reduction_ratio(self.fxk, fxkpk, self.mk0, mkpk);
 
         let pk_norm = pk.norm();
 
         let cur_radius = self.radius;
-        self.radius = if rho < 0.25 {
-            0.25 * pk_norm
-        } else if rho > 0.75 && (pk_norm - self.radius).abs() <= 10.0 * std::f64::EPSILON {
-            self.max_radius.min(2.0 * self.radius)
+        self.radius = if rho < F::from_f64(0.25).unwrap() {
+            F::from_f64(0.25).unwrap() * pk_norm
+        } else if rho > F::from_f64(0.75).unwrap()
+            && (pk_norm - self.radius).abs() <= F::from_f64(10.0).unwrap() * F::epsilon()
+        {
+            self.max_radius.min(F::from_f64(2.0).unwrap() * self.radius)
         } else {
             self.radius
         };
@@ -193,7 +197,7 @@ where
         .kv(make_kv!("radius" => cur_radius;)))
     }
 
-    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<O, F>) -> TerminationReason {
         // todo
         TerminationReason::NotTerminated
     }
@@ -207,5 +211,5 @@ mod tests {
 
     type Operator = MinimalNoOperator;
 
-    test_trait_impl!(trustregion, TrustRegion<Steihaug<Operator>>);
+    test_trait_impl!(trustregion, TrustRegion<Steihaug<Operator, f64>, f64>);
 }

@@ -82,21 +82,21 @@
 //!
 //! More details can be found in the `IterState` documentation.
 
-use crate::core::{ArgminOp, IterState};
+use crate::core::{ArgminFloat, ArgminOp, IterState};
 use std::cmp::Ordering;
 
 /// Final struct returned by the `run` method of `Executor`.
 #[derive(Clone)]
-pub struct ArgminResult<O: ArgminOp> {
+pub struct ArgminResult<O: ArgminOp, F> {
     /// operator
     pub operator: O,
     /// iteration state
-    pub state: IterState<O>,
+    pub state: IterState<O, F>,
 }
 
-impl<O: ArgminOp> ArgminResult<O> {
+impl<O: ArgminOp, F> ArgminResult<O, F> {
     /// Constructor
-    pub fn new(operator: O, state: IterState<O>) -> Self {
+    pub fn new(operator: O, state: IterState<O, F>) -> Self {
         ArgminResult { operator, state }
     }
 
@@ -106,15 +106,16 @@ impl<O: ArgminOp> ArgminResult<O> {
     }
 
     /// Return handle to state
-    pub fn state(&self) -> &IterState<O> {
+    pub fn state(&self) -> &IterState<O, F> {
         &self.state
     }
 }
 
-impl<O> std::fmt::Display for ArgminResult<O>
+impl<O, F> std::fmt::Display for ArgminResult<O, F>
 where
     O: ArgminOp,
     O::Param: std::fmt::Debug,
+    F: ArgminFloat,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "ArgminResult:")?;
@@ -132,20 +133,20 @@ where
     }
 }
 
-impl<O: ArgminOp> PartialEq for ArgminResult<O> {
-    fn eq(&self, other: &ArgminResult<O>) -> bool {
-        (self.state.get_cost() - other.state.get_cost()).abs() < std::f64::EPSILON
+impl<O: ArgminOp, F: ArgminFloat> PartialEq for ArgminResult<O, F> {
+    fn eq(&self, other: &ArgminResult<O, F>) -> bool {
+        (self.state.get_cost() - other.state.get_cost()).abs() < F::epsilon()
     }
 }
 
-impl<O: ArgminOp> Eq for ArgminResult<O> {}
+impl<O: ArgminOp, F: ArgminFloat> Eq for ArgminResult<O, F> {}
 
-impl<O: ArgminOp> Ord for ArgminResult<O> {
-    fn cmp(&self, other: &ArgminResult<O>) -> Ordering {
+impl<O: ArgminOp, F: ArgminFloat> Ord for ArgminResult<O, F> {
+    fn cmp(&self, other: &ArgminResult<O, F>) -> Ordering {
         let t = self.state.get_cost() - other.state.get_cost();
-        if t.abs() < std::f64::EPSILON {
+        if t.abs() < F::epsilon() {
             Ordering::Equal
-        } else if t > 0.0 {
+        } else if t > F::from_f64(0.0).unwrap() {
             Ordering::Greater
         } else {
             Ordering::Less
@@ -153,8 +154,8 @@ impl<O: ArgminOp> Ord for ArgminResult<O> {
     }
 }
 
-impl<O: ArgminOp> PartialOrd for ArgminResult<O> {
-    fn partial_cmp(&self, other: &ArgminResult<O>) -> Option<Ordering> {
+impl<O: ArgminOp, F: ArgminFloat> PartialOrd for ArgminResult<O, F> {
+    fn partial_cmp(&self, other: &ArgminResult<O, F>) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -164,5 +165,5 @@ mod tests {
     use super::*;
     use crate::core::MinimalNoOperator;
 
-    send_sync_test!(argmin_result, ArgminResult<MinimalNoOperator>);
+    send_sync_test!(argmin_result, ArgminResult<MinimalNoOperator, f64>);
 }

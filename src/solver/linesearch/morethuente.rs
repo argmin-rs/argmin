@@ -37,47 +37,47 @@ use std::default::Default;
 /// decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
 /// DOI: https://doi.org/10.1145/192115.192132
 #[derive(Serialize, Deserialize, Clone)]
-pub struct MoreThuenteLineSearch<P> {
+pub struct MoreThuenteLineSearch<P, F> {
     /// Search direction (builder)
     search_direction_b: Option<P>,
     /// initial parameter vector
     init_param: P,
     /// initial cost
-    finit: f64,
+    finit: F,
     /// initial gradient
     init_grad: P,
     /// Search direction
     search_direction: P,
     /// Search direction in 1D
-    dginit: f64,
+    dginit: F,
     /// dgtest
-    dgtest: f64,
+    dgtest: F,
     /// c1
-    ftol: f64,
+    ftol: F,
     /// c2
-    gtol: f64,
+    gtol: F,
     /// xtrapf?
-    xtrapf: f64,
+    xtrapf: F,
     /// width of interval
-    width: f64,
+    width: F,
     /// width of what?
-    width1: f64,
+    width1: F,
     /// xtol
-    xtol: f64,
+    xtol: F,
     /// alpha
-    alpha: f64,
+    alpha: F,
     /// stpmin
-    stpmin: f64,
+    stpmin: F,
     /// stpmax
-    stpmax: f64,
+    stpmax: F,
     /// current step
-    stp: Step,
+    stp: Step<F>,
     /// stx
-    stx: Step,
+    stx: Step<F>,
     /// sty
-    sty: Step,
+    sty: Step<F>,
     /// f
-    f: f64,
+    f: F,
     /// bracketed
     brackt: bool,
     /// stage1
@@ -86,43 +86,53 @@ pub struct MoreThuenteLineSearch<P> {
     infoc: usize,
 }
 
-#[derive(Default, Clone, Serialize, Deserialize)]
-struct Step {
-    pub x: f64,
-    pub fx: f64,
-    pub gx: f64,
+#[derive(Clone, Serialize, Deserialize)]
+struct Step<F> {
+    pub x: F,
+    pub fx: F,
+    pub gx: F,
 }
 
-impl Step {
-    pub fn new(x: f64, fx: f64, gx: f64) -> Self {
+impl<F> Step<F> {
+    pub fn new(x: F, fx: F, gx: F) -> Self {
         Step { x, fx, gx }
     }
 }
 
-impl<P: Default> MoreThuenteLineSearch<P> {
+impl<F: ArgminFloat> Default for Step<F> {
+    fn default() -> Self {
+        Step {
+            x: F::from_f64(0.0).unwrap(),
+            fx: F::from_f64(0.0).unwrap(),
+            gx: F::from_f64(0.0).unwrap(),
+        }
+    }
+}
+
+impl<P: Default, F: ArgminFloat> MoreThuenteLineSearch<P, F> {
     /// Constructor
     pub fn new() -> Self {
         MoreThuenteLineSearch {
             search_direction_b: None,
             init_param: P::default(),
-            finit: std::f64::INFINITY,
+            finit: F::infinity(),
             init_grad: P::default(),
             search_direction: P::default(),
-            dginit: 0.0,
-            dgtest: 0.0,
-            ftol: 1e-4,
-            gtol: 0.9,
-            xtrapf: 4.0,
-            width: std::f64::NAN,
-            width1: std::f64::NAN,
-            xtol: 1e-10,
-            alpha: 1.0,
-            stpmin: std::f64::EPSILON.sqrt(),
-            stpmax: std::f64::INFINITY,
+            dginit: F::from_f64(0.0).unwrap(),
+            dgtest: F::from_f64(0.0).unwrap(),
+            ftol: F::from_f64(1e-4).unwrap(),
+            gtol: F::from_f64(0.9).unwrap(),
+            xtrapf: F::from_f64(4.0).unwrap(),
+            width: F::nan(),
+            width1: F::nan(),
+            xtol: F::from_f64(1e-10).unwrap(),
+            alpha: F::from_f64(1.0).unwrap(),
+            stpmin: F::epsilon().sqrt(),
+            stpmax: F::infinity(),
             stp: Step::default(),
             stx: Step::default(),
             sty: Step::default(),
-            f: std::f64::NAN,
+            f: F::nan(),
             brackt: false,
             stage1: true,
             infoc: 1,
@@ -130,14 +140,14 @@ impl<P: Default> MoreThuenteLineSearch<P> {
     }
 
     /// Set c1 and c2 where 0 < c1 < c2 < 1.
-    pub fn c(mut self, c1: f64, c2: f64) -> Result<Self, Error> {
-        if c1 <= 0.0 || c1 >= c2 {
+    pub fn c(mut self, c1: F, c2: F) -> Result<Self, Error> {
+        if c1 <= F::from_f64(0.0).unwrap() || c1 >= c2 {
             return Err(ArgminError::InvalidParameter {
                 text: "MoreThuenteLineSearch: Parameter c1 must be in (0, c2).".to_string(),
             }
             .into());
         }
-        if c2 <= c1 || c2 >= 1.0 {
+        if c2 <= c1 || c2 >= F::from_f64(1.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "MoreThuenteLineSearch: Parameter c2 must be in (c1, 1).".to_string(),
             }
@@ -149,8 +159,8 @@ impl<P: Default> MoreThuenteLineSearch<P> {
     }
 
     /// set alpha limits
-    pub fn alpha(mut self, alpha_min: f64, alpha_max: f64) -> Result<Self, Error> {
-        if alpha_min < 0.0 {
+    pub fn alpha(mut self, alpha_min: F, alpha_max: F) -> Result<Self, Error> {
+        if alpha_min < F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "MoreThuenteLineSearch: alpha_min must be >= 0.0.".to_string(),
             }
@@ -169,15 +179,16 @@ impl<P: Default> MoreThuenteLineSearch<P> {
     }
 }
 
-impl<P: Default> Default for MoreThuenteLineSearch<P> {
+impl<P: Default, F: ArgminFloat> Default for MoreThuenteLineSearch<P, F> {
     fn default() -> Self {
         MoreThuenteLineSearch::new()
     }
 }
 
-impl<P> ArgminLineSearch<P> for MoreThuenteLineSearch<P>
+impl<P, F> ArgminLineSearch<P, F> for MoreThuenteLineSearch<P, F>
 where
-    P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
+    P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
+    F: ArgminFloat,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {
@@ -185,8 +196,8 @@ where
     }
 
     /// Set initial alpha value
-    fn set_init_alpha(&mut self, alpha: f64) -> Result<(), Error> {
-        if alpha <= 0.0 {
+    fn set_init_alpha(&mut self, alpha: F) -> Result<(), Error> {
+        if alpha <= F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "MoreThuenteLineSearch: Initial alpha must be > 0.".to_string(),
             }
@@ -197,23 +208,24 @@ where
     }
 }
 
-impl<P, O> Solver<O> for MoreThuenteLineSearch<P>
+impl<P, O, F> Solver<O, F> for MoreThuenteLineSearch<P, F>
 where
-    O: ArgminOp<Param = P, Output = f64>,
+    O: ArgminOp<Param = P, Output = F>,
     P: Clone
         + Serialize
         + DeserializeOwned
         + ArgminSub<P, P>
-        + ArgminDot<P, f64>
-        + ArgminScaledAdd<P, f64, P>,
+        + ArgminDot<P, F>
+        + ArgminScaledAdd<P, F, P>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "More-Thuente Line search";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
         self.search_direction = check_param!(
             self.search_direction_b,
             "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
@@ -222,7 +234,7 @@ where
         self.init_param = state.get_param();
 
         let cost = state.get_cost();
-        self.finit = if cost == std::f64::INFINITY {
+        self.finit = if cost.is_infinite() {
             op.apply(&self.init_param)?
         } else {
             cost
@@ -235,7 +247,7 @@ where
         self.dginit = self.init_grad.dot(&self.search_direction);
 
         // compute search direction in 1D
-        if self.dginit >= 0.0 {
+        if self.dginit >= F::from_f64(0.0).unwrap() {
             return Err(ArgminError::ConditionViolated {
                 text: "MoreThuenteLineSearch: Search direction must be a descent direction."
                     .to_string(),
@@ -248,12 +260,12 @@ where
 
         self.dgtest = self.ftol * self.dginit;
         self.width = self.stpmax - self.stpmin;
-        self.width1 = 2.0 * self.width;
+        self.width1 = F::from_f64(2.0).unwrap() * self.width;
         self.f = self.finit;
 
-        self.stp = Step::new(self.alpha, std::f64::NAN, std::f64::NAN);
-        self.stx = Step::new(0.0, self.finit, self.dginit);
-        self.sty = Step::new(0.0, self.finit, self.dginit);
+        self.stp = Step::new(self.alpha, F::nan(), F::nan());
+        self.stx = Step::new(F::from_f64(0.0).unwrap(), self.finit, self.dginit);
+        self.sty = Step::new(F::from_f64(0.0).unwrap(), self.finit, self.dginit);
 
         Ok(None)
     }
@@ -261,8 +273,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+        _state: &IterState<O, F>,
+    ) -> Result<ArgminIterData<O, F>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {
@@ -306,15 +318,12 @@ where
             info = 6;
         }
 
-        if (self.stp.x - self.stpmax).abs() < std::f64::EPSILON
-            && self.f <= ftest1
-            && dg <= self.dgtest
+        if (self.stp.x - self.stpmax).abs() < F::epsilon() && self.f <= ftest1 && dg <= self.dgtest
         {
             info = 5;
         }
 
-        if (self.stp.x - self.stpmin).abs() < std::f64::EPSILON
-            && (self.f > ftest1 || dg >= self.dgtest)
+        if (self.stp.x - self.stpmin).abs() < F::epsilon() && (self.f > ftest1 || dg >= self.dgtest)
         {
             info = 4;
         }
@@ -359,10 +368,10 @@ where
             self.stx.x = stx1.x;
             self.sty.x = sty1.x;
             self.stp.x = stp1.x;
-            self.stx.fx += stx1.x * self.dgtest;
-            self.sty.fx += sty1.x * self.dgtest;
-            self.stx.gx += self.dgtest;
-            self.sty.gx += self.dgtest;
+            self.stx.fx = self.stx.fx + stx1.x * self.dgtest;
+            self.sty.fx = self.sty.fx + sty1.x * self.dgtest;
+            self.stx.gx = self.stx.gx + self.dgtest;
+            self.sty.gx = self.sty.gx + self.dgtest;
             self.brackt = brackt1;
             self.stp = stp1;
             self.infoc = infoc;
@@ -385,8 +394,8 @@ where
         }
 
         if self.brackt {
-            if (self.sty.x - self.stx.x).abs() >= 0.66 * self.width1 {
-                self.stp.x = self.stx.x + 0.5 * (self.sty.x - self.stx.x);
+            if (self.sty.x - self.stx.x).abs() >= F::from_f64(0.66).unwrap() * self.width1 {
+                self.stp.x = self.stx.x + F::from_f64(0.5).unwrap() * (self.sty.x - self.stx.x);
             }
             self.width1 = self.width;
             self.width = (self.sty.x - self.stx.x).abs();
@@ -400,24 +409,24 @@ where
     }
 }
 
-fn cstep(
-    stx: Step,
-    sty: Step,
-    stp: Step,
+fn cstep<F: ArgminFloat>(
+    stx: Step<F>,
+    sty: Step<F>,
+    stp: Step<F>,
     brackt: bool,
-    stpmin: f64,
-    stpmax: f64,
-) -> (Step, Step, Step, bool, f64, f64, usize) {
+    stpmin: F,
+    stpmax: F,
+) -> (Step<F>, Step<F>, Step<F>, bool, F, F, usize) {
     let mut info: usize = 0;
     let bound: bool;
-    let mut stpf: f64;
-    let stpc: f64;
-    let stpq: f64;
+    let mut stpf: F;
+    let stpc: F;
+    let stpq: F;
     let mut brackt = brackt;
 
     // check inputs
     if (brackt && (stp.x <= stx.x.min(sty.x) || stp.x >= stx.x.max(sty.x)))
-        || stx.gx * (stp.x - stx.x) >= 0.0
+        || stx.gx * (stp.x - stx.x) >= F::from_f64(0.0).unwrap()
         || stpmax < stpmin
     {
         return (stx, sty, stp, brackt, stpmin, stpmax, info);
@@ -432,9 +441,10 @@ fn cstep(
         // the quadratic steps is taken.
         info = 1;
         bound = true;
-        let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        let theta =
+            F::from_f64(3.0).unwrap() * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
-        let s = tmp.iter().cloned().fold(std::f64::NAN, f64::max);
+        let s = tmp.iter().cloned().fold(F::nan(), F::max);
         let mut gamma = s * ((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s)).sqrt();
         if stp.x < stx.x {
             gamma = -gamma;
@@ -445,22 +455,25 @@ fn cstep(
         let r = p / q;
         stpc = stx.x + r * (stp.x - stx.x);
         stpq = stx.x
-            + ((stx.gx / ((stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx)) / 2.0) * (stp.x - stx.x);
+            + ((stx.gx / ((stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx))
+                / F::from_f64(2.0).unwrap())
+                * (stp.x - stx.x);
         if (stpc - stx.x).abs() < (stpq - stx.x).abs() {
             stpf = stpc;
         } else {
-            stpf = stpc + (stpq - stpc) / 2.0;
+            stpf = stpc + (stpq - stpc) / F::from_f64(2.0).unwrap();
         }
         brackt = true;
-    } else if sgnd < 0.0 {
+    } else if sgnd < F::from_f64(0.0).unwrap() {
         // Second case. A lower function value and derivatives of opposite sign. The minimum is
         // bracketed. If the cubic step is closer to stx.x than the quadtratic (secant) step, the
         // cubic step is taken, else the quadratic step is taken.
         info = 2;
         bound = false;
-        let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        let theta =
+            F::from_f64(3.0).unwrap() * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
-        let s = tmp.iter().cloned().fold(std::f64::NAN, f64::max);
+        let s = tmp.iter().cloned().fold(F::nan(), F::max);
         let mut gamma = s * ((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s)).sqrt();
         if stp.x > stx.x {
             gamma = -gamma;
@@ -485,13 +498,15 @@ fn cstep(
         // else the step farthest away is taken.
         info = 3;
         bound = true;
-        let theta = 3.0 * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        let theta =
+            F::from_f64(3.0).unwrap() * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
-        let s = tmp.iter().cloned().fold(std::f64::NAN, f64::max);
+        let s = tmp.iter().cloned().fold(F::nan(), F::max);
         // the case gamma == 0 only arises if the cubic does not tend to infinity in the direction
         // of the step.
 
-        let mut gamma = s * 0.0f64
+        let mut gamma = s * F::from_f64(0.0)
+            .unwrap()
             .max((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s))
             .sqrt();
         if stp.x > stx.x {
@@ -501,7 +516,7 @@ fn cstep(
         let p = (gamma - stp.gx) + theta;
         let q = (gamma + (stx.gx - stp.gx)) + gamma;
         let r = p / q;
-        if r < 0.0 && gamma != 0.0 {
+        if r < F::from_f64(0.0).unwrap() && gamma != F::from_f64(0.0).unwrap() {
             stpc = stp.x + r * (stx.x - stp.x);
         } else if stp.x > stx.x {
             stpc = stpmax;
@@ -527,9 +542,10 @@ fn cstep(
         info = 4;
         bound = false;
         if brackt {
-            let theta = 3.0 * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
+            let theta =
+                F::from_f64(3.0).unwrap() * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
             let tmp = vec![theta, sty.gx, stp.gx];
-            let s = tmp.iter().cloned().fold(std::f64::NAN, f64::max);
+            let s = tmp.iter().cloned().fold(F::nan(), F::max);
             let mut gamma = s * ((theta / s).powi(2) - (sty.gx / s) * (stp.gx / s)).sqrt();
             if stp.x > sty.x {
                 gamma = -gamma;
@@ -554,7 +570,7 @@ fn cstep(
     if stp_o.fx > stx_o.fx {
         sty_o = Step::new(stp_o.x, stp_o.fx, stp_o.gx);
     } else {
-        if sgnd < 0.0 {
+        if sgnd < F::from_f64(0.0).unwrap() {
             sty_o = Step::new(stx_o.x, stx_o.fx, stx_o.gx);
         }
         stx_o = Step::new(stp_o.x, stp_o.fx, stp_o.gx);
@@ -568,9 +584,13 @@ fn cstep(
     stp_o.x = stpf;
     if brackt && bound {
         if sty_o.x > stx_o.x {
-            stp_o.x = stp_o.x.min(stx_o.x + 0.66 * (sty_o.x - stx_o.x));
+            stp_o.x = stp_o
+                .x
+                .min(stx_o.x + F::from_f64(0.66).unwrap() * (sty_o.x - stx_o.x));
         } else {
-            stp_o.x = stp_o.x.max(stx_o.x + 0.66 * (sty_o.x - stx_o.x));
+            stp_o.x = stp_o
+                .x
+                .max(stx_o.x + F::from_f64(0.66).unwrap() * (sty_o.x - stx_o.x));
         }
     }
 
@@ -583,5 +603,5 @@ mod tests {
     use crate::core::MinimalNoOperator;
     use crate::test_trait_impl;
 
-    test_trait_impl!(morethuente, MoreThuenteLineSearch<MinimalNoOperator>);
+    test_trait_impl!(morethuente, MoreThuenteLineSearch<MinimalNoOperator, f64>);
 }

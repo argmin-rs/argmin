@@ -24,52 +24,52 @@ use std::fmt::Debug;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct BFGS<L, H> {
+pub struct BFGS<L, H, F> {
     /// Inverse Hessian
     inv_hessian: H,
     /// line search
     linesearch: L,
     /// Tolerance for the stopping criterion based on the change of the norm on the gradient
-    tol_grad: f64,
+    tol_grad: F,
     /// Tolerance for the stopping criterion based on the change of the cost stopping criterion
-    tol_cost: f64,
+    tol_cost: F,
 }
 
-impl<L, H> BFGS<L, H> {
+impl<L, H, F: ArgminFloat> BFGS<L, H, F> {
     /// Constructor
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         BFGS {
             inv_hessian: init_inverse_hessian,
             linesearch,
-            tol_grad: std::f64::EPSILON.sqrt(),
-            tol_cost: std::f64::EPSILON,
+            tol_grad: F::epsilon().sqrt(),
+            tol_cost: F::epsilon(),
         }
     }
 
     /// Sets tolerance for the stopping criterion based on the change of the norm on the gradient
-    pub fn with_tol_grad(mut self, tol_grad: f64) -> Self {
+    pub fn with_tol_grad(mut self, tol_grad: F) -> Self {
         self.tol_grad = tol_grad;
         self
     }
 
     /// Sets tolerance for the stopping criterion based on the change of the cost stopping criterion
-    pub fn with_tol_cost(mut self, tol_cost: f64) -> Self {
+    pub fn with_tol_cost(mut self, tol_cost: F) -> Self {
         self.tol_cost = tol_cost;
         self
     }
 }
 
-impl<O, L, H> Solver<O> for BFGS<L, H>
+impl<O, L, H, F> Solver<O, F> for BFGS<L, H, F>
 where
-    O: ArgminOp<Output = f64, Hessian = H>,
+    O: ArgminOp<Output = F, Hessian = H>,
     O::Param: Debug
         + Default
         + ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
+        + ArgminDot<O::Param, F>
         + ArgminDot<O::Param, O::Hessian>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, O::Param>,
+        + ArgminScaledAdd<O::Param, F, O::Param>
+        + ArgminNorm<F>
+        + ArgminMul<F, O::Param>,
     O::Hessian: Clone
         + Default
         + Debug
@@ -79,18 +79,19 @@ where
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
-        + ArgminMul<f64, O::Hessian>
+        + ArgminMul<F, O::Hessian>
         + ArgminTranspose
         + ArgminEye,
-    L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
+    L: Clone + ArgminLineSearch<O::Param, F> + Solver<OpWrapper<O>, F>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "BFGS";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
         let param = state.get_param();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -102,8 +103,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<ArgminIterData<O, F>, Error> {
         let param = state.get_param();
         let cur_cost = state.get_cost();
         let prev_grad = state.get_grad().unwrap();
@@ -113,7 +114,10 @@ where
         //     op.gradient(&param)?
         // };
 
-        let p = self.inv_hessian.dot(&prev_grad).mul(&(-1.0));
+        let p = self
+            .inv_hessian
+            .dot(&prev_grad)
+            .mul(&F::from_f64(-1.0).unwrap());
 
         self.linesearch.set_search_direction(p);
 
@@ -146,8 +150,8 @@ where
 
         let sk = xk1.sub(&param);
 
-        let yksk: f64 = yk.dot(&sk);
-        let rhok = 1.0 / yksk;
+        let yksk: F = yk.dot(&sk);
+        let rhok = F::from_f64(1.0).unwrap() / yksk;
 
         let e = self.inv_hessian.eye_like();
         let mat1: O::Hessian = sk.dot(&yk);
@@ -172,7 +176,7 @@ where
         Ok(ArgminIterData::new().param(xk1).cost(next_cost).grad(grad))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
         if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
@@ -191,16 +195,16 @@ mod tests {
 
     type Operator = MinimalNoOperator;
 
-    test_trait_impl!(bfgs, BFGS<Operator, MoreThuenteLineSearch<Operator>>);
+    test_trait_impl!(bfgs, BFGS<Operator, MoreThuenteLineSearch<Operator, f64>, f64>);
 
     #[test]
     fn test_tolerances() {
-        let linesearch: MoreThuenteLineSearch<f64> =
+        let linesearch: MoreThuenteLineSearch<f64, f64> =
             MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
         let init_hessian: Vec<Vec<f64>> = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
 
-        let tol1 = 1e-4;
-        let tol2 = 1e-2;
+        let tol1: f64 = 1e-4;
+        let tol2: f64 = 1e-2;
 
         let BFGS {
             tol_grad: t1,

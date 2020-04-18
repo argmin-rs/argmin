@@ -23,25 +23,25 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct GaussNewton {
+pub struct GaussNewton<F> {
     /// gamma
-    gamma: f64,
+    gamma: F,
     /// Tolerance for the stopping criterion based on cost difference
-    tol: f64,
+    tol: F,
 }
 
-impl GaussNewton {
+impl<F: ArgminFloat> GaussNewton<F> {
     /// Constructor
     pub fn new() -> Self {
         GaussNewton {
-            gamma: 1.0,
-            tol: std::f64::EPSILON.sqrt(),
+            gamma: F::from_f64(1.0).unwrap(),
+            tol: F::epsilon().sqrt(),
         }
     }
 
     /// set gamma
-    pub fn with_gamma(mut self, gamma: f64) -> Result<Self, Error> {
-        if gamma <= 0.0 || gamma > 1.0 {
+    pub fn with_gamma(mut self, gamma: F) -> Result<Self, Error> {
+        if gamma <= F::from_f64(0.0).unwrap() || gamma > F::from_f64(1.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "Gauss-Newton: gamma must be in  (0, 1].".to_string(),
             }
@@ -52,8 +52,8 @@ impl GaussNewton {
     }
 
     /// Set tolerance for the stopping criterion based on cost difference
-    pub fn with_tol(mut self, tol: f64) -> Result<Self, Error> {
-        if tol <= 0.0 {
+    pub fn with_tol(mut self, tol: F) -> Result<Self, Error> {
+        if tol <= F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "Gauss-Newton: tol must be positive.".to_string(),
             }
@@ -64,34 +64,35 @@ impl GaussNewton {
     }
 }
 
-impl Default for GaussNewton {
-    fn default() -> GaussNewton {
+impl<F: ArgminFloat> Default for GaussNewton<F> {
+    fn default() -> GaussNewton<F> {
         GaussNewton::new()
     }
 }
 
-impl<O> Solver<O> for GaussNewton
+impl<O, F> Solver<O, F> for GaussNewton<F>
 where
     O: ArgminOp,
     O::Param: Default
-        + ArgminScaledSub<O::Param, f64, O::Param>
+        + ArgminScaledSub<O::Param, F, O::Param>
         + ArgminSub<O::Param, O::Param>
-        + ArgminMul<f64, O::Param>,
-    O::Output: ArgminNorm<f64>,
+        + ArgminMul<F, O::Param>,
+    O::Output: ArgminNorm<F>,
     O::Jacobian: ArgminTranspose
         + ArgminInv<O::Jacobian>
         + ArgminDot<O::Jacobian, O::Jacobian>
         + ArgminDot<O::Output, O::Param>
         + ArgminDot<O::Param, O::Param>,
     O::Hessian: Default,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Gauss-Newton method";
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<ArgminIterData<O, F>, Error> {
         let param = state.get_param();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;
@@ -110,7 +111,7 @@ where
             .cost(residuals.norm()))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
             return TerminationReason::NoChangeInCost;
         }
@@ -123,11 +124,11 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(gauss_newton_method, GaussNewton);
+    test_trait_impl!(gauss_newton_method, GaussNewton<f64>);
 
     #[test]
     fn test_tolerance() {
-        let tol1 = 1e-4;
+        let tol1: f64 = 1e-4;
 
         let GaussNewton { tol: t, .. } = GaussNewton::new().with_tol(tol1).unwrap();
 
@@ -136,7 +137,7 @@ mod tests {
 
     #[test]
     fn test_gamma() {
-        let gamma = 0.5;
+        let gamma: f64 = 0.5;
 
         let GaussNewton { gamma: g, .. } = GaussNewton::new().with_gamma(gamma).unwrap();
 

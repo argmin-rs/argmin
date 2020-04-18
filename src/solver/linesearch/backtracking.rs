@@ -24,40 +24,40 @@ use serde::{Deserialize, Serialize};
 ///
 /// [1] Wikipedia: https://en.wikipedia.org/wiki/Backtracking_line_search
 #[derive(Serialize, Deserialize, Clone)]
-pub struct BacktrackingLineSearch<P, L> {
+pub struct BacktrackingLineSearch<P, L, F> {
     /// initial parameter vector
     init_param: P,
     /// initial cost
-    init_cost: f64,
+    init_cost: F,
     /// initial gradient
     init_grad: P,
     /// Search direction
     search_direction: Option<P>,
     /// Contraction factor rho
-    rho: f64,
+    rho: F,
     /// Stopping condition
     condition: Box<L>,
     /// alpha
-    alpha: f64,
+    alpha: F,
 }
 
-impl<P: Default, L> BacktrackingLineSearch<P, L> {
+impl<P: Default, L, F: ArgminFloat> BacktrackingLineSearch<P, L, F> {
     /// Constructor
     pub fn new(condition: L) -> Self {
         BacktrackingLineSearch {
             init_param: P::default(),
-            init_cost: std::f64::INFINITY,
+            init_cost: F::infinity(),
             init_grad: P::default(),
             search_direction: None,
-            rho: 0.9,
+            rho: F::from_f64(0.9).unwrap(),
             condition: Box::new(condition),
-            alpha: 1.0,
+            alpha: F::from_f64(1.0).unwrap(),
         }
     }
 
     /// Set rho
-    pub fn rho(mut self, rho: f64) -> Result<Self, Error> {
-        if rho <= 0.0 || rho >= 1.0 {
+    pub fn rho(mut self, rho: F) -> Result<Self, Error> {
+        if rho <= F::from_f64(0.0).unwrap() || rho >= F::from_f64(1.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "BacktrackingLineSearch: Contraction factor rho must be in (0, 1)."
                     .to_string(),
@@ -69,10 +69,11 @@ impl<P: Default, L> BacktrackingLineSearch<P, L> {
     }
 }
 
-impl<P, L> ArgminLineSearch<P> for BacktrackingLineSearch<P, L>
+impl<P, L, F> ArgminLineSearch<P, F> for BacktrackingLineSearch<P, L, F>
 where
     P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
-    L: LineSearchCondition<P>,
+    L: LineSearchCondition<P, F>,
+    F: ArgminFloat + Serialize + DeserializeOwned,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {
@@ -80,8 +81,8 @@ where
     }
 
     /// Set initial alpha value
-    fn set_init_alpha(&mut self, alpha: f64) -> Result<(), Error> {
-        if alpha <= 0.0 {
+    fn set_init_alpha(&mut self, alpha: F) -> Result<(), Error> {
+        if alpha <= F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "LineSearch: Inital alpha must be > 0.".to_string(),
             }
@@ -92,28 +93,29 @@ where
     }
 }
 
-impl<O, P, L> Solver<O> for BacktrackingLineSearch<P, L>
+impl<O, P, L, F> Solver<O, F> for BacktrackingLineSearch<P, L, F>
 where
     P: Clone
         + Default
         + Serialize
         + DeserializeOwned
         + ArgminSub<P, P>
-        + ArgminDot<P, f64>
-        + ArgminScaledAdd<P, f64, P>,
-    O: ArgminOp<Param = P, Output = f64>,
-    L: LineSearchCondition<P>,
+        + ArgminDot<P, F>
+        + ArgminScaledAdd<P, F, P>,
+    O: ArgminOp<Param = P, Output = F>,
+    L: LineSearchCondition<P, F>,
+    F: ArgminFloat + Serialize + DeserializeOwned,
 {
     const NAME: &'static str = "Backtracking Line search";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
         self.init_param = state.get_param();
         let cost = state.get_cost();
-        self.init_cost = if cost == std::f64::INFINITY {
+        self.init_cost = if cost == F::infinity() {
             op.apply(&self.init_param)?
         } else {
             cost
@@ -134,15 +136,15 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+        _state: &IterState<O, F>,
+    ) -> Result<ArgminIterData<O, F>, Error> {
         let new_param = self
             .init_param
             .scaled_add(&self.alpha, self.search_direction.as_ref().unwrap());
 
         let cur_cost = op.apply(&new_param)?;
 
-        self.alpha *= self.rho;
+        self.alpha = self.alpha * self.rho;
 
         let mut out = ArgminIterData::new()
             .param(new_param.clone())
@@ -155,7 +157,7 @@ where
         Ok(out)
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
         if self.condition.eval(
             state.get_cost(),
             state.get_grad().unwrap_or_default(),
@@ -178,5 +180,5 @@ mod tests {
     use crate::test_trait_impl;
 
     test_trait_impl!(backtrackinglinesearch,
-                    BacktrackingLineSearch<MinimalNoOperator, ArmijoCondition>);
+                    BacktrackingLineSearch<MinimalNoOperator, ArmijoCondition<f64>, f64>);
 }

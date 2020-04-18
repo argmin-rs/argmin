@@ -70,7 +70,7 @@ fn run() -> Result<(), Error> {
     let init_param: Array1<f64> = Array1::from(vec![0.9, 0.2]);
 
     // Set up solver
-    let solver: GaussNewton = GaussNewton::new();
+    let solver: GaussNewton<f64> = GaussNewton::new();
 
     // Run solver
     let res = Executor::new(cost, solver, init_param)

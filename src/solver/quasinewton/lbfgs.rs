@@ -27,7 +27,7 @@ use std::fmt::Debug;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct LBFGS<L, P> {
+pub struct LBFGS<L, P, F> {
     /// line search
     linesearch: L,
     /// m
@@ -37,12 +37,12 @@ pub struct LBFGS<L, P> {
     /// y_{k-1}
     y: VecDeque<P>,
     /// Tolerance for the stopping criterion based on the change of the norm on the gradient
-    tol_grad: f64,
+    tol_grad: F,
     /// Tolerance for the stopping criterion based on the change of the cost stopping criterion
-    tol_cost: f64,
+    tol_cost: F,
 }
 
-impl<L, P> LBFGS<L, P> {
+impl<L, P, F: ArgminFloat> LBFGS<L, P, F> {
     /// Constructor
     pub fn new(linesearch: L, m: usize) -> Self {
         LBFGS {
@@ -50,27 +50,27 @@ impl<L, P> LBFGS<L, P> {
             m,
             s: VecDeque::with_capacity(m),
             y: VecDeque::with_capacity(m),
-            tol_grad: std::f64::EPSILON.sqrt(),
-            tol_cost: std::f64::EPSILON,
+            tol_grad: F::epsilon().sqrt(),
+            tol_cost: F::epsilon(),
         }
     }
 
     /// Sets tolerance for the stopping criterion based on the change of the norm on the gradient
-    pub fn with_tol_grad(mut self, tol_grad: f64) -> Self {
+    pub fn with_tol_grad(mut self, tol_grad: F) -> Self {
         self.tol_grad = tol_grad;
         self
     }
 
     /// Sets tolerance for the stopping criterion based on the change of the cost stopping criterion
-    pub fn with_tol_cost(mut self, tol_cost: f64) -> Self {
+    pub fn with_tol_cost(mut self, tol_cost: F) -> Self {
         self.tol_cost = tol_cost;
         self
     }
 }
 
-impl<O, L, P> Solver<O> for LBFGS<L, P>
+impl<O, L, P, F> Solver<O, F> for LBFGS<L, P, F>
 where
-    O: ArgminOp<Param = P, Output = f64>,
+    O: ArgminOp<Param = P, Output = F>,
     O::Param: Clone
         + Serialize
         + DeserializeOwned
@@ -78,20 +78,21 @@ where
         + Default
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
-        + ArgminScaledAdd<O::Param, f64, O::Param>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, O::Param>,
+        + ArgminDot<O::Param, F>
+        + ArgminScaledAdd<O::Param, F, O::Param>
+        + ArgminNorm<F>
+        + ArgminMul<F, O::Param>,
     O::Hessian: Clone + Default + Serialize + DeserializeOwned,
-    L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
+    L: Clone + ArgminLineSearch<O::Param, F> + Solver<OpWrapper<O>, F>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "L-BFGS";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
         let param = state.get_param();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -103,31 +104,31 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<ArgminIterData<O, F>, Error> {
         let param = state.get_param();
         let cur_cost = state.get_cost();
         let prev_grad = state.get_grad().unwrap();
         // .unwrap_or_else(|| op.gradient(&param).unwrap());
 
-        let gamma: f64 = if let (Some(ref sk), Some(ref yk)) = (self.s.back(), self.y.back()) {
+        let gamma: F = if let (Some(ref sk), Some(ref yk)) = (self.s.back(), self.y.back()) {
             sk.dot(*yk) / yk.dot(*yk)
         } else {
-            1.0
+            F::from_f64(1.0).unwrap()
         };
 
         // L-BFGS two-loop recursion
         let mut q = prev_grad.clone();
         let cur_m = self.s.len();
-        let mut alpha: Vec<f64> = vec![0.0; cur_m];
-        let mut rho: Vec<f64> = vec![0.0; cur_m];
+        let mut alpha: Vec<F> = vec![F::from_f64(0.0).unwrap(); cur_m];
+        let mut rho: Vec<F> = vec![F::from_f64(0.0).unwrap(); cur_m];
         for (i, (ref sk, ref yk)) in self.s.iter().rev().zip(self.y.iter().rev()).enumerate() {
             let sk = *sk;
             let yk = *yk;
-            let yksk: f64 = yk.dot(sk);
-            let rho_t = 1.0 / yksk;
-            let skq: f64 = sk.dot(&q);
-            let alpha_t = skq.mul(&rho_t);
+            let yksk: F = yk.dot(sk);
+            let rho_t = F::from_f64(1.0).unwrap() / yksk;
+            let skq: F = sk.dot(&q);
+            let alpha_t = skq.mul(rho_t);
             q = q.sub(&yk.mul(&alpha_t));
             rho[cur_m - i - 1] = rho_t;
             alpha[cur_m - i - 1] = alpha_t;
@@ -136,11 +137,12 @@ where
         for (i, (ref sk, ref yk)) in self.s.iter().zip(self.y.iter()).enumerate() {
             let sk = *sk;
             let yk = *yk;
-            let beta = yk.dot(&r).mul(&rho[i]);
+            let beta = yk.dot(&r).mul(rho[i]);
             r = r.add(&sk.mul(&(alpha[i] - beta)));
         }
 
-        self.linesearch.set_search_direction(r.mul(&-1.0));
+        self.linesearch
+            .set_search_direction(r.mul(&F::from_f64(-1.0).unwrap()));
 
         // Run solver
         let ArgminResult {
@@ -181,7 +183,7 @@ where
             .kv(make_kv!("gamma" => gamma;)))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
         if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
@@ -200,11 +202,11 @@ mod tests {
 
     type Operator = MinimalNoOperator;
 
-    test_trait_impl!(lbfgs, LBFGS<Operator, MoreThuenteLineSearch<Operator>>);
+    test_trait_impl!(lbfgs, LBFGS<Operator, MoreThuenteLineSearch<Operator, f64>, f64>);
 
     #[test]
     fn test_tolerances() {
-        let linesearch: MoreThuenteLineSearch<f64> =
+        let linesearch: MoreThuenteLineSearch<f64, f64> =
             MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
 
         let tol1 = 1e-4;
@@ -214,7 +216,7 @@ mod tests {
             tol_grad: t1,
             tol_cost: t2,
             ..
-        }: LBFGS<_, f64> = LBFGS::new(linesearch, 7)
+        }: LBFGS<_, f64, f64> = LBFGS::new(linesearch, 7)
             .with_tol_grad(tol1)
             .with_tol_cost(tol2);
 

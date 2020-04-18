@@ -24,34 +24,34 @@ use std::fmt::Debug;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct SR1<L, H> {
+pub struct SR1<L, H, F> {
     /// parameter for skipping rule
-    r: f64,
+    r: F,
     /// Inverse Hessian
     inv_hessian: H,
     /// line search
     linesearch: L,
     /// Tolerance for the stopping criterion based on the change of the norm on the gradient
-    tol_grad: f64,
+    tol_grad: F,
     /// Tolerance for the stopping criterion based on the change of the cost stopping criterion
-    tol_cost: f64,
+    tol_cost: F,
 }
 
-impl<L, H> SR1<L, H> {
+impl<L, H, F: ArgminFloat> SR1<L, H, F> {
     /// Constructor
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         SR1 {
-            r: 1e-8,
+            r: F::from_f64(1e-8).unwrap(),
             inv_hessian: init_inverse_hessian,
             linesearch,
-            tol_grad: std::f64::EPSILON.sqrt(),
-            tol_cost: std::f64::EPSILON,
+            tol_grad: F::epsilon().sqrt(),
+            tol_cost: F::epsilon(),
         }
     }
 
     /// Set r
-    pub fn r(mut self, r: f64) -> Result<Self, Error> {
-        if r < 0.0 || r > 1.0 {
+    pub fn r(mut self, r: F) -> Result<Self, Error> {
+        if r < F::from_f64(0.0).unwrap() || r > F::from_f64(1.0).unwrap() {
             Err(ArgminError::InvalidParameter {
                 text: "SR1: r must be between 0 and 1.".to_string(),
             }
@@ -63,30 +63,30 @@ impl<L, H> SR1<L, H> {
     }
 
     /// Sets tolerance for the stopping criterion based on the change of the norm on the gradient
-    pub fn with_tol_grad(mut self, tol_grad: f64) -> Self {
+    pub fn with_tol_grad(mut self, tol_grad: F) -> Self {
         self.tol_grad = tol_grad;
         self
     }
 
     /// Sets tolerance for the stopping criterion based on the change of the cost stopping criterion
-    pub fn with_tol_cost(mut self, tol_cost: f64) -> Self {
+    pub fn with_tol_cost(mut self, tol_cost: F) -> Self {
         self.tol_cost = tol_cost;
         self
     }
 }
 
-impl<O, L, H> Solver<O> for SR1<L, H>
+impl<O, L, H, F> Solver<O, F> for SR1<L, H, F>
 where
-    O: ArgminOp<Output = f64, Hessian = H>,
+    O: ArgminOp<Output = F, Hessian = H>,
     O::Param: Debug
         + Clone
         + Default
         + Serialize
         + ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
+        + ArgminDot<O::Param, F>
         + ArgminDot<O::Param, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminMul<f64, O::Param>,
+        + ArgminNorm<F>
+        + ArgminMul<F, O::Param>,
     O::Hessian: Debug
         + Clone
         + Default
@@ -96,16 +96,17 @@ where
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
-        + ArgminMul<f64, O::Hessian>,
-    L: Clone + ArgminLineSearch<O::Param> + Solver<OpWrapper<O>>,
+        + ArgminMul<F, O::Hessian>,
+    L: Clone + ArgminLineSearch<O::Param, F> + Solver<OpWrapper<O>, F>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "SR1";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
         let param = state.get_param();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -117,8 +118,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<ArgminIterData<O, F>, Error> {
         let param = state.get_param();
         let cost = state.get_cost();
         let prev_grad = if let Some(grad) = state.get_grad() {
@@ -127,7 +128,10 @@ where
             op.gradient(&param)?
         };
 
-        let p = self.inv_hessian.dot(&prev_grad).mul(&(-1.0));
+        let p = self
+            .inv_hessian
+            .dot(&prev_grad)
+            .mul(&F::from_f64(-1.0).unwrap());
 
         self.linesearch.set_search_direction(p);
 
@@ -160,7 +164,7 @@ where
 
         let skmhkyk: O::Param = sk.sub(&self.inv_hessian.dot(&yk));
         let a: O::Hessian = skmhkyk.dot(&skmhkyk);
-        let b: f64 = skmhkyk.dot(&yk);
+        let b: F = skmhkyk.dot(&yk);
 
         let hessian_update = b.abs() >= self.r * yk.norm() * skmhkyk.norm();
 
@@ -173,7 +177,9 @@ where
         // let hessian_update = tmp.abs() >= self.r * sksk.sqrt() * blah.sqrt();
 
         if hessian_update {
-            self.inv_hessian = self.inv_hessian.add(&a.mul(&(1.0 / b)));
+            self.inv_hessian = self
+                .inv_hessian
+                .add(&a.mul(&(F::from_f64(1.0).unwrap() / b)));
         }
 
         Ok(ArgminIterData::new()
@@ -183,7 +189,7 @@ where
             .kv(make_kv!["denom" => b; "hessian_update" => hessian_update;]))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
         if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
@@ -202,16 +208,16 @@ mod tests {
 
     type Operator = MinimalNoOperator;
 
-    test_trait_impl!(sr1, SR1<Operator, MoreThuenteLineSearch<Operator>>);
+    test_trait_impl!(sr1, SR1<Operator, MoreThuenteLineSearch<Operator, f64>, f64>);
 
     #[test]
     fn test_tolerances() {
-        let linesearch: MoreThuenteLineSearch<f64> =
+        let linesearch: MoreThuenteLineSearch<f64, f64> =
             MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
         let init_hessian: Vec<Vec<f64>> = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
 
-        let tol1 = 1e-4;
-        let tol2 = 1e-2;
+        let tol1: f64 = 1e-4;
+        let tol2: f64 = 1e-2;
 
         let SR1 {
             tol_grad: t1,

@@ -419,24 +419,25 @@
 //! // solver. Note that this does not include parameter vectors, gradients, Hessians, cost
 //! // function values and so on, as those will be handled by the `Executor`.
 //! #[derive(Serialize, Deserialize)]
-//! pub struct Landweber {
+//! pub struct Landweber<F> {
 //!     /// omega
-//!     omega: f64,
+//!     omega: F,
 //! }
 //!
-//! impl Landweber {
+//! impl<F> Landweber<F> {
 //!     /// Constructor
-//!     pub fn new(omega: f64) -> Self {
+//!     pub fn new(omega: F) -> Self {
 //!         Landweber { omega }
 //!     }
 //! }
 //!
-//! impl<O> Solver<O> for Landweber
+//! impl<O, F> Solver<O, F> for Landweber<F>
 //! where
 //!     // `O` always needs to implement `ArgminOp`
 //!     O: ArgminOp,
 //!     // `O::Param` needs to implement `ArgminScaledSub` because of the update formula
-//!     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+//!     O::Param: ArgminScaledSub<O::Param, F, O::Param>,
+//!     F: ArgminFloat,
 //! {
 //!     // This gives the solver a name which will be used for logging
 //!     const NAME: &'static str = "Landweber";
@@ -451,8 +452,8 @@
 //!         // Current state of the optimization. This gives access to the parameter vector,
 //!         // gradient, Hessian and cost function value of the current, previous and best
 //!         // iteration as well as current iteration number, and many more.
-//!         state: &IterState<O>,
-//!     ) -> Result<ArgminIterData<O>, Error> {
+//!         state: &IterState<O, F>,
+//!     ) -> Result<ArgminIterData<O, F>, Error> {
 //!         // First we obtain the current parameter vector from the `state` struct (`x_k`).
 //!         let xk = state.get_param();
 //!         // Then we compute the gradient at `x_k` (`\nabla f(x_k)`)

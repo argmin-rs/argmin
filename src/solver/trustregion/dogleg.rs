@@ -22,39 +22,38 @@ use serde::{Deserialize, Serialize};
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize, Debug, Copy, PartialEq, PartialOrd, Default)]
-pub struct Dogleg {
+pub struct Dogleg<F> {
     /// Radius
-    radius: f64,
+    radius: F,
 }
 
-impl Dogleg {
+impl<F: ArgminFloat> Dogleg<F> {
     /// Constructor
     pub fn new() -> Self {
-        Dogleg {
-            radius: std::f64::NAN,
-        }
+        Dogleg { radius: F::nan() }
     }
 }
 
-impl<O> Solver<O> for Dogleg
+impl<O, F> Solver<O, F> for Dogleg<F>
 where
-    O: ArgminOp<Output = f64>,
+    O: ArgminOp<Output = F>,
     O::Param: std::fmt::Debug
-        + ArgminMul<f64, O::Param>
-        + ArgminWeightedDot<O::Param, f64, O::Hessian>
-        + ArgminNorm<f64>
-        + ArgminDot<O::Param, f64>
+        + ArgminMul<F, O::Param>
+        + ArgminWeightedDot<O::Param, F, O::Hessian>
+        + ArgminNorm<F>
+        + ArgminDot<O::Param, F>
         + ArgminAdd<O::Param, O::Param>
         + ArgminSub<O::Param, O::Param>,
     O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Dogleg";
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+        state: &IterState<O, F>,
+    ) -> Result<ArgminIterData<O, F>, Error> {
         let param = state.get_param();
         let g = state
             .get_grad()
@@ -65,7 +64,7 @@ where
         let pstar;
 
         // pb = -H^-1g
-        let pb = (h.inv()?).dot(&g).mul(&(-1.0));
+        let pb = (h.inv()?).dot(&g).mul(&F::from_f64(-1.0).unwrap());
 
         if pb.norm() <= self.radius {
             pstar = pb;
@@ -80,32 +79,28 @@ where
 
             // compute tau
             let delta = self.radius.powi(2);
-            let t1 = 3.0 * utb - btb - 2.0 * utu;
-            let t2 =
-                (utb.powi(2) - 2.0 * utb * delta + delta * btb - btb * utu + delta * utu).sqrt();
-            let t3 = -2.0 * utb + btb + utu;
-            let tau1: f64 = -(t1 + t2) / t3;
-            let tau2: f64 = -(t1 - t2) / t3;
+            let t1 = F::from_f64(3.0).unwrap() * utb - btb - F::from_f64(2.0).unwrap() * utu;
+            let t2 = (utb.powi(2) - F::from_f64(2.0).unwrap() * utb * delta + delta * btb
+                - btb * utu
+                + delta * utu)
+                .sqrt();
+            let t3 = F::from_f64(-2.0).unwrap() * utb + btb + utu;
+            let tau1: F = -(t1 + t2) / t3;
+            let tau2: F = -(t1 - t2) / t3;
 
             // pick maximum value of both -- not sure if this is the proper way
             let mut tau = tau1.max(tau2);
 
             // if calculation failed because t3 is too small, use the third option
-            // println!("t1: {:?}", tau);
             if tau.is_nan() || tau.is_infinite() {
-                tau = (delta + btb - 2.0 * utu) / (btb - utu);
-                // println!("btb: {:?}", btb);
-                // println!("utu: {:?}", utu);
+                tau = (delta + btb - F::from_f64(2.0).unwrap() * utu) / (btb - utu);
             }
-            // println!("t2: {:?}", tau);
 
-            if tau >= 0.0 && tau < 1.0 {
+            if tau >= F::from_f64(0.0).unwrap() && tau < F::from_f64(1.0).unwrap() {
                 pstar = pu.mul(&tau);
-            } else if tau >= 1.0 && tau <= 2.0 {
-                // pstar = pu + (tau - 1.0) * (pb - pu)
-                pstar = pu.add(&pb.sub(&pu).mul(&(tau - 1.0)));
+            } else if tau >= F::from_f64(1.0).unwrap() && tau <= F::from_f64(2.0).unwrap() {
+                pstar = pu.add(&pb.sub(&pu).mul(&(tau - F::from_f64(1.0).unwrap())));
             } else {
-                // println!("{:?}", tau);
                 return Err(ArgminError::ImpossibleError {
                     text: "tau is bigger than 2, this is not supposed to happen.".to_string(),
                 }
@@ -116,7 +111,7 @@ where
         Ok(out)
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
         if state.get_iter() >= 1 {
             TerminationReason::MaxItersReached
         } else {
@@ -125,8 +120,8 @@ where
     }
 }
 
-impl ArgminTrustRegion for Dogleg {
-    fn set_radius(&mut self, radius: f64) {
+impl<F: ArgminFloat> ArgminTrustRegion<F> for Dogleg<F> {
+    fn set_radius(&mut self, radius: F) {
         self.radius = radius;
     }
 }
@@ -136,5 +131,5 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(dogleg, Dogleg);
+    test_trait_impl!(dogleg, Dogleg<f64>);
 }

@@ -10,20 +10,20 @@
 //! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::core::{ArgminDot, ArgminError, Error};
-use serde::{Deserialize, Serialize};
+use crate::core::{ArgminDot, ArgminError, ArgminFloat, Error};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 /// Needs to be implemented by everything that wants to be a LineSearchCondition
-pub trait LineSearchCondition<T>: Serialize {
+pub trait LineSearchCondition<T, F>: Serialize {
     /// Evaluate the condition
     fn eval(
         &self,
-        cur_cost: f64,
+        cur_cost: F,
         cur_grad: T,
-        init_cost: f64,
+        init_cost: F,
         init_grad: T,
         search_direction: T,
-        alpha: f64,
+        alpha: F,
     ) -> bool;
 
     /// Indicates whether this condition requires the computation of the gradient at the new point
@@ -32,14 +32,14 @@ pub trait LineSearchCondition<T>: Serialize {
 
 /// Armijo Condition
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
-pub struct ArmijoCondition {
-    c: f64,
+pub struct ArmijoCondition<F> {
+    c: F,
 }
 
-impl ArmijoCondition {
+impl<F: ArgminFloat> ArmijoCondition<F> {
     /// Constructor
-    pub fn new(c: f64) -> Result<Self, Error> {
-        if c <= 0.0 || c >= 1.0 {
+    pub fn new(c: F) -> Result<Self, Error> {
+        if c <= F::from_f64(0.0).unwrap() || c >= F::from_f64(1.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "ArmijoCondition: Parameter c must be in (0, 1)".to_string(),
             }
@@ -49,18 +49,19 @@ impl ArmijoCondition {
     }
 }
 
-impl<T> LineSearchCondition<T> for ArmijoCondition
+impl<T, F> LineSearchCondition<T, F> for ArmijoCondition<F>
 where
-    T: ArgminDot<T, f64>,
+    T: ArgminDot<T, F>,
+    F: ArgminFloat + Serialize + DeserializeOwned,
 {
     fn eval(
         &self,
-        cur_cost: f64,
+        cur_cost: F,
         _cur_grad: T,
-        init_cost: f64,
+        init_cost: F,
         init_grad: T,
         search_direction: T,
-        alpha: f64,
+        alpha: F,
     ) -> bool {
         cur_cost <= init_cost + self.c * alpha * init_grad.dot(&search_direction)
     }
@@ -72,21 +73,21 @@ where
 
 /// Wolfe Condition
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
-pub struct WolfeCondition {
-    c1: f64,
-    c2: f64,
+pub struct WolfeCondition<F> {
+    c1: F,
+    c2: F,
 }
 
-impl WolfeCondition {
+impl<F: ArgminFloat> WolfeCondition<F> {
     /// Constructor
-    pub fn new(c1: f64, c2: f64) -> Result<Self, Error> {
-        if c1 <= 0.0 || c1 >= 1.0 {
+    pub fn new(c1: F, c2: F) -> Result<Self, Error> {
+        if c1 <= F::from_f64(0.0).unwrap() || c1 >= F::from_f64(1.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "WolfeCondition: Parameter c1 must be in (0, 1)".to_string(),
             }
             .into());
         }
-        if c2 <= c1 || c2 >= 1.0 {
+        if c2 <= c1 || c2 >= F::from_f64(1.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "WolfeCondition: Parameter c2 must be in (c1, 1)".to_string(),
             }
@@ -96,18 +97,19 @@ impl WolfeCondition {
     }
 }
 
-impl<T> LineSearchCondition<T> for WolfeCondition
+impl<T, F> LineSearchCondition<T, F> for WolfeCondition<F>
 where
-    T: Clone + ArgminDot<T, f64>,
+    T: Clone + ArgminDot<T, F>,
+    F: ArgminFloat + DeserializeOwned + Serialize,
 {
     fn eval(
         &self,
-        cur_cost: f64,
+        cur_cost: F,
         cur_grad: T,
-        init_cost: f64,
+        init_cost: F,
         init_grad: T,
         search_direction: T,
-        alpha: f64,
+        alpha: F,
     ) -> bool {
         let tmp = init_grad.dot(&search_direction);
         (cur_cost <= init_cost + self.c1 * alpha * tmp)
@@ -121,21 +123,21 @@ where
 
 /// Strong Wolfe conditions
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
-pub struct StrongWolfeCondition {
-    c1: f64,
-    c2: f64,
+pub struct StrongWolfeCondition<F> {
+    c1: F,
+    c2: F,
 }
 
-impl StrongWolfeCondition {
+impl<F: ArgminFloat> StrongWolfeCondition<F> {
     /// Constructor
-    pub fn new(c1: f64, c2: f64) -> Result<Self, Error> {
-        if c1 <= 0.0 || c1 >= 1.0 {
+    pub fn new(c1: F, c2: F) -> Result<Self, Error> {
+        if c1 <= F::from_f64(0.0).unwrap() || c1 >= F::from_f64(1.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "StrongWolfeCondition: Parameter c1 must be in (0, 1)".to_string(),
             }
             .into());
         }
-        if c2 <= c1 || c2 >= 1.0 {
+        if c2 <= c1 || c2 >= F::from_f64(1.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "StrongWolfeCondition: Parameter c2 must be in (c1, 1)".to_string(),
             }
@@ -145,18 +147,19 @@ impl StrongWolfeCondition {
     }
 }
 
-impl<T> LineSearchCondition<T> for StrongWolfeCondition
+impl<T, F> LineSearchCondition<T, F> for StrongWolfeCondition<F>
 where
-    T: Clone + ArgminDot<T, f64>,
+    T: Clone + ArgminDot<T, F>,
+    F: ArgminFloat + Serialize + DeserializeOwned,
 {
     fn eval(
         &self,
-        cur_cost: f64,
+        cur_cost: F,
         cur_grad: T,
-        init_cost: f64,
+        init_cost: F,
         init_grad: T,
         search_direction: T,
-        alpha: f64,
+        alpha: F,
     ) -> bool {
         let tmp = init_grad.dot(&search_direction);
         (cur_cost <= init_cost + self.c1 * alpha * tmp)
@@ -170,14 +173,14 @@ where
 
 /// Goldstein conditions
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
-pub struct GoldsteinCondition {
-    c: f64,
+pub struct GoldsteinCondition<F> {
+    c: F,
 }
 
-impl GoldsteinCondition {
+impl<F: ArgminFloat> GoldsteinCondition<F> {
     /// Constructor
-    pub fn new(c: f64) -> Result<Self, Error> {
-        if c <= 0.0 || c >= 0.5 {
+    pub fn new(c: F) -> Result<Self, Error> {
+        if c <= F::from_f64(0.0).unwrap() || c >= F::from_f64(0.5).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "GoldsteinCondition: Parameter c must be in (0, 0.5)".to_string(),
             }
@@ -187,21 +190,23 @@ impl GoldsteinCondition {
     }
 }
 
-impl<T> LineSearchCondition<T> for GoldsteinCondition
+impl<T, F> LineSearchCondition<T, F> for GoldsteinCondition<F>
 where
-    T: ArgminDot<T, f64>,
+    T: ArgminDot<T, F>,
+    F: ArgminFloat + Serialize + DeserializeOwned,
 {
     fn eval(
         &self,
-        cur_cost: f64,
+        cur_cost: F,
         _cur_grad: T,
-        init_cost: f64,
+        init_cost: F,
         init_grad: T,
         search_direction: T,
-        alpha: f64,
+        alpha: F,
     ) -> bool {
         let tmp = alpha * init_grad.dot(&search_direction);
-        init_cost + (1.0 - self.c) * tmp <= cur_cost && cur_cost <= init_cost + self.c * alpha * tmp
+        init_cost + (F::from_f64(1.0).unwrap() - self.c) * tmp <= cur_cost
+            && cur_cost <= init_cost + self.c * alpha * tmp
     }
 
     fn requires_cur_grad(&self) -> bool {
@@ -214,8 +219,8 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(goldstein, GoldsteinCondition);
-    test_trait_impl!(armijo, ArmijoCondition);
-    test_trait_impl!(wolfe, WolfeCondition);
-    test_trait_impl!(strongwolfe, StrongWolfeCondition);
+    test_trait_impl!(goldstein, GoldsteinCondition<f64>);
+    test_trait_impl!(armijo, ArmijoCondition<f64>);
+    test_trait_impl!(wolfe, WolfeCondition<f64>);
+    test_trait_impl!(strongwolfe, StrongWolfeCondition<f64>);
 }

@@ -8,7 +8,7 @@
 //! # Observer which visualizes the progress of the solver
 
 extern crate gnuplot;
-use crate::core::{ArgminKV, ArgminOp, Error, IterState, Observe};
+use crate::core::{ArgminFloat, ArgminKV, ArgminOp, Error, IterState, Observe};
 use std::sync::Mutex;
 
 /// Visualize iterations of a solver for cost functions of type
@@ -114,13 +114,18 @@ impl Visualizer3d {
     }
 
     /// TODO
-    fn iteration(&mut self, xy: &Vec<f64>, cost: f64, population: Option<&Vec<(Vec<f64>, f64)>>) {
+    fn iteration<F: ArgminFloat>(
+        &mut self,
+        xy: &Vec<F>,
+        cost: F,
+        population: Option<&Vec<(Vec<F>, F)>>,
+    ) {
         self.optima_x.clear();
         self.optima_y.clear();
         self.optima_z.clear();
-        self.optima_x.push(xy[0]);
-        self.optima_y.push(xy[1]);
-        self.optima_z.push(cost);
+        self.optima_x.push(F::to_f64(&xy[0]).unwrap());
+        self.optima_y.push(F::to_f64(&xy[1]).unwrap());
+        self.optima_z.push(F::to_f64(&cost).unwrap());
 
         self.particles_x.clear();
         self.particles_y.clear();
@@ -128,9 +133,9 @@ impl Visualizer3d {
 
         if let Some(population) = population {
             for (param, cost) in population {
-                self.particles_x.push(param[0]);
-                self.particles_y.push(param[1]);
-                self.particles_z.push(*cost);
+                self.particles_x.push(F::to_f64(&param[0]).unwrap());
+                self.particles_y.push(F::to_f64(&param[1]).unwrap());
+                self.particles_z.push(F::to_f64(&cost).unwrap());
             }
         }
 
@@ -138,11 +143,12 @@ impl Visualizer3d {
     }
 }
 
-impl<O> Observe<O> for Visualizer3d
+impl<O, F> Observe<O, F> for Visualizer3d
 where
-    O: ArgminOp<Param = Vec<f64>>,
+    O: ArgminOp<Param = Vec<F>>,
+    F: ArgminFloat,
 {
-    fn observe_iter(&mut self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, state: &IterState<O, F>, _kv: &ArgminKV) -> Result<(), Error> {
         // TODO: get particles from `state` or `kv`
 
         self.iteration(&state.param, state.best_cost, state.get_population());
