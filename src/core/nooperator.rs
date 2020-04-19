@@ -79,7 +79,7 @@ where
     }
 
     /// Do nothing, really.
-    fn modify(&self, _p: &Self::Param, _t: f64) -> Result<Self::Param, Error> {
+    fn modify(&self, _p: &Self::Param, _t: Self::Float) -> Result<Self::Param, Error> {
         Ok(Self::Param::default())
     }
 }

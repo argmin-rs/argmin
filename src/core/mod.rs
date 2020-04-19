@@ -129,7 +129,7 @@ pub trait ArgminOp {
 
     /// Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
     /// modification.
-    fn modify(&self, _param: &Self::Param, _extent: f64) -> Result<Self::Param, Error> {
+    fn modify(&self, _param: &Self::Param, _extent: Self::Float) -> Result<Self::Param, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `modify` of ArgminOp trait not implemented!".to_string(),
         }

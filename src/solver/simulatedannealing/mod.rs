@@ -260,7 +260,7 @@ where
         let prev_cost = state.get_cost();
 
         // Make a move
-        let new_param = op.modify(&prev_param, self.cur_temp.to_f64().unwrap())?;
+        let new_param = op.modify(&prev_param, self.cur_temp)?;
         // let new_param = op.modify(&prev_param, self.cur_temp)?;
 
         // Evaluate cost function with new parameter vector
