@@ -89,9 +89,9 @@ impl<R, F: ArgminFloat> TrustRegion<R, F> {
     }
 }
 
-impl<O, R, F> Solver<O, F> for TrustRegion<R, F>
+impl<O, R, F> Solver<O> for TrustRegion<R, F>
 where
-    O: ArgminOp<Output = F>,
+    O: ArgminOp<Output = F, Float = F>,
     O::Param: Default
         + Clone
         + Debug
@@ -105,7 +105,7 @@ where
         + ArgminZeroLike
         + ArgminMul<F, O::Param>,
     O::Hessian: Default + Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
-    R: ArgminTrustRegion<F> + Solver<OpWrapper<O>, F>,
+    R: ArgminTrustRegion<F> + Solver<OpWrapper<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Trust region";
@@ -113,8 +113,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         let param = state.get_param();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
@@ -132,8 +132,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let grad = state
             .get_grad()
@@ -197,7 +197,7 @@ where
         .kv(make_kv!("radius" => cur_radius;)))
     }
 
-    fn terminate(&mut self, _state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
         // todo
         TerminationReason::NotTerminated
     }

@@ -34,14 +34,14 @@ impl<F: ArgminFloat> Dogleg<F> {
     }
 }
 
-impl<O, F> Solver<O, F> for Dogleg<F>
+impl<O, F> Solver<O> for Dogleg<F>
 where
-    O: ArgminOp<Output = F>,
+    O: ArgminOp<Output = F, Float = F>,
     O::Param: std::fmt::Debug
         + ArgminMul<F, O::Param>
-        + ArgminWeightedDot<O::Param, F, O::Hessian>
+        + ArgminWeightedDot<O::Param, O::Float, O::Hessian>
         + ArgminNorm<F>
-        + ArgminDot<O::Param, F>
+        + ArgminDot<O::Param, O::Float>
         + ArgminAdd<O::Param, O::Param>
         + ArgminSub<O::Param, O::Param>,
     O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
@@ -52,8 +52,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let g = state
             .get_grad()
@@ -111,7 +111,7 @@ where
         Ok(out)
     }
 
-    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if state.get_iter() >= 1 {
             TerminationReason::MaxItersReached
         } else {

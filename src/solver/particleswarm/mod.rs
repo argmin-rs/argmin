@@ -24,8 +24,8 @@ use std::default::Default;
 #[derive(Serialize)]
 pub struct ParticleSwarm<O, F>
 where
-    O: ArgminOp<Output = F>,
-    <O as ArgminOp>::Param: Position<F>,
+    O: ArgminOp<Output = F, Float = F>,
+    O::Param: Position<F>,
     F: ArgminFloat,
 {
     particles: Vec<Particle<O::Param, F>>,
@@ -43,7 +43,7 @@ where
 
 impl<O, F> ParticleSwarm<O, F>
 where
-    O: ArgminOp<Output = F>,
+    O: ArgminOp<Output = F, Float = F>,
     <O as ArgminOp>::Param: Position<F>,
     F: ArgminFloat,
 {
@@ -126,11 +126,11 @@ where
     }
 }
 
-impl<O, F> Solver<O, F> for ParticleSwarm<O, F>
+impl<O, F> Solver<O> for ParticleSwarm<O, F>
 where
-    O: ArgminOp<Output = F>,
-    <O as ArgminOp>::Param: Position<F>,
-    <O as ArgminOp>::Hessian: Clone + Default,
+    O: ArgminOp<Output = F, Float = F>,
+    O::Param: Position<F>,
+    O::Hessian: Clone + Default,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Particle Swarm Optimization";
@@ -138,8 +138,8 @@ where
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        _state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.initialize_particles(_op);
 
         Ok(None)
@@ -149,8 +149,8 @@ where
     fn next_iter(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        _state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let zero = O::Param::zero_like(&self.best_position);
 
         for p in self.particles.iter_mut() {

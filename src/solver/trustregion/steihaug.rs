@@ -138,9 +138,9 @@ where
     }
 }
 
-impl<P, O, F> Solver<O, F> for Steihaug<P, F>
+impl<P, O, F> Solver<O> for Steihaug<P, F>
 where
-    O: ArgminOp<Param = P, Output = F>,
+    O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
         + Serialize
         + DeserializeOwned
@@ -161,11 +161,9 @@ where
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
-        // let param = state.get_param();
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.r = state.get_grad().unwrap();
-        // .unwrap_or_else(|| op.gradient(&param).unwrap());
 
         self.r_0_norm = self.r.norm();
         self.rtr = self.r.dot(&self.r);
@@ -186,8 +184,8 @@ where
     fn next_iter(
         &mut self,
         _op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let grad = state.get_grad().unwrap();
         let h = state.get_hessian().unwrap();
         let dhd = self.d.weighted_dot(&h, &self.d);
@@ -233,7 +231,7 @@ where
             .hessian(h))
     }
 
-    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if state.get_iter() >= self.max_iters {
             TerminationReason::MaxItersReached
         } else {
