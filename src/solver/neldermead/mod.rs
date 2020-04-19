@@ -10,7 +10,7 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 
 use crate::prelude::*;
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::default::Default;
 
 /// Nelder-Mead method
@@ -37,7 +37,7 @@ use std::default::Default;
 ///
 /// [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 #[derive(Clone, Serialize, Deserialize)]
-pub struct NelderMead<O: ArgminOp, F> {
+pub struct NelderMead<P, F> {
     /// alpha
     alpha: F,
     /// gamma
@@ -47,18 +47,14 @@ pub struct NelderMead<O: ArgminOp, F> {
     /// sigma
     sigma: F,
     /// parameters
-    params: Vec<(O::Param, F)>,
+    params: Vec<(P, F)>,
     /// Sample standard deviation tolerance
     sd_tolerance: F,
 }
 
-impl<O: ArgminOp, F> NelderMead<O, F>
+impl<P, F> NelderMead<P, F>
 where
-    O: ArgminOp<Output = F>,
-    O::Param: Default
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminMul<F, O::Param>,
+    P: Clone + Default + ArgminAdd<P, P> + ArgminSub<P, P> + ArgminMul<F, P>,
     F: ArgminFloat,
 {
     /// Constructor
@@ -74,7 +70,7 @@ where
     }
 
     /// Add initial parameters
-    pub fn with_initial_params(mut self, params: Vec<O::Param>) -> Self {
+    pub fn with_initial_params(mut self, params: Vec<P>) -> Self {
         self.params = params.into_iter().map(|p| (p, F::nan())).collect();
         self
     }
@@ -140,9 +136,9 @@ where
     }
 
     /// Calculate centroid of all but the worst vectors
-    fn calculate_centroid(&self) -> O::Param {
+    fn calculate_centroid(&self) -> P {
         let num_param = self.params.len() - 1;
-        let mut x0: O::Param = self.params[0].0.clone();
+        let mut x0: P = self.params[0].0.clone();
         for idx in 1..num_param {
             x0 = x0.add(&self.params[idx].0)
         }
@@ -150,24 +146,24 @@ where
     }
 
     /// Reflect
-    fn reflect(&self, x0: &O::Param, x: &O::Param) -> O::Param {
+    fn reflect(&self, x0: &P, x: &P) -> P {
         x0.add(&x0.sub(&x).mul(&self.alpha))
     }
 
     /// Expand
-    fn expand(&self, x0: &O::Param, x: &O::Param) -> O::Param {
+    fn expand(&self, x0: &P, x: &P) -> P {
         x0.add(&x.sub(&x0).mul(&self.gamma))
     }
 
     /// Contract
-    fn contract(&self, x0: &O::Param, x: &O::Param) -> O::Param {
+    fn contract(&self, x0: &P, x: &P) -> P {
         x0.add(&x.sub(&x0).mul(&self.rho))
     }
 
     /// Shrink
     fn shrink<S>(&mut self, mut cost: S) -> Result<(), Error>
     where
-        S: FnMut(&O::Param) -> Result<O::Output, Error>,
+        S: FnMut(&P) -> Result<F, Error>,
     {
         let mut out = Vec::with_capacity(self.params.len());
         out.push(self.params[0].clone());
@@ -184,37 +180,36 @@ where
     }
 }
 
-impl<O: ArgminOp, F> Default for NelderMead<O, F>
+impl<P, F> Default for NelderMead<P, F>
 where
-    O: ArgminOp<Output = F>,
-    O::Param: Default
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminMul<F, O::Param>,
+    P: Clone + Default + ArgminAdd<P, P> + ArgminSub<P, P> + ArgminMul<F, P>,
     F: ArgminFloat,
 {
-    fn default() -> NelderMead<O, F> {
+    fn default() -> NelderMead<P, F> {
         NelderMead::new()
     }
 }
 
-impl<O, F> Solver<O, F> for NelderMead<O, F>
+impl<O, P, F> Solver<O> for NelderMead<P, F>
 where
-    O: ArgminOp<Output = F>,
-    O::Param: Default
-        + ArgminScaledSub<O::Param, F, O::Param>
+    O: ArgminOp<Output = F, Param = P, Float = F>,
+    P: Default
+        + Clone
+        + Serialize
+        + DeserializeOwned
+        + ArgminScaledSub<O::Param, O::Float, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
-        + ArgminMul<F, O::Param>,
-    F: ArgminFloat + std::iter::Sum<F>,
+        + ArgminMul<O::Float, O::Param>,
+    F: ArgminFloat + std::iter::Sum<O::Float>,
 {
     const NAME: &'static str = "Nelder-Mead method";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        _state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.params = self
             .params
             .iter()
@@ -236,17 +231,14 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
-        // self.sort_param_vecs();
-
+        _state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let num_param = self.params.len();
 
         let x0 = self.calculate_centroid();
 
         let xr = self.reflect(&x0, &self.params[num_param - 1].0);
         let xr_cost = op.apply(&xr)?;
-        // println!("{:?}", self.params);
 
         let action = if xr_cost < self.params[num_param - 2].1 && xr_cost >= self.params[0].1 {
             // reflection
@@ -288,7 +280,7 @@ where
             .kv(make_kv!("action" => action;)))
     }
 
-    fn terminate(&mut self, _state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
         let n = F::from_usize(self.params.len()).unwrap();
         let c0: F = self.params.iter().map(|(_, c)| *c).sum::<F>() / n;
         let s: F = (F::from_f64(1.0).unwrap() / (n - F::from_f64(1.0).unwrap())

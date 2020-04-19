@@ -11,7 +11,7 @@
 // pub mod gradientdescent;
 // pub mod landweber;
 pub mod linesearch;
-// pub mod neldermead;
+pub mod neldermead;
 // pub mod newton;
 pub mod particleswarm;
 pub mod quasinewton;
