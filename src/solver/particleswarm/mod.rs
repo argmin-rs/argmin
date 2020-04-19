@@ -10,7 +10,7 @@
 //! TODO
 
 use crate::prelude::*;
-use serde::Serialize;
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std;
 use std::default::Default;
 
@@ -21,15 +21,10 @@ use std::default::Default;
 /// # References:
 ///
 /// TODO
-#[derive(Serialize)]
-pub struct ParticleSwarm<O, F>
-where
-    O: ArgminOp<Output = F, Float = F>,
-    O::Param: Position<F>,
-    F: ArgminFloat,
-{
-    particles: Vec<Particle<O::Param, F>>,
-    best_position: O::Param,
+#[derive(Serialize, Deserialize)]
+pub struct ParticleSwarm<P, F> {
+    particles: Vec<Particle<P, F>>,
+    best_position: P,
     best_cost: F,
 
     // Weights for particle updates
@@ -37,14 +32,13 @@ where
     weight_particle: F,
     weight_swarm: F,
 
-    search_region: (O::Param, O::Param),
+    search_region: (P, P),
     num_particles: usize,
 }
 
-impl<O, F> ParticleSwarm<O, F>
+impl<P, F> ParticleSwarm<P, F>
 where
-    O: ArgminOp<Output = F, Float = F>,
-    <O as ArgminOp>::Param: Position<F>,
+    P: Position<F> + DeserializeOwned + Serialize,
     F: ArgminFloat,
 {
     /// Constructor
@@ -54,7 +48,7 @@ where
     /// * `cost_function`: cost function
     /// * `init_temp`: initial temperature
     pub fn new(
-        search_region: (O::Param, O::Param),
+        search_region: (P, P),
         num_particles: usize,
         weight_momentum: F,
         weight_particle: F,
@@ -62,7 +56,7 @@ where
     ) -> Result<Self, Error> {
         let particle_swarm = ParticleSwarm {
             particles: vec![],
-            best_position: O::Param::rand_from_range(
+            best_position: P::rand_from_range(
                 // FIXME: random smart?
                 &search_region.0,
                 &search_region.1,
@@ -78,7 +72,10 @@ where
         Ok(particle_swarm)
     }
 
-    fn initialize_particles(&mut self, op: &mut OpWrapper<O>) {
+    fn initialize_particles<O: ArgminOp<Param = P, Output = F, Float = F>>(
+        &mut self,
+        op: &mut OpWrapper<O>,
+    ) {
         self.particles = (0..self.num_particles)
             .map(|_| self.initialize_particle(op))
             .collect();
@@ -88,7 +85,10 @@ where
         // TODO unwrap evil
     }
 
-    fn initialize_particle(&mut self, op: &mut OpWrapper<O>) -> Particle<O::Param, F> {
+    fn initialize_particle<O: ArgminOp<Param = P, Output = F, Float = F>>(
+        &mut self,
+        op: &mut OpWrapper<O>,
+    ) -> Particle<P, F> {
         let (min, max) = &self.search_region;
         let delta = max.sub(min);
         let delta_neg = delta.mul(&F::from_f64(-1.0).unwrap());
@@ -105,8 +105,8 @@ where
         }
     }
 
-    fn get_best_position(&self) -> O::Param {
-        let mut best: Option<(&O::Param, F)> = None;
+    fn get_best_position(&self) -> P {
+        let mut best: Option<(&P, F)> = None;
 
         for p in &self.particles {
             match best {
@@ -126,10 +126,10 @@ where
     }
 }
 
-impl<O, F> Solver<O> for ParticleSwarm<O, F>
+impl<O, P, F> Solver<O> for ParticleSwarm<P, F>
 where
-    O: ArgminOp<Output = F, Float = F>,
-    O::Param: Position<F>,
+    O: ArgminOp<Output = F, Param = P, Float = F>,
+    O::Param: Position<F> + DeserializeOwned + Serialize,
     O::Hessian: Clone + Default,
     F: ArgminFloat,
 {
@@ -253,12 +253,8 @@ where
 // );
 
 /// A single particle
-#[derive(Clone, Serialize, Debug)]
-pub struct Particle<T, F>
-where
-    T: Position<F>,
-    F: ArgminFloat,
-{
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct Particle<T, F> {
     /// Position of particle
     pub position: T,
     /// Velocity of particle
