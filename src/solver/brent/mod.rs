@@ -79,9 +79,9 @@ impl<F: ArgminFloat> Brent<F> {
     }
 }
 
-impl<O, F> Solver<O, F> for Brent<F>
+impl<O, F> Solver<O> for Brent<F>
 where
-    O: ArgminOp<Param = F, Output = F>,
+    O: ArgminOp<Param = F, Output = F, Float = F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Brent";
@@ -90,8 +90,8 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         // Brent maintains its own state
-        _state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        _state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.fa = op.apply(&self.a)?;
         self.fb = op.apply(&self.b)?;
         if self.fa * self.fb > F::from_f64(0.0).unwrap() {
@@ -107,8 +107,8 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         // Brent maintains its own state
-        _state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        _state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         if (self.fb > F::from_f64(0.0).unwrap() && self.fc > F::from_f64(0.0).unwrap())
             || self.fb < F::from_f64(0.0).unwrap() && self.fc < F::from_f64(0.0).unwrap()
         {
