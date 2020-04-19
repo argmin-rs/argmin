@@ -92,6 +92,8 @@ pub trait ArgminOp {
     type Hessian: Clone + Serialize + DeserializeOwned;
     /// Type of Jacobian
     type Jacobian: Clone + Serialize + DeserializeOwned;
+    /// Precision of floats
+    type Float: ArgminFloat;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
@@ -138,7 +140,7 @@ pub trait ArgminOp {
 /// Solver
 ///
 /// Every solver needs to implement this trait.
-pub trait Solver<O: ArgminOp, F: ArgminFloat>: Serialize {
+pub trait Solver<O: ArgminOp>: Serialize {
     /// Name of the solver
     const NAME: &'static str = "UNDEFINED";
 
@@ -146,8 +148,8 @@ pub trait Solver<O: ArgminOp, F: ArgminFloat>: Serialize {
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error>;
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error>;
 
     /// Initializes the algorithm
     ///
@@ -156,8 +158,8 @@ pub trait Solver<O: ArgminOp, F: ArgminFloat>: Serialize {
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        _state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         Ok(None)
     }
 
@@ -170,7 +172,7 @@ pub trait Solver<O: ArgminOp, F: ArgminFloat>: Serialize {
     /// 3) cost is lower than target cost
     ///
     /// This can be overwritten in a `Solver` implementation; however it is not advised.
-    fn terminate_internal(&mut self, state: &IterState<O, F>) -> TerminationReason {
+    fn terminate_internal(&mut self, state: &IterState<O>) -> TerminationReason {
         let solver_terminate = self.terminate(state);
         if solver_terminate.terminated() {
             return solver_terminate;
@@ -185,7 +187,7 @@ pub trait Solver<O: ArgminOp, F: ArgminFloat>: Serialize {
     }
 
     /// Checks whether the algorithm must be terminated
-    fn terminate(&mut self, _state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
         TerminationReason::NotTerminated
     }
 }
@@ -194,11 +196,11 @@ pub trait Solver<O: ArgminOp, F: ArgminFloat>: Serialize {
 ///
 /// TODO: Rename to IterResult?
 #[derive(Clone, Debug, Default)]
-pub struct ArgminIterData<O: ArgminOp, F> {
+pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
     param: Option<O::Param>,
     /// Current cost function value
-    cost: Option<F>,
+    cost: Option<O::Float>,
     /// Current gradient
     grad: Option<O::Param>,
     /// Current Hessian
@@ -206,7 +208,7 @@ pub struct ArgminIterData<O: ArgminOp, F> {
     /// Current Jacobian
     jacobian: Option<O::Jacobian>,
     /// Current population
-    population: Option<Vec<(O::Param, F)>>,
+    population: Option<Vec<(O::Param, O::Float)>>,
     /// terminationreason
     termination_reason: Option<TerminationReason>,
     /// Key value pairs which are used to provide additional information for the Observers
@@ -215,7 +217,7 @@ pub struct ArgminIterData<O: ArgminOp, F> {
 
 // TODO: Many clones are necessary in the getters.. maybe a complete "deconstruct" method would be
 // better?
-impl<O: ArgminOp, F: ArgminFloat> ArgminIterData<O, F> {
+impl<O: ArgminOp> ArgminIterData<O> {
     /// Constructor
     pub fn new() -> Self {
         ArgminIterData {
@@ -237,7 +239,7 @@ impl<O: ArgminOp, F: ArgminFloat> ArgminIterData<O, F> {
     }
 
     /// Set cost function value
-    pub fn cost(mut self, cost: F) -> Self {
+    pub fn cost(mut self, cost: O::Float) -> Self {
         self.cost = Some(cost);
         self
     }
@@ -261,7 +263,7 @@ impl<O: ArgminOp, F: ArgminFloat> ArgminIterData<O, F> {
     }
 
     /// Set Population
-    pub fn population(mut self, population: Vec<(O::Param, F)>) -> Self {
+    pub fn population(mut self, population: Vec<(O::Param, O::Float)>) -> Self {
         self.population = Some(population);
         self
     }
@@ -284,7 +286,7 @@ impl<O: ArgminOp, F: ArgminFloat> ArgminIterData<O, F> {
     }
 
     /// Get cost function value
-    pub fn get_cost(&self) -> Option<F> {
+    pub fn get_cost(&self) -> Option<O::Float> {
         self.cost
     }
 
@@ -304,7 +306,7 @@ impl<O: ArgminOp, F: ArgminFloat> ArgminIterData<O, F> {
     }
 
     /// Get reference to population
-    pub fn get_population(&self) -> Option<&Vec<(O::Param, F)>> {
+    pub fn get_population(&self) -> Option<&Vec<(O::Param, O::Float)>> {
         match &self.population {
             Some(population) => Some(&population),
             None => None,

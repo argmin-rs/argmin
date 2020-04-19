@@ -132,6 +132,7 @@ impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
     type Output = O::Output;
     type Hessian = O::Hessian;
     type Jacobian = O::Jacobian;
+    type Float = O::Float;
 
     fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
         self.op.as_ref().unwrap().apply(param)

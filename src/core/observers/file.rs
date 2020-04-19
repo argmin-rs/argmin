@@ -7,7 +7,7 @@
 
 //! # Output parameter vectors to file
 
-use crate::core::{ArgminFloat, ArgminKV, ArgminOp, Error, IterState, Observe};
+use crate::core::{ArgminKV, ArgminOp, Error, IterState, Observe};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fs::File;
@@ -59,8 +59,8 @@ impl<O: ArgminOp> WriteToFile<O> {
     }
 }
 
-impl<O: ArgminOp, F: ArgminFloat> Observe<O, F> for WriteToFile<O> {
-    fn observe_iter(&mut self, state: &IterState<O, F>, _kv: &ArgminKV) -> Result<(), Error> {
+impl<O: ArgminOp> Observe<O> for WriteToFile<O> {
+    fn observe_iter(&mut self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
         let param = state.get_param();
         let iter = state.get_iter();
         let dir = Path::new(&self.dir);

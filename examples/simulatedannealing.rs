@@ -59,6 +59,7 @@ impl ArgminOp for Rosenbrock {
     type Output = f64;
     type Hessian = ();
     type Jacobian = ();
+    type Float = f64;
 
     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
         Ok(rosenbrock(param, self.a, self.b))

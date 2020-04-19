@@ -5,13 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminFloat, ArgminOp, OpWrapper, TerminationReason};
+use crate::core::{ArgminOp, OpWrapper, TerminationReason};
+use num::traits::float::Float;
 use paste::item;
 use serde::{Deserialize, Serialize};
 
 /// Maintains the state from iteration to iteration of a solver
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct IterState<O: ArgminOp, F> {
+pub struct IterState<O: ArgminOp> {
     /// Current parameter vector
     pub param: O::Param,
     /// Previous parameter vector
@@ -21,15 +22,15 @@ pub struct IterState<O: ArgminOp, F> {
     /// Previous best parameter vector
     pub prev_best_param: O::Param,
     /// Current cost function value
-    pub cost: F,
+    pub cost: O::Float,
     /// Previous cost function value
-    pub prev_cost: F,
+    pub prev_cost: O::Float,
     /// Current best cost function value
-    pub best_cost: F,
+    pub best_cost: O::Float,
     /// Previous best cost function value
-    pub prev_best_cost: F,
+    pub prev_best_cost: O::Float,
     /// Target cost function value
-    pub target_cost: F,
+    pub target_cost: O::Float,
     /// Current gradient
     pub grad: Option<O::Param>,
     /// Previous gradient
@@ -43,7 +44,7 @@ pub struct IterState<O: ArgminOp, F> {
     /// Previous Jacobian
     pub prev_jacobian: Option<O::Jacobian>,
     /// All members for population-based algorithms as (param, cost) tuples
-    pub population: Option<Vec<(O::Param, F)>>,
+    pub population: Option<Vec<(O::Param, O::Float)>>,
     /// Current iteration
     pub iter: u64,
     /// Iteration number of last best cost
@@ -98,17 +99,16 @@ macro_rules! getter {
     };
 }
 
-impl<O: ArgminOp, F> std::default::Default for IterState<O, F>
+impl<O: ArgminOp> std::default::Default for IterState<O>
 where
     O::Param: Default,
-    F: ArgminFloat,
 {
     fn default() -> Self {
         IterState::new(O::Param::default())
     }
 }
 
-impl<O: ArgminOp, F: ArgminFloat> IterState<O, F> {
+impl<O: ArgminOp> IterState<O> {
     /// Create new IterState from `param`
     pub fn new(param: O::Param) -> Self {
         IterState {
@@ -116,11 +116,11 @@ impl<O: ArgminOp, F: ArgminFloat> IterState<O, F> {
             prev_param: param.clone(),
             best_param: param.clone(),
             prev_best_param: param,
-            cost: F::infinity(),
-            prev_cost: F::infinity(),
-            best_cost: F::infinity(),
-            prev_best_cost: F::infinity(),
-            target_cost: F::neg_infinity(),
+            cost: O::Float::infinity(),
+            prev_cost: O::Float::infinity(),
+            best_cost: O::Float::infinity(),
+            prev_best_cost: O::Float::infinity(),
+            target_cost: O::Float::neg_infinity(),
             grad: None,
             prev_grad: None,
             hessian: None,
@@ -159,7 +159,7 @@ impl<O: ArgminOp, F: ArgminFloat> IterState<O, F> {
 
     /// Set the current cost function value. This shifts the stored cost function value to the
     /// previous cost function value.
-    pub fn cost(&mut self, cost: F) -> &mut Self {
+    pub fn cost(&mut self, cost: O::Float) -> &mut Self {
         std::mem::swap(&mut self.prev_cost, &mut self.cost);
         self.cost = cost;
         self
@@ -167,7 +167,7 @@ impl<O: ArgminOp, F: ArgminFloat> IterState<O, F> {
 
     /// Set the current best cost function value. This shifts the stored best cost function value to
     /// the previous cost function value.
-    pub fn best_cost(&mut self, cost: F) -> &mut Self {
+    pub fn best_cost(&mut self, cost: O::Float) -> &mut Self {
         std::mem::swap(&mut self.prev_best_cost, &mut self.best_cost);
         self.best_cost = cost;
         self
@@ -195,13 +195,13 @@ impl<O: ArgminOp, F: ArgminFloat> IterState<O, F> {
     }
 
     /// Set population
-    pub fn population(&mut self, population: Vec<(O::Param, F)>) -> &mut Self {
+    pub fn population(&mut self, population: Vec<(O::Param, O::Float)>) -> &mut Self {
         self.population = Some(population);
         self
     }
 
     /// Set target cost value
-    setter!(target_cost, F);
+    setter!(target_cost, O::Float);
     /// Set maximum number of iterations
     setter!(max_iters, u64);
     /// Set iteration number where the previous best parameter vector was found
@@ -219,15 +219,15 @@ impl<O: ArgminOp, F: ArgminFloat> IterState<O, F> {
     /// Returns previous best parameter vector
     getter!(prev_best_param, O::Param);
     /// Returns current cost function value
-    getter!(cost, F);
+    getter!(cost, O::Float);
     /// Returns previous cost function value
-    getter!(prev_cost, F);
+    getter!(prev_cost, O::Float);
     /// Returns current best cost function value
-    getter!(best_cost, F);
+    getter!(best_cost, O::Float);
     /// Returns previous best cost function value
-    getter!(prev_best_cost, F);
+    getter!(prev_best_cost, O::Float);
     /// Returns target cost
-    getter!(target_cost, F);
+    getter!(target_cost, O::Float);
     /// Returns current cost function evaluation count
     getter!(cost_func_count, u64);
     /// Returns current gradient function evaluation count
@@ -262,7 +262,7 @@ impl<O: ArgminOp, F: ArgminFloat> IterState<O, F> {
     getter!(max_iters, u64);
 
     /// Returns population
-    pub fn get_population(&self) -> Option<&Vec<(O::Param, F)>> {
+    pub fn get_population(&self) -> Option<&Vec<(O::Param, O::Float)>> {
         match &self.population {
             Some(population) => Some(&population),
             None => None,
@@ -346,7 +346,7 @@ mod tests {
         let param = vec![1.0f64, 2.0];
         let cost: f64 = 42.0;
 
-        let mut state: IterState<MinimalNoOperator, f64> = IterState::new(param.clone());
+        let mut state: IterState<MinimalNoOperator> = IterState::new(param.clone());
 
         assert_eq!(state.get_param(), param);
         assert_eq!(state.get_prev_param(), param);

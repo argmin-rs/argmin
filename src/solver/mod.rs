@@ -5,15 +5,15 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-pub mod brent;
-pub mod conjugategradient;
-pub mod gaussnewton;
-pub mod gradientdescent;
-pub mod landweber;
-pub mod linesearch;
-pub mod neldermead;
-pub mod newton;
-pub mod particleswarm;
-pub mod quasinewton;
+// pub mod brent;
+// pub mod conjugategradient;
+// pub mod gaussnewton;
+// pub mod gradientdescent;
+// pub mod landweber;
+// pub mod linesearch;
+// pub mod neldermead;
+// pub mod newton;
+// pub mod particleswarm;
+// pub mod quasinewton;
 pub mod simulatedannealing;
-pub mod trustregion;
+// pub mod trustregion;

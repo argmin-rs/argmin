@@ -9,8 +9,8 @@
 
 use crate::core::serialization::*;
 use crate::core::{
-    ArgminCheckpoint, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, Error,
-    IterState, Observe, Observer, ObserverMode, OpWrapper, Solver, TerminationReason,
+    ArgminCheckpoint, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, Error, IterState, Observe,
+    Observer, ObserverMode, OpWrapper, Solver, TerminationReason,
 };
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -20,29 +20,28 @@ use std::sync::Arc;
 
 /// Executes a solver
 #[derive(Clone, Serialize, Deserialize)]
-pub struct Executor<O: ArgminOp, S, F: ArgminFloat> {
+pub struct Executor<O: ArgminOp, S> {
     /// solver
     solver: S,
     /// operator
     #[serde(skip)]
     pub op: OpWrapper<O>,
     /// State
-    #[serde(bound = "IterState<O, F>: Serialize")]
-    state: IterState<O, F>,
+    #[serde(bound = "IterState<O>: Serialize")]
+    state: IterState<O>,
     /// Storage for observers
     #[serde(skip)]
-    observers: Observer<O, F>,
+    observers: Observer<O>,
     /// Checkpoint
     checkpoint: ArgminCheckpoint,
     /// Indicates whether Ctrl-C functionality should be active or not
     ctrlc: bool,
 }
 
-impl<O, S, F> Executor<O, S, F>
+impl<O, S> Executor<O, S>
 where
     O: ArgminOp,
-    S: Solver<O, F>,
-    F: ArgminFloat,
+    S: Solver<O>,
 {
     /// Create a new executor with a `solver` and an initial parameter `init_param`
     pub fn new(op: O, solver: S, init_param: O::Param) -> Self {
@@ -68,7 +67,7 @@ where
         // load_checkpoint(path)
     }
 
-    fn update(&mut self, data: &ArgminIterData<O, F>) -> Result<(), Error> {
+    fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {
         if let Some(cur_param) = data.get_param() {
             self.state.param(cur_param);
         }
@@ -103,7 +102,7 @@ where
     }
 
     /// Run the executor
-    pub fn run(mut self) -> Result<ArgminResult<O, F>, Error> {
+    pub fn run(mut self) -> Result<ArgminResult<O>, Error> {
         let total_time = std::time::Instant::now();
 
         let running = Arc::new(AtomicBool::new(true));
@@ -202,7 +201,7 @@ where
     }
 
     /// Attaches a observer which implements `ArgminLog` to the solver.
-    pub fn add_observer<OBS: Observe<O, F> + 'static>(
+    pub fn add_observer<OBS: Observe<O> + 'static>(
         mut self,
         observer: OBS,
         mode: ObserverMode,
@@ -218,13 +217,13 @@ where
     }
 
     /// Set target cost value
-    pub fn target_cost(mut self, cost: F) -> Self {
+    pub fn target_cost(mut self, cost: O::Float) -> Self {
         self.state.target_cost(cost);
         self
     }
 
     /// Set cost value
-    pub fn cost(mut self, cost: F) -> Self {
+    pub fn cost(mut self, cost: O::Float) -> Self {
         self.state.cost(cost);
         self
     }

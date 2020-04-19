@@ -93,7 +93,10 @@ pub struct SimulatedAnnealing<F> {
     rng: XorShiftRng,
 }
 
-impl<F: ArgminFloat> SimulatedAnnealing<F> {
+impl<F> SimulatedAnnealing<F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     ///
     /// Parameter:
@@ -173,7 +176,7 @@ impl<F: ArgminFloat> SimulatedAnnealing<F> {
             SATempFunc::Boltzmann => self.init_temp / F::from_u64(self.temp_iter + 1).unwrap().ln(),
             SATempFunc::Exponential(x) => {
                 self.init_temp * x.powf(F::from_u64(self.temp_iter + 1).unwrap())
-            } // SATempFunc::Custom(ref func) => func(self.init_temp, self.temp_iter),
+            }
         };
     }
 
@@ -222,17 +225,17 @@ impl<F: ArgminFloat> SimulatedAnnealing<F> {
     }
 }
 
-impl<O, F> Solver<O, F> for SimulatedAnnealing<F>
+impl<O, F> Solver<O> for SimulatedAnnealing<F>
 where
-    O: ArgminOp<Output = F>,
+    O: ArgminOp<Output = F, Float = F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Simulated Annealing";
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        _state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         Ok(Some(ArgminIterData::new().kv(make_kv!(
             "initial_temperature" => self.init_temp;
             "stall_iter_accepted_limit" => self.stall_iter_accepted_limit;
@@ -247,8 +250,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
         // behaviour.
@@ -314,7 +317,7 @@ where
         )))
     }
 
-    fn terminate(&mut self, _state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
         if self.stall_iter_accepted > self.stall_iter_accepted_limit {
             return TerminationReason::AcceptedStallIterExceeded;
         }

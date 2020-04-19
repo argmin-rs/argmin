@@ -8,7 +8,7 @@
 //! # Observer which visualizes the progress of the solver
 
 extern crate gnuplot;
-use crate::core::{ArgminFloat, ArgminKV, ArgminOp, Error, IterState, Observe};
+use crate::prelude::*;
 use std::sync::Mutex;
 
 /// Visualize iterations of a solver for cost functions of type
@@ -143,12 +143,11 @@ impl Visualizer3d {
     }
 }
 
-impl<O, F> Observe<O, F> for Visualizer3d
+impl<O> Observe<O> for Visualizer3d
 where
-    O: ArgminOp<Param = Vec<F>>,
-    F: ArgminFloat,
+    O: ArgminOp<Param = Vec<f64>, Float = f64>,
 {
-    fn observe_iter(&mut self, state: &IterState<O, F>, _kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
         // TODO: get particles from `state` or `kv`
 
         self.iteration(&state.param, state.best_cost, state.get_population());
