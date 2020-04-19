@@ -149,6 +149,8 @@
 //!     type Hessian = Vec<Vec<f64>>;
 //!     /// Type of the Jacobian. Can be `()` if not needed.
 //!     type Jacobian = ();
+//!     /// Floating point precision
+//!     type Float = f64;
 //!
 //!     /// Apply the cost function to a parameter `p`
 //!     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
@@ -196,6 +198,7 @@
 //! #     type Output = f64;
 //! #     type Hessian = ();
 //! #     type Jacobian = ();
+//! #     type Float = f64;
 //! #
 //! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 //! #         Ok(rosenbrock_2d(p, self.a, self.b))
@@ -280,6 +283,7 @@
 //! #     type Output = f64;
 //! #     type Hessian = ();
 //! #     type Jacobian = ();
+//! #     type Float = f64;
 //! #
 //! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 //! #         Ok(rosenbrock_2d(p, self.a, self.b))
@@ -356,6 +360,7 @@
 //! #     type Output = f64;
 //! #     type Hessian = ();
 //! #     type Jacobian = ();
+//! #     type Float = f64;
 //! #
 //! #     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
 //! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
@@ -431,12 +436,12 @@
 //!     }
 //! }
 //!
-//! impl<O, F> Solver<O, F> for Landweber<F>
+//! impl<O, F> Solver<O> for Landweber<F>
 //! where
 //!     // `O` always needs to implement `ArgminOp`
-//!     O: ArgminOp,
+//!     O: ArgminOp<Float = F>,
 //!     // `O::Param` needs to implement `ArgminScaledSub` because of the update formula
-//!     O::Param: ArgminScaledSub<O::Param, F, O::Param>,
+//!     O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>,
 //!     F: ArgminFloat,
 //! {
 //!     // This gives the solver a name which will be used for logging
@@ -452,8 +457,8 @@
 //!         // Current state of the optimization. This gives access to the parameter vector,
 //!         // gradient, Hessian and cost function value of the current, previous and best
 //!         // iteration as well as current iteration number, and many more.
-//!         state: &IterState<O, F>,
-//!     ) -> Result<ArgminIterData<O, F>, Error> {
+//!         state: &IterState<O>,
+//!     ) -> Result<ArgminIterData<O>, Error> {
 //!         // First we obtain the current parameter vector from the `state` struct (`x_k`).
 //!         let xk = state.get_param();
 //!         // Then we compute the gradient at `x_k` (`\nabla f(x_k)`)

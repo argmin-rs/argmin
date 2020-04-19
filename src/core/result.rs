@@ -36,6 +36,7 @@
 //! #     type Output = f64;
 //! #     type Hessian = ();
 //! #     type Jacobian = ();
+//! #     type Float = f64;
 //! #
 //! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 //! #         Ok(rosenbrock_2d(p, self.a, self.b))

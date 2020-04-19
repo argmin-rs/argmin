@@ -148,8 +148,5 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(
-        conjugate_gradient,
-        ConjugateGradient<NoOperator<Vec<f64>, Vec<f64>, (), ()>, f64>
-    );
+    test_trait_impl!(conjugate_gradient, ConjugateGradient<Vec<f64>, f64>);
 }

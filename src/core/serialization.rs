@@ -167,16 +167,15 @@ mod tests {
         }
     }
 
-    impl<O, F> Solver<O, F> for PhonySolver
+    impl<O> Solver<O> for PhonySolver
     where
         O: ArgminOp,
-        F: ArgminFloat,
     {
         fn next_iter(
             &mut self,
             _op: &mut OpWrapper<O>,
-            _state: &IterState<O, F>,
-        ) -> Result<ArgminIterData<O, F>, Error> {
+            _state: &IterState<O>,
+        ) -> Result<ArgminIterData<O>, Error> {
             unimplemented!()
         }
     }
@@ -185,12 +184,12 @@ mod tests {
     fn test_store() {
         let op: MinimalNoOperator = MinimalNoOperator::new();
         let solver = PhonySolver::new();
-        let exec: Executor<MinimalNoOperator, PhonySolver, f64> =
+        let exec: Executor<MinimalNoOperator, PhonySolver> =
             Executor::new(op, solver, vec![0.0f64, 0.0]);
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&exec, 20).unwrap();
 
-        let _loaded: Executor<MinimalNoOperator, PhonySolver, f64> =
+        let _loaded: Executor<MinimalNoOperator, PhonySolver> =
             load_checkpoint("checkpoints/solver.arg").unwrap();
     }
 }
