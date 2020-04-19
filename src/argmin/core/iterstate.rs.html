@@ -503,6 +503,7 @@
 <span id="503">503</span>
 <span id="504">504</span>
 <span id="505">505</span>
+<span id="506">506</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -512,6 +513,7 @@
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">ArgminOp</span>, <span class="ident">OpWrapper</span>, <span class="ident">TerminationReason</span>};
+<span class="kw">use</span> <span class="ident">num</span>::<span class="ident">traits</span>::<span class="ident">float</span>::<span class="ident">Float</span>;
 <span class="kw">use</span> <span class="ident">paste</span>::<span class="ident">item</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
@@ -527,15 +529,15 @@
     <span class="doccomment">/// Previous best parameter vector</span>
     <span class="kw">pub</span> <span class="ident">prev_best_param</span>: <span class="ident">O</span>::<span class="ident">Param</span>,
     <span class="doccomment">/// Current cost function value</span>
-    <span class="kw">pub</span> <span class="ident">cost</span>: <span class="ident">f64</span>,
+    <span class="kw">pub</span> <span class="ident">cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>,
     <span class="doccomment">/// Previous cost function value</span>
-    <span class="kw">pub</span> <span class="ident">prev_cost</span>: <span class="ident">f64</span>,
+    <span class="kw">pub</span> <span class="ident">prev_cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>,
     <span class="doccomment">/// Current best cost function value</span>
-    <span class="kw">pub</span> <span class="ident">best_cost</span>: <span class="ident">f64</span>,
+    <span class="kw">pub</span> <span class="ident">best_cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>,
     <span class="doccomment">/// Previous best cost function value</span>
-    <span class="kw">pub</span> <span class="ident">prev_best_cost</span>: <span class="ident">f64</span>,
+    <span class="kw">pub</span> <span class="ident">prev_best_cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>,
     <span class="doccomment">/// Target cost function value</span>
-    <span class="kw">pub</span> <span class="ident">target_cost</span>: <span class="ident">f64</span>,
+    <span class="kw">pub</span> <span class="ident">target_cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>,
     <span class="doccomment">/// Current gradient</span>
     <span class="kw">pub</span> <span class="ident">grad</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Previous gradient</span>
@@ -549,7 +551,7 @@
     <span class="doccomment">/// Previous Jacobian</span>
     <span class="kw">pub</span> <span class="ident">prev_jacobian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Jacobian</span><span class="op">&gt;</span>,
     <span class="doccomment">/// All members for population-based algorithms as (param, cost) tuples</span>
-    <span class="kw">pub</span> <span class="ident">population</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">population</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Float</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Current iteration</span>
     <span class="kw">pub</span> <span class="ident">iter</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// Iteration number of last best cost</span>
@@ -621,11 +623,11 @@
             <span class="ident">prev_param</span>: <span class="ident">param</span>.<span class="ident">clone</span>(),
             <span class="ident">best_param</span>: <span class="ident">param</span>.<span class="ident">clone</span>(),
             <span class="ident">prev_best_param</span>: <span class="ident">param</span>,
-            <span class="ident">cost</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>,
-            <span class="ident">prev_cost</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>,
-            <span class="ident">best_cost</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>,
-            <span class="ident">prev_best_cost</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>,
-            <span class="ident">target_cost</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NEG_INFINITY</span>,
+            <span class="ident">cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>::<span class="ident">infinity</span>(),
+            <span class="ident">prev_cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>::<span class="ident">infinity</span>(),
+            <span class="ident">best_cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>::<span class="ident">infinity</span>(),
+            <span class="ident">prev_best_cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>::<span class="ident">infinity</span>(),
+            <span class="ident">target_cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>::<span class="ident">neg_infinity</span>(),
             <span class="ident">grad</span>: <span class="prelude-val">None</span>,
             <span class="ident">prev_grad</span>: <span class="prelude-val">None</span>,
             <span class="ident">hessian</span>: <span class="prelude-val">None</span>,
@@ -664,7 +666,7 @@
 
     <span class="doccomment">/// Set the current cost function value. This shifts the stored cost function value to the</span>
     <span class="doccomment">/// previous cost function value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">prev_cost</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">cost</span>);
         <span class="self">self</span>.<span class="ident">cost</span> <span class="op">=</span> <span class="ident">cost</span>;
         <span class="self">self</span>
@@ -672,7 +674,7 @@
 
     <span class="doccomment">/// Set the current best cost function value. This shifts the stored best cost function value to</span>
     <span class="doccomment">/// the previous cost function value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">best_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">best_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">prev_best_cost</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">best_cost</span>);
         <span class="self">self</span>.<span class="ident">best_cost</span> <span class="op">=</span> <span class="ident">cost</span>;
         <span class="self">self</span>
@@ -700,13 +702,13 @@
     }
 
     <span class="doccomment">/// Set population</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">population</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">population</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>)<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">population</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">population</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Float</span>)<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">population</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">population</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set target cost value</span>
-    <span class="macro">setter</span><span class="macro">!</span>(<span class="ident">target_cost</span>, <span class="ident">f64</span>);
+    <span class="macro">setter</span><span class="macro">!</span>(<span class="ident">target_cost</span>, <span class="ident">O</span>::<span class="ident">Float</span>);
     <span class="doccomment">/// Set maximum number of iterations</span>
     <span class="macro">setter</span><span class="macro">!</span>(<span class="ident">max_iters</span>, <span class="ident">u64</span>);
     <span class="doccomment">/// Set iteration number where the previous best parameter vector was found</span>
@@ -724,15 +726,15 @@
     <span class="doccomment">/// Returns previous best parameter vector</span>
     <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">prev_best_param</span>, <span class="ident">O</span>::<span class="ident">Param</span>);
     <span class="doccomment">/// Returns current cost function value</span>
-    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">cost</span>, <span class="ident">f64</span>);
+    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">cost</span>, <span class="ident">O</span>::<span class="ident">Float</span>);
     <span class="doccomment">/// Returns previous cost function value</span>
-    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">prev_cost</span>, <span class="ident">f64</span>);
+    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">prev_cost</span>, <span class="ident">O</span>::<span class="ident">Float</span>);
     <span class="doccomment">/// Returns current best cost function value</span>
-    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">best_cost</span>, <span class="ident">f64</span>);
+    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">best_cost</span>, <span class="ident">O</span>::<span class="ident">Float</span>);
     <span class="doccomment">/// Returns previous best cost function value</span>
-    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">prev_best_cost</span>, <span class="ident">f64</span>);
+    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">prev_best_cost</span>, <span class="ident">O</span>::<span class="ident">Float</span>);
     <span class="doccomment">/// Returns target cost</span>
-    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">target_cost</span>, <span class="ident">f64</span>);
+    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">target_cost</span>, <span class="ident">O</span>::<span class="ident">Float</span>);
     <span class="doccomment">/// Returns current cost function evaluation count</span>
     <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">cost_func_count</span>, <span class="ident">u64</span>);
     <span class="doccomment">/// Returns current gradient function evaluation count</span>
@@ -767,7 +769,7 @@
     <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">max_iters</span>, <span class="ident">u64</span>);
 
     <span class="doccomment">/// Returns population</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_population</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_population</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Float</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">population</span> {
             <span class="prelude-val">Some</span>(<span class="ident">population</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">population</span>),
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
@@ -848,8 +850,8 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_iterstate</span>() {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>];
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="number">42.0</span>;
+        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>];
+        <span class="kw">let</span> <span class="ident">cost</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">42.0</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">MinimalNoOperator</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState</span>::<span class="ident">new</span>(<span class="ident">param</span>.<span class="ident">clone</span>());
 

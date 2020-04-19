@@ -71,6 +71,7 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -107,22 +108,23 @@
 <span class="doccomment">/// kind. Amer. J. Math. 73, 615–624</span>
 <span class="doccomment">/// [1] https://en.wikipedia.org/wiki/Landweber_iteration</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Landweber</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Landweber</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// omega</span>
-    <span class="ident">omega</span>: <span class="ident">f64</span>,
+    <span class="ident">omega</span>: <span class="ident">F</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Landweber</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Landweber</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Constructor</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">omega</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">omega</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Landweber</span> { <span class="ident">omega</span> }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Landweber</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Landweber</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span>,
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Float</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Landweber&quot;</span>;
 
@@ -143,7 +145,7 @@
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">test_trait_impl</span>;
 
-    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">landweber</span>, <span class="ident">Landweber</span>);
+    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">landweber</span>, <span class="ident">Landweber</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

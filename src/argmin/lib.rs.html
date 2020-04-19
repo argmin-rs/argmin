@@ -525,6 +525,12 @@
 <span id="525">525</span>
 <span id="526">526</span>
 <span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -677,6 +683,8 @@
 <span class="doccomment">//!     type Hessian = Vec&lt;Vec&lt;f64&gt;&gt;;</span>
 <span class="doccomment">//!     /// Type of the Jacobian. Can be `()` if not needed.</span>
 <span class="doccomment">//!     type Jacobian = ();</span>
+<span class="doccomment">//!     /// Floating point precision</span>
+<span class="doccomment">//!     type Float = f64;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     /// Apply the cost function to a parameter `p`</span>
 <span class="doccomment">//!     fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
@@ -724,6 +732,7 @@
 <span class="doccomment">//! #     type Output = f64;</span>
 <span class="doccomment">//! #     type Hessian = ();</span>
 <span class="doccomment">//! #     type Jacobian = ();</span>
+<span class="doccomment">//! #     type Float = f64;</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! #     fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
 <span class="doccomment">//! #         Ok(rosenbrock_2d(p, self.a, self.b))</span>
@@ -808,6 +817,7 @@
 <span class="doccomment">//! #     type Output = f64;</span>
 <span class="doccomment">//! #     type Hessian = ();</span>
 <span class="doccomment">//! #     type Jacobian = ();</span>
+<span class="doccomment">//! #     type Float = f64;</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! #     fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
 <span class="doccomment">//! #         Ok(rosenbrock_2d(p, self.a, self.b))</span>
@@ -884,6 +894,7 @@
 <span class="doccomment">//! #     type Output = f64;</span>
 <span class="doccomment">//! #     type Hessian = ();</span>
 <span class="doccomment">//! #     type Jacobian = ();</span>
+<span class="doccomment">//! #     type Float = f64;</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! #     fn apply(&amp;self, p: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;f64, Error&gt; {</span>
 <span class="doccomment">//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))</span>
@@ -947,24 +958,25 @@
 <span class="doccomment">//! // solver. Note that this does not include parameter vectors, gradients, Hessians, cost</span>
 <span class="doccomment">//! // function values and so on, as those will be handled by the `Executor`.</span>
 <span class="doccomment">//! #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">//! pub struct Landweber {</span>
+<span class="doccomment">//! pub struct Landweber&lt;F&gt; {</span>
 <span class="doccomment">//!     /// omega</span>
-<span class="doccomment">//!     omega: f64,</span>
+<span class="doccomment">//!     omega: F,</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! impl Landweber {</span>
+<span class="doccomment">//! impl&lt;F&gt; Landweber&lt;F&gt; {</span>
 <span class="doccomment">//!     /// Constructor</span>
-<span class="doccomment">//!     pub fn new(omega: f64) -&gt; Self {</span>
+<span class="doccomment">//!     pub fn new(omega: F) -&gt; Self {</span>
 <span class="doccomment">//!         Landweber { omega }</span>
 <span class="doccomment">//!     }</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! impl&lt;O&gt; Solver&lt;O&gt; for Landweber</span>
+<span class="doccomment">//! impl&lt;O, F&gt; Solver&lt;O&gt; for Landweber&lt;F&gt;</span>
 <span class="doccomment">//! where</span>
 <span class="doccomment">//!     // `O` always needs to implement `ArgminOp`</span>
-<span class="doccomment">//!     O: ArgminOp,</span>
+<span class="doccomment">//!     O: ArgminOp&lt;Float = F&gt;,</span>
 <span class="doccomment">//!     // `O::Param` needs to implement `ArgminScaledSub` because of the update formula</span>
-<span class="doccomment">//!     O::Param: ArgminScaledSub&lt;O::Param, f64, O::Param&gt;,</span>
+<span class="doccomment">//!     O::Param: ArgminScaledSub&lt;O::Param, O::Float, O::Param&gt;,</span>
+<span class="doccomment">//!     F: ArgminFloat,</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     // This gives the solver a name which will be used for logging</span>
 <span class="doccomment">//!     const NAME: &amp;&#39;static str = &quot;Landweber&quot;;</span>

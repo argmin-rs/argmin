@@ -490,13 +490,13 @@
     }
 
     <span class="doccomment">/// Set target cost value</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">target_cost</span>(<span class="ident">cost</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set cost value</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">O</span>::<span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cost</span>(<span class="ident">cost</span>);
         <span class="self">self</span>
     }

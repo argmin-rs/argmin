@@ -25,6 +25,8 @@
 <span id="25">25</span>
 <span id="26">26</span>
 <span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -49,8 +51,10 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">steihaug</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">trustregion_method</span>::<span class="kw-2">*</span>;
 
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::<span class="ident">ArgminFloat</span>;
+
 <span class="doccomment">/// Computes reduction ratio</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reduction_ratio</span>(<span class="ident">fxk</span>: <span class="ident">f64</span>, <span class="ident">fxkpk</span>: <span class="ident">f64</span>, <span class="ident">mk0</span>: <span class="ident">f64</span>, <span class="ident">mkpk</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reduction_ratio</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span>(<span class="ident">fxk</span>: <span class="ident">F</span>, <span class="ident">fxkpk</span>: <span class="ident">F</span>, <span class="ident">mk0</span>: <span class="ident">F</span>, <span class="ident">mkpk</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span> {
     (<span class="ident">fxk</span> <span class="op">-</span> <span class="ident">fxkpk</span>) <span class="op">/</span> (<span class="ident">mk0</span> <span class="op">-</span> <span class="ident">mkpk</span>)
 }
 </pre></div>

@@ -133,11 +133,6 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -163,31 +158,30 @@
 <span class="doccomment">/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Dogleg</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Dogleg</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Radius</span>
-    <span class="ident">radius</span>: <span class="ident">f64</span>,
+    <span class="ident">radius</span>: <span class="ident">F</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Dogleg</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">Dogleg</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Dogleg</span> {
-            <span class="ident">radius</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
-        }
+        <span class="ident">Dogleg</span> { <span class="ident">radius</span>: <span class="ident">F</span>::<span class="ident">nan</span>() }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Dogleg</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Dogleg</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span>, <span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Hessian</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Float</span>, <span class="ident">O</span>::<span class="ident">Hessian</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Float</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
     <span class="ident">O</span>::<span class="ident">Hessian</span>: <span class="ident">ArgminInv</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Hessian</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Dogleg&quot;</span>;
 
@@ -206,7 +200,7 @@
         <span class="kw">let</span> <span class="ident">pstar</span>;
 
         <span class="comment">// pb = -H^-1g</span>
-        <span class="kw">let</span> <span class="ident">pb</span> <span class="op">=</span> (<span class="ident">h</span>.<span class="ident">inv</span>()<span class="question-mark">?</span>).<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="op">-</span><span class="number">1.0</span>));
+        <span class="kw">let</span> <span class="ident">pb</span> <span class="op">=</span> (<span class="ident">h</span>.<span class="ident">inv</span>()<span class="question-mark">?</span>).<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>());
 
         <span class="kw">if</span> <span class="ident">pb</span>.<span class="ident">norm</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">radius</span> {
             <span class="ident">pstar</span> <span class="op">=</span> <span class="ident">pb</span>;
@@ -221,32 +215,28 @@
 
             <span class="comment">// compute tau</span>
             <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">radius</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-            <span class="kw">let</span> <span class="ident">t1</span> <span class="op">=</span> <span class="number">3.0</span> <span class="op">*</span> <span class="ident">utb</span> <span class="op">-</span> <span class="ident">btb</span> <span class="op">-</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">utu</span>;
-            <span class="kw">let</span> <span class="ident">t2</span> <span class="op">=</span>
-                (<span class="ident">utb</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">utb</span> <span class="op">*</span> <span class="ident">delta</span> <span class="op">+</span> <span class="ident">delta</span> <span class="op">*</span> <span class="ident">btb</span> <span class="op">-</span> <span class="ident">btb</span> <span class="op">*</span> <span class="ident">utu</span> <span class="op">+</span> <span class="ident">delta</span> <span class="op">*</span> <span class="ident">utu</span>).<span class="ident">sqrt</span>();
-            <span class="kw">let</span> <span class="ident">t3</span> <span class="op">=</span> <span class="op">-</span><span class="number">2.0</span> <span class="op">*</span> <span class="ident">utb</span> <span class="op">+</span> <span class="ident">btb</span> <span class="op">+</span> <span class="ident">utu</span>;
-            <span class="kw">let</span> <span class="ident">tau1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">t1</span> <span class="op">+</span> <span class="ident">t2</span>) <span class="op">/</span> <span class="ident">t3</span>;
-            <span class="kw">let</span> <span class="ident">tau2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">t1</span> <span class="op">-</span> <span class="ident">t2</span>) <span class="op">/</span> <span class="ident">t3</span>;
+            <span class="kw">let</span> <span class="ident">t1</span> <span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">3.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">utb</span> <span class="op">-</span> <span class="ident">btb</span> <span class="op">-</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">2.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">utu</span>;
+            <span class="kw">let</span> <span class="ident">t2</span> <span class="op">=</span> (<span class="ident">utb</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">2.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">utb</span> <span class="op">*</span> <span class="ident">delta</span> <span class="op">+</span> <span class="ident">delta</span> <span class="op">*</span> <span class="ident">btb</span>
+                <span class="op">-</span> <span class="ident">btb</span> <span class="op">*</span> <span class="ident">utu</span>
+                <span class="op">+</span> <span class="ident">delta</span> <span class="op">*</span> <span class="ident">utu</span>)
+                .<span class="ident">sqrt</span>();
+            <span class="kw">let</span> <span class="ident">t3</span> <span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="op">-</span><span class="number">2.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">utb</span> <span class="op">+</span> <span class="ident">btb</span> <span class="op">+</span> <span class="ident">utu</span>;
+            <span class="kw">let</span> <span class="ident">tau1</span>: <span class="ident">F</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">t1</span> <span class="op">+</span> <span class="ident">t2</span>) <span class="op">/</span> <span class="ident">t3</span>;
+            <span class="kw">let</span> <span class="ident">tau2</span>: <span class="ident">F</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">t1</span> <span class="op">-</span> <span class="ident">t2</span>) <span class="op">/</span> <span class="ident">t3</span>;
 
             <span class="comment">// pick maximum value of both -- not sure if this is the proper way</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tau</span> <span class="op">=</span> <span class="ident">tau1</span>.<span class="ident">max</span>(<span class="ident">tau2</span>);
 
             <span class="comment">// if calculation failed because t3 is too small, use the third option</span>
-            <span class="comment">// println!(&quot;t1: {:?}&quot;, tau);</span>
             <span class="kw">if</span> <span class="ident">tau</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tau</span>.<span class="ident">is_infinite</span>() {
-                <span class="ident">tau</span> <span class="op">=</span> (<span class="ident">delta</span> <span class="op">+</span> <span class="ident">btb</span> <span class="op">-</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">utu</span>) <span class="op">/</span> (<span class="ident">btb</span> <span class="op">-</span> <span class="ident">utu</span>);
-                <span class="comment">// println!(&quot;btb: {:?}&quot;, btb);</span>
-                <span class="comment">// println!(&quot;utu: {:?}&quot;, utu);</span>
+                <span class="ident">tau</span> <span class="op">=</span> (<span class="ident">delta</span> <span class="op">+</span> <span class="ident">btb</span> <span class="op">-</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">2.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">utu</span>) <span class="op">/</span> (<span class="ident">btb</span> <span class="op">-</span> <span class="ident">utu</span>);
             }
-            <span class="comment">// println!(&quot;t2: {:?}&quot;, tau);</span>
 
-            <span class="kw">if</span> <span class="ident">tau</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0.0</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">tau</span> <span class="op">&lt;</span> <span class="number">1.0</span> {
+            <span class="kw">if</span> <span class="ident">tau</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">tau</span> <span class="op">&lt;</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
                 <span class="ident">pstar</span> <span class="op">=</span> <span class="ident">pu</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">tau</span>);
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tau</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1.0</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">tau</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">2.0</span> {
-                <span class="comment">// pstar = pu + (tau - 1.0) * (pb - pu)</span>
-                <span class="ident">pstar</span> <span class="op">=</span> <span class="ident">pu</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">pb</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">pu</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">tau</span> <span class="op">-</span> <span class="number">1.0</span>)));
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tau</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">tau</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">2.0</span>).<span class="ident">unwrap</span>() {
+                <span class="ident">pstar</span> <span class="op">=</span> <span class="ident">pu</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">pb</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">pu</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">tau</span> <span class="op">-</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>())));
             } <span class="kw">else</span> {
-                <span class="comment">// println!(&quot;{:?}&quot;, tau);</span>
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">ImpossibleError</span> {
                     <span class="ident">text</span>: <span class="string">&quot;tau is bigger than 2, this is not supposed to happen.&quot;</span>.<span class="ident">to_string</span>(),
                 }
@@ -266,8 +256,8 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ArgminTrustRegion</span> <span class="kw">for</span> <span class="ident">Dogleg</span> {
-    <span class="kw">fn</span> <span class="ident">set_radius</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">f64</span>) {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">ArgminTrustRegion</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Dogleg</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">set_radius</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">F</span>) {
         <span class="self">self</span>.<span class="ident">radius</span> <span class="op">=</span> <span class="ident">radius</span>;
     }
 }
@@ -277,7 +267,7 @@
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">test_trait_impl</span>;
 
-    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">dogleg</span>, <span class="ident">Dogleg</span>);
+    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">dogleg</span>, <span class="ident">Dogleg</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

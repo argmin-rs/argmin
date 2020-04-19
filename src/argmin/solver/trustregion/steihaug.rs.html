@@ -278,46 +278,47 @@
 <span class="doccomment">/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Radius</span>
-    <span class="ident">radius</span>: <span class="ident">f64</span>,
+    <span class="ident">radius</span>: <span class="ident">F</span>,
     <span class="doccomment">/// epsilon</span>
-    <span class="ident">epsilon</span>: <span class="ident">f64</span>,
+    <span class="ident">epsilon</span>: <span class="ident">F</span>,
     <span class="doccomment">/// p</span>
     <span class="ident">p</span>: <span class="ident">P</span>,
     <span class="doccomment">/// residual</span>
     <span class="ident">r</span>: <span class="ident">P</span>,
     <span class="doccomment">/// r^Tr</span>
-    <span class="ident">rtr</span>: <span class="ident">f64</span>,
+    <span class="ident">rtr</span>: <span class="ident">F</span>,
     <span class="doccomment">/// initial residual</span>
-    <span class="ident">r_0_norm</span>: <span class="ident">f64</span>,
+    <span class="ident">r_0_norm</span>: <span class="ident">F</span>,
     <span class="doccomment">/// direction</span>
     <span class="ident">d</span>: <span class="ident">P</span>,
     <span class="doccomment">/// max iters</span>
     <span class="ident">max_iters</span>: <span class="ident">u64</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Steihaug</span> {
-            <span class="ident">radius</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
-            <span class="ident">epsilon</span>: <span class="number">10e-10</span>,
+            <span class="ident">radius</span>: <span class="ident">F</span>::<span class="ident">nan</span>(),
+            <span class="ident">epsilon</span>: <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">10e-10</span>).<span class="ident">unwrap</span>(),
             <span class="ident">p</span>: <span class="ident">P</span>::<span class="ident">default</span>(),
             <span class="ident">r</span>: <span class="ident">P</span>::<span class="ident">default</span>(),
-            <span class="ident">rtr</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
-            <span class="ident">r_0_norm</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>,
+            <span class="ident">rtr</span>: <span class="ident">F</span>::<span class="ident">nan</span>(),
+            <span class="ident">r_0_norm</span>: <span class="ident">F</span>::<span class="ident">nan</span>(),
             <span class="ident">d</span>: <span class="ident">P</span>::<span class="ident">default</span>(),
             <span class="ident">max_iters</span>: <span class="ident">std</span>::<span class="ident">u64</span>::<span class="ident">MAX</span>,
         }
     }
 
     <span class="doccomment">/// Set epsilon</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">epsilon</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">epsilon</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">epsilon</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0.0</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">epsilon</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">epsilon</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">epsilon</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;Steihaug: epsilon must be &gt; 0.0.&quot;</span>.<span class="ident">to_string</span>(),
             }
@@ -334,19 +335,19 @@
     }
 
     <span class="doccomment">/// evaluate m(p) (without considering f_init because it is not available)</span>
-    <span class="kw">fn</span> <span class="ident">eval_m</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>
+    <span class="kw">fn</span> <span class="ident">eval_m</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>
     <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span>, <span class="ident">H</span><span class="op">&gt;</span>,
+        <span class="ident">P</span>: <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">H</span><span class="op">&gt;</span>,
     {
         <span class="comment">// self.cur_grad().dot(&amp;p) + 0.5 * p.weighted_dot(&amp;self.cur_hessian(), &amp;p)</span>
-        <span class="ident">g</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>) <span class="op">+</span> <span class="number">0.5</span> <span class="op">*</span> <span class="ident">p</span>.<span class="ident">weighted_dot</span>(<span class="kw-2">&amp;</span><span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">p</span>)
+        <span class="ident">g</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>) <span class="op">+</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">p</span>.<span class="ident">weighted_dot</span>(<span class="kw-2">&amp;</span><span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">p</span>)
     }
 
     <span class="doccomment">/// calculate all possible step lengths</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">many_single_char_names</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">tau</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter_func</span>: <span class="ident">F</span>, <span class="ident">eval</span>: <span class="ident">bool</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>
+    <span class="kw">fn</span> <span class="ident">tau</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter_func</span>: <span class="ident">G</span>, <span class="ident">eval</span>: <span class="ident">bool</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">G</span>: <span class="ident">Fn</span>(<span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
         <span class="ident">H</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">p</span>);
@@ -359,7 +360,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">tau1</span>, <span class="ident">tau2</span>];
         <span class="comment">// Maybe calculating tau3 should only be done if b is close to zero?</span>
         <span class="kw">if</span> <span class="ident">tau1</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tau2</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tau1</span>.<span class="ident">is_infinite</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tau2</span>.<span class="ident">is_infinite</span>() {
-            <span class="kw">let</span> <span class="ident">tau3</span> <span class="op">=</span> (<span class="ident">delta</span> <span class="op">-</span> <span class="ident">a</span>) <span class="op">/</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="ident">c</span>);
+            <span class="kw">let</span> <span class="ident">tau3</span> <span class="op">=</span> (<span class="ident">delta</span> <span class="op">-</span> <span class="ident">a</span>) <span class="op">/</span> (<span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">2.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">c</span>);
             <span class="ident">t</span>.<span class="ident">push</span>(<span class="ident">tau3</span>);
         }
         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">eval</span> {
@@ -375,7 +376,7 @@
                     (<span class="ident">i</span>, <span class="self">self</span>.<span class="ident">eval_m</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>, <span class="ident">g</span>, <span class="ident">h</span>))
                 })
                 .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">m</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">m</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">m</span>.<span class="ident">is_infinite</span>())
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">f64</span>)<span class="op">&gt;</span><span class="op">&gt;</span>();
+                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">F</span>)<span class="op">&gt;</span><span class="op">&gt;</span>();
             <span class="ident">v</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="number">1</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">1</span>).<span class="ident">unwrap</span>());
             <span class="ident">v</span>
         } <span class="kw">else</span> {
@@ -384,7 +385,7 @@
                 .<span class="ident">cloned</span>()
                 .<span class="ident">enumerate</span>()
                 .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">tau</span>)<span class="op">|</span> (<span class="op">!</span><span class="ident">tau</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">tau</span>.<span class="ident">is_infinite</span>()) <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">filter_func</span>(<span class="kw-2">*</span><span class="ident">tau</span>))
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">f64</span>)<span class="op">&gt;</span><span class="op">&gt;</span>();
+                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">F</span>)<span class="op">&gt;</span><span class="op">&gt;</span>();
             <span class="ident">v</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="number">1</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="number">1</span>).<span class="ident">unwrap</span>());
             <span class="ident">v</span>
         };
@@ -393,22 +394,23 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span>, <span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">P</span>: <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">Serialize</span>
         <span class="op">+</span> <span class="ident">DeserializeOwned</span>
         <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Hessian</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">f64</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">O</span>::<span class="ident">Hessian</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminZeroLike</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">P</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
     <span class="ident">O</span>::<span class="ident">Hessian</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Steihaug&quot;</span>;
 
@@ -417,13 +419,11 @@
         <span class="ident">_op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// let param = state.get_param();</span>
         <span class="self">self</span>.<span class="ident">r</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap</span>();
-        <span class="comment">// .unwrap_or_else(|| op.gradient(&amp;param).unwrap());</span>
 
         <span class="self">self</span>.<span class="ident">r_0_norm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">norm</span>();
         <span class="self">self</span>.<span class="ident">rtr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">r</span>);
-        <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="op">-</span><span class="number">1.0</span>));
+        <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>());
         <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">zero_like</span>();
 
         <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="self">self</span>.<span class="ident">r_0_norm</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">epsilon</span> {
@@ -447,7 +447,7 @@
         <span class="kw">let</span> <span class="ident">dhd</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">weighted_dot</span>(<span class="kw-2">&amp;</span><span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">d</span>);
 
         <span class="comment">// Current search direction d is a direction of zero curvature or negative curvature</span>
-        <span class="kw">if</span> <span class="ident">dhd</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0.0</span> {
+        <span class="kw">if</span> <span class="ident">dhd</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
             <span class="kw">let</span> <span class="ident">tau</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tau</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData</span>::<span class="ident">new</span>()
                 .<span class="ident">param</span>(<span class="self">self</span>.<span class="ident">p</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">tau</span>)))
@@ -459,7 +459,7 @@
 
         <span class="comment">// new p violates trust region bound</span>
         <span class="kw">if</span> <span class="ident">p_n</span>.<span class="ident">norm</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">radius</span> {
-            <span class="kw">let</span> <span class="ident">tau</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tau</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0.0</span>, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
+            <span class="kw">let</span> <span class="ident">tau</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tau</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>(), <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData</span>::<span class="ident">new</span>()
                 .<span class="ident">param</span>(<span class="self">self</span>.<span class="ident">p</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">tau</span>)))
                 .<span class="ident">termination_reason</span>(<span class="ident">TerminationReason</span>::<span class="ident">TargetPrecisionReached</span>));
@@ -475,7 +475,7 @@
 
         <span class="kw">let</span> <span class="ident">rjtrj</span> <span class="op">=</span> <span class="ident">r_n</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">r_n</span>);
         <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="ident">rjtrj</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">rtr</span>;
-        <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="ident">r_n</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="op">-</span><span class="number">1.0</span>).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">beta</span>));
+        <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="ident">r_n</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>()).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">beta</span>));
         <span class="self">self</span>.<span class="ident">r</span> <span class="op">=</span> <span class="ident">r_n</span>;
         <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="ident">p_n</span>;
         <span class="self">self</span>.<span class="ident">rtr</span> <span class="op">=</span> <span class="ident">rjtrj</span>;
@@ -496,8 +496,8 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Serialize</span><span class="op">&gt;</span> <span class="ident">ArgminTrustRegion</span> <span class="kw">for</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">set_radius</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">f64</span>) {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Serialize</span>, <span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">ArgminTrustRegion</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">set_radius</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">F</span>) {
         <span class="self">self</span>.<span class="ident">radius</span> <span class="op">=</span> <span class="ident">radius</span>;
     }
 }
@@ -507,7 +507,7 @@
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">test_trait_impl</span>;
 
-    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">steihaug</span>, <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">MinimalNoOperator</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">steihaug</span>, <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">MinimalNoOperator</span>, <span class="ident">f64</span><span class="op">&gt;</span>);
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

@@ -143,6 +143,7 @@
 <span id="143">143</span>
 <span id="144">144</span>
 <span id="145">145</span>
+<span id="146">146</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -169,25 +170,25 @@
 <span class="doccomment">/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GaussNewton</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GaussNewton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// gamma</span>
-    <span class="ident">gamma</span>: <span class="ident">f64</span>,
+    <span class="ident">gamma</span>: <span class="ident">F</span>,
     <span class="doccomment">/// Tolerance for the stopping criterion based on cost difference</span>
-    <span class="ident">tol</span>: <span class="ident">f64</span>,
+    <span class="ident">tol</span>: <span class="ident">F</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">GaussNewton</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">GaussNewton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">GaussNewton</span> {
-            <span class="ident">gamma</span>: <span class="number">1.0</span>,
-            <span class="ident">tol</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>.<span class="ident">sqrt</span>(),
+            <span class="ident">gamma</span>: <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">tol</span>: <span class="ident">F</span>::<span class="ident">epsilon</span>().<span class="ident">sqrt</span>(),
         }
     }
 
     <span class="doccomment">/// set gamma</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">gamma</span> <span class="op">&gt;</span> <span class="number">1.0</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">gamma</span> <span class="op">&gt;</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;Gauss-Newton: gamma must be in  (0, 1].&quot;</span>.<span class="ident">to_string</span>(),
             }
@@ -198,8 +199,8 @@
     }
 
     <span class="doccomment">/// Set tolerance for the stopping criterion based on cost difference</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tol</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">tol</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0.0</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tol</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">tol</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;Gauss-Newton: tol must be positive.&quot;</span>.<span class="ident">to_string</span>(),
             }
@@ -210,26 +211,27 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">GaussNewton</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GaussNewton</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">GaussNewton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GaussNewton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="ident">GaussNewton</span>::<span class="ident">new</span>()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GaussNewton</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GaussNewton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Float</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>::<span class="ident">Output</span>: <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Float</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>::<span class="ident">Output</span>: <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Float</span><span class="op">&gt;</span>,
     <span class="ident">O</span>::<span class="ident">Jacobian</span>: <span class="ident">ArgminTranspose</span>
         <span class="op">+</span> <span class="ident">ArgminInv</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Jacobian</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Jacobian</span>, <span class="ident">O</span>::<span class="ident">Jacobian</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Output</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
     <span class="ident">O</span>::<span class="ident">Hessian</span>: <span class="ident">Default</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Gauss-Newton method&quot;</span>;
 
@@ -269,11 +271,11 @@
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">test_trait_impl</span>;
 
-    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">gauss_newton_method</span>, <span class="ident">GaussNewton</span>);
+    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">gauss_newton_method</span>, <span class="ident">GaussNewton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_tolerance</span>() {
-        <span class="kw">let</span> <span class="ident">tol1</span> <span class="op">=</span> <span class="number">1e-4</span>;
+        <span class="kw">let</span> <span class="ident">tol1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1e-4</span>;
 
         <span class="kw">let</span> <span class="ident">GaussNewton</span> { <span class="ident">tol</span>: <span class="ident">t</span>, .. } <span class="op">=</span> <span class="ident">GaussNewton</span>::<span class="ident">new</span>().<span class="ident">with_tol</span>(<span class="ident">tol1</span>).<span class="ident">unwrap</span>();
 
@@ -282,7 +284,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_gamma</span>() {
-        <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="number">0.5</span>;
+        <span class="kw">let</span> <span class="ident">gamma</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.5</span>;
 
         <span class="kw">let</span> <span class="ident">GaussNewton</span> { <span class="ident">gamma</span>: <span class="ident">g</span>, .. } <span class="op">=</span> <span class="ident">GaussNewton</span>::<span class="ident">new</span>().<span class="ident">with_gamma</span>(<span class="ident">gamma</span>).<span class="ident">unwrap</span>();
 

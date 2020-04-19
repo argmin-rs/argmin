@@ -185,6 +185,16 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -208,7 +218,6 @@
 <span class="doccomment">/// see https://en.wikipedia.org/wiki/Brent%27s_method</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
 <span class="kw">use</span> <span class="ident">thiserror</span>::<span class="ident">Error</span>;
 
 <span class="doccomment">/// Error to be thrown if Brent is initialized with improper parameters.</span>
@@ -228,49 +237,50 @@
 <span class="doccomment">/// # References:</span>
 <span class="doccomment">/// https://en.wikipedia.org/wiki/Brent%27s_method</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Brent</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Brent</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// required relative accuracy</span>
-    <span class="ident">tol</span>: <span class="ident">f64</span>,
+    <span class="ident">tol</span>: <span class="ident">F</span>,
     <span class="doccomment">/// left or right boundary of current interval</span>
-    <span class="ident">a</span>: <span class="ident">f64</span>,
+    <span class="ident">a</span>: <span class="ident">F</span>,
     <span class="doccomment">/// currently proposed best guess</span>
-    <span class="ident">b</span>: <span class="ident">f64</span>,
+    <span class="ident">b</span>: <span class="ident">F</span>,
     <span class="doccomment">/// left or right boundary of current interval</span>
-    <span class="ident">c</span>: <span class="ident">f64</span>,
+    <span class="ident">c</span>: <span class="ident">F</span>,
     <span class="doccomment">/// helper variable</span>
-    <span class="ident">d</span>: <span class="ident">f64</span>,
+    <span class="ident">d</span>: <span class="ident">F</span>,
     <span class="doccomment">/// another helper variable</span>
-    <span class="ident">e</span>: <span class="ident">f64</span>,
+    <span class="ident">e</span>: <span class="ident">F</span>,
     <span class="doccomment">/// function value at `a`</span>
-    <span class="ident">fa</span>: <span class="ident">f64</span>,
+    <span class="ident">fa</span>: <span class="ident">F</span>,
     <span class="doccomment">/// function value at `b`</span>
-    <span class="ident">fb</span>: <span class="ident">f64</span>,
+    <span class="ident">fb</span>: <span class="ident">F</span>,
     <span class="doccomment">/// function value at `c`</span>
-    <span class="ident">fc</span>: <span class="ident">f64</span>,
+    <span class="ident">fc</span>: <span class="ident">F</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Brent</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">Brent</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Constructor</span>
     <span class="doccomment">/// The values `min` and `max` must bracketing the root of the function.</span>
     <span class="doccomment">/// The parameter `tol` specifies the relative error to be targeted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">min</span>: <span class="ident">f64</span>, <span class="ident">max</span>: <span class="ident">f64</span>, <span class="ident">tol</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Brent</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">min</span>: <span class="ident">F</span>, <span class="ident">max</span>: <span class="ident">F</span>, <span class="ident">tol</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Brent</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="ident">Brent</span> {
             <span class="ident">tol</span>: <span class="ident">tol</span>,
             <span class="ident">a</span>: <span class="ident">min</span>,
             <span class="ident">b</span>: <span class="ident">max</span>,
             <span class="ident">c</span>: <span class="ident">max</span>,
-            <span class="ident">d</span>: <span class="ident">f64</span>::<span class="ident">NAN</span>,
-            <span class="ident">e</span>: <span class="ident">f64</span>::<span class="ident">NAN</span>,
-            <span class="ident">fa</span>: <span class="ident">f64</span>::<span class="ident">NAN</span>,
-            <span class="ident">fb</span>: <span class="ident">f64</span>::<span class="ident">NAN</span>,
-            <span class="ident">fc</span>: <span class="ident">f64</span>::<span class="ident">NAN</span>,
+            <span class="ident">d</span>: <span class="ident">F</span>::<span class="ident">nan</span>(),
+            <span class="ident">e</span>: <span class="ident">F</span>::<span class="ident">nan</span>(),
+            <span class="ident">fa</span>: <span class="ident">F</span>::<span class="ident">nan</span>(),
+            <span class="ident">fb</span>: <span class="ident">F</span>::<span class="ident">nan</span>(),
+            <span class="ident">fc</span>: <span class="ident">F</span>::<span class="ident">nan</span>(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Brent</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Brent</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">f64</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">F</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span>, <span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Brent&quot;</span>;
 
@@ -282,7 +292,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fa</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">a</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">fb</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">b</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fa</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">fb</span> <span class="op">&gt;</span> <span class="number">0.0</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fa</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">fb</span> <span class="op">&gt;</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">BrentError</span>::<span class="ident">WrongSign</span>.<span class="ident">into</span>());
         }
         <span class="self">self</span>.<span class="ident">fc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fb</span>;
@@ -297,7 +307,9 @@
         <span class="comment">// Brent maintains its own state</span>
         <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">fb</span> <span class="op">&gt;</span> <span class="number">0.0</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">fc</span> <span class="op">&gt;</span> <span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">fb</span> <span class="op">&lt;</span> <span class="number">0.0</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">fc</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
+        <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">fb</span> <span class="op">&gt;</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">fc</span> <span class="op">&gt;</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>())
+            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">fb</span> <span class="op">&lt;</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">fc</span> <span class="op">&lt;</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>()
+        {
             <span class="self">self</span>.<span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>;
             <span class="self">self</span>.<span class="ident">fc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fa</span>;
             <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>;
@@ -312,9 +324,10 @@
             <span class="self">self</span>.<span class="ident">fc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fa</span>;
         }
         <span class="comment">// effective tolerance is double machine precision plus half tolerance as given.</span>
-        <span class="kw">let</span> <span class="ident">eff_tol</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">EPSILON</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">abs</span>() <span class="op">+</span> <span class="number">0.5</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">tol</span>;
-        <span class="kw">let</span> <span class="ident">mid</span> <span class="op">=</span> <span class="number">0.5</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">c</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">b</span>);
-        <span class="kw">if</span> <span class="ident">mid</span>.<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">eff_tol</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">fb</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+        <span class="kw">let</span> <span class="ident">eff_tol</span> <span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">2.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">F</span>::<span class="ident">epsilon</span>() <span class="op">*</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">abs</span>()
+            <span class="op">+</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="self">self</span>.<span class="ident">tol</span>;
+        <span class="kw">let</span> <span class="ident">mid</span> <span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>() <span class="op">*</span> (<span class="self">self</span>.<span class="ident">c</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">b</span>);
+        <span class="kw">if</span> <span class="ident">mid</span>.<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">eff_tol</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">fb</span> <span class="op">=</span><span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData</span>::<span class="ident">new</span>()
                 .<span class="ident">termination_reason</span>(<span class="ident">TerminationReason</span>::<span class="ident">TargetPrecisionReached</span>)
                 .<span class="ident">param</span>(<span class="self">self</span>.<span class="ident">b</span>)
@@ -323,22 +336,28 @@
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">e</span>.<span class="ident">abs</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">eff_tol</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">fa</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">fb</span>.<span class="ident">abs</span>() {
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fb</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">fa</span>;
             <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">p</span>, <span class="kw-2">mut</span> <span class="ident">q</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">c</span> {
-                (<span class="number">2.0</span> <span class="op">*</span> <span class="ident">mid</span> <span class="op">*</span> <span class="ident">s</span>, <span class="number">1.0</span> <span class="op">-</span> <span class="ident">s</span>)
+                (
+                    <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">2.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">mid</span> <span class="op">*</span> <span class="ident">s</span>,
+                    <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() <span class="op">-</span> <span class="ident">s</span>,
+                )
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fa</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">fc</span>;
                 <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fb</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">fc</span>;
                 (
-                    <span class="ident">s</span> <span class="op">*</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="ident">mid</span> <span class="op">*</span> <span class="ident">q</span> <span class="op">*</span> (<span class="ident">q</span> <span class="op">-</span> <span class="ident">r</span>) <span class="op">-</span> (<span class="self">self</span>.<span class="ident">b</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>) <span class="op">*</span> (<span class="ident">r</span> <span class="op">-</span> <span class="number">1.0</span>)),
-                    (<span class="ident">q</span> <span class="op">-</span> <span class="number">1.0</span>) <span class="op">*</span> (<span class="ident">r</span> <span class="op">-</span> <span class="number">1.0</span>) <span class="op">*</span> (<span class="ident">s</span> <span class="op">-</span> <span class="number">1.0</span>),
+                    <span class="ident">s</span> <span class="op">*</span> (<span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">2.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">mid</span> <span class="op">*</span> <span class="ident">q</span> <span class="op">*</span> (<span class="ident">q</span> <span class="op">-</span> <span class="ident">r</span>)
+                        <span class="op">-</span> (<span class="self">self</span>.<span class="ident">b</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">a</span>) <span class="op">*</span> (<span class="ident">r</span> <span class="op">-</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>())),
+                    (<span class="ident">q</span> <span class="op">-</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>())
+                        <span class="op">*</span> (<span class="ident">r</span> <span class="op">-</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>())
+                        <span class="op">*</span> (<span class="ident">s</span> <span class="op">-</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>()),
                 )
             };
-            <span class="kw">if</span> <span class="ident">p</span> <span class="op">&gt;</span> <span class="number">0.0</span> {
+            <span class="kw">if</span> <span class="ident">p</span> <span class="op">&gt;</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
                 <span class="ident">q</span> <span class="op">=</span> <span class="op">-</span><span class="ident">q</span>;
             }
             <span class="ident">p</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">abs</span>();
-            <span class="kw">let</span> <span class="ident">min1</span> <span class="op">=</span> <span class="number">3.0</span> <span class="op">*</span> <span class="ident">mid</span> <span class="op">*</span> <span class="ident">q</span> <span class="op">-</span> (<span class="ident">eff_tol</span> <span class="op">*</span> <span class="ident">q</span>).<span class="ident">abs</span>();
+            <span class="kw">let</span> <span class="ident">min1</span> <span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">3.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">mid</span> <span class="op">*</span> <span class="ident">q</span> <span class="op">-</span> (<span class="ident">eff_tol</span> <span class="op">*</span> <span class="ident">q</span>).<span class="ident">abs</span>();
             <span class="kw">let</span> <span class="ident">min2</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">e</span> <span class="op">*</span> <span class="ident">q</span>).<span class="ident">abs</span>();
-            <span class="kw">if</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">p</span> <span class="op">&lt;</span> <span class="kw">if</span> <span class="ident">min1</span> <span class="op">&lt;</span> <span class="ident">min2</span> { <span class="ident">min1</span> } <span class="kw">else</span> { <span class="ident">min2</span> } {
+            <span class="kw">if</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">2.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">p</span> <span class="op">&lt;</span> <span class="kw">if</span> <span class="ident">min1</span> <span class="op">&lt;</span> <span class="ident">min2</span> { <span class="ident">min1</span> } <span class="kw">else</span> { <span class="ident">min2</span> } {
                 <span class="self">self</span>.<span class="ident">e</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">d</span>;
                 <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="ident">p</span> <span class="op">/</span> <span class="ident">q</span>;
             } <span class="kw">else</span> {
@@ -352,13 +371,14 @@
         <span class="self">self</span>.<span class="ident">a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span>;
         <span class="self">self</span>.<span class="ident">fa</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fb</span>;
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">eff_tol</span> {
-            <span class="self">self</span>.<span class="ident">b</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">d</span>;
+            <span class="self">self</span>.<span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">d</span>;
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">b</span> <span class="op">+</span><span class="op">=</span> <span class="kw">if</span> <span class="ident">mid</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0.0</span> {
-                <span class="ident">eff_tol</span>.<span class="ident">abs</span>()
-            } <span class="kw">else</span> {
-                <span class="op">-</span><span class="ident">eff_tol</span>.<span class="ident">abs</span>()
-            };
+            <span class="self">self</span>.<span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span>
+                <span class="op">+</span> <span class="kw">if</span> <span class="ident">mid</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F</span>::<span class="ident">from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
+                    <span class="ident">eff_tol</span>.<span class="ident">abs</span>()
+                } <span class="kw">else</span> {
+                    <span class="op">-</span><span class="ident">eff_tol</span>.<span class="ident">abs</span>()
+                };
         }
 
         <span class="self">self</span>.<span class="ident">fb</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">b</span>)<span class="question-mark">?</span>;
@@ -371,7 +391,7 @@
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">test_trait_impl</span>;
 
-    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">brent</span>, <span class="ident">Brent</span>);
+    <span class="macro">test_trait_impl</span><span class="macro">!</span>(<span class="ident">brent</span>, <span class="ident">Brent</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>
