@@ -68,9 +68,9 @@ impl<L, P, F: ArgminFloat> LBFGS<L, P, F> {
     }
 }
 
-impl<O, L, P, F> Solver<O, F> for LBFGS<L, P, F>
+impl<O, L, P, F> Solver<O> for LBFGS<L, P, F>
 where
-    O: ArgminOp<Param = P, Output = F>,
+    O: ArgminOp<Param = P, Output = F, Float = F>,
     O::Param: Clone
         + Serialize
         + DeserializeOwned
@@ -78,12 +78,12 @@ where
         + Default
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, F>
-        + ArgminScaledAdd<O::Param, F, O::Param>
-        + ArgminNorm<F>
-        + ArgminMul<F, O::Param>,
+        + ArgminDot<O::Param, O::Float>
+        + ArgminScaledAdd<O::Param, O::Float, O::Param>
+        + ArgminNorm<O::Float>
+        + ArgminMul<O::Float, O::Param>,
     O::Hessian: Clone + Default + Serialize + DeserializeOwned,
-    L: Clone + ArgminLineSearch<O::Param, F> + Solver<OpWrapper<O>, F>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "L-BFGS";
@@ -91,8 +91,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         let param = state.get_param();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -104,8 +104,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let cur_cost = state.get_cost();
         let prev_grad = state.get_grad().unwrap();
@@ -183,7 +183,7 @@ where
             .kv(make_kv!("gamma" => gamma;)))
     }
 
-    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }

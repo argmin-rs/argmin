@@ -97,18 +97,18 @@ impl<B, R, F: ArgminFloat> SR1TrustRegion<B, R, F> {
     }
 }
 
-impl<O, B, R, F> Solver<O, F> for SR1TrustRegion<B, R, F>
+impl<O, B, R, F> Solver<O> for SR1TrustRegion<B, R, F>
 where
-    O: ArgminOp<Output = F, Hessian = B>,
+    O: ArgminOp<Output = F, Hessian = B, Float = F>,
     O::Param: Debug
         + Clone
         + Default
         + Serialize
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, F>
+        + ArgminDot<O::Param, O::Float>
         + ArgminDot<O::Param, O::Hessian>
-        + ArgminNorm<F>
+        + ArgminNorm<O::Float>
         + ArgminZeroLike
         + ArgminMul<F, O::Param>,
     O::Hessian: Debug
@@ -121,16 +121,16 @@ where
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<F, O::Hessian>,
-    R: ArgminTrustRegion<F> + Solver<OpWrapper<O>, F>,
-    F: ArgminFloat + ArgminNorm<F>,
+    R: ArgminTrustRegion<F> + Solver<OpWrapper<O>>,
+    F: ArgminFloat + ArgminNorm<O::Float>,
 {
     const NAME: &'static str = "SR1 Trust Region";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         let param = state.get_param();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -149,8 +149,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let xk = state.get_param();
         let cost = state.get_cost();
         let prev_grad = state
@@ -232,7 +232,7 @@ where
                          "hessian_update" => hessian_update;]))
     }
 
-    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }

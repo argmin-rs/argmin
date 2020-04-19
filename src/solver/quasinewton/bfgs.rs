@@ -59,17 +59,17 @@ impl<L, H, F: ArgminFloat> BFGS<L, H, F> {
     }
 }
 
-impl<O, L, H, F> Solver<O, F> for BFGS<L, H, F>
+impl<O, L, H, F> Solver<O> for BFGS<L, H, F>
 where
-    O: ArgminOp<Output = F, Hessian = H>,
+    O: ArgminOp<Output = F, Hessian = H, Float = F>,
     O::Param: Debug
         + Default
         + ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, F>
+        + ArgminDot<O::Param, O::Float>
         + ArgminDot<O::Param, O::Hessian>
-        + ArgminScaledAdd<O::Param, F, O::Param>
-        + ArgminNorm<F>
-        + ArgminMul<F, O::Param>,
+        + ArgminScaledAdd<O::Param, O::Float, O::Param>
+        + ArgminNorm<O::Float>
+        + ArgminMul<O::Float, O::Param>,
     O::Hessian: Clone
         + Default
         + Debug
@@ -79,10 +79,10 @@ where
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
-        + ArgminMul<F, O::Hessian>
+        + ArgminMul<O::Float, O::Hessian>
         + ArgminTranspose
         + ArgminEye,
-    L: Clone + ArgminLineSearch<O::Param, F> + Solver<OpWrapper<O>, F>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "BFGS";
@@ -90,8 +90,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         let param = state.get_param();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -103,16 +103,11 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let cur_cost = state.get_cost();
         let prev_grad = state.get_grad().unwrap();
-        // let prev_grad = if let Some(grad) = state.get_grad() {
-        //     grad
-        // } else {
-        //     op.gradient(&param)?
-        // };
 
         let p = self
             .inv_hessian
@@ -144,7 +139,6 @@ where
         op.consume_op(line_op);
 
         let grad = op.gradient(&xk1)?;
-        // let next_cost = op.apply(&xk1)?;
 
         let yk = grad.sub(&prev_grad);
 
@@ -176,7 +170,7 @@ where
         Ok(ArgminIterData::new().param(xk1).cost(next_cost).grad(grad))
     }
 
-    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
