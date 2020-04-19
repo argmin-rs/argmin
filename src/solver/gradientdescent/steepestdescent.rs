@@ -39,20 +39,20 @@ impl<L> SteepestDescent<L> {
     }
 }
 
-impl<O, L, F> Solver<O, F> for SteepestDescent<L>
+impl<O, L, F> Solver<O> for SteepestDescent<L>
 where
-    O: ArgminOp<Output = F>,
+    O: ArgminOp<Output = F, Float = F>,
     O::Param: Clone
         + Default
         + Serialize
         + ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, F>
-        + ArgminScaledAdd<O::Param, F, O::Param>
-        + ArgminMul<F, O::Param>
+        + ArgminDot<O::Param, O::Float>
+        + ArgminScaledAdd<O::Param, O::Float, O::Param>
+        + ArgminMul<O::Float, O::Param>
         + ArgminSub<O::Param, O::Param>
-        + ArgminNorm<F>,
+        + ArgminNorm<O::Float>,
     O::Hessian: Default,
-    L: Clone + ArgminLineSearch<O::Param, F> + Solver<OpWrapper<O>, F>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Steepest Descent";
@@ -60,14 +60,14 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let param_new = state.get_param();
         let new_cost = op.apply(&param_new)?;
         let new_grad = op.gradient(&param_new)?;
 
         self.linesearch
-            .set_search_direction(new_grad.mul(&(F::from_f64(-1.0).unwrap())));
+            .set_search_direction(new_grad.mul(&(O::Float::from_f64(-1.0).unwrap())));
 
         // Run solver
         let ArgminResult {
