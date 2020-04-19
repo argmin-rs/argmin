@@ -184,7 +184,8 @@ mod tests {
     fn test_store() {
         let op: MinimalNoOperator = MinimalNoOperator::new();
         let solver = PhonySolver::new();
-        let exec = Executor::new(op, solver, vec![0.0f64, 0.0]);
+        let exec: Executor<MinimalNoOperator, PhonySolver> =
+            Executor::new(op, solver, vec![0.0f64, 0.0]);
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&exec, 20).unwrap();
 

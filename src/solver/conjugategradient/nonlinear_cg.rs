@@ -28,11 +28,11 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct NonlinearConjugateGradient<P, L, B> {
+pub struct NonlinearConjugateGradient<P, L, B, F> {
     /// p
     p: P,
     /// beta
-    beta: f64,
+    beta: F,
     /// line search
     linesearch: L,
     /// beta update method
@@ -40,18 +40,19 @@ pub struct NonlinearConjugateGradient<P, L, B> {
     /// Number of iterations after which a restart is performed
     restart_iter: u64,
     /// Restart based on orthogonality
-    restart_orthogonality: Option<f64>,
+    restart_orthogonality: Option<F>,
 }
 
-impl<P, L, B> NonlinearConjugateGradient<P, L, B>
+impl<P, L, B, F> NonlinearConjugateGradient<P, L, B, F>
 where
     P: Default,
+    F: ArgminFloat,
 {
     /// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))
     pub fn new(linesearch: L, beta_method: B) -> Result<Self, Error> {
         Ok(NonlinearConjugateGradient {
             p: P::default(),
-            beta: std::f64::NAN,
+            beta: F::nan(),
             linesearch,
             beta_method,
             restart_iter: std::u64::MAX,
@@ -75,29 +76,30 @@ where
     /// `|\nabla f_k^T * \nabla f_{k-1}| / | \nabla f_k ||^2 >= v`
     ///
     /// A typical value for `v` is 0.1.
-    pub fn restart_orthogonality(mut self, v: f64) -> Self {
+    pub fn restart_orthogonality(mut self, v: F) -> Self {
         self.restart_orthogonality = Some(v);
         self
     }
 }
 
-impl<O, P, L, B> Solver<O> for NonlinearConjugateGradient<P, L, B>
+impl<O, P, L, B, F> Solver<O> for NonlinearConjugateGradient<P, L, B, F>
 where
-    O: ArgminOp<Param = P, Output = f64>,
+    O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
         + Default
         + Serialize
         + DeserializeOwned
-        + ArgminSub<P, P>
-        + ArgminDot<P, f64>
-        + ArgminScaledAdd<P, f64, P>
-        + ArgminAdd<P, P>
-        + ArgminMul<f64, P>
-        + ArgminDot<P, f64>
-        + ArgminNorm<f64>,
+        + ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, O::Float>
+        + ArgminScaledAdd<O::Param, O::Float, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<F, O::Param>
+        + ArgminDot<O::Param, O::Float>
+        + ArgminNorm<O::Float>,
     O::Hessian: Default,
-    L: Clone + ArgminLineSearch<P> + Solver<OpWrapper<O>>,
-    B: ArgminNLCGBetaUpdate<P>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
+    B: ArgminNLCGBetaUpdate<O::Param, O::Float>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Nonlinear Conjugate Gradient";
 
@@ -109,7 +111,7 @@ where
         let param = state.get_param();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
-        self.p = grad.mul(&(-1.0));
+        self.p = grad.mul(&(F::from_f64(-1.0).unwrap()));
         Ok(Some(
             ArgminIterData::new().param(param).cost(cost).grad(grad),
         ))
@@ -158,13 +160,15 @@ where
             (state.get_iter() % self.restart_iter == 0) && state.get_iter() != 0;
 
         if restart_iter || restart_orthogonality {
-            self.beta = 0.0;
+            self.beta = F::from_f64(0.0).unwrap();
         } else {
             self.beta = self.beta_method.update(&grad, &new_grad, &self.p);
         }
 
         // Update of p
-        self.p = new_grad.mul(&(-1.0)).add(&self.p.mul(&self.beta));
+        self.p = new_grad
+            .mul(&(F::from_f64(-1.0).unwrap()))
+            .add(&self.p.mul(&self.beta));
 
         // Housekeeping
         let cost = op.apply(&xk1)?;
@@ -192,8 +196,9 @@ mod tests {
         nonlinear_cg,
         NonlinearConjugateGradient<
             MinimalNoOperator,
-            MoreThuenteLineSearch<MinimalNoOperator>,
+            MoreThuenteLineSearch<MinimalNoOperator, f64>,
             PolakRibiere,
+            f64
         >
     );
 }

@@ -24,20 +24,22 @@ use std::default::Default;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct Newton {
+pub struct Newton<F> {
     /// gamma
-    gamma: f64,
+    gamma: F,
 }
 
-impl Newton {
+impl<F: ArgminFloat> Newton<F> {
     /// Constructor
     pub fn new() -> Self {
-        Newton { gamma: 1.0 }
+        Newton {
+            gamma: F::from_f64(1.0).unwrap(),
+        }
     }
 
     /// set gamma
-    pub fn set_gamma(mut self, gamma: f64) -> Result<Self, Error> {
-        if gamma <= 0.0 || gamma > 1.0 {
+    pub fn set_gamma(mut self, gamma: F) -> Result<Self, Error> {
+        if gamma <= F::from_f64(0.0).unwrap() || gamma > F::from_f64(1.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "Newton: gamma must be in  (0, 1].".to_string(),
             }
@@ -48,17 +50,18 @@ impl Newton {
     }
 }
 
-impl Default for Newton {
-    fn default() -> Newton {
+impl<F: ArgminFloat> Default for Newton<F> {
+    fn default() -> Newton<F> {
         Newton::new()
     }
 }
 
-impl<O> Solver<O> for Newton
+impl<O, F> Solver<O> for Newton<F>
 where
-    O: ArgminOp,
-    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+    O: ArgminOp<Float = F>,
+    O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>,
     O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Newton method";
 
@@ -80,5 +83,5 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(newton_method, Newton);
+    test_trait_impl!(newton_method, Newton<f64>);
 }

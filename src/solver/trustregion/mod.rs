@@ -21,7 +21,9 @@ pub use self::dogleg::*;
 pub use self::steihaug::*;
 pub use self::trustregion_method::*;
 
+use crate::core::ArgminFloat;
+
 /// Computes reduction ratio
-pub fn reduction_ratio(fxk: f64, fxkpk: f64, mk0: f64, mkpk: f64) -> f64 {
+pub fn reduction_ratio<F: ArgminFloat>(fxk: F, fxkpk: F, mk0: F, mkpk: F) -> F {
     (fxk - fxkpk) / (mk0 - mkpk)
 }

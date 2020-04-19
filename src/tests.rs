@@ -58,6 +58,7 @@ impl ArgminOp for MaxEntropy {
     type Output = f64;
     type Hessian = Array2<f64>;
     type Jacobian = ();
+    type Float = f64;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         let log_pdot = self.F.dot(&p.t());

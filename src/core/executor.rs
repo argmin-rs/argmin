@@ -217,13 +217,13 @@ where
     }
 
     /// Set target cost value
-    pub fn target_cost(mut self, cost: f64) -> Self {
+    pub fn target_cost(mut self, cost: O::Float) -> Self {
         self.state.target_cost(cost);
         self
     }
 
     /// Set cost value
-    pub fn cost(mut self, cost: f64) -> Self {
+    pub fn cost(mut self, cost: O::Float) -> Self {
         self.state.cost(cost);
         self
     }

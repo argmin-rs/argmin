@@ -48,13 +48,32 @@ pub use iterstate::*;
 pub use kv::ArgminKV;
 pub use math::*;
 pub use nooperator::*;
+use num::traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 pub use observers::*;
 pub use opwrapper::*;
 pub use result::ArgminResult;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 pub use serialization::*;
+use std::fmt::{Debug, Display};
 pub use termination::TerminationReason;
+
+/// Trait alias to simplify common trait bounds
+pub trait ArgminFloat:
+    Float + FloatConst + FromPrimitive + ToPrimitive + Debug + Display + Serialize + DeserializeOwned
+{
+}
+impl<I> ArgminFloat for I where
+    I: Float
+        + FloatConst
+        + FromPrimitive
+        + ToPrimitive
+        + Debug
+        + Display
+        + Serialize
+        + DeserializeOwned
+{
+}
 
 /// This trait needs to be implemented for every operator/cost function.
 ///
@@ -73,6 +92,8 @@ pub trait ArgminOp {
     type Hessian: Clone + Serialize + DeserializeOwned;
     /// Type of Jacobian
     type Jacobian: Clone + Serialize + DeserializeOwned;
+    /// Precision of floats
+    type Float: ArgminFloat;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
@@ -108,7 +129,7 @@ pub trait ArgminOp {
 
     /// Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
     /// modification.
-    fn modify(&self, _param: &Self::Param, _extent: f64) -> Result<Self::Param, Error> {
+    fn modify(&self, _param: &Self::Param, _extent: Self::Float) -> Result<Self::Param, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `modify` of ArgminOp trait not implemented!".to_string(),
         }
@@ -179,14 +200,15 @@ pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
     param: Option<O::Param>,
     /// Current cost function value
-    cost: Option<f64>,
+    cost: Option<O::Float>,
     /// Current gradient
     grad: Option<O::Param>,
     /// Current Hessian
     hessian: Option<O::Hessian>,
     /// Current Jacobian
     jacobian: Option<O::Jacobian>,
-    population: Option<Vec<(O::Param, f64)>>,
+    /// Current population
+    population: Option<Vec<(O::Param, O::Float)>>,
     /// terminationreason
     termination_reason: Option<TerminationReason>,
     /// Key value pairs which are used to provide additional information for the Observers
@@ -217,7 +239,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
     }
 
     /// Set cost function value
-    pub fn cost(mut self, cost: f64) -> Self {
+    pub fn cost(mut self, cost: O::Float) -> Self {
         self.cost = Some(cost);
         self
     }
@@ -241,7 +263,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
     }
 
     /// Set Population
-    pub fn population(mut self, population: Vec<(O::Param, f64)>) -> Self {
+    pub fn population(mut self, population: Vec<(O::Param, O::Float)>) -> Self {
         self.population = Some(population);
         self
     }
@@ -264,7 +286,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
     }
 
     /// Get cost function value
-    pub fn get_cost(&self) -> Option<f64> {
+    pub fn get_cost(&self) -> Option<O::Float> {
         self.cost
     }
 
@@ -284,7 +306,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
     }
 
     /// Get reference to population
-    pub fn get_population(&self) -> Option<&Vec<(O::Param, f64)>> {
+    pub fn get_population(&self) -> Option<&Vec<(O::Param, O::Float)>> {
         match &self.population {
             Some(population) => Some(&population),
             None => None,
@@ -303,26 +325,26 @@ impl<O: ArgminOp> ArgminIterData<O> {
 }
 
 /// Defines a common interface for line search methods.
-pub trait ArgminLineSearch<P>: Serialize {
+pub trait ArgminLineSearch<P, F>: Serialize {
     /// Set the search direction
     fn set_search_direction(&mut self, direction: P);
 
     /// Set the initial step length
-    fn set_init_alpha(&mut self, step_length: f64) -> Result<(), Error>;
+    fn set_init_alpha(&mut self, step_length: F) -> Result<(), Error>;
 }
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods.
-pub trait ArgminTrustRegion: Clone + Serialize {
+pub trait ArgminTrustRegion<F>: Clone + Serialize {
     /// Set the initial step length
-    fn set_radius(&mut self, radius: f64);
+    fn set_radius(&mut self, radius: F);
 }
 //
 /// Common interface for beta update methods (Nonlinear-CG)
-pub trait ArgminNLCGBetaUpdate<T>: Serialize {
+pub trait ArgminNLCGBetaUpdate<T, F: ArgminFloat>: Serialize {
     /// Update beta
     /// Parameter 1: \nabla f_k
     /// Parameter 2: \nabla f_{k+1}
     /// Parameter 3: p_k
-    fn update(&self, nabla_f_k: &T, nabla_f_k_p_1: &T, p_k: &T) -> f64;
+    fn update(&self, nabla_f_k: &T, nabla_f_k_p_1: &T, p_k: &T) -> F;
 }

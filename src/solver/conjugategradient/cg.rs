@@ -11,7 +11,6 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-// use num_complex::Complex;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
@@ -85,19 +84,20 @@ where
     }
 }
 
-impl<P, O, S> Solver<O> for ConjugateGradient<P, S>
+impl<P, O, S, F> Solver<O> for ConjugateGradient<P, S>
 where
-    O: ArgminOp<Param = P, Output = P>,
+    O: ArgminOp<Param = P, Output = P, Float = F>,
     P: Clone
         + Serialize
         + DeserializeOwned
-        + ArgminDot<P, S>
-        + ArgminSub<P, P>
-        + ArgminScaledAdd<P, S, P>
-        + ArgminAdd<P, P>
+        + ArgminDot<O::Param, S>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminScaledAdd<O::Param, S, O::Param>
+        + ArgminAdd<O::Param, O::Param>
         + ArgminConj
-        + ArgminMul<f64, P>,
-    S: Debug + ArgminDiv<S, S> + ArgminNorm<f64> + ArgminConj,
+        + ArgminMul<O::Float, O::Param>,
+    S: Debug + ArgminDiv<S, S> + ArgminNorm<O::Float> + ArgminConj,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Conjugate Gradient";
 
@@ -108,9 +108,9 @@ where
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         let init_param = state.get_param();
         let ap = op.apply(&init_param)?;
-        let r0 = self.b.sub(&ap).mul(&(-1.0));
+        let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
         self.r = r0.clone();
-        self.p = r0.mul(&(-1.0));
+        self.p = r0.mul(&(F::from_f64(-1.0).unwrap()));
         self.rtr = self.r.dot(&self.r.conj());
         Ok(None)
     }
@@ -129,7 +129,10 @@ where
         let rtr_n = self.r.dot(&self.r.conj());
         self.beta = rtr_n.div(&self.rtr);
         self.rtr = rtr_n;
-        self.p = self.r.mul(&(-1.0)).scaled_add(&self.beta, &self.p);
+        self.p = self
+            .r
+            .mul(&(F::from_f64(-1.0).unwrap()))
+            .scaled_add(&self.beta, &self.p);
         let norm = self.r.dot(&self.r.conj());
 
         Ok(ArgminIterData::new()
@@ -145,8 +148,5 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(
-        conjugate_gradient,
-        ConjugateGradient<NoOperator<Vec<f64>, Vec<f64>, (), ()>, f64>
-    );
+    test_trait_impl!(conjugate_gradient, ConjugateGradient<Vec<f64>, f64>);
 }

@@ -80,7 +80,7 @@ impl<O: ArgminOp> OpWrapper<O> {
     }
 
     /// Calls the `modify` method of `op` and increments `modify_func_count`.
-    pub fn modify(&mut self, param: &O::Param, extent: f64) -> Result<O::Param, Error> {
+    pub fn modify(&mut self, param: &O::Param, extent: O::Float) -> Result<O::Param, Error> {
         self.modify_func_count += 1;
         self.op.as_ref().unwrap().modify(param, extent)
     }
@@ -132,6 +132,7 @@ impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
     type Output = O::Output;
     type Hessian = O::Hessian;
     type Jacobian = O::Jacobian;
+    type Float = O::Float;
 
     fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
         self.op.as_ref().unwrap().apply(param)
@@ -149,7 +150,7 @@ impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
         self.op.as_ref().unwrap().jacobian(param)
     }
 
-    fn modify(&self, param: &Self::Param, extent: f64) -> Result<Self::Param, Error> {
+    fn modify(&self, param: &Self::Param, extent: Self::Float) -> Result<Self::Param, Error> {
         self.op.as_ref().unwrap().modify(param, extent)
     }
 }
