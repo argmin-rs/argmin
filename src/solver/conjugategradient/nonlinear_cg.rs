@@ -82,23 +82,23 @@ where
     }
 }
 
-impl<O, P, L, B, F> Solver<O, F> for NonlinearConjugateGradient<P, L, B, F>
+impl<O, P, L, B, F> Solver<O> for NonlinearConjugateGradient<P, L, B, F>
 where
-    O: ArgminOp<Param = P, Output = F>,
+    O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
         + Default
         + Serialize
         + DeserializeOwned
-        + ArgminSub<P, P>
-        + ArgminDot<P, F>
-        + ArgminScaledAdd<P, F, P>
-        + ArgminAdd<P, P>
-        + ArgminMul<F, P>
-        + ArgminDot<P, F>
-        + ArgminNorm<F>,
+        + ArgminSub<O::Param, O::Param>
+        + ArgminDot<O::Param, O::Float>
+        + ArgminScaledAdd<O::Param, O::Float, O::Param>
+        + ArgminAdd<O::Param, O::Param>
+        + ArgminMul<F, O::Param>
+        + ArgminDot<O::Param, O::Float>
+        + ArgminNorm<O::Float>,
     O::Hessian: Default,
-    L: Clone + ArgminLineSearch<P, F> + Solver<OpWrapper<O>, F>,
-    B: ArgminNLCGBetaUpdate<P, F>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
+    B: ArgminNLCGBetaUpdate<O::Param, O::Float>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Nonlinear Conjugate Gradient";
@@ -106,8 +106,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         let param = state.get_param();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -120,8 +120,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let xk = state.get_param();
         let grad = if let Some(grad) = state.get_grad() {
             grad

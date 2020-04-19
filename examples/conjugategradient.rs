@@ -16,6 +16,7 @@ impl ArgminOp for MyProblem {
     type Output = Vec<f64>;
     type Hessian = ();
     type Jacobian = ();
+    type Float = f64;
 
     fn apply(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
         Ok(vec![4.0 * p[0] + 1.0 * p[1], 1.0 * p[0] + 3.0 * p[1]])

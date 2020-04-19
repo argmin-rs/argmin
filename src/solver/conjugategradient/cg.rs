@@ -84,19 +84,19 @@ where
     }
 }
 
-impl<P, O, S, F> Solver<O, F> for ConjugateGradient<P, S>
+impl<P, O, S, F> Solver<O> for ConjugateGradient<P, S>
 where
-    O: ArgminOp<Param = P, Output = P>,
+    O: ArgminOp<Param = P, Output = P, Float = F>,
     P: Clone
         + Serialize
         + DeserializeOwned
-        + ArgminDot<P, S>
-        + ArgminSub<P, P>
-        + ArgminScaledAdd<P, S, P>
-        + ArgminAdd<P, P>
+        + ArgminDot<O::Param, S>
+        + ArgminSub<O::Param, O::Param>
+        + ArgminScaledAdd<O::Param, S, O::Param>
+        + ArgminAdd<O::Param, O::Param>
         + ArgminConj
-        + ArgminMul<F, P>,
-    S: Debug + ArgminDiv<S, S> + ArgminNorm<F> + ArgminConj,
+        + ArgminMul<O::Float, O::Param>,
+    S: Debug + ArgminDiv<S, S> + ArgminNorm<O::Float> + ArgminConj,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Conjugate Gradient";
@@ -104,8 +104,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         let init_param = state.get_param();
         let ap = op.apply(&init_param)?;
         let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
@@ -119,8 +119,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         self.p_prev = self.p.clone();
         let apk = op.apply(&self.p)?;
         self.alpha = self.rtr.div(&self.p.dot(&apk.conj()));
