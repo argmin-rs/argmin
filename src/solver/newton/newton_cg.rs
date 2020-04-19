@@ -64,9 +64,9 @@ impl<L, F: ArgminFloat> NewtonCG<L, F> {
     }
 }
 
-impl<O, L, F> Solver<O, F> for NewtonCG<L, F>
+impl<O, L, F> Solver<O> for NewtonCG<L, F>
 where
-    O: ArgminOp<Output = F>,
+    O: ArgminOp<Output = F, Float = F>,
     O::Param: Send
         + Sync
         + Clone
@@ -74,12 +74,12 @@ where
         + Default
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, F>
-        + ArgminScaledAdd<O::Param, F, O::Param>
+        + ArgminDot<O::Param, O::Float>
+        + ArgminScaledAdd<O::Param, O::Float, O::Param>
         + ArgminMul<F, O::Param>
         + ArgminConj
         + ArgminZeroLike
-        + ArgminNorm<F>,
+        + ArgminNorm<O::Float>,
     O::Hessian: Send
         + Sync
         + Default
@@ -88,22 +88,23 @@ where
         + Default
         + ArgminInv<O::Hessian>
         + ArgminDot<O::Param, O::Param>,
-    L: Clone + ArgminLineSearch<O::Param, F> + Solver<OpWrapper<O>, F>,
-    F: ArgminFloat + Default + ArgminDiv<F, F> + ArgminNorm<F> + ArgminConj,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
+    F: ArgminFloat + Default + ArgminDiv<O::Float, O::Float> + ArgminNorm<O::Float> + ArgminConj,
 {
     const NAME: &'static str = "Newton-CG";
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
 
         // Solve CG subproblem
-        let cg_op: CGSubProblem<O::Param, O::Hessian> = CGSubProblem::new(hessian.clone());
+        let cg_op: CGSubProblem<O::Param, O::Hessian, O::Float> =
+            CGSubProblem::new(hessian.clone());
         let mut cg_op = OpWrapper::new(cg_op);
 
         let mut x_p = param.zero_like();
@@ -164,7 +165,7 @@ where
         Ok(ArgminIterData::new().param(next_param).cost(next_cost))
     }
 
-    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if (state.get_cost() - state.get_prev_cost()).abs() < self.tol {
             TerminationReason::NoChangeInCost
         } else {
@@ -174,12 +175,13 @@ where
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-struct CGSubProblem<T, H> {
+struct CGSubProblem<T, H, F> {
     hessian: H,
     phantom: std::marker::PhantomData<T>,
+    float: std::marker::PhantomData<F>,
 }
 
-impl<T, H> CGSubProblem<T, H>
+impl<T, H, F> CGSubProblem<T, H, F>
 where
     T: Clone + Send + Sync,
     H: Clone + Default + ArgminDot<T, T> + Send + Sync,
@@ -189,19 +191,22 @@ where
         CGSubProblem {
             hessian,
             phantom: std::marker::PhantomData,
+            float: std::marker::PhantomData,
         }
     }
 }
 
-impl<T, H> ArgminOp for CGSubProblem<T, H>
+impl<T, H, F> ArgminOp for CGSubProblem<T, H, F>
 where
     T: Clone + Default + Send + Sync + Serialize + serde::de::DeserializeOwned,
     H: Clone + Default + ArgminDot<T, T> + Send + Sync + Serialize + serde::de::DeserializeOwned,
+    F: ArgminFloat,
 {
     type Param = T;
     type Output = T;
     type Hessian = ();
     type Jacobian = ();
+    type Float = F;
 
     fn apply(&self, p: &T) -> Result<T, Error> {
         Ok(self.hessian.dot(&p))
@@ -219,7 +224,7 @@ mod tests {
         NewtonCG<MoreThuenteLineSearch<Vec<f64>, f64>, f64>
     );
 
-    test_trait_impl!(cg_subproblem, CGSubProblem<Vec<f64>, Vec<Vec<f64>>>);
+    test_trait_impl!(cg_subproblem, CGSubProblem<Vec<f64>, Vec<Vec<f64>>, f64>);
 
     #[test]
     fn test_tolerance() {

@@ -12,7 +12,7 @@ pub mod conjugategradient;
 // pub mod landweber;
 pub mod linesearch;
 pub mod neldermead;
-// pub mod newton;
+pub mod newton;
 pub mod particleswarm;
 pub mod quasinewton;
 pub mod simulatedannealing;
