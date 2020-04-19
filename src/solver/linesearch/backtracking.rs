@@ -93,7 +93,7 @@ where
     }
 }
 
-impl<O, P, L, F> Solver<O, F> for BacktrackingLineSearch<P, L, F>
+impl<O, P, L, F> Solver<O> for BacktrackingLineSearch<P, L, F>
 where
     P: Clone
         + Default
@@ -102,17 +102,17 @@ where
         + ArgminSub<P, P>
         + ArgminDot<P, F>
         + ArgminScaledAdd<P, F, P>,
-    O: ArgminOp<Param = P, Output = F>,
+    O: ArgminOp<Param = P, Output = F, Float = F>,
     L: LineSearchCondition<P, F>,
-    F: ArgminFloat + Serialize + DeserializeOwned,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Backtracking Line search";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.init_param = state.get_param();
         let cost = state.get_cost();
         self.init_cost = if cost == F::infinity() {
@@ -136,8 +136,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        _state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let new_param = self
             .init_param
             .scaled_add(&self.alpha, self.search_direction.as_ref().unwrap());
@@ -157,7 +157,7 @@ where
         Ok(out)
     }
 
-    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if self.condition.eval(
             state.get_cost(),
             state.get_grad().unwrap_or_default(),

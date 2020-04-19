@@ -208,9 +208,9 @@ where
     }
 }
 
-impl<P, O, F> Solver<O, F> for MoreThuenteLineSearch<P, F>
+impl<P, O, F> Solver<O> for MoreThuenteLineSearch<P, F>
 where
-    O: ArgminOp<Param = P, Output = F>,
+    O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
         + Serialize
         + DeserializeOwned
@@ -224,8 +224,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.search_direction = check_param!(
             self.search_direction_b,
             "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
@@ -273,8 +273,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        _state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {

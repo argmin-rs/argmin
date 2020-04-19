@@ -18,6 +18,7 @@ impl ArgminOp for Sphere {
     type Output = f64;
     type Hessian = ();
     type Jacobian = ();
+    type Float = f64;
 
     fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
         Ok(sphere(param))

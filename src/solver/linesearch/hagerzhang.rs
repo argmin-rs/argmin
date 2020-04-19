@@ -419,9 +419,9 @@ where
     }
 }
 
-impl<P, O, F> Solver<O, F> for HagerZhangLineSearch<P, F>
+impl<P, O, F> Solver<O> for HagerZhangLineSearch<P, F>
 where
-    O: ArgminOp<Param = P, Output = F>,
+    O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
         + Default
         + Serialize
@@ -436,8 +436,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<Option<ArgminIterData<O, F>>, Error> {
+        state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
                 text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),
@@ -491,8 +491,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        _state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);
         let bb = (self.b_x, self.b_f, self.b_g);
@@ -531,7 +531,7 @@ where
         Ok(ArgminIterData::new().param(new_param).cost(self.best_f))
     }
 
-    fn terminate(&mut self, _state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
         if self.best_f - self.finit < self.delta * self.best_x * self.dginit {
             return TerminationReason::LineSearchConditionMet;
         }
