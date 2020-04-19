@@ -52,22 +52,22 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
     }
 }
 
-impl<O, L, F> Solver<O, F> for GaussNewtonLS<L, F>
+impl<O, L, F> Solver<O> for GaussNewtonLS<L, F>
 where
-    O: ArgminOp,
+    O: ArgminOp<Float = F>,
     O::Param: Default
         + std::fmt::Debug
-        + ArgminScaledSub<O::Param, F, O::Param>
+        + ArgminScaledSub<O::Param, O::Float, O::Param>
         + ArgminSub<O::Param, O::Param>
-        + ArgminMul<F, O::Param>,
-    O::Output: ArgminNorm<F>,
+        + ArgminMul<O::Float, O::Param>,
+    O::Output: ArgminNorm<O::Float>,
     O::Jacobian: ArgminTranspose
         + ArgminInv<O::Jacobian>
         + ArgminDot<O::Jacobian, O::Jacobian>
         + ArgminDot<O::Output, O::Param>
         + ArgminDot<O::Param, O::Param>,
     O::Hessian: Default,
-    L: Clone + ArgminLineSearch<O::Param, F> + Solver<OpWrapper<LineSearchOP<O, F>>, F>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<LineSearchOP<O>>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Gauss-Newton method with Linesearch";
@@ -75,8 +75,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;
@@ -91,7 +91,6 @@ where
         // create operator for linesearch
         let line_op = OpWrapper::new(LineSearchOP {
             op: op.take_op().unwrap(),
-            _marker: std::marker::PhantomData,
         });
 
         // perform linesearch
@@ -118,7 +117,7 @@ where
         Ok(ArgminIterData::new().param(next_param).cost(next_cost))
     }
 
-    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
             return TerminationReason::NoChangeInCost;
         }
@@ -128,21 +127,21 @@ where
 
 #[doc(hidden)]
 #[derive(Clone, Default, Serialize, Deserialize)]
-pub struct LineSearchOP<O, F> {
+pub struct LineSearchOP<O> {
     pub op: O,
-    _marker: std::marker::PhantomData<F>,
 }
 
-impl<O: ArgminOp, F> ArgminOp for LineSearchOP<O, F>
+impl<O> ArgminOp for LineSearchOP<O>
 where
+    O: ArgminOp,
     O::Jacobian: ArgminTranspose + ArgminDot<O::Output, O::Param>,
-    O::Output: ArgminNorm<F>,
-    F: ArgminFloat,
+    O::Output: ArgminNorm<O::Float>,
 {
     type Param = O::Param;
-    type Output = F;
+    type Output = O::Float;
     type Hessian = O::Hessian;
     type Jacobian = O::Jacobian;
+    type Float = O::Float;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(self.op.apply(p)?.norm())

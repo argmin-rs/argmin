@@ -7,9 +7,9 @@
 
 // pub mod brent;
 pub mod conjugategradient;
-// pub mod gaussnewton;
+pub mod gaussnewton;
 pub mod gradientdescent;
-// pub mod landweber;
+pub mod landweber;
 pub mod linesearch;
 pub mod neldermead;
 pub mod newton;

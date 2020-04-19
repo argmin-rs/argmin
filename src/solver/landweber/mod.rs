@@ -45,10 +45,10 @@ impl<F> Landweber<F> {
     }
 }
 
-impl<O, F> Solver<O, F> for Landweber<F>
+impl<O, F> Solver<O> for Landweber<F>
 where
-    O: ArgminOp,
-    O::Param: ArgminScaledSub<O::Param, F, O::Param>,
+    O: ArgminOp<Float = F>,
+    O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Landweber";
@@ -56,8 +56,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let grad = op.gradient(&param)?;
         let new_param = param.scaled_sub(&self.omega, &grad);

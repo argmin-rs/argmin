@@ -70,14 +70,14 @@ impl<F: ArgminFloat> Default for GaussNewton<F> {
     }
 }
 
-impl<O, F> Solver<O, F> for GaussNewton<F>
+impl<O, F> Solver<O> for GaussNewton<F>
 where
-    O: ArgminOp,
+    O: ArgminOp<Float = F>,
     O::Param: Default
-        + ArgminScaledSub<O::Param, F, O::Param>
+        + ArgminScaledSub<O::Param, O::Float, O::Param>
         + ArgminSub<O::Param, O::Param>
-        + ArgminMul<F, O::Param>,
-    O::Output: ArgminNorm<F>,
+        + ArgminMul<O::Float, O::Param>,
+    O::Output: ArgminNorm<O::Float>,
     O::Jacobian: ArgminTranspose
         + ArgminInv<O::Jacobian>
         + ArgminDot<O::Jacobian, O::Jacobian>
@@ -91,8 +91,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O, F>,
-    ) -> Result<ArgminIterData<O, F>, Error> {
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;
@@ -111,7 +111,7 @@ where
             .cost(residuals.norm()))
     }
 
-    fn terminate(&mut self, state: &IterState<O, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
             return TerminationReason::NoChangeInCost;
         }

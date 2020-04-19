@@ -29,6 +29,7 @@ impl ArgminOp for Problem {
     type Output = Array1<f64>;
     type Hessian = ();
     type Jacobian = Array2<f64>;
+    type Float = f64;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(self
