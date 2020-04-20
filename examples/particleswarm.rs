@@ -19,6 +19,7 @@ impl ArgminOp for Himmelblau {
     type Output = f64;
     type Hessian = ();
     type Jacobian = ();
+    type Float = f64;
 
     fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
         Ok(himmelblau(param))

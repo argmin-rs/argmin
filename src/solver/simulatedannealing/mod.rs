@@ -28,22 +28,20 @@ use serde::{Deserialize, Serialize};
 /// * `SATempFunc::TemperatureFast`: `t_i = t_init / i`
 /// * `SATempFunc::Boltzmann`: `t_i = t_init / ln(i)`
 /// * `SATempFunc::Exponential`: `t_i = t_init * 0.95^i`
-// /// * `SATempFunc::Custom`: User provided temperature update function which must have the function
-// ///   signature `&Fn(init_temp: f64, iteration_number: u64) -> f64`
 #[derive(Clone, Copy, Serialize, Deserialize, Debug)]
-pub enum SATempFunc {
+pub enum SATempFunc<F> {
     /// `t_i = t_init / i`
     TemperatureFast,
     /// `t_i = t_init / ln(i)`
     Boltzmann,
     /// `t_i = t_init * x^i`
-    Exponential(f64),
+    Exponential(F),
     // /// User-provided temperature function. The first parameter must be the current temperature and
     // /// the second parameter must be the iteration number.
     // Custom(Box<Fn(f64, u64) -> f64>),
 }
 
-impl std::default::Default for SATempFunc {
+impl<F> std::default::Default for SATempFunc<F> {
     fn default() -> Self {
         SATempFunc::Boltzmann
     }
@@ -61,11 +59,11 @@ impl std::default::Default for SATempFunc {
 /// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 /// DOI: 10.1126/science.220.4598.671  
 #[derive(Clone, Serialize, Deserialize)]
-pub struct SimulatedAnnealing {
+pub struct SimulatedAnnealing<F> {
     /// Initial temperature
-    init_temp: f64,
+    init_temp: F,
     /// which temperature function?
-    temp_func: SATempFunc,
+    temp_func: SATempFunc<F>,
     /// Number of iterations used for the caluclation of temperature. This is needed for
     /// reannealing!
     temp_iter: u64,
@@ -90,19 +88,22 @@ pub struct SimulatedAnnealing {
     /// Similar to `stall_iter_best`, but will be reset to 0 when reannealing is performed
     reanneal_iter_best: u64,
     /// current temperature
-    cur_temp: f64,
+    cur_temp: F,
     /// random number generator
     rng: XorShiftRng,
 }
 
-impl SimulatedAnnealing {
+impl<F> SimulatedAnnealing<F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     ///
     /// Parameter:
     ///
     /// * `init_temp`: initial temperature
-    pub fn new(init_temp: f64) -> Result<Self, Error> {
-        if init_temp <= 0_f64 {
+    pub fn new(init_temp: F) -> Result<Self, Error> {
+        if init_temp <= F::from_f64(0.0).unwrap() {
             Err(ArgminError::InvalidParameter {
                 text: "Initial temperature must be > 0.".to_string(),
             }
@@ -111,10 +112,10 @@ impl SimulatedAnnealing {
             Ok(SimulatedAnnealing {
                 init_temp,
                 temp_func: SATempFunc::TemperatureFast,
-                temp_iter: 0u64,
-                stall_iter_accepted: 0u64,
+                temp_iter: 0,
+                stall_iter_accepted: 0,
                 stall_iter_accepted_limit: std::u64::MAX,
-                stall_iter_best: 0u64,
+                stall_iter_best: 0,
                 stall_iter_best_limit: std::u64::MAX,
                 reanneal_fixed: std::u64::MAX,
                 reanneal_iter_fixed: 0,
@@ -129,7 +130,7 @@ impl SimulatedAnnealing {
     }
 
     /// Set temperature function to one of the options in `SATempFunc`.
-    pub fn temp_func(mut self, temperature_func: SATempFunc) -> Self {
+    pub fn temp_func(mut self, temperature_func: SATempFunc<F>) -> Self {
         self.temp_func = temperature_func;
         self
     }
@@ -169,10 +170,13 @@ impl SimulatedAnnealing {
     /// Updates are performed based on specific update functions. See `SATempFunc` for details.
     fn update_temperature(&mut self) {
         self.cur_temp = match self.temp_func {
-            SATempFunc::TemperatureFast => self.init_temp / ((self.temp_iter + 1) as f64),
-            SATempFunc::Boltzmann => self.init_temp / ((self.temp_iter + 1) as f64).ln(),
-            SATempFunc::Exponential(x) => self.init_temp * x.powf((self.temp_iter + 1) as f64),
-            // SATempFunc::Custom(ref func) => func(self.init_temp, self.temp_iter),
+            SATempFunc::TemperatureFast => {
+                self.init_temp / F::from_u64(self.temp_iter + 1).unwrap()
+            }
+            SATempFunc::Boltzmann => self.init_temp / F::from_u64(self.temp_iter + 1).unwrap().ln(),
+            SATempFunc::Exponential(x) => {
+                self.init_temp * x.powf(F::from_u64(self.temp_iter + 1).unwrap())
+            }
         };
     }
 
@@ -221,9 +225,10 @@ impl SimulatedAnnealing {
     }
 }
 
-impl<O> Solver<O> for SimulatedAnnealing
+impl<O, F> Solver<O> for SimulatedAnnealing<F>
 where
-    O: ArgminOp<Output = f64>,
+    O: ArgminOp<Output = F, Float = F>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Simulated Annealing";
     fn init(
@@ -256,6 +261,7 @@ where
 
         // Make a move
         let new_param = op.modify(&prev_param, self.cur_temp)?;
+        // let new_param = op.modify(&prev_param, self.cur_temp)?;
 
         // Evaluate cost function with new parameter vector
         let new_cost = op.apply(&new_param)?;
@@ -272,8 +278,12 @@ where
         //
         // which will always be between 0 and 0.5.
         let prob: f64 = self.rng.gen();
+        let prob = F::from_f64(prob).unwrap();
         let accepted = (new_cost < state.get_prev_cost())
-            || (1.0 / (1.0 + ((new_cost - state.get_prev_cost()) / self.cur_temp).exp()) > prob);
+            || (F::from_f64(1.0).unwrap()
+                / (F::from_f64(1.0).unwrap()
+                    + ((new_cost - state.get_prev_cost()) / self.cur_temp).exp())
+                > prob);
 
         // Update stall iter variables
         self.update_stall_and_reanneal_iter(accepted, new_cost <= state.get_best_cost());
@@ -323,5 +333,5 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(sa, SimulatedAnnealing);
+    test_trait_impl!(sa, SimulatedAnnealing<f64>);
 }

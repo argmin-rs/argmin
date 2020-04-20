@@ -31,11 +31,12 @@ impl FletcherReeves {
     }
 }
 
-impl<T> ArgminNLCGBetaUpdate<T> for FletcherReeves
+impl<T, F> ArgminNLCGBetaUpdate<T, F> for FletcherReeves
 where
-    T: Clone + ArgminDot<T, f64>,
+    T: Clone + ArgminDot<T, F>,
+    F: ArgminFloat,
 {
-    fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> f64 {
+    fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
         dfk1.dot(&dfk1) / dfk.dot(&dfk)
     }
 }
@@ -54,11 +55,12 @@ impl PolakRibiere {
     }
 }
 
-impl<T> ArgminNLCGBetaUpdate<T> for PolakRibiere
+impl<T, F> ArgminNLCGBetaUpdate<T, F> for PolakRibiere
 where
-    T: Clone + ArgminDot<T, f64> + ArgminSub<T, T> + ArgminNorm<f64>,
+    T: Clone + ArgminDot<T, F> + ArgminSub<T, T> + ArgminNorm<F>,
+    F: ArgminFloat,
 {
-    fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> f64 {
+    fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
         let dfk_norm_sq = dfk.norm().powi(2);
         dfk1.dot(&dfk1.sub(&dfk)) / dfk_norm_sq
     }
@@ -78,14 +80,15 @@ impl PolakRibierePlus {
     }
 }
 
-impl<T> ArgminNLCGBetaUpdate<T> for PolakRibierePlus
+impl<T, F> ArgminNLCGBetaUpdate<T, F> for PolakRibierePlus
 where
-    T: Clone + ArgminDot<T, f64> + ArgminSub<T, T> + ArgminNorm<f64>,
+    T: Clone + ArgminDot<T, F> + ArgminSub<T, T> + ArgminNorm<F>,
+    F: ArgminFloat,
 {
-    fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> f64 {
+    fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
         let dfk_norm_sq = dfk.norm().powi(2);
         let beta = dfk1.dot(&dfk1.sub(&dfk)) / dfk_norm_sq;
-        0.0f64.max(beta)
+        F::from_f64(0.0).unwrap().max(beta)
     }
 }
 
@@ -103,11 +106,12 @@ impl HestenesStiefel {
     }
 }
 
-impl<T> ArgminNLCGBetaUpdate<T> for HestenesStiefel
+impl<T, F> ArgminNLCGBetaUpdate<T, F> for HestenesStiefel
 where
-    T: Clone + ArgminDot<T, f64> + ArgminSub<T, T> + ArgminNorm<f64>,
+    T: Clone + ArgminDot<T, F> + ArgminSub<T, T> + ArgminNorm<F>,
+    F: ArgminFloat,
 {
-    fn update(&self, dfk: &T, dfk1: &T, pk: &T) -> f64 {
+    fn update(&self, dfk: &T, dfk1: &T, pk: &T) -> F {
         let d = dfk1.sub(&dfk);
         dfk1.dot(&d) / d.dot(&pk)
     }

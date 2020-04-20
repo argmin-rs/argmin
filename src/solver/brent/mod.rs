@@ -20,7 +20,6 @@
 /// see https://en.wikipedia.org/wiki/Brent%27s_method
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::f64;
 use thiserror::Error;
 
 /// Error to be thrown if Brent is initialized with improper parameters.
@@ -40,49 +39,50 @@ pub enum BrentError {
 /// # References:
 /// https://en.wikipedia.org/wiki/Brent%27s_method
 #[derive(Clone, Serialize, Deserialize)]
-pub struct Brent {
+pub struct Brent<F> {
     /// required relative accuracy
-    tol: f64,
+    tol: F,
     /// left or right boundary of current interval
-    a: f64,
+    a: F,
     /// currently proposed best guess
-    b: f64,
+    b: F,
     /// left or right boundary of current interval
-    c: f64,
+    c: F,
     /// helper variable
-    d: f64,
+    d: F,
     /// another helper variable
-    e: f64,
+    e: F,
     /// function value at `a`
-    fa: f64,
+    fa: F,
     /// function value at `b`
-    fb: f64,
+    fb: F,
     /// function value at `c`
-    fc: f64,
+    fc: F,
 }
 
-impl Brent {
+impl<F: ArgminFloat> Brent<F> {
     /// Constructor
     /// The values `min` and `max` must bracketing the root of the function.
     /// The parameter `tol` specifies the relative error to be targeted.
-    pub fn new(min: f64, max: f64, tol: f64) -> Brent {
+    pub fn new(min: F, max: F, tol: F) -> Brent<F> {
         Brent {
             tol: tol,
             a: min,
             b: max,
             c: max,
-            d: f64::NAN,
-            e: f64::NAN,
-            fa: f64::NAN,
-            fb: f64::NAN,
-            fc: f64::NAN,
+            d: F::nan(),
+            e: F::nan(),
+            fa: F::nan(),
+            fb: F::nan(),
+            fc: F::nan(),
         }
     }
 }
 
-impl<O> Solver<O> for Brent
+impl<O, F> Solver<O> for Brent<F>
 where
-    O: ArgminOp<Param = f64, Output = f64>,
+    O: ArgminOp<Param = F, Output = F, Float = F>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Brent";
 
@@ -94,7 +94,7 @@ where
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.fa = op.apply(&self.a)?;
         self.fb = op.apply(&self.b)?;
-        if self.fa * self.fb > 0.0 {
+        if self.fa * self.fb > F::from_f64(0.0).unwrap() {
             return Err(BrentError::WrongSign.into());
         }
         self.fc = self.fb;
@@ -109,7 +109,9 @@ where
         // Brent maintains its own state
         _state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        if (self.fb > 0.0 && self.fc > 0.0) || self.fb < 0.0 && self.fc < 0.0 {
+        if (self.fb > F::from_f64(0.0).unwrap() && self.fc > F::from_f64(0.0).unwrap())
+            || self.fb < F::from_f64(0.0).unwrap() && self.fc < F::from_f64(0.0).unwrap()
+        {
             self.c = self.a;
             self.fc = self.fa;
             self.d = self.b - self.a;
@@ -124,9 +126,10 @@ where
             self.fc = self.fa;
         }
         // effective tolerance is double machine precision plus half tolerance as given.
-        let eff_tol = 2.0 * f64::EPSILON * self.b.abs() + 0.5 * self.tol;
-        let mid = 0.5 * (self.c - self.b);
-        if mid.abs() <= eff_tol || self.fb == 0.0 {
+        let eff_tol = F::from_f64(2.0).unwrap() * F::epsilon() * self.b.abs()
+            + F::from_f64(0.5).unwrap() * self.tol;
+        let mid = F::from_f64(0.5).unwrap() * (self.c - self.b);
+        if mid.abs() <= eff_tol || self.fb == F::from_f64(0.0).unwrap() {
             return Ok(ArgminIterData::new()
                 .termination_reason(TerminationReason::TargetPrecisionReached)
                 .param(self.b)
@@ -135,22 +138,28 @@ where
         if self.e.abs() >= eff_tol && self.fa.abs() > self.fb.abs() {
             let s = self.fb / self.fa;
             let (mut p, mut q) = if self.a == self.c {
-                (2.0 * mid * s, 1.0 - s)
+                (
+                    F::from_f64(2.0).unwrap() * mid * s,
+                    F::from_f64(1.0).unwrap() - s,
+                )
             } else {
                 let q = self.fa / self.fc;
                 let r = self.fb / self.fc;
                 (
-                    s * (2.0 * mid * q * (q - r) - (self.b - self.a) * (r - 1.0)),
-                    (q - 1.0) * (r - 1.0) * (s - 1.0),
+                    s * (F::from_f64(2.0).unwrap() * mid * q * (q - r)
+                        - (self.b - self.a) * (r - F::from_f64(1.0).unwrap())),
+                    (q - F::from_f64(1.0).unwrap())
+                        * (r - F::from_f64(1.0).unwrap())
+                        * (s - F::from_f64(1.0).unwrap()),
                 )
             };
-            if p > 0.0 {
+            if p > F::from_f64(0.0).unwrap() {
                 q = -q;
             }
             p = p.abs();
-            let min1 = 3.0 * mid * q - (eff_tol * q).abs();
+            let min1 = F::from_f64(3.0).unwrap() * mid * q - (eff_tol * q).abs();
             let min2 = (self.e * q).abs();
-            if 2.0 * p < if min1 < min2 { min1 } else { min2 } {
+            if F::from_f64(2.0).unwrap() * p < if min1 < min2 { min1 } else { min2 } {
                 self.e = self.d;
                 self.d = p / q;
             } else {
@@ -164,13 +173,14 @@ where
         self.a = self.b;
         self.fa = self.fb;
         if self.d.abs() > eff_tol {
-            self.b += self.d;
+            self.b = self.b + self.d;
         } else {
-            self.b += if mid >= 0.0 {
-                eff_tol.abs()
-            } else {
-                -eff_tol.abs()
-            };
+            self.b = self.b
+                + if mid >= F::from_f64(0.0).unwrap() {
+                    eff_tol.abs()
+                } else {
+                    -eff_tol.abs()
+                };
         }
 
         self.fb = op.apply(&self.b)?;
@@ -183,5 +193,5 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(brent, Brent);
+    test_trait_impl!(brent, Brent<f64>);
 }

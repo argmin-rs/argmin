@@ -33,22 +33,23 @@ use serde::{Deserialize, Serialize};
 /// kind. Amer. J. Math. 73, 615–624
 /// [1] https://en.wikipedia.org/wiki/Landweber_iteration
 #[derive(Clone, Serialize, Deserialize)]
-pub struct Landweber {
+pub struct Landweber<F> {
     /// omega
-    omega: f64,
+    omega: F,
 }
 
-impl Landweber {
+impl<F> Landweber<F> {
     /// Constructor
-    pub fn new(omega: f64) -> Self {
+    pub fn new(omega: F) -> Self {
         Landweber { omega }
     }
 }
 
-impl<O> Solver<O> for Landweber
+impl<O, F> Solver<O> for Landweber<F>
 where
-    O: ArgminOp,
-    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+    O: ArgminOp<Float = F>,
+    O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Landweber";
 
@@ -69,5 +70,5 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(landweber, Landweber);
+    test_trait_impl!(landweber, Landweber<f64>);
 }

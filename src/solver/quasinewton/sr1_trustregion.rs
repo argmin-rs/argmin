@@ -24,31 +24,31 @@ use std::fmt::Debug;
 /// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct SR1TrustRegion<B, R> {
+pub struct SR1TrustRegion<B, R, F> {
     /// parameter for skipping rule
-    r: f64,
+    r: F,
     /// Inverse Hessian
     init_hessian: Option<B>,
     /// subproblem
     subproblem: R,
     /// Radius
-    radius: f64,
+    radius: F,
     /// eta \in [0, 1/4)
-    eta: f64,
+    eta: F,
     /// Tolerance for the stopping criterion based on the change of the norm on the gradient
-    tol_grad: f64,
+    tol_grad: F,
 }
 
-impl<B, R> SR1TrustRegion<B, R> {
+impl<B, R, F: ArgminFloat> SR1TrustRegion<B, R, F> {
     /// Constructor
     pub fn new(subproblem: R) -> Self {
         SR1TrustRegion {
-            r: 1e-8,
+            r: F::from_f64(1e-8).unwrap(),
             init_hessian: None,
             subproblem,
-            radius: 1.0,
-            eta: 0.5 * 1e-3,
-            tol_grad: 1e-3,
+            radius: F::from_f64(1.0).unwrap(),
+            eta: F::from_f64(0.5 * 1e-3).unwrap(),
+            tol_grad: F::from_f64(1e-3).unwrap(),
         }
     }
 
@@ -60,8 +60,8 @@ impl<B, R> SR1TrustRegion<B, R> {
     }
 
     /// Set r
-    pub fn r(mut self, r: f64) -> Result<Self, Error> {
-        if r <= 0.0 || r >= 1.0 {
+    pub fn r(mut self, r: F) -> Result<Self, Error> {
+        if r <= F::from_f64(0.0).unwrap() || r >= F::from_f64(1.0).unwrap() {
             Err(ArgminError::InvalidParameter {
                 text: "SR1: r must be in (0, 1).".to_string(),
             }
@@ -73,14 +73,14 @@ impl<B, R> SR1TrustRegion<B, R> {
     }
 
     /// set radius
-    pub fn radius(mut self, radius: f64) -> Self {
+    pub fn radius(mut self, radius: F) -> Self {
         self.radius = radius.abs();
         self
     }
 
     /// Set eta
-    pub fn eta(mut self, eta: f64) -> Result<Self, Error> {
-        if eta >= 10e-3 || eta <= 0.0 {
+    pub fn eta(mut self, eta: F) -> Result<Self, Error> {
+        if eta >= F::from_f64(10e-3).unwrap() || eta <= F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "SR1TrustRegion: eta must be in (0, 10^-3).".to_string(),
             }
@@ -91,26 +91,26 @@ impl<B, R> SR1TrustRegion<B, R> {
     }
 
     /// Sets tolerance for the stopping criterion based on the change of the norm on the gradient
-    pub fn with_tol_grad(mut self, tol_grad: f64) -> Self {
+    pub fn with_tol_grad(mut self, tol_grad: F) -> Self {
         self.tol_grad = tol_grad;
         self
     }
 }
 
-impl<O, B, R> Solver<O> for SR1TrustRegion<B, R>
+impl<O, B, R, F> Solver<O> for SR1TrustRegion<B, R, F>
 where
-    O: ArgminOp<Output = f64, Hessian = B>,
+    O: ArgminOp<Output = F, Hessian = B, Float = F>,
     O::Param: Debug
         + Clone
         + Default
         + Serialize
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, f64>
+        + ArgminDot<O::Param, O::Float>
         + ArgminDot<O::Param, O::Hessian>
-        + ArgminNorm<f64>
+        + ArgminNorm<O::Float>
         + ArgminZeroLike
-        + ArgminMul<f64, O::Param>,
+        + ArgminMul<F, O::Param>,
     O::Hessian: Debug
         + Clone
         + Default
@@ -120,8 +120,9 @@ where
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
-        + ArgminMul<f64, O::Hessian>,
-    R: ArgminTrustRegion + Solver<OpWrapper<O>>,
+        + ArgminMul<F, O::Hessian>,
+    R: ArgminTrustRegion<F> + Solver<OpWrapper<O>>,
+    F: ArgminFloat + ArgminNorm<O::Float>,
 {
     const NAME: &'static str = "SR1 Trust Region";
 
@@ -182,9 +183,9 @@ where
         let fk1 = op.apply(&xksk)?;
 
         let ared = cost - fk1;
-        let tmp1: f64 = prev_grad.dot(&sk);
-        let tmp2: f64 = sk.weighted_dot(&hessian, &sk);
-        let tmp2: f64 = tmp2.mul(&0.5);
+        let tmp1: F = prev_grad.dot(&sk);
+        let tmp2: F = sk.weighted_dot(&hessian, &sk);
+        let tmp2: F = tmp2.mul(F::from_f64(0.5).unwrap());
         let pred = -tmp1 - tmp2;
         let ap = ared / pred;
 
@@ -194,27 +195,27 @@ where
             (xk, cost, prev_grad)
         };
 
-        self.radius = if ap > 0.75 {
-            if sk.norm() <= 0.8 * self.radius {
+        self.radius = if ap > F::from_f64(0.75).unwrap() {
+            if sk.norm() <= F::from_f64(0.8).unwrap() * self.radius {
                 self.radius
             } else {
-                2.0 * self.radius
+                F::from_f64(2.0).unwrap() * self.radius
             }
-        } else if ap <= 0.75 && ap >= 0.1 {
+        } else if ap <= F::from_f64(0.75).unwrap() && ap >= F::from_f64(0.1).unwrap() {
             self.radius
         } else {
-            0.5 * self.radius
+            F::from_f64(0.5).unwrap() * self.radius
         };
 
         let bksk = hessian.dot(&sk);
         let ykbksk = yk.sub(&bksk);
-        let skykbksk: f64 = sk.dot(&ykbksk);
+        let skykbksk: F = sk.dot(&ykbksk);
 
         let hessian_update = skykbksk.abs() >= self.r * sk.norm() * skykbksk.norm();
         let hessian = if hessian_update {
             let a: O::Hessian = ykbksk.dot(&ykbksk);
-            let b: f64 = sk.dot(&ykbksk);
-            hessian.add(&a.mul(&(1.0 / b)))
+            let b: F = sk.dot(&ykbksk);
+            hessian.add(&a.mul(&(F::from_f64(1.0).unwrap() / b)))
         } else {
             hessian
         };
@@ -250,16 +251,19 @@ mod tests {
 
     type Operator = MinimalNoOperator;
 
-    test_trait_impl!(sr1, SR1TrustRegion<Operator, CauchyPoint>);
+    test_trait_impl!(sr1, SR1TrustRegion<Operator, CauchyPoint<f64>, f64>);
 
     #[test]
     fn test_tolerances() {
         let subproblem = CauchyPoint::new();
 
-        let tol = 1e-4;
+        let tol: f64 = 1e-4;
 
-        let SR1TrustRegion { tol_grad: t, .. }: SR1TrustRegion<MinimalNoOperator, CauchyPoint> =
-            SR1TrustRegion::new(subproblem).with_tol_grad(tol);
+        let SR1TrustRegion { tol_grad: t, .. }: SR1TrustRegion<
+            MinimalNoOperator,
+            CauchyPoint<f64>,
+            f64,
+        > = SR1TrustRegion::new(subproblem).with_tol_grad(tol);
 
         assert!((t - tol).abs() < std::f64::EPSILON);
     }

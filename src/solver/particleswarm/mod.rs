@@ -10,12 +10,9 @@
 //! TODO
 
 use crate::prelude::*;
-// use argmin_core::ArgminAdd;
-// use argmin_core::ArgminOp;
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std;
 use std::default::Default;
-use std::f64;
 
 /// Particle Swarm Optimization (PSO)
 ///
@@ -25,28 +22,24 @@ use std::f64;
 ///
 /// TODO
 #[derive(Serialize, Deserialize)]
-pub struct ParticleSwarm<O>
-where
-    O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: Position,
-{
-    particles: Vec<Particle<O::Param>>,
-    best_position: O::Param,
-    best_cost: f64,
+pub struct ParticleSwarm<P, F> {
+    particles: Vec<Particle<P, F>>,
+    best_position: P,
+    best_cost: F,
 
     // Weights for particle updates
-    weight_momentum: f64,
-    weight_particle: f64,
-    weight_swarm: f64,
+    weight_momentum: F,
+    weight_particle: F,
+    weight_swarm: F,
 
-    search_region: (O::Param, O::Param),
+    search_region: (P, P),
     num_particles: usize,
 }
 
-impl<O> ParticleSwarm<O>
+impl<P, F> ParticleSwarm<P, F>
 where
-    O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: Position,
+    P: Position<F> + DeserializeOwned + Serialize,
+    F: ArgminFloat,
 {
     /// Constructor
     ///
@@ -55,20 +48,20 @@ where
     /// * `cost_function`: cost function
     /// * `init_temp`: initial temperature
     pub fn new(
-        search_region: (O::Param, O::Param),
+        search_region: (P, P),
         num_particles: usize,
-        weight_momentum: f64,
-        weight_particle: f64,
-        weight_swarm: f64,
+        weight_momentum: F,
+        weight_particle: F,
+        weight_swarm: F,
     ) -> Result<Self, Error> {
         let particle_swarm = ParticleSwarm {
             particles: vec![],
-            best_position: O::Param::rand_from_range(
+            best_position: P::rand_from_range(
                 // FIXME: random smart?
                 &search_region.0,
                 &search_region.1,
             ),
-            best_cost: f64::INFINITY,
+            best_cost: F::infinity(),
             weight_momentum,
             weight_particle,
             weight_swarm,
@@ -79,7 +72,10 @@ where
         Ok(particle_swarm)
     }
 
-    fn initialize_particles(&mut self, op: &mut OpWrapper<O>) {
+    fn initialize_particles<O: ArgminOp<Param = P, Output = F, Float = F>>(
+        &mut self,
+        op: &mut OpWrapper<O>,
+    ) {
         self.particles = (0..self.num_particles)
             .map(|_| self.initialize_particle(op))
             .collect();
@@ -89,10 +85,13 @@ where
         // TODO unwrap evil
     }
 
-    fn initialize_particle(&mut self, op: &mut OpWrapper<O>) -> Particle<O::Param> {
+    fn initialize_particle<O: ArgminOp<Param = P, Output = F, Float = F>>(
+        &mut self,
+        op: &mut OpWrapper<O>,
+    ) -> Particle<P, F> {
         let (min, max) = &self.search_region;
         let delta = max.sub(min);
-        let delta_neg = delta.mul(&-1.0);
+        let delta_neg = delta.mul(&F::from_f64(-1.0).unwrap());
 
         let initial_position = O::Param::rand_from_range(min, max);
         let initial_cost = op.apply(&initial_position).unwrap(); // FIXME do not unwrap
@@ -106,8 +105,8 @@ where
         }
     }
 
-    fn get_best_position(&self) -> O::Param {
-        let mut best: Option<(&O::Param, f64)> = None;
+    fn get_best_position(&self) -> P {
+        let mut best: Option<(&P, F)> = None;
 
         for p in &self.particles {
             match best {
@@ -127,11 +126,12 @@ where
     }
 }
 
-impl<O> Solver<O> for ParticleSwarm<O>
+impl<O, P, F> Solver<O> for ParticleSwarm<P, F>
 where
-    O: ArgminOp<Output = f64>,
-    <O as ArgminOp>::Param: Position,
-    <O as ArgminOp>::Hessian: Clone + Default,
+    O: ArgminOp<Output = F, Param = P, Float = F>,
+    O::Param: Position<F> + DeserializeOwned + Serialize,
+    O::Hessian: Clone + Default,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Particle Swarm Optimization";
 
@@ -212,29 +212,57 @@ where
     }
 }
 
-trait_bound!(Position
-; Clone
-, Default
-, ArgminAdd<Self, Self>
-, ArgminSub<Self, Self>
-, ArgminMul<f64, Self>
-, ArgminZeroLike
-, ArgminRandom
-, ArgminMinMax
-, std::fmt::Debug
-);
+/// Position
+pub trait Position<F: ArgminFloat>:
+    Clone
+    + Default
+    + ArgminAdd<Self, Self>
+    + ArgminSub<Self, Self>
+    + ArgminMul<F, Self>
+    + ArgminZeroLike
+    + ArgminRandom
+    + ArgminMinMax
+    + std::fmt::Debug
+{
+}
+impl<T, F: ArgminFloat> Position<F> for T
+where
+    T: Clone
+        + Default
+        + ArgminAdd<Self, Self>
+        + ArgminSub<Self, Self>
+        + ArgminMul<F, Self>
+        + ArgminZeroLike
+        + ArgminRandom
+        + ArgminMinMax
+        + std::fmt::Debug,
+    F: ArgminFloat,
+{
+}
+
+// trait_bound!(Position<F>
+// ; Clone
+// , Default
+// , ArgminAdd<Self, Self>
+// , ArgminSub<Self, Self>
+// , ArgminMul<F, Self>
+// , ArgminZeroLike
+// , ArgminRandom
+// , ArgminMinMax
+// , std::fmt::Debug
+// );
 
 /// A single particle
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct Particle<T: Position> {
+pub struct Particle<T, F> {
     /// Position of particle
     pub position: T,
     /// Velocity of particle
     velocity: T,
     /// Cost of particle
-    pub cost: f64,
+    pub cost: F,
     /// Best position of particle so far
     best_position: T,
     /// Best cost of particle so far
-    best_cost: f64,
+    best_cost: F,
 }

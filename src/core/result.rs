@@ -36,6 +36,7 @@
 //! #     type Output = f64;
 //! #     type Hessian = ();
 //! #     type Jacobian = ();
+//! #     type Float = f64;
 //! #
 //! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 //! #         Ok(rosenbrock_2d(p, self.a, self.b))
@@ -82,7 +83,7 @@
 //!
 //! More details can be found in the `IterState` documentation.
 
-use crate::core::{ArgminOp, IterState};
+use crate::prelude::*;
 use std::cmp::Ordering;
 
 /// Final struct returned by the `run` method of `Executor`.
@@ -134,7 +135,7 @@ where
 
 impl<O: ArgminOp> PartialEq for ArgminResult<O> {
     fn eq(&self, other: &ArgminResult<O>) -> bool {
-        (self.state.get_cost() - other.state.get_cost()).abs() < std::f64::EPSILON
+        (self.state.get_cost() - other.state.get_cost()).abs() < O::Float::epsilon()
     }
 }
 
@@ -143,9 +144,9 @@ impl<O: ArgminOp> Eq for ArgminResult<O> {}
 impl<O: ArgminOp> Ord for ArgminResult<O> {
     fn cmp(&self, other: &ArgminResult<O>) -> Ordering {
         let t = self.state.get_cost() - other.state.get_cost();
-        if t.abs() < std::f64::EPSILON {
+        if t.abs() < O::Float::epsilon() {
             Ordering::Equal
-        } else if t > 0.0 {
+        } else if t > O::Float::from_f64(0.0).unwrap() {
             Ordering::Greater
         } else {
             Ordering::Less

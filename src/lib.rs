@@ -149,6 +149,8 @@
 //!     type Hessian = Vec<Vec<f64>>;
 //!     /// Type of the Jacobian. Can be `()` if not needed.
 //!     type Jacobian = ();
+//!     /// Floating point precision
+//!     type Float = f64;
 //!
 //!     /// Apply the cost function to a parameter `p`
 //!     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
@@ -196,6 +198,7 @@
 //! #     type Output = f64;
 //! #     type Hessian = ();
 //! #     type Jacobian = ();
+//! #     type Float = f64;
 //! #
 //! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 //! #         Ok(rosenbrock_2d(p, self.a, self.b))
@@ -280,6 +283,7 @@
 //! #     type Output = f64;
 //! #     type Hessian = ();
 //! #     type Jacobian = ();
+//! #     type Float = f64;
 //! #
 //! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 //! #         Ok(rosenbrock_2d(p, self.a, self.b))
@@ -356,6 +360,7 @@
 //! #     type Output = f64;
 //! #     type Hessian = ();
 //! #     type Jacobian = ();
+//! #     type Float = f64;
 //! #
 //! #     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
 //! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
@@ -419,24 +424,25 @@
 //! // solver. Note that this does not include parameter vectors, gradients, Hessians, cost
 //! // function values and so on, as those will be handled by the `Executor`.
 //! #[derive(Serialize, Deserialize)]
-//! pub struct Landweber {
+//! pub struct Landweber<F> {
 //!     /// omega
-//!     omega: f64,
+//!     omega: F,
 //! }
 //!
-//! impl Landweber {
+//! impl<F> Landweber<F> {
 //!     /// Constructor
-//!     pub fn new(omega: f64) -> Self {
+//!     pub fn new(omega: F) -> Self {
 //!         Landweber { omega }
 //!     }
 //! }
 //!
-//! impl<O> Solver<O> for Landweber
+//! impl<O, F> Solver<O> for Landweber<F>
 //! where
 //!     // `O` always needs to implement `ArgminOp`
-//!     O: ArgminOp,
+//!     O: ArgminOp<Float = F>,
 //!     // `O::Param` needs to implement `ArgminScaledSub` because of the update formula
-//!     O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+//!     O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>,
+//!     F: ArgminFloat,
 //! {
 //!     // This gives the solver a name which will be used for logging
 //!     const NAME: &'static str = "Landweber";

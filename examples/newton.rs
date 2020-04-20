@@ -23,6 +23,7 @@ impl ArgminOp for Rosenbrock {
     type Output = f64;
     type Hessian = Array2<f64>;
     type Jacobian = ();
+    type Float = f64;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
@@ -51,7 +52,7 @@ fn run() -> Result<(), Error> {
     let init_param: Array1<f64> = Array1::from(vec![-1.2, 1.0]);
 
     // Set up solver
-    let solver = Newton::new();
+    let solver: Newton<f64> = Newton::new();
 
     // Run solver
     let res = Executor::new(cost, solver, init_param)
