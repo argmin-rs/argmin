@@ -150,3 +150,11 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_trait_impl;
+
+    test_trait_impl!(golden_section_search, GoldenSectionSearch<f64>);
+}
