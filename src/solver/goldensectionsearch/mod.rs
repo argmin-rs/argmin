@@ -35,51 +35,55 @@ const G2: f64 = 1.0 - G1;
 ///
 /// [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
 #[derive(Clone, Serialize, Deserialize)]
-pub struct GoldenSectionSearch<O: ArgminOp> {
-    min_bound: f64,
-    max_bound: f64,
-    init_estimate: f64,
-    tolerance: f64,
+pub struct GoldenSectionSearch<F> {
+    g1: F,
+    g2: F,
+    min_bound: F,
+    max_bound: F,
+    init_estimate: F,
+    tolerance: F,
 
-    x0: f64,
-    x1: f64,
-    x2: f64,
-    x3: f64,
-    f1: O::Output,
-    f2: O::Output,
+    x0: F,
+    x1: F,
+    x2: F,
+    x3: F,
+    f1: F,
+    f2: F,
 }
 
-impl<O> GoldenSectionSearch<O>
+impl<F> GoldenSectionSearch<F>
 where
-    O: ArgminOp,
-    O::Output: ArgminZero,
+    F: ArgminFloat,
 {
     /// Constructor
-    pub fn new(min_bound: f64, max_bound: f64) -> Self {
+    pub fn new(min_bound: F, max_bound: F) -> Self {
         GoldenSectionSearch {
+            g1: F::from(G1).unwrap(),
+            g2: F::from(G2).unwrap(),
             min_bound,
             max_bound,
-            init_estimate: 0.0,
-            tolerance: 0.01,
+            init_estimate: F::zero(),
+            tolerance: F::from(0.01).unwrap(),
             x0: min_bound,
-            x1: 0.0,
-            x2: 0.0,
+            x1: F::zero(),
+            x2: F::zero(),
             x3: max_bound,
-            f1: O::Output::zero(),
-            f2: O::Output::zero(),
+            f1: F::zero(),
+            f2: F::zero(),
         }
     }
 
     /// Set tolerance
-    pub fn tolerance(mut self, tol: f64) -> Self {
+    pub fn tolerance(mut self, tol: F) -> Self {
         self.tolerance = tol;
         self
     }
 }
 
-impl<O> Solver<O> for GoldenSectionSearch<O>
+impl<O, F> Solver<O> for GoldenSectionSearch<F>
 where
-    O: ArgminOp<Param = f64, Output = f64>,
+    O: ArgminOp<Output = F, Param = F, Float = F>,
+    F: ArgminFloat + std::cmp::PartialOrd,
 {
     const NAME: &'static str = "Golden-section search";
 
@@ -98,9 +102,9 @@ where
             let ie_min = init_estimate - self.min_bound;
             let max_ie = self.max_bound - init_estimate;
             let (x1, x2) = if max_ie.abs() > ie_min.abs() {
-                (init_estimate, init_estimate + G2 * max_ie)
+                (init_estimate, init_estimate + self.g2 * max_ie)
             } else {
-                (init_estimate - G2 * ie_min, init_estimate)
+                (init_estimate - self.g2 * ie_min, init_estimate)
             };
             self.x1 = x1;
             self.x2 = x2;
@@ -129,13 +133,13 @@ where
         if self.f2 < self.f1 {
             self.x0 = self.x1;
             self.x1 = self.x2;
-            self.x2 = G1 * self.x1 + G2 * self.x3;
+            self.x2 = self.g1 * self.x1 + self.g2 * self.x3;
             self.f1 = self.f2;
             self.f2 = op.apply(&self.x2)?;
         } else {
             self.x3 = self.x2;
             self.x2 = self.x1;
-            self.x1 = G1 * self.x2 + G2 * self.x0;
+            self.x1 = self.g1 * self.x2 + self.g2 * self.x0;
             self.f2 = self.f1;
             self.f1 = op.apply(&self.x1)?;
         }
