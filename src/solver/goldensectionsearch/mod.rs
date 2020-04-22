@@ -83,7 +83,7 @@ where
 impl<O, F> Solver<O> for GoldenSectionSearch<F>
 where
     O: ArgminOp<Output = F, Param = F, Float = F>,
-    F: ArgminFloat + std::cmp::PartialOrd,
+    F: ArgminFloat,
 {
     const NAME: &'static str = "Golden-section search";
 
