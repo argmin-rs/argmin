@@ -68,8 +68,8 @@ pub struct IterState<O: ArgminOp> {
 }
 
 macro_rules! setter {
-    ($name:ident, $type:ty) => {
-        /// Set
+    ($name:ident, $type:ty, $doc:tt) => {
+        #[doc=$doc]
         pub fn $name(&mut self, $name: $type) -> &mut Self {
             self.$name = $name;
             self
@@ -78,9 +78,9 @@ macro_rules! setter {
 }
 
 macro_rules! getter_option {
-    ($name:ident, $type:ty) => {
+    ($name:ident, $type:ty, $doc:tt) => {
         item! {
-            /// Get
+            #[doc=$doc]
             pub fn [<get_ $name>](&self) -> Option<$type> {
                 self.$name.clone()
             }
@@ -89,9 +89,9 @@ macro_rules! getter_option {
 }
 
 macro_rules! getter {
-    ($name:ident, $type:ty) => {
+    ($name:ident, $type:ty, $doc:tt) => {
         item! {
-            /// Get
+            #[doc=$doc]
             pub fn [<get_ $name>](&self) -> $type {
                 self.$name.clone()
             }
@@ -200,66 +200,84 @@ impl<O: ArgminOp> IterState<O> {
         self
     }
 
-    /// Set target cost value
-    setter!(target_cost, O::Float);
-    /// Set maximum number of iterations
-    setter!(max_iters, u64);
-    /// Set iteration number where the previous best parameter vector was found
-    setter!(last_best_iter, u64);
-    /// Set termination_reston
-    setter!(termination_reason, TerminationReason);
-    /// Set time required so far
-    setter!(time, std::time::Duration);
-    /// Returns current parameter vector
-    getter!(param, O::Param);
-    /// Returns previous parameter vector
-    getter!(prev_param, O::Param);
-    /// Returns best parameter vector
-    getter!(best_param, O::Param);
-    /// Returns previous best parameter vector
-    getter!(prev_best_param, O::Param);
-    /// Returns current cost function value
-    getter!(cost, O::Float);
-    /// Returns previous cost function value
-    getter!(prev_cost, O::Float);
-    /// Returns current best cost function value
-    getter!(best_cost, O::Float);
-    /// Returns previous best cost function value
-    getter!(prev_best_cost, O::Float);
-    /// Returns target cost
-    getter!(target_cost, O::Float);
-    /// Returns current cost function evaluation count
-    getter!(cost_func_count, u64);
-    /// Returns current gradient function evaluation count
-    getter!(grad_func_count, u64);
-    /// Returns current Hessian function evaluation count
-    getter!(hessian_func_count, u64);
-    /// Returns current Jacobian function evaluation count
-    getter!(jacobian_func_count, u64);
-    /// Returns current Modify function evaluation count
-    getter!(modify_func_count, u64);
-    /// Returns iteration number where the last best parameter vector was found
-    getter!(last_best_iter, u64);
-    /// Get termination_reason
-    getter!(termination_reason, TerminationReason);
-    /// Get time required so far
-    getter!(time, std::time::Duration);
-    /// Returns gradient
-    getter_option!(grad, O::Param);
-    /// Returns previous gradient
-    getter_option!(prev_grad, O::Param);
-    /// Returns current Hessian
-    getter_option!(hessian, O::Hessian);
-    /// Returns previous Hessian
-    getter_option!(prev_hessian, O::Hessian);
-    /// Returns current Jacobian
-    getter_option!(jacobian, O::Jacobian);
-    /// Returns previous Jacobian
-    getter_option!(prev_jacobian, O::Jacobian);
-    /// Returns current number of iterations
-    getter!(iter, u64);
-    /// Returns maximum number of iterations
-    getter!(max_iters, u64);
+    setter!(target_cost, O::Float, "Set target cost value");
+    setter!(max_iters, u64, "Set maximum number of iterations");
+    setter!(
+        last_best_iter,
+        u64,
+        "Set iteration number where the previous best parameter vector was found"
+    );
+    setter!(
+        termination_reason,
+        TerminationReason,
+        "Set termination_reason"
+    );
+    setter!(time, std::time::Duration, "Set time required so far");
+    getter!(param, O::Param, "Returns current parameter vector");
+    getter!(prev_param, O::Param, "Returns previous parameter vector");
+    getter!(best_param, O::Param, "Returns best parameter vector");
+    getter!(
+        prev_best_param,
+        O::Param,
+        "Returns previous best parameter vector"
+    );
+    getter!(cost, O::Float, "Returns current cost function value");
+    getter!(prev_cost, O::Float, "Returns previous cost function value");
+    getter!(
+        best_cost,
+        O::Float,
+        "Returns current best cost function value"
+    );
+    getter!(
+        prev_best_cost,
+        O::Float,
+        "Returns previous best cost function value"
+    );
+    getter!(target_cost, O::Float, "Returns target cost");
+    getter!(
+        cost_func_count,
+        u64,
+        "Returns current cost function evaluation count"
+    );
+    getter!(
+        grad_func_count,
+        u64,
+        "Returns current gradient function evaluation count"
+    );
+    getter!(
+        hessian_func_count,
+        u64,
+        "Returns current Hessian function evaluation count"
+    );
+    getter!(
+        jacobian_func_count,
+        u64,
+        "Returns current Jacobian function evaluation count"
+    );
+    getter!(
+        modify_func_count,
+        u64,
+        "Returns current Modify function evaluation count"
+    );
+    getter!(
+        last_best_iter,
+        u64,
+        "Returns iteration number where the last best parameter vector was found"
+    );
+    getter!(
+        termination_reason,
+        TerminationReason,
+        "Get termination_reason"
+    );
+    getter!(time, std::time::Duration, "Get time required so far");
+    getter_option!(grad, O::Param, "Returns gradient");
+    getter_option!(prev_grad, O::Param, "Returns previous gradient");
+    getter_option!(hessian, O::Hessian, "Returns current Hessian");
+    getter_option!(prev_hessian, O::Hessian, "Returns previous Hessian");
+    getter_option!(jacobian, O::Jacobian, "Returns current Jacobian");
+    getter_option!(prev_jacobian, O::Jacobian, "Returns previous Jacobian");
+    getter!(iter, u64, "Returns current number of iterations");
+    getter!(max_iters, u64, "Returns maximum number of iterations");
 
     /// Returns population
     pub fn get_population(&self) -> Option<&Vec<(O::Param, O::Float)>> {
