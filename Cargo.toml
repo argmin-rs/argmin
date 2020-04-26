@@ -1,11 +1,11 @@
 [package]
 name = "argmin"
-version = "0.2.6"
+version = "0.3.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
 description = "Mathematical optimization in pure Rust"
-documentation = "https://docs.rs/argmin/latest/argmin/"
+documentation = "https://docs.rs/argmin/"
 homepage = "http://argmin-rs.org"
 repository = "https://github.com/argmin-rs/argmin"
 readme = "README.md"
@@ -17,29 +17,26 @@ exclude = [
 ]
 
 [dependencies]
-# argmin_testfunctions = { path = "../argmin-testfunctions" }
-# argmin_testfunctions = { git = "https://github.com/argmin-rs/argmin-testfunctions.git", branch = "master"}
-# argmin_testfunctions = "0.1.1"
-rand = { version = "0.7.2", features = ["serde1"] }
-rand_xorshift = { version = "0.2.0", features = ["serde1"] }
-serde = { version = "1.0", features = ["derive", "rc"] }
-serde_json = "1.0"
-bincode = "1.1.4"
-approx = "0.3.2"
 anyhow = "1.0"
-thiserror = "1.0"
+approx = "0.3.2"
+bincode = "1.1.4"
 ctrlc = { version = "3.1.2", optional = true }
-slog = "2.4.1"
-slog-term = "2.4.0"
-slog-async = "2.3.0"
-slog-json = "2.3.0"
+gnuplot = { version = "0.0.34", optional = true}
+paste = "0.1.5"
 ndarray = { version = "0.13", optional = true, features = ["serde-1"] }
 ndarray-linalg = { version = "0.12", optional = true }
 ndarray-rand = {version = "0.11.0", optional = true }
 num = { version = "0.2" }
-paste = "0.1.5"
-gnuplot = { version = "0.0.34", optional = true}
 num-complex = "0.2"
+rand = { version = "0.7.2", features = ["serde1"] }
+rand_xorshift = { version = "0.2.0", features = ["serde1"] }
+serde = { version = "1.0", features = ["derive", "rc"] }
+serde_json = "1.0"
+slog = "2.4.1"
+slog-term = "2.4.0"
+slog-async = "2.3.0"
+slog-json = "2.3.0"
+thiserror = "1.0"
 
 [dev-dependencies]
 ndarray-linalg = { version = "0.12", features = ["openblas"] }
