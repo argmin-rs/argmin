@@ -66,6 +66,7 @@
 //!   - [SR1-TrustRegion](solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
 //! - [Gauss-Newton method](solver/gaussnewton/gaussnewton/struct.GaussNewton.html)
 //! - [Gauss-Newton method with linesearch](solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLS.html)
+//! - [Golden-section search](solver/goldensectionsearch/struct.GoldenSectionSearch.html)
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
 //! - [Brent's method](solver/brent/struct.Brent.html)
 //! - [Nelder-Mead method](solver/neldermead/struct.NelderMead.html)
