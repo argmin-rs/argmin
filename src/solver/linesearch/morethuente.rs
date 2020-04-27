@@ -447,8 +447,7 @@ fn cstep<F: ArgminFloat>(
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
             return Err(ArgminError::ConditionViolated {
-                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
-                    .to_string(),
+                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration".to_string(),
             }
             .into());
         }
@@ -484,8 +483,7 @@ fn cstep<F: ArgminFloat>(
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
             return Err(ArgminError::ConditionViolated {
-                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
-                    .to_string(),
+                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration".to_string(),
             }
             .into());
         }
@@ -520,8 +518,7 @@ fn cstep<F: ArgminFloat>(
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
             return Err(ArgminError::ConditionViolated {
-                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
-                    .to_string(),
+                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration".to_string(),
             }
             .into());
         }
@@ -529,10 +526,11 @@ fn cstep<F: ArgminFloat>(
         // the case gamma == 0 only arises if the cubic does not tend to infinity in the direction
         // of the step.
 
-        let mut gamma = *s * F::from_f64(0.0)
-            .unwrap()
-            .max((theta / *s).powi(2) - (stx.gx / *s) * (stp.gx / *s))
-            .sqrt();
+        let mut gamma = *s
+            * F::from_f64(0.0)
+                .unwrap()
+                .max((theta / *s).powi(2) - (stx.gx / *s) * (stp.gx / *s))
+                .sqrt();
         if stp.x > stx.x {
             gamma = -gamma;
         }
