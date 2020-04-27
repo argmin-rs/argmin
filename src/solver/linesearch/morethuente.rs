@@ -363,7 +363,7 @@ where
                 self.brackt,
                 stmin,
                 stmax,
-            );
+            )?;
 
             self.stx.x = stx1.x;
             self.sty.x = sty1.x;
@@ -383,7 +383,7 @@ where
                 self.brackt,
                 stmin,
                 stmax,
-            );
+            )?;
             self.stx = stx1;
             self.sty = sty1;
             self.stp = stp1;
@@ -416,7 +416,7 @@ fn cstep<F: ArgminFloat>(
     brackt: bool,
     stpmin: F,
     stpmax: F,
-) -> (Step<F>, Step<F>, Step<F>, bool, F, F, usize) {
+) -> Result<(Step<F>, Step<F>, Step<F>, bool, F, F, usize), Error> {
     let mut info: usize = 0;
     let bound: bool;
     let mut stpf: F;
@@ -429,7 +429,7 @@ fn cstep<F: ArgminFloat>(
         || stx.gx * (stp.x - stx.x) >= F::from_f64(0.0).unwrap()
         || stpmax < stpmin
     {
-        return (stx, sty, stp, brackt, stpmin, stpmax, info);
+        return Ok((stx, sty, stp, brackt, stpmin, stpmax, info));
     }
 
     // determine if the derivatives have opposite sign
@@ -444,8 +444,16 @@ fn cstep<F: ArgminFloat>(
         let theta =
             F::from_f64(3.0).unwrap() * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
-        let s = tmp.iter().cloned().fold(F::nan(), F::max);
-        let mut gamma = s * ((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s)).sqrt();
+        // Check for a NaN or Inf in tmp before sorting
+        if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
+            return Err(ArgminError::ConditionViolated {
+                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
+                    .to_string(),
+            }
+            .into());
+        }
+        let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        let mut gamma = *s * ((theta / *s).powi(2) - (stx.gx / *s) * (stp.gx / *s)).sqrt();
         if stp.x < stx.x {
             gamma = -gamma;
         }
@@ -473,8 +481,16 @@ fn cstep<F: ArgminFloat>(
         let theta =
             F::from_f64(3.0).unwrap() * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
-        let s = tmp.iter().cloned().fold(F::nan(), F::max);
-        let mut gamma = s * ((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s)).sqrt();
+        // Check for a NaN or Inf in tmp before sorting
+        if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
+            return Err(ArgminError::ConditionViolated {
+                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
+                    .to_string(),
+            }
+            .into());
+        }
+        let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        let mut gamma = *s * ((theta / *s).powi(2) - (stx.gx / *s) * (stp.gx / *s)).sqrt();
         if stp.x > stx.x {
             gamma = -gamma;
         }
@@ -501,13 +517,21 @@ fn cstep<F: ArgminFloat>(
         let theta =
             F::from_f64(3.0).unwrap() * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
-        let s = tmp.iter().cloned().fold(F::nan(), F::max);
+        // Check for a NaN or Inf in tmp before sorting
+        if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
+            return Err(ArgminError::ConditionViolated {
+                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
+                    .to_string(),
+            }
+            .into());
+        }
+        let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
         // the case gamma == 0 only arises if the cubic does not tend to infinity in the direction
         // of the step.
 
-        let mut gamma = s * F::from_f64(0.0)
+        let mut gamma = *s * F::from_f64(0.0)
             .unwrap()
-            .max((theta / s).powi(2) - (stx.gx / s) * (stp.gx / s))
+            .max((theta / *s).powi(2) - (stx.gx / *s) * (stp.gx / *s))
             .sqrt();
         if stp.x > stx.x {
             gamma = -gamma;
@@ -545,8 +569,16 @@ fn cstep<F: ArgminFloat>(
             let theta =
                 F::from_f64(3.0).unwrap() * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
             let tmp = vec![theta, sty.gx, stp.gx];
-            let s = tmp.iter().cloned().fold(F::nan(), F::max);
-            let mut gamma = s * ((theta / s).powi(2) - (sty.gx / s) * (stp.gx / s)).sqrt();
+            // Check for a NaN or Inf in tmp before sorting
+            if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
+                return Err(ArgminError::ConditionViolated {
+                    text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
+                        .to_string(),
+                }
+                .into());
+            }
+            let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+            let mut gamma = *s * ((theta / *s).powi(2) - (sty.gx / *s) * (stp.gx / *s)).sqrt();
             if stp.x > sty.x {
                 gamma = -gamma;
             }
@@ -594,7 +626,7 @@ fn cstep<F: ArgminFloat>(
         }
     }
 
-    (stx_o, sty_o, stp_o, brackt, stpmin, stpmax, info)
+    Ok((stx_o, sty_o, stp_o, brackt, stpmin, stpmax, info))
 }
 
 #[cfg(test)]
