@@ -37,6 +37,7 @@ slog-term = "2.4.0"
 slog-async = "2.3.0"
 slog-json = "2.3.0"
 thiserror = "1.0"
+finitediff = { version = "0.1.2", optional = true, features = ["ndarray"] }
 
 [dev-dependencies]
 ndarray-linalg = { version = "0.12", features = ["openblas"] }
