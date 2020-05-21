@@ -45,7 +45,7 @@ argmin_testfunctions = "0.1.1"
 
 [features]
 default = []
-ndarrayl = ["ndarray", "ndarray-linalg", "ndarray-rand", "finitediff/ndarray"]
+ndarrayl = ["ndarray", "ndarray-linalg", "ndarray-rand"]
 visualizer = ["gnuplot"]
 
 [badges]
