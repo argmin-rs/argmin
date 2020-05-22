@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["steepestdescent","Steepest Descent method"]]});

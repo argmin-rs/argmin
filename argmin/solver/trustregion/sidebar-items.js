@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["reduction_ratio","Computes reduction ratio"]],"mod":[["cauchypoint","Cauchy Point # References:"],["dogleg","Dogleg method # References:"],["steihaug","Steihaug method # References:"],["trustregion_method","Trust region solver # References:"]]});

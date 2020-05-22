@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["NewtonCG","The Newton-CG method (also called truncated Newton method) uses a modified CG to solve the Newton equations approximately. After a search direction is found, a line search is performed."]]});

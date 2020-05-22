@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["TrustRegion","The trust region method approximates the cost function within a certain region around the current point in parameter space. Depending on the quality of this approximation, the region is either expanded or contracted."]]});
