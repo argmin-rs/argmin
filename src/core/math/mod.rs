@@ -40,6 +40,8 @@ mod dot_vec;
 #[cfg(feature = "ndarrayl")]
 mod eye_ndarray;
 mod eye_vec;
+#[cfg(feature = "nalgebral")]
+mod inv_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod inv_ndarray;
 mod mul;
