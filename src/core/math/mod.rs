@@ -32,6 +32,8 @@ mod div;
 mod div_ndarray;
 mod div_vec;
 mod dot;
+#[cfg(feature = "nalgebral")]
+mod dot_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
 mod dot_vec;
