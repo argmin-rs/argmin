@@ -71,6 +71,8 @@ mod sub_nalgebra;
 mod sub_ndarray;
 mod sub_vec;
 mod transpose;
+#[cfg(feature = "nalgebral")]
+mod transpose_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod transpose_ndarray;
 mod transpose_vec;
