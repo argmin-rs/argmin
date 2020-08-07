@@ -45,6 +45,8 @@ mod inv_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod inv_ndarray;
 mod mul;
+#[cfg(feature = "nalgebral")]
+mod mul_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod mul_ndarray;
 mod mul_vec;
