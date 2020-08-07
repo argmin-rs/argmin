@@ -223,10 +223,10 @@ pub trait ArgminNorm<U> {
 }
 
 // Suboptimal: self is moved. ndarray however offers array views...
-/// Transposing a type
-pub trait ArgminTranspose {
+/// Return the transpose (`U`) of `self`
+pub trait ArgminTranspose<U> {
     /// Transpose
-    fn t(self) -> Self;
+    fn t(self) -> U;
 }
 
 /// Compute the inverse (`T`) of `self`

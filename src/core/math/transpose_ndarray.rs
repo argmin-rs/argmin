@@ -14,14 +14,14 @@ use num_complex::Complex;
 
 macro_rules! make_add {
     ($t:ty) => {
-        impl ArgminTranspose for Array1<$t> {
+        impl ArgminTranspose<Array1<$t>> for Array1<$t> {
             #[inline]
             fn t(self) -> Array1<$t> {
                 self.reversed_axes()
             }
         }
 
-        impl ArgminTranspose for Array2<$t> {
+        impl ArgminTranspose<Array2<$t>> for Array2<$t> {
             #[inline]
             fn t(self) -> Array2<$t> {
                 self.reversed_axes()
@@ -57,7 +57,7 @@ mod tests {
                 fn [<test_transpose_ $t>]() {
                     let a = array![1 as $t, 4 as $t];
                     let target = array![1 as $t, 4 as $t];
-                    let res = <Array1<$t> as ArgminTranspose>::t(a);
+                    let res = <Array1<$t> as ArgminTranspose<Array1<$t>>>::t(a);
                     for i in 0..2 {
                         assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
                     }
@@ -75,7 +75,7 @@ mod tests {
                         [1 as $t, 8 as $t],
                         [4 as $t, 7 as $t]
                     ];
-                    let res = <Array2<$t> as ArgminTranspose>::t(a);
+                    let res = <Array2<$t> as ArgminTranspose<Array2<$t>>>::t(a);
                     for i in 0..2 {
                         for j in 0..2 {
                             assert!(((target[(i, j)] - res[(i, j)]) as f64).abs() < std::f64::EPSILON);
@@ -96,7 +96,7 @@ mod tests {
                         [1 as $t, 8 as $t, 3 as $t],
                         [4 as $t, 7 as $t, 6 as $t]
                     ];
-                    let res = <Array2<$t> as ArgminTranspose>::t(a);
+                    let res = <Array2<$t> as ArgminTranspose<Array2<$t>>>::t(a);
                     for i in 0..2 {
                         for j in 0..3 {
                             assert!(((target[(i, j)] - res[(i, j)]) as f64).abs() < std::f64::EPSILON);

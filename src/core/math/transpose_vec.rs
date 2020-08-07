@@ -13,7 +13,7 @@ use num_complex::Complex;
 
 macro_rules! make_transpose {
     ($t:ty) => {
-        impl ArgminTranspose for Vec<Vec<$t>> {
+        impl ArgminTranspose<Vec<Vec<$t>>> for Vec<Vec<$t>> {
             fn t(self) -> Self {
                 let n1 = self.len();
                 let n2 = self[0].len();

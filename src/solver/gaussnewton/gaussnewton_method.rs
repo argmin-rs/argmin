@@ -78,7 +78,7 @@ where
         + ArgminSub<O::Param, O::Param>
         + ArgminMul<O::Float, O::Param>,
     O::Output: ArgminNorm<O::Float>,
-    O::Jacobian: ArgminTranspose
+    O::Jacobian: ArgminTranspose<O::Jacobian>
         + ArgminInv<O::Jacobian>
         + ArgminDot<O::Jacobian, O::Jacobian>
         + ArgminDot<O::Output, O::Param>
