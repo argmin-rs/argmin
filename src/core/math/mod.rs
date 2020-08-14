@@ -20,6 +20,8 @@
 //! * Implement tests for Complex<T> impls
 
 mod add;
+#[cfg(feature = "nalgebral")]
+mod add_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod add_ndarray;
 mod add_vec;
