@@ -90,6 +90,8 @@ mod transpose_ndarray;
 mod transpose_vec;
 mod weighteddot;
 mod zero;
+#[cfg(feature = "nalgebral")]
+mod zero_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod zero_ndarray;
 mod zero_vec;
