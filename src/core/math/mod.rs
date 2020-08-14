@@ -26,6 +26,8 @@ mod add_nalgebra;
 mod add_ndarray;
 mod add_vec;
 mod conj;
+#[cfg(feature = "nalgebral")]
+mod conj_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod conj_ndarray;
 mod conj_vec;
