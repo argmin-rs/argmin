@@ -65,6 +65,8 @@ mod norm_nalgebra;
 mod norm_ndarray;
 mod norm_vec;
 mod scaledadd;
+#[cfg(feature = "nalgebral")]
+mod scaledadd_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod scaledadd_ndarray;
 mod scaledadd_vec;
