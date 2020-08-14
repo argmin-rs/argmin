@@ -92,3 +92,41 @@ mod tests_ndarray {
     make_test!(f32);
     make_test!(f64);
 }
+
+#[cfg(feature = "nalgebral")]
+#[cfg(test)]
+mod tests_nalgebra {
+    use super::*;
+    use nalgebra::{Vector3, Matrix3};
+    use paste::item;
+
+    macro_rules! make_test {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_ $t>]() {
+                    let a = Vector3::new(2 as $t, 1 as $t, 2 as $t);
+                    let b = Vector3::new(1 as $t, 2 as $t, 1 as $t);
+                    let w = Matrix3::new(
+                        8 as $t, 1 as $t, 6 as $t,
+                        3 as $t, 5 as $t, 7 as $t,
+                        4 as $t, 9 as $t, 2 as $t,
+                    );
+                    let res: $t = a.weighted_dot(&w, &b);
+                    assert!((((res - 100 as $t) as f64).abs()) < std::f64::EPSILON);
+                }
+            }
+        };
+    }
+
+    make_test!(i8);
+    make_test!(u8);
+    make_test!(i16);
+    make_test!(u16);
+    make_test!(i32);
+    make_test!(u32);
+    make_test!(i64);
+    make_test!(u64);
+    make_test!(f32);
+    make_test!(f64);
+}
