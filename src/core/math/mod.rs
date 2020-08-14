@@ -71,6 +71,8 @@ mod scaledadd_nalgebra;
 mod scaledadd_ndarray;
 mod scaledadd_vec;
 mod scaledsub;
+#[cfg(feature = "nalgebral")]
+mod scaledsub_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod scaledsub_ndarray;
 mod scaledsub_vec;
