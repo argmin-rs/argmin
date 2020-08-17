@@ -97,7 +97,7 @@ mod tests_ndarray {
 #[cfg(test)]
 mod tests_nalgebra {
     use super::*;
-    use nalgebra::{Vector3, Matrix3};
+    use nalgebra::{Matrix3, Vector3};
     use paste::item;
 
     macro_rules! make_test {

@@ -73,8 +73,7 @@ impl<F: ArgminFloat> Default for GaussNewton<F> {
 impl<O, F> Solver<O> for GaussNewton<F>
 where
     O: ArgminOp<Float = F>,
-    O::Param:
-          ArgminScaledSub<O::Param, O::Float, O::Param>
+    O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminMul<O::Float, O::Param>,
     O::Output: ArgminNorm<O::Float>,

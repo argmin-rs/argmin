@@ -8,7 +8,7 @@
 use argmin::prelude::*;
 use argmin::solver::gaussnewton::GaussNewton;
 
-use nalgebra::{DVector, DMatrix};
+use nalgebra::{DMatrix, DVector};
 
 type Rate = f64;
 type S = f64;
@@ -30,11 +30,12 @@ impl ArgminOp for Problem {
     type Float = f64;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(DVector::from_vec(self
-            .data
-            .iter()
-            .map(|(s, rate)| rate - (p[0] * s) / (p[1] + s))
-            .collect()))
+        Ok(DVector::from_vec(
+            self.data
+                .iter()
+                .map(|(s, rate)| rate - (p[0] * s) / (p[1] + s))
+                .collect(),
+        ))
     }
 
     fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {

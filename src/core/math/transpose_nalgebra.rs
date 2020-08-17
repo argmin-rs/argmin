@@ -32,7 +32,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use nalgebra::{RowVector2, Vector2, Matrix2, Matrix3x2, Matrix2x3};
+    use nalgebra::{Matrix2, Matrix2x3, Matrix3x2, RowVector2, Vector2};
     use paste::item;
 
     macro_rules! make_test {
