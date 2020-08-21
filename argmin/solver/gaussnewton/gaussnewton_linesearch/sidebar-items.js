@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["GaussNewtonLS","Gauss-Newton method with linesearch"]]});

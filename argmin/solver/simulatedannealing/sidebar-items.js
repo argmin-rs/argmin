@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["SATempFunc","Temperature functions for Simulated Annealing."]],"struct":[["SimulatedAnnealing","Simulated Annealing"]]});

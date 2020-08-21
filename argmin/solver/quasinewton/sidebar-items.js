@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["bfgs","References:"],["dfp","References:"],["lbfgs","References:"],["sr1","References:"],["sr1_trustregion","References:"]]});

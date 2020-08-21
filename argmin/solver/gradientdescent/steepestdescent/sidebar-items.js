@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SteepestDescent","Steepest descent iteratively takes steps in the direction of the strongest negative gradient. In each iteration, a line search is employed to obtain an appropriate step length."]]});

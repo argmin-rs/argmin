@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["HagerZhangLineSearch","The Hager-Zhang line search is a method to find a step length which obeys the strong Wolfe conditions."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["WriteToFileSerializer","Different kinds of serializers"]],"struct":[["WriteToFile","Write parameter vectors to file"]]});
