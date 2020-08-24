@@ -61,7 +61,7 @@ where
         + ArgminScaledAdd<O::Param, F, O::Param>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>
-        + ArgminTranspose,
+        + ArgminTranspose<O::Param>,
     O::Hessian: Clone
         + Default
         + Serialize
@@ -71,7 +71,7 @@ where
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<F, O::Hessian>
-        + ArgminTranspose
+        + ArgminTranspose<O::Hessian>
         + ArgminEye,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
     F: ArgminFloat,

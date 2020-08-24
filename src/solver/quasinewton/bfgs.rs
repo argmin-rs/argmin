@@ -80,7 +80,7 @@ where
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<O::Float, O::Hessian>
-        + ArgminTranspose
+        + ArgminTranspose<O::Hessian>
         + ArgminEye,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
     F: ArgminFloat,

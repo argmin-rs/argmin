@@ -20,52 +20,78 @@
 //! * Implement tests for Complex<T> impls
 
 mod add;
+#[cfg(feature = "nalgebral")]
+mod add_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod add_ndarray;
 mod add_vec;
 mod conj;
+#[cfg(feature = "nalgebral")]
+mod conj_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod conj_ndarray;
 mod conj_vec;
 mod div;
+#[cfg(feature = "nalgebral")]
+mod div_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod div_ndarray;
 mod div_vec;
 mod dot;
+#[cfg(feature = "nalgebral")]
+mod dot_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
 mod dot_vec;
+#[cfg(feature = "nalgebral")]
+mod eye_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod eye_ndarray;
 mod eye_vec;
+#[cfg(feature = "nalgebral")]
+mod inv_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod inv_ndarray;
 mod mul;
+#[cfg(feature = "nalgebral")]
+mod mul_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod mul_ndarray;
 mod mul_vec;
 mod norm;
+#[cfg(feature = "nalgebral")]
+mod norm_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod norm_ndarray;
 mod norm_vec;
 mod scaledadd;
+#[cfg(feature = "nalgebral")]
+mod scaledadd_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod scaledadd_ndarray;
 mod scaledadd_vec;
 mod scaledsub;
+#[cfg(feature = "nalgebral")]
+mod scaledsub_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod scaledsub_ndarray;
 mod scaledsub_vec;
 mod sub;
+#[cfg(feature = "nalgebral")]
+mod sub_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod sub_ndarray;
 mod sub_vec;
 mod transpose;
+#[cfg(feature = "nalgebral")]
+mod transpose_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod transpose_ndarray;
 mod transpose_vec;
 mod weighteddot;
 mod zero;
+#[cfg(feature = "nalgebral")]
+mod zero_nalgebra;
 #[cfg(feature = "ndarrayl")]
 mod zero_ndarray;
 mod zero_vec;
@@ -213,10 +239,10 @@ pub trait ArgminNorm<U> {
 }
 
 // Suboptimal: self is moved. ndarray however offers array views...
-/// Transposing a type
-pub trait ArgminTranspose {
+/// Return the transpose (`U`) of `self`
+pub trait ArgminTranspose<U> {
     /// Transpose
-    fn t(self) -> Self;
+    fn t(self) -> U;
 }
 
 /// Compute the inverse (`T`) of `self`

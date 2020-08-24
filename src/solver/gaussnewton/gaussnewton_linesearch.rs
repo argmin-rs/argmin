@@ -55,18 +55,16 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
 impl<O, L, F> Solver<O> for GaussNewtonLS<L, F>
 where
     O: ArgminOp<Float = F>,
-    O::Param: Default
-        + std::fmt::Debug
+    O::Param: std::fmt::Debug
         + ArgminScaledSub<O::Param, O::Float, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminMul<O::Float, O::Param>,
     O::Output: ArgminNorm<O::Float>,
-    O::Jacobian: ArgminTranspose
+    O::Jacobian: ArgminTranspose<O::Jacobian>
         + ArgminInv<O::Jacobian>
         + ArgminDot<O::Jacobian, O::Jacobian>
         + ArgminDot<O::Output, O::Param>
         + ArgminDot<O::Param, O::Param>,
-    O::Hessian: Default,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<LineSearchOP<O>>>,
     F: ArgminFloat,
 {
@@ -134,7 +132,7 @@ pub struct LineSearchOP<O> {
 impl<O> ArgminOp for LineSearchOP<O>
 where
     O: ArgminOp,
-    O::Jacobian: ArgminTranspose + ArgminDot<O::Output, O::Param>,
+    O::Jacobian: ArgminTranspose<O::Jacobian> + ArgminDot<O::Output, O::Param>,
     O::Output: ArgminNorm<O::Float>,
 {
     type Param = O::Param;

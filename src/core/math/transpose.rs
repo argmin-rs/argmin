@@ -10,7 +10,7 @@ use num_complex::Complex;
 
 macro_rules! make_transpose {
     ($t:ty) => {
-        impl ArgminTranspose for $t {
+        impl ArgminTranspose<$t> for $t {
             #[inline]
             fn t(self) -> $t {
                 self
@@ -55,7 +55,7 @@ mod tests {
                 #[test]
                 fn [<test_transpose_ $t>]() {
                     let a = 8 as $t;
-                    let res = <$t as ArgminTranspose>::t(a);
+                    let res = <$t as ArgminTranspose<$t>>::t(a);
                     assert!(((8 as $t - res) as f64).abs() < std::f64::EPSILON);
                 }
             }

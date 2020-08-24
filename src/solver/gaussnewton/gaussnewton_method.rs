@@ -73,17 +73,15 @@ impl<F: ArgminFloat> Default for GaussNewton<F> {
 impl<O, F> Solver<O> for GaussNewton<F>
 where
     O: ArgminOp<Float = F>,
-    O::Param: Default
-        + ArgminScaledSub<O::Param, O::Float, O::Param>
+    O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminMul<O::Float, O::Param>,
     O::Output: ArgminNorm<O::Float>,
-    O::Jacobian: ArgminTranspose
+    O::Jacobian: ArgminTranspose<O::Jacobian>
         + ArgminInv<O::Jacobian>
         + ArgminDot<O::Jacobian, O::Jacobian>
         + ArgminDot<O::Output, O::Param>
         + ArgminDot<O::Param, O::Param>,
-    O::Hessian: Default,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Gauss-Newton method";
