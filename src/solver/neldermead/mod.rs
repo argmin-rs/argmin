@@ -54,7 +54,7 @@ pub struct NelderMead<P, F> {
 
 impl<P, F> NelderMead<P, F>
 where
-    P: Clone + Default + ArgminAdd<P, P> + ArgminSub<P, P> + ArgminMul<F, P>,
+    P: Clone + ArgminAdd<P, P> + ArgminSub<P, P> + ArgminMul<F, P>,
     F: ArgminFloat,
 {
     /// Constructor
@@ -182,7 +182,7 @@ where
 
 impl<P, F> Default for NelderMead<P, F>
 where
-    P: Clone + Default + ArgminAdd<P, P> + ArgminSub<P, P> + ArgminMul<F, P>,
+    P: Clone + ArgminAdd<P, P> + ArgminSub<P, P> + ArgminMul<F, P>,
     F: ArgminFloat,
 {
     fn default() -> NelderMead<P, F> {
@@ -193,8 +193,7 @@ where
 impl<O, P, F> Solver<O> for NelderMead<P, F>
 where
     O: ArgminOp<Output = F, Param = P, Float = F>,
-    P: Default
-        + Clone
+    P: Clone
         + Serialize
         + DeserializeOwned
         + ArgminScaledSub<O::Param, O::Float, O::Param>
