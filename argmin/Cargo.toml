@@ -73,6 +73,10 @@ name = "brent"
 required-features = ["slog-logger"]
 
 [[example]]
+name = "brentopt"
+required-features = ["slog-logger"]
+
+[[example]]
 name = "checkpoint"
 required-features = ["serde1", "slog-logger"]
 
