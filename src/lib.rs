@@ -188,6 +188,7 @@
 //! use argmin::solver::gradientdescent::SteepestDescent;
 //! use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use instant;
 //! #
 //! # struct Rosenbrock {
 //! #     a: f64,
@@ -234,7 +235,7 @@
 //!     .run()?;
 //! #
 //! #     // Wait a second (lets the logger flush everything first)
-//! #     std::thread::sleep(std::time::Duration::from_secs(1));
+//! #     std::thread::sleep(instant::Duration::from_secs(1));
 //!  
 //! // print result
 //! println!("{}", res);
@@ -352,6 +353,7 @@
 //! # use argmin::solver::landweber::*;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! # use argmin::core::Error;
+//! # use instant;
 //! #
 //! # #[derive(Default)]
 //! # struct Rosenbrock {}
@@ -388,7 +390,7 @@
 //!     .run()?;
 //! #
 //! #     // Wait a second (lets the logger flush everything before printing to screen again)
-//! #     std::thread::sleep(std::time::Duration::from_secs(1));
+//! #     std::thread::sleep(instant::Duration::from_secs(1));
 //! #     println!("{}", res);
 //! #     Ok(())
 //! # }
