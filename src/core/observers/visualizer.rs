@@ -9,6 +9,7 @@
 
 extern crate gnuplot;
 use crate::prelude::*;
+use instant;
 use std::sync::Mutex;
 
 /// Visualize iterations of a solver for cost functions of type
@@ -34,7 +35,7 @@ pub struct Visualizer3d {
     /// Optional visualized surface of cost function
     surface: Option<Surface>,
     /// Optional delay between iterations
-    delay: Option<std::time::Duration>,
+    delay: Option<instant::Duration>,
 }
 
 impl Visualizer3d {
@@ -54,7 +55,7 @@ impl Visualizer3d {
     }
 
     /// Set delay
-    pub fn delay(mut self, duration: std::time::Duration) -> Self {
+    pub fn delay(mut self, duration: instant::Duration) -> Self {
         self.delay = Some(duration);
         self
     }

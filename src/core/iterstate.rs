@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{ArgminOp, OpWrapper, TerminationReason};
+use instant;
 use num::traits::float::Float;
 use paste::item;
 use serde::{Deserialize, Serialize};
@@ -62,7 +63,7 @@ pub struct IterState<O: ArgminOp> {
     /// Number of modify evaluations so far
     pub modify_func_count: u64,
     /// Time required so far
-    pub time: std::time::Duration,
+    pub time: instant::Duration,
     /// Reason of termination
     pub termination_reason: TerminationReason,
 }
@@ -136,7 +137,7 @@ impl<O: ArgminOp> IterState<O> {
             hessian_func_count: 0,
             jacobian_func_count: 0,
             modify_func_count: 0,
-            time: std::time::Duration::new(0, 0),
+            time: instant::Duration::new(0, 0),
             termination_reason: TerminationReason::NotTerminated,
         }
     }
@@ -212,7 +213,7 @@ impl<O: ArgminOp> IterState<O> {
         TerminationReason,
         "Set termination_reason"
     );
-    setter!(time, std::time::Duration, "Set time required so far");
+    setter!(time, instant::Duration, "Set time required so far");
     getter!(param, O::Param, "Returns current parameter vector");
     getter!(prev_param, O::Param, "Returns previous parameter vector");
     getter!(best_param, O::Param, "Returns best parameter vector");
@@ -269,7 +270,7 @@ impl<O: ArgminOp> IterState<O> {
         TerminationReason,
         "Get termination_reason"
     );
-    getter!(time, std::time::Duration, "Get time required so far");
+    getter!(time, instant::Duration, "Get time required so far");
     getter_option!(grad, O::Param, "Returns gradient");
     getter_option!(prev_grad, O::Param, "Returns previous gradient");
     getter_option!(hessian, O::Hessian, "Returns current Hessian");

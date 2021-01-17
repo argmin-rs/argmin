@@ -21,6 +21,7 @@ anyhow = "1.0"
 approx = "0.4.0"
 bincode = "1.1.4"
 ctrlc = { version = "3.1.2", optional = true }
+instant = {version = "0.1", features = ["now"] }
 gnuplot = { version = "0.0.37", optional = true}
 paste = "1.0.0"
 nalgebra = { version = "0.22.0", optional = true, features = ["serde-serialize"] }
@@ -49,6 +50,8 @@ default = []
 nalgebral = ["nalgebra"]
 ndarrayl = ["ndarray", "ndarray-linalg", "ndarray-rand"]
 visualizer = ["gnuplot"]
+wasm-bindgen = ["instant/wasm-bindgen"]
+stdweb = ["instant/stdweb"]
 
 [badges]
 travis-ci = { repository = "argmin-rs/argmin", branch = "master" }

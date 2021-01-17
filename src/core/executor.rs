@@ -12,6 +12,7 @@ use crate::core::{
     ArgminCheckpoint, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, Error, IterState, Observe,
     Observer, ObserverMode, OpWrapper, Solver, TerminationReason,
 };
+use instant;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -103,7 +104,7 @@ where
 
     /// Run the executor
     pub fn run(mut self) -> Result<ArgminResult<O>, Error> {
-        let total_time = std::time::Instant::now();
+        let total_time = instant::Instant::now();
 
         let running = Arc::new(AtomicBool::new(true));
 
@@ -161,7 +162,7 @@ where
             }
 
             // Start time measurement
-            let start = std::time::Instant::now();
+            let start = instant::Instant::now();
 
             let data = self.solver.next_iter(&mut self.op, &self.state)?;
 
