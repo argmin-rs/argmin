@@ -325,19 +325,16 @@ where
             self.update(op, (a_x, a_f, a_g), (b_x, b_f, b_g), (c_x, c_f, c_g))?;
 
         // S2
-        // if (c_x - bb_x).abs() < F::epsilon() {
         if c_x == bb_x {
             c_bar_x = self.secant(b_x, b_g, bb_x, bb_g);
         }
 
         // S3
-        // if (c_x - aa_x).abs() < F::epsilon() {
         if c_x == aa_x {
             c_bar_x = self.secant(a_x, a_g, aa_x, aa_g);
         }
 
         // S4
-        // if (c_x - aa_x).abs() < F::epsilon() || (c_x - bb_x).abs() < F::epsilon() {
         if c_x == bb_x && c_x == aa_x {
             let c_bar_f = self.calc(op, c_bar_x)?;
             let c_bar_g = self.calc_grad(op, c_bar_x)?;
