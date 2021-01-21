@@ -11,6 +11,7 @@ use argmin::solver::linesearch::HagerZhangLineSearch;
 
 struct problem {}
 
+// cost_function
 // f(x)=(x−3) x^{3} (x−6)^{4}
 pub fn cf(params: &Vec<f64>) -> f64 {
     let x = params[0];
@@ -19,6 +20,7 @@ pub fn cf(params: &Vec<f64>) -> f64 {
     value
 }
 
+// derivative of cost_function
 // df(x) = (x - 6)**5 *
 // (x**3*(x - 6)*(x - 3)**(x**4)*(x + 4*(x - 3)*log(x - 3)) + 6*(x - 3)**(x**4 + 1)) /
 // (x - 3)
@@ -72,9 +74,6 @@ fn run() -> Result<(), Error> {
     let init_cost = operator.apply(&init_param)?;
     let init_grad = operator.gradient(&init_param)?;
 
-    println!("init_cost: {:?}", init_cost);
-    println!("init_grad: {:?}", init_grad);
-
     // Run solver
     let res = Executor::new(operator, solver, init_param)
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
@@ -88,7 +87,7 @@ fn run() -> Result<(), Error> {
     std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print Result
-    println!("results: {}", res);
+    println!("{}", res);
     Ok(())
 }
 
