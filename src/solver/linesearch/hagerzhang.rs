@@ -256,12 +256,6 @@ where
         (b_x, b_f, b_g): Triplet<F>,
         (c_x, c_f, c_g): Triplet<F>,
     ) -> Result<(Triplet<F>, Triplet<F>), Error> {
-        println!(
-            "a: {:?}, b: {:?}, c: {:?}",
-            &(a_x, a_f, a_g),
-            &(b_x, b_f, b_g),
-            &(c_x, c_f, c_g)
-        );
         // U0
         if c_x <= a_x || c_x >= b_x {
             // nothing changes.
@@ -532,8 +526,6 @@ where
         self.b_x = bt_x;
         self.b_f = bt_f;
         self.b_g = bt_g;
-
-        println!("a: {:?}, b: {:?}", (&at_x, &at_f, &at_g), (&bt_x, &bt_f, &bt_g));
 
         self.set_best();
         let new_param = self

@@ -14,7 +14,7 @@ struct problem {}
 // f(x)=(x−3) x^{3} (x−6)^{4}
 pub fn cf(params: &Vec<f64>) -> f64 {
     let x = params[0];
-    let value: f64 = (x - 3 as f64) * x.powi(3) * (x - 6 as f64).powi(4);
+    let value: f64 = (x - 3.0) * x.powi(3) * (x - 6.0).powi(4);
     println!("x: {}, value: {}", x, &value);
     value
 }
@@ -52,7 +52,7 @@ impl ArgminOp for problem {
 
 fn run() -> Result<(), Error> {
     // Define inital parameter vector
-    let init_param: Vec<f64> = vec![-0.5];
+    let init_param: Vec<f64> = vec![4.0];
 
     // Problem definition
     let operator = problem {};
@@ -67,7 +67,7 @@ fn run() -> Result<(), Error> {
     solver.set_search_direction(vec![1.0]);
 
     // Set initial step length
-    solver.set_init_alpha(4.0)?;
+    solver.set_init_alpha(1.5)?;
 
     let init_cost = operator.apply(&init_param)?;
     let init_grad = operator.gradient(&init_param)?;
