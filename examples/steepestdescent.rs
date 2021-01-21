@@ -47,23 +47,15 @@ fn run() -> Result<(), Error> {
     // let init_param: Vec<f64> = vec![-1.2, 1.0];
 
     // Pick a line search.
-    let mut linesearch = HagerZhangLineSearch::new();
+    let linesearch = HagerZhangLineSearch::new();
     //let linesearch = MoreThuenteLineSearch::new();
-
-    linesearch.set_search_direction(vec![-1.0, 1.0]);
-    linesearch.set_init_alpha(0.5)?;
 
     // Set up solver
     let solver = SteepestDescent::new(linesearch);
 
-    // Set up writer
-    let writer = WriteToFile::new("hager-zhang", "param").serializer(WriteToFileSerializer::JSON);
-    //let writer = WriteToFile::new("more-thuente", "param").serializer(WriteToFileSerializer::JSON);
-
     // Run solver
     let res = Executor::new(cost, solver, init_param)
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
-        .add_observer(writer, ObserverMode::Always)
         .max_iters(10)
         .run()?;
 
