@@ -53,7 +53,10 @@ mod tests {
                     let res = <Array2<$t> as ArgminInv<Array2<$t>>>::inv(&a).unwrap();
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!((((res[(i, j)] - target[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            // TODO: before ndarray 0.14 / ndarray-linalg 0.13, comparison with
+                            // EPSILON worked, now errors are larger (and dependent on the BLAS
+                            // backend)
+                            assert!((((res[(i, j)] - target[(i, j)]) as f64).abs()) < 0.000001);
                         }
                     }
                 }

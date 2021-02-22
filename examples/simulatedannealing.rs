@@ -73,10 +73,10 @@ impl ArgminOp for Rosenbrock {
             // Compute random index of the parameter vector using the supplied random number
             // generator.
             let mut rng = self.rng.lock().unwrap();
-            let idx = (*rng).gen_range(0, param.len());
+            let idx = (*rng).gen_range(0..param.len());
 
             // Compute random number in [0.1, 0.1].
-            let val = 0.1 * (*rng).gen_range(-1.0, 1.0);
+            let val = 0.1 * (*rng).gen_range(-1.0..1.0);
 
             // modify previous parameter value at random position `idx` by `val`
             let tmp = param[idx] + val;
