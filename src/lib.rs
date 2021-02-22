@@ -79,7 +79,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = "0.3.1"
+//! argmin = "0.4.1"
 //! ```
 //!
 //! ## Optional features (recommended)
@@ -88,7 +88,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = { version = "0.3.1", features = ["ctrlc", "ndarrayl"] }
+//! argmin = { version = "0.4.1", features = ["ctrlc", "ndarrayl", "nalgebral"] }
 //! ```
 //!
 //! These may become default features in the future. Without these features compilation to
@@ -97,10 +97,11 @@
 //! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
 //!    result) after pressing Ctrl+C.
 //! - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.
+//! - `nalgebral`: Support for `nalgebra`.
 //!
 //! ## Running the tests
 //!
-//! Running the tests requires the `ndarrayl` feature to be enabled:
+//! Running the tests requires the `ndarrayl` and feature to be enabled:
 //!
 //! ```bash
 //! cargo test --features "ndarrayl"

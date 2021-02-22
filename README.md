@@ -78,7 +78,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-argmin = "0.3.1"
+argmin = "0.4.1"
 ```
 
 ### Optional features (recommended)
@@ -87,7 +87,7 @@ There are additional features which can be activated in `Cargo.toml`:
 
 ```toml
 [dependencies]
-argmin = { version = "0.3.1", features = ["ctrlc", "ndarrayl", "nalgebral"] }
+argmin = { version = "0.4.1", features = ["ctrlc", "ndarrayl", "nalgebral"] }
 ```
 
 These may become default features in the future. Without these features compilation to
@@ -96,7 +96,7 @@ These may become default features in the future. Without these features compilat
 - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
    result) after pressing Ctrl+C.
 - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.
-- `nalgebral`: Support for [`nalgebra`](https://nalgebra.org)
+- `nalgebral`: Support for [`nalgebra`](https://nalgebra.org).
 
 ### Running the tests
 
