@@ -537,6 +537,7 @@
 <span id="534">534</span>
 <span id="535">535</span>
 <span id="536">536</span>
+<span id="537">537</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -619,7 +620,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! argmin = &quot;0.3.1&quot;</span>
+<span class="doccomment">//! argmin = &quot;0.4.1&quot;</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Optional features (recommended)</span>
@@ -628,7 +629,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! argmin = { version = &quot;0.3.1&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;] }</span>
+<span class="doccomment">//! argmin = { version = &quot;0.4.1&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;, &quot;nalgebral&quot;] }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! These may become default features in the future. Without these features compilation to</span>
@@ -637,10 +638,11 @@
 <span class="doccomment">//! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best</span>
 <span class="doccomment">//!    result) after pressing Ctrl+C.</span>
 <span class="doccomment">//! - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.</span>
+<span class="doccomment">//! - `nalgebral`: Support for `nalgebra`.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Running the tests</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Running the tests requires the `ndarrayl` feature to be enabled:</span>
+<span class="doccomment">//! Running the tests requires the `ndarrayl` and feature to be enabled:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```bash</span>
 <span class="doccomment">//! cargo test --features &quot;ndarrayl&quot;</span>
