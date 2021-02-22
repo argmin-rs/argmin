@@ -27,9 +27,9 @@ where
                 if a == b {
                     a.clone()
                 } else if a < b {
-                    rng.gen_range(a, b)
+                    rng.gen_range(a.clone()..b.clone())
                 } else {
-                    rng.gen_range(b, a)
+                    rng.gen_range(b.clone()..a.clone())
                 }
             })
             .collect()
