@@ -459,7 +459,10 @@ where
             cost
         };
 
-        self.init_grad = state.get_grad().unwrap_or(op.gradient(&self.init_param)?);
+        self.init_grad = state
+            .get_grad()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.gradient(&self.init_param))?;
 
         self.a_x = self.a_x_init;
         self.b_x = self.b_x_init;
