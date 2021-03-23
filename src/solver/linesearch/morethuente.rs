@@ -242,7 +242,8 @@ where
 
         self.init_grad = state
             .get_grad()
-            .unwrap_or_else(|| op.gradient(&self.init_param).unwrap());
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.gradient(&self.init_param))?;
 
         self.dginit = self.init_grad.dot(&self.search_direction);
 

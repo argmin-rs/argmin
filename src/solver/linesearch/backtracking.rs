@@ -121,7 +121,10 @@ where
             cost
         };
 
-        self.init_grad = state.get_grad().unwrap_or(op.gradient(&self.init_param)?);
+        self.init_grad = state
+            .get_grad()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.gradient(&self.init_param))?;
 
         if self.search_direction.is_none() {
             return Err(ArgminError::NotInitialized {
