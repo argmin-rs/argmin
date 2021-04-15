@@ -111,7 +111,7 @@ where
         + ArgminNorm<O::Float>
         + ArgminZeroLike
         + ArgminMul<F, O::Param>,
-    O::Hessian: Debug
+    B: Debug
         + Clone
         + Default
         + Serialize
