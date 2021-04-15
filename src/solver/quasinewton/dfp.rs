@@ -62,7 +62,7 @@ where
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>
         + ArgminTranspose<O::Param>,
-    O::Hessian: Clone
+    H: Clone
         + Default
         + Serialize
         + DeserializeOwned

@@ -129,7 +129,7 @@ where
 impl<O, P, F> Solver<O> for ParticleSwarm<P, F>
 where
     O: ArgminOp<Output = F, Param = P, Float = F>,
-    O::Param: Position<F> + DeserializeOwned + Serialize,
+    P: Position<F> + DeserializeOwned + Serialize,
     O::Hessian: Clone + Default,
     F: ArgminFloat,
 {

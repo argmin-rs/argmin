@@ -87,7 +87,7 @@ where
         + ArgminDot<O::Param, O::Hessian>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    O::Hessian: Debug
+    H: Debug
         + Clone
         + Default
         + Serialize

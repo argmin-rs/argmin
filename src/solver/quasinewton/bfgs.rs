@@ -70,7 +70,7 @@ where
         + ArgminScaledAdd<O::Param, O::Float, O::Param>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    O::Hessian: Clone
+    H: Clone
         + Default
         + Debug
         + Serialize
