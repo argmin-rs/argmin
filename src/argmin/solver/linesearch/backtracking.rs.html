@@ -185,6 +185,9 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
@@ -309,7 +312,10 @@
             <span class="ident">cost</span>
         };
 
-        <span class="self">self</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap_or</span>(<span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">init_param</span>)<span class="question-mark">?</span>);
+        <span class="self">self</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="ident">state</span>
+            .<span class="ident">get_grad</span>()
+            .<span class="ident">map</span>(<span class="prelude-ty">Result</span>::<span class="prelude-val">Ok</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">init_param</span>))<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">is_none</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotInitialized</span> {
@@ -371,4 +377,5 @@
                     <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">MinimalNoOperator</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>);
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "argmin";</script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin"></div>
+    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>
