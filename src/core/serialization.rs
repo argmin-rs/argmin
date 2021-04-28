@@ -103,6 +103,14 @@ impl ArgminCheckpoint {
         self.name.clone()
     }
 
+    /// Get filename for checkpoint
+    #[inline]
+    fn filename(&self) -> String {
+        let mut filename = self.name();
+        filename.push_str(".arg");
+        filename
+    }
+
     /// Set mode of checkpoint
     #[inline]
     pub fn set_mode(&mut self, mode: CheckpointMode) {
@@ -126,11 +134,9 @@ impl ArgminCheckpoint {
     /// Write checkpoint based on the desired `CheckpointMode`
     #[inline]
     pub fn store_cond<T: Serialize>(&self, executor: &T, iter: u64) -> Result<(), Error> {
-        let mut filename = self.name();
-        filename.push_str(".arg");
         match self.mode {
-            CheckpointMode::Always => self.store(executor, filename)?,
-            CheckpointMode::Every(it) if iter % it == 0 => self.store(executor, filename)?,
+            CheckpointMode::Always => self.store(executor, self.filename())?,
+            CheckpointMode::Every(it) if iter % it == 0 => self.store(executor, self.filename())?,
             CheckpointMode::Never | CheckpointMode::Every(_) => {}
         };
         Ok(())

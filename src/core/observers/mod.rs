@@ -72,6 +72,11 @@ impl<O: ArgminOp> Observer<O> {
         self.observers.push((Arc::new(Mutex::new(observer)), mode));
         self
     }
+
+    /// Returns true if `observers` is empty
+    pub fn is_empty(&self) -> bool {
+        self.observers.is_empty()
+    }
 }
 
 /// By implementing `Observe` for `Observer` we basically allow a set of `Observer`s to be used
