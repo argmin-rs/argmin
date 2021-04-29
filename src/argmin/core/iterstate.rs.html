@@ -592,7 +592,7 @@
     <span class="doccomment">/// Number of modify evaluations so far</span>
     <span class="kw">pub</span> <span class="ident">modify_func_count</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// Time required so far</span>
-    <span class="kw">pub</span> <span class="ident">time</span>: <span class="ident">instant</span>::<span class="ident">Duration</span>,
+    <span class="kw">pub</span> <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">instant</span>::<span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Reason of termination</span>
     <span class="kw">pub</span> <span class="ident">termination_reason</span>: <span class="ident">TerminationReason</span>,
 }
@@ -666,7 +666,7 @@
             <span class="ident">hessian_func_count</span>: <span class="number">0</span>,
             <span class="ident">jacobian_func_count</span>: <span class="number">0</span>,
             <span class="ident">modify_func_count</span>: <span class="number">0</span>,
-            <span class="ident">time</span>: <span class="ident">instant</span>::<span class="ident">Duration</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">0</span>),
+            <span class="ident">time</span>: <span class="prelude-val">Some</span>(<span class="ident">instant</span>::<span class="ident">Duration</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">0</span>)),
             <span class="ident">termination_reason</span>: <span class="ident">TerminationReason</span>::<span class="ident">NotTerminated</span>,
         }
     }
@@ -742,7 +742,7 @@
         <span class="ident">TerminationReason</span>,
         <span class="string">&quot;Set termination_reason&quot;</span>
     );
-    <span class="macro">setter</span><span class="macro">!</span>(<span class="ident">time</span>, <span class="ident">instant</span>::<span class="ident">Duration</span>, <span class="string">&quot;Set time required so far&quot;</span>);
+    <span class="macro">setter</span><span class="macro">!</span>(<span class="ident">time</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">instant</span>::<span class="ident">Duration</span><span class="op">&gt;</span>, <span class="string">&quot;Set time required so far&quot;</span>);
     <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">param</span>, <span class="ident">O</span>::<span class="ident">Param</span>, <span class="string">&quot;Returns current parameter vector&quot;</span>);
     <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">prev_param</span>, <span class="ident">O</span>::<span class="ident">Param</span>, <span class="string">&quot;Returns previous parameter vector&quot;</span>);
     <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">best_param</span>, <span class="ident">O</span>::<span class="ident">Param</span>, <span class="string">&quot;Returns best parameter vector&quot;</span>);
@@ -799,7 +799,7 @@
         <span class="ident">TerminationReason</span>,
         <span class="string">&quot;Get termination_reason&quot;</span>
     );
-    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">time</span>, <span class="ident">instant</span>::<span class="ident">Duration</span>, <span class="string">&quot;Get time required so far&quot;</span>);
+    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">time</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">instant</span>::<span class="ident">Duration</span><span class="op">&gt;</span>, <span class="string">&quot;Get time required so far&quot;</span>);
     <span class="macro">getter_option</span><span class="macro">!</span>(<span class="ident">grad</span>, <span class="ident">O</span>::<span class="ident">Param</span>, <span class="string">&quot;Returns gradient&quot;</span>);
     <span class="macro">getter_option</span><span class="macro">!</span>(<span class="ident">prev_grad</span>, <span class="ident">O</span>::<span class="ident">Param</span>, <span class="string">&quot;Returns previous gradient&quot;</span>);
     <span class="macro">getter_option</span><span class="macro">!</span>(<span class="ident">hessian</span>, <span class="ident">O</span>::<span class="ident">Hessian</span>, <span class="string">&quot;Returns current Hessian&quot;</span>);
