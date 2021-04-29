@@ -49,6 +49,7 @@ pub struct ArgminCheckpoint {
     mode: CheckpointMode,
     directory: String,
     name: String,
+    filename: String,
 }
 
 impl Default for ArgminCheckpoint {
@@ -57,6 +58,7 @@ impl Default for ArgminCheckpoint {
             mode: CheckpointMode::Never,
             directory: ".checkpoints".to_string(),
             name: "default".to_string(),
+            filename: "default.arg".to_string(),
         }
     }
 }
@@ -71,11 +73,13 @@ impl ArgminCheckpoint {
             _ => {}
         }
         let name = "solver".to_string();
+        let filename = "solver.arg".to_string();
         let directory = directory.to_string();
         Ok(ArgminCheckpoint {
             mode,
             directory,
             name,
+            filename,
         })
     }
 
@@ -95,20 +99,15 @@ impl ArgminCheckpoint {
     #[inline]
     pub fn set_name(&mut self, name: &str) {
         self.name = name.to_string();
+        let mut filename = self.name();
+        filename.push_str(".arg");
+        self.filename = filename;
     }
 
     /// Get name of checkpoint
     #[inline]
     pub fn name(&self) -> String {
         self.name.clone()
-    }
-
-    /// Get filename for checkpoint
-    #[inline]
-    fn filename(&self) -> String {
-        let mut filename = self.name();
-        filename.push_str(".arg");
-        filename
     }
 
     /// Set mode of checkpoint
@@ -119,7 +118,7 @@ impl ArgminCheckpoint {
 
     /// Write checkpoint to disk
     #[inline]
-    pub fn store<T: Serialize>(&self, executor: &T, filename: String) -> Result<(), Error> {
+    pub fn store<T: Serialize>(&self, executor: &T, filename: &str) -> Result<(), Error> {
         let dir = Path::new(&self.directory);
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?
@@ -135,8 +134,8 @@ impl ArgminCheckpoint {
     #[inline]
     pub fn store_cond<T: Serialize>(&self, executor: &T, iter: u64) -> Result<(), Error> {
         match self.mode {
-            CheckpointMode::Always => self.store(executor, self.filename())?,
-            CheckpointMode::Every(it) if iter % it == 0 => self.store(executor, self.filename())?,
+            CheckpointMode::Always => self.store(executor, &self.filename)?,
+            CheckpointMode::Every(it) if iter % it == 0 => self.store(executor, &self.filename)?,
             CheckpointMode::Never | CheckpointMode::Every(_) => {}
         };
         Ok(())
