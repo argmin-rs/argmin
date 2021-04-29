@@ -78,7 +78,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-argmin = "0.4.3"
+argmin = "0.4.4"
 ```
 
 ### Optional features (recommended)
@@ -87,7 +87,7 @@ There are additional features which can be activated in `Cargo.toml`:
 
 ```toml
 [dependencies]
-argmin = { version = "0.4.3", features = ["ctrlc", "ndarrayl", "nalgebral"] }
+argmin = { version = "0.4.4", features = ["ctrlc", "ndarrayl", "nalgebral"] }
 ```
 
 These may become default features in the future. Without these features compilation to
