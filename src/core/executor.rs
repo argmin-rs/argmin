@@ -37,6 +37,8 @@ pub struct Executor<O: ArgminOp, S> {
     checkpoint: ArgminCheckpoint,
     /// Indicates whether Ctrl-C functionality should be active or not
     ctrlc: bool,
+    /// Indicates whether to time execution or not
+    timer: bool,
 }
 
 impl<O, S> Executor<O, S>
@@ -54,6 +56,7 @@ where
             observers: Observer::new(),
             checkpoint: ArgminCheckpoint::default(),
             ctrlc: true,
+            timer: true,
         }
     }
 
@@ -104,7 +107,11 @@ where
 
     /// Run the executor
     pub fn run(mut self) -> Result<ArgminResult<O>, Error> {
-        let total_time = instant::Instant::now();
+        let total_time = if self.timer {
+            Some(instant::Instant::now())
+        } else {
+            None
+        };
 
         let running = Arc::new(AtomicBool::new(true));
 
@@ -132,16 +139,21 @@ where
         // let mut op_wrapper = OpWrapper::new(&self.op);
         let init_data = self.solver.init(&mut self.op, &self.state)?;
 
-        let mut logs = make_kv!("max_iters" => self.state.get_max_iters(););
-
         // If init() returned something, deal with it
-        if let Some(data) = init_data {
+        if let Some(data) = &init_data {
             self.update(&data)?;
-            logs = logs.merge(&mut data.get_kv());
         }
 
-        // Observe after init
-        self.observers.observe_init(S::NAME, &logs)?;
+        if !self.observers.is_empty() {
+            let mut logs = make_kv!("max_iters" => self.state.get_max_iters(););
+
+            if let Some(data) = init_data {
+                logs = logs.merge(&mut data.get_kv());
+            }
+
+            // Observe after init
+            self.observers.observe_init(S::NAME, &logs)?;
+        }
 
         self.state.set_func_counts(&self.op);
 
@@ -162,29 +174,45 @@ where
             }
 
             // Start time measurement
-            let start = instant::Instant::now();
+            let start = if self.timer {
+                Some(instant::Instant::now())
+            } else {
+                None
+            };
 
             let data = self.solver.next_iter(&mut self.op, &self.state)?;
 
             self.state.set_func_counts(&self.op);
 
             // End time measurement
-            let duration = start.elapsed();
+            let duration = if self.timer {
+                Some(start.unwrap().elapsed())
+            } else {
+                None
+            };
 
             self.update(&data)?;
 
-            let log = data.get_kv().merge(&mut make_kv!(
-                "time" => duration.as_secs() as f64 + f64::from(duration.subsec_nanos()) * 1e-9;
-            ));
+            if !self.observers.is_empty() {
+                let mut log = data.get_kv();
 
-            self.observers.observe_iter(&self.state, &log)?;
+                if self.timer {
+                    let duration = duration.unwrap();
+                    log = log.merge(&mut make_kv!(
+                        "time" => duration.as_secs() as f64 + f64::from(duration.subsec_nanos()) * 1e-9;
+                    ));
+                }
+                self.observers.observe_iter(&self.state, &log)?;
+            }
 
             // increment iteration number
             self.state.increment_iter();
 
             self.checkpoint.store_cond(&self, self.state.get_iter())?;
 
-            self.state.time(total_time.elapsed());
+            if self.timer {
+                total_time.map(|total_time| self.state.time(Some(total_time.elapsed())));
+            }
 
             // Check if termination occured inside next_iter()
             if self.state.terminated() {
@@ -268,6 +296,12 @@ where
     /// Turn Ctrl-C handling on or off (default: on)
     pub fn ctrlc(mut self, ctrlc: bool) -> Self {
         self.ctrlc = ctrlc;
+        self
+    }
+
+    /// Turn timer on or off (default: on)
+    pub fn timer(mut self, timer: bool) -> Self {
+        self.timer = timer;
         self
     }
 }
