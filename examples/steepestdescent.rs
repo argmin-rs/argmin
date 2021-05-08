@@ -7,8 +7,6 @@
 
 #![allow(unused_imports)]
 
-extern crate argmin;
-extern crate argmin_testfunctions;
 use argmin::prelude::*;
 use argmin::solver::gradientdescent::SteepestDescent;
 use argmin::solver::linesearch::HagerZhangLineSearch;

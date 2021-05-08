@@ -5,8 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-extern crate argmin;
-extern crate argmin_testfunctions;
 use argmin::prelude::*;
 use argmin::solver::linesearch::{ArmijoCondition, BacktrackingLineSearch};
 use argmin_testfunctions::{sphere, sphere_derivative};

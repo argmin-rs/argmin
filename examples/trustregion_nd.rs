@@ -5,9 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-extern crate argmin;
-extern crate argmin_testfunctions;
-extern crate ndarray;
 use argmin::prelude::*;
 #[allow(unused_imports)]
 use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};

@@ -5,7 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-extern crate argmin;
 use argmin::prelude::*;
 use argmin::solver::goldensectionsearch::GoldenSectionSearch;
 
