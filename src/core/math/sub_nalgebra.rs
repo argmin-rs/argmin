@@ -11,10 +11,10 @@ use crate::core::math::ArgminSub;
 
 use nalgebra::{
     base::{allocator::Allocator, dimension::Dim, storage::Storage, Scalar},
-    ClosedSub, DefaultAllocator, Matrix, MatrixMN,
+    ClosedSub, DefaultAllocator, Matrix, OMatrix,
 };
 
-impl<N, R, C, S> ArgminSub<N, MatrixMN<N, R, C>> for Matrix<N, R, C, S>
+impl<N, R, C, S> ArgminSub<N, OMatrix<N, R, C>> for Matrix<N, R, C, S>
 where
     N: Scalar + Copy + Sub<Output = N>,
     R: Dim,
@@ -23,12 +23,12 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn sub(&self, other: &N) -> MatrixMN<N, R, C> {
+    fn sub(&self, other: &N) -> OMatrix<N, R, C> {
         self.map(|entry| entry - *other)
     }
 }
 
-impl<N, R, C, S> ArgminSub<Matrix<N, R, C, S>, MatrixMN<N, R, C>> for N
+impl<N, R, C, S> ArgminSub<Matrix<N, R, C, S>, OMatrix<N, R, C>> for N
 where
     N: Scalar + Copy + Sub<Output = N>,
     R: Dim,
@@ -37,12 +37,12 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn sub(&self, other: &Matrix<N, R, C, S>) -> MatrixMN<N, R, C> {
+    fn sub(&self, other: &Matrix<N, R, C, S>) -> OMatrix<N, R, C> {
         other.map(|entry| *self - entry)
     }
 }
 
-impl<N, R, C, S> ArgminSub<Matrix<N, R, C, S>, MatrixMN<N, R, C>> for Matrix<N, R, C, S>
+impl<N, R, C, S> ArgminSub<Matrix<N, R, C, S>, OMatrix<N, R, C>> for Matrix<N, R, C, S>
 where
     N: Scalar + ClosedSub,
     R: Dim,
@@ -51,7 +51,7 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn sub(&self, other: &Matrix<N, R, C, S>) -> MatrixMN<N, R, C> {
+    fn sub(&self, other: &Matrix<N, R, C, S>) -> OMatrix<N, R, C> {
         self - other
     }
 }

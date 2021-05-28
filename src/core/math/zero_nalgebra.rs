@@ -11,10 +11,10 @@ use num::Zero;
 
 use nalgebra::{
     base::{allocator::Allocator, dimension::Dim},
-    DefaultAllocator, MatrixMN, Scalar,
+    DefaultAllocator, OMatrix, Scalar,
 };
 
-impl<N, R, C> ArgminZeroLike for MatrixMN<N, R, C>
+impl<N, R, C> ArgminZeroLike for OMatrix<N, R, C>
 where
     N: Scalar + Zero + ArgminZero,
     R: Dim,
@@ -22,7 +22,7 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn zero_like(&self) -> MatrixMN<N, R, C> {
+    fn zero_like(&self) -> OMatrix<N, R, C> {
         Self::zeros_generic(R::from_usize(self.nrows()), C::from_usize(self.ncols()))
     }
 }

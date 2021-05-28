@@ -15,10 +15,10 @@ use nalgebra::{
         storage::Storage,
         Scalar,
     },
-    ClosedAdd, DefaultAllocator, Matrix, MatrixMN, MatrixSum,
+    ClosedAdd, DefaultAllocator, Matrix, MatrixSum, OMatrix,
 };
 
-impl<N, R, C, S> ArgminAdd<N, MatrixMN<N, R, C>> for Matrix<N, R, C, S>
+impl<N, R, C, S> ArgminAdd<N, OMatrix<N, R, C>> for Matrix<N, R, C, S>
 where
     N: Scalar + ClosedAdd + Copy,
     R: Dim,
@@ -27,12 +27,12 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn add(&self, other: &N) -> MatrixMN<N, R, C> {
+    fn add(&self, other: &N) -> OMatrix<N, R, C> {
         self.add_scalar(*other)
     }
 }
 
-impl<N, R, C, S> ArgminAdd<Matrix<N, R, C, S>, MatrixMN<N, R, C>> for N
+impl<N, R, C, S> ArgminAdd<Matrix<N, R, C, S>, OMatrix<N, R, C>> for N
 where
     N: Scalar + ClosedAdd + Copy,
     R: Dim,
@@ -41,7 +41,7 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn add(&self, other: &Matrix<N, R, C, S>) -> MatrixMN<N, R, C> {
+    fn add(&self, other: &Matrix<N, R, C, S>) -> OMatrix<N, R, C> {
         other.add_scalar(*self)
     }
 }

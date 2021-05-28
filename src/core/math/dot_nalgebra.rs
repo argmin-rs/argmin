@@ -17,7 +17,7 @@ use nalgebra::{
         storage::Storage,
         Scalar,
     },
-    ClosedAdd, ClosedMul, DefaultAllocator, Matrix, MatrixMN,
+    ClosedAdd, ClosedMul, DefaultAllocator, Matrix, OMatrix,
 };
 
 impl<N, R1, R2, C1, C2, SA, SB> ArgminDot<Matrix<N, R2, C2, SB>, N> for Matrix<N, R1, C1, SA>
@@ -37,7 +37,7 @@ where
     }
 }
 
-impl<N, R, C, S> ArgminDot<N, MatrixMN<N, R, C>> for Matrix<N, R, C, S>
+impl<N, R, C, S> ArgminDot<N, OMatrix<N, R, C>> for Matrix<N, R, C, S>
 where
     N: Scalar + Copy + ClosedMul,
     R: Dim,
@@ -46,12 +46,12 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn dot(&self, other: &N) -> MatrixMN<N, R, C> {
+    fn dot(&self, other: &N) -> OMatrix<N, R, C> {
         self * *other
     }
 }
 
-impl<N, R, C, S> ArgminDot<Matrix<N, R, C, S>, MatrixMN<N, R, C>> for N
+impl<N, R, C, S> ArgminDot<Matrix<N, R, C, S>, OMatrix<N, R, C>> for N
 where
     N: Scalar + Copy + ClosedMul,
     R: Dim,
@@ -60,12 +60,12 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn dot(&self, other: &Matrix<N, R, C, S>) -> MatrixMN<N, R, C> {
+    fn dot(&self, other: &Matrix<N, R, C, S>) -> OMatrix<N, R, C> {
         other * *self
     }
 }
 
-impl<N, R1, R2, C1, C2, SA, SB> ArgminDot<Matrix<N, R2, C2, SB>, MatrixMN<N, R1, C2>>
+impl<N, R1, R2, C1, C2, SA, SB> ArgminDot<Matrix<N, R2, C2, SB>, OMatrix<N, R1, C2>>
     for Matrix<N, R1, C1, SA>
 where
     N: Scalar + Zero + One + ClosedAdd + ClosedMul,
@@ -79,7 +79,7 @@ where
     ShapeConstraint: AreMultipliable<R1, C1, R2, C2>,
 {
     #[inline]
-    fn dot(&self, other: &Matrix<N, R2, C2, SB>) -> MatrixMN<N, R1, C2> {
+    fn dot(&self, other: &Matrix<N, R2, C2, SB>) -> OMatrix<N, R1, C2> {
         self * other
     }
 }
