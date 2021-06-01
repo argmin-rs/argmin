@@ -15,10 +15,10 @@ use nalgebra::{
         storage::Storage,
         MatrixSum, Scalar,
     },
-    ClosedMul, DefaultAllocator, Matrix, MatrixMN,
+    ClosedMul, DefaultAllocator, Matrix, OMatrix,
 };
 
-impl<N, R, C, S> ArgminMul<N, MatrixMN<N, R, C>> for Matrix<N, R, C, S>
+impl<N, R, C, S> ArgminMul<N, OMatrix<N, R, C>> for Matrix<N, R, C, S>
 where
     N: Scalar + Copy + ClosedMul,
     R: Dim,
@@ -27,12 +27,12 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn mul(&self, other: &N) -> MatrixMN<N, R, C> {
+    fn mul(&self, other: &N) -> OMatrix<N, R, C> {
         self * *other
     }
 }
 
-impl<N, R, C, S> ArgminMul<Matrix<N, R, C, S>, MatrixMN<N, R, C>> for N
+impl<N, R, C, S> ArgminMul<Matrix<N, R, C, S>, OMatrix<N, R, C>> for N
 where
     N: Scalar + Copy + ClosedMul,
     R: Dim,
@@ -41,7 +41,7 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn mul(&self, other: &Matrix<N, R, C, S>) -> MatrixMN<N, R, C> {
+    fn mul(&self, other: &Matrix<N, R, C, S>) -> OMatrix<N, R, C> {
         other * *self
     }
 }

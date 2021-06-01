@@ -12,10 +12,10 @@ use crate::core::math::ArgminTranspose;
 
 use nalgebra::{
     base::{allocator::Allocator, dimension::Dim, storage::Storage, Scalar},
-    DefaultAllocator, Matrix, MatrixMN,
+    DefaultAllocator, Matrix, OMatrix,
 };
 
-impl<N, R, C, S> ArgminTranspose<MatrixMN<N, C, R>> for Matrix<N, R, C, S>
+impl<N, R, C, S> ArgminTranspose<OMatrix<N, C, R>> for Matrix<N, R, C, S>
 where
     N: Scalar,
     R: Dim,
@@ -24,7 +24,7 @@ where
     DefaultAllocator: Allocator<N, C, R>,
 {
     #[inline]
-    fn t(self) -> MatrixMN<N, C, R> {
+    fn t(self) -> OMatrix<N, C, R> {
         self.transpose()
     }
 }

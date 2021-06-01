@@ -15,10 +15,10 @@ use nalgebra::{
         storage::Storage,
         MatrixSum, Scalar,
     },
-    ClosedDiv, DefaultAllocator, Matrix, MatrixMN,
+    ClosedDiv, DefaultAllocator, Matrix, OMatrix,
 };
 
-impl<N, R, C, S> ArgminDiv<N, MatrixMN<N, R, C>> for Matrix<N, R, C, S>
+impl<N, R, C, S> ArgminDiv<N, OMatrix<N, R, C>> for Matrix<N, R, C, S>
 where
     N: Scalar + Copy + ClosedDiv,
     R: Dim,
@@ -27,12 +27,12 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn div(&self, other: &N) -> MatrixMN<N, R, C> {
+    fn div(&self, other: &N) -> OMatrix<N, R, C> {
         self / *other
     }
 }
 
-impl<N, R, C, S> ArgminDiv<Matrix<N, R, C, S>, MatrixMN<N, R, C>> for N
+impl<N, R, C, S> ArgminDiv<Matrix<N, R, C, S>, OMatrix<N, R, C>> for N
 where
     N: Scalar + Copy + ClosedDiv,
     R: Dim,
@@ -41,7 +41,7 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn div(&self, other: &Matrix<N, R, C, S>) -> MatrixMN<N, R, C> {
+    fn div(&self, other: &Matrix<N, R, C, S>) -> OMatrix<N, R, C> {
         other.map(|entry| *self / entry)
     }
 }

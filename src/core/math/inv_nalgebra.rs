@@ -9,10 +9,10 @@ use crate::core::{errors::ArgminError, math::ArgminInv, Error};
 
 use nalgebra::{
     base::{allocator::Allocator, dimension::Dim, storage::Storage},
-    ComplexField, DefaultAllocator, MatrixN, SquareMatrix,
+    ComplexField, DefaultAllocator, OMatrix, SquareMatrix,
 };
 
-impl<N, D, S> ArgminInv<MatrixN<N, D>> for SquareMatrix<N, D, S>
+impl<N, D, S> ArgminInv<OMatrix<N, D, D>> for SquareMatrix<N, D, S>
 where
     N: ComplexField,
     D: Dim,
@@ -20,7 +20,7 @@ where
     DefaultAllocator: Allocator<N, D, D>,
 {
     #[inline]
-    fn inv(&self) -> Result<MatrixN<N, D>, Error> {
+    fn inv(&self) -> Result<OMatrix<N, D, D>, Error> {
         match self.clone_owned().try_inverse() {
             Some(m) => Ok(m),
             None => Err(ArgminError::InvalidParameter {

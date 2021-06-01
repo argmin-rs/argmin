@@ -11,10 +11,10 @@ use num::{One, Zero};
 
 use nalgebra::{
     base::{allocator::Allocator, dimension::Dim},
-    DefaultAllocator, MatrixMN, Scalar,
+    DefaultAllocator, OMatrix, Scalar,
 };
 
-impl<N, R, C> ArgminEye for MatrixMN<N, R, C>
+impl<N, R, C> ArgminEye for OMatrix<N, R, C>
 where
     N: Scalar + Zero + One,
     R: Dim,
@@ -22,13 +22,13 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn eye_like(&self) -> MatrixMN<N, R, C> {
+    fn eye_like(&self) -> OMatrix<N, R, C> {
         assert!(self.is_square());
         Self::identity_generic(R::from_usize(self.nrows()), C::from_usize(self.ncols()))
     }
 
     #[inline]
-    fn eye(n: usize) -> MatrixMN<N, R, C> {
+    fn eye(n: usize) -> OMatrix<N, R, C> {
         Self::identity_generic(R::from_usize(n), C::from_usize(n))
     }
 }

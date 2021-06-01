@@ -9,10 +9,10 @@ use crate::core::math::ArgminConj;
 
 use nalgebra::{
     base::{allocator::Allocator, dimension::Dim},
-    DefaultAllocator, MatrixMN, SimdComplexField,
+    DefaultAllocator, OMatrix, SimdComplexField,
 };
 
-impl<N, R, C> ArgminConj for MatrixMN<N, R, C>
+impl<N, R, C> ArgminConj for OMatrix<N, R, C>
 where
     N: SimdComplexField,
     R: Dim,
@@ -20,7 +20,7 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn conj(&self) -> MatrixMN<N, R, C> {
+    fn conj(&self) -> OMatrix<N, R, C> {
         self.conjugate()
     }
 }
