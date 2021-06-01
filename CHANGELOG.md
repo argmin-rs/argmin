@@ -1,5 +1,9 @@
 # Changelog
 
+## argmin v0.4.5 
+
+- Squash warnings for Nalgebra 0.26.x (#118, #117, @CattleProdigy)
+
 ## argmin v0.4.4 
 
 - Finally started writing a changelog.

@@ -79,7 +79,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = "0.4.4"
+//! argmin = "0.4.5"
 //! ```
 //!
 //! ## Optional features (recommended)
@@ -88,7 +88,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! argmin = { version = "0.4.4", features = ["ctrlc", "ndarrayl", "nalgebral"] }
+//! argmin = { version = "0.4.5", features = ["ctrlc", "ndarrayl", "nalgebral"] }
 //! ```
 //!
 //! These may become default features in the future. Without these features compilation to
@@ -98,6 +98,13 @@
 //!    result) after pressing Ctrl+C.
 //! - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.
 //! - `nalgebral`: Support for `nalgebra`.
+//!
+//! Using the `ndarrayl` feature on Windows might require to explicitly choose the `ndarray-linalg`
+//! BLAS backend in the `Cargo.toml`:
+//!
+//! ```toml
+//! ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
+//! ```
 //!
 //! ## Running the tests
 //!
