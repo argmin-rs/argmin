@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["BrentError","Error to be thrown if Brent is initialized with improper parameters."]],"struct":[["Brent","Brent's method"]]});
+initSidebarItems({"enum":[["BrentError","Error to be thrown if Brent is initialized with improper parameters."]],"struct":[["Brent","Brent’s method"]]});
