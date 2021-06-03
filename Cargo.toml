@@ -18,7 +18,7 @@ exclude = [
 
 [dependencies]
 anyhow = "1.0"
-approx = "0.4.0"
+approx = "0.5.0"
 bincode = "1.1.4"
 ctrlc = { version = "3.1.2", optional = true }
 instant = {version = "0.1", features = ["now"] }
