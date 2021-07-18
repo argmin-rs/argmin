@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A pure Rust optimization framework"><meta name="keywords" content="rust, rustlang, rust-lang, argmin"><title>argmin - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../argmin/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate argmin</p><div class="block version"><p>Version 0.4.5</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all argmin's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="argmin" data-ty="mod" data-relpath="../"></div></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">argmin</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/argmin/lib.rs.html#8-544" title="goto source code">[src]</a></span></h1><div class="docblock"><p>A pure Rust optimization framework</p>
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../argmin/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate argmin</p><div class="block version"><p>Version 0.4.6</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all argmin's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="argmin" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">argmin</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/argmin/lib.rs.html#8-544" title="goto source code">[src]</a></span></h1><div class="docblock"><p>A pure Rust optimization framework</p>
 <p>This crate offers a (work in progress) numerical optimization toolbox/framework written entirely
 in Rust. It is at the moment potentially very buggy. Please use with care and report any bugs
 you encounter. This crate is looking for contributors!</p>
@@ -78,12 +78,12 @@ remain future plans.</p>
 <h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
 <p>Add this to your <code>Cargo.toml</code>:</p>
 <pre><code class="language-toml">[dependencies]
-argmin = &quot;0.4.5&quot;
+argmin = &quot;0.4.6&quot;
 </code></pre>
 <h2 id="optional-features-recommended" class="section-header"><a href="#optional-features-recommended">Optional features (recommended)</a></h2>
 <p>There are additional features which can be activated in <code>Cargo.toml</code>:</p>
 <pre><code class="language-toml">[dependencies]
-argmin = { version = &quot;0.4.5&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;, &quot;nalgebral&quot;] }
+argmin = { version = &quot;0.4.6&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;, &quot;nalgebral&quot;] }
 </code></pre>
 <p>These may become default features in the future. Without these features compilation to
 <code>wasm32-unknown-unkown</code> seems to be possible.</p>
@@ -123,7 +123,7 @@ at <code>p</code>.</li>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">argmin_testfunctions</span>::{<span class="ident">rosenbrock_2d</span>, <span class="ident">rosenbrock_2d_derivative</span>, <span class="ident">rosenbrock_2d_hessian</span>};
-<span class="kw">use</span> <span class="ident">argmin</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">argmin::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// First, create a struct for your problem</span>
 <span class="kw">struct</span> <span class="ident">Rosenbrock</span> {
@@ -145,19 +145,19 @@ at <code>p</code>.</li>
     <span class="kw">type</span> <span class="ident">Float</span> <span class="op">=</span> <span class="ident">f64</span>;
 
     <span class="doccomment">/// Apply the cost function to a parameter `p`</span>
-    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Param</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Param</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">rosenbrock_2d</span>(<span class="ident">p</span>, <span class="self">self</span>.<span class="ident">a</span>, <span class="self">self</span>.<span class="ident">b</span>))
     }
 
     <span class="doccomment">/// Compute the gradient at parameter `p`.</span>
-    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Param</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Param</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Param</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Param</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">rosenbrock_2d_derivative</span>(<span class="ident">p</span>, <span class="self">self</span>.<span class="ident">a</span>, <span class="self">self</span>.<span class="ident">b</span>))
     }
 
     <span class="doccomment">/// Compute the Hessian at parameter `p`.</span>
-    <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Param</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Param</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">rosenbrock_2d_hessian</span>(<span class="ident">p</span>, <span class="self">self</span>.<span class="ident">a</span>, <span class="self">self</span>.<span class="ident">b</span>);
-        <span class="prelude-val">Ok</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">t</span>[<span class="number">0</span>], <span class="ident">t</span>[<span class="number">1</span>]], <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">t</span>[<span class="number">2</span>], <span class="ident">t</span>[<span class="number">3</span>]]])
+        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="ident">t</span>[<span class="number">0</span>], <span class="ident">t</span>[<span class="number">1</span>]], <span class="macro">vec!</span>[<span class="ident">t</span>[<span class="number">2</span>], <span class="ident">t</span>[<span class="number">3</span>]]])
     }
 }</pre></div>
 <p>It is optional to implement any of these methods, as there are default implementations which
@@ -168,33 +168,33 @@ of the solver that is to be used.</p>
 Steepest Descent (Gradient Descent) solver.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">argmin</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">argmin</span>::<span class="ident">solver</span>::<span class="ident">gradientdescent</span>::<span class="ident">SteepestDescent</span>;
-<span class="kw">use</span> <span class="ident">argmin</span>::<span class="ident">solver</span>::<span class="ident">linesearch</span>::<span class="ident">MoreThuenteLineSearch</span>;
+<span class="kw">use</span> <span class="ident">argmin::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">argmin::solver::gradientdescent::SteepestDescent</span>;
+<span class="kw">use</span> <span class="ident">argmin::solver::linesearch::MoreThuenteLineSearch</span>;
 
 <span class="comment">// Define cost function (must implement `ArgminOperator`)</span>
 <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">Rosenbrock</span> { <span class="ident">a</span>: <span class="number">1.0</span>, <span class="ident">b</span>: <span class="number">100.0</span> };
   
 <span class="comment">// Define initial parameter vector</span>
-<span class="kw">let</span> <span class="ident">init_param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="op">-</span><span class="number">1.2</span>, <span class="number">1.0</span>];
+<span class="kw">let</span> <span class="ident">init_param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.2</span>, <span class="number">1.0</span>];
   
 <span class="comment">// Set up line search</span>
-<span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch</span>::<span class="ident">new</span>();
+<span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
   
 <span class="comment">// Set up solver</span>
-<span class="kw">let</span> <span class="ident">solver</span> <span class="op">=</span> <span class="ident">SteepestDescent</span>::<span class="ident">new</span>(<span class="ident">linesearch</span>);
+<span class="kw">let</span> <span class="ident">solver</span> <span class="op">=</span> <span class="ident">SteepestDescent::new</span>(<span class="ident">linesearch</span>);
   
 <span class="comment">// Run solver</span>
-<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor</span>::<span class="ident">new</span>(<span class="ident">cost</span>, <span class="ident">solver</span>, <span class="ident">init_param</span>)
+<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">cost</span>, <span class="ident">solver</span>, <span class="ident">init_param</span>)
     <span class="comment">// Add an observer which will log all iterations to the terminal</span>
-    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger</span>::<span class="ident">term</span>(), <span class="ident">ObserverMode</span>::<span class="ident">Always</span>)
+    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger::term</span>(), <span class="ident">ObserverMode::Always</span>)
     <span class="comment">// Set maximum iterations to 10</span>
     .<span class="ident">max_iters</span>(<span class="number">10</span>)
     <span class="comment">// run the solver on the defined problem</span>
     .<span class="ident">run</span>()<span class="question-mark">?</span>;
   
 <span class="comment">// print result</span>
-<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">res</span>);</pre></div>
+<span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">res</span>);</pre></div>
 <h1 id="observing-iterations" class="section-header"><a href="#observing-iterations">Observing iterations</a></h1>
 <p>Argmin offers an interface to observe the state of the iteration at initialization as well as
 after every iteration. This includes the parameter vector, gradient, Hessian, iteration number,
@@ -211,13 +211,13 @@ is indicated via the enum <code>ObserverMode</code> which can be either <code>Al
 (whenever a new best solution is found) or <code>Every(i)</code> which means every <code>i</code>th iteration.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor</span>::<span class="ident">new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>, <span class="ident">init_param</span>)
+<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>, <span class="ident">init_param</span>)
     <span class="comment">// Add an observer which will log all iterations to the terminal (without blocking)</span>
-    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger</span>::<span class="ident">term_noblock</span>(), <span class="ident">ObserverMode</span>::<span class="ident">Always</span>)
+    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger::term_noblock</span>(), <span class="ident">ObserverMode::Always</span>)
     <span class="comment">// Log to file whenever a new best solution is found</span>
-    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger</span>::<span class="ident">file</span>(<span class="string">&quot;solver.log&quot;</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">ObserverMode</span>::<span class="ident">NewBest</span>)
+    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger::file</span>(<span class="string">&quot;solver.log&quot;</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">ObserverMode::NewBest</span>)
     <span class="comment">// Write parameter vector to `params/param.arg` every 20th iteration</span>
-    .<span class="ident">add_observer</span>(<span class="ident">WriteToFile</span>::<span class="ident">new</span>(<span class="string">&quot;params&quot;</span>, <span class="string">&quot;param&quot;</span>), <span class="ident">ObserverMode</span>::<span class="ident">Every</span>(<span class="number">20</span>))
+    .<span class="ident">add_observer</span>(<span class="ident">WriteToFile::new</span>(<span class="string">&quot;params&quot;</span>, <span class="string">&quot;param&quot;</span>), <span class="ident">ObserverMode::Every</span>(<span class="number">20</span>))
     <span class="comment">// run the solver on the defined problem</span>
     .<span class="ident">run</span>()<span class="question-mark">?</span>;</pre></div>
 <h1 id="checkpoints" class="section-header"><a href="#checkpoints">Checkpoints</a></h1>
@@ -234,12 +234,12 @@ that this is the first run and there is nothing to resume from), it will resort 
 new <code>Executor</code>, thus starting from scratch.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor</span>::<span class="ident">from_checkpoint</span>(<span class="string">&quot;.checkpoints/optim.arg&quot;</span>, <span class="ident">Rosenbrock</span> {})
-    .<span class="ident">unwrap_or</span>(<span class="ident">Executor</span>::<span class="ident">new</span>(<span class="ident">Rosenbrock</span> {}, <span class="ident">solver</span>, <span class="ident">init_param</span>))
+<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::from_checkpoint</span>(<span class="string">&quot;.checkpoints/optim.arg&quot;</span>, <span class="ident">Rosenbrock</span> {})
+    .<span class="ident">unwrap_or</span>(<span class="ident">Executor::new</span>(<span class="ident">Rosenbrock</span> {}, <span class="ident">solver</span>, <span class="ident">init_param</span>))
     .<span class="ident">max_iters</span>(<span class="ident">iters</span>)
     .<span class="ident">checkpoint_dir</span>(<span class="string">&quot;.checkpoints&quot;</span>)
     .<span class="ident">checkpoint_name</span>(<span class="string">&quot;optim&quot;</span>)
-    .<span class="ident">checkpoint_mode</span>(<span class="ident">CheckpointMode</span>::<span class="ident">Every</span>(<span class="number">20</span>))
+    .<span class="ident">checkpoint_mode</span>(<span class="ident">CheckpointMode::Every</span>(<span class="number">20</span>))
     .<span class="ident">run</span>()<span class="question-mark">?</span>;</pre></div>
 <h1 id="implementing-an-optimization-algorithm" class="section-header"><a href="#implementing-an-optimization-algorithm">Implementing an optimization algorithm</a></h1>
 <p>In this section we are going to implement the Landweber solver, which essentially is a special
@@ -256,7 +256,7 @@ computation, Hessian, …) and to the current state of the optimization (paramet
 cost function values, iteration number, …), respectively.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">argmin</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">argmin::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="comment">// Define a struct which holds any parameters/data which are needed during the execution of the</span>
@@ -280,7 +280,7 @@ cost function values, iteration number, …), respectively.</p>
     <span class="comment">// `O` always needs to implement `ArgminOp`</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
     <span class="comment">// `O::Param` needs to implement `ArgminScaledSub` because of the update formula</span>
-    <span class="ident">O</span>::<span class="ident">Param</span>: <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Param</span>, <span class="ident">O</span>::<span class="ident">Float</span>, <span class="ident">O</span>::<span class="ident">Param</span><span class="op">&gt;</span>,
+    <span class="ident">O::Param</span>: <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="comment">// This gives the solver a name which will be used for logging</span>
@@ -306,7 +306,7 @@ cost function values, iteration number, …), respectively.</p>
         <span class="kw">let</span> <span class="ident">xkp1</span> <span class="op">=</span> <span class="ident">xk</span>.<span class="ident">scaled_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">omega</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>);
         <span class="comment">// Return new paramter vector which will then be used by the `Executor` to update</span>
         <span class="comment">// `state`.</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData</span>::<span class="ident">new</span>().<span class="ident">param</span>(<span class="ident">xkp1</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData::new</span>().<span class="ident">param</span>(<span class="ident">xkp1</span>))
     }
 }</pre></div>
 <h1 id="todos" class="section-header"><a href="#todos">TODOs</a></h1>
@@ -349,5 +349,5 @@ Argmin Optimizaton toolbox core</p>
 </td></tr><tr class="module-item"><td><a class="macro" href="macro.make_kv.html" title="argmin::make_kv macro">make_kv</a></td><td class="docblock-short"><p>Creates an <code>ArgminKV</code> at compile time in order to avoid pushing to the <code>kv</code> vector.</p>
 </td></tr><tr class="module-item"><td><a class="macro" href="macro.trait_bound.html" title="argmin::trait_bound macro">trait_bound</a></td><td class="docblock-short"><p>Reuse a list of trait bounds by giving it a name,
 e.g. trait_bound!(CopyAndDefault; Copy, Default);</p>
-</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="argmin" data-search-js="../search-index.js"></div>
+</td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="argmin" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script></body></html>
