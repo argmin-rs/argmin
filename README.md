@@ -1,5 +1,5 @@
 [![CircleCI](https://circleci.com/gh/argmin-rs/argmin.svg?style=svg)](https://circleci.com/gh/argmin-rs/argmin)
-[![Build Status](https://travis-ci.org/argmin-rs/argmin.svg?branch=master)](https://travis-ci.org/argmin-rs/argmin)
+[![argmin CI](https://github.com/argmin-rs/argmin/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/argmin-rs/argmin/actions/workflows/ci.yml)
 [![Gitter chat](https://badges.gitter.im/argmin-rs/community.png)](https://gitter.im/argmin-rs/community)
 
 # argmin
