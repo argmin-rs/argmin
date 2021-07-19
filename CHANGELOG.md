@@ -1,5 +1,16 @@
 # Changelog
 
+## argmin v0.4.6 (18 July 2021)
+
+- updated dependencies (#121, #123, #129, @stefan-k):
+  + ndarray 0.15
+  + ndarray-linalg 0.14
+  + appox 0.5
+  + nalgebra 0.28
+  + ndarray-rand 0.14
+  + num-complex 0.4
+  + finitediff 0.1.4
+
 ## argmin v0.4.5 
 
 - Squash warnings for Nalgebra 0.26.x (#118, #117, @CattleProdigy)
