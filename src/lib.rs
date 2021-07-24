@@ -5,11 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! A pure Rust optimization framework
-//!
-//! This crate offers a (work in progress) numerical optimization toolbox/framework written entirely
-//! in Rust. It is at the moment potentially very buggy. Please use with care and report any bugs
-//! you encounter. This crate is looking for contributors!
+//! argmin is a numerical optimization toolbox/framework written entirely in Rust.
+//! This crate is looking for contributors!
 //!
 //! [Documentation of most recent release](https://docs.rs/argmin/latest/argmin/)
 //!
@@ -17,30 +14,33 @@
 //!
 //! # Design goals
 //!
-//! This crate's intention is to be useful to users as well as developers of optimization
-//! algorithms, meaning that it should be both easy to apply and easy to implement algorithms. In
-//! particular, as a developer of optimization algorithms you should not need to worry about
-//! usability features (such as logging, dealing with different types, setters and getters for
-//! certain common parameters, counting cost function and gradient evaluations, termination, and so
-//! on). Instead you can focus on implementing your algorithm.
+//! argmin aims at offering a wide range of optimization algorithms with a consistent interface,
+//! written purely in Rust. It comes with additional features such as checkpointing and observers
+//! which for instance allow one to log the progress of an optimization to screen or file.
 //!
-//! - Easy framework for the implementation of optimization algorithms: Implement a single iteration
-//!   of your method and let the framework do the rest. This leads to similar interfaces for
-//!   different solvers, making it easy for users.
-//! - Pure Rust implementations of a wide range of optimization methods: This avoids the need to
-//!   compile and interface C/C++/Fortran code.
-//! - Type-agnostic: Many problems require data structures that go beyond simple vectors to
-//!   represent the parameters. In argmin, everything is generic: All that needs to be done is
-//!   implementing certain traits on your data type. For common types, these traits are already
-//!   implemented.
-//! - Convenient: Easy and consistent logging of anything that may be important. Log to the
-//!   terminal, to a file or implement your own observers. Future plans include sending metrics to
-//!   databases and connecting to big data piplines.
-//! - Algorithm evaluation: Methods to assess the performance of an algorithm for different
-//!   parameter settings, problem classes, ...
+//! In addition it provides a framework for implementing iterative optimization algorithms in a
+//! convenient manner. Essentially, a single iteration of the algorithm needs to be implemented and
+//! everything else, such as handling termination, parameter vectors, gradients and Hessians, is
+//! taken care of by the library.
 //!
-//! Since this crate is in a very early stage, so far most points are only partially implemented or
-//! remain future plans.
+//! This library makes heavy use of generics in order to be as type-agnostic as possible. It
+//! supports `nalgebra` and `ndarray` types via feature gates, but custom types can easily be made
+//! compatible with argmin by implementing the respective traits.
+//!
+//! Future plans include functionality for easy performance evaluation of optimization algorithms,
+//! parallel computation of cost functions/gradients/Hessians as well as GPU support
+//! And of course more optimization algorithms!
+//!
+//! # Contributing
+//!
+//! This crate is looking for contributors!
+//! Potential projects can be found in the
+//! [Github issues](https://github.com/argmin-rs/argmin/issues), but even if you have an idea that
+//! is not already mentioned there or if you found a bug, feel free to open a new issue.
+//! Besides adding optimization methods and new features, other contributions are also highly
+//! welcome, for instance improving performance, documentation, writing examples (with real world
+//! problems), developing tests, adding observers, implementing a C interface or
+//! [Python wrappers](https://github.com/argmin-rs/pyargmin).
 //!
 //! # Algorithms
 //!
@@ -106,12 +106,18 @@
 //! ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
 //! ```
 //!
-//! ## Running the tests
+//! ## Running the tests and building the examples
 //!
 //! Running the tests requires the `ndarrayl` and feature to be enabled:
 //!
 //! ```bash
 //! cargo test --features "ndarrayl"
+//! ```
+//!
+//! The examples require all features to be enabled:
+//!
+//! ```bash
+//! cargo test --features --all-features
 //! ```
 //!
 //! # Defining a problem
@@ -483,21 +489,6 @@
 //! }
 //! ```
 //!
-//! # TODOs
-//!
-//!   * More optimization methods
-//!   * Automatic differentiation
-//!   * Parallelization
-//!   * Tests
-//!   * Evaluation on real problems
-//!   * Evaluation framework
-//!   * Documentation & Tutorials
-//!   * C interface
-//!   * Python wrapper
-//!   * Solver and problem definition via a config file
-//!
-//! Please open an [issue](https://github.com/argmin-rs/argmin/issues) if you want to contribute!
-//! Any help is appreciated!
 //!
 //! # License
 //!
@@ -510,7 +501,6 @@
 //!     http://opensource.org/licenses/MIT)
 //!
 //! at your option.
-//!
 //!
 //! ## Contribution
 //!

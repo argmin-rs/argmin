@@ -1,14 +1,12 @@
 [![CircleCI](https://circleci.com/gh/argmin-rs/argmin.svg?style=svg)](https://circleci.com/gh/argmin-rs/argmin)
 [![argmin CI](https://github.com/argmin-rs/argmin/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/argmin-rs/argmin/actions/workflows/ci.yml)
+![Maintenance](https://img.shields.io/badge/maintenance-activly--developed-brightgreen.svg)
 [![Gitter chat](https://badges.gitter.im/argmin-rs/community.png)](https://gitter.im/argmin-rs/community)
 
 # argmin
 
-A pure Rust optimization framework
-
-This crate offers a numerical optimization toolbox/framework written entirely
-in Rust. It is at the moment potentially very buggy. Please use with care and report any bugs
-you encounter. This crate is looking for contributors!
+argmin is a numerical optimization toolbox/framework written entirely in Rust.
+This crate is looking for contributors!
 
 [Documentation of most recent release](https://docs.rs/argmin/latest/argmin/)
 
@@ -16,30 +14,33 @@ you encounter. This crate is looking for contributors!
 
 ## Design goals
 
-This crate's intention is to be useful to users as well as developers of optimization
-algorithms, meaning that it should be both easy to apply and easy to implement algorithms. In
-particular, as a developer of optimization algorithms you should not need to worry about
-usability features (such as logging, dealing with different types, setters and getters for
-certain common parameters, counting cost function and gradient evaluations, termination, and so
-on). Instead you can focus on implementing your algorithm.
+argmin aims at offering a wide range of optimization algorithms with a consistent interface,
+written purely in Rust. It comes with additional features such as checkpointing and observers
+which for instance allow one to log the progress of an optimization to screen or file.
 
-- Easy framework for the implementation of optimization algorithms: Implement a single iteration
-  of your method and let the framework do the rest. This leads to similar interfaces for
-  different solvers, making it easy for users.
-- Pure Rust implementations of a wide range of optimization methods: This avoids the need to
-  compile and interface C/C++/Fortran code.
-- Type-agnostic: Many problems require data structures that go beyond simple vectors to
-  represent the parameters. In argmin, everything is generic: All that needs to be done is
-  implementing certain traits on your data type. For common types, these traits are already
-  implemented.
-- Convenient: Easy and consistent logging of anything that may be important. Log to the
-  terminal, to a file or implement your own observers. Future plans include sending metrics to
-  databases and connecting to big data piplines.
-- Algorithm evaluation: Methods to assess the performance of an algorithm for different
-  parameter settings, problem classes, ...
+In addition it provides a framework for implementing iterative optimization algorithms in a
+convenient manner. Essentially, a single iteration of the algorithm needs to be implemented and
+everything else, such as handling termination, parameter vectors, gradients and Hessians, is
+taken care of by the library.
 
-Since this crate is in a very early stage, so far most points are only partially implemented or
-remain future plans.
+This library makes heavy use of generics in order to be as type-agnostic as possible. It
+supports `nalgebra` and `ndarray` types via feature gates, but custom types can easily be made
+compatible with argmin by implementing the respective traits.
+
+Future plans include functionality for easy performance evaluation of optimization algorithms,
+parallel computation of cost functions/gradients/Hessians as well as GPU support
+And of course more optimization algorithms!
+
+## Contributing
+
+This crate is looking for contributors!
+Potential projects can be found in the
+[Github issues](https://github.com/argmin-rs/argmin/issues), but even if you have an idea that
+is not already mentioned there or if you found a bug, feel free to open a new issue.
+Besides adding optimization methods and new features, other contributions are also highly
+welcome, for instance improving performance, documentation, writing examples (with real world
+problems), developing tests, adding observers, implementing a C interface or
+[Python wrappers](https://github.com/argmin-rs/pyargmin).
 
 ## Algorithms
 
@@ -63,11 +64,11 @@ remain future plans.
   - [DFP](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/dfp/struct.DFP.html)
   - [SR1](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/sr1/struct.SR1.html)
   - [SR1-TrustRegion](https://argmin-rs.github.io/argmin/argmin/solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
-- [Gauss-Newton method](https://argmin-rs.github.io/argmin/argmin/solver/gaussnewton/gaussnewton_method/struct.GaussNewton.html)
+- [Gauss-Newton method](https://argmin-rs.github.io/argmin/argmin/solver/gaussnewton/gaussnewton/struct.GaussNewton.html)
 - [Gauss-Newton method with linesearch](https://argmin-rs.github.io/argmin/argmin/solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLS.html)
 - [Golden-section search](https://argmin-rs.github.io/argmin/argmin/solver/goldensectionsearch/struct.GoldenSectionSearch.html)
 - [Landweber iteration](https://argmin-rs.github.io/argmin/argmin/solver/landweber/struct.Landweber.html)
-- [Brent's method](https://argmin-rs.github.io/argmin/argmin/solver/brent/index.html)
+- [Brent's method](https://argmin-rs.github.io/argmin/argmin/solver/brent/struct.Brent.html)
 - [Nelder-Mead method](https://argmin-rs.github.io/argmin/argmin/solver/neldermead/struct.NelderMead.html)
 - [Simulated Annealing](https://argmin-rs.github.io/argmin/argmin/solver/simulatedannealing/struct.SimulatedAnnealing.html)
 - [Particle Swarm Optimization](https://argmin-rs.github.io/argmin/argmin/solver/particleswarm/struct.ParticleSwarm.html)
@@ -96,20 +97,27 @@ These may become default features in the future. Without these features compilat
 - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
    result) after pressing Ctrl+C.
 - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.
-- `nalgebral`: Support for [`nalgebra`](https://nalgebra.org).
+- `nalgebral`: Support for `nalgebra`.
 
-Using the `ndarrayl` feature on Windows might require to explicitly choose the `ndarray-linalg` BLAS backend in the `Cargo.toml`:
+Using the `ndarrayl` feature on Windows might require to explicitly choose the `ndarray-linalg`
+BLAS backend in the `Cargo.toml`:
 
 ```toml
 ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
 ```
 
-### Running the tests
+### Running the tests and building the examples
 
-Running the tests requires the `ndarrayl` and `nalgebral` features to be enabled
+Running the tests requires the `ndarrayl` and feature to be enabled:
 
 ```bash
-cargo test --features "ndarrayl nalgebral"
+cargo test --features "ndarrayl"
+```
+
+The examples require all features to be enabled:
+
+```bash
+cargo test --features --all-features
 ```
 
 ## Defining a problem
@@ -117,7 +125,8 @@ cargo test --features "ndarrayl nalgebral"
 A problem can be defined by implementing the `ArgminOp` trait which comes with the
 associated types `Param`, `Output` and `Hessian`. `Param` is the type of your
 parameter vector (i.e. the input to your cost function), `Output` is the type returned
-by the cost function and `Hessian` is the type of the Hessian.
+by the cost function, `Hessian` is the type of the Hessian and `Jacobian` is the type of the
+Jacobian.
 The trait provides the following methods:
 
 - `apply(&self, p: &Self::Param) -> Result<Self::Output, Error>`: Applys the cost
@@ -126,17 +135,17 @@ The trait provides the following methods:
   gradient at `p`.
 - `hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error>`: Computes the Hessian
   at `p`.
+- `jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error>`: Computes the Jacobian
+  at `p`.
 
 The following code snippet shows an example of how to use the Rosenbrock test functions from
 `argmin-testfunctions` in argmin:
 
 ```rust
-use argmin::testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use argmin::prelude::*;
-use serde::{Serialize, Deserialize};
 
 /// First, create a struct for your problem
-#[derive(Clone, Default, Serialize, Deserialize)]
 struct Rosenbrock {
     a: f64,
     b: f64,
@@ -150,6 +159,10 @@ impl ArgminOp for Rosenbrock {
     type Output = f64;
     /// Type of the Hessian. Can be `()` if not needed.
     type Hessian = Vec<Vec<f64>>;
+    /// Type of the Jacobian. Can be `()` if not needed.
+    type Jacobian = ();
+    /// Floating point precision
+    type Float = f64;
 
     /// Apply the cost function to a parameter `p`
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
@@ -229,7 +242,7 @@ let res = Executor::new(problem, solver, init_param)
     // Add an observer which will log all iterations to the terminal (without blocking)
     .add_observer(ArgminSlogLogger::term_noblock(), ObserverMode::Always)
     // Log to file whenever a new best solution is found
-    .add_observer(ArgminSlogLogger::file("solver.log")?, ObserverMode::NewBest)
+    .add_observer(ArgminSlogLogger::file("solver.log", false)?, ObserverMode::NewBest)
     // Write parameter vector to `params/param.arg` every 20th iteration
     .add_observer(WriteToFile::new("params", "param"), ObserverMode::Every(20))
     // run the solver on the defined problem
@@ -252,8 +265,8 @@ that this is the first run and there is nothing to resume from), it will resort 
 new `Executor`, thus starting from scratch.
 
 ```rust
-let res = Executor::from_checkpoint(".checkpoints/optim.arg")
-    .unwrap_or(Executor::new(operator, solver, init_param))
+let res = Executor::from_checkpoint(".checkpoints/optim.arg", Rosenbrock {})
+    .unwrap_or(Executor::new(Rosenbrock {}, solver, init_param))
     .max_iters(iters)
     .checkpoint_dir(".checkpoints")
     .checkpoint_name("optim")
@@ -286,24 +299,25 @@ use serde::{Deserialize, Serialize};
 // solver. Note that this does not include parameter vectors, gradients, Hessians, cost
 // function values and so on, as those will be handled by the `Executor`.
 #[derive(Serialize, Deserialize)]
-pub struct Landweber {
+pub struct Landweber<F> {
     /// omega
-    omega: f64,
+    omega: F,
 }
 
-impl Landweber {
+impl<F> Landweber<F> {
     /// Constructor
-    pub fn new(omega: f64) -> Self {
+    pub fn new(omega: F) -> Self {
         Landweber { omega }
     }
 }
 
-impl<O> Solver<O> for Landweber
+impl<O, F> Solver<O> for Landweber<F>
 where
     // `O` always needs to implement `ArgminOp`
-    O: ArgminOp,
+    O: ArgminOp<Float = F>,
     // `O::Param` needs to implement `ArgminScaledSub` because of the update formula
-    O::Param: ArgminScaledSub<O::Param, f64, O::Param>,
+    O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>,
+    F: ArgminFloat,
 {
     // This gives the solver a name which will be used for logging
     const NAME: &'static str = "Landweber";
@@ -333,21 +347,6 @@ where
 }
 ```
 
-## TODOs
-
-  * More optimization methods
-  * Automatic differentiation
-  * Parallelization
-  * Tests
-  * Evaluation on real problems
-  * Evaluation framework
-  * Documentation & Tutorials
-  * C interface
-  * Python wrapper
-  * Solver and problem definition via a config file
-
-Please open an [issue](https://github.com/argmin-rs/argmin/issues) if you want to contribute!
-Any help is appreciated!
 
 ## License
 
@@ -361,11 +360,8 @@ Licensed under either of
 
 at your option.
 
-
 ### Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
 in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
 without any additional terms or conditions.
-
-License: MIT OR Apache-2.0
