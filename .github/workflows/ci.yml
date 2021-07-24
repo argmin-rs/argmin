@@ -27,7 +27,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           override: true
       - name: Install dependencies
-        run: sudo apt-get install cmake gfortran libcurl4-openssl-dev libelf-dev libdw-dev binutils-dev libiberty-dev liblapacke-dev libopenblas-dev gcc
+        run: sudo apt-get install cmake gfortran libelf-dev libdw-dev binutils-dev libiberty-dev liblapacke-dev libopenblas-dev gcc
       - run: cargo build --verbose --all --all-features && cargo clean && cargo test --verbose --all --all-features
 
   clippy:

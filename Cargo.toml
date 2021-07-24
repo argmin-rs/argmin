@@ -54,5 +54,4 @@ wasm-bindgen = ["instant/wasm-bindgen"]
 stdweb = ["instant/stdweb"]
 
 [badges]
-travis-ci = { repository = "argmin-rs/argmin", branch = "master" }
 maintenance = { status = "actively-developed" }
