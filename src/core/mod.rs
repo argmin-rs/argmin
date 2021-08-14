@@ -308,7 +308,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
     /// Get reference to population
     pub fn get_population(&self) -> Option<&Vec<(O::Param, O::Float)>> {
         match &self.population {
-            Some(population) => Some(&population),
+            Some(population) => Some(population),
             None => None,
         }
     }

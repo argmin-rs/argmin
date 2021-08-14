@@ -80,7 +80,7 @@ where
         }
         // check if parameters are the best so far
         if self.state.get_cost() <= self.state.get_best_cost() {
-            let param = self.state.get_param().clone();
+            let param = self.state.get_param();
             let cost = self.state.get_cost();
             self.state.best_param(param).best_cost(cost);
             self.state.new_best();
@@ -141,7 +141,7 @@ where
 
         // If init() returned something, deal with it
         if let Some(data) = &init_data {
-            self.update(&data)?;
+            self.update(data)?;
         }
 
         if !self.observers.is_empty() {

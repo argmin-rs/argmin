@@ -69,7 +69,7 @@ impl<O: ArgminOp> Observe<O> for WriteToFile<O> {
         }
 
         let mut fname = self.prefix.clone();
-        fname.push_str("_");
+        fname.push('_');
         fname.push_str(&iter.to_string());
         fname.push_str(".arp");
         let fname = dir.join(fname);

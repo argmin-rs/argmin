@@ -37,7 +37,7 @@ where
     F: ArgminFloat,
 {
     fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
-        dfk1.dot(&dfk1) / dfk.dot(&dfk)
+        dfk1.dot(dfk1) / dfk.dot(dfk)
     }
 }
 
@@ -62,7 +62,7 @@ where
 {
     fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
         let dfk_norm_sq = dfk.norm().powi(2);
-        dfk1.dot(&dfk1.sub(&dfk)) / dfk_norm_sq
+        dfk1.dot(&dfk1.sub(dfk)) / dfk_norm_sq
     }
 }
 
@@ -87,7 +87,7 @@ where
 {
     fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
         let dfk_norm_sq = dfk.norm().powi(2);
-        let beta = dfk1.dot(&dfk1.sub(&dfk)) / dfk_norm_sq;
+        let beta = dfk1.dot(&dfk1.sub(dfk)) / dfk_norm_sq;
         F::from_f64(0.0).unwrap().max(beta)
     }
 }
@@ -112,8 +112,8 @@ where
     F: ArgminFloat,
 {
     fn update(&self, dfk: &T, dfk1: &T, pk: &T) -> F {
-        let d = dfk1.sub(&dfk);
-        dfk1.dot(&d) / d.dot(&pk)
+        let d = dfk1.sub(dfk);
+        dfk1.dot(&d) / d.dot(pk)
     }
 }
 

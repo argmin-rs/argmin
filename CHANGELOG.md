@@ -1,5 +1,11 @@
 # Changelog
 
+## argmin v0.4.7 (14 August 2021)
+
+- Moved to Github actions (#130, @stefan-k)
+- Updated README.md (#131, @stefan-k)
+- Updated nalgebra from 0.28 to 0.29 (#133)
+
 ## argmin v0.4.6 (18 July 2021)
 
 - updated dependencies (#121, #123, #129, @stefan-k):

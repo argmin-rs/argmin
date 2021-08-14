@@ -109,10 +109,9 @@ where
         let param = state.get_param();
         let cur_cost = state.get_cost();
         let prev_grad = state.get_grad().unwrap();
-        // .unwrap_or_else(|| op.gradient(&param).unwrap());
 
-        let gamma: F = if let (Some(ref sk), Some(ref yk)) = (self.s.back(), self.y.back()) {
-            sk.dot(*yk) / yk.dot(*yk)
+        let gamma: F = if let (Some(sk), Some(yk)) = (self.s.back(), self.y.back()) {
+            sk.dot(yk) / yk.dot(yk)
         } else {
             F::from_f64(1.0).unwrap()
         };
@@ -122,9 +121,7 @@ where
         let cur_m = self.s.len();
         let mut alpha: Vec<F> = vec![F::from_f64(0.0).unwrap(); cur_m];
         let mut rho: Vec<F> = vec![F::from_f64(0.0).unwrap(); cur_m];
-        for (i, (ref sk, ref yk)) in self.s.iter().rev().zip(self.y.iter().rev()).enumerate() {
-            let sk = *sk;
-            let yk = *yk;
+        for (i, (sk, yk)) in self.s.iter().rev().zip(self.y.iter().rev()).enumerate() {
             let yksk: F = yk.dot(sk);
             let rho_t = F::from_f64(1.0).unwrap() / yksk;
             let skq: F = sk.dot(&q);
@@ -134,9 +131,7 @@ where
             alpha[cur_m - i - 1] = alpha_t;
         }
         let mut r = q.mul(&gamma);
-        for (i, (ref sk, ref yk)) in self.s.iter().zip(self.y.iter()).enumerate() {
-            let sk = *sk;
-            let yk = *yk;
+        for (i, (sk, yk)) in self.s.iter().zip(self.y.iter()).enumerate() {
             let beta = yk.dot(&r).mul(rho[i]);
             r = r.add(&sk.mul(&(alpha[i] - beta)));
         }
