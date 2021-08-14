@@ -282,10 +282,7 @@ impl<O: ArgminOp> IterState<O> {
 
     /// Returns population
     pub fn get_population(&self) -> Option<&Vec<(O::Param, O::Float)>> {
-        match &self.population {
-            Some(population) => Some(&population),
-            None => None,
-        }
+        self.population.as_ref()
     }
 
     /// Increment the number of iterations by one

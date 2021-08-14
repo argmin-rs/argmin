@@ -410,6 +410,8 @@ where
     }
 }
 
+type CstepReturnValue<F> = (Step<F>, Step<F>, Step<F>, bool, F, F, usize);
+
 fn cstep<F: ArgminFloat>(
     stx: Step<F>,
     sty: Step<F>,
@@ -417,7 +419,7 @@ fn cstep<F: ArgminFloat>(
     brackt: bool,
     stpmin: F,
     stpmax: F,
-) -> Result<(Step<F>, Step<F>, Step<F>, bool, F, F, usize), Error> {
+) -> Result<CstepReturnValue<F>, Error> {
     let mut info: usize = 0;
     let bound: bool;
     let mut stpf: F;
@@ -595,9 +597,9 @@ fn cstep<F: ArgminFloat>(
     // Update the interval of uncertainty. This update does not depend on the new step or the case
     // analysis above.
 
-    let mut stx_o = stx.clone();
-    let mut sty_o = sty.clone();
-    let mut stp_o = stp.clone();
+    let mut stx_o = stx;
+    let mut sty_o = sty;
+    let mut stp_o = stp;
     if stp_o.fx > stx_o.fx {
         sty_o = Step::new(stp_o.x, stp_o.fx, stp_o.gx);
     } else {

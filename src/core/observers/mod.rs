@@ -49,12 +49,14 @@ pub trait Observe<O: ArgminOp> {
     }
 }
 
+type ObserversVec<O> = Vec<(Arc<Mutex<dyn Observe<O>>>, ObserverMode)>;
+
 /// Container for observers which acts just like a single `Observe`r by implementing `Observe` on
 /// it.
 #[derive(Clone, Default)]
 pub struct Observer<O> {
     /// Vector of `Observe`rs with the corresponding `ObserverMode`
-    observers: Vec<(Arc<Mutex<dyn Observe<O>>>, ObserverMode)>,
+    observers: ObserversVec<O>,
 }
 
 impl<O: ArgminOp> Observer<O> {

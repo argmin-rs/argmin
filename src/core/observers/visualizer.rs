@@ -117,7 +117,7 @@ impl Visualizer3d {
     /// TODO
     fn iteration<F: ArgminFloat>(
         &mut self,
-        xy: &Vec<F>,
+        xy: &[F],
         cost: F,
         population: Option<&Vec<(Vec<F>, F)>>,
     ) {
@@ -136,11 +136,17 @@ impl Visualizer3d {
             for (param, cost) in population {
                 self.particles_x.push(F::to_f64(&param[0]).unwrap());
                 self.particles_y.push(F::to_f64(&param[1]).unwrap());
-                self.particles_z.push(F::to_f64(&cost).unwrap());
+                self.particles_z.push(F::to_f64(cost).unwrap());
             }
         }
 
         self.draw();
+    }
+}
+
+impl std::default::Default for Visualizer3d {
+    fn default() -> Self {
+        Visualizer3d::new()
     }
 }
 
@@ -193,7 +199,7 @@ impl Surface {
         }
 
         Self {
-            window: window,
+            window,
             width: num_x,
             height: num_y,
             zvalues,

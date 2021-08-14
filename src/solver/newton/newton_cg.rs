@@ -122,11 +122,10 @@ where
             if curvature <= self.curvature_threshold {
                 if iter == 0 {
                     x = grad.mul(&(F::from_f64(-1.0).unwrap()));
-                    break;
                 } else {
                     x = x_p;
-                    break;
                 }
+                break;
             }
             if data.get_cost().unwrap()
                 <= F::from_f64(0.5).unwrap().min(grad_norm.sqrt()) * grad_norm
@@ -209,7 +208,7 @@ where
     type Float = F;
 
     fn apply(&self, p: &T) -> Result<T, Error> {
-        Ok(self.hessian.dot(&p))
+        Ok(self.hessian.dot(p))
     }
 }
 

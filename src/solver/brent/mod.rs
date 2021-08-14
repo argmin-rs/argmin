@@ -66,7 +66,7 @@ impl<F: ArgminFloat> Brent<F> {
     /// The parameter `tol` specifies the relative error to be targeted.
     pub fn new(min: F, max: F, tol: F) -> Brent<F> {
         Brent {
-            tol: tol,
+            tol,
             a: min,
             b: max,
             c: max,

@@ -12,7 +12,8 @@
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 
-const GOLDEN_RATIO: f64 = 1.61803398874989484820;
+// Golden ratio is actually 1.61803398874989484820, but that is too much precision for f64.
+const GOLDEN_RATIO: f64 = 1.618_033_988_749_895;
 const G1: f64 = -1.0 + GOLDEN_RATIO;
 const G2: f64 = 1.0 - G1;
 

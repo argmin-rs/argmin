@@ -147,17 +147,17 @@ where
 
     /// Reflect
     fn reflect(&self, x0: &P, x: &P) -> P {
-        x0.add(&x0.sub(&x).mul(&self.alpha))
+        x0.add(&x0.sub(x).mul(&self.alpha))
     }
 
     /// Expand
     fn expand(&self, x0: &P, x: &P) -> P {
-        x0.add(&x.sub(&x0).mul(&self.gamma))
+        x0.add(&x.sub(x0).mul(&self.gamma))
     }
 
     /// Contract
     fn contract(&self, x0: &P, x: &P) -> P {
-        x0.add(&x.sub(&x0).mul(&self.rho))
+        x0.add(&x.sub(x0).mul(&self.rho))
     }
 
     /// Shrink

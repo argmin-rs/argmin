@@ -84,7 +84,7 @@ where
         P: ArgminWeightedDot<P, F, H>,
     {
         // self.cur_grad().dot(&p) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
-        g.dot(&p) + F::from_f64(0.5).unwrap() * p.weighted_dot(&h, &p)
+        g.dot(p) + F::from_f64(0.5).unwrap() * p.weighted_dot(h, p)
     }
 
     /// calculate all possible step lengths
