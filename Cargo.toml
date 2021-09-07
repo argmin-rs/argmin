@@ -12,8 +12,8 @@ readme = "README.md"
 keywords = ["optimization", "math", "science"]
 categories = ["science"]
 exclude = [
-	".travis.yml",
-	"push_docs",
+    ".travis.yml",
+    "push_docs",
 ]
 
 [dependencies]
@@ -34,10 +34,10 @@ rand = { version = "0.8.3", features = ["serde1"] }
 rand_xorshift = { version = "0.3.0", features = ["serde1"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
-slog = "2.4.1"
-slog-term = "2.4.0"
-slog-async = "2.3.0"
-slog-json = "2.3.0"
+slog = { version = "2.4.1", optional = true }
+slog-term = { version = "2.4.0", optional = true }
+slog-async = { version = "2.3.0", optional = true }
+slog-json = { version = "2.3.0", optional = true }
 thiserror = "1.0"
 
 [dev-dependencies]
@@ -46,11 +46,12 @@ finitediff = { version = "0.1.4", features = ["ndarray"] }
 argmin_testfunctions = "0.1.1"
 
 [features]
-default = []
+default = ["slog-logger"]
 nalgebral = ["nalgebra"]
 ndarrayl = ["ndarray", "ndarray-linalg", "ndarray-rand"]
 visualizer = ["gnuplot"]
 wasm-bindgen = ["instant/wasm-bindgen"]
+slog-logger = ["slog", "slog-term", "slog-async", "slog-json"]
 stdweb = ["instant/stdweb"]
 
 [badges]
