@@ -39,7 +39,7 @@ impl ArgminOp for Rosenbrock {
     }
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-        Ok((*p).forward_hessian(&|x| self.gradient(&x).unwrap()))
+        Ok((*p).forward_hessian(&|x| self.gradient(x).unwrap()))
     }
 }
 
