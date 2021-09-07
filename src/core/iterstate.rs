@@ -368,11 +368,22 @@ mod tests {
         assert_eq!(state.get_prev_param(), param);
         assert_eq!(state.get_best_param(), param);
         assert_eq!(state.get_prev_best_param(), param);
-        assert_eq!(state.get_cost(), std::f64::INFINITY);
-        assert_eq!(state.get_prev_cost(), std::f64::INFINITY);
-        assert_eq!(state.get_best_cost(), std::f64::INFINITY);
-        assert_eq!(state.get_prev_best_cost(), std::f64::INFINITY);
-        assert_eq!(state.get_target_cost(), std::f64::NEG_INFINITY);
+
+        assert!(state.get_cost().is_infinite());
+        assert!(state.get_cost().is_sign_positive());
+
+        assert!(state.get_prev_cost().is_infinite());
+        assert!(state.get_prev_cost().is_sign_positive());
+
+        assert!(state.get_best_cost().is_infinite());
+        assert!(state.get_best_cost().is_sign_positive());
+
+        assert!(state.get_prev_best_cost().is_infinite());
+        assert!(state.get_prev_best_cost().is_sign_positive());
+
+        assert!(state.get_target_cost().is_infinite());
+        assert!(state.get_target_cost().is_sign_negative());
+
         assert_eq!(state.get_grad(), None);
         assert_eq!(state.get_prev_grad(), None);
         assert_eq!(state.get_hessian(), None);
@@ -380,7 +391,9 @@ mod tests {
         assert_eq!(state.get_jacobian(), None);
         assert_eq!(state.get_prev_jacobian(), None);
         assert_eq!(state.get_iter(), 0);
-        assert_eq!(state.is_best(), true);
+
+        assert!(state.is_best());
+
         assert_eq!(state.get_max_iters(), std::u64::MAX);
         assert_eq!(state.get_cost_func_count(), 0);
         assert_eq!(state.get_grad_func_count(), 0);
@@ -394,13 +407,15 @@ mod tests {
 
         state.cost(cost);
 
-        assert_eq!(state.get_cost(), cost);
-        assert_eq!(state.get_prev_cost(), std::f64::INFINITY);
+        assert_eq!(state.get_cost().to_ne_bytes(), cost.to_ne_bytes());
+        assert!(state.get_prev_cost().is_infinite());
+        assert!(state.get_prev_cost().is_sign_positive());
 
         state.best_cost(cost);
 
-        assert_eq!(state.get_best_cost(), cost);
-        assert_eq!(state.get_prev_best_cost(), std::f64::INFINITY);
+        assert_eq!(state.get_best_cost().to_ne_bytes(), cost.to_ne_bytes());
+        assert!(state.get_prev_best_cost().is_infinite());
+        assert!(state.get_prev_best_cost().is_sign_positive());
 
         let new_param = vec![2.0, 1.0];
 
@@ -418,23 +433,23 @@ mod tests {
 
         state.cost(new_cost);
 
-        assert_eq!(state.get_cost(), new_cost);
-        assert_eq!(state.get_prev_cost(), cost);
+        assert_eq!(state.get_cost().to_ne_bytes(), new_cost.to_ne_bytes());
+        assert_eq!(state.get_prev_cost().to_ne_bytes(), cost.to_ne_bytes());
 
         state.best_cost(new_cost);
 
-        assert_eq!(state.get_best_cost(), new_cost);
-        assert_eq!(state.get_prev_best_cost(), cost);
+        assert_eq!(state.get_best_cost().to_ne_bytes(), new_cost.to_ne_bytes());
+        assert_eq!(state.get_prev_best_cost().to_ne_bytes(), cost.to_ne_bytes());
 
         state.increment_iter();
 
         assert_eq!(state.get_iter(), 1);
 
-        assert_eq!(state.is_best(), false);
+        assert!(!state.is_best());
 
         state.new_best();
 
-        assert_eq!(state.is_best(), true);
+        assert!(state.is_best());
 
         let grad = vec![1.0, 2.0];
 
@@ -479,7 +494,7 @@ mod tests {
 
         assert_eq!(state.get_iter(), 2);
         assert_eq!(state.get_last_best_iter(), 1);
-        assert_eq!(state.is_best(), false);
+        assert!(!state.is_best());
 
         state.increment_cost_func_count(42);
         assert_eq!(state.get_cost_func_count(), 42);
@@ -496,17 +511,25 @@ mod tests {
         assert_eq!(state.get_iter(), 2);
         assert_eq!(state.get_last_best_iter(), 1);
         assert_eq!(state.get_max_iters(), 42);
-        assert_eq!(state.is_best(), false);
-        assert_eq!(state.get_cost(), new_cost);
-        assert_eq!(state.get_prev_cost(), cost);
+
+        assert!(!state.is_best());
+
+        assert_eq!(state.get_cost().to_ne_bytes(), new_cost.to_ne_bytes());
+        assert_eq!(state.get_prev_cost().to_ne_bytes(), cost.to_ne_bytes());
+        assert_eq!(state.get_prev_cost().to_ne_bytes(), cost.to_ne_bytes());
+
         assert_eq!(state.get_param(), new_param);
         assert_eq!(state.get_prev_param(), param);
-        assert_eq!(state.get_best_cost(), new_cost);
-        assert_eq!(state.get_prev_best_cost(), cost);
+
+        assert_eq!(state.get_best_cost().to_ne_bytes(), new_cost.to_ne_bytes());
+        assert_eq!(state.get_prev_best_cost().to_ne_bytes(), cost.to_ne_bytes());
+
         assert_eq!(state.get_best_param(), new_param);
         assert_eq!(state.get_prev_best_param(), param);
-        assert_eq!(state.get_best_cost(), new_cost);
-        assert_eq!(state.get_prev_best_cost(), cost);
+
+        assert_eq!(state.get_best_cost().to_ne_bytes(), new_cost.to_ne_bytes());
+        assert_eq!(state.get_prev_best_cost().to_ne_bytes(), cost.to_ne_bytes());
+
         assert_eq!(state.get_grad(), Some(new_grad));
         assert_eq!(state.get_prev_grad(), Some(grad));
         assert_eq!(state.get_hessian(), Some(new_hessian));
