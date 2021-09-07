@@ -12,6 +12,7 @@
 //! parameter vector to disk.
 
 pub mod file;
+#[cfg(feature = "slog-logger")]
 pub mod slog_logger;
 #[cfg(feature = "visualizer")]
 pub mod visualizer;
@@ -22,6 +23,7 @@ use std::default::Default;
 use std::sync::{Arc, Mutex};
 
 pub use file::*;
+#[cfg(feature = "slog-logger")]
 pub use slog_logger::*;
 #[cfg(feature = "visualizer")]
 pub use visualizer::*;
