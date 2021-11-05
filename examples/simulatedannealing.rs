@@ -8,9 +8,9 @@
 use argmin::prelude::*;
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin_testfunctions::rosenbrock;
+use rand::distributions::Uniform;
 use rand::prelude::*;
 use rand_xoshiro::Xoshiro256PlusPlus;
-use rand::distributions::Uniform;
 use std::default::Default;
 use std::sync::{Arc, Mutex};
 
