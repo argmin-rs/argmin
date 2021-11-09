@@ -333,5 +333,5 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(sa, SimulatedAnnealing<f64>);
+    test_trait_impl!(sa, SimulatedAnnealing<f64, StdRng>);
 }
