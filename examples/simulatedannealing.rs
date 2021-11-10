@@ -79,8 +79,7 @@ impl ArgminOp for Rosenbrock {
             param_n[idx] += val;
 
             // check if bounds are violated. If yes, project onto bound.
-            param_n[idx] = param_n[idx].min(self.upper_bound[idx]);
-            param_n[idx] = param_n[idx].max(self.lower_bound[idx]);
+            param_n[idx] = param_n[idx].clamp(self.lower_bound[idx], self.upper_bound[idx]);
         }
         Ok(param_n)
     }
