@@ -17,7 +17,6 @@
 
 use crate::prelude::*;
 use rand::prelude::*;
-use rand_xorshift::XorShiftRng;
 use serde::{Deserialize, Serialize};
 
 /// Temperature functions for Simulated Annealing.
@@ -57,23 +56,23 @@ impl<F> std::default::Default for SATempFunc<F> {
 ///
 /// [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 /// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
-/// DOI: 10.1126/science.220.4598.671  
+/// DOI: 10.1126/science.220.4598.671
 #[derive(Clone, Serialize, Deserialize)]
-pub struct SimulatedAnnealing<F> {
+pub struct SimulatedAnnealing<F, R> {
     /// Initial temperature
     init_temp: F,
     /// which temperature function?
     temp_func: SATempFunc<F>,
-    /// Number of iterations used for the caluclation of temperature. This is needed for
+    /// Number of iterations used for the calculation of temperature. This is needed for
     /// reannealing!
     temp_iter: u64,
     /// Iterations since the last accepted solution
     stall_iter_accepted: u64,
-    /// Stop if stall_iter_accepted exceedes this number
+    /// Stop if stall_iter_accepted exceeds this number
     stall_iter_accepted_limit: u64,
     /// Iterations since the last best solution was found
     stall_iter_best: u64,
-    /// Stop if stall_iter_best exceedes this number
+    /// Stop if stall_iter_best exceeds this number
     stall_iter_best_limit: u64,
     /// Reanneal after this number of iterations is reached
     reanneal_fixed: u64,
@@ -90,10 +89,10 @@ pub struct SimulatedAnnealing<F> {
     /// current temperature
     cur_temp: F,
     /// random number generator
-    rng: XorShiftRng,
+    rng: R,
 }
 
-impl<F> SimulatedAnnealing<F>
+impl<F, R> SimulatedAnnealing<F, R>
 where
     F: ArgminFloat,
 {
@@ -102,7 +101,8 @@ where
     /// Parameter:
     ///
     /// * `init_temp`: initial temperature
-    pub fn new(init_temp: F) -> Result<Self, Error> {
+    /// * `rng`: an RNG (must implement Serialize)
+    pub fn new(init_temp: F, rng: R) -> Result<Self, Error> {
         if init_temp <= F::from_f64(0.0).unwrap() {
             Err(ArgminError::InvalidParameter {
                 text: "Initial temperature must be > 0.".to_string(),
@@ -124,7 +124,7 @@ where
                 reanneal_best: std::u64::MAX,
                 reanneal_iter_best: 0,
                 cur_temp: init_temp,
-                rng: XorShiftRng::from_entropy(),
+                rng,
             })
         }
     }
@@ -225,10 +225,11 @@ where
     }
 }
 
-impl<O, F> Solver<O> for SimulatedAnnealing<F>
+impl<O, F, R> Solver<O> for SimulatedAnnealing<F, R>
 where
     O: ArgminOp<Output = F, Float = F>,
     F: ArgminFloat,
+    R: Rng + Serialize,
 {
     const NAME: &'static str = "Simulated Annealing";
     fn init(
@@ -261,7 +262,6 @@ where
 
         // Make a move
         let new_param = op.modify(&prev_param, self.cur_temp)?;
-        // let new_param = op.modify(&prev_param, self.cur_temp)?;
 
         // Evaluate cost function with new parameter vector
         let new_cost = op.apply(&new_param)?;
@@ -333,5 +333,5 @@ mod tests {
     use super::*;
     use crate::test_trait_impl;
 
-    test_trait_impl!(sa, SimulatedAnnealing<f64>);
+    test_trait_impl!(sa, SimulatedAnnealing<f64, StdRng>);
 }

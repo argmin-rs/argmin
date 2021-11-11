@@ -8,11 +8,11 @@
 use argmin::prelude::*;
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin_testfunctions::rosenbrock;
+use rand::distributions::Uniform;
 use rand::prelude::*;
-use rand_xorshift::XorShiftRng;
+use rand_xoshiro::Xoshiro256PlusPlus;
 use std::default::Default;
-use std::sync::Arc;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 struct Rosenbrock {
     /// Parameter a, usually 1.0
@@ -26,7 +26,7 @@ struct Rosenbrock {
     /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
     /// `self` to be passed as an immutable reference. This gives us thread safe interior
     /// mutability.
-    rng: Arc<Mutex<XorShiftRng>>,
+    rng: Arc<Mutex<Xoshiro256PlusPlus>>,
 }
 
 impl Default for Rosenbrock {
@@ -45,7 +45,7 @@ impl Rosenbrock {
             b,
             lower_bound,
             upper_bound,
-            rng: Arc::new(Mutex::new(XorShiftRng::from_entropy())),
+            rng: Arc::new(Mutex::new(Xoshiro256PlusPlus::from_entropy())),
         }
     }
 }
@@ -64,27 +64,22 @@ impl ArgminOp for Rosenbrock {
     /// This function is called by the annealing function
     fn modify(&self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
         let mut param_n = param.clone();
+        let mut rng = self.rng.lock().unwrap();
+        let distr = Uniform::from(0..param.len());
         // Perform modifications to a degree proportional to the current temperature `temp`.
         for _ in 0..(temp.floor() as u64 + 1) {
             // Compute random index of the parameter vector using the supplied random number
             // generator.
-            let mut rng = self.rng.lock().unwrap();
-            let idx = (*rng).gen_range(0..param.len());
+            let idx = rng.sample(distr);
 
             // Compute random number in [0.1, 0.1].
-            let val = 0.1 * (*rng).gen_range(-1.0..1.0);
+            let val = rng.sample(Uniform::new_inclusive(-0.1, 0.1));
 
             // modify previous parameter value at random position `idx` by `val`
-            let tmp = param[idx] + val;
+            param_n[idx] += val;
 
             // check if bounds are violated. If yes, project onto bound.
-            if tmp > self.upper_bound[idx] {
-                param_n[idx] = self.upper_bound[idx];
-            } else if tmp < self.lower_bound[idx] {
-                param_n[idx] = self.lower_bound[idx];
-            } else {
-                param_n[idx] = param[idx] + val;
-            }
+            param_n[idx] = param_n[idx].clamp(self.lower_bound[idx], self.upper_bound[idx]);
         }
         Ok(param_n)
     }
@@ -98,14 +93,17 @@ fn run() -> Result<(), Error> {
     // Define cost function
     let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
 
-    // definie inital parameter vector
+    // Define initial parameter vector
     let init_param: Vec<f64> = vec![1.0, 1.2];
 
     // Define initial temperature
     let temp = 15.0;
 
+    // Seed RNG
+    let rng = Xoshiro256PlusPlus::from_entropy();
+
     // Set up simulated annealing solver
-    let solver = SimulatedAnnealing::new(temp)?
+    let solver = SimulatedAnnealing::new(temp, rng)?
         // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
         .temp_func(SATempFunc::Boltzmann)
         /////////////////////////
