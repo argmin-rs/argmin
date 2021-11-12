@@ -119,7 +119,7 @@ pub trait ArgminOp {
         .into())
     }
 
-    /// Computes the Hessian at the given parameters
+    /// Computes the Jacobian at the given parameters
     fn jacobian(&self, _param: &Self::Param) -> Result<Self::Jacobian, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `jacobian` of ArgminOp trait not implemented!".to_string(),
@@ -134,6 +134,100 @@ pub trait ArgminOp {
             text: "Method `modify` of ArgminOp trait not implemented!".to_string(),
         }
         .into())
+    }
+
+    /// Applies the operator/cost function to many parameters at once.
+    ///
+    /// This allows parallel execution of the cost function which may speed up evaluation,
+    /// especially easy with a crate like [rayon](https://docs.rs/rayon). The default
+    /// implementation is sequential.
+    ///
+    /// # Examples
+    /// ```ignore
+    /// use rayon::prelude::*;
+    /// use argmin::prelude::*;
+    ///
+    /// struct ProblemType;
+    ///
+    /// impl ArgminOp for ProblemType {
+    ///     type Param = f64;
+    ///     type Float = f64;
+    ///     type Output = f64;
+    ///     type Hessian = ();
+    ///     type Jacobian = ();
+    ///
+    ///     fn bulk_apply(&self, params: &[Self::Param]) -> Result<Vec<Self::Output>, Error> {
+    ///         params.par_iter().map(|p| self.apply(p)).collect()
+    ///     }
+    /// }
+    fn bulk_apply(&self, params: &[Self::Param]) -> Result<Vec<Self::Output>, Error> {
+        params.iter().map(|p| self.apply(p)).collect()
+    }
+
+    /// Computes the gradient at many given parameters at once.
+    ///
+    /// See [`bulk_apply`](ArgminOp::bulk_apply).
+    fn bulk_gradient(&self, params: &[Self::Param]) -> Result<Vec<Self::Param>, Error> {
+        params.iter().map(|p| self.gradient(p)).collect()
+    }
+
+    /// Computes the Hessian at many given parameters at once.
+    ///
+    /// See [`bulk_apply`](ArgminOp::bulk_apply).
+    fn bulk_hessian(&self, params: &[Self::Param]) -> Result<Vec<Self::Hessian>, Error> {
+        params.iter().map(|p| self.hessian(p)).collect()
+    }
+
+    /// Computes the Jacobian at many given parameters at once.
+    ///
+    /// See [`bulk_apply`](ArgminOp::bulk_apply).
+    fn bulk_jacobian(&self, params: &[Self::Param]) -> Result<Vec<Self::Jacobian>, Error> {
+        params.iter().map(|p| self.jacobian(p)).collect()
+    }
+
+    /// Modifies many parameter vectors at once. Comes with a vector that indicates the "degree"
+    /// of the modification for each parameter vector.
+    ///
+    /// See [`bulk_apply`](ArgminOp::bulk_apply).
+    ///
+    /// # Examples
+    /// ```ignore
+    /// use rayon::prelude::*;
+    /// use argmin::prelude::*;
+    ///
+    /// struct ProblemType;
+    ///
+    /// impl ArgminOp for ProblemType {
+    ///     type Param = f64;
+    ///     type Float = f64;
+    ///     type Output = f64;
+    ///     type Hessian = ();
+    ///     type Jacobian = ();
+    ///
+    ///     fn bulk_modify(
+    ///         &self,
+    ///         params: &[Self::Param],
+    ///         extents: &[Self::Float]
+    ///     ) -> Result<Vec<Self::Param>, Error> {
+    ///         assert_eq!(params.len(), extents.len());
+    ///         params
+    ///             .par_iter()
+    ///             .zip_eq(extents)
+    ///             .map(|(p, e)| self.modify(p, *e))
+    ///             .collect()
+    ///     }
+    /// }
+    fn bulk_modify(
+        &self,
+        params: &[Self::Param],
+        extents: &[Self::Float],
+    ) -> Result<Vec<Self::Param>, Error> {
+        assert_eq!(params.len(), extents.len());
+        params
+            .iter()
+            .zip(extents)
+            .map(|(p, e)| self.modify(p, *e))
+            .collect()
     }
 }
 
