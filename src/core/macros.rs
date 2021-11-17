@@ -31,7 +31,7 @@ macro_rules! check_param {
         }
     };
     ($param:expr, $msg:expr) => {
-        check_param!($param, $msg, NotInitialized);
+        check_param!($param, $msg, NotInitialized)
     };
 }
 
