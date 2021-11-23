@@ -9,6 +9,7 @@ use argmin::prelude::*;
 use argmin::solver::particleswarm::*;
 
 use argmin_testfunctions::himmelblau;
+use rayon::prelude::*;
 
 struct Himmelblau {}
 
@@ -21,6 +22,12 @@ impl ArgminOp for Himmelblau {
 
     fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
         Ok(himmelblau(param))
+    }
+
+    /// If the `apply` cost function is expensive, a parallel implementation like this one may
+    /// be faster. If `apply` is cheap this may be detrimental.
+    fn bulk_apply(&self, params: &[&Self::Param]) -> Result<Vec<Self::Output>, Error> {
+        params.par_iter().map(|p| self.apply(&p)).collect()
     }
 }
 

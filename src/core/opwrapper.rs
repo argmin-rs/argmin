@@ -86,25 +86,25 @@ impl<O: ArgminOp> OpWrapper<O> {
     }
 
     /// Calls the `bulk_apply` method of `op` and increments `cost_func_count`.
-    pub fn bulk_apply(&mut self, params: &[O::Param]) -> Result<Vec<O::Output>, Error> {
+    pub fn bulk_apply(&mut self, params: &[&O::Param]) -> Result<Vec<O::Output>, Error> {
         self.cost_func_count += params.len() as u64;
         self.op.as_ref().unwrap().bulk_apply(params)
     }
 
     /// Calls the `bulk_gradient` method of `op` and increments `gradient_func_count`.
-    pub fn bulk_gradient(&mut self, params: &[O::Param]) -> Result<Vec<O::Param>, Error> {
+    pub fn bulk_gradient(&mut self, params: &[&O::Param]) -> Result<Vec<O::Param>, Error> {
         self.grad_func_count += params.len() as u64;
         self.op.as_ref().unwrap().bulk_gradient(params)
     }
 
     /// Calls the `bulk_hessian` method of `op` and increments `hessian_func_count`.
-    pub fn bulk_hessian(&mut self, params: &[O::Param]) -> Result<Vec<O::Hessian>, Error> {
+    pub fn bulk_hessian(&mut self, params: &[&O::Param]) -> Result<Vec<O::Hessian>, Error> {
         self.hessian_func_count += params.len() as u64;
         self.op.as_ref().unwrap().bulk_hessian(params)
     }
 
     /// Calls the `bulk_jacobian` method of `op` and increments `jacobian_func_count`.
-    pub fn bulk_jacobian(&mut self, params: &[O::Param]) -> Result<Vec<O::Jacobian>, Error> {
+    pub fn bulk_jacobian(&mut self, params: &[&O::Param]) -> Result<Vec<O::Jacobian>, Error> {
         self.jacobian_func_count += params.len() as u64;
         self.op.as_ref().unwrap().bulk_jacobian(params)
     }
@@ -112,7 +112,7 @@ impl<O: ArgminOp> OpWrapper<O> {
     /// Calls the `bulk_modify` method of `op` and increments `modify_func_count`.
     pub fn bulk_modify(
         &mut self,
-        params: &[O::Param],
+        params: &[&O::Param],
         extents: &[O::Float],
     ) -> Result<Vec<O::Param>, Error> {
         self.modify_func_count += params.len() as u64;
@@ -188,25 +188,25 @@ impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
         self.op.as_ref().unwrap().modify(param, extent)
     }
 
-    fn bulk_apply(&self, params: &[Self::Param]) -> Result<Vec<Self::Output>, Error> {
+    fn bulk_apply(&self, params: &[&Self::Param]) -> Result<Vec<Self::Output>, Error> {
         self.op.as_ref().unwrap().bulk_apply(params)
     }
 
-    fn bulk_gradient(&self, params: &[Self::Param]) -> Result<Vec<Self::Param>, Error> {
+    fn bulk_gradient(&self, params: &[&Self::Param]) -> Result<Vec<Self::Param>, Error> {
         self.op.as_ref().unwrap().bulk_gradient(params)
     }
 
-    fn bulk_hessian(&self, params: &[Self::Param]) -> Result<Vec<Self::Hessian>, Error> {
+    fn bulk_hessian(&self, params: &[&Self::Param]) -> Result<Vec<Self::Hessian>, Error> {
         self.op.as_ref().unwrap().bulk_hessian(params)
     }
 
-    fn bulk_jacobian(&self, params: &[Self::Param]) -> Result<Vec<Self::Jacobian>, Error> {
+    fn bulk_jacobian(&self, params: &[&Self::Param]) -> Result<Vec<Self::Jacobian>, Error> {
         self.op.as_ref().unwrap().bulk_jacobian(params)
     }
 
     fn bulk_modify(
         &self,
-        params: &[Self::Param],
+        params: &[&Self::Param],
         extents: &[Self::Float],
     ) -> Result<Vec<Self::Param>, Error> {
         self.op.as_ref().unwrap().bulk_modify(params, extents)

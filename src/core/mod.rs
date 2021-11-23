@@ -80,7 +80,7 @@ impl<I> ArgminFloat for I where
 /// It is required to implement the `apply` method, all others are optional and provide a default
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
-/// uses solver requires it.
+/// user's solver requires it.
 pub trait ArgminOp {
     // TODO: Once associated type defaults are stable, it hopefully will be possible to define
     // default types for `Hessian` and `Jacobian`.
@@ -138,12 +138,12 @@ pub trait ArgminOp {
 
     /// Applies the operator/cost function to many parameters at once.
     ///
-    /// This allows parallel execution of the cost function which may speed up evaluation,
-    /// especially easy with a crate like [rayon](https://docs.rs/rayon). The default
-    /// implementation is sequential.
+    /// This allows parallel or otherwise optimized execution of the cost function which may
+    /// speed up evaluation, especially easy with a crate like [rayon](https://docs.rs/rayon).
+    /// The default implementation is sequential.
     ///
     /// # Examples
-    /// ```ignore
+    /// ```
     /// use rayon::prelude::*;
     /// use argmin::prelude::*;
     ///
@@ -156,32 +156,32 @@ pub trait ArgminOp {
     ///     type Hessian = ();
     ///     type Jacobian = ();
     ///
-    ///     fn bulk_apply(&self, params: &[Self::Param]) -> Result<Vec<Self::Output>, Error> {
+    ///     fn bulk_apply(&self, params: &[&Self::Param]) -> Result<Vec<Self::Output>, Error> {
     ///         params.par_iter().map(|p| self.apply(p)).collect()
     ///     }
     /// }
-    fn bulk_apply(&self, params: &[Self::Param]) -> Result<Vec<Self::Output>, Error> {
+    fn bulk_apply(&self, params: &[&Self::Param]) -> Result<Vec<Self::Output>, Error> {
         params.iter().map(|p| self.apply(p)).collect()
     }
 
     /// Computes the gradient at many given parameters at once.
     ///
     /// See [`bulk_apply`](ArgminOp::bulk_apply).
-    fn bulk_gradient(&self, params: &[Self::Param]) -> Result<Vec<Self::Param>, Error> {
+    fn bulk_gradient(&self, params: &[&Self::Param]) -> Result<Vec<Self::Param>, Error> {
         params.iter().map(|p| self.gradient(p)).collect()
     }
 
     /// Computes the Hessian at many given parameters at once.
     ///
     /// See [`bulk_apply`](ArgminOp::bulk_apply).
-    fn bulk_hessian(&self, params: &[Self::Param]) -> Result<Vec<Self::Hessian>, Error> {
+    fn bulk_hessian(&self, params: &[&Self::Param]) -> Result<Vec<Self::Hessian>, Error> {
         params.iter().map(|p| self.hessian(p)).collect()
     }
 
     /// Computes the Jacobian at many given parameters at once.
     ///
     /// See [`bulk_apply`](ArgminOp::bulk_apply).
-    fn bulk_jacobian(&self, params: &[Self::Param]) -> Result<Vec<Self::Jacobian>, Error> {
+    fn bulk_jacobian(&self, params: &[&Self::Param]) -> Result<Vec<Self::Jacobian>, Error> {
         params.iter().map(|p| self.jacobian(p)).collect()
     }
 
@@ -191,7 +191,7 @@ pub trait ArgminOp {
     /// See [`bulk_apply`](ArgminOp::bulk_apply).
     ///
     /// # Examples
-    /// ```ignore
+    /// ```
     /// use rayon::prelude::*;
     /// use argmin::prelude::*;
     ///
@@ -206,7 +206,7 @@ pub trait ArgminOp {
     ///
     ///     fn bulk_modify(
     ///         &self,
-    ///         params: &[Self::Param],
+    ///         params: &[&Self::Param],
     ///         extents: &[Self::Float]
     ///     ) -> Result<Vec<Self::Param>, Error> {
     ///         assert_eq!(params.len(), extents.len());
@@ -219,7 +219,7 @@ pub trait ArgminOp {
     /// }
     fn bulk_modify(
         &self,
-        params: &[Self::Param],
+        params: &[&Self::Param],
         extents: &[Self::Float],
     ) -> Result<Vec<Self::Param>, Error> {
         assert_eq!(params.len(), extents.len());

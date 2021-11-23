@@ -106,23 +106,12 @@ where
     }
 
     fn get_best_position(&self) -> P {
-        let mut best: Option<(&P, F)> = None;
-
-        for p in &self.particles {
-            match best {
-                Some(best_sofar) => {
-                    if p.cost < best_sofar.1 {
-                        best = Some((&p.position, p.cost))
-                    }
-                }
-                None => best = Some((&p.position, p.cost)),
-            }
-        }
-
-        match best {
-            Some(best_sofar) => best_sofar.0.clone(),
-            None => panic!("Particles not initialized"),
-        }
+        self.particles
+            .iter()
+            .min_by(|a, b| a.cost.partial_cmp(&b.cost).expect("cost is NaN"))
+            .expect("Particles not initialized")
+            .position
+            .clone()
     }
 }
 
@@ -137,10 +126,10 @@ where
 
     fn init(
         &mut self,
-        _op: &mut OpWrapper<O>,
+        op: &mut OpWrapper<O>,
         _state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        self.initialize_particles(_op);
+        self.initialize_particles(op);
 
         Ok(None)
     }
@@ -148,7 +137,7 @@ where
     /// Perform one iteration of algorithm
     fn next_iter(
         &mut self,
-        _op: &mut OpWrapper<O>,
+        op: &mut OpWrapper<O>,
         _state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let zero = O::Param::zero_like(&self.best_position);
@@ -180,8 +169,16 @@ where
                 &O::Param::max(&new_position, &self.search_region.0),
                 &self.search_region.1,
             );
+        }
 
-            p.cost = _op.apply(&p.position)?;
+        // Evaluate new positions. The user may have parallelized or otherwise optimized the cost
+        // function via`bulk_apply`, prefer that here at the cost of two extra Vec::collects.
+        let positions: Vec<_> = self.particles.iter().map(|p| &p.position).collect();
+        let new_costs = op.bulk_apply(&positions)?;
+
+        for (p, new_cost) in self.particles.iter_mut().zip(new_costs) {
+            p.cost = new_cost;
+
             if p.cost < p.best_cost {
                 p.best_position = p.position.clone();
                 p.best_cost = p.cost;
