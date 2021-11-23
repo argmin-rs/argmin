@@ -44,6 +44,7 @@ ndarray-linalg = { version = "0.14", features = ["openblas"] }
 finitediff = { version = "0.1.4", features = ["ndarray"] }
 argmin_testfunctions = "0.1.1"
 rand_xoshiro = { version = "0.6.0", features = ["serde1"] }
+rayon = "1.5.1"
 
 [features]
 default = ["slog-logger"]
