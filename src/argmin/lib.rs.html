@@ -1,7 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../argmin/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../argmin/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -535,17 +534,7 @@
 <span id="532">532</span>
 <span id="533">533</span>
 <span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre><pre class="rust">
 <span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -553,11 +542,8 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! A pure Rust optimization framework</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate offers a (work in progress) numerical optimization toolbox/framework written entirely</span>
-<span class="doccomment">//! in Rust. It is at the moment potentially very buggy. Please use with care and report any bugs</span>
-<span class="doccomment">//! you encounter. This crate is looking for contributors!</span>
+<span class="doccomment">//! argmin is a numerical optimization toolbox/framework written entirely in Rust.</span>
+<span class="doccomment">//! This crate is looking for contributors!</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [Documentation of most recent release](https://docs.rs/argmin/latest/argmin/)</span>
 <span class="doccomment">//!</span>
@@ -565,30 +551,33 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Design goals</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! This crate&#39;s intention is to be useful to users as well as developers of optimization</span>
-<span class="doccomment">//! algorithms, meaning that it should be both easy to apply and easy to implement algorithms. In</span>
-<span class="doccomment">//! particular, as a developer of optimization algorithms you should not need to worry about</span>
-<span class="doccomment">//! usability features (such as logging, dealing with different types, setters and getters for</span>
-<span class="doccomment">//! certain common parameters, counting cost function and gradient evaluations, termination, and so</span>
-<span class="doccomment">//! on). Instead you can focus on implementing your algorithm.</span>
+<span class="doccomment">//! argmin aims at offering a wide range of optimization algorithms with a consistent interface,</span>
+<span class="doccomment">//! written purely in Rust. It comes with additional features such as checkpointing and observers</span>
+<span class="doccomment">//! which for instance allow one to log the progress of an optimization to screen or file.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! - Easy framework for the implementation of optimization algorithms: Implement a single iteration</span>
-<span class="doccomment">//!   of your method and let the framework do the rest. This leads to similar interfaces for</span>
-<span class="doccomment">//!   different solvers, making it easy for users.</span>
-<span class="doccomment">//! - Pure Rust implementations of a wide range of optimization methods: This avoids the need to</span>
-<span class="doccomment">//!   compile and interface C/C++/Fortran code.</span>
-<span class="doccomment">//! - Type-agnostic: Many problems require data structures that go beyond simple vectors to</span>
-<span class="doccomment">//!   represent the parameters. In argmin, everything is generic: All that needs to be done is</span>
-<span class="doccomment">//!   implementing certain traits on your data type. For common types, these traits are already</span>
-<span class="doccomment">//!   implemented.</span>
-<span class="doccomment">//! - Convenient: Easy and consistent logging of anything that may be important. Log to the</span>
-<span class="doccomment">//!   terminal, to a file or implement your own observers. Future plans include sending metrics to</span>
-<span class="doccomment">//!   databases and connecting to big data piplines.</span>
-<span class="doccomment">//! - Algorithm evaluation: Methods to assess the performance of an algorithm for different</span>
-<span class="doccomment">//!   parameter settings, problem classes, ...</span>
+<span class="doccomment">//! In addition it provides a framework for implementing iterative optimization algorithms in a</span>
+<span class="doccomment">//! convenient manner. Essentially, a single iteration of the algorithm needs to be implemented and</span>
+<span class="doccomment">//! everything else, such as handling termination, parameter vectors, gradients and Hessians, is</span>
+<span class="doccomment">//! taken care of by the library.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Since this crate is in a very early stage, so far most points are only partially implemented or</span>
-<span class="doccomment">//! remain future plans.</span>
+<span class="doccomment">//! This library makes heavy use of generics in order to be as type-agnostic as possible. It</span>
+<span class="doccomment">//! supports `nalgebra` and `ndarray` types via feature gates, but custom types can easily be made</span>
+<span class="doccomment">//! compatible with argmin by implementing the respective traits.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Future plans include functionality for easy performance evaluation of optimization algorithms,</span>
+<span class="doccomment">//! parallel computation of cost functions/gradients/Hessians as well as GPU support</span>
+<span class="doccomment">//! And of course more optimization algorithms!</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Contributing</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This crate is looking for contributors!</span>
+<span class="doccomment">//! Potential projects can be found in the</span>
+<span class="doccomment">//! [Github issues](https://github.com/argmin-rs/argmin/issues), but even if you have an idea that</span>
+<span class="doccomment">//! is not already mentioned there or if you found a bug, feel free to open a new issue.</span>
+<span class="doccomment">//! Besides adding optimization methods and new features, other contributions are also highly</span>
+<span class="doccomment">//! welcome, for instance improving performance, documentation, writing examples (with real world</span>
+<span class="doccomment">//! problems), developing tests, adding observers, implementing a C interface or</span>
+<span class="doccomment">//! [Python wrappers](https://github.com/argmin-rs/pyargmin).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Algorithms</span>
 <span class="doccomment">//!</span>
@@ -627,7 +616,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! argmin = &quot;0.4.6&quot;</span>
+<span class="doccomment">//! argmin = &quot;0.4.7&quot;</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Optional features (recommended)</span>
@@ -636,7 +625,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! argmin = { version = &quot;0.4.6&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;, &quot;nalgebral&quot;] }</span>
+<span class="doccomment">//! argmin = { version = &quot;0.4.7&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;, &quot;nalgebral&quot;] }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! These may become default features in the future. Without these features compilation to</span>
@@ -654,12 +643,18 @@
 <span class="doccomment">//! ndarray-linalg = { version = &quot;*&quot;, features = [&quot;intel-mkl-static&quot;] }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ## Running the tests</span>
+<span class="doccomment">//! ## Running the tests and building the examples</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Running the tests requires the `ndarrayl` and feature to be enabled:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```bash</span>
 <span class="doccomment">//! cargo test --features &quot;ndarrayl&quot;</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The examples require all features to be enabled:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```bash</span>
+<span class="doccomment">//! cargo test --features --all-features</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Defining a problem</span>
@@ -1031,21 +1026,6 @@
 <span class="doccomment">//! }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! # TODOs</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   * More optimization methods</span>
-<span class="doccomment">//!   * Automatic differentiation</span>
-<span class="doccomment">//!   * Parallelization</span>
-<span class="doccomment">//!   * Tests</span>
-<span class="doccomment">//!   * Evaluation on real problems</span>
-<span class="doccomment">//!   * Evaluation framework</span>
-<span class="doccomment">//!   * Documentation &amp; Tutorials</span>
-<span class="doccomment">//!   * C interface</span>
-<span class="doccomment">//!   * Python wrapper</span>
-<span class="doccomment">//!   * Solver and problem definition via a config file</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Please open an [issue](https://github.com/argmin-rs/argmin/issues) if you want to contribute!</span>
-<span class="doccomment">//! Any help is appreciated!</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # License</span>
 <span class="doccomment">//!</span>
@@ -1058,7 +1038,6 @@
 <span class="doccomment">//!     http://opensource.org/licenses/MIT)</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! at your option.</span>
-<span class="doccomment">//!</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Contribution</span>
 <span class="doccomment">//!</span>
@@ -1091,5 +1070,4 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
 </pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="argmin" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="argmin" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
