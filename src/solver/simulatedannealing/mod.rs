@@ -234,17 +234,23 @@ where
     const NAME: &'static str = "Simulated Annealing";
     fn init(
         &mut self,
-        _op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        Ok(Some(ArgminIterData::new().kv(make_kv!(
-            "initial_temperature" => self.init_temp;
-            "stall_iter_accepted_limit" => self.stall_iter_accepted_limit;
-            "stall_iter_best_limit" => self.stall_iter_best_limit;
-            "reanneal_fixed" => self.reanneal_fixed;
-            "reanneal_accepted" => self.reanneal_accepted;
-            "reanneal_best" => self.reanneal_best;
-        ))))
+        let cost = op.apply(&state.get_param())?;
+        Ok(Some(
+            ArgminIterData::new()
+                .param(state.get_param())
+                .cost(cost)
+                .kv(make_kv!(
+                    "initial_temperature" => self.init_temp;
+                    "stall_iter_accepted_limit" => self.stall_iter_accepted_limit;
+                    "stall_iter_best_limit" => self.stall_iter_best_limit;
+                    "reanneal_fixed" => self.reanneal_fixed;
+                    "reanneal_accepted" => self.reanneal_accepted;
+                    "reanneal_best" => self.reanneal_best;
+                )),
+        ))
     }
 
     /// Perform one iteration of SA algorithm
