@@ -48,6 +48,9 @@ macro_rules! make_dot_vec {
             }
         }
 
+        // This allows the combination of Vec::with_capacity(...) and unsafe .set_len(...).
+        // Since we are not reading here, this should be safe.
+        #[allow(clippy::uninit_vec)]
         impl ArgminDot<Vec<Vec<$t>>, Vec<Vec<$t>>> for Vec<Vec<$t>> {
             #[inline]
             fn dot(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {

@@ -79,7 +79,7 @@ where
             self.state.cost(cur_cost);
         }
         // check if parameters are the best so far
-        if self.state.get_cost() <= self.state.get_best_cost() {
+        if self.state.get_cost() < self.state.get_best_cost() {
             let param = self.state.get_param();
             let cost = self.state.get_cost();
             self.state.best_param(param).best_cost(cost);
