@@ -1,5 +1,9 @@
 # Changelog
 
+## argmin unreleased (xx xxxxxx xxxx)
+
+- Fixed simulated annealing always accepting the first iteration (#153, @dariogoetz)
+
 ## argmin v0.4.7 (14 August 2021)
 
 - Moved to Github actions (#130, @stefan-k)
