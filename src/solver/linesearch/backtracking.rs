@@ -93,15 +93,37 @@ where
     }
 }
 
+impl<P, L, F: ArgminFloat> BacktrackingLineSearch<P, L, F>
+where
+    P: ArgminScaledAdd<P, F, P>,
+    L: LineSearchCondition<P, F>,
+{
+    fn backtracking_step<O: ArgminOp<Param = P, Output = F, Float = F>>(
+        &self,
+        op: &mut OpWrapper<O>,
+    ) -> Result<ArgminIterData<O>, Error> {
+        let new_param = self
+            .init_param
+            .scaled_add(&self.alpha, self.search_direction.as_ref().unwrap());
+
+        let cur_cost = op.apply(&new_param)?;
+
+        let out = if self.condition.requires_cur_grad() {
+            ArgminIterData::new()
+                .grad(op.gradient(&new_param)?)
+                .param(new_param)
+                .cost(cur_cost)
+        } else {
+            ArgminIterData::new().param(new_param).cost(cur_cost)
+        };
+
+        Ok(out)
+    }
+}
+
 impl<O, P, L, F> Solver<O> for BacktrackingLineSearch<P, L, F>
 where
-    P: Clone
-        + Default
-        + Serialize
-        + DeserializeOwned
-        + ArgminSub<P, P>
-        + ArgminDot<P, F>
-        + ArgminScaledAdd<P, F, P>,
+    P: Clone + Default + Serialize + DeserializeOwned + ArgminScaledAdd<P, F, P>,
     O: ArgminOp<Param = P, Output = F, Float = F>,
     L: LineSearchCondition<P, F>,
     F: ArgminFloat,
@@ -133,7 +155,8 @@ where
             .into());
         }
 
-        Ok(None)
+        let out = self.backtracking_step(op)?;
+        Ok(Some(out))
     }
 
     fn next_iter(
@@ -141,23 +164,8 @@ where
         op: &mut OpWrapper<O>,
         _state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let new_param = self
-            .init_param
-            .scaled_add(&self.alpha, self.search_direction.as_ref().unwrap());
-
-        let cur_cost = op.apply(&new_param)?;
-
         self.alpha = self.alpha * self.rho;
-
-        let mut out = ArgminIterData::new()
-            .param(new_param.clone())
-            .cost(cur_cost);
-
-        if self.condition.requires_cur_grad() {
-            out = out.grad(op.gradient(&new_param)?);
-        }
-
-        Ok(out)
+        self.backtracking_step(op)
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
