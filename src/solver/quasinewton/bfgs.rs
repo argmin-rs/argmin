@@ -82,7 +82,7 @@ where
         + ArgminMul<O::Float, O::Hessian>
         + ArgminTranspose<O::Hessian>
         + ArgminEye,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "BFGS";
@@ -126,7 +126,7 @@ where
                     ..
                 },
         } = Executor::new(
-            OpWrapper::new_from_wrapper(op),
+            op.take_op().unwrap(),
             self.linesearch.clone(),
             param.clone(),
         )

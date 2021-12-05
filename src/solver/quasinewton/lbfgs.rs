@@ -83,7 +83,8 @@ where
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
     O::Hessian: Clone + Default + Serialize + DeserializeOwned,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
+    // L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "L-BFGS";
@@ -149,7 +150,7 @@ where
                     ..
                 },
         } = Executor::new(
-            OpWrapper::new_from_wrapper(op),
+            op.take_op().unwrap(),
             self.linesearch.clone(),
             param.clone(),
         )
