@@ -97,7 +97,7 @@ where
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<F, O::Hessian>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "SR1";
@@ -145,7 +145,7 @@ where
                     ..
                 },
         } = Executor::new(
-            OpWrapper::new_from_wrapper(op),
+            op.take_op().unwrap(),
             self.linesearch.clone(),
             param.clone(),
         )

@@ -141,5 +141,8 @@ fn test_lbfgs_func_count() {
     assert!(res.state.cost_func_count <= 7);
     // The following value is 5 in scipy.optimize, but the convergence
     // criteria is different
-    assert!(res.state.grad_func_count <= 6);
+    // assert!(res.state.grad_func_count <= 6);
+    // NOTE: Changed to 11, because LBFGS now correctly includes the number of evaluations
+    // performed in the linesearch.
+    assert!(res.state.grad_func_count <= 11);
 }

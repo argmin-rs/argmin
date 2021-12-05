@@ -225,8 +225,7 @@ where
         if self.state.get_iter() < self.state.get_max_iters() && !self.state.terminated() {
             self.state.termination_reason(TerminationReason::Aborted);
         }
-
-        Ok(ArgminResult::new(self.op.get_op(), self.state))
+        Ok(ArgminResult::new(self.op, self.state))
     }
 
     /// Attaches a observer which implements `ArgminLog` to the solver.

@@ -88,7 +88,7 @@ where
         + Default
         + ArgminInv<O::Hessian>
         + ArgminDot<O::Param, O::Param>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
     F: ArgminFloat + Default + ArgminDiv<O::Float, O::Float> + ArgminNorm<O::Float> + ArgminConj,
 {
     const NAME: &'static str = "Newton-CG";
@@ -149,15 +149,11 @@ where
                     cost: next_cost,
                     ..
                 },
-        } = Executor::new(
-            OpWrapper::new_from_wrapper(op),
-            self.linesearch.clone(),
-            param,
-        )
-        .grad(grad)
-        .cost(state.get_cost())
-        .ctrlc(false)
-        .run()?;
+        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone(), param)
+            .grad(grad)
+            .cost(state.get_cost())
+            .ctrlc(false)
+            .run()?;
 
         op.consume_op(line_op);
 

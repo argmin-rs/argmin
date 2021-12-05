@@ -90,19 +90,19 @@ use std::cmp::Ordering;
 #[derive(Clone)]
 pub struct ArgminResult<O: ArgminOp> {
     /// operator
-    pub operator: O,
+    pub operator: OpWrapper<O>,
     /// iteration state
     pub state: IterState<O>,
 }
 
 impl<O: ArgminOp> ArgminResult<O> {
     /// Constructor
-    pub fn new(operator: O, state: IterState<O>) -> Self {
+    pub fn new(operator: OpWrapper<O>, state: IterState<O>) -> Self {
         ArgminResult { operator, state }
     }
 
     /// Return handle to operator
-    pub fn operator(&self) -> &O {
+    pub fn operator(&self) -> &OpWrapper<O> {
         &self.operator
     }
 

@@ -121,7 +121,7 @@ where
         + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<F, O::Hessian>,
-    R: ArgminTrustRegion<F> + Solver<OpWrapper<O>>,
+    R: ArgminTrustRegion<F> + Solver<O>,
     F: ArgminFloat + ArgminNorm<O::Float>,
 {
     const NAME: &'static str = "SR1 Trust Region";
@@ -164,9 +164,8 @@ where
             operator: sub_op,
             state: IterState { param: sk, .. },
         } = Executor::new(
-            OpWrapper::new_from_wrapper(op),
+            op.take_op().unwrap(),
             self.subproblem.clone(),
-            // xk.clone(),
             xk.zero_like(),
         )
         .cost(cost)
