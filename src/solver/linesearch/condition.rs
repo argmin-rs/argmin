@@ -19,10 +19,10 @@ pub trait LineSearchCondition<T, F>: Serialize {
     fn eval(
         &self,
         cur_cost: F,
-        cur_grad: T,
+        cur_grad: &T,
         init_cost: F,
-        init_grad: T,
-        search_direction: T,
+        init_grad: &T,
+        search_direction: &T,
         alpha: F,
     ) -> bool;
 
@@ -57,13 +57,13 @@ where
     fn eval(
         &self,
         cur_cost: F,
-        _cur_grad: T,
+        _cur_grad: &T,
         init_cost: F,
-        init_grad: T,
-        search_direction: T,
+        init_grad: &T,
+        search_direction: &T,
         alpha: F,
     ) -> bool {
-        cur_cost <= init_cost + self.c * alpha * init_grad.dot(&search_direction)
+        cur_cost <= init_cost + self.c * alpha * init_grad.dot(search_direction)
     }
 
     fn requires_cur_grad(&self) -> bool {
@@ -105,15 +105,15 @@ where
     fn eval(
         &self,
         cur_cost: F,
-        cur_grad: T,
+        cur_grad: &T,
         init_cost: F,
-        init_grad: T,
-        search_direction: T,
+        init_grad: &T,
+        search_direction: &T,
         alpha: F,
     ) -> bool {
-        let tmp = init_grad.dot(&search_direction);
+        let tmp = init_grad.dot(search_direction);
         (cur_cost <= init_cost + self.c1 * alpha * tmp)
-            && cur_grad.dot(&search_direction) >= self.c2 * tmp
+            && cur_grad.dot(search_direction) >= self.c2 * tmp
     }
 
     fn requires_cur_grad(&self) -> bool {
@@ -155,15 +155,15 @@ where
     fn eval(
         &self,
         cur_cost: F,
-        cur_grad: T,
+        cur_grad: &T,
         init_cost: F,
-        init_grad: T,
-        search_direction: T,
+        init_grad: &T,
+        search_direction: &T,
         alpha: F,
     ) -> bool {
-        let tmp = init_grad.dot(&search_direction);
+        let tmp = init_grad.dot(search_direction);
         (cur_cost <= init_cost + self.c1 * alpha * tmp)
-            && cur_grad.dot(&search_direction).abs() <= self.c2 * tmp.abs()
+            && cur_grad.dot(search_direction).abs() <= self.c2 * tmp.abs()
     }
 
     fn requires_cur_grad(&self) -> bool {
@@ -198,13 +198,13 @@ where
     fn eval(
         &self,
         cur_cost: F,
-        _cur_grad: T,
+        _cur_grad: &T,
         init_cost: F,
-        init_grad: T,
-        search_direction: T,
+        init_grad: &T,
+        search_direction: &T,
         alpha: F,
     ) -> bool {
-        let tmp = alpha * init_grad.dot(&search_direction);
+        let tmp = alpha * init_grad.dot(search_direction);
         init_cost + (F::from_f64(1.0).unwrap() - self.c) * tmp <= cur_cost
             && cur_cost <= init_cost + self.c * alpha * tmp
     }
