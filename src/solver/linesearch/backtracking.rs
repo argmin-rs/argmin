@@ -11,6 +11,7 @@ use crate::prelude::*;
 use crate::solver::linesearch::condition::*;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 
 /// The Backtracking line search is a simple method to find a step length which obeys the Armijo
 /// (sufficient decrease) condition.
@@ -171,10 +172,14 @@ where
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if self.condition.eval(
             state.get_cost(),
-            state.get_grad().unwrap_or_default(),
+            &state
+                .get_grad()
+                .as_ref()
+                .map(Cow::Borrowed)
+                .unwrap_or_else(|| Cow::Owned(P::default())),
             self.init_cost,
-            self.init_grad.clone(),
-            self.search_direction.clone().unwrap(),
+            &self.init_grad,
+            self.search_direction.as_ref().unwrap(),
             self.alpha,
         ) {
             TerminationReason::LineSearchConditionMet
