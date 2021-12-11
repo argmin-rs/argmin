@@ -285,14 +285,15 @@ where
         // which will always be between 0 and 0.5.
         let prob: f64 = self.rng.gen();
         let prob = F::from_f64(prob).unwrap();
-        let accepted = (new_cost < state.get_prev_cost())
+        let accepted = (new_cost < prev_cost)
             || (F::from_f64(1.0).unwrap()
-                / (F::from_f64(1.0).unwrap()
-                    + ((new_cost - state.get_prev_cost()) / self.cur_temp).exp())
+                / (F::from_f64(1.0).unwrap() + ((new_cost - prev_cost) / self.cur_temp).exp())
                 > prob);
 
+        let new_best_found = new_cost < state.get_best_cost();
+
         // Update stall iter variables
-        self.update_stall_and_reanneal_iter(accepted, new_cost <= state.get_best_cost());
+        self.update_stall_and_reanneal_iter(accepted, new_best_found);
 
         let (r_fixed, r_accepted, r_best) = self.reanneal();
 
@@ -310,7 +311,7 @@ where
         }
         .kv(make_kv!(
             "t" => self.cur_temp;
-            "new_be" => new_cost <= state.get_best_cost();
+            "new_be" => new_best_found;
             "acc" => accepted;
             "st_i_be" => self.stall_iter_best;
             "st_i_ac" => self.stall_iter_accepted;
