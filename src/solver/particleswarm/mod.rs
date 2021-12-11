@@ -45,8 +45,11 @@ where
     ///
     /// Parameters:
     ///
-    /// * `cost_function`: cost function
-    /// * `init_temp`: initial temperature
+    /// * `search_region`: size of search region
+    /// * `num_particles`: number of particles
+    /// * `weight_momentum`: momentum weight for particle update
+    /// * `weight_particle`: particle weight for particle update
+    /// * `weight_swarm`: swarm weight for particle update
     pub fn new(
         search_region: (P, P),
         num_particles: usize,
@@ -130,7 +133,6 @@ impl<O, P, F> Solver<O> for ParticleSwarm<P, F>
 where
     O: ArgminOp<Output = F, Param = P, Float = F>,
     P: Position<F> + DeserializeOwned + Serialize,
-    O::Hessian: Clone + Default,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Particle Swarm Optimization";
@@ -239,18 +241,6 @@ where
     F: ArgminFloat,
 {
 }
-
-// trait_bound!(Position<F>
-// ; Clone
-// , Default
-// , ArgminAdd<Self, Self>
-// , ArgminSub<Self, Self>
-// , ArgminMul<F, Self>
-// , ArgminZeroLike
-// , ArgminRandom
-// , ArgminMinMax
-// , std::fmt::Debug
-// );
 
 /// A single particle
 #[derive(Clone, Serialize, Deserialize, Debug)]
