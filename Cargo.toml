@@ -2,7 +2,7 @@
 name = "argmin"
 version = "0.4.7"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
-edition = "2018"
+edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "Mathematical optimization in pure Rust"
 documentation = "https://docs.rs/argmin/"
