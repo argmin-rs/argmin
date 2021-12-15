@@ -13,6 +13,7 @@ use crate::core::{
     Observer, ObserverMode, OpWrapper, Solver, TerminationReason,
 };
 use instant;
+use num::Float;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -68,7 +69,6 @@ where
         let mut executor: Self = load_checkpoint(path)?;
         executor.op = OpWrapper::new(op);
         Ok(executor)
-        // load_checkpoint(path)
     }
 
     fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {
@@ -79,7 +79,17 @@ where
             self.state.cost(cur_cost);
         }
         // check if parameters are the best so far
-        if self.state.get_cost() < self.state.get_best_cost() {
+        // Comparison is done using `<` to avoid new solutions with the same cost function value as
+        // the current best to be accepted. However, some solvers to not compute the cost function
+        // value (such as the Newton method). Those will always have `Inf` cost. Therefore if both
+        // the new value and the previous best value are `Inf`, the solution is also accepted. Care
+        // is taken that both `Inf` also have the same sign.
+        if self.state.get_cost() < self.state.get_best_cost()
+            || (self.state.get_cost().is_infinite()
+                && self.state.get_best_cost().is_infinite()
+                && self.state.get_cost().is_sign_positive()
+                    == self.state.get_best_cost().is_sign_positive())
+        {
             let param = self.state.get_param();
             let cost = self.state.get_cost();
             self.state.best_param(param).best_cost(cost);
@@ -302,5 +312,99 @@ where
     pub fn timer(mut self, timer: bool) -> Self {
         self.timer = timer;
         self
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::core::MinimalNoOperator;
+    use approx::assert_relative_eq;
+
+    #[test]
+    fn test_update() {
+        #[derive(Clone, Serialize, Deserialize)]
+        struct TestSolver {}
+
+        impl<O> Solver<O> for TestSolver
+        where
+            O: ArgminOp,
+        {
+            fn next_iter(
+                &mut self,
+                _op: &mut OpWrapper<O>,
+                _state: &IterState<O>,
+            ) -> Result<ArgminIterData<O>, Error> {
+                Ok(ArgminIterData::new())
+            }
+        }
+
+        let op = MinimalNoOperator::new();
+        let solver = TestSolver {};
+
+        let mut executor = Executor::new(op, solver, vec![0.0, 0.0]);
+
+        // 1) Parameter vector changes, but not cost (continues to be `Inf`)
+        let new_param = vec![1.0, 1.0];
+        let new_iterdata: ArgminIterData<MinimalNoOperator> =
+            ArgminIterData::new().param(new_param.clone());
+        executor.update(&new_iterdata).unwrap();
+        assert_eq!(executor.state.get_best_param(), new_param);
+        assert!(executor.state.get_best_cost().is_infinite());
+        assert!(executor.state.get_best_cost().is_sign_positive());
+
+        // 2) Parameter vector and cost changes to something better
+        let new_param = vec![2.0, 2.0];
+        let new_cost = 10.0;
+        let new_iterdata: ArgminIterData<MinimalNoOperator> = ArgminIterData::new()
+            .param(new_param.clone())
+            .cost(new_cost);
+        executor.update(&new_iterdata).unwrap();
+        assert_eq!(executor.state.get_best_param(), new_param);
+        assert_relative_eq!(
+            executor.state.get_best_cost(),
+            new_cost,
+            epsilon = f64::EPSILON
+        );
+
+        // 3) Parameter vector and cost changes to something worse
+        let old_param = executor.state.get_best_param();
+        let new_param = vec![3.0, 3.0];
+        let old_cost = executor.state.get_best_cost();
+        let new_cost = old_cost + 1.0;
+        let new_iterdata: ArgminIterData<MinimalNoOperator> =
+            ArgminIterData::new().param(new_param).cost(new_cost);
+        executor.update(&new_iterdata).unwrap();
+        assert_eq!(executor.state.get_best_param(), old_param);
+        assert_relative_eq!(
+            executor.state.get_best_cost(),
+            old_cost,
+            epsilon = f64::EPSILON
+        );
+
+        // 4) `-Inf` is better than `Inf`
+        let solver = TestSolver {};
+        let mut executor = Executor::new(op, solver, vec![0.0, 0.0]);
+
+        let new_param = vec![1.0, 1.0];
+        let new_cost = std::f64::NEG_INFINITY;
+        let new_iterdata: ArgminIterData<MinimalNoOperator> = ArgminIterData::new()
+            .param(new_param.clone())
+            .cost(new_cost);
+        executor.update(&new_iterdata).unwrap();
+        assert_eq!(executor.state.get_best_param(), new_param);
+        assert!(executor.state.get_best_cost().is_infinite());
+        assert!(executor.state.get_best_cost().is_sign_negative());
+
+        // 5) `Inf` is worse than `-Inf`
+        let old_param = executor.state.get_best_param();
+        let new_param = vec![6.0, 6.0];
+        let new_cost = std::f64::INFINITY;
+        let new_iterdata: ArgminIterData<MinimalNoOperator> =
+            ArgminIterData::new().param(new_param).cost(new_cost);
+        executor.update(&new_iterdata).unwrap();
+        assert_eq!(executor.state.get_best_param(), old_param);
+        assert!(executor.state.get_best_cost().is_infinite());
+        assert!(executor.state.get_best_cost().is_sign_negative());
     }
 }
