@@ -38,7 +38,7 @@ impl ArgminOp for Problem {
     }
 
     fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {
-        Ok(Array2::from_shape_fn((7, 2), |(si, i)| {
+        Ok(Array2::from_shape_fn((self.data.len(), 2), |(si, i)| {
             if i == 0 {
                 -self.data[si].0 / (p[1] + self.data[si].0)
             } else {
