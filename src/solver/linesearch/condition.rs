@@ -206,7 +206,7 @@ where
     ) -> bool {
         let tmp = alpha * init_grad.dot(search_direction);
         init_cost + (F::from_f64(1.0).unwrap() - self.c) * tmp <= cur_cost
-            && cur_cost <= init_cost + self.c * alpha * tmp
+            && cur_cost <= init_cost + self.c * tmp
     }
 
     fn requires_cur_grad(&self) -> bool {
@@ -217,10 +217,401 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::assert_error;
     use crate::test_trait_impl;
 
     test_trait_impl!(goldstein, GoldsteinCondition<f64>);
     test_trait_impl!(armijo, ArmijoCondition<f64>);
     test_trait_impl!(wolfe, WolfeCondition<f64>);
     test_trait_impl!(strongwolfe, StrongWolfeCondition<f64>);
+
+    #[test]
+    fn test_armijo_new() {
+        let c: f64 = 0.01;
+        let ArmijoCondition { c: c_arm } = ArmijoCondition::new(c).unwrap();
+        assert_eq!(c.to_ne_bytes(), c_arm.to_ne_bytes());
+
+        assert_error!(
+            ArmijoCondition::new(1.0f64),
+            ArgminError,
+            "Invalid parameter: \"ArmijoCondition: Parameter c must be in (0, 1)\""
+        );
+
+        assert_error!(
+            ArmijoCondition::new(2.0f64),
+            ArgminError,
+            "Invalid parameter: \"ArmijoCondition: Parameter c must be in (0, 1)\""
+        );
+
+        assert_error!(
+            ArmijoCondition::new(0.0f64),
+            ArgminError,
+            "Invalid parameter: \"ArmijoCondition: Parameter c must be in (0, 1)\""
+        );
+
+        assert_error!(
+            ArmijoCondition::new(-1.0f64),
+            ArgminError,
+            "Invalid parameter: \"ArmijoCondition: Parameter c must be in (0, 1)\""
+        );
+    }
+
+    #[test]
+    fn test_armijo() {
+        let c: f64 = 0.50;
+        let cond = ArmijoCondition::new(c).unwrap();
+        let f = |x: f64, y: f64| x.powf(2.0) + y.powf(2.0);
+        let g = |x: f64, y: f64| vec![2.0 * x, 2.0 * y];
+        let initial_x = -1.0;
+        let initial_y = -0.0;
+        let search_direction = vec![1.0, 0.0];
+        for (alpha, acc) in [
+            (0.001, true),
+            (0.03, true),
+            (0.2, true),
+            (0.5, true),
+            (0.9, true),
+            (0.99, true),
+            (1.0, true),
+            (1.0 + f64::EPSILON, false),
+            (1.5, false),
+            (1.8, false),
+            (2.0, false),
+            (2.3, false),
+        ] {
+            assert_eq!(
+                cond.eval(
+                    f(initial_x + alpha, initial_y),
+                    &g(initial_x + alpha, initial_y),
+                    f(initial_x, initial_y),
+                    &g(initial_x, initial_y),
+                    &search_direction,
+                    alpha,
+                ),
+                acc
+            );
+        }
+    }
+
+    #[test]
+    fn test_wolfe_new() {
+        let c1: f64 = 0.01;
+        let c2: f64 = 0.08;
+        let WolfeCondition {
+            c1: c1_wolfe,
+            c2: c2_wolfe,
+        } = WolfeCondition::new(c1, c2).unwrap();
+        assert_eq!(c1.to_ne_bytes(), c1_wolfe.to_ne_bytes());
+        assert_eq!(c2.to_ne_bytes(), c2_wolfe.to_ne_bytes());
+
+        // c1
+        assert_error!(
+            WolfeCondition::new(1.0, 0.5),
+            ArgminError,
+            "Invalid parameter: \"WolfeCondition: Parameter c1 must be in (0, 1)\""
+        );
+
+        assert_error!(
+            WolfeCondition::new(0.0, 0.5),
+            ArgminError,
+            "Invalid parameter: \"WolfeCondition: Parameter c1 must be in (0, 1)\""
+        );
+
+        assert_error!(
+            WolfeCondition::new(-1.0, 0.5),
+            ArgminError,
+            "Invalid parameter: \"WolfeCondition: Parameter c1 must be in (0, 1)\""
+        );
+
+        assert_error!(
+            WolfeCondition::new(2.0, 0.5),
+            ArgminError,
+            "Invalid parameter: \"WolfeCondition: Parameter c1 must be in (0, 1)\""
+        );
+
+        // c2
+        assert_error!(
+            WolfeCondition::new(0.5, -1.0),
+            ArgminError,
+            "Invalid parameter: \"WolfeCondition: Parameter c2 must be in (c1, 1)\""
+        );
+
+        assert_error!(
+            WolfeCondition::new(0.5, -0.0),
+            ArgminError,
+            "Invalid parameter: \"WolfeCondition: Parameter c2 must be in (c1, 1)\""
+        );
+
+        assert_error!(
+            WolfeCondition::new(0.5, 0.5),
+            ArgminError,
+            "Invalid parameter: \"WolfeCondition: Parameter c2 must be in (c1, 1)\""
+        );
+
+        assert_error!(
+            WolfeCondition::new(0.5, 1.0),
+            ArgminError,
+            "Invalid parameter: \"WolfeCondition: Parameter c2 must be in (c1, 1)\""
+        );
+
+        assert_error!(
+            WolfeCondition::new(0.5, 2.0),
+            ArgminError,
+            "Invalid parameter: \"WolfeCondition: Parameter c2 must be in (c1, 1)\""
+        );
+    }
+
+    #[test]
+    fn test_wolfe() {
+        let c1: f64 = 0.5;
+        let c2: f64 = 0.9;
+        let cond = WolfeCondition::new(c1, c2).unwrap();
+        let f = |x: f64, y: f64| x.powf(2.0) + y.powf(2.0);
+        let g = |x: f64, y: f64| vec![2.0 * x, 2.0 * y];
+        let initial_x = -1.0;
+        let initial_y = -0.0;
+        let search_direction = vec![1.0, 0.0];
+        for (alpha, acc) in [
+            (0.001, false),
+            (0.03, false),
+            (0.1 - f64::EPSILON, false),
+            (0.1, true),
+            (0.5, true),
+            (0.9, true),
+            (0.99, true),
+            (1.0, true),
+            (1.0 + f64::EPSILON, false),
+            (1.5, false),
+            (1.8, false),
+            (2.0, false),
+            (2.3, false),
+        ] {
+            assert_eq!(
+                cond.eval(
+                    f(initial_x + alpha, initial_y),
+                    &g(initial_x + alpha, initial_y),
+                    f(initial_x, initial_y),
+                    &g(initial_x, initial_y),
+                    &search_direction,
+                    alpha,
+                ),
+                acc
+            );
+        }
+    }
+
+    #[test]
+    fn test_strongwolfe_new() {
+        let c1: f64 = 0.01;
+        let c2: f64 = 0.08;
+        let StrongWolfeCondition {
+            c1: c1_wolfe,
+            c2: c2_wolfe,
+        } = StrongWolfeCondition::new(c1, c2).unwrap();
+        assert_eq!(c1.to_ne_bytes(), c1_wolfe.to_ne_bytes());
+        assert_eq!(c2.to_ne_bytes(), c2_wolfe.to_ne_bytes());
+
+        // c1
+        assert_error!(
+            StrongWolfeCondition::new(1.0, 0.5),
+            ArgminError,
+            "Invalid parameter: \"StrongWolfeCondition: Parameter c1 must be in (0, 1)\""
+        );
+
+        assert_error!(
+            StrongWolfeCondition::new(0.0, 0.5),
+            ArgminError,
+            "Invalid parameter: \"StrongWolfeCondition: Parameter c1 must be in (0, 1)\""
+        );
+
+        assert_error!(
+            StrongWolfeCondition::new(-1.0, 0.5),
+            ArgminError,
+            "Invalid parameter: \"StrongWolfeCondition: Parameter c1 must be in (0, 1)\""
+        );
+
+        assert_error!(
+            StrongWolfeCondition::new(2.0, 0.5),
+            ArgminError,
+            "Invalid parameter: \"StrongWolfeCondition: Parameter c1 must be in (0, 1)\""
+        );
+
+        // c2
+        assert_error!(
+            StrongWolfeCondition::new(0.5, -1.0),
+            ArgminError,
+            "Invalid parameter: \"StrongWolfeCondition: Parameter c2 must be in (c1, 1)\""
+        );
+
+        assert_error!(
+            StrongWolfeCondition::new(0.5, 0.0),
+            ArgminError,
+            "Invalid parameter: \"StrongWolfeCondition: Parameter c2 must be in (c1, 1)\""
+        );
+
+        assert_error!(
+            StrongWolfeCondition::new(0.5, 0.5),
+            ArgminError,
+            "Invalid parameter: \"StrongWolfeCondition: Parameter c2 must be in (c1, 1)\""
+        );
+
+        assert_error!(
+            StrongWolfeCondition::new(0.5, 1.0),
+            ArgminError,
+            "Invalid parameter: \"StrongWolfeCondition: Parameter c2 must be in (c1, 1)\""
+        );
+
+        assert_error!(
+            StrongWolfeCondition::new(0.5, 2.0),
+            ArgminError,
+            "Invalid parameter: \"StrongWolfeCondition: Parameter c2 must be in (c1, 1)\""
+        );
+    }
+
+    #[test]
+    fn test_strongwolfe() {
+        // Armijo basically never active (c1 so low that only constraint on gradients have impact
+        // on the chosen function).
+        let c1: f64 = 0.01;
+        let c2: f64 = 0.9;
+        let cond = StrongWolfeCondition::new(c1, c2).unwrap();
+        let f = |x: f64, y: f64| x.powf(2.0) + y.powf(2.0);
+        let g = |x: f64, y: f64| vec![2.0 * x, 2.0 * y];
+        let initial_x = -1.0;
+        let initial_y = -0.0;
+        let search_direction = vec![1.0, 0.0];
+        for (alpha, acc) in [
+            (0.001, false),
+            (0.03, false),
+            (0.1 - f64::EPSILON, false),
+            (0.1, true),
+            (0.15, true),
+            (0.9, true),
+            (0.99, true),
+            (1.0, true),
+            (1.9, true),
+            (1.9 + f64::EPSILON, false),
+            (2.0, false),
+            (2.3, false),
+        ] {
+            assert_eq!(
+                cond.eval(
+                    f(initial_x + alpha, initial_y),
+                    &g(initial_x + alpha, initial_y),
+                    f(initial_x, initial_y),
+                    &g(initial_x, initial_y),
+                    &search_direction,
+                    alpha,
+                ),
+                acc
+            );
+        }
+
+        // Armijo active
+        let c1: f64 = 0.5;
+        let c2: f64 = 0.9;
+        let cond = StrongWolfeCondition::new(c1, c2).unwrap();
+        let f = |x: f64, y: f64| x.powf(2.0) + y.powf(2.0);
+        let g = |x: f64, y: f64| vec![2.0 * x, 2.0 * y];
+        let initial_x = -1.0;
+        let initial_y = -0.0;
+        let search_direction = vec![1.0, 0.0];
+        for (alpha, acc) in [
+            (0.001, false),
+            (0.03, false),
+            (0.1 - f64::EPSILON, false),
+            (0.1, true),
+            (0.15, true),
+            (0.9, true),
+            (0.99, true),
+            (1.0, true),
+            (1.0 + f64::EPSILON, false),
+            (1.9, false),
+            (2.0, false),
+            (2.3, false),
+        ] {
+            assert_eq!(
+                cond.eval(
+                    f(initial_x + alpha, initial_y),
+                    &g(initial_x + alpha, initial_y),
+                    f(initial_x, initial_y),
+                    &g(initial_x, initial_y),
+                    &search_direction,
+                    alpha,
+                ),
+                acc
+            );
+        }
+    }
+
+    #[test]
+    fn test_goldstein_new() {
+        let c: f64 = 0.01;
+        let GoldsteinCondition { c: c_arm } = GoldsteinCondition::new(c).unwrap();
+        assert_eq!(c.to_ne_bytes(), c_arm.to_ne_bytes());
+
+        assert_error!(
+            GoldsteinCondition::new(0.5f64),
+            ArgminError,
+            "Invalid parameter: \"GoldsteinCondition: Parameter c must be in (0, 0.5)\""
+        );
+
+        assert_error!(
+            GoldsteinCondition::new(1.0f64),
+            ArgminError,
+            "Invalid parameter: \"GoldsteinCondition: Parameter c must be in (0, 0.5)\""
+        );
+
+        assert_error!(
+            GoldsteinCondition::new(0.0f64),
+            ArgminError,
+            "Invalid parameter: \"GoldsteinCondition: Parameter c must be in (0, 0.5)\""
+        );
+
+        assert_error!(
+            GoldsteinCondition::new(-1.0f64),
+            ArgminError,
+            "Invalid parameter: \"GoldsteinCondition: Parameter c must be in (0, 0.5)\""
+        );
+    }
+
+    #[test]
+    fn test_goldstein() {
+        let c: f64 = 0.1;
+        let cond = GoldsteinCondition::new(c).unwrap();
+        let f = |x: f64, y: f64| x.powf(2.0) + y.powf(2.0);
+        let g = |x: f64, y: f64| vec![2.0 * x, 2.0 * y];
+        let initial_x = -1.0;
+        let initial_y = -0.0;
+        let search_direction = vec![1.0, 0.0];
+        // Need a larger epsilon here, I suppose because of more severe round off errors.
+        for (alpha, acc) in [
+            (0.001, false),
+            (0.03, false),
+            (0.2 - 6.0 * f64::EPSILON, false),
+            (0.2, true),
+            (0.2, true),
+            (0.5, true),
+            (0.9, true),
+            (0.99, true),
+            (1.0, true),
+            (1.5, true),
+            (1.8 - f64::EPSILON, true),
+            (1.8, false),
+            (2.0, false),
+            (2.3, false),
+        ] {
+            assert_eq!(
+                cond.eval(
+                    f(initial_x + alpha, initial_y),
+                    &g(initial_x + alpha, initial_y),
+                    f(initial_x, initial_y),
+                    &g(initial_x, initial_y),
+                    &search_direction,
+                    alpha,
+                ),
+                acc
+            );
+        }
+    }
 }
