@@ -48,9 +48,6 @@ macro_rules! make_dot_vec {
             }
         }
 
-        // This allows the combination of Vec::with_capacity(...) and unsafe .set_len(...).
-        // Since we are not reading here, this should be safe.
-        #[allow(clippy::uninit_vec)]
         impl ArgminDot<Vec<Vec<$t>>, Vec<Vec<$t>>> for Vec<Vec<$t>> {
             #[inline]
             fn dot(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {
@@ -65,14 +62,10 @@ macro_rules! make_dot_vec {
                 let oc = other[0].len();
                 assert_eq!(sc, or);
                 assert!(oc > 0);
-                let mut v = Vec::with_capacity(oc);
-                unsafe {
-                    v.set_len(oc);
-                }
+                let v = vec![<$t>::default(); oc];
                 let mut out = vec![v; sr];
                 for i in 0..sr {
                     assert_eq!(self[i].len(), sc);
-                    // assert_eq!(other[i].len(), oc);
                     for j in 0..oc {
                         out[i][j] = self[i].dot(&other[j]);
                     }
