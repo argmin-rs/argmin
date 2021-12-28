@@ -13,17 +13,11 @@ use num_complex::Complex;
 
 macro_rules! make_transpose {
     ($t:ty) => {
-        // This allows the combination of Vec::with_capacity(...) and unsafe .set_len(...).
-        // Since we are not reading here, this should be safe.
-        #[allow(clippy::uninit_vec)]
         impl ArgminTranspose<Vec<Vec<$t>>> for Vec<Vec<$t>> {
             fn t(self) -> Self {
                 let n1 = self.len();
                 let n2 = self[0].len();
-                let mut v = Vec::with_capacity(n1);
-                unsafe {
-                    v.set_len(n1);
-                }
+                let v = vec![<$t>::default(); n1];
                 let mut out = vec![v; n2];
                 for i in 0..n1 {
                     for j in 0..n2 {
