@@ -119,6 +119,7 @@ argmin = { version = "0.4.7", features = ["wasm-bindgen"] }
 ```toml
 argmin = { version = "0.4.7", features = ["stdweb"] }
 ```
+Note that WASM support is still experimental. Please report any issues you encounter when compiling argmin to WASM.
 
 ### Running the tests and building the examples
 
