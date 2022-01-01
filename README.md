@@ -110,7 +110,7 @@ ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
 
 #### Experimental support for compiling to WebAssembly
 
-To prevent panics when compiling to WASM, one of the following features needs to be used:
+When compiling to WASM, one of the following features must be used:
 
 ```toml
 argmin = { version = "0.4.7", features = ["wasm-bindgen"] }
