@@ -108,7 +108,7 @@ BLAS backend in the `Cargo.toml`:
 ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
 ```
 
-#### Required for WebAssembly
+#### Experimental support for compiling to WebAssembly
 
 To prevent panics when compiling to WASM, one of the following features needs to be used:
 
