@@ -41,7 +41,7 @@ slog-json = { version = "2.3.0", optional = true }
 thiserror = "1.0"
 
 [dev-dependencies]
-ndarray-linalg = { version = "0.14", features = ["openblas"] }
+ndarray-linalg = { version = "0.14", features = ["netlib"] }
 finitediff = { version = "0.1.4", features = ["ndarray"] }
 argmin_testfunctions = "0.1.1"
 rand_xoshiro = { version = "0.6.0", features = ["serde1"] }
