@@ -22,14 +22,15 @@ approx = "0.5.0"
 bincode = "1.1.4"
 ctrlc = { version = "3.1.2", optional = true }
 instant = {version = "0.1", features = ["now"] }
-gnuplot = { version = "0.0.37", optional = true}
+gnuplot = { version = "0.0.37", optional = true }
+getrandom = { version = "0.2", features = ["js"] }
 paste = "1.0.0"
 nalgebra = { version = "0.30.0", optional = true, features = ["serde-serialize"] }
 ndarray = { version = "0.15", optional = true, features = ["serde-1"] }
 ndarray-linalg = { version = "0.14", optional = true }
 ndarray-rand = {version = "0.14.0", optional = true }
 num = { version = "0.4" }
-num-complex = "0.4"
+num-complex = { version = "0.4" }
 rand = { version = "0.8.3", features = ["serde1"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
