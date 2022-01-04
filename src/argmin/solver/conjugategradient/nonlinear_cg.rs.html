@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/solver/conjugategradient/nonlinear_cg.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>nonlinear_cg.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../argmin/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;solver&#x2F;conjugategradient&#x2F;nonlinear_cg.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>nonlinear_cg.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../argmin/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -204,8 +202,7 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
-</pre><pre class="rust">
-<span class="comment">// Copyright 2018-2020 argmin developers</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
 <span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
@@ -220,7 +217,7 @@
 <span class="doccomment">//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std::default::Default</span>;
@@ -256,7 +253,7 @@
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="doccomment">/// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">linesearch</span>: <span class="ident">L</span>, <span class="ident">beta_method</span>: <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">linesearch</span>: <span class="ident">L</span>, <span class="ident">beta_method</span>: <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">NonlinearConjugateGradient</span> {
             <span class="ident">p</span>: <span class="ident">P::default</span>(),
             <span class="ident">beta</span>: <span class="ident">F::nan</span>(),
@@ -270,7 +267,7 @@
     <span class="doccomment">/// Specifiy the number of iterations after which a restart should be performed</span>
     <span class="doccomment">/// This allows the algorithm to &quot;forget&quot; previous information which may not be helpful</span>
     <span class="doccomment">/// anymore.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart_iters</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iters</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart_iters</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iters</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">restart_iter</span> <span class="op">=</span> <span class="ident">iters</span>;
         <span class="self">self</span>
     }
@@ -283,7 +280,7 @@
     <span class="doccomment">/// `|\nabla f_k^T * \nabla f_{k-1}| / | \nabla f_k ||^2 &gt;= v`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A typical value for `v` is 0.1.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart_orthogonality</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart_orthogonality</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">restart_orthogonality</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>);
         <span class="self">self</span>
     }
@@ -304,7 +301,7 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">O::Float</span><span class="op">&gt;</span>,
     <span class="ident">O::Hessian</span>: <span class="ident">Default</span>,
-    <span class="ident">L</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminLineSearch</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">L</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminLineSearch</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     <span class="ident">B</span>: <span class="ident">ArgminNLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
@@ -314,7 +311,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
         <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
@@ -328,7 +325,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>) <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_grad</span>() {
             <span class="ident">grad</span>
@@ -344,7 +341,7 @@
         <span class="kw">let</span> <span class="ident">ArgminResult</span> {
             <span class="ident">operator</span>: <span class="ident">line_op</span>,
             <span class="ident">state</span>: <span class="ident">line_state</span>,
-        } <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">OpWrapper::new_from_wrapper</span>(<span class="ident">op</span>), <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">clone</span>(), <span class="ident">xk</span>)
+        } <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">op</span>.<span class="ident">take_op</span>().<span class="ident">unwrap</span>(), <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">clone</span>(), <span class="ident">xk</span>)
             .<span class="ident">grad</span>(<span class="ident">grad</span>.<span class="ident">clone</span>())
             .<span class="ident">cost</span>(<span class="ident">cur_cost</span>)
             .<span class="ident">ctrlc</span>(<span class="bool-val">false</span>)
@@ -359,12 +356,12 @@
         <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk1</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">restart_orthogonality</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">restart_orthogonality</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">new_grad</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>).<span class="ident">abs</span>() <span class="op">/</span> <span class="ident">new_grad</span>.<span class="ident">norm</span>().<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">v</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">new_grad</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>).<span class="ident">abs</span>() <span class="op">/</span> <span class="ident">new_grad</span>.<span class="ident">norm</span>().<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">v</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
         };
 
         <span class="kw">let</span> <span class="ident">restart_iter</span>: <span class="ident">bool</span> <span class="op">=</span>
-            (<span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">%</span> <span class="self">self</span>.<span class="ident">restart_iter</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>) <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
+            (<span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">%</span> <span class="self">self</span>.<span class="ident">restart_iter</span> <span class="op">==</span> <span class="number">0</span>) <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
 
         <span class="kw">if</span> <span class="ident">restart_iter</span> <span class="op">|</span><span class="op">|</span> <span class="ident">restart_orthogonality</span> {
             <span class="self">self</span>.<span class="ident">beta</span> <span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>();
@@ -384,9 +381,9 @@
             .<span class="ident">param</span>(<span class="ident">xk1</span>)
             .<span class="ident">cost</span>(<span class="ident">cost</span>)
             .<span class="ident">grad</span>(<span class="ident">new_grad</span>)
-            .<span class="ident">kv</span>(<span class="macro">make_kv!</span>(<span class="string">&quot;beta&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">beta</span>;
-             <span class="string">&quot;restart_iter&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">restart_iter</span>;
-             <span class="string">&quot;restart_orthogonality&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">restart_orthogonality</span>;
+            .<span class="ident">kv</span>(<span class="macro">make_kv!</span>(<span class="string">&quot;beta&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">beta</span>;
+             <span class="string">&quot;restart_iter&quot;</span> =&gt; <span class="ident">restart_iter</span>;
+             <span class="string">&quot;restart_orthogonality&quot;</span> =&gt; <span class="ident">restart_orthogonality</span>;
             )))
     }
 }
@@ -394,10 +391,10 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::core::MinimalNoOperator</span>;
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::solver::conjugategradient::beta::PolakRibiere</span>;
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::solver::linesearch::MoreThuenteLineSearch</span>;
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::test_trait_impl</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::MinimalNoOperator</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::conjugategradient::beta::PolakRibiere</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::linesearch::MoreThuenteLineSearch</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
 
     <span class="macro">test_trait_impl!</span>(
         <span class="ident">nonlinear_cg</span>,
@@ -409,5 +406,7 @@
         <span class="op">&gt;</span>
     );
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
+    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
+</body></html>
