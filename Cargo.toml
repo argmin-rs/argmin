@@ -57,3 +57,103 @@ stdweb = ["instant/stdweb"]
 
 [badges]
 maintenance = { status = "actively-developed" }
+
+[[example]]
+name = "backtracking"
+required-features = []
+
+[[example]]
+name = "bfgs"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "brent"
+required-features = []
+
+[[example]]
+name = "checkpoint"
+required-features = []
+
+[[example]]
+name = "conjugategradient"
+required-features = []
+
+[[example]]
+name = "dfp"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "gaussnewton"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "gaussnewton_linesearch"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "gaussnewton_nalgebra"
+required-features = ["nalgebral"]
+
+[[example]]
+name = "goldensectionsearch"
+required-features = []
+
+[[example]]
+name = "hagerzhang"
+required-features = []
+
+[[example]]
+name = "landweber"
+required-features = []
+
+[[example]]
+name = "lbfgs"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "morethuente"
+required-features = []
+
+[[example]]
+name = "neldermead"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "newton"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "newton_cg"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "nonlinear_cg"
+required-features = []
+
+[[example]]
+name = "particleswarm"
+required-features = []
+
+[[example]]
+name = "simulatedannealing"
+required-features = []
+
+[[example]]
+name = "sr1"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "sr1_trustregion"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "steepestdescent"
+required-features = []
+
+[[example]]
+name = "trustregion_nd"
+required-features = ["ndarrayl"]
+
+[[example]]
+name = "writers"
+required-features = ["ndarrayl"]
