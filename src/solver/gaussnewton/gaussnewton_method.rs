@@ -121,8 +121,17 @@ where
 mod tests {
     use super::*;
     use crate::test_trait_impl;
+    use approx::assert_relative_eq;
 
     test_trait_impl!(gauss_newton_method, GaussNewton<f64>);
+
+    #[test]
+    fn test_default() {
+        let GaussNewton { tol: t, gamma: g } = GaussNewton::<f64>::new();
+
+        assert_eq!(g.to_ne_bytes(), (1.0f64).to_ne_bytes());
+        assert_eq!(t.to_ne_bytes(), f64::EPSILON.sqrt().to_ne_bytes());
+    }
 
     #[test]
     fn test_tolerance() {
@@ -130,7 +139,17 @@ mod tests {
 
         let GaussNewton { tol: t, .. } = GaussNewton::new().with_tol(tol1).unwrap();
 
-        assert!((t - tol1).abs() < std::f64::EPSILON);
+        assert_eq!(t.to_ne_bytes(), tol1.to_ne_bytes());
+    }
+
+    #[test]
+    fn test_tolerance_error() {
+        let tol = -2.0;
+        let error = GaussNewton::new().with_tol(tol).err().unwrap();
+        assert_eq!(
+            error.downcast_ref::<ArgminError>().unwrap().to_string(),
+            "Invalid parameter: \"Gauss-Newton: tol must be positive.\""
+        );
     }
 
     #[test]
@@ -139,6 +158,126 @@ mod tests {
 
         let GaussNewton { gamma: g, .. } = GaussNewton::new().with_gamma(gamma).unwrap();
 
-        assert!((g - gamma).abs() < std::f64::EPSILON);
+        assert_eq!(g.to_ne_bytes(), gamma.to_ne_bytes());
+    }
+
+    #[test]
+    fn test_gamma_errors() {
+        let gamma = -0.5;
+        let error = GaussNewton::new().with_gamma(gamma).err().unwrap();
+        assert_eq!(
+            error.downcast_ref::<ArgminError>().unwrap().to_string(),
+            "Invalid parameter: \"Gauss-Newton: gamma must be in  (0, 1].\""
+        );
+
+        let gamma = 0.0;
+        let error = GaussNewton::new().with_gamma(gamma).err().unwrap();
+        assert_eq!(
+            error.downcast_ref::<ArgminError>().unwrap().to_string(),
+            "Invalid parameter: \"Gauss-Newton: gamma must be in  (0, 1].\""
+        );
+
+        let gamma = 2.0;
+        let error = GaussNewton::new().with_gamma(gamma).err().unwrap();
+        assert_eq!(
+            error.downcast_ref::<ArgminError>().unwrap().to_string(),
+            "Invalid parameter: \"Gauss-Newton: gamma must be in  (0, 1].\""
+        );
+    }
+
+    #[test]
+    fn test_solver() {
+        use ndarray::{Array, Array1, Array2};
+        use std::cell::RefCell;
+
+        struct Problem {
+            counter: RefCell<usize>,
+        }
+
+        impl ArgminOp for Problem {
+            type Param = Array1<f64>;
+            type Output = Array1<f64>;
+            type Hessian = ();
+            type Jacobian = Array2<f64>;
+            type Float = f64;
+
+            fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
+                if *self.counter.borrow() == 0 {
+                    let mut c = self.counter.borrow_mut();
+                    *c += 1;
+                    Ok(Array1::from_vec(vec![0.5, 2.0]))
+                } else {
+                    Ok(Array1::from_vec(vec![0.3, 1.0]))
+                }
+            }
+
+            fn jacobian(&self, _p: &Self::Param) -> Result<Self::Jacobian, Error> {
+                Ok(Array::from_shape_vec((2, 2), vec![1f64, 2.0, 3.0, 4.0])?)
+            }
+        }
+
+        // Single iteration, starting from [0, 0], gamma = 1
+        let problem = Problem {
+            counter: RefCell::new(0),
+        };
+        let solver: GaussNewton<f64> = GaussNewton::new();
+        let init_param = Array1::from_vec(vec![0.0, 0.0]);
+
+        let param = Executor::new(problem, solver, init_param)
+            .max_iters(1)
+            .run()
+            .unwrap()
+            .state
+            .best_param;
+        assert_relative_eq!(param[0], -1.0, epsilon = f64::EPSILON.sqrt());
+        assert_relative_eq!(param[1], 0.25, epsilon = f64::EPSILON.sqrt());
+
+        // Two iterations, starting from [0, 0], gamma = 1
+        let problem = Problem {
+            counter: RefCell::new(0),
+        };
+        let solver: GaussNewton<f64> = GaussNewton::new();
+        let init_param = Array1::from_vec(vec![0.0, 0.0]);
+
+        let param = Executor::new(problem, solver, init_param)
+            .max_iters(2)
+            .run()
+            .unwrap()
+            .state
+            .best_param;
+        assert_relative_eq!(param[0], -1.4, epsilon = f64::EPSILON.sqrt());
+        assert_relative_eq!(param[1], 0.3, epsilon = f64::EPSILON.sqrt());
+
+        // Single iteration, starting from [0, 0], gamma = 0.5
+        let problem = Problem {
+            counter: RefCell::new(0),
+        };
+        let solver: GaussNewton<f64> = GaussNewton::new().with_gamma(0.5).unwrap();
+        let init_param = Array1::from_vec(vec![0.0, 0.0]);
+
+        let param = Executor::new(problem, solver, init_param)
+            .max_iters(1)
+            .run()
+            .unwrap()
+            .state
+            .best_param;
+        assert_relative_eq!(param[0], -0.5, epsilon = f64::EPSILON.sqrt());
+        assert_relative_eq!(param[1], 0.125, epsilon = f64::EPSILON.sqrt());
+
+        // Two iterations, starting from [0, 0], gamma = 0.5
+        let problem = Problem {
+            counter: RefCell::new(0),
+        };
+        let solver: GaussNewton<f64> = GaussNewton::new().with_gamma(0.5).unwrap();
+        let init_param = Array1::from_vec(vec![0.0, 0.0]);
+
+        let param = Executor::new(problem, solver, init_param)
+            .max_iters(2)
+            .run()
+            .unwrap()
+            .state
+            .best_param;
+        assert_relative_eq!(param[0], -0.7, epsilon = f64::EPSILON.sqrt());
+        assert_relative_eq!(param[1], 0.15, epsilon = f64::EPSILON.sqrt());
     }
 }

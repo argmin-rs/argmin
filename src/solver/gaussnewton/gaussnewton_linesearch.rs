@@ -65,7 +65,7 @@ where
         + ArgminDot<O::Jacobian, O::Jacobian>
         + ArgminDot<O::Output, O::Param>
         + ArgminDot<O::Param, O::Param>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<LineSearchOP<O>>>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<LineSearchOP<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Gauss-Newton method with Linesearch";
@@ -86,11 +86,6 @@ where
         self.linesearch
             .set_search_direction(p.mul(&(F::from_f64(-1.0).unwrap())));
 
-        // create operator for linesearch
-        let line_op = OpWrapper::new(LineSearchOP {
-            op: op.take_op().unwrap(),
-        });
-
         // perform linesearch
         let ArgminResult {
             operator: mut line_op,
@@ -100,11 +95,17 @@ where
                     cost: next_cost,
                     ..
                 },
-        } = Executor::new(line_op, self.linesearch.clone(), param)
-            .grad(grad)
-            .cost(residuals.norm())
-            .ctrlc(false)
-            .run()?;
+        } = Executor::new(
+            LineSearchOP {
+                op: op.take_op().unwrap(),
+            },
+            self.linesearch.clone(),
+            param,
+        )
+        .grad(grad)
+        .cost(residuals.norm())
+        .ctrlc(false)
+        .run()?;
 
         // Here we cannot use `consume_op` because the operator we need is hidden inside a
         // `LineSearchOP` hidden inside a `OpWrapper`. Therefore we have to split this in two

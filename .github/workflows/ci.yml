@@ -2,13 +2,14 @@ name: argmin CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 env:
   CARGO_TERM_COLOR: always
   HOST: x86_64-unknown-linux-gnu
+  OPENBLAS_TARGET: sse_generic
 
 jobs:
   tests:
@@ -44,4 +45,33 @@ jobs:
           toolchain: ${{ matrix.rust }}
           override: true
           components: clippy
-      - run: cargo clippy
+      - run: cargo clippy --all-targets --all-features -- -D warnings
+  
+  wasm-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - name: Install toolchains
+        run: |
+          rustup target add wasm32-unknown-unknown
+          rustup target add wasm32-unknown-emscripten
+          rustup target add wasm32-wasi
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh 
+      - name: Build target wasm32-unknown-unknown
+        run: cargo build --target wasm32-unknown-unknown --features wasm-bindgen
+      - name: Build target wasm32-wasi with feature stdweb
+        run: cargo build --target wasm32-wasi --features stdweb
+      - name: Build target wasm32-wasi with feature wasm-bindgen
+        run: cargo build --target wasm32-wasi --features wasm-bindgen
+      - name: Build target wasm32-unknown-emscripten
+        run: cargo build --target wasm32-unknown-emscripten --no-default-features --features wasm-bindgen

@@ -40,3 +40,15 @@ macro_rules! test_trait_impl {
         }
     };
 }
+
+/// Asserts that expression $n leads to an error of type $t and text $s
+#[cfg(test)]
+#[macro_export]
+macro_rules! assert_error {
+    ($n:expr, $t:ty, $s:expr) => {
+        assert_eq!(
+            $n.err().unwrap().downcast_ref::<$t>().unwrap().to_string(),
+            $s
+        );
+    };
+}

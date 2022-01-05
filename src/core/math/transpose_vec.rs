@@ -17,11 +17,7 @@ macro_rules! make_transpose {
             fn t(self) -> Self {
                 let n1 = self.len();
                 let n2 = self[0].len();
-                // let mut out: Vec<Vec<$t>> = vec![vec![0; n1]; n2];
-                let mut v = Vec::with_capacity(n1);
-                unsafe {
-                    v.set_len(n1);
-                }
+                let v = vec![<$t>::default(); n1];
                 let mut out = vec![v; n2];
                 for i in 0..n1 {
                     for j in 0..n2 {

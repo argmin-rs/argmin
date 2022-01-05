@@ -105,7 +105,7 @@ where
         + ArgminZeroLike
         + ArgminMul<F, O::Param>,
     O::Hessian: Default + Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
-    R: ArgminTrustRegion<F> + Solver<OpWrapper<O>>,
+    R: ArgminTrustRegion<F> + Solver<O>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Trust region";
@@ -148,7 +148,7 @@ where
             operator: sub_op,
             state: IterState { param: pk, .. },
         } = Executor::new(
-            OpWrapper::new_from_wrapper(op),
+            op.take_op().unwrap(),
             self.subproblem.clone(),
             param.clone(),
         )
@@ -157,8 +157,7 @@ where
         .ctrlc(false)
         .run()?;
 
-        // Operator must be consumed again, otherwise the operator, which moved into the subproblem
-        // executor as well as the function evaluation counts are lost.
+        // Consume intermediate operator again. This takes care of the function evaluation counts.
         op.consume_op(sub_op);
 
         let new_param = pk.add(&param);

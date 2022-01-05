@@ -97,7 +97,7 @@ where
         + ArgminDot<O::Param, O::Float>
         + ArgminNorm<O::Float>,
     O::Hessian: Default,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
     B: ArgminNLCGBetaUpdate<O::Param, O::Float>,
     F: ArgminFloat,
 {
@@ -137,7 +137,7 @@ where
         let ArgminResult {
             operator: line_op,
             state: line_state,
-        } = Executor::new(OpWrapper::new_from_wrapper(op), self.linesearch.clone(), xk)
+        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone(), xk)
             .grad(grad.clone())
             .cost(cur_cost)
             .ctrlc(false)

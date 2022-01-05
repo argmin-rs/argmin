@@ -82,7 +82,9 @@ Add this to your `Cargo.toml`:
 argmin = "0.4.7"
 ```
 
-### Optional features (recommended)
+### Optional features
+
+#### Recommended features
 
 There are additional features which can be activated in `Cargo.toml`:
 
@@ -105,6 +107,20 @@ BLAS backend in the `Cargo.toml`:
 ```toml
 ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
 ```
+
+#### Experimental support for compiling to WebAssembly
+
+When compiling to WASM, one of the following features must be used:
+
+```toml
+argmin = { version = "0.4.7", features = ["wasm-bindgen"] }
+```
+
+```toml
+argmin = { version = "0.4.7", features = ["stdweb"] }
+```
+
+Note that WASM support is still experimental. Please report any issues you encounter when compiling argmin to WASM.
 
 ### Running the tests and building the examples
 

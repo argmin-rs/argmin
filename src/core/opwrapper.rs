@@ -12,7 +12,7 @@ use std::default::Default;
 /// This wraps an operator and keeps track of how often the cost, gradient and Hessian have been
 /// computed and how often the modify function has been called. Usually, this is an implementation
 /// detail unless a solver is needed within another solver (such as a line search within a gradient
-/// descent method), then it may be necessary to wrap the operator in an OpWrapper.
+/// descent method).
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct OpWrapper<O: ArgminOp> {
     /// Operator
@@ -30,23 +30,10 @@ pub struct OpWrapper<O: ArgminOp> {
 }
 
 impl<O: ArgminOp> OpWrapper<O> {
-    /// Constructor
+    /// Construct an `OpWrapper` from an operator
     pub fn new(op: O) -> Self {
         OpWrapper {
             op: Some(op),
-            cost_func_count: 0,
-            grad_func_count: 0,
-            hessian_func_count: 0,
-            jacobian_func_count: 0,
-            modify_func_count: 0,
-        }
-    }
-
-    /// Construct struct from other `OpWrapper`. Takes the operator from `op` (replaces it with
-    /// `None`) and crates a new `OpWrapper`
-    pub fn new_from_wrapper(op: &mut OpWrapper<O>) -> Self {
-        OpWrapper {
-            op: op.take_op(),
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
@@ -157,58 +144,5 @@ impl<O: ArgminOp> OpWrapper<O> {
     /// Returns the operator `op` by taking ownership of `self`.
     pub fn get_op(self) -> O {
         self.op.unwrap()
-    }
-}
-
-/// The OpWrapper<O> should behave just like any other `ArgminOp`
-impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
-    type Param = O::Param;
-    type Output = O::Output;
-    type Hessian = O::Hessian;
-    type Jacobian = O::Jacobian;
-    type Float = O::Float;
-
-    fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
-        self.op.as_ref().unwrap().apply(param)
-    }
-
-    fn gradient(&self, param: &Self::Param) -> Result<Self::Param, Error> {
-        self.op.as_ref().unwrap().gradient(param)
-    }
-
-    fn hessian(&self, param: &Self::Param) -> Result<Self::Hessian, Error> {
-        self.op.as_ref().unwrap().hessian(param)
-    }
-
-    fn jacobian(&self, param: &Self::Param) -> Result<Self::Jacobian, Error> {
-        self.op.as_ref().unwrap().jacobian(param)
-    }
-
-    fn modify(&self, param: &Self::Param, extent: Self::Float) -> Result<Self::Param, Error> {
-        self.op.as_ref().unwrap().modify(param, extent)
-    }
-
-    fn bulk_apply(&self, params: &[&Self::Param]) -> Result<Vec<Self::Output>, Error> {
-        self.op.as_ref().unwrap().bulk_apply(params)
-    }
-
-    fn bulk_gradient(&self, params: &[&Self::Param]) -> Result<Vec<Self::Param>, Error> {
-        self.op.as_ref().unwrap().bulk_gradient(params)
-    }
-
-    fn bulk_hessian(&self, params: &[&Self::Param]) -> Result<Vec<Self::Hessian>, Error> {
-        self.op.as_ref().unwrap().bulk_hessian(params)
-    }
-
-    fn bulk_jacobian(&self, params: &[&Self::Param]) -> Result<Vec<Self::Jacobian>, Error> {
-        self.op.as_ref().unwrap().bulk_jacobian(params)
-    }
-
-    fn bulk_modify(
-        &self,
-        params: &[&Self::Param],
-        extents: &[Self::Float],
-    ) -> Result<Vec<Self::Param>, Error> {
-        self.op.as_ref().unwrap().bulk_modify(params, extents)
     }
 }

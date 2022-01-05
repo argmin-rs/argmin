@@ -52,7 +52,7 @@ where
         + ArgminSub<O::Param, O::Param>
         + ArgminNorm<O::Float>,
     O::Hessian: Default,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Steepest Descent";
@@ -78,15 +78,11 @@ where
                     cost: next_cost,
                     ..
                 },
-        } = Executor::new(
-            OpWrapper::new_from_wrapper(op),
-            self.linesearch.clone(),
-            param_new,
-        )
-        .grad(new_grad)
-        .cost(new_cost)
-        .ctrlc(false)
-        .run()?;
+        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone(), param_new)
+            .grad(new_grad)
+            .cost(new_cost)
+            .ctrlc(false)
+            .run()?;
 
         // Get back operator and function evaluation counts
         op.consume_op(line_op);

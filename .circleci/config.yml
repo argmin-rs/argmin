@@ -3,7 +3,7 @@ version: 2
 jobs:
   lint:
     docker:
-      - image: rust:1.36.0-buster
+      - image: cimg/rust:1.57.0
     steps:
       - checkout
       - run:
@@ -18,7 +18,7 @@ jobs:
       - run:
           name: cargo clippy
           command: |
-            cargo clippy || true
+            cargo clippy --all-features --all-targets -- -D warnings || true
 
 
 workflows:
