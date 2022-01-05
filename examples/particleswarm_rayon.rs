@@ -27,7 +27,7 @@ impl ArgminOp for Himmelblau {
     /// If the `apply` cost function is expensive, a parallel implementation like this one may
     /// be faster. If `apply` is cheap this may be detrimental.
     fn bulk_apply(&self, params: &[&Self::Param]) -> Result<Vec<Self::Output>, Error> {
-        params.par_iter().map(|p| self.apply(&p)).collect()
+        params.par_iter().map(|p| self.apply(p)).collect()
     }
 }
 
