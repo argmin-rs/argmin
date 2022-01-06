@@ -46,6 +46,21 @@ jobs:
           override: true
           components: clippy
       - run: cargo clippy --all-targets --all-features -- -D warnings
+
+  docs-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - run: cargo rustdoc --all-features -- -D warnings
   
   wasm-build:
     runs-on: ubuntu-latest

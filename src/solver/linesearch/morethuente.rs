@@ -5,18 +5,16 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! * [More-Thuente line search](struct.MoreThuenteLineSearch.html)
-//!
 //! TODO: Apparently it is missing stopping criteria!
 //!
 //! This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
-//! http://www.cs.umd.edu/users/oleary/software/
+//! <http://www.cs.umd.edu/users/oleary/software/>
 //!
 //! # Reference
 //!
 //! Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 //! decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
-//! DOI: https://doi.org/10.1145/192115.192132
+//! DOI: <https://doi.org/10.1145/192115.192132>
 
 use crate::prelude::*;
 use serde::de::DeserializeOwned;
@@ -31,11 +29,11 @@ use std::default::Default;
 /// # References
 ///
 /// This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
-/// http://www.cs.umd.edu/users/oleary/software/
+/// <http://www.cs.umd.edu/users/oleary/software/>
 ///
-/// [0] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
+/// \[0\] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 /// decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
-/// DOI: https://doi.org/10.1145/192115.192132
+/// DOI: <https://doi.org/10.1145/192115.192132>
 #[derive(Serialize, Deserialize, Clone)]
 pub struct MoreThuenteLineSearch<P, F> {
     /// Search direction (builder)

@@ -11,9 +11,9 @@
 //!
 //! # References
 //!
-//! [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
+//! \[0\] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
 //! kind. Amer. J. Math. 73, 615–624
-//! [1] https://en.wikipedia.org/wiki/Landweber_iteration
+//! \[1\] <https://en.wikipedia.org/wiki/Landweber_iteration>
 
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -29,9 +29,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// # References
 ///
-/// [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
+/// \[0\] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
 /// kind. Amer. J. Math. 73, 615–624
-/// [1] https://en.wikipedia.org/wiki/Landweber_iteration
+/// \[1\] <https://en.wikipedia.org/wiki/Landweber_iteration>
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Landweber<F> {
     /// omega
