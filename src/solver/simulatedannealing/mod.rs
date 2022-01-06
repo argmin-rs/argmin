@@ -9,9 +9,9 @@
 //!
 //! # References
 //!
-//! [0] [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
+//! \[0\] [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
 //!
-//! [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
+//! \[1\] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 //! Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 //! DOI: 10.1126/science.220.4598.671
 
@@ -52,9 +52,9 @@ impl<F> std::default::Default for SATempFunc<F> {
 ///
 /// # References
 ///
-/// [0] [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
+/// \[0\] [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
 ///
-/// [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
+/// \[1\] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 /// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 /// DOI: 10.1126/science.220.4598.671
 #[derive(Clone, Serialize, Deserialize)]

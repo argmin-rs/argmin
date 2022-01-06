@@ -11,7 +11,7 @@
 //!
 //! # References:
 //!
-//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # References:
 ///
-/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SteepestDescent<L> {

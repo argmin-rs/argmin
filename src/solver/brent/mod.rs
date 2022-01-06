@@ -13,11 +13,11 @@
 //!
 //! # References:
 //!
-//! https://en.wikipedia.org/wiki/Brent%27s_method
+//! <https://en.wikipedia.org/wiki/Brent%27s_method>
 //!
 
 /// Implementation of Brent's optimization method,
-/// see https://en.wikipedia.org/wiki/Brent%27s_method
+/// see <https://en.wikipedia.org/wiki/Brent%27s_method>
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -37,7 +37,7 @@ pub enum BrentError {
 /// but it can be as quick as some of the less-reliable methods.
 ///
 /// # References:
-/// https://en.wikipedia.org/wiki/Brent%27s_method
+/// <https://en.wikipedia.org/wiki/Brent%27s_method>
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Brent<F> {
     /// required relative accuracy
