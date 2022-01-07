@@ -16,8 +16,6 @@ use std::default::Default;
 
 /// Particle Swarm Optimization (PSO)
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/particleswarm.rs)
-///
 /// # References:
 ///
 /// TODO

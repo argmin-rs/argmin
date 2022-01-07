@@ -19,8 +19,6 @@ use serde::{Deserialize, Serialize};
 /// The Newton-CG method (also called truncated Newton method) uses a modified CG to solve the
 /// Newton equations approximately. After a search direction is found, a line search is performed.
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/newton_cg.rs)
-///
 /// # References:
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

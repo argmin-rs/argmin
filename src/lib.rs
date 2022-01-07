@@ -10,7 +10,7 @@
 //!
 //! [Documentation of most recent release](https://docs.rs/argmin/latest/argmin/)
 //!
-//! [Documentation of master](https://argmin-rs.github.io/argmin/argmin/)
+//! [Documentation of main branch](https://argmin-rs.github.io/argmin/argmin/)
 //!
 //! # Design goals
 //!
@@ -72,6 +72,12 @@
 //! - [Nelder-Mead method](solver/neldermead/struct.NelderMead.html)
 //! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
 //! - [Particle Swarm Optimization](solver/particleswarm/struct.ParticleSwarm.html)
+//!
+//! # Examples
+//!
+//! Examples for each solver can be found
+//! [here (current released version)](https://github.com/argmin-rs/argmin/tree/v0.4.7/examples) and
+//! [here (main branch)](https://github.com/argmin-rs/argmin/tree/main/examples).
 //!
 //! # Usage
 //!
@@ -511,9 +517,9 @@
 //! Licensed under either of
 //!
 //!   * Apache License, Version 2.0,
-//!     ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/master/LICENSE-APACHE) or
+//!     ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE) or
 //!     <http://www.apache.org/licenses/LICENSE-2.0>)
-//!   * MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/master/LICENSE-MIT) or
+//!   * MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT) or
 //!     <http://opensource.org/licenses/MIT>)
 //!
 //! at your option.

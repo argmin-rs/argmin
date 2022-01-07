@@ -16,8 +16,6 @@ use std::default::Default;
 
 /// Gauss-Newton method
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/gaussnewton.rs)
-///
 /// # References:
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

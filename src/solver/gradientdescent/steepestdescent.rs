@@ -20,8 +20,6 @@ use serde::{Deserialize, Serialize};
 /// Steepest descent iteratively takes steps in the direction of the strongest negative gradient.
 /// In each iteration, a line search is employed to obtain an appropriate step length.
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/steepestdescent.rs)
-///
 /// # References:
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

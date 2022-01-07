@@ -16,8 +16,6 @@ use serde::{Deserialize, Serialize};
 
 /// DFP method
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/dfp.rs)
-///
 /// # References:
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

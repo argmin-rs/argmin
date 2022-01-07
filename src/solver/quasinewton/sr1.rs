@@ -17,8 +17,6 @@ use std::fmt::Debug;
 
 /// SR1 method (broken!)
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/sr1.rs)
-///
 /// # References:
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

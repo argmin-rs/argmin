@@ -29,8 +29,6 @@ use std::fmt::Debug;
 /// This subproblem can be set via `set_subproblem(...)`. If this is not provided, it will default
 /// to the Steihaug method.
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/trustregion_nd.rs)
-///
 /// # References:
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
