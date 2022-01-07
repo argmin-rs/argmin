@@ -31,8 +31,6 @@ use std::default::Default;
 /// 3) Contraction: (Parameter `rho`, default `0.5`)
 /// 4) Shrink: (Parameter `sigma`, default `0.5`)
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/neldermead.rs)
-///
 /// # References:
 ///
 /// [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)

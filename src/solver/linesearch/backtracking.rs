@@ -16,8 +16,6 @@ use std::borrow::Cow;
 /// The Backtracking line search is a simple method to find a step length which obeys the Armijo
 /// (sufficient decrease) condition.
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/backtracking.rs)
-///
 /// # References:
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

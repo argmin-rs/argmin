@@ -25,8 +25,6 @@ type Triplet<F> = (F, F, F);
 /// The Hager-Zhang line search is a method to find a step length which obeys the strong Wolfe
 /// conditions.
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/hagerzhang.rs)
-///
 /// # References
 ///
 /// \[0\] William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed

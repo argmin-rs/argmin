@@ -48,8 +48,6 @@ impl<F> std::default::Default for SATempFunc<F> {
 
 /// Simulated Annealing
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/simulatedannealing.rs)
-///
 /// # References
 ///
 /// \[0\] [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
