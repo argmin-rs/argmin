@@ -634,10 +634,6 @@
 <span id="634">634</span>
 <span id="635">635</span>
 <span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -645,18 +641,16 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! * [More-Thuente line search](struct.MoreThuenteLineSearch.html)</span>
-<span class="doccomment">//!</span>
 <span class="doccomment">//! TODO: Apparently it is missing stopping criteria!</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This implementation follows the excellent MATLAB implementation of Dianne P. O&#39;Leary at</span>
-<span class="doccomment">//! http://www.cs.umd.edu/users/oleary/software/</span>
+<span class="doccomment">//! &lt;http://www.cs.umd.edu/users/oleary/software/&gt;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Reference</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient</span>
 <span class="doccomment">//! decrease.&quot; ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.</span>
-<span class="doccomment">//! DOI: https://doi.org/10.1145/192115.192132</span>
+<span class="doccomment">//! DOI: &lt;https://doi.org/10.1145/192115.192132&gt;</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
@@ -666,16 +660,14 @@
 <span class="doccomment">/// The More-Thuente line search is a method to find a step length which obeys the strong Wolfe</span>
 <span class="doccomment">/// conditions.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/morethuente.rs)</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// # References</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This implementation follows the excellent MATLAB implementation of Dianne P. O&#39;Leary at</span>
-<span class="doccomment">/// http://www.cs.umd.edu/users/oleary/software/</span>
+<span class="doccomment">/// &lt;http://www.cs.umd.edu/users/oleary/software/&gt;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [0] Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient</span>
+<span class="doccomment">/// \[0\] Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient</span>
 <span class="doccomment">/// decrease.&quot; ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.</span>
-<span class="doccomment">/// DOI: https://doi.org/10.1145/192115.192132</span>
+<span class="doccomment">/// DOI: &lt;https://doi.org/10.1145/192115.192132&gt;</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Search direction (builder)</span>

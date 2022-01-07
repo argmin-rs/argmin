@@ -558,8 +558,6 @@
 <span id="558">558</span>
 <span id="559">559</span>
 <span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -575,7 +573,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! William W. Hager and Hongchao Zhang. &quot;A new conjugate gradient method with guaranteed descent</span>
 <span class="doccomment">//! and an efficient line search.&quot; SIAM J. Optim. 16(1), 2006, 170-192.</span>
-<span class="doccomment">//! DOI: https://doi.org/10.1137/030601880</span>
+<span class="doccomment">//! DOI: &lt;https://doi.org/10.1137/030601880&gt;</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
@@ -587,13 +585,11 @@
 <span class="doccomment">/// The Hager-Zhang line search is a method to find a step length which obeys the strong Wolfe</span>
 <span class="doccomment">/// conditions.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/hagerzhang.rs)</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// # References</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [0] William W. Hager and Hongchao Zhang. &quot;A new conjugate gradient method with guaranteed</span>
+<span class="doccomment">/// \[0\] William W. Hager and Hongchao Zhang. &quot;A new conjugate gradient method with guaranteed</span>
 <span class="doccomment">/// descent and an efficient line search.&quot; SIAM J. Optim. 16(1), 2006, 170-192.</span>
-<span class="doccomment">/// DOI: https://doi.org/10.1137/030601880</span>
+<span class="doccomment">/// DOI: &lt;https://doi.org/10.1137/030601880&gt;</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// delta: (0, 0.5), used in the Wolve conditions</span>

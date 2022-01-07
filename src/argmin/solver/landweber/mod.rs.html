@@ -70,8 +70,6 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -85,9 +83,9 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # References</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first</span>
+<span class="doccomment">//! \[0\] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first</span>
 <span class="doccomment">//! kind. Amer. J. Math. 73, 615–624</span>
-<span class="doccomment">//! [1] https://en.wikipedia.org/wiki/Landweber_iteration</span>
+<span class="doccomment">//! \[1\] &lt;https://en.wikipedia.org/wiki/Landweber_iteration&gt;</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -99,13 +97,11 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// `x_{k+1} = x_k - omega * \nabla f(x_k)`</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/landweber.rs)</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// # References</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [0] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first</span>
+<span class="doccomment">/// \[0\] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first</span>
 <span class="doccomment">/// kind. Amer. J. Math. 73, 615–624</span>
-<span class="doccomment">/// [1] https://en.wikipedia.org/wiki/Landweber_iteration</span>
+<span class="doccomment">/// \[1\] &lt;https://en.wikipedia.org/wiki/Landweber_iteration&gt;</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Landweber</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// omega</span>

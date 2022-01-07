@@ -218,8 +218,6 @@
 <span id="218">218</span>
 <span id="219">219</span>
 <span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -229,7 +227,7 @@
 
 <span class="doccomment">//! # References:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
@@ -240,13 +238,11 @@
 
 <span class="doccomment">/// L-BFGS method</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/lbfgs.rs)</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// TODO: Implement compact representation of BFGS updating (Nocedal/Wright p.230)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # References:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LBFGS</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
