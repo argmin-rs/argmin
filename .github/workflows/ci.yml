@@ -29,7 +29,10 @@ jobs:
           override: true
       - name: Install dependencies
         run: sudo apt-get install cmake gfortran libelf-dev libdw-dev binutils-dev libiberty-dev liblapacke-dev libopenblas-dev gcc
-      - run: cargo build --verbose --all --all-features && cargo clean && cargo test --verbose --all --all-features
+      - name: Build
+        run: cargo build --verbose --all --all-features
+      - name: Test
+        run: cargo test --verbose --all --all-features
 
   clippy:
     runs-on: ubuntu-latest
