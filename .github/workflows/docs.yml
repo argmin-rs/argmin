@@ -1,0 +1,42 @@
+name: rustdoc
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  RUSTFLAGS: "-D warnings -W unreachable-pub"
+
+jobs:
+  rustdoc:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+        components: rustfmt, rust-src
+
+    - name: Build Documentation
+      run: cargo doc --all-features --all --no-deps
+
+#     - name: Forward
+#       run: cat <<EOF > ./target/doc/index.html
+# <!doctype html><meta http-equiv="refresh" content="0; ./argmin/">
+# EOF
+
+    - name: Deploy docs
+      uses: peaceiris/actions-gh-pages
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: ./target/doc
+        force_orphan: true
