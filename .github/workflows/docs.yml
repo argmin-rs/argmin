@@ -22,8 +22,8 @@ jobs:
           override: true
           components: rustfmt, rust-src
 
-        - name: Build Documentation
-          run: cargo doc --all-features --all --no-deps
+      - name: Build Documentation
+        run: cargo doc --all-features --all --no-deps
 
 #     - name: Forward
 #       run: cat <<EOF > ./target/doc/index.html
