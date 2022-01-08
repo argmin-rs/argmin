@@ -30,10 +30,10 @@ jobs:
 # <!doctype html><meta http-equiv="refresh" content="0; ./argmin/">
 # EOF
 
-      # - name: Deploy docs
-      #   uses: peaceiris/actions-gh-pages
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_branch: gh-pages
-      #     publish_dir: ./target/doc
-      #     force_orphan: true
+      - name: Deploy docs
+        uses: peaceiris/actions-gh-pages
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./target/doc
+          force_orphan: true
