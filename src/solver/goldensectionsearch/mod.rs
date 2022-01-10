@@ -10,6 +10,7 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
 
 use crate::prelude::*;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 // Golden ratio is actually 1.61803398874989484820, but that is too much precision for f64.
@@ -33,7 +34,8 @@ const G2: f64 = 1.0 - G1;
 /// # References:
 ///
 /// [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct GoldenSectionSearch<F> {
     g1: F,
     g2: F,

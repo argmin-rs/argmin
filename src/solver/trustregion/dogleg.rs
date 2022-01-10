@@ -11,6 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 /// The Dogleg method computes the intersection of the trust region boundary with a path given by
@@ -21,7 +22,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize, Debug, Copy, PartialEq, PartialOrd, Default)]
+#[derive(Clone, Debug, Copy, PartialEq, PartialOrd, Default)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Dogleg<F> {
     /// Radius
     radius: F,

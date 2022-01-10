@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use serde::de::DeserializeOwned;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 /// The Steihaug method is a conjugate gradients based approach for finding an approximate solution
@@ -21,7 +21,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize, Debug, Copy, PartialEq, PartialOrd, Default)]
+#[derive(Clone, Default)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Steihaug<P, F> {
     /// Radius
     radius: F,
@@ -142,8 +143,8 @@ impl<P, O, F> Solver<O> for Steihaug<P, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + Default
         + ArgminMul<F, P>
         + ArgminWeightedDot<P, F, O::Hessian>
@@ -240,7 +241,7 @@ where
     }
 }
 
-impl<P: Clone + Serialize, F: ArgminFloat> ArgminTrustRegion<F> for Steihaug<P, F> {
+impl<P: Clone + SerializeAlias, F: ArgminFloat> ArgminTrustRegion<F> for Steihaug<P, F> {
     fn set_radius(&mut self, radius: F) {
         self.radius = radius;
     }

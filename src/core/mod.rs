@@ -37,6 +37,7 @@ mod opwrapper;
 /// Definition of the return type of the solvers
 mod result;
 /// Serialization of `ArgminSolver`s
+#[cfg(feature = "serde1")]
 mod serialization;
 /// Definition of termination reasons
 mod termination;
@@ -48,19 +49,27 @@ pub use iterstate::*;
 pub use kv::ArgminKV;
 pub use math::*;
 pub use nooperator::*;
-use num::traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
+use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 pub use observers::*;
 pub use opwrapper::*;
 pub use result::ArgminResult;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
+#[cfg(feature = "serde1")]
+use serde::{de::DeserializeOwned, Serialize};
+#[cfg(feature = "serde1")]
 pub use serialization::*;
 use std::fmt::{Debug, Display};
 pub use termination::TerminationReason;
 
 /// Trait alias to simplify common trait bounds
 pub trait ArgminFloat:
-    Float + FloatConst + FromPrimitive + ToPrimitive + Debug + Display + Serialize + DeserializeOwned
+    Float
+    + FloatConst
+    + FromPrimitive
+    + ToPrimitive
+    + Debug
+    + Display
+    + SerializeAlias
+    + DeserializeOwnedAlias
 {
 }
 impl<I> ArgminFloat for I where
@@ -70,8 +79,8 @@ impl<I> ArgminFloat for I where
         + ToPrimitive
         + Debug
         + Display
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
 {
 }
 
@@ -85,13 +94,13 @@ pub trait ArgminOp {
     // TODO: Once associated type defaults are stable, it hopefully will be possible to define
     // default types for `Hessian` and `Jacobian`.
     /// Type of the parameter vector
-    type Param: Clone + Serialize + DeserializeOwned;
+    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Output of the operator
-    type Output: Clone + Serialize + DeserializeOwned;
+    type Output: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Type of Hessian
-    type Hessian: Clone + Serialize + DeserializeOwned;
+    type Hessian: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Type of Jacobian
-    type Jacobian: Clone + Serialize + DeserializeOwned;
+    type Jacobian: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Precision of floats
     type Float: ArgminFloat;
 
@@ -140,7 +149,7 @@ pub trait ArgminOp {
 /// Solver
 ///
 /// Every solver needs to implement this trait.
-pub trait Solver<O: ArgminOp>: Serialize {
+pub trait Solver<O: ArgminOp>: SerializeAlias {
     /// Name of the solver
     const NAME: &'static str = "UNDEFINED";
 
@@ -325,7 +334,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
 }
 
 /// Defines a common interface for line search methods.
-pub trait ArgminLineSearch<P, F>: Serialize {
+pub trait ArgminLineSearch<P, F>: SerializeAlias {
     /// Set the search direction
     fn set_search_direction(&mut self, direction: P);
 
@@ -335,16 +344,49 @@ pub trait ArgminLineSearch<P, F>: Serialize {
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods.
-pub trait ArgminTrustRegion<F>: Clone + Serialize {
+pub trait ArgminTrustRegion<F>: Clone + SerializeAlias {
     /// Set the initial step length
     fn set_radius(&mut self, radius: F);
 }
 //
 /// Common interface for beta update methods (Nonlinear-CG)
-pub trait ArgminNLCGBetaUpdate<T, F: ArgminFloat>: Serialize {
+pub trait ArgminNLCGBetaUpdate<T, F: ArgminFloat>: SerializeAlias {
     /// Update beta
     /// Parameter 1: \nabla f_k
     /// Parameter 2: \nabla f_{k+1}
     /// Parameter 3: p_k
     fn update(&self, nabla_f_k: &T, nabla_f_k_p_1: &T, p_k: &T) -> F;
 }
+
+/// If the `serde1` feature is set, it acts as an alias for `Serialize` and is implemented for all
+/// types which implement `Serialize`. If `serde1` is not set, it will be an "empty" trait
+/// implemented for all types.
+#[cfg(feature = "serde1")]
+pub trait SerializeAlias: Serialize {}
+
+/// If the `serde1` feature is set, it acts as an alias for `Serialize` and is implemented for all
+/// types which implement `Serialize`. If `serde1` is not set, it will be an "empty" trait
+/// implemented for all types.
+#[cfg(not(feature = "serde1"))]
+pub trait SerializeAlias {}
+
+#[cfg(feature = "serde1")]
+impl<T> SerializeAlias for T where T: Serialize {}
+#[cfg(not(feature = "serde1"))]
+impl<T> SerializeAlias for T {}
+
+/// If the `serde1` feature is set, it acts as an alias for `DeserializeOwned` and is implemented
+/// for all types which implement `DeserializeOwned`. If `serde1` is not set, it will be an "empty"
+/// trait implemented for all types.
+#[cfg(feature = "serde1")]
+pub trait DeserializeOwnedAlias: DeserializeOwned {}
+/// If the `serde1` feature is set, it acts as an alias for `DeserializeOwned` and is implemented
+/// for all types which implement `DeserializeOwned`. If `serde1` is not set, it will be an "empty"
+/// trait implemented for all types.
+#[cfg(not(feature = "serde1"))]
+pub trait DeserializeOwnedAlias {}
+
+#[cfg(feature = "serde1")]
+impl<T> DeserializeOwnedAlias for T where T: DeserializeOwned {}
+#[cfg(not(feature = "serde1"))]
+impl<T> DeserializeOwnedAlias for T {}

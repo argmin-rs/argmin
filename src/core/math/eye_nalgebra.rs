@@ -7,7 +7,7 @@
 
 use crate::core::math::ArgminEye;
 
-use num::{One, Zero};
+use num_traits::{One, Zero};
 
 use nalgebra::{
     base::{allocator::Allocator, dimension::Dim},

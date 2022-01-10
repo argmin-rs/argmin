@@ -14,7 +14,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use serde::de::DeserializeOwned;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -25,7 +25,8 @@ use std::default::Default;
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct NonlinearConjugateGradient<P, L, B, F> {
     /// p
     p: P,
@@ -85,8 +86,8 @@ where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
         + Default
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminScaledAdd<O::Param, O::Float, O::Param>

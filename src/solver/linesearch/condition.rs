@@ -10,11 +10,14 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::core::{ArgminDot, ArgminError, ArgminFloat, Error};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use crate::core::{
+    ArgminDot, ArgminError, ArgminFloat, DeserializeOwnedAlias, Error, SerializeAlias,
+};
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 
 /// Needs to be implemented by everything that wants to be a LineSearchCondition
-pub trait LineSearchCondition<T, F>: Serialize {
+pub trait LineSearchCondition<T, F>: SerializeAlias {
     /// Evaluate the condition
     fn eval(
         &self,
@@ -31,7 +34,8 @@ pub trait LineSearchCondition<T, F>: Serialize {
 }
 
 /// Armijo Condition
-#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct ArmijoCondition<F> {
     c: F,
 }
@@ -52,7 +56,7 @@ impl<F: ArgminFloat> ArmijoCondition<F> {
 impl<T, F> LineSearchCondition<T, F> for ArmijoCondition<F>
 where
     T: ArgminDot<T, F>,
-    F: ArgminFloat + Serialize + DeserializeOwned,
+    F: ArgminFloat + SerializeAlias + DeserializeOwnedAlias,
 {
     fn eval(
         &self,
@@ -72,7 +76,8 @@ where
 }
 
 /// Wolfe Condition
-#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct WolfeCondition<F> {
     c1: F,
     c2: F,
@@ -100,7 +105,7 @@ impl<F: ArgminFloat> WolfeCondition<F> {
 impl<T, F> LineSearchCondition<T, F> for WolfeCondition<F>
 where
     T: Clone + ArgminDot<T, F>,
-    F: ArgminFloat + DeserializeOwned + Serialize,
+    F: ArgminFloat + DeserializeOwnedAlias + SerializeAlias,
 {
     fn eval(
         &self,
@@ -122,7 +127,8 @@ where
 }
 
 /// Strong Wolfe conditions
-#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct StrongWolfeCondition<F> {
     c1: F,
     c2: F,
@@ -150,7 +156,7 @@ impl<F: ArgminFloat> StrongWolfeCondition<F> {
 impl<T, F> LineSearchCondition<T, F> for StrongWolfeCondition<F>
 where
     T: Clone + ArgminDot<T, F>,
-    F: ArgminFloat + Serialize + DeserializeOwned,
+    F: ArgminFloat + SerializeAlias + DeserializeOwnedAlias,
 {
     fn eval(
         &self,
@@ -172,7 +178,8 @@ where
 }
 
 /// Goldstein conditions
-#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct GoldsteinCondition<F> {
     c: F,
 }
@@ -193,7 +200,7 @@ impl<F: ArgminFloat> GoldsteinCondition<F> {
 impl<T, F> LineSearchCondition<T, F> for GoldsteinCondition<F>
 where
     T: ArgminDot<T, F>,
-    F: ArgminFloat + Serialize + DeserializeOwned,
+    F: ArgminFloat + SerializeAlias + DeserializeOwnedAlias,
 {
     fn eval(
         &self,

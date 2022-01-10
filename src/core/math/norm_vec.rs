@@ -6,8 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::math::ArgminNorm;
-use num::integer::Roots;
 use num_complex::Complex;
+use num_integer::Roots;
 
 macro_rules! make_norm_float {
     ($t:ty) => {

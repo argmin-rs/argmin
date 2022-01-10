@@ -12,6 +12,7 @@
 
 use crate::prelude::*;
 use crate::solver::trustregion::reduction_ratio;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
@@ -33,7 +34,8 @@ use std::fmt::Debug;
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct TrustRegion<R, F> {
     /// Radius
     radius: F,
@@ -93,7 +95,7 @@ where
     O::Param: Default
         + Clone
         + Debug
-        + Serialize
+        + SerializeAlias
         + ArgminMul<F, O::Param>
         + ArgminWeightedDot<O::Param, F, O::Hessian>
         + ArgminNorm<F>
@@ -102,7 +104,7 @@ where
         + ArgminSub<O::Param, O::Param>
         + ArgminZeroLike
         + ArgminMul<F, O::Param>,
-    O::Hessian: Default + Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
+    O::Hessian: Default + Clone + Debug + SerializeAlias + ArgminDot<O::Param, O::Param>,
     R: ArgminTrustRegion<F> + Solver<O>,
     F: ArgminFloat,
 {

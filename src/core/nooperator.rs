@@ -5,17 +5,16 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminFloat, ArgminOp, Error};
-use serde::de::DeserializeOwned;
+use crate::core::{ArgminFloat, ArgminOp, DeserializeOwnedAlias, Error, SerializeAlias};
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 
 /// Fake Operators for testing
 
 /// No-op operator with free choice of the types
-#[derive(
-    Clone, Default, Debug, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash, Copy,
-)]
+#[derive(Clone, Default, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Copy)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct NoOperator<T, U, H, J, F> {
     /// Fake parameter
     param: std::marker::PhantomData<T>,
@@ -51,10 +50,10 @@ impl<T, U, H, J, F> Display for NoOperator<T, U, H, J, F> {
 
 impl<T, U, H, J, F> ArgminOp for NoOperator<T, U, H, J, F>
 where
-    T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-    U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-    H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-    J: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    T: Clone + Default + Debug + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
+    U: Clone + Default + Debug + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
+    H: Clone + Default + Debug + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
+    J: Clone + Default + Debug + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
     F: ArgminFloat,
 {
     type Param = T;
@@ -85,9 +84,8 @@ where
 }
 
 /// Minimal No-op operator which does nothing, really.
-#[derive(
-    Clone, Default, Debug, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash, Copy,
-)]
+#[derive(Clone, Default, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Copy)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct MinimalNoOperator {}
 
 /// No-op operator with fixed types (See `ArgminOp` impl on `MinimalNoOperator`)

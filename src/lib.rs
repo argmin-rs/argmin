@@ -88,9 +88,22 @@
 //! argmin = "0.5.0"
 //! ```
 //!
-//! ## Optional features
+//! or, for the current development version:
 //!
-//! ### Recommended features
+//! ```toml
+//! [dependencies]
+//! argmin = { git = "https://github.com/argmin-rs/argmin" }
+//! ```
+//!
+//! ## Features
+//!
+//! ### Default features
+//!
+//! - `slog-logger`: Support for logging using `slog`
+//! - `serde1`: Support for `serde`. Needed for checkpointing and writing parameters to disk as
+//! well as logging to disk.
+//!
+//! ### Additional features
 //!
 //! There are additional features which can be activated in `Cargo.toml`:
 //!
@@ -99,11 +112,8 @@
 //! argmin = { version = "0.5.0", features = ["ctrlc", "ndarrayl", "nalgebral"] }
 //! ```
 //!
-//! These may become default features in the future. Without these features compilation to
-//! `wasm32-unknown-unkown` seems to be possible.
-//!
 //! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
-//!    result) after pressing Ctrl+C.
+//!    result) after pressing Ctrl+C during an optimization run.
 //! - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.
 //! - `nalgebral`: Support for `nalgebra`.
 //!
@@ -126,17 +136,24 @@
 //! argmin = { version = "0.5.0", features = ["stdweb"] }
 //! ```
 //!
-//! Note that WASM support is still experimental. Please report any issues you encounter when compiling argmin to WASM.
+//! WASM support is still experimental. Please report any issues you encounter when compiling argmin
+//! to WASM.
+//!
+//! ### Compiling without `serde` dependency
+//!
+//! The `serde` dependency can be removed by turning off the `serde1` feature, for instance like so:
+//!
+//! ```toml
+//! [dependencies]
+//! argmin = { version = "0.5.0", default-features = false, features = ["slog-logger"] }
+//! ```
+//!
+//! Note that this will remove the ability to write parameters and logs to disk as well as
+//! checkpointing.
 //!
 //! ## Running the tests and building the examples
 //!
-//! Running the tests requires the `ndarrayl` and feature to be enabled:
-//!
-//! ```bash
-//! cargo test --features "ndarrayl"
-//! ```
-//!
-//! The examples require all features to be enabled:
+//! The tests and examples require all features to be enabled:
 //!
 //! ```bash
 //! cargo test --features --all-features
@@ -166,7 +183,6 @@
 //! ```rust
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
-//! # extern crate ndarray;
 //! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 //! use argmin::prelude::*;
 //!
@@ -263,16 +279,18 @@
 //!  
 //! // Run solver
 //! let res = Executor::new(cost, solver, init_param)
+//! # ;
+//! # #[cfg(feature = "slog-logger")]
+//! # let res = res
 //!     // Add an observer which will log all iterations to the terminal
 //!     .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+//! # ;
+//! # let res = res
 //!     // Set maximum iterations to 10
 //!     .max_iters(10)
 //!     // run the solver on the defined problem
 //!     .run()?;
 //! #
-//! #     // Wait a second (lets the logger flush everything first)
-//! #     std::thread::sleep(instant::Duration::from_secs(1));
-//!  
 //! // print result
 //! println!("{}", res);
 //! #     Ok(())
@@ -347,12 +365,21 @@
 //! # let solver = SteepestDescent::new(linesearch);
 //! #
 //! let res = Executor::new(problem, solver, init_param)
+//! # ;
+//! # #[cfg(feature = "slog-logger")]
+//! let res = res
 //!     // Add an observer which will log all iterations to the terminal (without blocking)
 //!     .add_observer(ArgminSlogLogger::term_noblock(), ObserverMode::Always)
+//! # ;
+//! # #[cfg(feature = "serde1")]
+//! # #[cfg(feature = "slog-logger")]
+//! # let res = res
 //!     // Log to file whenever a new best solution is found
 //!     .add_observer(ArgminSlogLogger::file("solver.log", false)?, ObserverMode::NewBest)
 //!     // Write parameter vector to `params/param.arg` every 20th iteration
 //!     .add_observer(WriteToFile::new("params", "param"), ObserverMode::Every(20))
+//! # ;
+//! # let res = res
 //! #     .max_iters(2)
 //!     // run the solver on the defined problem
 //!     .run()?;
@@ -417,6 +444,7 @@
 //! #     let iters = 35;
 //! #     let solver = Landweber::new(0.001);
 //! #
+//! # #[cfg(feature = "serde1")]
 //! let res = Executor::from_checkpoint(".checkpoints/optim.arg", Rosenbrock {})
 //!     .unwrap_or(Executor::new(Rosenbrock {}, solver, init_param))
 //!     .max_iters(iters)
@@ -425,9 +453,6 @@
 //!     .checkpoint_mode(CheckpointMode::Every(20))
 //!     .run()?;
 //! #
-//! #     // Wait a second (lets the logger flush everything before printing to screen again)
-//! #     std::thread::sleep(instant::Duration::from_secs(1));
-//! #     println!("{}", res);
 //! #     Ok(())
 //! # }
 //! #
@@ -457,12 +482,13 @@
 //!
 //! ```rust
 //! use argmin::prelude::*;
+//! #[cfg(feature = "serde1")]
 //! use serde::{Deserialize, Serialize};
 //!
 //! // Define a struct which holds any parameters/data which are needed during the execution of the
 //! // solver. Note that this does not include parameter vectors, gradients, Hessians, cost
 //! // function values and so on, as those will be handled by the `Executor`.
-//! #[derive(Serialize, Deserialize)]
+//! #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 //! pub struct Landweber<F> {
 //!     /// omega
 //!     omega: F,
@@ -553,4 +579,5 @@ pub mod solver;
 mod macros;
 
 #[cfg(test)]
+#[cfg(feature = "ndarrayl")]
 mod tests;
