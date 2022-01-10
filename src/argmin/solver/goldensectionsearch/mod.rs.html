@@ -155,10 +155,6 @@
 <span id="155">155</span>
 <span id="156">156</span>
 <span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -189,9 +185,7 @@
 <span class="doccomment">/// are in the ratio 2-φ:2φ-3:2-φ where φ is the golden ratio. These ratios are maintained for each</span>
 <span class="doccomment">/// iteration and are maximally efficient.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum. The</span>
-<span class="doccomment">/// `init_estimate` argument is the initial estimate of the minimum that is required to be larger</span>
-<span class="doccomment">/// than `min_bound` and smaller than `max_bound`.</span>
+<span class="doccomment">/// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # References:</span>
 <span class="doccomment">///</span>
@@ -202,7 +196,6 @@
     <span class="ident">g2</span>: <span class="ident">F</span>,
     <span class="ident">min_bound</span>: <span class="ident">F</span>,
     <span class="ident">max_bound</span>: <span class="ident">F</span>,
-    <span class="ident">init_estimate</span>: <span class="ident">F</span>,
     <span class="ident">tolerance</span>: <span class="ident">F</span>,
 
     <span class="ident">x0</span>: <span class="ident">F</span>,
@@ -224,7 +217,6 @@
             <span class="ident">g2</span>: <span class="ident">F::from</span>(<span class="ident">G2</span>).<span class="ident">unwrap</span>(),
             <span class="ident">min_bound</span>,
             <span class="ident">max_bound</span>,
-            <span class="ident">init_estimate</span>: <span class="ident">F::zero</span>(),
             <span class="ident">tolerance</span>: <span class="ident">F::from</span>(<span class="number">0.01</span>).<span class="ident">unwrap</span>(),
             <span class="ident">x0</span>: <span class="ident">min_bound</span>,
             <span class="ident">x1</span>: <span class="ident">F::zero</span>(),
