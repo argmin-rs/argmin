@@ -7,7 +7,7 @@
 
 use crate::core::math::{ArgminZero, ArgminZeroLike};
 
-use num::Zero;
+use num_traits::Zero;
 
 use nalgebra::{
     base::{allocator::Allocator, dimension::Dim},

@@ -11,6 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -21,7 +22,8 @@ use std::default::Default;
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Newton<F> {
     /// gamma
     gamma: F,
@@ -80,6 +82,7 @@ where
 mod tests {
     use super::*;
     use crate::test_trait_impl;
+    #[cfg(feature = "ndarrayl")]
     use approx::assert_relative_eq;
 
     test_trait_impl!(newton_method, Newton<f64>);
@@ -128,6 +131,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "ndarrayl")]
     #[test]
     fn test_solver() {
         use ndarray::{Array, Array1, Array2};

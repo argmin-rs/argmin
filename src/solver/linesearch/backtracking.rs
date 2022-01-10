@@ -9,7 +9,7 @@
 
 use crate::prelude::*;
 use crate::solver::linesearch::condition::*;
-use serde::de::DeserializeOwned;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 
@@ -22,7 +22,8 @@ use std::borrow::Cow;
 /// Springer. ISBN 0-387-30303-0.
 ///
 /// \[1\] Wikipedia: <https://en.wikipedia.org/wiki/Backtracking_line_search>
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct BacktrackingLineSearch<P, L, F> {
     /// initial parameter vector
     init_param: P,
@@ -70,9 +71,9 @@ impl<P: Default, L, F: ArgminFloat> BacktrackingLineSearch<P, L, F> {
 
 impl<P, L, F> ArgminLineSearch<P, F> for BacktrackingLineSearch<P, L, F>
 where
-    P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
+    P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
     L: LineSearchCondition<P, F>,
-    F: ArgminFloat + Serialize + DeserializeOwned,
+    F: ArgminFloat + SerializeAlias + DeserializeOwnedAlias,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {
@@ -122,7 +123,7 @@ where
 
 impl<O, P, L, F> Solver<O> for BacktrackingLineSearch<P, L, F>
 where
-    P: Clone + Default + Serialize + DeserializeOwned + ArgminScaledAdd<P, F, P>,
+    P: Clone + Default + SerializeAlias + DeserializeOwnedAlias + ArgminScaledAdd<P, F, P>,
     O: ArgminOp<Param = P, Output = F, Float = F>,
     L: LineSearchCondition<P, F>,
     F: ArgminFloat,

@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::math::{ArgminZero, ArgminZeroLike};
-use num::Zero;
+use num_traits::Zero;
 
 impl<T> ArgminZeroLike for ndarray::Array1<T>
 where

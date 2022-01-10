@@ -5,8 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminError, Error};
-use serde::de::DeserializeOwned;
+use crate::core::{ArgminError, DeserializeOwnedAlias, Error, SerializeAlias};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fmt::Display;
@@ -118,7 +117,7 @@ impl ArgminCheckpoint {
 
     /// Write checkpoint to disk
     #[inline]
-    pub fn store<T: Serialize>(&self, executor: &T, filename: &str) -> Result<(), Error> {
+    pub fn store<T: SerializeAlias>(&self, executor: &T, filename: &str) -> Result<(), Error> {
         let dir = Path::new(&self.directory);
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?
@@ -132,7 +131,7 @@ impl ArgminCheckpoint {
 
     /// Write checkpoint based on the desired `CheckpointMode`
     #[inline]
-    pub fn store_cond<T: Serialize>(&self, executor: &T, iter: u64) -> Result<(), Error> {
+    pub fn store_cond<T: SerializeAlias>(&self, executor: &T, iter: u64) -> Result<(), Error> {
         match self.mode {
             CheckpointMode::Always => self.store(executor, &self.filename)?,
             CheckpointMode::Every(it) if iter % it == 0 => self.store(executor, &self.filename)?,
@@ -143,7 +142,7 @@ impl ArgminCheckpoint {
 }
 
 /// Load a checkpoint from disk
-pub fn load_checkpoint<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T, Error> {
+pub fn load_checkpoint<T: DeserializeOwnedAlias, P: AsRef<Path>>(path: P) -> Result<T, Error> {
     let path = path.as_ref();
     if !path.exists() {
         return Err(ArgminError::CheckpointNotFound {

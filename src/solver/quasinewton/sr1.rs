@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use serde::de::DeserializeOwned;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
@@ -21,7 +21,8 @@ use std::fmt::Debug;
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct SR1<L, H, F> {
     /// parameter for skipping rule
     r: F,
@@ -79,7 +80,7 @@ where
     O::Param: Debug
         + Clone
         + Default
-        + Serialize
+        + SerializeAlias
         + ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminDot<O::Param, O::Hessian>
@@ -88,8 +89,8 @@ where
     H: Debug
         + Clone
         + Default
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>

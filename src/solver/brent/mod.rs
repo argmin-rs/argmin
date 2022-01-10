@@ -19,6 +19,7 @@
 /// Implementation of Brent's optimization method,
 /// see <https://en.wikipedia.org/wiki/Brent%27s_method>
 use crate::prelude::*;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -38,7 +39,8 @@ pub enum BrentError {
 ///
 /// # References:
 /// <https://en.wikipedia.org/wiki/Brent%27s_method>
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Brent<F> {
     /// required relative accuracy
     tol: F,

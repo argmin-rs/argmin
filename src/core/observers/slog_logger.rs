@@ -12,9 +12,12 @@ use slog;
 use slog::{info, o, Drain, Record, Serializer, KV};
 use slog_async;
 use slog_async::OverflowStrategy;
+#[cfg(feature = "serde1")]
 use slog_json;
 use slog_term;
+#[cfg(feature = "serde1")]
 use std::fs::OpenOptions;
+#[cfg(feature = "serde1")]
 use std::sync::Mutex;
 
 /// A logger based on `slog`
@@ -55,6 +58,9 @@ impl ArgminSlogLogger {
     ///
     /// If `truncate` is set to `true`, the content of existing log files at `file` will be
     /// cleared.
+    ///
+    /// Only available when the `serde1` feature is set.
+    #[cfg(feature = "serde1")]
     pub fn file(file: &str, truncate: bool) -> Result<Self, Error> {
         ArgminSlogLogger::file_internal(file, OverflowStrategy::Block, truncate)
     }
@@ -63,11 +69,17 @@ impl ArgminSlogLogger {
     ///
     /// If `truncate` is set to `true`, the content of existing log files at `file` will be
     /// cleared.
+    ///
+    /// Only available when the `serde1` feature is set.
+    #[cfg(feature = "serde1")]
     pub fn file_noblock(file: &str, truncate: bool) -> Result<Self, Error> {
         ArgminSlogLogger::file_internal(file, OverflowStrategy::Drop, truncate)
     }
 
+    #[cfg(feature = "serde1")]
     /// Actual implementaiton of logging JSON to file
+    ///
+    /// Only available when the `serde1` feature is set.
     fn file_internal(
         file: &str,
         overflow_strategy: OverflowStrategy,

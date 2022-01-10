@@ -10,7 +10,8 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 
 use crate::prelude::*;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 use std::default::Default;
 
 /// Nelder-Mead method
@@ -34,7 +35,8 @@ use std::default::Default;
 /// # References:
 ///
 /// [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct NelderMead<P, F> {
     /// alpha
     alpha: F,
@@ -192,8 +194,8 @@ impl<O, P, F> Solver<O> for NelderMead<P, F>
 where
     O: ArgminOp<Output = F, Param = P, Float = F>,
     P: Clone
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminScaledSub<O::Param, O::Float, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>

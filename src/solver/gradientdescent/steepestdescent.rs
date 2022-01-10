@@ -15,6 +15,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 /// Steepest descent iteratively takes steps in the direction of the strongest negative gradient.
@@ -24,7 +25,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct SteepestDescent<L> {
     /// line search
     linesearch: L,
@@ -42,7 +44,7 @@ where
     O: ArgminOp<Output = F, Float = F>,
     O::Param: Clone
         + Default
-        + Serialize
+        + SerializeAlias
         + ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminScaledAdd<O::Param, O::Float, O::Param>

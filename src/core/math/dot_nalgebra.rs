@@ -7,7 +7,7 @@
 
 use crate::core::math::ArgminDot;
 
-use num::{One, Zero};
+use num_traits::{One, Zero};
 
 use nalgebra::{
     base::{
