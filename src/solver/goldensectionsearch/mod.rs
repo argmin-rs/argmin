@@ -28,9 +28,7 @@ const G2: f64 = 1.0 - G1;
 /// are in the ratio 2-φ:2φ-3:2-φ where φ is the golden ratio. These ratios are maintained for each
 /// iteration and are maximally efficient.
 ///
-/// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum. The
-/// `init_estimate` argument is the initial estimate of the minimum that is required to be larger
-/// than `min_bound` and smaller than `max_bound`.
+/// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.
 ///
 /// # References:
 ///
@@ -41,7 +39,6 @@ pub struct GoldenSectionSearch<F> {
     g2: F,
     min_bound: F,
     max_bound: F,
-    init_estimate: F,
     tolerance: F,
 
     x0: F,
@@ -63,7 +60,6 @@ where
             g2: F::from(G2).unwrap(),
             min_bound,
             max_bound,
-            init_estimate: F::zero(),
             tolerance: F::from(0.01).unwrap(),
             x0: min_bound,
             x1: F::zero(),
