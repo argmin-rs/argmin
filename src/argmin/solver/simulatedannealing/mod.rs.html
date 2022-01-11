@@ -340,6 +340,9 @@
 <span id="340">340</span>
 <span id="341">341</span>
 <span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -359,6 +362,7 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rand::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="doccomment">/// Temperature functions for Simulated Annealing.</span>
@@ -369,7 +373,8 @@
 <span class="doccomment">/// * `SATempFunc::TemperatureFast`: `t_i = t_init / i`</span>
 <span class="doccomment">/// * `SATempFunc::Boltzmann`: `t_i = t_init / ln(i)`</span>
 <span class="doccomment">/// * `SATempFunc::Exponential`: `t_i = t_init * 0.95^i`</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SATempFunc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// `t_i = t_init / i`</span>
     <span class="ident">TemperatureFast</span>,
@@ -397,7 +402,8 @@
 <span class="doccomment">/// \[1\] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). &quot;Optimization by Simulated Annealing&quot;.</span>
 <span class="doccomment">/// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680</span>
 <span class="doccomment">/// DOI: 10.1126/science.220.4598.671</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Initial temperature</span>
     <span class="ident">init_temp</span>: <span class="ident">F</span>,
@@ -441,7 +447,7 @@
     <span class="doccomment">/// Parameter:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `init_temp`: initial temperature</span>
-    <span class="doccomment">/// * `rng`: an RNG (must implement Serialize)</span>
+    <span class="doccomment">/// * `rng`: an RNG (must implement Serialize when `serde1` feature is activated)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">init_temp</span>: <span class="ident">F</span>, <span class="ident">rng</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">init_temp</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
             <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
@@ -569,7 +575,7 @@
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span>, <span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
-    <span class="ident">R</span>: <span class="ident">Rng</span> <span class="op">+</span> <span class="ident">Serialize</span>,
+    <span class="ident">R</span>: <span class="ident">Rng</span> <span class="op">+</span> <span class="ident">SerializeAlias</span>,
 {
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Simulated Annealing&quot;</span>;
     <span class="kw">fn</span> <span class="ident">init</span>(

@@ -210,6 +210,7 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
+<span id="213">213</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -223,7 +224,7 @@
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
 
@@ -233,7 +234,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BFGS</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Inverse Hessian</span>
     <span class="ident">inv_hessian</span>: <span class="ident">H</span>,
@@ -283,8 +285,8 @@
     <span class="ident">H</span>: <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">Debug</span>
-        <span class="op">+</span> <span class="ident">Serialize</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwned</span>
+        <span class="op">+</span> <span class="ident">SerializeAlias</span>
+        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O::Hessian</span>, <span class="ident">O::Hessian</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Hessian</span>, <span class="ident">O::Hessian</span><span class="op">&gt;</span>

@@ -554,6 +554,33 @@
 <span id="554">554</span>
 <span id="555">555</span>
 <span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -644,9 +671,22 @@
 <span class="doccomment">//! argmin = &quot;0.5.0&quot;</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ## Optional features</span>
+<span class="doccomment">//! or, for the current development version:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ### Recommended features</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies]</span>
+<span class="doccomment">//! argmin = { git = &quot;https://github.com/argmin-rs/argmin&quot; }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Features</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Default features</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `slog-logger`: Support for logging using `slog`</span>
+<span class="doccomment">//! - `serde1`: Support for `serde`. Needed for checkpointing and writing parameters to disk as</span>
+<span class="doccomment">//! well as logging to disk.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Additional features</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! There are additional features which can be activated in `Cargo.toml`:</span>
 <span class="doccomment">//!</span>
@@ -655,11 +695,8 @@
 <span class="doccomment">//! argmin = { version = &quot;0.5.0&quot;, features = [&quot;ctrlc&quot;, &quot;ndarrayl&quot;, &quot;nalgebral&quot;] }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! These may become default features in the future. Without these features compilation to</span>
-<span class="doccomment">//! `wasm32-unknown-unkown` seems to be possible.</span>
-<span class="doccomment">//!</span>
 <span class="doccomment">//! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best</span>
-<span class="doccomment">//!    result) after pressing Ctrl+C.</span>
+<span class="doccomment">//!    result) after pressing Ctrl+C during an optimization run.</span>
 <span class="doccomment">//! - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.</span>
 <span class="doccomment">//! - `nalgebral`: Support for `nalgebra`.</span>
 <span class="doccomment">//!</span>
@@ -682,17 +719,24 @@
 <span class="doccomment">//! argmin = { version = &quot;0.5.0&quot;, features = [&quot;stdweb&quot;] }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Note that WASM support is still experimental. Please report any issues you encounter when compiling argmin to WASM.</span>
+<span class="doccomment">//! WASM support is still experimental. Please report any issues you encounter when compiling argmin</span>
+<span class="doccomment">//! to WASM.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Compiling without `serde` dependency</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The `serde` dependency can be removed by turning off the `serde1` feature, for instance like so:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies]</span>
+<span class="doccomment">//! argmin = { version = &quot;0.5.0&quot;, default-features = false, features = [&quot;slog-logger&quot;] }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Note that this will remove the ability to write parameters and logs to disk as well as</span>
+<span class="doccomment">//! checkpointing.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Running the tests and building the examples</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Running the tests requires the `ndarrayl` and feature to be enabled:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```bash</span>
-<span class="doccomment">//! cargo test --features &quot;ndarrayl&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The examples require all features to be enabled:</span>
+<span class="doccomment">//! The tests and examples require all features to be enabled:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```bash</span>
 <span class="doccomment">//! cargo test --features --all-features</span>
@@ -722,7 +766,6 @@
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # extern crate argmin;</span>
 <span class="doccomment">//! # extern crate argmin_testfunctions;</span>
-<span class="doccomment">//! # extern crate ndarray;</span>
 <span class="doccomment">//! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};</span>
 <span class="doccomment">//! use argmin::prelude::*;</span>
 <span class="doccomment">//!</span>
@@ -819,16 +862,18 @@
 <span class="doccomment">//!  </span>
 <span class="doccomment">//! // Run solver</span>
 <span class="doccomment">//! let res = Executor::new(cost, solver, init_param)</span>
+<span class="doccomment">//! # ;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
+<span class="doccomment">//! # let res = res</span>
 <span class="doccomment">//!     // Add an observer which will log all iterations to the terminal</span>
 <span class="doccomment">//!     .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)</span>
+<span class="doccomment">//! # ;</span>
+<span class="doccomment">//! # let res = res</span>
 <span class="doccomment">//!     // Set maximum iterations to 10</span>
 <span class="doccomment">//!     .max_iters(10)</span>
 <span class="doccomment">//!     // run the solver on the defined problem</span>
 <span class="doccomment">//!     .run()?;</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! #     // Wait a second (lets the logger flush everything first)</span>
-<span class="doccomment">//! #     std::thread::sleep(instant::Duration::from_secs(1));</span>
-<span class="doccomment">//!  </span>
 <span class="doccomment">//! // print result</span>
 <span class="doccomment">//! println!(&quot;{}&quot;, res);</span>
 <span class="doccomment">//! #     Ok(())</span>
@@ -903,12 +948,21 @@
 <span class="doccomment">//! # let solver = SteepestDescent::new(linesearch);</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! let res = Executor::new(problem, solver, init_param)</span>
+<span class="doccomment">//! # ;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
+<span class="doccomment">//! let res = res</span>
 <span class="doccomment">//!     // Add an observer which will log all iterations to the terminal (without blocking)</span>
 <span class="doccomment">//!     .add_observer(ArgminSlogLogger::term_noblock(), ObserverMode::Always)</span>
+<span class="doccomment">//! # ;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
+<span class="doccomment">//! # let res = res</span>
 <span class="doccomment">//!     // Log to file whenever a new best solution is found</span>
 <span class="doccomment">//!     .add_observer(ArgminSlogLogger::file(&quot;solver.log&quot;, false)?, ObserverMode::NewBest)</span>
 <span class="doccomment">//!     // Write parameter vector to `params/param.arg` every 20th iteration</span>
 <span class="doccomment">//!     .add_observer(WriteToFile::new(&quot;params&quot;, &quot;param&quot;), ObserverMode::Every(20))</span>
+<span class="doccomment">//! # ;</span>
+<span class="doccomment">//! # let res = res</span>
 <span class="doccomment">//! #     .max_iters(2)</span>
 <span class="doccomment">//!     // run the solver on the defined problem</span>
 <span class="doccomment">//!     .run()?;</span>
@@ -973,6 +1027,7 @@
 <span class="doccomment">//! #     let iters = 35;</span>
 <span class="doccomment">//! #     let solver = Landweber::new(0.001);</span>
 <span class="doccomment">//! #</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
 <span class="doccomment">//! let res = Executor::from_checkpoint(&quot;.checkpoints/optim.arg&quot;, Rosenbrock {})</span>
 <span class="doccomment">//!     .unwrap_or(Executor::new(Rosenbrock {}, solver, init_param))</span>
 <span class="doccomment">//!     .max_iters(iters)</span>
@@ -981,9 +1036,6 @@
 <span class="doccomment">//!     .checkpoint_mode(CheckpointMode::Every(20))</span>
 <span class="doccomment">//!     .run()?;</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! #     // Wait a second (lets the logger flush everything before printing to screen again)</span>
-<span class="doccomment">//! #     std::thread::sleep(instant::Duration::from_secs(1));</span>
-<span class="doccomment">//! #     println!(&quot;{}&quot;, res);</span>
 <span class="doccomment">//! #     Ok(())</span>
 <span class="doccomment">//! # }</span>
 <span class="doccomment">//! #</span>
@@ -1013,12 +1065,13 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! use argmin::prelude::*;</span>
+<span class="doccomment">//! #[cfg(feature = &quot;serde1&quot;)]</span>
 <span class="doccomment">//! use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // Define a struct which holds any parameters/data which are needed during the execution of the</span>
 <span class="doccomment">//! // solver. Note that this does not include parameter vectors, gradients, Hessians, cost</span>
 <span class="doccomment">//! // function values and so on, as those will be handled by the `Executor`.</span>
-<span class="doccomment">//! #[derive(Serialize, Deserialize)]</span>
+<span class="doccomment">//! #[cfg_attr(feature = &quot;serde1&quot;, derive(Serialize, Deserialize))]</span>
 <span class="doccomment">//! pub struct Landweber&lt;F&gt; {</span>
 <span class="doccomment">//!     /// omega</span>
 <span class="doccomment">//!     omega: F,</span>
@@ -1109,6 +1162,7 @@
 <span class="kw">mod</span> <span class="ident">macros</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="argmin" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
