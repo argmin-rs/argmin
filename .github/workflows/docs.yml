@@ -20,8 +20,8 @@ jobs:
           override: true
           components: rustfmt, rust-src
 
-      - name: Build Documentation
-        run: cargo doc --all-features --all --no-deps
+      - name: Build documentation
+        run: cargo doc --features "argmin/visualizer,argmin-math/latest_all" --no-deps
 
       - name: Forwarding
         run: echo '<!doctype html><meta http-equiv="refresh" content="0; ./argmin/">' > ./target/doc/index.html
