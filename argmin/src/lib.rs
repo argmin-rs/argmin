@@ -85,7 +85,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!("argmin = \"", env!("CARGO_PKG_VERSION"), "\"")]
+#![doc = concat!(" argmin = \"", env!("CARGO_PKG_VERSION"), "\"")]
 //! ```
 //!
 //! or, for the current development version:
@@ -109,7 +109,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!("argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ctrlc\", \"ndarrayl\", \"nalgebral\"] }")]
+#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ctrlc\", \"ndarrayl\", \"nalgebral\"] }")]
 //! ```
 //!
 //! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
@@ -129,11 +129,11 @@
 //! When compiling to WASM, one of the following features must be used:
 //!
 //! ```toml
-#![doc = concat!("argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"wasm-bindgen\"] }")]
+#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"wasm-bindgen\"] }")]
 //! ```
 //!
 //! ```toml
-#![doc = concat!("argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"stdweb\"] }")]
+#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"stdweb\"] }")]
 //! ```
 //!
 //! WASM support is still experimental. Please report any issues you encounter when compiling argmin
@@ -145,7 +145,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!("argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", default-features = false, features = [\"slog-logger\"] }")]
+#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", default-features = false, features = [\"slog-logger\"] }")]
 //! ```
 //!
 //! Note that this will remove the ability to write parameters and logs to disk as well as
