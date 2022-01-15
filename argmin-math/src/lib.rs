@@ -5,19 +5,95 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Math
+//! argmin-math provides mathematics related abstractions needed in argmin. It supports
+//! implementations of these abstractions for basic `Vec`s and for `ndarray` and `nalgebra`.
+//! The traits can of course also be implemented for your own types to make them compatible with
+//! argmin.
 //!
-//! Mathematics related traits which some solvers require. This provides an abstraction over
-//! different types of parameter vectors. The idea is, that it does not matter whether you would
-//! like to use simple `Vec`s, `ndarray`, `nalgebra` or custom defined types: As long as the traits
-//! required by the solver are implemented, you should be fine. In this module several of these
-//! traits are defined and implemented. These will be extended as needed. They are also already
-//! implemented for basic `Vec`s, and will in the future also be implemented for types defined by
-//! `ndarray` and `nalgebra`.
+//! # Usage
 //!
-//! # TODO
+//! Add the following line to your dependencies list:
 //!
-//! * Implement tests for Complex<T> impls
+//! ```toml
+//! [dependencies]
+#![doc = concat!(" argmin-math = \"", env!("CARGO_PKG_VERSION"), "\"")]
+//! ```
+//!
+//! This will activate the `primitives` and `vec` features. For other backends see the section
+//! below.
+//!
+//! ## Features
+//!
+//! Support for the various backends can be switched on via features:
+//!
+//! | Feature                | Default | Backend                                               |
+//! |------------------------|---------|-------------------------------------------------------|
+//! | `primitives`           | yes     | basic integer and floating point types                |
+//! | `vec`                  | yes     | `Vec`s (basic functionality)                          |
+//! | `ndarray_latest`       | no      | `ndarray` (latest supported version)                  |
+//! | `ndarray_latest-serde` | no      | `ndarray` (latest supported version) + serde support  |
+//! | `ndarray_v0_15`        | no      | `ndarray` (version 0.15)                              |
+//! | `ndarray_v0_15-serde`  | no      | `ndarray` (version 0.15) + serde support              |
+//! | `ndarray_v0_14`        | no      | `ndarray` (version 0.14)                              |
+//! | `ndarray_v0_14-serde`  | no      | `ndarray` (version 0.14) + serde support              |
+//! | `ndarray_v0_13`        | no      | `ndarray` (version 0.13)                              |
+//! | `ndarray_v0_13-serde`  | no      | `ndarray` (version 0.13) + serde support              |
+//! | `nalgebra_latest`      | no      | `nalgebra` (latest supported version)                 |
+//! | `nalgebra_latest-serde`| no      | `nalgebra` (latest supported version) + serde support |
+//! | `nalgebra_v0_30`       | no      | `nalgebra` (version 0.30)                             |
+//! | `nalgebra_v0_30-serde` | no      | `nalgebra` (version 0.30) + serde support             |
+//! | `nalgebra_v0_29`       | no      | `nalgebra` (version 0.29)                             |
+//! | `nalgebra_v0_29-serde` | no      | `nalgebra` (version 0.29) + serde support             |
+//!
+//! It is not possible to activate two versions of the same backend.
+//!
+//! The features labelled `*_latest*` are an alias for the most recent supported version of the
+//! respective backend.
+//!
+//! Note that `argmin` by default compiles with `serde` support. Therefore, unless `serde` is
+//! deliberately turned off in `argmin`, it is necessary to activiate the `serde` support in
+//! `argmin-math` as well.
+//!
+//! The default features `primitives` and `vec` can be turned off in order to only compile the
+//! trait definitions. If another backend is chosen, they will automatically be turned on again.
+//!
+//! ### Example
+//!
+//! Activate support for the latest supported `ndarray` version:
+//!
+//! ```toml
+//! [dependencies]
+#![doc = concat!(" argmin-math = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ndarray_latest-serde\"] }")]
+//! ```
+//!
+//! # Contributing
+//!
+//! You found a bug? Your favourite backend is not supported? Feel free to open an issue or ideally
+//! submit a PR.
+//!
+//! # License
+//!
+//! Licensed under either of
+//!
+//!   * Apache License, Version 2.0,
+//!     ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE) or
+//!     <http://www.apache.org/licenses/LICENSE-2.0>)
+//!   * MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT) or
+//!     <http://opensource.org/licenses/MIT>)
+//!
+//! at your option.
+//!
+//! ## Contribution
+//!
+//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
+//! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
+//! without any additional terms or conditions.
+
+#![warn(missing_docs)]
+#![allow(unused_attributes)]
+// Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,
+// this is just to make sure that it will always stay this way.)
+#![deny(clippy::float_cmp)]
 
 #[cfg(feature = "nalgebra_v0_29")]
 extern crate nalgebra_0_29 as nalgebra;
