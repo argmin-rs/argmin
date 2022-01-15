@@ -1,4 +1,4 @@
-// Copyright 2018-2020 argmin developers
+// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
@@ -24,11 +24,11 @@
 //! taken care of by the library.
 //!
 //! This library makes heavy use of generics in order to be as type-agnostic as possible. It
-//! supports `nalgebra` and `ndarray` types via feature gates, but custom types can easily be made
-//! compatible with argmin by implementing the respective traits.
+//! supports `nalgebra` and `ndarray` types via the `argmin-math` crate, but custom types can easily
+//! be made compatible with argmin by implementing the respective traits.
 //!
 //! Future plans include functionality for easy performance evaluation of optimization algorithms,
-//! parallel computation of cost functions/gradients/Hessians as well as GPU support
+//! parallel computation of cost functions/gradients/Hessians as well as GPU support.
 //! And of course more optimization algorithms!
 //!
 //! # Contributing
