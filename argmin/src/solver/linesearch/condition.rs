@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{ArgminError, ArgminFloat, DeserializeOwnedAlias, Error, SerializeAlias};
-use crate::prelude::ArgminDot;
+use argmin_math::ArgminDot;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 

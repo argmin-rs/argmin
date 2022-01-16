@@ -15,7 +15,10 @@
 //! Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 //! DOI: 10.1126/science.220.4598.671
 
-use crate::prelude::*;
+use crate::core::{
+    ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, Error, IterState, OpWrapper,
+    SerializeAlias, Solver, TerminationReason,
+};
 use rand::prelude::*;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};

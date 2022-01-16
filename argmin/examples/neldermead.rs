@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::prelude::*;
+use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, ObserverMode};
 use argmin::solver::neldermead::NelderMead;
 use argmin_testfunctions::rosenbrock;
 use ndarray::{array, Array1, Array2};

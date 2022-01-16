@@ -11,7 +11,11 @@
 //!
 //! [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 
-use crate::prelude::*;
+use crate::core::{
+    ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, DeserializeOwnedAlias, Error,
+    IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+};
+use argmin_math::{ArgminAdd, ArgminMul, ArgminScaledSub, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
@@ -303,6 +307,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::MinimalNoOperator;
     use crate::test_trait_impl;
     type Operator = MinimalNoOperator;
 

@@ -137,7 +137,7 @@
 //! The tests and examples require a set of features to be enabled:
 //!
 //! ```bash
-//! cargo test --features "argmin/ctrlc,argmin-math/ndarray_latest-serde,argmin-math/nalgebra_latest-serde"
+//! cargo test --features "argmin/ctrlc,argmin-math/ndarray_latest-serde,argmin-math/nalgebra_latest-serde,argmin/ndarrayl"
 //! ```
 //!
 //! # Defining a problem
@@ -165,7 +165,7 @@
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
 //! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-//! use argmin::prelude::*;
+//! use argmin::core::{ArgminOp, Error};
 //!
 //! /// First, create a struct for your problem
 //! struct Rosenbrock {
@@ -217,11 +217,12 @@
 //! # #![allow(unused_imports)]
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
-//! use argmin::prelude::*;
+//! use argmin::core::{ArgminOp, Error, Executor};
+//! # #[cfg(feature = "slog-logger")]
+//! use argmin::core::{ArgminSlogLogger, ObserverMode};
 //! use argmin::solver::gradientdescent::SteepestDescent;
 //! use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-//! # use instant;
 //! #
 //! # struct Rosenbrock {
 //! #     a: f64,
@@ -305,7 +306,11 @@
 //! # #![allow(unused_imports)]
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
-//! # use argmin::prelude::*;
+//! # use argmin::core::{ArgminOp, Error, Executor, ObserverMode};
+//! # #[cfg(feature = "slog-logger")]
+//! # use argmin::core::ArgminSlogLogger;
+//! # #[cfg(feature = "serde1")]
+//! # use argmin::core::WriteToFile;
 //! # use argmin::solver::gradientdescent::SteepestDescent;
 //! # use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -393,11 +398,13 @@
 //! ```rust
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
-//! # use argmin::prelude::*;
-//! # use argmin::solver::landweber::*;
+//! # use argmin::core::{ArgminOp,  Error, Executor, ObserverMode};
+//! # #[cfg(feature = "serde1")]
+//! # use argmin::core::{CheckpointMode};
+//! # #[cfg(feature = "slog-logger")]
+//! # use argmin::core::{ArgminSlogLogger};
+//! # use argmin::solver::landweber::Landweber;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-//! # use argmin::core::Error;
-//! # use instant;
 //! #
 //! # #[derive(Default)]
 //! # struct Rosenbrock {}
@@ -462,9 +469,10 @@
 //! cost function values, iteration number, ...), respectively.
 //!
 //! ```rust
-//! use argmin::prelude::*;
+//! use argmin::core::{ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver};
 //! #[cfg(feature = "serde1")]
 //! use serde::{Deserialize, Serialize};
+//! use argmin_math::ArgminScaledSub;
 //!
 //! // Define a struct which holds any parameters/data which are needed during the execution of the
 //! // solver. Note that this does not include parameter vectors, gradients, Hessians, cost
@@ -547,9 +555,6 @@ extern crate rand;
 
 #[macro_use]
 pub mod core;
-
-/// Definition of all relevant traits and types
-pub mod prelude;
 
 /// Solvers
 pub mod solver;

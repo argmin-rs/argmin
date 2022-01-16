@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::prelude::*;
+use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, ObserverMode};
 #[allow(unused_imports)]
 use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
