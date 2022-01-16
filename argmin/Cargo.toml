@@ -39,6 +39,7 @@ approx = "0.5.0"
 finitediff = { version = "0.1.4", features = ["ndarray"] }
 argmin_testfunctions = "0.1.1"
 rand_xoshiro = { version = "0.6.0", features = ["serde1"] }
+nalgebra = { version = "0.30", features = ["serde-serialize"] }
 ndarray = { version = "0.15", features = ["serde-1"] }
 ndarray-linalg = { version = "0.14", features = ["netlib"] }
 argmin-math = { path = "../argmin-math" }
@@ -65,7 +66,7 @@ required-features = ["slog-logger"]
 
 [[example]]
 name = "bfgs"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "brent"
@@ -81,15 +82,15 @@ required-features = ["slog-logger"]
 
 [[example]]
 name = "dfp"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "gaussnewton"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "gaussnewton_linesearch"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "gaussnewton_nalgebra"
@@ -109,7 +110,7 @@ required-features = ["slog-logger"]
 
 [[example]]
 name = "lbfgs"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "morethuente"
@@ -117,15 +118,15 @@ required-features = ["slog-logger"]
 
 [[example]]
 name = "neldermead"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "newton"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "newton_cg"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "nonlinear_cg"
@@ -141,11 +142,11 @@ required-features = ["slog-logger"]
 
 [[example]]
 name = "sr1"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "sr1_trustregion"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "steepestdescent"
@@ -153,8 +154,8 @@ required-features = ["slog-logger"]
 
 [[example]]
 name = "trustregion_nd"
-required-features = ["ndarrayl", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "writers"
-required-features = ["ndarrayl", "serde1"]
+required-features = ["argmin-math/ndarray_latest-serde", "serde1"]

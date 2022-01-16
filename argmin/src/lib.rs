@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 
 //! argmin is a numerical optimization toolbox/framework written entirely in Rust.
-//! This crate is looking for contributors!
 //!
 //! [Documentation of most recent release](https://docs.rs/argmin/latest/argmin/)
 //!
@@ -16,31 +15,27 @@
 //!
 //! argmin aims at offering a wide range of optimization algorithms with a consistent interface,
 //! written purely in Rust. It comes with additional features such as checkpointing and observers
-//! which for instance allow one to log the progress of an optimization to screen or file.
+//! which for instance make it possible to log the progress of an optimization to screen or file.
 //!
 //! In addition it provides a framework for implementing iterative optimization algorithms in a
 //! convenient manner. Essentially, a single iteration of the algorithm needs to be implemented and
 //! everything else, such as handling termination, parameter vectors, gradients and Hessians, is
 //! taken care of by the library.
 //!
-//! This library makes heavy use of generics in order to be as type-agnostic as possible. It
-//! supports `nalgebra` and `ndarray` types via the `argmin-math` crate, but custom types can easily
-//! be made compatible with argmin by implementing the respective traits.
-//!
-//! Future plans include functionality for easy performance evaluation of optimization algorithms,
-//! parallel computation of cost functions/gradients/Hessians as well as GPU support.
-//! And of course more optimization algorithms!
+//! This library uses generics to be as type-agnostic as possible. Abstractions over common math
+//! functions enable the use of common backends such as `ndarray` and `nalgebra` via the
+//! `argmin-math` crate. Custom types are of course also supported.
 //!
 //! # Contributing
 //!
 //! This crate is looking for contributors!
 //! Potential projects can be found in the
-//! [Github issues](https://github.com/argmin-rs/argmin/issues), but even if you have an idea that
-//! is not already mentioned there or if you found a bug, feel free to open a new issue.
-//! Besides adding optimization methods and new features, other contributions are also highly
-//! welcome, for instance improving performance, documentation, writing examples (with real world
-//! problems), developing tests, adding observers, implementing a C interface or
+//! [Github issues](https://github.com/argmin-rs/argmin/issues), but feel free to suggest your own
+//! ideas as well. Besides adding optimization methods and new features, other contributions are
+//! also highly welcome, for instance improving performance, documentation, writing examples (with
+//! real world problems), developing tests, adding observers, implementing a C interface or
 //! [Python wrappers](https://github.com/argmin-rs/pyargmin).
+//! Bug reports (and fixes) are of course also highly appreciated.
 //!
 //! # Algorithms
 //!
@@ -77,7 +72,7 @@
 //!
 //! Examples for each solver can be found
 //! [here (current released version)](https://github.com/argmin-rs/argmin/tree/v0.5.0/examples) and
-//! [here (main branch)](https://github.com/argmin-rs/argmin/tree/main/examples).
+//! [here (main branch)](https://github.com/argmin-rs/argmin/tree/main/argmin/examples).
 //!
 //! # Usage
 //!
@@ -86,6 +81,7 @@
 //! ```toml
 //! [dependencies]
 #![doc = concat!(" argmin = \"", env!("CARGO_PKG_VERSION"), "\"")]
+//! argmin-math = { version = "0.1.0", features = ["ndarray_latest-serde,nalgebra_latest-serde"] }
 //! ```
 //!
 //! or, for the current development version:
@@ -93,7 +89,11 @@
 //! ```toml
 //! [dependencies]
 //! argmin = { git = "https://github.com/argmin-rs/argmin" }
+//! argmin-math = { git = "https://github.com/argmin-rs/argmin", features = ["ndarray_latest-serde,nalgebra_latest-serde"] }
 //! ```
+//!
+//! (For which features to select for `argmin-math` please see the
+//! [documentation](https://docs.rs/argmin/latest/argmin-math).)
 //!
 //! ## Features
 //!
@@ -103,41 +103,22 @@
 //! - `serde1`: Support for `serde`. Needed for checkpointing and writing parameters to disk as
 //! well as logging to disk.
 //!
-//! ### Additional features
+//! ### Optional features
 //!
-//! There are additional features which can be activated in `Cargo.toml`:
+//! The `ctrlc` feature uses the `ctrlc` crate to properly stop the optimization (and return the
+//! current best result) after pressing Ctrl+C during an optimization run.
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ctrlc\", \"ndarrayl\", \"nalgebral\"] }")]
-//! ```
-//!
-//! - `ctrlc`: Uses the `ctrlc` crate to properly stop the optimization (and return the current best
-//!    result) after pressing Ctrl+C during an optimization run.
-//! - `ndarrayl`: Support for `ndarray`, `ndarray-linalg` and `ndarray-rand`.
-//! - `nalgebral`: Support for `nalgebra`.
-//!
-//! Using the `ndarrayl` feature on Windows might require to explicitly choose the `ndarray-linalg`
-//! BLAS backend in the `Cargo.toml`:
-//!
-//! ```toml
-//! ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
+#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ctrlc\"] }")]
 //! ```
 //!
 //! ### Experimental support for compiling to WebAssembly
 //!
-//! When compiling to WASM, one of the following features must be used:
+//! When compiling to WASM, either the feature `wasm-bindgen` or `stdweb` must be used.
 //!
-//! ```toml
-#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"wasm-bindgen\"] }")]
-//! ```
-//!
-//! ```toml
-#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"stdweb\"] }")]
-//! ```
-//!
-//! WASM support is still experimental. Please report any issues you encounter when compiling argmin
-//! to WASM.
+//! WASM support is still experimental. Please report any issues you encounter when using argmin
+//! in a WASM context.
 //!
 //! ### Compiling without `serde` dependency
 //!
@@ -153,10 +134,10 @@
 //!
 //! ## Running the tests and building the examples
 //!
-//! The tests and examples require all features to be enabled:
+//! The tests and examples require a set of features to be enabled:
 //!
 //! ```bash
-//! cargo test --features --all-features
+//! cargo test --features "argmin/ctrlc,argmin-math/ndarray_latest-serde,argmin-math/nalgebra_latest-serde"
 //! ```
 //!
 //! # Defining a problem
@@ -306,16 +287,16 @@
 //!
 //! # Observing iterations
 //!
-//! Argmin offers an interface to observe the state of the iteration at initialization as well as
+//! Argmin offers an interface to observe the state of the solver at initialization as well as
 //! after every iteration. This includes the parameter vector, gradient, Hessian, iteration number,
 //! cost values and many more as well as solver-specific metrics. This interface can be used to
 //! implement loggers, send the information to a storage or to plot metrics.
-//! Observers need to implment the `Observe` trait.
+//! Observers need to implement the `Observe` trait.
 //! Argmin ships with a logger based on the `slog` crate. `ArgminSlogLogger::term` logs to the
 //! terminal and `ArgminSlogLogger::file` logs to a file in JSON format. Both loggers also come
 //! with a `*_noblock` version which does not block the execution of logging, but may drop some
-//! messages if the buffer is full.
-//! Parameter vectors can be written to disc using `WriteToFile`.
+//! messages in case of a full buffer.
+//! Parameter vectors can be written to disk using `WriteToFile`.
 //! For each observer it can be defined how often it will observe the progress of the solver. This
 //! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`
 //! (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.
@@ -564,7 +545,6 @@
 
 extern crate rand;
 
-/// Core functionality
 #[macro_use]
 pub mod core;
 

@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Argmin Trust region methods
+//! Trust region methods
 
 /// Cauchy Point
 pub mod cauchypoint;
@@ -21,9 +21,7 @@ pub use self::dogleg::*;
 pub use self::steihaug::*;
 pub use self::trustregion_method::*;
 
-use crate::core::ArgminFloat;
-
 /// Computes reduction ratio
-pub fn reduction_ratio<F: ArgminFloat>(fxk: F, fxkpk: F, mk0: F, mkpk: F) -> F {
+pub fn reduction_ratio<F: crate::core::ArgminFloat>(fxk: F, fxkpk: F, mk0: F, mkpk: F) -> F {
     (fxk - fxkpk) / (mk0 - mkpk)
 }

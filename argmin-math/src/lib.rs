@@ -57,6 +57,14 @@
 //! The default features `primitives` and `vec` can be turned off in order to only compile the
 //! trait definitions. If another backend is chosen, they will automatically be turned on again.
 //!
+//! Using the `ndarray_*` features on Windows might require to explicitly choose the
+//! `ndarray-linalg` BLAS backend in the `Cargo.toml` (see the [`ndarray-linalg` documentation for
+//! details](https://github.com/rust-ndarray/ndarray-linalg)):
+//!
+//! ```toml
+//! ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
+//! ```
+//!
 //! ### Example
 //!
 //! Activate support for the latest supported `ndarray` version:

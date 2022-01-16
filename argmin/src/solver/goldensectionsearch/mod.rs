@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+//! Golden Section Search
+//!
 //! # References:
 //!
 //! [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)

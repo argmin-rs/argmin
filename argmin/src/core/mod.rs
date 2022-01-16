@@ -7,9 +7,8 @@
 
 //! Argmin Optimizaton toolbox core
 //!
-//! This crate contains the core functionality of argmin. If you just want to run an optimization
-//! method, this is *not* what you are looking for. However, if you want to implement your own
-//! solver based on the argmin architecture, you should find all necessary tools here.
+//! This module contains the traits and types necessary for implementing optimization algorithms
+//! and tools for observing the state of optimization runs and checkpointing.
 
 // I really do not like the a..=b syntax
 #![allow(clippy::range_plus_one)]
