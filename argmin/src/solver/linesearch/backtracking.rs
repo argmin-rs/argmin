@@ -7,8 +7,12 @@
 
 //! * [Backtracking line search](struct.BacktrackingLineSearch.html)
 
-use crate::prelude::*;
+use crate::core::{
+    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, DeserializeOwnedAlias,
+    Error, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+};
 use crate::solver::linesearch::condition::*;
+use argmin_math::{ArgminDot, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -192,9 +196,10 @@ where
 mod tests {
     use super::*;
     use crate::assert_error;
-    use crate::core::MinimalNoOperator;
+    use crate::core::{Executor, MinimalNoOperator};
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
+    use num_traits::Float;
 
     #[derive(Debug, Clone)]
     struct Problem {}

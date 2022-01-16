@@ -10,7 +10,11 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::prelude::*;
+use crate::core::{
+    ArgminFloat, ArgminIterData, ArgminOp, ArgminTrustRegion, Error, IterState, OpWrapper,
+    SerializeAlias, Solver, TerminationReason,
+};
+use argmin_math::{ArgminMul, ArgminNorm, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;

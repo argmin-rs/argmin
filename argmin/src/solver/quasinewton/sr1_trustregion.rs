@@ -10,7 +10,14 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::prelude::*;
+use crate::core::{
+    ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, ArgminTrustRegion,
+    DeserializeOwnedAlias, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver,
+    TerminationReason,
+};
+use argmin_math::{
+    ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
+};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -248,6 +255,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::MinimalNoOperator;
     use crate::solver::trustregion::CauchyPoint;
     use crate::test_trait_impl;
 

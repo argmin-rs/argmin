@@ -14,7 +14,8 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::prelude::*;
+use crate::core::{ArgminFloat, ArgminNLCGBetaUpdate};
+use argmin_math::{ArgminDot, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 

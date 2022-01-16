@@ -11,7 +11,11 @@
 //!
 //! TODO
 
-use crate::prelude::*;
+use crate::core::{
+    ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, DeserializeOwnedAlias, Error, IterState,
+    OpWrapper, SerializeAlias, Solver,
+};
+use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;

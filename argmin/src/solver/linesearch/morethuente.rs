@@ -21,7 +21,11 @@
 // read.
 #![allow(clippy::nonminimal_bool)]
 
-use crate::prelude::*;
+use crate::core::{
+    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, DeserializeOwnedAlias,
+    Error, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+};
+use argmin_math::{ArgminDot, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;

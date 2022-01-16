@@ -22,7 +22,7 @@
 # #![allow(unused_imports)]
 # extern crate argmin;
 # extern crate argmin_testfunctions;
-# use argmin::prelude::*;
+# use argmin::core::{ArgminOp, Error, Executor};
 # use argmin::solver::gradientdescent::SteepestDescent;
 # use argmin::solver::linesearch::MoreThuenteLineSearch;
 # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -88,7 +88,8 @@ let num_iters = result.state().get_iter();
 //!
 //! More details can be found in the `IterState` documentation.
 
-use crate::prelude::*;
+use crate::core::{ArgminOp, IterState, OpWrapper};
+use num_traits::{Float, FromPrimitive};
 use std::cmp::Ordering;
 
 /// Final struct returned by the `run` method of `Executor`.

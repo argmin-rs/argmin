@@ -5,9 +5,10 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::prelude::*;
-use argmin::solver::particleswarm::*;
-
+use argmin::core::{ArgminOp, Error, Executor};
+#[cfg(feature = "visualizer")]
+use argmin::core::{ObserverMode, Surface, Visualizer3d};
+use argmin::solver::particleswarm::ParticleSwarm;
 use argmin_testfunctions::himmelblau;
 
 struct Himmelblau {}

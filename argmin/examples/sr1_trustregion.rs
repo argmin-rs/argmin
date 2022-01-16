@@ -5,12 +5,12 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::prelude::*;
+use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, ObserverMode};
 use argmin::solver::quasinewton::SR1TrustRegion;
 #[allow(unused_imports)]
 use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
 use argmin_testfunctions::rosenbrock;
-use finitediff::*;
+use finitediff::FiniteDiff;
 use ndarray::{array, Array1, Array2};
 
 struct Rosenbrock {

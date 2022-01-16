@@ -40,19 +40,19 @@ mod serialization;
 mod termination;
 
 pub use anyhow::Error;
-pub use errors::*;
-pub use executor::*;
-pub use iterstate::*;
+pub use errors::ArgminError;
+pub use executor::Executor;
+pub use iterstate::IterState;
 pub use kv::ArgminKV;
-pub use nooperator::*;
+pub use nooperator::{MinimalNoOperator, NoOperator};
 use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 pub use observers::*;
-pub use opwrapper::*;
+pub use opwrapper::OpWrapper;
 pub use result::ArgminResult;
 #[cfg(feature = "serde1")]
 use serde::{de::DeserializeOwned, Serialize};
 #[cfg(feature = "serde1")]
-pub use serialization::*;
+pub use serialization::{load_checkpoint, ArgminCheckpoint, CheckpointMode};
 use std::fmt::{Debug, Display};
 pub use termination::TerminationReason;
 

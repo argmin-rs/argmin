@@ -11,7 +11,10 @@
 //!
 //! [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
 
-use crate::prelude::*;
+use crate::core::{
+    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver,
+    TerminationReason,
+};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 

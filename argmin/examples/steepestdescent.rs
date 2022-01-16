@@ -7,7 +7,7 @@
 
 #![allow(unused_imports)]
 
-use argmin::prelude::*;
+use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, ObserverMode};
 use argmin::solver::gradientdescent::SteepestDescent;
 use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin::solver::linesearch::MoreThuenteLineSearch;

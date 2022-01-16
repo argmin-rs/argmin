@@ -15,7 +15,11 @@
 //! and an efficient line search." SIAM J. Optim. 16(1), 2006, 170-192.
 //! DOI: <https://doi.org/10.1137/030601880>
 
-use crate::prelude::*;
+use crate::core::{
+    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, DeserializeOwnedAlias,
+    Error, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+};
+use argmin_math::{ArgminDot, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;

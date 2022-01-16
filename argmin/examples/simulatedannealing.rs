@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::prelude::*;
+use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, ObserverMode};
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin_testfunctions::rosenbrock;
 use rand::distributions::Uniform;

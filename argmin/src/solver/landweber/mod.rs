@@ -15,7 +15,8 @@
 //! kind. Amer. J. Math. 73, 615–624
 //! \[1\] <https://en.wikipedia.org/wiki/Landweber_iteration>
 
-use crate::prelude::*;
+use crate::core::{ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver};
+use argmin_math::ArgminScaledSub;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 

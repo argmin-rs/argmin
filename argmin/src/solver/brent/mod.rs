@@ -18,7 +18,9 @@
 
 /// Implementation of Brent's optimization method,
 /// see <https://en.wikipedia.org/wiki/Brent%27s_method>
-use crate::prelude::*;
+use crate::core::{
+    ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver, TerminationReason,
+};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
