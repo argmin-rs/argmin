@@ -7,12 +7,14 @@
 
 use crate::core::{ArgminOp, OpWrapper, TerminationReason};
 use instant;
-use num::traits::float::Float;
+use num_traits::Float;
 use paste::item;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 /// Maintains the state from iteration to iteration of a solver
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct IterState<O: ArgminOp> {
     /// Current parameter vector
     pub param: O::Param,

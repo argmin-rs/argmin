@@ -7,23 +7,22 @@
 
 //! # References:
 //!
-//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use serde::de::DeserializeOwned;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
 /// BFGS method
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/bfgs.rs)
-///
 /// # References:
 ///
-/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct BFGS<L, H, F> {
     /// Inverse Hessian
     inv_hessian: H,
@@ -73,8 +72,8 @@ where
     H: Clone
         + Default
         + Debug
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>

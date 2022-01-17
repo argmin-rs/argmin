@@ -29,7 +29,38 @@ jobs:
           override: true
       - name: Install dependencies
         run: sudo apt-get install cmake gfortran libelf-dev libdw-dev binutils-dev libiberty-dev liblapacke-dev libopenblas-dev gcc
-      - run: cargo build --verbose --all --all-features && cargo clean && cargo test --verbose --all --all-features
+      - name: Build (default features)
+        run: cargo build --verbose --all
+      - name: Test (default features)
+        run: cargo test --verbose --all
+      - name: Build (all features)
+        run: cargo build --verbose --all --all-features
+      - name: Test (all features)
+        run: cargo test --verbose --all --all-features
+
+  test-serde1-feature:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - beta
+          - nightly
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - name: Build (no default features)
+        run: cargo build --verbose --all --no-default-features
+      - name: Test (no default features)
+        run: cargo test --verbose --all --no-default-features
+      - name: Test with serde1 feature
+        run: cargo test --verbose --all --no-default-features --features "serde1"
+      - name: Test with slog-logger feature
+        run: cargo test --verbose --all --no-default-features --features "slog-logger"
 
   clippy:
     runs-on: ubuntu-latest
@@ -45,7 +76,45 @@ jobs:
           toolchain: ${{ matrix.rust }}
           override: true
           components: clippy
-      - run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Clippy with default features
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Clippy without default features
+        run: cargo clippy --all-targets --no-default-features -- -D warnings
+      - name: Clippy without serde1 feature
+        run: cargo clippy --all-targets --no-default-features --features="ndarrayl,nalgebral,visualizer,slog-logger" -- -D warnings
+      - name: Clippy with all features
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+  rustfmt:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+          components: rustfmt, rust-src
+      - run: cargo fmt -- --check
+
+  docs-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - run: cargo rustdoc --all-features -- -D warnings
   
   wasm-build:
     runs-on: ubuntu-latest

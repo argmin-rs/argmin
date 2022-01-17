@@ -1,6 +1,6 @@
 [package]
 name = "argmin"
-version = "0.4.7"
+version = "0.5.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -17,119 +17,123 @@ exclude = [
 ]
 
 [dependencies]
+# Required
 anyhow = "1.0"
 approx = "0.5.0"
-bincode = "1.1.4"
-ctrlc = { version = "3.1.2", optional = true }
 instant = {version = "0.1", features = ["now"] }
-gnuplot = { version = "0.0.37", optional = true }
 getrandom = { version = "0.2", features = ["js"] }
 paste = "1.0.0"
-nalgebra = { version = "0.30.0", optional = true, features = ["serde-serialize"] }
-ndarray = { version = "0.15", optional = true, features = ["serde-1"] }
+num-traits = { version = "0.2" }
+num-integer = { version = "0.1" }
+num-complex = { version = "0.4", default-features = false, features = ["std"] }
+rand = { version = "0.8.3"}
+thiserror = "1.0"
+# optional
+bincode = { version = "1.1.4", optional = true }
+ctrlc = { version = "3.1.2", optional = true }
+gnuplot = { version = "0.0.37", optional = true }
+nalgebra = { version = "0.30.0", optional = true }
+ndarray = { version = "0.15", optional = true }
 ndarray-linalg = { version = "0.14", optional = true }
 ndarray-rand = {version = "0.14.0", optional = true }
-num = { version = "0.4" }
-num-complex = { version = "0.4" }
-rand = { version = "0.8.3", features = ["serde1"] }
-serde = { version = "1.0", features = ["derive", "rc"] }
-serde_json = "1.0"
+serde = { version = "1.0", features = ["derive", "rc"], optional = true }
+serde_json = { version = "1.0", optional = true }
 slog = { version = "2.4.1", optional = true }
 slog-term = { version = "2.4.0", optional = true }
 slog-async = { version = "2.3.0", optional = true }
 slog-json = { version = "2.3.0", optional = true }
-thiserror = "1.0"
 
 [dev-dependencies]
 ndarray-linalg = { version = "0.14", features = ["netlib"] }
-finitediff = { version = "0.1.4", features = ["ndarray"] }
+finitediff = { version = "0.1.4" }
 argmin_testfunctions = "0.1.1"
-rand_xoshiro = { version = "0.6.0", features = ["serde1"] }
+rand_xoshiro = { version = "0.6.0" }
 rayon = "1.5.1"
 
 [features]
-default = ["slog-logger"]
+default = ["slog-logger", "serde1"]
 nalgebral = ["nalgebra"]
-ndarrayl = ["ndarray", "ndarray-linalg", "ndarray-rand"]
+ndarrayl = ["ndarray", "ndarray-linalg", "ndarray-rand", "finitediff/ndarray"]
 visualizer = ["gnuplot"]
 wasm-bindgen = ["instant/wasm-bindgen"]
-slog-logger = ["slog", "slog-term", "slog-async", "slog-json"]
+slog-logger = ["slog", "slog-term", "slog-async"]
 stdweb = ["instant/stdweb"]
+serde1 = ["serde", "serde_json", "nalgebra/serde-serialize", "ndarray/serde-1", "rand/serde1", "bincode", "rand_xoshiro/serde1", "num-complex/serde", "slog-json"]
 
 [badges]
 maintenance = { status = "actively-developed" }
 
 [[example]]
 name = "backtracking"
-required-features = []
+required-features = ["slog-logger"]
 
 [[example]]
 name = "bfgs"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "brent"
-required-features = []
+required-features = ["slog-logger"]
 
 [[example]]
 name = "checkpoint"
-required-features = []
+required-features = ["serde1", "slog-logger"]
 
 [[example]]
 name = "conjugategradient"
-required-features = []
+required-features = ["slog-logger"]
 
 [[example]]
 name = "dfp"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "gaussnewton"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "gaussnewton_linesearch"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "gaussnewton_nalgebra"
-required-features = ["nalgebral"]
+required-features = ["nalgebral", "slog-logger"]
 
 [[example]]
 name = "goldensectionsearch"
-required-features = []
+required-features = ["slog-logger"]
 
 [[example]]
 name = "hagerzhang"
-required-features = []
+required-features = ["slog-logger"]
 
 [[example]]
 name = "landweber"
-required-features = []
+required-features = ["slog-logger"]
 
 [[example]]
 name = "lbfgs"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "morethuente"
-required-features = []
+required-features = ["slog-logger"]
 
 [[example]]
 name = "neldermead"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "newton"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "newton_cg"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "nonlinear_cg"
-required-features = []
+required-features = ["slog-logger"]
 
 [[example]]
 name = "particleswarm"
@@ -137,24 +141,24 @@ required-features = []
 
 [[example]]
 name = "simulatedannealing"
-required-features = []
+required-features = ["slog-logger"]
 
 [[example]]
 name = "sr1"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "sr1_trustregion"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "steepestdescent"
-required-features = []
+required-features = ["slog-logger"]
 
 [[example]]
 name = "trustregion_nd"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "slog-logger"]
 
 [[example]]
 name = "writers"
-required-features = ["ndarrayl"]
+required-features = ["ndarrayl", "serde1"]

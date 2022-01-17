@@ -13,16 +13,16 @@
 //!
 //! # References:
 //!
-//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 //!
-//! [1] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
+//! \[1\] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 //! decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
-//! DOI: https://doi.org/10.1145/192115.192132
+//! DOI: <https://doi.org/10.1145/192115.192132>
 //!
-//! [2] William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed
+//! \[2\] William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed
 //! descent and an efficient line search." SIAM J. Optim. 16(1), 2006, 170-192.
-//! DOI: https://doi.org/10.1137/030601880
+//! DOI: <https://doi.org/10.1137/030601880>
 
 /// Backtracking line search algorithm
 pub mod backtracking;

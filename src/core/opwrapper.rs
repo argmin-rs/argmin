@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{ArgminOp, Error};
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -13,7 +14,8 @@ use std::default::Default;
 /// computed and how often the modify function has been called. Usually, this is an implementation
 /// detail unless a solver is needed within another solver (such as a line search within a gradient
 /// descent method).
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct OpWrapper<O: ArgminOp> {
     /// Operator
     pub op: Option<O>,

@@ -5,38 +5,35 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! * [More-Thuente line search](struct.MoreThuenteLineSearch.html)
-//!
 //! TODO: Apparently it is missing stopping criteria!
 //!
 //! This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
-//! http://www.cs.umd.edu/users/oleary/software/
+//! <http://www.cs.umd.edu/users/oleary/software/>
 //!
 //! # Reference
 //!
 //! Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 //! decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
-//! DOI: https://doi.org/10.1145/192115.192132
+//! DOI: <https://doi.org/10.1145/192115.192132>
 
 use crate::prelude::*;
-use serde::de::DeserializeOwned;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
 /// The More-Thuente line search is a method to find a step length which obeys the strong Wolfe
 /// conditions.
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/morethuente.rs)
-///
 /// # References
 ///
 /// This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
-/// http://www.cs.umd.edu/users/oleary/software/
+/// <http://www.cs.umd.edu/users/oleary/software/>
 ///
-/// [0] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
+/// \[0\] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 /// decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
-/// DOI: https://doi.org/10.1145/192115.192132
-#[derive(Serialize, Deserialize, Clone)]
+/// DOI: <https://doi.org/10.1145/192115.192132>
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct MoreThuenteLineSearch<P, F> {
     /// Search direction (builder)
     search_direction_b: Option<P>,
@@ -86,7 +83,8 @@ pub struct MoreThuenteLineSearch<P, F> {
     infoc: usize,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 struct Step<F> {
     pub x: F,
     pub fx: F,
@@ -187,7 +185,7 @@ impl<P: Default, F: ArgminFloat> Default for MoreThuenteLineSearch<P, F> {
 
 impl<P, F> ArgminLineSearch<P, F> for MoreThuenteLineSearch<P, F>
 where
-    P: Clone + Serialize + ArgminSub<P, P> + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
+    P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
     F: ArgminFloat,
 {
     /// Set search direction
@@ -212,8 +210,8 @@ impl<P, O, F> Solver<O> for MoreThuenteLineSearch<P, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<P, P>
         + ArgminDot<P, F>
         + ArgminScaledAdd<P, F, P>,

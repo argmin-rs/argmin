@@ -15,71 +15,76 @@
 //!
 //! ## Examples:
 //!
-//! ```
-//! # #![allow(unused_imports)]
-//! # extern crate argmin;
-//! # extern crate argmin_testfunctions;
-//! # use argmin::prelude::*;
-//! # use argmin::solver::gradientdescent::SteepestDescent;
-//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
-//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-//! # use serde::{Deserialize, Serialize};
-//! #
-//! # #[derive(Clone, Default, Serialize, Deserialize)]
-//! # struct Rosenbrock {
-//! #     a: f64,
-//! #     b: f64,
-//! # }
-//! #
-//! # impl ArgminOp for Rosenbrock {
-//! #     type Param = Vec<f64>;
-//! #     type Output = f64;
-//! #     type Hessian = ();
-//! #     type Jacobian = ();
-//! #     type Float = f64;
-//! #
-//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-//! #         Ok(rosenbrock_2d(p, self.a, self.b))
-//! #     }
-//! #
-//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-//! #         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
-//! #     }
-//! # }
-//! #
-//! # fn run() -> Result<(), Error> {
-//! #     // Define cost function (must implement `ArgminOperator`)
-//! #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
-//! #     // Define initial parameter vector
-//! #     let init_param: Vec<f64> = vec![-1.2, 1.0];
-//! #     // Set up line search
-//! #     let linesearch = MoreThuenteLineSearch::new();
-//! #     // Set up solver
-//! #     let solver = SteepestDescent::new(linesearch);
-//! #     // Run solver
-//! #     let result = Executor::new(cost, solver, init_param)
-//! #         // Set maximum iterations to 10
-//! #         .max_iters(1)
-//! #         // run the solver on the defined problem
-//! #         .run()?;
-//! // Get best parameter vector
-//! let best_parameter = result.state().get_best_param();
-//!
-//! // Get best cost function value
-//! let best_cost = result.state().get_best_cost();
-//!
-//! // Get the number of iterations
-//! let num_iters = result.state().get_iter();
-//! #     Ok(())
-//! # }
-//! #
-//! # fn main() {
-//! #     if let Err(ref e) = run() {
-//! #         println!("{}", e);
-//! #         std::process::exit(1);
-//! #     }
-//! # }
-//! ```
+#![cfg_attr(
+    feature = "serde1",
+    doc = r##"
+```
+# #![allow(unused_imports)]
+# extern crate argmin;
+# extern crate argmin_testfunctions;
+# use argmin::prelude::*;
+# use argmin::solver::gradientdescent::SteepestDescent;
+# use argmin::solver::linesearch::MoreThuenteLineSearch;
+# use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+# use serde::{Deserialize, Serialize};
+#
+# #[derive(Clone, Default, Serialize, Deserialize)]
+# struct Rosenbrock {
+#     a: f64,
+#     b: f64,
+# }
+#
+# impl ArgminOp for Rosenbrock {
+#     type Param = Vec<f64>;
+#     type Output = f64;
+#     type Hessian = ();
+#     type Jacobian = ();
+#     type Float = f64;
+#
+#     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+#         Ok(rosenbrock_2d(p, self.a, self.b))
+#     }
+#
+#     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+#         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+#     }
+# }
+#
+# fn run() -> Result<(), Error> {
+#     // Define cost function (must implement `ArgminOperator`)
+#     let cost = Rosenbrock { a: 1.0, b: 100.0 };
+#     // Define initial parameter vector
+#     let init_param: Vec<f64> = vec![-1.2, 1.0];
+#     // Set up line search
+#     let linesearch = MoreThuenteLineSearch::new();
+#     // Set up solver
+#     let solver = SteepestDescent::new(linesearch);
+#     // Run solver
+#     let result = Executor::new(cost, solver, init_param)
+#         // Set maximum iterations to 10
+#         .max_iters(1)
+#         // run the solver on the defined problem
+#         .run()?;
+// Get best parameter vector
+let best_parameter = result.state().get_best_param();
+
+// Get best cost function value
+let best_cost = result.state().get_best_cost();
+
+// Get the number of iterations
+let num_iters = result.state().get_iter();
+#     Ok(())
+# }
+#
+# fn main() {
+#     if let Err(ref e) = run() {
+#         println!("{}", e);
+#         std::process::exit(1);
+#     }
+# }
+```
+"##
+)]
 //!
 //! More details can be found in the `IterState` documentation.
 

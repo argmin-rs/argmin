@@ -7,8 +7,8 @@
 
 use crate::core::math::ArgminNorm;
 use ndarray::Array1;
-use num::integer::Roots;
 use num_complex::Complex;
+use num_integer::Roots;
 
 macro_rules! make_norm_float {
     ($t:ty) => {

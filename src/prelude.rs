@@ -10,4 +10,4 @@
 //! Put `argmin::prelude::*` on top of your code to get all relevant traits into scope.
 
 pub use crate::core::*;
-pub use num::traits::*;
+pub use num_traits::*;

@@ -13,14 +13,16 @@
 //!   * Either use something existing, or at least evaluate the performance and if necessary,
 //!     improve performance.
 
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std;
 
 /// A simple key-value storage
-#[derive(Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize, Deserialize)]
+#[derive(Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct ArgminKV {
     /// The actual key value storage
-    #[serde(borrow)]
+    #[cfg_attr(feature = "serde1", serde(borrow))]
     pub kv: Vec<(&'static str, String)>,
 }
 

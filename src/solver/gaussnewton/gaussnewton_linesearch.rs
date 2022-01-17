@@ -7,22 +7,22 @@
 
 //! # References:
 //!
-//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
 /// Gauss-Newton method with linesearch
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/gaussnewton_linesearch.rs)
-///
 /// # References:
 ///
-/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct GaussNewtonLS<L, F> {
     /// linesearch
     linesearch: L,
@@ -125,7 +125,8 @@ where
 }
 
 #[doc(hidden)]
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct LineSearchOP<O> {
     pub op: O,
 }

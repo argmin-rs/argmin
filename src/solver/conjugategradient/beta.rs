@@ -11,17 +11,17 @@
 //!
 //! # References:
 //!
-//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 /// Fletcher and Reeves (FR) method
 /// TODO: Reference
-#[derive(
-    Default, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug,
-)]
+#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct FletcherReeves {}
 
 impl FletcherReeves {
@@ -43,9 +43,8 @@ where
 
 /// Polak and Ribiere (PR) method
 /// TODO: Reference
-#[derive(
-    Default, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug,
-)]
+#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct PolakRibiere {}
 
 impl PolakRibiere {
@@ -68,9 +67,8 @@ where
 
 /// Polak and Ribiere Plus (PR+) method
 /// TODO: Reference
-#[derive(
-    Default, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug,
-)]
+#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct PolakRibierePlus {}
 
 impl PolakRibierePlus {
@@ -94,9 +92,8 @@ where
 
 /// Hestenes and Stiefel (HS) method
 /// TODO: Reference
-#[derive(
-    Default, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug,
-)]
+#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct HestenesStiefel {}
 
 impl HestenesStiefel {

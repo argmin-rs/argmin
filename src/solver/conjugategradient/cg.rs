@@ -7,11 +7,11 @@
 
 //! # References:
 //!
-//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use serde::de::DeserializeOwned;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fmt::Debug;
@@ -19,13 +19,12 @@ use std::fmt::Debug;
 /// The conjugate gradient method is a solver for systems of linear equations with a symmetric and
 /// positive-definite matrix.
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/conjugategradient.rs)
-///
 /// # References:
 ///
-/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct ConjugateGradient<P, S> {
     /// b (right hand side)
     b: P,
@@ -36,13 +35,13 @@ pub struct ConjugateGradient<P, S> {
     /// previous p
     p_prev: P,
     /// r^T * r
-    #[serde(skip)]
+    #[cfg_attr(feature = "serde1", serde(skip))]
     rtr: S,
     /// alpha
-    #[serde(skip)]
+    #[cfg_attr(feature = "serde1", serde(skip))]
     alpha: S,
     /// beta
-    #[serde(skip)]
+    #[cfg_attr(feature = "serde1", serde(skip))]
     beta: S,
 }
 
@@ -88,8 +87,8 @@ impl<P, O, S, F> Solver<O> for ConjugateGradient<P, S>
 where
     O: ArgminOp<Param = P, Output = P, Float = F>,
     P: Clone
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminDot<O::Param, S>
         + ArgminSub<O::Param, O::Param>
         + ArgminScaledAdd<O::Param, S, O::Param>

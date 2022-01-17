@@ -9,23 +9,23 @@
 //!
 //! # References:
 //!
-//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
 use crate::solver::conjugategradient::ConjugateGradient;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 /// The Newton-CG method (also called truncated Newton method) uses a modified CG to solve the
 /// Newton equations approximately. After a search direction is found, a line search is performed.
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/newton_cg.rs)
-///
 /// # References:
 ///
-/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct NewtonCG<L, F> {
     /// line search
     linesearch: L,
@@ -70,7 +70,7 @@ where
     O::Param: Send
         + Sync
         + Clone
-        + Serialize
+        + SerializeAlias
         + Default
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
@@ -84,7 +84,7 @@ where
         + Sync
         + Default
         + Clone
-        + Serialize
+        + SerializeAlias
         + Default
         + ArgminInv<O::Hessian>
         + ArgminDot<O::Param, O::Param>,
@@ -169,7 +169,8 @@ where
     }
 }
 
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 struct CGSubProblem<T, H, F> {
     hessian: H,
     phantom: std::marker::PhantomData<T>,
@@ -193,8 +194,8 @@ where
 
 impl<T, H, F> ArgminOp for CGSubProblem<T, H, F>
 where
-    T: Clone + Default + Send + Sync + Serialize + serde::de::DeserializeOwned,
-    H: Clone + Default + ArgminDot<T, T> + Send + Sync + Serialize + serde::de::DeserializeOwned,
+    T: Clone + Default + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
+    H: Clone + Default + ArgminDot<T, T> + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
     F: ArgminFloat,
 {
     type Param = T;

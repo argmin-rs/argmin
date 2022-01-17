@@ -7,26 +7,25 @@
 
 //! # References:
 //!
-//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use serde::de::DeserializeOwned;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::fmt::Debug;
 
 /// L-BFGS method
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/lbfgs.rs)
-///
 /// TODO: Implement compact representation of BFGS updating (Nocedal/Wright p.230)
 ///
 /// # References:
 ///
-/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct LBFGS<L, P, F> {
     /// line search
     linesearch: L,
@@ -72,8 +71,8 @@ impl<O, L, P, F> Solver<O> for LBFGS<L, P, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     O::Param: Clone
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + Debug
         + Default
         + ArgminSub<O::Param, O::Param>
@@ -82,7 +81,7 @@ where
         + ArgminScaledAdd<O::Param, O::Float, O::Param>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    O::Hessian: Clone + Default + Serialize + DeserializeOwned,
+    O::Hessian: Clone + Default + SerializeAlias + DeserializeOwnedAlias,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
     // L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
     F: ArgminFloat,

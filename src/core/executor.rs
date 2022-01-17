@@ -7,34 +7,38 @@
 
 // TODO: Logging of "initial info"
 
-use crate::core::serialization::*;
+#[cfg(feature = "serde1")]
+use crate::core::{serialization::*, ArgminCheckpoint, DeserializeOwnedAlias};
 use crate::core::{
-    ArgminCheckpoint, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, Error, IterState, Observe,
-    Observer, ObserverMode, OpWrapper, Solver, TerminationReason,
+    ArgminIterData, ArgminKV, ArgminOp, ArgminResult, Error, IterState, Observe, Observer,
+    ObserverMode, OpWrapper, Solver, TerminationReason,
 };
 use instant;
-use num::Float;
-use serde::de::DeserializeOwned;
+use num_traits::Float;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "serde1")]
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
 /// Executes a solver
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Executor<O: ArgminOp, S> {
     /// solver
     solver: S,
     /// operator
-    #[serde(skip)]
+    #[cfg_attr(feature = "serde1", serde(skip))]
     pub op: OpWrapper<O>,
     /// State
-    #[serde(bound = "IterState<O>: Serialize")]
+    #[cfg_attr(feature = "serde1", serde(bound = "IterState<O>: Serialize"))]
     state: IterState<O>,
     /// Storage for observers
-    #[serde(skip)]
+    #[cfg_attr(feature = "serde1", serde(skip))]
     observers: Observer<O>,
     /// Checkpoint
+    #[cfg(feature = "serde1")]
     checkpoint: ArgminCheckpoint,
     /// Indicates whether Ctrl-C functionality should be active or not
     ctrlc: bool,
@@ -55,6 +59,7 @@ where
             op: OpWrapper::new(op),
             state,
             observers: Observer::new(),
+            #[cfg(feature = "serde1")]
             checkpoint: ArgminCheckpoint::default(),
             ctrlc: true,
             timer: true,
@@ -62,9 +67,10 @@ where
     }
 
     /// Create a new executor from a checkpoint
+    #[cfg(feature = "serde1")]
     pub fn from_checkpoint<P: AsRef<Path>>(path: P, op: O) -> Result<Self, Error>
     where
-        Self: Sized + DeserializeOwned,
+        Self: Sized + DeserializeOwnedAlias,
     {
         let mut executor: Self = load_checkpoint(path)?;
         executor.op = OpWrapper::new(op);
@@ -218,6 +224,7 @@ where
             // increment iteration number
             self.state.increment_iter();
 
+            #[cfg(feature = "serde1")]
             self.checkpoint.store_cond(&self, self.state.get_iter())?;
 
             if self.timer {
@@ -285,18 +292,21 @@ where
     }
 
     /// Set checkpoint directory
+    #[cfg(feature = "serde1")]
     pub fn checkpoint_dir(mut self, dir: &str) -> Self {
         self.checkpoint.set_dir(dir);
         self
     }
 
     /// Set checkpoint name
+    #[cfg(feature = "serde1")]
     pub fn checkpoint_name(mut self, dir: &str) -> Self {
         self.checkpoint.set_name(dir);
         self
     }
 
     /// Set the checkpoint mode
+    #[cfg(feature = "serde1")]
     pub fn checkpoint_mode(mut self, mode: CheckpointMode) -> Self {
         self.checkpoint.set_mode(mode);
         self
@@ -323,7 +333,8 @@ mod tests {
 
     #[test]
     fn test_update() {
-        #[derive(Clone, Serialize, Deserialize)]
+        #[derive(Clone)]
+        #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
         struct TestSolver {}
 
         impl<O> Solver<O> for TestSolver

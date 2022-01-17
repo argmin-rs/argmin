@@ -10,24 +10,23 @@
 //!
 //! # References:
 //!
-//! [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::prelude::*;
-use serde::de::DeserializeOwned;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
 /// The nonlinear conjugate gradient is a generalization of the conjugate gradient method for
 /// nonlinear optimization problems.
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/nonlinear_cg.rs)
-///
 /// # References:
 ///
-/// [0] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct NonlinearConjugateGradient<P, L, B, F> {
     /// p
     p: P,
@@ -87,8 +86,8 @@ where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
         + Default
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminScaledAdd<O::Param, O::Float, O::Param>

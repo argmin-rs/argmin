@@ -13,10 +13,10 @@
 //!
 //! William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed descent
 //! and an efficient line search." SIAM J. Optim. 16(1), 2006, 170-192.
-//! DOI: https://doi.org/10.1137/030601880
+//! DOI: <https://doi.org/10.1137/030601880>
 
 use crate::prelude::*;
-use serde::de::DeserializeOwned;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -25,14 +25,13 @@ type Triplet<F> = (F, F, F);
 /// The Hager-Zhang line search is a method to find a step length which obeys the strong Wolfe
 /// conditions.
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/hagerzhang.rs)
-///
 /// # References
 ///
-/// [0] William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed
+/// \[0\] William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed
 /// descent and an efficient line search." SIAM J. Optim. 16(1), 2006, 170-192.
-/// DOI: https://doi.org/10.1137/030601880
-#[derive(Serialize, Deserialize, Clone)]
+/// DOI: <https://doi.org/10.1137/030601880>
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct HagerZhangLineSearch<P, F> {
     /// delta: (0, 0.5), used in the Wolve conditions
     delta: F,
@@ -131,7 +130,12 @@ impl<P: Default, F: ArgminFloat> HagerZhangLineSearch<P, F> {
 
 impl<P, F> HagerZhangLineSearch<P, F>
 where
-    P: Clone + Default + Serialize + DeserializeOwned + ArgminScaledAdd<P, F, P> + ArgminDot<P, F>,
+    P: Clone
+        + Default
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminScaledAdd<P, F, P>
+        + ArgminDot<P, F>,
     F: ArgminFloat,
 {
     /// set delta
@@ -401,7 +405,7 @@ impl<P, F> ArgminLineSearch<P, F> for HagerZhangLineSearch<P, F>
 where
     P: Clone
         + Default
-        + Serialize
+        + SerializeAlias
         + ArgminSub<P, P>
         + ArgminDot<P, f64>
         + ArgminScaledAdd<P, f64, P>,
@@ -424,8 +428,8 @@ where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
         + Default
-        + Serialize
-        + DeserializeOwned
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<P, P>
         + ArgminDot<P, F>
         + ArgminScaledAdd<P, F, P>,

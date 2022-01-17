@@ -9,14 +9,15 @@
 //!
 //! # References
 //!
-//! [0] [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
+//! \[0\] [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
 //!
-//! [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
+//! \[1\] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 //! Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 //! DOI: 10.1126/science.220.4598.671
 
 use crate::prelude::*;
 use rand::prelude::*;
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 /// Temperature functions for Simulated Annealing.
@@ -27,7 +28,8 @@ use serde::{Deserialize, Serialize};
 /// * `SATempFunc::TemperatureFast`: `t_i = t_init / i`
 /// * `SATempFunc::Boltzmann`: `t_i = t_init / ln(i)`
 /// * `SATempFunc::Exponential`: `t_i = t_init * 0.95^i`
-#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub enum SATempFunc<F> {
     /// `t_i = t_init / i`
     TemperatureFast,
@@ -48,16 +50,15 @@ impl<F> std::default::Default for SATempFunc<F> {
 
 /// Simulated Annealing
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/simulatedannealing.rs)
-///
 /// # References
 ///
-/// [0] [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
+/// \[0\] [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
 ///
-/// [1] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
+/// \[1\] S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). "Optimization by Simulated Annealing".
 /// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 /// DOI: 10.1126/science.220.4598.671
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct SimulatedAnnealing<F, R> {
     /// Initial temperature
     init_temp: F,
@@ -101,7 +102,7 @@ where
     /// Parameter:
     ///
     /// * `init_temp`: initial temperature
-    /// * `rng`: an RNG (must implement Serialize)
+    /// * `rng`: an RNG (must implement Serialize when `serde1` feature is activated)
     pub fn new(init_temp: F, rng: R) -> Result<Self, Error> {
         if init_temp <= F::from_f64(0.0).unwrap() {
             Err(ArgminError::InvalidParameter {
@@ -229,7 +230,7 @@ impl<O, F, R> Solver<O> for SimulatedAnnealing<F, R>
 where
     O: ArgminOp<Output = F, Float = F>,
     F: ArgminFloat,
-    R: Rng + Serialize,
+    R: Rng + SerializeAlias,
 {
     const NAME: &'static str = "Simulated Annealing";
     fn init(

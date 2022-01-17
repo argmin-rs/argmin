@@ -10,18 +10,17 @@
 //! TODO
 
 use crate::prelude::*;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use std;
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 use std::default::Default;
 
 /// Particle Swarm Optimization (PSO)
 ///
-/// [Example](https://github.com/argmin-rs/argmin/blob/master/examples/particleswarm.rs)
-///
 /// # References:
 ///
 /// TODO
-#[derive(Serialize, Deserialize)]
+#[derive(Clone)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct ParticleSwarm<P, F> {
     particles: Vec<Particle<P, F>>,
     best_position: P,
@@ -38,7 +37,7 @@ pub struct ParticleSwarm<P, F> {
 
 impl<P, F> ParticleSwarm<P, F>
 where
-    P: Position<F> + DeserializeOwned + Serialize,
+    P: Position<F> + DeserializeOwnedAlias + SerializeAlias,
     F: ArgminFloat,
 {
     /// Constructor
@@ -121,7 +120,7 @@ where
 impl<O, P, F> Solver<O> for ParticleSwarm<P, F>
 where
     O: ArgminOp<Output = F, Param = P, Float = F>,
-    P: Position<F> + DeserializeOwned + Serialize,
+    P: Position<F> + DeserializeOwnedAlias + SerializeAlias,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Particle Swarm Optimization";
@@ -240,7 +239,8 @@ where
 }
 
 /// A single particle
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Particle<T, F> {
     /// Position of particle
     pub position: T,
