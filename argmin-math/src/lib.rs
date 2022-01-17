@@ -98,40 +98,47 @@
 //! without any additional terms or conditions.
 
 #![warn(missing_docs)]
-#![allow(unused_attributes)]
 // Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,
 // this is just to make sure that it will always stay this way.)
 #![deny(clippy::float_cmp)]
 
-#[cfg(feature = "nalgebra_v0_29")]
-extern crate nalgebra_0_29 as nalgebra;
-#[cfg(feature = "nalgebra_v0_30")]
-extern crate nalgebra_0_30 as nalgebra;
+cfg_if::cfg_if! {
+    if #[cfg(feature = "nalgebra_v0_30")] {
+        extern crate nalgebra_0_30 as nalgebra;
+    } else if #[cfg(feature = "nalgebra_v0_29")] {
+        extern crate nalgebra_0_29 as nalgebra;
+    }
+}
 
-#[cfg(feature = "ndarray_v0_13")]
-extern crate ndarray_0_13 as ndarray;
-#[cfg(feature = "ndarray_v0_14")]
-extern crate ndarray_0_14 as ndarray;
-#[cfg(feature = "ndarray_v0_15")]
-extern crate ndarray_0_15 as ndarray;
+cfg_if::cfg_if! {
+    if #[cfg(feature = "ndarray_v0_15")] {
+        extern crate ndarray_0_15 as ndarray;
+    } else if #[cfg(feature = "ndarray_v0_14")] {
+        extern crate ndarray_0_14 as ndarray;
+    } else if #[cfg(feature = "ndarray_v0_13")] {
+        extern crate ndarray_0_13 as ndarray;
+    }
+}
 
-#[cfg(feature = "ndarray-linalg_0_12")]
-extern crate ndarray_linalg_0_12 as ndarray_linalg;
-#[cfg(feature = "ndarray-linalg_0_13")]
-extern crate ndarray_linalg_0_13 as ndarray_linalg;
-#[cfg(feature = "ndarray-linalg_0_14")]
-extern crate ndarray_linalg_0_14 as ndarray_linalg;
+cfg_if::cfg_if! {
+    if #[cfg(feature = "ndarray-linalg_0_14")] {
+        extern crate ndarray_linalg_0_14 as ndarray_linalg;
+    } else if #[cfg(feature = "ndarray-linalg_0_13")] {
+        extern crate ndarray_linalg_0_13 as ndarray_linalg;
+    } else if #[cfg(feature = "ndarray-linalg_0_12")] {
+        extern crate ndarray_linalg_0_12 as ndarray_linalg;
+    }
+}
 
-#[cfg(feature = "num-complex_0_2")]
-extern crate num_complex_0_2 as num_complex;
-#[cfg(all(feature = "num-complex_0_3", not(feature = "num-complex_0_2")))]
-extern crate num_complex_0_3 as num_complex;
-#[cfg(all(
-    feature = "num-complex_0_4",
-    not(feature = "num-complex_0_3"),
-    not(feature = "num-complex_0_2")
-))]
-extern crate num_complex_0_4 as num_complex;
+cfg_if::cfg_if! {
+    if #[cfg(feature = "num-complex_0_2")] {
+        extern crate num_complex_0_2 as num_complex;
+    } else if #[cfg(feature = "num-complex_0_3")] {
+        extern crate num_complex_0_3 as num_complex;
+    } else if #[cfg(feature = "num-complex_0_4")] {
+        extern crate num_complex_0_4 as num_complex;
+    }
+}
 
 #[cfg(feature = "primitives")]
 mod primitives;
