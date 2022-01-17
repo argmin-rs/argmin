@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["argmin"];
+window.ALL_CRATES = ["argmin","argmin_math"];
