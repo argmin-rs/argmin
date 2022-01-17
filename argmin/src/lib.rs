@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! argmin is a numerical optimization toolbox/framework written entirely in Rust.
+//! argmin is a numerical optimization library written entirely in Rust.
 //!
 //! [Documentation of most recent release](https://docs.rs/argmin/latest/argmin/)
 //!
@@ -17,14 +17,15 @@
 //! written purely in Rust. It comes with additional features such as checkpointing and observers
 //! which for instance make it possible to log the progress of an optimization to screen or file.
 //!
-//! In addition it provides a framework for implementing iterative optimization algorithms in a
+//! It further provides a framework for implementing iterative optimization algorithms in a
 //! convenient manner. Essentially, a single iteration of the algorithm needs to be implemented and
 //! everything else, such as handling termination, parameter vectors, gradients and Hessians, is
 //! taken care of by the library.
 //!
 //! This library uses generics to be as type-agnostic as possible. Abstractions over common math
 //! functions enable the use of common backends such as `ndarray` and `nalgebra` via the
-//! `argmin-math` crate. Custom types are of course also supported.
+//! `argmin-math` crate. All operations can be performed with 32 and 64 bit floats. Custom types are
+//! of course also supported.
 //!
 //! # Contributing
 //!
@@ -40,32 +41,50 @@
 //! # Algorithms
 //!
 //! - [Line searches](solver/linesearch/index.html)
+//!
 //!   - [Backtracking line search](solver/linesearch/backtracking/struct.BacktrackingLineSearch.html)
 //!   - [More-Thuente line search](solver/linesearch/morethuente/struct.MoreThuenteLineSearch.html)
 //!   - [Hager-Zhang line search](solver/linesearch/hagerzhang/struct.HagerZhangLineSearch.html)
+//!
 //! - [Trust region method](solver/trustregion/trustregion_method/struct.TrustRegion.html)
+//!
 //!   - [Cauchy point method](solver/trustregion/cauchypoint/struct.CauchyPoint.html)
 //!   - [Dogleg method](solver/trustregion/dogleg/struct.Dogleg.html)
 //!   - [Steihaug method](solver/trustregion/steihaug/struct.Steihaug.html)
+//!   
 //! - [Steepest descent](solver/gradientdescent/steepestdescent/struct.SteepestDescent.html)
+//!
 //! - [Conjugate gradient method](solver/conjugategradient/cg/struct.ConjugateGradient.html)
+//!
 //! - [Nonlinear conjugate gradient method](solver/conjugategradient/nonlinear_cg/struct.NonlinearConjugateGradient.html)
+//!
 //! - [Newton methods](solver/newton/index.html)
+//!
 //!   - [Newton's method](solver/newton/newton_method/struct.Newton.html)
 //!   - [Newton-CG](solver/newton/newton_cg/struct.NewtonCG.html)
+//!
 //! - [Quasi-Newton methods](solver/quasinewton/index.html)
+//!
 //!   - [BFGS](solver/quasinewton/bfgs/struct.BFGS.html)
 //!   - [L-BFGS](solver/quasinewton/lbfgs/struct.LBFGS.html)
 //!   - [DFP](solver/quasinewton/dfp/struct.DFP.html)
 //!   - [SR1](solver/quasinewton/sr1/struct.SR1.html)
 //!   - [SR1-TrustRegion](solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
-//! - [Gauss-Newton method](solver/gaussnewton/gaussnewton/struct.GaussNewton.html)
+//!
+//! - [Gauss-Newton method](solver/gaussnewton/gaussnewton_method/struct.GaussNewton.html)
+//!
 //! - [Gauss-Newton method with linesearch](solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLS.html)
+//!
 //! - [Golden-section search](solver/goldensectionsearch/struct.GoldenSectionSearch.html)
+//!
 //! - [Landweber iteration](solver/landweber/struct.Landweber.html)
+//!
 //! - [Brent's method](solver/brent/struct.Brent.html)
+//!
 //! - [Nelder-Mead method](solver/neldermead/struct.NelderMead.html)
+//!
 //! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
+//!
 //! - [Particle Swarm Optimization](solver/particleswarm/struct.ParticleSwarm.html)
 //!
 //! # Examples
