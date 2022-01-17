@@ -39,6 +39,8 @@ rand = { version = "0.8.3" }
 anyhow = { version = "1.0" }
 thiserror = { version = "1.0" }
 
+cfg-if = "1"
+
 [dev-dependencies]
 ndarray-linalg_0_14 = { package = "ndarray-linalg", version = "0.14", features = ["netlib"] }
 ndarray-linalg_0_13 = { package = "ndarray-linalg", version = "0.13", features = ["netlib"] }
