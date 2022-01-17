@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 env:
-  RUSTFLAGS: "-D warnings -W unreachable-pub"
+  RUSTFLAGS: "-D warnings"
 
 jobs:
   rustdoc:
