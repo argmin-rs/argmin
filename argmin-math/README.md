@@ -1,4 +1,12 @@
-# argmin-math ![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue) [![argmin-math on crates.io](https://img.shields.io/crates/v/argmin-math)](https://crates.io/crates/argmin-math) [![argmin-math on docs.rs](https://docs.rs/argmin-math/badge.svg)](https://docs.rs/argmin-math) [![Source Code Repository](https://img.shields.io/badge/Code-On%20github.com-blue)](https://github.com/argmin-rs/argmin) [![argmin-math on deps.rs](https://deps.rs/repo/github/argmin-rs/argmin/status.svg)](https://deps.rs/repo/github/argmin-rs/argmin)
+# argmin-math
+[![argmin CI](https://github.com/argmin-rs/argmin/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/argmin-rs/argmin/actions/workflows/ci.yml)
+[![argmin-math on crates.io](https://img.shields.io/crates/v/argmin-math)](https://crates.io/crates/argmin-math)
+[![argmin-math on docs.rs](https://docs.rs/argmin-math/badge.svg)](https://docs.rs/argmin-math)
+[![Source Code Repository](https://img.shields.io/badge/Code-On%20github.com-blue)](https://github.com/argmin-rs/argmin)
+[![argmin-math on deps.rs](https://deps.rs/repo/github/argmin-rs/argmin/status.svg)](https://deps.rs/repo/github/argmin-rs/argmin)
+![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
+![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
+[![Gitter chat](https://badges.gitter.im/argmin-rs/community.png)](https://gitter.im/argmin-rs/community)
 
 argmin-math provides mathematics related abstractions needed in argmin. It supports implementations of these abstractions for basic `Vec`s and for `ndarray` and `nalgebra`. The traits can of course also be implemented for your own types to make them compatible with argmin.
 
@@ -47,6 +55,13 @@ Note that `argmin` by default compiles with `serde` support. Therefore, unless `
 
 The default features `primitives` and `vec` can be turned off in order to only compile the trait definitions. If another backend is chosen, they will automatically be turned on again.
 
+Using the `ndarray_*` features on Windows might require to explicitly choose the `ndarray-linalg` BLAS backend in the `Cargo.toml` (see the [`ndarray-linalg` documentation for details][__link0]):
+
+
+```toml
+ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
+```
+
 
 #### Example
 
@@ -68,8 +83,8 @@ You found a bug? Your favourite backend is not supported? Feel free to open an i
 
 Licensed under either of
 
- - Apache License, Version 2.0, ([LICENSE-APACHE][__link0] or <http://www.apache.org/licenses/LICENSE-2.0>)
- - MIT License ([LICENSE-MIT][__link2] or <http://opensource.org/licenses/MIT>)
+ - Apache License, Version 2.0, ([LICENSE-APACHE][__link1] or <http://www.apache.org/licenses/LICENSE-2.0>)
+ - MIT License ([LICENSE-MIT][__link3] or <http://opensource.org/licenses/MIT>)
 
 at your option.
 
@@ -79,5 +94,6 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
 
 
- [__link0]: https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE
- [__link2]: https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT
+ [__link0]: https://github.com/rust-ndarray/ndarray-linalg
+ [__link1]: https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE
+ [__link3]: https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT
