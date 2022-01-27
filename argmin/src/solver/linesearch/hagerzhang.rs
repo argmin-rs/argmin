@@ -37,7 +37,7 @@ type Triplet<F> = (F, F, F);
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct HagerZhangLineSearch<P, F> {
-    /// delta: (0, 0.5), used in the Wolve conditions
+    /// delta: (0, 0.5), used in the Wolfe conditions
     delta: F,
     /// sigma: [delta, 1), used in the Wolfe conditions
     sigma: F,
@@ -46,7 +46,7 @@ pub struct HagerZhangLineSearch<P, F> {
     /// epsilon_k
     epsilon_k: F,
     /// theta: (0, 1), used in the update rules when the potential intervals [a, c] or [c, b]
-    /// viloate the opposite slope condition
+    /// violate the opposite slope condition
     theta: F,
     /// gamma: (0, 1), determines when a bisection step is performed
     gamma: F,
