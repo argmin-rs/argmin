@@ -151,7 +151,7 @@ pub trait LinearProgram {
 
     /// TODO c for linear programs
     /// Those three could maybe be merged into a single function; name unclear
-    fn c(&self) -> Result<Vec<Self::Float>, Error> {
+    fn c(&self) -> Result<&[Self::Float], Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `c` of ArgminOp trait not implemented!".to_string(),
         }
@@ -159,7 +159,7 @@ pub trait LinearProgram {
     }
 
     /// TODO b for linear programs
-    fn b(&self) -> Result<Vec<Self::Float>, Error> {
+    fn b(&self) -> Result<&[Self::Float], Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `b` of ArgminOp trait not implemented!".to_string(),
         }
@@ -168,7 +168,7 @@ pub trait LinearProgram {
 
     /// TODO A for linear programs
     #[allow(non_snake_case)]
-    fn A(&self) -> Result<Vec<Vec<Self::Float>>, Error> {
+    fn A(&self) -> Result<&[Vec<Self::Float>], Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `A` of ArgminOp trait not implemented!".to_string(),
         }

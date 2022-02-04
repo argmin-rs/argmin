@@ -566,11 +566,16 @@
 //! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
 //! without any additional terms or conditions.
 
-#![warn(missing_docs)]
+// #![warn(missing_docs)]
 #![allow(unused_attributes)]
 // Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,
 // this is just to make sure that it will always stay this way.)
 #![deny(clippy::float_cmp)]
+// for development only
+#![allow(dead_code)]
+#![allow(unused_variables)]
+// #![feature(generic_const_exprs)]
+// #![feature(adt_const_params)]
 
 extern crate rand;
 

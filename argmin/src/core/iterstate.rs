@@ -545,8 +545,9 @@ macro_rules! getter {
     };
 }
 
-impl<O: ArgminOp> std::default::Default for IterState<O>
+impl<O> std::default::Default for IterState<O>
 where
+    O: ArgminOp,
     O::Param: Default,
 {
     fn default() -> Self {
@@ -554,7 +555,10 @@ where
     }
 }
 
-impl<O: ArgminOp> State for IterState<O> {
+impl<O> State for IterState<O>
+where
+    O: ArgminOp,
+{
     type Param = O::Param;
     type Output = O::Output;
     type Hessian = O::Hessian;
@@ -977,7 +981,10 @@ pub struct LinearProgramState<O: LinearProgram> {
     pub termination_reason: TerminationReason,
 }
 
-impl<O: LinearProgram> State for LinearProgramState<O> {
+impl<O> State for LinearProgramState<O>
+where
+    O: LinearProgram,
+{
     type Param = O::Param;
     type Output = ();
     type Hessian = ();

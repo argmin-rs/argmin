@@ -120,18 +120,18 @@ impl<O: ArgminOp> OpWrapper<O> {
 
 impl<O: LinearProgram> OpWrapper<O> {
     /// Calls the `c` method of `op`
-    pub fn c(&self) -> Result<Vec<O::Float>, Error> {
+    pub fn c(&self) -> Result<&[O::Float], Error> {
         self.op.as_ref().unwrap().c()
     }
 
     /// Calls the `b` method of `op`
-    pub fn b(&self) -> Result<Vec<O::Float>, Error> {
+    pub fn b(&self) -> Result<&[O::Float], Error> {
         self.op.as_ref().unwrap().b()
     }
 
     /// Calls the `A` method of `op`
     #[allow(non_snake_case)]
-    pub fn A(&self) -> Result<Vec<Vec<O::Float>>, Error> {
+    pub fn A(&self) -> Result<&[Vec<O::Float>], Error> {
         self.op.as_ref().unwrap().A()
     }
 }
