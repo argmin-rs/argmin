@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminFloat, ArgminIterData, ArgminKV, ArgminLineSearch, ArgminOp, ArgminResult, Error,
-    Executor, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    Executor, IterState, OpWrapper, SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -75,7 +75,7 @@ where
     }
 }
 
-impl<O, L, P, F> Solver<O> for LBFGS<L, P, F>
+impl<O, L, P, F> Solver<IterState<O>> for LBFGS<L, P, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     O::Param: Clone
@@ -85,7 +85,7 @@ where
         + ArgminDot<O::Param, O::Float>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "L-BFGS";
@@ -94,7 +94,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         let param = state.take_param().unwrap();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -107,7 +107,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param = state.take_param().unwrap();
         let cur_cost = state.get_cost();
         let prev_grad = state.take_grad().unwrap();

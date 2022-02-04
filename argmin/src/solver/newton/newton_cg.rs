@@ -14,7 +14,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult,
-    DeserializeOwnedAlias, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver,
+    DeserializeOwnedAlias, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, State,
     TerminationReason,
 };
 use crate::solver::conjugategradient::ConjugateGradient;
@@ -75,7 +75,7 @@ where
     }
 }
 
-impl<O, L, F> Solver<O> for NewtonCG<L, F>
+impl<O, L, F> Solver<IterState<O>> for NewtonCG<L, F>
 where
     O: ArgminOp<Output = F, Float = F>,
     O::Param: SerializeAlias
@@ -87,7 +87,7 @@ where
         + ArgminZeroLike
         + ArgminNorm<O::Float>,
     O::Hessian: ArgminDot<O::Param, O::Param>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
     F: ArgminFloat + ArgminNorm<O::Float>,
 {
     const NAME: &'static str = "Newton-CG";
@@ -96,7 +96,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;

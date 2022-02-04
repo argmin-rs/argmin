@@ -9,7 +9,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, Error, IterState,
-    OpWrapper, SerializeAlias, Solver, TerminationReason,
+    OpWrapper, SerializeAlias, Solver, State, TerminationReason,
 };
 use crate::solver::linesearch::condition::*;
 use argmin_math::ArgminScaledAdd;
@@ -106,7 +106,7 @@ where
     fn backtracking_step<O: ArgminOp<Param = P, Output = F, Float = F>>(
         &self,
         op: &mut OpWrapper<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let new_param = self
             .init_param
             .as_ref()
@@ -128,7 +128,7 @@ where
     }
 }
 
-impl<O, P, L, F> Solver<O> for BacktrackingLineSearch<P, L, F>
+impl<O, P, L, F> Solver<IterState<O>> for BacktrackingLineSearch<P, L, F>
 where
     P: SerializeAlias + ArgminScaledAdd<P, F, P>,
     O: ArgminOp<Param = P, Output = F, Float = F>,
@@ -141,7 +141,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         let init_param = state.get_param().unwrap();
         let cost = state.get_cost();
         self.init_cost = if cost == F::infinity() {
@@ -172,7 +172,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         self.alpha = self.alpha * self.rho;
         self.backtracking_step(op)
     }

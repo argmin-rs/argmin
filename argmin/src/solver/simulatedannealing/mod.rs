@@ -17,7 +17,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, Error, IterState, OpWrapper,
-    SerializeAlias, Solver, TerminationReason,
+    SerializeAlias, Solver, State, TerminationReason,
 };
 use rand::prelude::*;
 #[cfg(feature = "serde1")]
@@ -235,7 +235,7 @@ where
     }
 }
 
-impl<O, F, R> Solver<O> for SimulatedAnnealing<F, R>
+impl<O, F, R> Solver<IterState<O>> for SimulatedAnnealing<F, R>
 where
     O: ArgminOp<Output = F, Float = F>,
     F: ArgminFloat,
@@ -246,7 +246,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         let param = state.take_param().unwrap();
         let cost = op.apply(&param)?;
         Ok(Some(ArgminIterData::new().param(param).cost(cost).kv(
@@ -266,7 +266,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
         // behaviour.

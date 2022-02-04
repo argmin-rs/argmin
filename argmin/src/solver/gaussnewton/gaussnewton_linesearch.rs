@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, Error,
-    Executor, IterState, OpWrapper, Solver, TerminationReason,
+    Executor, IterState, OpWrapper, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminTranspose};
 #[cfg(feature = "serde1")]
@@ -55,7 +55,7 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
     }
 }
 
-impl<O, L, F> Solver<O> for GaussNewtonLS<L, F>
+impl<O, L, F> Solver<IterState<O>> for GaussNewtonLS<L, F>
 where
     O: ArgminOp<Float = F>,
     O::Param: ArgminMul<O::Float, O::Param>,
@@ -65,7 +65,7 @@ where
         + ArgminDot<O::Jacobian, O::Jacobian>
         + ArgminDot<O::Output, O::Param>
         + ArgminDot<O::Param, O::Param>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<LineSearchOP<O>>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<LineSearchOP<O>>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Gauss-Newton method with Linesearch";
@@ -74,7 +74,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param = state.take_param().unwrap();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;

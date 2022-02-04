@@ -7,7 +7,7 @@
 
 //! # Output parameter vectors to file
 
-use crate::core::{ArgminKV, ArgminOp, Error, IterState, Observe};
+use crate::core::{ArgminKV, Error, Observe, State};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fs::File;
@@ -31,24 +31,22 @@ impl Default for WriteToFileSerializer {
 
 /// Write parameter vectors to file
 #[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
-pub struct WriteToFile<O> {
+pub struct WriteToFile {
     /// Directory
     dir: String,
     /// File prefix
     prefix: String,
     /// Chosen serializer
     serializer: WriteToFileSerializer,
-    _param: std::marker::PhantomData<O>,
 }
 
-impl<O: ArgminOp> WriteToFile<O> {
+impl WriteToFile {
     /// Create a new `WriteToFile` struct
     pub fn new(dir: &str, prefix: &str) -> Self {
         WriteToFile {
             dir: dir.to_string(),
             prefix: prefix.to_string(),
             serializer: WriteToFileSerializer::Bincode,
-            _param: std::marker::PhantomData,
         }
     }
 
@@ -60,8 +58,8 @@ impl<O: ArgminOp> WriteToFile<O> {
     }
 }
 
-impl<O: ArgminOp> Observe<O> for WriteToFile<O> {
-    fn observe_iter(&mut self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
+impl<I: State> Observe<I> for WriteToFile {
+    fn observe_iter(&mut self, state: &I, _kv: &ArgminKV) -> Result<(), Error> {
         let param = state.get_param();
         let iter = state.get_iter();
         let dir = Path::new(&self.dir);
@@ -92,5 +90,5 @@ impl<O: ArgminOp> Observe<O> for WriteToFile<O> {
 mod tests {
     use super::*;
 
-    send_sync_test!(write_to_file, WriteToFile<Vec<f64>>);
+    send_sync_test!(write_to_file, WriteToFile);
 }

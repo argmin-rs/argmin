@@ -12,7 +12,7 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver,
+    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver, State,
     TerminationReason,
 };
 #[cfg(feature = "serde1")]
@@ -85,7 +85,7 @@ where
     }
 }
 
-impl<O, F> Solver<O> for GoldenSectionSearch<F>
+impl<O, F> Solver<IterState<O>> for GoldenSectionSearch<F>
 where
     O: ArgminOp<Output = F, Param = F, Float = F>,
     F: ArgminFloat,
@@ -96,7 +96,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         let init_estimate = state.take_param().unwrap();
         if init_estimate < self.min_bound || init_estimate > self.max_bound {
             Err(ArgminError::InvalidParameter {
@@ -127,7 +127,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         if self.f2 < self.f1 {
             self.x0 = self.x1;
             self.x1 = self.x2;

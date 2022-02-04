@@ -205,7 +205,7 @@ enum Action {
     Shrink,
 }
 
-impl<O, P, F> Solver<O> for NelderMead<P, F>
+impl<O, P, F> Solver<IterState<O>> for NelderMead<P, F>
 where
     O: ArgminOp<Output = F, Param = P, Float = F>,
     P: Clone
@@ -221,7 +221,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         _state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         self.params = self
             .params
             .iter()
@@ -244,7 +244,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let num_param = self.params.len();
 
         let x0 = self.calculate_centroid();

@@ -133,7 +133,7 @@ where
     }
 }
 
-impl<O, P, F> Solver<O> for ParticleSwarm<P, F>
+impl<O, P, F> Solver<IterState<O>> for ParticleSwarm<P, F>
 where
     O: ArgminOp<Output = F, Param = P, Float = F>,
     P: SerializeAlias + Position<F>,
@@ -145,7 +145,7 @@ where
         &mut self,
         _op: &mut OpWrapper<O>,
         _state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         self.initialize_particles(_op);
 
         Ok(None)
@@ -156,7 +156,7 @@ where
         &mut self,
         _op: &mut OpWrapper<O>,
         _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let zero = O::Param::zero_like(&self.best_position);
 
         for p in self.particles.iter_mut() {

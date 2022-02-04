@@ -15,7 +15,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, Error, IterState,
-    OpWrapper, SerializeAlias, Solver, TerminationReason,
+    OpWrapper, SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -421,7 +421,7 @@ impl<P, F> ArgminLineSearch<P, F> for HagerZhangLineSearch<P, F> {
     }
 }
 
-impl<P, O, F> Solver<O> for HagerZhangLineSearch<P, F>
+impl<P, O, F> Solver<IterState<O>> for HagerZhangLineSearch<P, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone + SerializeAlias + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
@@ -433,7 +433,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
                 text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),
@@ -499,7 +499,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);
         let bb = (self.b_x, self.b_f, self.b_g);

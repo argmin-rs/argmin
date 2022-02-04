@@ -7,7 +7,7 @@
 
 //! # Loggers based on the `slog` crate
 
-use crate::core::{ArgminKV, ArgminOp, Error, IterState, Observe};
+use crate::core::{ArgminKV, ArgminOp, Error, IterState, Observe, State};
 use slog;
 use slog::{info, o, Drain, Record, Serializer, KV};
 use slog_async;
@@ -146,7 +146,7 @@ impl<'a> From<&'a ArgminKV> for ArgminSlogKV {
     }
 }
 
-impl<O: ArgminOp> Observe<O> for ArgminSlogLogger {
+impl<I: KV> Observe<I> for ArgminSlogLogger {
     /// Log general info
     fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
         info!(self.logger, "{}", msg; ArgminSlogKV::from(kv));
@@ -155,7 +155,7 @@ impl<O: ArgminOp> Observe<O> for ArgminSlogLogger {
 
     /// This should be used to log iteration data only (because this is what may be saved in a CSV
     /// file or a database)
-    fn observe_iter(&mut self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, state: &I, kv: &ArgminKV) -> Result<(), Error> {
         info!(self.logger, ""; state, ArgminSlogKV::from(kv));
         Ok(())
     }

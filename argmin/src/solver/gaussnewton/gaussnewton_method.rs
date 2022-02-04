@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver,
+    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver, State,
     TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose};
@@ -73,7 +73,7 @@ impl<F: ArgminFloat> Default for GaussNewton<F> {
     }
 }
 
-impl<O, F> Solver<O> for GaussNewton<F>
+impl<O, F> Solver<IterState<O>> for GaussNewton<F>
 where
     O: ArgminOp<Float = F>,
     O::Param: ArgminSub<O::Param, O::Param> + ArgminMul<O::Float, O::Param>,
@@ -91,7 +91,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param = state.take_param().unwrap();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;

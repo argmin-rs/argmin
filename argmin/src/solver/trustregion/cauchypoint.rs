@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminFloat, ArgminIterData, ArgminOp, ArgminTrustRegion, Error, IterState, OpWrapper, Solver,
-    TerminationReason,
+    State, TerminationReason,
 };
 use argmin_math::{ArgminMul, ArgminNorm, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
@@ -43,7 +43,7 @@ where
     }
 }
 
-impl<O, F> Solver<O> for CauchyPoint<F>
+impl<O, F> Solver<IterState<O>> for CauchyPoint<F>
 where
     O: ArgminOp<Output = F, Float = F>,
     O::Param: ArgminMul<O::Float, O::Param>
@@ -57,7 +57,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param = state.take_param().unwrap();
         let grad = state
             .take_grad()

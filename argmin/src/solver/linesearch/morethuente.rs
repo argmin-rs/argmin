@@ -23,7 +23,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, Error, IterState,
-    OpWrapper, SerializeAlias, Solver, TerminationReason,
+    OpWrapper, SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -220,7 +220,7 @@ where
     }
 }
 
-impl<P, O, F> Solver<O> for MoreThuenteLineSearch<P, F>
+impl<P, O, F> Solver<IterState<O>> for MoreThuenteLineSearch<P, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone + SerializeAlias + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
@@ -232,7 +232,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         check_param!(
             self.search_direction,
             "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
@@ -288,7 +288,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {
