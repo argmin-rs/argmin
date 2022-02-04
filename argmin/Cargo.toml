@@ -51,6 +51,7 @@ wasm-bindgen = ["instant/wasm-bindgen", "getrandom/js"]
 slog-logger = ["slog", "slog-term", "slog-async"]
 serde1 = ["serde", "serde_json", "rand/serde1", "bincode", "slog-json"]
 ndarrayl = ["argmin-math/ndarray_latest-serde"]
+nalgebral = ["argmin-math/nalgebra_latest-serde"]
 
 [badges]
 maintenance = { status = "actively-developed" }
@@ -93,7 +94,7 @@ required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
 name = "gaussnewton_nalgebra"
-required-features = ["argmin-math/nalgebra_latest-serde", "slog-logger"]
+required-features = ["nalgebral", "argmin-math/nalgebra_latest-serde", "slog-logger"]
 
 [[example]]
 name = "goldensectionsearch"

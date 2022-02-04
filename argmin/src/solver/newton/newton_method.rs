@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver,
+    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver, State,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminScaledSub};
 #[cfg(feature = "serde1")]
@@ -65,7 +65,7 @@ where
     }
 }
 
-impl<O, F> Solver<O> for Newton<F>
+impl<O, F> Solver<IterState<O>> for Newton<F>
 where
     O: ArgminOp<Float = F>,
     O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>,
@@ -78,7 +78,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;

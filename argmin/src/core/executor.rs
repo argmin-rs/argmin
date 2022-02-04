@@ -10,8 +10,8 @@
 #[cfg(feature = "serde1")]
 use crate::core::{serialization::*, ArgminCheckpoint, DeserializeOwnedAlias};
 use crate::core::{
-    ArgminIterData, ArgminKV, ArgminOp, ArgminResult, Error, IterState, Observe, Observer,
-    ObserverMode, OpWrapper, Solver, TerminationReason,
+    ArgminIterData, ArgminKV, ArgminResult, Error, Observe, Observer, ObserverMode, OpWrapper,
+    Solver, State, TerminationReason,
 };
 use instant;
 use num_traits::Float;
@@ -25,18 +25,18 @@ use std::sync::Arc;
 /// Executes a solver
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct Executor<O: ArgminOp, S> {
+pub struct Executor<O, S, I> {
     /// solver
     solver: S,
     /// operator
     #[cfg_attr(feature = "serde1", serde(skip))]
     pub op: OpWrapper<O>,
     /// State
-    #[cfg_attr(feature = "serde1", serde(bound = "IterState<O>: Serialize"))]
-    state: IterState<O>,
+    // #[cfg_attr(feature = "serde1", serde(bound = "IterState<O>: Serialize"))]
+    state: I,
     /// Storage for observers
     #[cfg_attr(feature = "serde1", serde(skip))]
-    observers: Observer<O>,
+    observers: Observer<I>,
     /// Checkpoint
     #[cfg(feature = "serde1")]
     checkpoint: ArgminCheckpoint,
@@ -46,14 +46,14 @@ pub struct Executor<O: ArgminOp, S> {
     timer: bool,
 }
 
-impl<O, S> Executor<O, S>
+impl<O, S, I> Executor<O, S, I>
 where
-    O: ArgminOp,
-    S: Solver<O>,
+    S: Solver<I>,
+    I: State<Operator = O>,
 {
     /// Create a new executor with a `solver` and an initial parameter `init_param`
-    pub fn new(op: O, solver: S, init_param: O::Param) -> Self {
-        let state = IterState::new(init_param);
+    pub fn new(op: O, solver: S, init_param: I::Param) -> Self {
+        let state = I::new(init_param);
         Executor {
             solver,
             op: OpWrapper::new(op),
@@ -77,7 +77,7 @@ where
         Ok(executor)
     }
 
-    fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {
+    fn update(&mut self, data: &ArgminIterData<I>) -> Result<(), Error> {
         if let Some(cur_param) = data.get_param() {
             self.state.param(cur_param);
         }
@@ -122,7 +122,7 @@ where
     }
 
     /// Run the executor
-    pub fn run(mut self) -> Result<ArgminResult<O>, Error> {
+    pub fn run(mut self) -> Result<ArgminResult<I>, Error> {
         let total_time = if self.timer {
             Some(instant::Instant::now())
         } else {
@@ -247,7 +247,7 @@ where
 
     /// Attaches a observer which implements `ArgminLog` to the solver.
     #[must_use]
-    pub fn add_observer<OBS: Observe<O> + 'static>(
+    pub fn add_observer<OBS: Observe<I> + 'static>(
         mut self,
         observer: OBS,
         mode: ObserverMode,
@@ -265,35 +265,35 @@ where
 
     /// Set target cost value
     #[must_use]
-    pub fn target_cost(mut self, cost: O::Float) -> Self {
+    pub fn target_cost(mut self, cost: I::Float) -> Self {
         self.state.target_cost(cost);
         self
     }
 
     /// Set cost value
     #[must_use]
-    pub fn cost(mut self, cost: O::Float) -> Self {
+    pub fn cost(mut self, cost: I::Float) -> Self {
         self.state.cost(cost);
         self
     }
 
     /// Set Gradient
     #[must_use]
-    pub fn grad(mut self, grad: O::Param) -> Self {
+    pub fn grad(mut self, grad: I::Param) -> Self {
         self.state.grad(grad);
         self
     }
 
     /// Set Hessian
     #[must_use]
-    pub fn hessian(mut self, hessian: O::Hessian) -> Self {
+    pub fn hessian(mut self, hessian: I::Hessian) -> Self {
         self.state.hessian(hessian);
         self
     }
 
     /// Set Jacobian
     #[must_use]
-    pub fn jacobian(mut self, jacobian: O::Jacobian) -> Self {
+    pub fn jacobian(mut self, jacobian: I::Jacobian) -> Self {
         self.state.jacobian(jacobian);
         self
     }
@@ -340,7 +340,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::MinimalNoOperator;
+    use crate::core::{ArgminOp, IterState, MinimalNoOperator, State};
     use approx::assert_relative_eq;
 
     #[test]
@@ -349,7 +349,7 @@ mod tests {
         #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
         struct TestSolver {}
 
-        impl<O> Solver<O> for TestSolver
+        impl<O> Solver<IterState<O>> for TestSolver
         where
             O: ArgminOp,
         {
@@ -357,7 +357,7 @@ mod tests {
                 &mut self,
                 _op: &mut OpWrapper<O>,
                 _state: &mut IterState<O>,
-            ) -> Result<ArgminIterData<O>, Error> {
+            ) -> Result<ArgminIterData<IterState<O>>, Error> {
                 Ok(ArgminIterData::new())
             }
         }
@@ -369,7 +369,7 @@ mod tests {
 
         // 1) Parameter vector changes, but not cost (continues to be `Inf`)
         let new_param = vec![1.0, 1.0];
-        let new_iterdata: ArgminIterData<MinimalNoOperator> =
+        let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> =
             ArgminIterData::new().param(new_param.clone());
         executor.update(&new_iterdata).unwrap();
         assert_eq!(executor.state.get_best_param().unwrap(), new_param);
@@ -379,7 +379,7 @@ mod tests {
         // 2) Parameter vector and cost changes to something better
         let new_param = vec![2.0, 2.0];
         let new_cost = 10.0;
-        let new_iterdata: ArgminIterData<MinimalNoOperator> = ArgminIterData::new()
+        let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> = ArgminIterData::new()
             .param(new_param.clone())
             .cost(new_cost);
         executor.update(&new_iterdata).unwrap();
@@ -395,7 +395,7 @@ mod tests {
         let new_param = vec![3.0, 3.0];
         let old_cost = executor.state.get_best_cost();
         let new_cost = old_cost + 1.0;
-        let new_iterdata: ArgminIterData<MinimalNoOperator> =
+        let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> =
             ArgminIterData::new().param(new_param).cost(new_cost);
         executor.update(&new_iterdata).unwrap();
         assert_eq!(executor.state.get_best_param(), old_param);
@@ -411,7 +411,7 @@ mod tests {
 
         let new_param = vec![1.0, 1.0];
         let new_cost = std::f64::NEG_INFINITY;
-        let new_iterdata: ArgminIterData<MinimalNoOperator> = ArgminIterData::new()
+        let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> = ArgminIterData::new()
             .param(new_param.clone())
             .cost(new_cost);
         executor.update(&new_iterdata).unwrap();
@@ -423,7 +423,7 @@ mod tests {
         let old_param = executor.state.get_best_param().unwrap();
         let new_param = vec![6.0, 6.0];
         let new_cost = std::f64::INFINITY;
-        let new_iterdata: ArgminIterData<MinimalNoOperator> =
+        let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> =
             ArgminIterData::new().param(new_param).cost(new_cost);
         executor.update(&new_iterdata).unwrap();
         assert_eq!(executor.state.get_best_param().unwrap(), old_param);

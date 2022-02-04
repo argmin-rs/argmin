@@ -16,7 +16,7 @@
 
 use crate::core::{
     ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, Error, Executor,
-    IterState, OpWrapper, SerializeAlias, Solver,
+    IterState, OpWrapper, SerializeAlias, Solver, State,
 };
 use argmin_math::ArgminMul;
 #[cfg(feature = "serde1")]
@@ -43,11 +43,11 @@ impl<L> SteepestDescent<L> {
     }
 }
 
-impl<O, L, F> Solver<O> for SteepestDescent<L>
+impl<O, L, F> Solver<IterState<O>> for SteepestDescent<L>
 where
     O: ArgminOp<Output = F, Float = F>,
     O::Param: SerializeAlias + ArgminMul<O::Float, O::Param>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Steepest Descent";
@@ -56,7 +56,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param_new = state.take_param().unwrap();
         let new_cost = op.apply(&param_new)?;
         let new_grad = op.gradient(&param_new)?;

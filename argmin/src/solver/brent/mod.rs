@@ -83,7 +83,7 @@ impl<F: ArgminFloat> Brent<F> {
     }
 }
 
-impl<O, F> Solver<O> for Brent<F>
+impl<O, F> Solver<IterState<O>> for Brent<F>
 where
     O: ArgminOp<Param = F, Output = F, Float = F>,
     F: ArgminFloat,
@@ -95,7 +95,7 @@ where
         op: &mut OpWrapper<O>,
         // Brent maintains its own state
         _state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         self.fa = op.apply(&self.a)?;
         self.fb = op.apply(&self.b)?;
         if self.fa * self.fb > F::from_f64(0.0).unwrap() {
@@ -112,7 +112,7 @@ where
         op: &mut OpWrapper<O>,
         // Brent maintains its own state
         _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         if (self.fb > F::from_f64(0.0).unwrap() && self.fc > F::from_f64(0.0).unwrap())
             || self.fb < F::from_f64(0.0).unwrap() && self.fc < F::from_f64(0.0).unwrap()
         {

@@ -158,8 +158,8 @@ pub fn load_checkpoint<T: DeserializeOwnedAlias, P: AsRef<Path>>(path: P) -> Res
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::nooperator::MinimalNoOperator;
     use crate::core::*;
+    use crate::core::{IterState, MinimalNoOperator};
 
     #[derive(Serialize, Deserialize, Clone, Debug)]
     pub struct PhonySolver {}
@@ -171,7 +171,7 @@ mod tests {
         }
     }
 
-    impl<O> Solver<O> for PhonySolver
+    impl<O> Solver<IterState<O>> for PhonySolver
     where
         O: ArgminOp,
     {
@@ -179,7 +179,7 @@ mod tests {
             &mut self,
             _op: &mut OpWrapper<O>,
             _state: &mut IterState<O>,
-        ) -> Result<ArgminIterData<O>, Error> {
+        ) -> Result<ArgminIterData<IterState<O>>, Error> {
             unimplemented!()
         }
     }
@@ -188,12 +188,12 @@ mod tests {
     fn test_store() {
         let op: MinimalNoOperator = MinimalNoOperator::new();
         let solver = PhonySolver::new();
-        let exec: Executor<MinimalNoOperator, PhonySolver> =
+        let exec: Executor<MinimalNoOperator, PhonySolver, _> =
             Executor::new(op, solver, vec![0.0f64, 0.0]);
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&exec, 20).unwrap();
 
-        let _loaded: Executor<MinimalNoOperator, PhonySolver> =
+        let _loaded: Executor<MinimalNoOperator, PhonySolver, IterState<MinimalNoOperator>> =
             load_checkpoint("checkpoints/solver.arg").unwrap();
     }
 }

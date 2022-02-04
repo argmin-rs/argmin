@@ -22,7 +22,7 @@
 # #![allow(unused_imports)]
 # extern crate argmin;
 # extern crate argmin_testfunctions;
-# use argmin::core::{ArgminOp, Error, Executor};
+# use argmin::core::{ArgminOp, Error, Executor, State};
 # use argmin::solver::gradientdescent::SteepestDescent;
 # use argmin::solver::linesearch::MoreThuenteLineSearch;
 # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -51,7 +51,7 @@
 # }
 #
 # fn run() -> Result<(), Error> {
-#     // Define cost function (must implement `ArgminOperator`)
+#     // Define cost function (must implement `ArgminOp`)
 #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 #     // Define initial parameter vector
 #     let init_param: Vec<f64> = vec![-1.2, 1.0];
@@ -88,40 +88,40 @@ let num_iters = result.state().get_iter();
 //!
 //! More details can be found in the `IterState` documentation.
 
-use crate::core::{ArgminOp, IterState, OpWrapper};
+use crate::core::{OpWrapper, State};
 use num_traits::{Float, FromPrimitive};
 use std::cmp::Ordering;
 
 /// Final struct returned by the `run` method of `Executor`.
 #[derive(Clone)]
-pub struct ArgminResult<O: ArgminOp> {
+pub struct ArgminResult<I: State> {
     /// operator
-    pub operator: OpWrapper<O>,
+    pub operator: OpWrapper<I::Operator>,
     /// iteration state
-    pub state: IterState<O>,
+    pub state: I,
 }
 
-impl<O: ArgminOp> ArgminResult<O> {
+impl<I: State> ArgminResult<I> {
     /// Constructor
-    pub fn new(operator: OpWrapper<O>, state: IterState<O>) -> Self {
+    pub fn new(operator: OpWrapper<I::Operator>, state: I) -> Self {
         ArgminResult { operator, state }
     }
 
     /// Return handle to operator
-    pub fn operator(&self) -> &OpWrapper<O> {
+    pub fn operator(&self) -> &OpWrapper<I::Operator> {
         &self.operator
     }
 
     /// Return handle to state
-    pub fn state(&self) -> &IterState<O> {
+    pub fn state(&self) -> &I {
         &self.state
     }
 }
 
-impl<O> std::fmt::Display for ArgminResult<O>
+impl<I> std::fmt::Display for ArgminResult<I>
 where
-    O: ArgminOp,
-    O::Param: std::fmt::Debug,
+    I: State,
+    I::Param: std::fmt::Debug,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "ArgminResult:")?;
@@ -139,20 +139,20 @@ where
     }
 }
 
-impl<O: ArgminOp> PartialEq for ArgminResult<O> {
-    fn eq(&self, other: &ArgminResult<O>) -> bool {
-        (self.state.get_cost() - other.state.get_cost()).abs() < O::Float::epsilon()
+impl<I: State> PartialEq for ArgminResult<I> {
+    fn eq(&self, other: &ArgminResult<I>) -> bool {
+        (self.state.get_cost() - other.state.get_cost()).abs() < I::Float::epsilon()
     }
 }
 
-impl<O: ArgminOp> Eq for ArgminResult<O> {}
+impl<I: State> Eq for ArgminResult<I> {}
 
-impl<O: ArgminOp> Ord for ArgminResult<O> {
-    fn cmp(&self, other: &ArgminResult<O>) -> Ordering {
+impl<I: State> Ord for ArgminResult<I> {
+    fn cmp(&self, other: &ArgminResult<I>) -> Ordering {
         let t = self.state.get_cost() - other.state.get_cost();
-        if t.abs() < O::Float::epsilon() {
+        if t.abs() < I::Float::epsilon() {
             Ordering::Equal
-        } else if t > O::Float::from_f64(0.0).unwrap() {
+        } else if t > I::Float::from_f64(0.0).unwrap() {
             Ordering::Greater
         } else {
             Ordering::Less
@@ -160,8 +160,8 @@ impl<O: ArgminOp> Ord for ArgminResult<O> {
     }
 }
 
-impl<O: ArgminOp> PartialOrd for ArgminResult<O> {
-    fn partial_cmp(&self, other: &ArgminResult<O>) -> Option<Ordering> {
+impl<I: State> PartialOrd for ArgminResult<I> {
+    fn partial_cmp(&self, other: &ArgminResult<I>) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -169,7 +169,7 @@ impl<O: ArgminOp> PartialOrd for ArgminResult<O> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::MinimalNoOperator;
+    use crate::core::{IterState, MinimalNoOperator};
 
-    send_sync_test!(argmin_result, ArgminResult<MinimalNoOperator>);
+    send_sync_test!(argmin_result, ArgminResult<IterState<MinimalNoOperator>>);
 }

@@ -488,7 +488,9 @@
 //! cost function values, iteration number, ...), respectively.
 //!
 //! ```rust
-//! use argmin::core::{ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver};
+//! use argmin::core::{
+//!     ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver, State
+//! };
 //! #[cfg(feature = "serde1")]
 //! use serde::{Deserialize, Serialize};
 //! use argmin_math::ArgminScaledSub;
@@ -509,7 +511,7 @@
 //!     }
 //! }
 //!
-//! impl<O, F> Solver<O> for Landweber<F>
+//! impl<O, F> Solver<IterState<O>> for Landweber<F>
 //! where
 //!     // `O` always needs to implement `ArgminOp`
 //!     O: ArgminOp<Float = F>,
@@ -531,7 +533,7 @@
 //!         // gradient, Hessian and cost function value of the current, previous and best
 //!         // iteration as well as current iteration number, and many more.
 //!         state: &mut IterState<O>,
-//!     ) -> Result<ArgminIterData<O>, Error> {
+//!     ) -> Result<ArgminIterData<IterState<O>>, Error> {
 //!         // First we obtain the current parameter vector from the `state` struct (`x_k`).
 //!         let xk = state.take_param().unwrap();
 //!         // Then we compute the gradient at `x_k` (`\nabla f(x_k)`)
