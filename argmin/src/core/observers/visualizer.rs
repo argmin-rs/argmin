@@ -8,7 +8,7 @@
 //! # Observer which visualizes the progress of the solver
 
 extern crate gnuplot;
-use crate::core::{ArgminFloat, ArgminKV, ArgminOp, Error, IterState, Observe};
+use crate::core::{ArgminFloat, ArgminKV, ArgminOp, Error, IterState, Observe, State};
 use instant;
 use std::sync::Mutex;
 
@@ -152,7 +152,7 @@ impl std::default::Default for Visualizer3d {
     }
 }
 
-impl<O> Observe<O> for Visualizer3d
+impl<O> Observe<IterState<O>> for Visualizer3d
 where
     O: ArgminOp<Param = Vec<f64>, Float = f64>,
 {

@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, Error, Executor,
-    IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    IterState, OpWrapper, SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminEye, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose,
@@ -68,7 +68,7 @@ where
     }
 }
 
-impl<O, L, H, F> Solver<O> for BFGS<L, H, F>
+impl<O, L, H, F> Solver<IterState<O>> for BFGS<L, H, F>
 where
     O: ArgminOp<Output = F, Hessian = H, Float = F>,
     O::Param: ArgminSub<O::Param, O::Param>
@@ -84,7 +84,7 @@ where
         + ArgminMul<O::Float, O::Hessian>
         + ArgminTranspose<O::Hessian>
         + ArgminEye,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "BFGS";
@@ -93,7 +93,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         let param = state.take_param().unwrap();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -110,7 +110,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param = state.take_param().unwrap();
         let cur_cost = state.get_cost();
         let prev_grad = state.take_grad().unwrap();

@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, Error, Executor,
-    IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    IterState, OpWrapper, SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -56,7 +56,7 @@ where
     }
 }
 
-impl<O, L, H, F> Solver<O> for DFP<L, H, F>
+impl<O, L, H, F> Solver<IterState<O>> for DFP<L, H, F>
 where
     O: ArgminOp<Output = F, Hessian = H, Float = F>,
     O::Param: ArgminSub<O::Param, O::Param>
@@ -70,7 +70,7 @@ where
         + ArgminDot<O::Param, O::Param>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<F, O::Hessian>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "DFP";
@@ -79,7 +79,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         let param = state.take_param().unwrap();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -96,7 +96,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param = state.take_param().unwrap();
         let cost = state.get_cost();
         let prev_grad = state

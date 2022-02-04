@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, Error, IterState, OpWrapper, SerializeAlias,
-    Solver,
+    Solver, State,
 };
 use argmin_math::{ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -77,7 +77,7 @@ where
     }
 }
 
-impl<P, O, F> Solver<O> for ConjugateGradient<P, F>
+impl<P, O, F> Solver<IterState<O>> for ConjugateGradient<P, F>
 where
     O: ArgminOp<Param = P, Output = P, Float = F>,
     P: Clone
@@ -95,7 +95,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         let init_param = state.get_param_ref().unwrap();
         let ap = op.apply(init_param)?;
         let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
@@ -110,7 +110,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let p = self.p.as_ref().unwrap();
         let r = self.r.as_ref().unwrap();
 

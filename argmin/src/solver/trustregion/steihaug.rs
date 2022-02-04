@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminOp, ArgminTrustRegion, Error, IterState,
-    OpWrapper, SerializeAlias, Solver, TerminationReason,
+    OpWrapper, SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot, ArgminZeroLike};
 #[cfg(feature = "serde1")]
@@ -145,7 +145,7 @@ where
     }
 }
 
-impl<P, O, F> Solver<O> for Steihaug<P, F>
+impl<P, O, F> Solver<IterState<O>> for Steihaug<P, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
@@ -164,7 +164,7 @@ where
         &mut self,
         _op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         let r = state.get_grad().unwrap();
 
         self.r_0_norm = r.norm();
@@ -182,7 +182,7 @@ where
         &mut self,
         _op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let grad = state.take_grad().unwrap();
         let h = state.take_hessian().unwrap();
         let d = self.d.as_ref().unwrap();

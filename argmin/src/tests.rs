@@ -11,7 +11,7 @@ use approx::assert_relative_eq;
 use ndarray::prelude::*;
 use ndarray::{Array1, Array2};
 
-use crate::core::{ArgminOp, Error, Executor};
+use crate::core::{ArgminOp, Error, Executor, State};
 use crate::solver::gradientdescent::SteepestDescent;
 use crate::solver::linesearch::{HagerZhangLineSearch, MoreThuenteLineSearch};
 use crate::solver::newton::NewtonCG;
