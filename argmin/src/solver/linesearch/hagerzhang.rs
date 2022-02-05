@@ -7,8 +7,6 @@
 
 //! * [Hager-Zhang line search](struct.HagerZhangLineSearch.html)
 //!
-//! TODO: Not all stopping criteria implemented
-//!
 //! # Reference
 //!
 //! William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed descent
@@ -543,10 +541,9 @@ where
     }
 
     fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
-        if self.best_f - self.finit <= self.delta * self.best_x * self.dginit {
-            return TerminationReason::LineSearchConditionMet;
-        }
-        if self.best_g >= self.sigma * self.dginit {
+        if self.best_f - self.finit <= self.delta * self.best_x * self.dginit
+            && self.best_g >= self.sigma * self.dginit
+        {
             return TerminationReason::LineSearchConditionMet;
         }
         if (F::from_f64(2.0).unwrap() * self.delta - F::from_f64(1.0).unwrap()) * self.dginit
