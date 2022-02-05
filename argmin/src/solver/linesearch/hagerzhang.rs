@@ -379,19 +379,19 @@ where
     }
 
     fn set_best(&mut self) {
-        if self.a_f < self.b_f && self.a_f < self.c_f {
+        if self.a_f <= self.b_f && self.a_f <= self.c_f {
             self.best_x = self.a_x;
             self.best_f = self.a_f;
             self.best_g = self.a_g;
         }
 
-        if self.b_f < self.a_f && self.b_f < self.c_f {
+        if self.b_f <= self.a_f && self.b_f <= self.c_f {
             self.best_x = self.b_x;
             self.best_f = self.b_f;
             self.best_g = self.b_g;
         }
 
-        if self.c_f < self.a_f && self.c_f < self.b_f {
+        if self.c_f <= self.a_f && self.c_f <= self.b_f {
             self.best_x = self.c_x;
             self.best_f = self.c_f;
             self.best_g = self.c_g;
@@ -543,10 +543,10 @@ where
     }
 
     fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
-        if self.best_f - self.finit < self.delta * self.best_x * self.dginit {
+        if self.best_f - self.finit <= self.delta * self.best_x * self.dginit {
             return TerminationReason::LineSearchConditionMet;
         }
-        if self.best_g > self.sigma * self.dginit {
+        if self.best_g >= self.sigma * self.dginit {
             return TerminationReason::LineSearchConditionMet;
         }
         if (F::from_f64(2.0).unwrap() * self.delta - F::from_f64(1.0).unwrap()) * self.dginit
