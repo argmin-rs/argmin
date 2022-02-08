@@ -80,9 +80,7 @@ where
         + ArgminScaledAdd<O::Param, O::Float, O::Param>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    O::Hessian: Clone + Default + Serialize + DeserializeOwned,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
-    // L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "L-BFGS";

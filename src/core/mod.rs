@@ -205,6 +205,8 @@ pub struct ArgminIterData<O: ArgminOp> {
     grad: Option<O::Param>,
     /// Current Hessian
     hessian: Option<O::Hessian>,
+    /// Current inverse Hessian
+    inv_hessian: Option<O::Hessian>,
     /// Current Jacobian
     jacobian: Option<O::Jacobian>,
     /// Current population
@@ -225,6 +227,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
             cost: None,
             grad: None,
             hessian: None,
+            inv_hessian: None,
             jacobian: None,
             termination_reason: None,
             population: None,
@@ -253,6 +256,13 @@ impl<O: ArgminOp> ArgminIterData<O> {
     /// Set Hessian
     pub fn hessian(mut self, hessian: O::Hessian) -> Self {
         self.hessian = Some(hessian);
+        self
+    }
+
+    /// Set inverse Hessian
+    #[must_use]
+    pub fn inv_hessian(mut self, inv_hessian: O::Hessian) -> Self {
+        self.inv_hessian = Some(inv_hessian);
         self
     }
 
@@ -298,6 +308,11 @@ impl<O: ArgminOp> ArgminIterData<O> {
     /// Get Hessian
     pub fn get_hessian(&self) -> Option<O::Hessian> {
         self.hessian.clone()
+    }
+
+    /// Get inverse Hessian
+    pub fn get_inv_hessian(&self) -> Option<O::Hessian> {
+        self.inv_hessian.clone()
     }
 
     /// Get Jacobian
