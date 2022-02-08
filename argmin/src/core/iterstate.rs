@@ -42,6 +42,10 @@ pub struct IterState<O: ArgminOp> {
     pub hessian: Option<O::Hessian>,
     /// Previous Hessian
     pub prev_hessian: Option<O::Hessian>,
+    /// Current inverse Hessian
+    pub inv_hessian: Option<O::Hessian>,
+    /// Previous inverse Hessian
+    pub prev_inv_hessian: Option<O::Hessian>,
     /// Current Jacobian
     pub jacobian: Option<O::Jacobian>,
     /// Previous Jacobian
@@ -128,6 +132,8 @@ impl<O: ArgminOp> IterState<O> {
             prev_grad: None,
             hessian: None,
             prev_hessian: None,
+            inv_hessian: None,
+            prev_inv_hessian: None,
             jacobian: None,
             prev_jacobian: None,
             population: None,
@@ -187,6 +193,13 @@ impl<O: ArgminOp> IterState<O> {
     pub fn hessian(&mut self, hessian: O::Hessian) -> &mut Self {
         std::mem::swap(&mut self.prev_hessian, &mut self.hessian);
         self.hessian = Some(hessian);
+        self
+    }
+
+    /// Set inverse Hessian. This shifts the stored inverse Hessian to the previous inverse Hessian.
+    pub fn inv_hessian(&mut self, inv_hessian: O::Hessian) -> &mut Self {
+        std::mem::swap(&mut self.prev_inv_hessian, &mut self.inv_hessian);
+        self.inv_hessian = Some(inv_hessian);
         self
     }
 
@@ -277,6 +290,12 @@ impl<O: ArgminOp> IterState<O> {
     getter_option!(prev_grad, O::Param, "Returns previous gradient");
     getter_option!(hessian, O::Hessian, "Returns current Hessian");
     getter_option!(prev_hessian, O::Hessian, "Returns previous Hessian");
+    getter_option!(inv_hessian, O::Hessian, "Returns current inverse Hessian");
+    getter_option!(
+        prev_inv_hessian,
+        O::Hessian,
+        "Returns previous inverse Hessian"
+    );
     getter_option!(jacobian, O::Jacobian, "Returns current Jacobian");
     getter_option!(prev_jacobian, O::Jacobian, "Returns previous Jacobian");
     getter!(iter, u64, "Returns current number of iterations");
@@ -390,6 +409,8 @@ mod tests {
         assert_eq!(state.get_prev_grad(), None);
         assert_eq!(state.get_hessian(), None);
         assert_eq!(state.get_prev_hessian(), None);
+        assert_eq!(state.get_inv_hessian(), None);
+        assert_eq!(state.get_prev_inv_hessian(), None);
         assert_eq!(state.get_jacobian(), None);
         assert_eq!(state.get_prev_jacobian(), None);
         assert_eq!(state.get_iter(), 0);
@@ -479,6 +500,19 @@ mod tests {
         assert_eq!(state.get_hessian(), Some(new_hessian.clone()));
         assert_eq!(state.get_prev_hessian(), Some(hessian.clone()));
 
+        let inv_hessian = vec![vec![1.0, 2.0], vec![2.0, 1.0]];
+
+        state.inv_hessian(inv_hessian.clone());
+        assert_eq!(state.get_inv_hessian(), Some(inv_hessian.clone()));
+        assert_eq!(state.get_prev_inv_hessian(), None);
+
+        let new_inv_hessian = vec![vec![2.0, 1.0], vec![1.0, 2.0]];
+
+        state.inv_hessian(new_inv_hessian.clone());
+
+        assert_eq!(state.get_inv_hessian(), Some(new_inv_hessian.clone()));
+        assert_eq!(state.get_prev_inv_hessian(), Some(inv_hessian.clone()));
+
         let jacobian = vec![1.0, 2.0];
 
         state.jacobian(jacobian.clone());
@@ -536,6 +570,8 @@ mod tests {
         assert_eq!(state.get_prev_grad(), Some(grad));
         assert_eq!(state.get_hessian(), Some(new_hessian));
         assert_eq!(state.get_prev_hessian(), Some(hessian));
+        assert_eq!(state.get_inv_hessian(), Some(new_inv_hessian));
+        assert_eq!(state.get_prev_inv_hessian(), Some(inv_hessian));
         assert_eq!(state.get_jacobian(), Some(new_jacobian));
         assert_eq!(state.get_prev_jacobian(), Some(jacobian));
         assert_eq!(state.get_cost_func_count(), 42);

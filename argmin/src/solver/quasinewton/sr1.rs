@@ -29,8 +29,8 @@ use serde::{Deserialize, Serialize};
 pub struct SR1<L, H, F> {
     /// parameter for skipping rule
     r: F,
-    /// Inverse Hessian
-    inv_hessian: H,
+    /// Init inverse Hessian
+    init_inv_hessian: H,
     /// line search
     linesearch: L,
     /// Tolerance for the stopping criterion based on the change of the norm on the gradient
@@ -47,7 +47,7 @@ where
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         SR1 {
             r: F::from_f64(1e-8).unwrap(),
-            inv_hessian: init_inverse_hessian,
+            init_inv_hessian: init_inverse_hessian,
             linesearch,
             tol_grad: F::epsilon().sqrt(),
             tol_cost: F::epsilon(),
@@ -108,7 +108,11 @@ where
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
         Ok(Some(
-            ArgminIterData::new().param(param).cost(cost).grad(grad),
+            ArgminIterData::new()
+                .param(param)
+                .cost(cost)
+                .grad(grad)
+                .inv_hessian(self.init_inv_hessian.clone()),
         ))
     }
 
@@ -119,16 +123,14 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let cost = state.get_cost();
+        let mut inv_hessian = state.get_inv_hessian().unwrap();
         let prev_grad = if let Some(grad) = state.get_grad() {
             grad
         } else {
             op.gradient(&param)?
         };
 
-        let p = self
-            .inv_hessian
-            .dot(&prev_grad)
-            .mul(&F::from_f64(-1.0).unwrap());
+        let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
 
         self.linesearch.set_search_direction(p);
 
@@ -159,7 +161,7 @@ where
 
         let sk = xk1.sub(&param);
 
-        let skmhkyk: O::Param = sk.sub(&self.inv_hessian.dot(&yk));
+        let skmhkyk: O::Param = sk.sub(&inv_hessian.dot(&yk));
         let a: O::Hessian = skmhkyk.dot(&skmhkyk);
         let b: F = skmhkyk.dot(&yk);
 
@@ -174,15 +176,14 @@ where
         // let hessian_update = tmp.abs() >= self.r * sksk.sqrt() * blah.sqrt();
 
         if hessian_update {
-            self.inv_hessian = self
-                .inv_hessian
-                .add(&a.mul(&(F::from_f64(1.0).unwrap() / b)));
+            inv_hessian = inv_hessian.add(&a.mul(&(F::from_f64(1.0).unwrap() / b)));
         }
 
         Ok(ArgminIterData::new()
             .param(xk1)
             .cost(next_cost)
             .grad(grad)
+            .inv_hessian(inv_hessian)
             .kv(make_kv!["denom" => b; "hessian_update" => hessian_update;]))
     }
 

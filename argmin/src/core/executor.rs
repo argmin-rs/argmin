@@ -108,6 +108,9 @@ where
         if let Some(hessian) = data.get_hessian() {
             self.state.hessian(hessian);
         }
+        if let Some(inv_hessian) = data.get_inv_hessian() {
+            self.state.inv_hessian(inv_hessian);
+        }
         if let Some(jacobian) = data.get_jacobian() {
             self.state.jacobian(jacobian);
         }
