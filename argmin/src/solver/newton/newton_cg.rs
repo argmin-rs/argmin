@@ -19,8 +19,7 @@ use crate::core::{
 };
 use crate::solver::conjugategradient::ConjugateGradient;
 use argmin_math::{
-    ArgminAdd, ArgminConj, ArgminDiv, ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminScaledAdd,
-    ArgminSub, ArgminZeroLike,
+    ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub, ArgminZeroLike,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -43,7 +42,10 @@ pub struct NewtonCG<L, F> {
     tol: F,
 }
 
-impl<L, F: ArgminFloat> NewtonCG<L, F> {
+impl<L, F> NewtonCG<L, F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(linesearch: L) -> Self {
         NewtonCG {
@@ -76,29 +78,17 @@ impl<L, F: ArgminFloat> NewtonCG<L, F> {
 impl<O, L, F> Solver<O> for NewtonCG<L, F>
 where
     O: ArgminOp<Output = F, Float = F>,
-    O::Param: Send
-        + Sync
-        + Clone
-        + SerializeAlias
-        + Default
+    O::Param: SerializeAlias
         + ArgminSub<O::Param, O::Param>
-        + ArgminAdd<O::Param, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminScaledAdd<O::Param, O::Float, O::Param>
         + ArgminMul<F, O::Param>
         + ArgminConj
         + ArgminZeroLike
         + ArgminNorm<O::Float>,
-    O::Hessian: Send
-        + Sync
-        + Default
-        + Clone
-        + SerializeAlias
-        + Default
-        + ArgminInv<O::Hessian>
-        + ArgminDot<O::Param, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
-    F: ArgminFloat + Default + ArgminDiv<O::Float, O::Float> + ArgminNorm<O::Float> + ArgminConj,
+    F: ArgminFloat + ArgminNorm<O::Float>,
 {
     const NAME: &'static str = "Newton-CG";
 
@@ -127,7 +117,7 @@ where
             let data = cg.next_iter(&mut cg_op, &cg_state)?;
             x = data.get_param().unwrap();
             let p = cg.p_prev();
-            let curvature = p.dot(&hessian.dot(&p));
+            let curvature = p.dot(&hessian.dot(p));
             if curvature <= self.curvature_threshold {
                 if iter == 0 {
                     x = grad.mul(&(F::from_f64(-1.0).unwrap()));
@@ -178,7 +168,7 @@ where
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 struct CGSubProblem<T, H, F> {
     hessian: H,
@@ -186,11 +176,7 @@ struct CGSubProblem<T, H, F> {
     float: std::marker::PhantomData<F>,
 }
 
-impl<T, H, F> CGSubProblem<T, H, F>
-where
-    T: Clone + Send + Sync,
-    H: Clone + Default + ArgminDot<T, T> + Send + Sync,
-{
+impl<T, H, F> CGSubProblem<T, H, F> {
     /// constructor
     pub fn new(hessian: H) -> Self {
         CGSubProblem {
@@ -203,8 +189,8 @@ where
 
 impl<T, H, F> ArgminOp for CGSubProblem<T, H, F>
 where
-    T: Clone + Default + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
-    H: Clone + Default + ArgminDot<T, T> + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
+    T: Clone + SerializeAlias + DeserializeOwnedAlias,
+    H: Clone + ArgminDot<T, T> + SerializeAlias + DeserializeOwnedAlias,
     F: ArgminFloat,
 {
     type Param = T;

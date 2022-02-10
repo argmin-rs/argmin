@@ -12,15 +12,13 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, ArgminTrustRegion,
-    DeserializeOwnedAlias, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver,
-    TerminationReason,
+    Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
 
 /// SR1 Trust Region method
 ///
@@ -45,7 +43,10 @@ pub struct SR1TrustRegion<B, R, F> {
     tol_grad: F,
 }
 
-impl<B, R, F: ArgminFloat> SR1TrustRegion<B, R, F> {
+impl<B, R, F> SR1TrustRegion<B, R, F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(subproblem: R) -> Self {
         SR1TrustRegion {
@@ -109,29 +110,18 @@ impl<B, R, F: ArgminFloat> SR1TrustRegion<B, R, F> {
 impl<O, B, R, F> Solver<O> for SR1TrustRegion<B, R, F>
 where
     O: ArgminOp<Output = F, Hessian = B, Float = F>,
-    O::Param: Debug
-        + Clone
-        + Default
-        + SerializeAlias
-        + ArgminSub<O::Param, O::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminDot<O::Param, O::Hessian>
-        + ArgminWeightedDot<O::Param, O::Float, O::Hessian>
         + ArgminNorm<O::Float>
-        + ArgminZeroLike
-        + ArgminMul<F, O::Param>,
-    B: Debug
-        + Clone
-        + Default
+        + ArgminZeroLike,
+    B: Clone
         + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
-        + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<F, O::Hessian>,
-    R: ArgminTrustRegion<F> + Solver<O>,
+    R: Clone + ArgminTrustRegion<F> + Solver<O>,
     F: ArgminFloat + ArgminNorm<O::Float>,
 {
     const NAME: &'static str = "SR1 Trust Region";

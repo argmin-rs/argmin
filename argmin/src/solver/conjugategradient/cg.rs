@@ -11,16 +11,12 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, DeserializeOwnedAlias, Error, IterState,
-    OpWrapper, SerializeAlias, Solver,
+    ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, Error, IterState, OpWrapper, SerializeAlias,
+    Solver,
 };
-use argmin_math::{
-    ArgminAdd, ArgminConj, ArgminDiv, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub,
-};
+use argmin_math::{ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::default::Default;
-use std::fmt::Debug;
 
 /// The conjugate gradient method is a solver for systems of linear equations with a symmetric and
 /// positive-definite matrix.
@@ -31,30 +27,24 @@ use std::fmt::Debug;
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct ConjugateGradient<P, S> {
+pub struct ConjugateGradient<P, F> {
     /// b (right hand side)
     b: P,
     /// residual
-    r: P,
+    r: Option<P>,
     /// p
-    p: P,
+    p: Option<P>,
     /// previous p
-    p_prev: P,
+    p_prev: Option<P>,
     /// r^T * r
     #[cfg_attr(feature = "serde1", serde(skip))]
-    rtr: S,
-    /// alpha
-    #[cfg_attr(feature = "serde1", serde(skip))]
-    alpha: S,
-    /// beta
-    #[cfg_attr(feature = "serde1", serde(skip))]
-    beta: S,
+    rtr: F,
 }
 
-impl<P, S> ConjugateGradient<P, S>
+impl<P, F> ConjugateGradient<P, F>
 where
-    P: Clone + Default,
-    S: Default,
+    P: Clone,
+    F: ArgminFloat,
 {
     /// Constructor
     ///
@@ -64,45 +54,40 @@ where
     pub fn new(b: P) -> Result<Self, Error> {
         Ok(ConjugateGradient {
             b,
-            r: P::default(),
-            p: P::default(),
-            p_prev: P::default(),
-            rtr: S::default(),
-            alpha: S::default(),
-            beta: S::default(),
+            r: None,
+            p: None,
+            p_prev: None,
+            rtr: F::nan(),
         })
     }
 
     /// Return the current search direction (This is needed by NewtonCG for instance)
-    pub fn p(&self) -> P {
-        self.p.clone()
+    pub fn p(&self) -> &P {
+        self.p.as_ref().unwrap()
     }
 
     /// Return the previous search direction (This is needed by NewtonCG for instance)
-    pub fn p_prev(&self) -> P {
-        self.p_prev.clone()
+    pub fn p_prev(&self) -> &P {
+        self.p_prev.as_ref().unwrap()
     }
 
     /// Return the current residual (This is needed by NewtonCG for instance)
-    pub fn residual(&self) -> P {
-        self.r.clone()
+    pub fn residual(&self) -> &P {
+        self.r.as_ref().unwrap()
     }
 }
 
-impl<P, O, S, F> Solver<O> for ConjugateGradient<P, S>
+impl<P, O, F> Solver<O> for ConjugateGradient<P, F>
 where
     O: ArgminOp<Param = P, Output = P, Float = F>,
     P: Clone
         + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminDot<O::Param, S>
+        + ArgminDot<O::Param, F>
         + ArgminSub<O::Param, O::Param>
-        + ArgminScaledAdd<O::Param, S, O::Param>
-        + ArgminAdd<O::Param, O::Param>
+        + ArgminScaledAdd<O::Param, F, O::Param>
         + ArgminConj
         + ArgminMul<O::Float, O::Param>,
-    S: Debug + ArgminDiv<S, S> + ArgminNorm<O::Float> + ArgminConj,
-    F: ArgminFloat,
+    F: ArgminFloat + ArgminNorm<O::Float>,
 {
     const NAME: &'static str = "Conjugate Gradient";
 
@@ -114,9 +99,9 @@ where
         let init_param = state.get_param();
         let ap = op.apply(&init_param)?;
         let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
-        self.r = r0.clone();
-        self.p = r0.mul(&(F::from_f64(-1.0).unwrap()));
-        self.rtr = self.r.dot(&self.r.conj());
+        self.r = Some(r0.clone());
+        self.p = Some(r0.mul(&(F::from_f64(-1.0).unwrap())));
+        self.rtr = r0.dot(&r0.conj());
         Ok(None)
     }
 
@@ -126,25 +111,27 @@ where
         op: &mut OpWrapper<O>,
         state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        self.p_prev = self.p.clone();
-        let apk = op.apply(&self.p)?;
-        self.alpha = self.rtr.div(&self.p.dot(&apk.conj()));
-        let new_param = state.get_param().scaled_add(&self.alpha, &self.p);
-        self.r = self.r.scaled_add(&self.alpha, &apk);
-        let rtr_n = self.r.dot(&self.r.conj());
-        self.beta = rtr_n.div(&self.rtr);
+        let p = self.p.as_ref().unwrap();
+        let r = self.r.as_ref().unwrap();
+
+        self.p_prev = Some(p.clone());
+        let apk = op.apply(p)?;
+        let alpha = self.rtr.div(p.dot(&apk.conj()));
+        let new_param = state.get_param().scaled_add(&alpha, p);
+        let r = r.scaled_add(&alpha, &apk);
+        let rtr_n = r.dot(&r.conj());
+        let beta = rtr_n.div(self.rtr);
         self.rtr = rtr_n;
-        self.p = self
-            .r
-            .mul(&(F::from_f64(-1.0).unwrap()))
-            .scaled_add(&self.beta, &self.p);
-        let norm = self.r.dot(&self.r.conj());
+        let p = r.mul(&(F::from_f64(-1.0).unwrap())).scaled_add(&beta, p);
+        let norm = r.dot(&r.conj());
+
+        self.p = Some(p);
+        self.r = Some(r);
 
         Ok(ArgminIterData::new()
             .param(new_param)
-            // .cost(norm.sqrt())
             .cost(norm.norm())
-            .kv(make_kv!("alpha" => self.alpha; "beta" => self.beta;)))
+            .kv(make_kv!("alpha" => alpha; "beta" => beta;)))
     }
 }
 

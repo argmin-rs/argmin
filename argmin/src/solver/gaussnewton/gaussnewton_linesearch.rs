@@ -14,12 +14,9 @@ use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, Error,
     Executor, IterState, OpWrapper, Solver, TerminationReason,
 };
-use argmin_math::{
-    ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminScaledSub, ArgminSub, ArgminTranspose,
-};
+use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminTranspose};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::default::Default;
 
 /// Gauss-Newton method with linesearch
 ///
@@ -61,10 +58,7 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
 impl<O, L, F> Solver<O> for GaussNewtonLS<L, F>
 where
     O: ArgminOp<Float = F>,
-    O::Param: std::fmt::Debug
-        + ArgminScaledSub<O::Param, O::Float, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminMul<O::Float, O::Param>,
+    O::Param: ArgminMul<O::Float, O::Param>,
     O::Output: ArgminNorm<O::Float>,
     O::Jacobian: ArgminTranspose<O::Jacobian>
         + ArgminInv<O::Jacobian>

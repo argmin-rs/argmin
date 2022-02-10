@@ -5,9 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Important TODO: Find out which line search should be the default choice. Also try to replicate
-//! CG_DESCENT.
-//!
 //! # References:
 //!
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
@@ -15,13 +12,11 @@
 
 use crate::core::{
     ArgminFloat, ArgminIterData, ArgminKV, ArgminLineSearch, ArgminNLCGBetaUpdate, ArgminOp,
-    ArgminResult, DeserializeOwnedAlias, Error, Executor, IterState, OpWrapper, SerializeAlias,
-    Solver,
+    ArgminResult, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver,
 };
-use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
+use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::default::Default;
 
 /// The nonlinear conjugate gradient is a generalization of the conjugate gradient method for
 /// nonlinear optimization problems.
@@ -34,7 +29,7 @@ use std::default::Default;
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct NonlinearConjugateGradient<P, L, B, F> {
     /// p
-    p: P,
+    p: Option<P>,
     /// beta
     beta: F,
     /// line search
@@ -49,13 +44,12 @@ pub struct NonlinearConjugateGradient<P, L, B, F> {
 
 impl<P, L, B, F> NonlinearConjugateGradient<P, L, B, F>
 where
-    P: Default,
     F: ArgminFloat,
 {
     /// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))
     pub fn new(linesearch: L, beta_method: B) -> Result<Self, Error> {
         Ok(NonlinearConjugateGradient {
-            p: P::default(),
+            p: None,
             beta: F::nan(),
             linesearch,
             beta_method,
@@ -92,17 +86,11 @@ impl<O, P, L, B, F> Solver<O> for NonlinearConjugateGradient<P, L, B, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
-        + Default
         + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, O::Float>
-        + ArgminScaledAdd<O::Param, O::Float, O::Param>
         + ArgminAdd<O::Param, O::Param>
         + ArgminMul<F, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminNorm<O::Float>,
-    O::Hessian: Default,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
     B: ArgminNLCGBetaUpdate<O::Param, O::Float>,
     F: ArgminFloat,
@@ -117,7 +105,7 @@ where
         let param = state.get_param();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
-        self.p = grad.mul(&(F::from_f64(-1.0).unwrap()));
+        self.p = Some(grad.mul(&(F::from_f64(-1.0).unwrap())));
         Ok(Some(
             ArgminIterData::new().param(param).cost(cost).grad(grad),
         ))
@@ -128,6 +116,7 @@ where
         op: &mut OpWrapper<O>,
         state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
+        let p = self.p.as_ref().unwrap();
         let xk = state.get_param();
         let grad = if let Some(grad) = state.get_grad() {
             grad
@@ -137,7 +126,7 @@ where
         let cur_cost = state.get_cost();
 
         // Linesearch
-        self.linesearch.set_search_direction(self.p.clone());
+        self.linesearch.set_search_direction(p.clone());
 
         // Run solver
         let ArgminResult {
@@ -168,13 +157,15 @@ where
         if restart_iter || restart_orthogonality {
             self.beta = F::from_f64(0.0).unwrap();
         } else {
-            self.beta = self.beta_method.update(&grad, &new_grad, &self.p);
+            self.beta = self.beta_method.update(&grad, &new_grad, p);
         }
 
         // Update of p
-        self.p = new_grad
-            .mul(&(F::from_f64(-1.0).unwrap()))
-            .add(&self.p.mul(&self.beta));
+        self.p = Some(
+            new_grad
+                .mul(&(F::from_f64(-1.0).unwrap()))
+                .add(&p.mul(&self.beta)),
+        );
 
         // Housekeeping
         let cost = op.apply(&xk1)?;

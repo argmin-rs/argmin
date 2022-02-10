@@ -32,7 +32,10 @@ pub struct Newton<F> {
     gamma: F,
 }
 
-impl<F: ArgminFloat> Newton<F> {
+impl<F> Newton<F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new() -> Self {
         Newton {
@@ -53,7 +56,10 @@ impl<F: ArgminFloat> Newton<F> {
     }
 }
 
-impl<F: ArgminFloat> Default for Newton<F> {
+impl<F> Default for Newton<F>
+where
+    F: ArgminFloat,
+{
     fn default() -> Newton<F> {
         Newton::new()
     }

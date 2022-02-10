@@ -10,7 +10,7 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::core::{ArgminError, ArgminFloat, DeserializeOwnedAlias, Error, SerializeAlias};
+use crate::core::{ArgminError, ArgminFloat, Error, SerializeAlias};
 use argmin_math::ArgminDot;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -21,7 +21,7 @@ pub trait LineSearchCondition<T, F>: SerializeAlias {
     fn eval(
         &self,
         cur_cost: F,
-        cur_grad: &T,
+        cur_grad: Option<&T>,
         init_cost: F,
         init_grad: &T,
         search_direction: &T,
@@ -39,7 +39,10 @@ pub struct ArmijoCondition<F> {
     c: F,
 }
 
-impl<F: ArgminFloat> ArmijoCondition<F> {
+impl<F> ArmijoCondition<F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(c: F) -> Result<Self, Error> {
         if c <= F::from_f64(0.0).unwrap() || c >= F::from_f64(1.0).unwrap() {
@@ -55,12 +58,12 @@ impl<F: ArgminFloat> ArmijoCondition<F> {
 impl<T, F> LineSearchCondition<T, F> for ArmijoCondition<F>
 where
     T: ArgminDot<T, F>,
-    F: ArgminFloat + SerializeAlias + DeserializeOwnedAlias,
+    F: ArgminFloat,
 {
     fn eval(
         &self,
         cur_cost: F,
-        _cur_grad: &T,
+        _cur_grad: Option<&T>,
         init_cost: F,
         init_grad: &T,
         search_direction: &T,
@@ -82,7 +85,10 @@ pub struct WolfeCondition<F> {
     c2: F,
 }
 
-impl<F: ArgminFloat> WolfeCondition<F> {
+impl<F> WolfeCondition<F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(c1: F, c2: F) -> Result<Self, Error> {
         if c1 <= F::from_f64(0.0).unwrap() || c1 >= F::from_f64(1.0).unwrap() {
@@ -103,13 +109,13 @@ impl<F: ArgminFloat> WolfeCondition<F> {
 
 impl<T, F> LineSearchCondition<T, F> for WolfeCondition<F>
 where
-    T: Clone + ArgminDot<T, F>,
-    F: ArgminFloat + DeserializeOwnedAlias + SerializeAlias,
+    T: ArgminDot<T, F>,
+    F: ArgminFloat,
 {
     fn eval(
         &self,
         cur_cost: F,
-        cur_grad: &T,
+        cur_grad: Option<&T>,
         init_cost: F,
         init_grad: &T,
         search_direction: &T,
@@ -117,7 +123,7 @@ where
     ) -> bool {
         let tmp = init_grad.dot(search_direction);
         (cur_cost <= init_cost + self.c1 * alpha * tmp)
-            && cur_grad.dot(search_direction) >= self.c2 * tmp
+            && cur_grad.unwrap().dot(search_direction) >= self.c2 * tmp
     }
 
     fn requires_cur_grad(&self) -> bool {
@@ -133,7 +139,10 @@ pub struct StrongWolfeCondition<F> {
     c2: F,
 }
 
-impl<F: ArgminFloat> StrongWolfeCondition<F> {
+impl<F> StrongWolfeCondition<F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(c1: F, c2: F) -> Result<Self, Error> {
         if c1 <= F::from_f64(0.0).unwrap() || c1 >= F::from_f64(1.0).unwrap() {
@@ -154,13 +163,13 @@ impl<F: ArgminFloat> StrongWolfeCondition<F> {
 
 impl<T, F> LineSearchCondition<T, F> for StrongWolfeCondition<F>
 where
-    T: Clone + ArgminDot<T, F>,
-    F: ArgminFloat + SerializeAlias + DeserializeOwnedAlias,
+    T: ArgminDot<T, F>,
+    F: ArgminFloat,
 {
     fn eval(
         &self,
         cur_cost: F,
-        cur_grad: &T,
+        cur_grad: Option<&T>,
         init_cost: F,
         init_grad: &T,
         search_direction: &T,
@@ -168,7 +177,7 @@ where
     ) -> bool {
         let tmp = init_grad.dot(search_direction);
         (cur_cost <= init_cost + self.c1 * alpha * tmp)
-            && cur_grad.dot(search_direction).abs() <= self.c2 * tmp.abs()
+            && cur_grad.unwrap().dot(search_direction).abs() <= self.c2 * tmp.abs()
     }
 
     fn requires_cur_grad(&self) -> bool {
@@ -183,7 +192,10 @@ pub struct GoldsteinCondition<F> {
     c: F,
 }
 
-impl<F: ArgminFloat> GoldsteinCondition<F> {
+impl<F> GoldsteinCondition<F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(c: F) -> Result<Self, Error> {
         if c <= F::from_f64(0.0).unwrap() || c >= F::from_f64(0.5).unwrap() {
@@ -199,12 +211,12 @@ impl<F: ArgminFloat> GoldsteinCondition<F> {
 impl<T, F> LineSearchCondition<T, F> for GoldsteinCondition<F>
 where
     T: ArgminDot<T, F>,
-    F: ArgminFloat + SerializeAlias + DeserializeOwnedAlias,
+    F: ArgminFloat,
 {
     fn eval(
         &self,
         cur_cost: F,
-        _cur_grad: &T,
+        _cur_grad: Option<&T>,
         init_cost: F,
         init_grad: &T,
         search_direction: &T,
@@ -288,7 +300,7 @@ mod tests {
             assert_eq!(
                 cond.eval(
                     f(initial_x + alpha, initial_y),
-                    &g(initial_x + alpha, initial_y),
+                    Some(&g(initial_x + alpha, initial_y)),
                     f(initial_x, initial_y),
                     &g(initial_x, initial_y),
                     &search_direction,
@@ -395,7 +407,7 @@ mod tests {
             assert_eq!(
                 cond.eval(
                     f(initial_x + alpha, initial_y),
-                    &g(initial_x + alpha, initial_y),
+                    Some(&g(initial_x + alpha, initial_y)),
                     f(initial_x, initial_y),
                     &g(initial_x, initial_y),
                     &search_direction,
@@ -503,7 +515,7 @@ mod tests {
             assert_eq!(
                 cond.eval(
                     f(initial_x + alpha, initial_y),
-                    &g(initial_x + alpha, initial_y),
+                    Some(&g(initial_x + alpha, initial_y)),
                     f(initial_x, initial_y),
                     &g(initial_x, initial_y),
                     &search_direction,
@@ -539,7 +551,7 @@ mod tests {
             assert_eq!(
                 cond.eval(
                     f(initial_x + alpha, initial_y),
-                    &g(initial_x + alpha, initial_y),
+                    Some(&g(initial_x + alpha, initial_y)),
                     f(initial_x, initial_y),
                     &g(initial_x, initial_y),
                     &search_direction,
@@ -610,7 +622,7 @@ mod tests {
             assert_eq!(
                 cond.eval(
                     f(initial_x + alpha, initial_y),
-                    &g(initial_x + alpha, initial_y),
+                    Some(&g(initial_x + alpha, initial_y)),
                     f(initial_x, initial_y),
                     &g(initial_x, initial_y),
                     &search_direction,

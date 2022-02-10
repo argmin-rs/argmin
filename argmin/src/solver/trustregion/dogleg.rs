@@ -35,7 +35,10 @@ pub struct Dogleg<F> {
     radius: F,
 }
 
-impl<F: ArgminFloat> Dogleg<F> {
+impl<F> Dogleg<F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new() -> Self {
         Dogleg { radius: F::nan() }
@@ -45,9 +48,7 @@ impl<F: ArgminFloat> Dogleg<F> {
 impl<O, F> Solver<O> for Dogleg<F>
 where
     O: ArgminOp<Output = F, Float = F>,
-    O::Param: std::fmt::Debug
-        + ArgminMul<F, O::Param>
-        + ArgminWeightedDot<O::Param, O::Float, O::Hessian>
+    O::Param: ArgminMul<F, O::Param>
         + ArgminNorm<F>
         + ArgminDot<O::Param, O::Float>
         + ArgminAdd<O::Param, O::Param>

@@ -14,13 +14,12 @@
 //! DOI: <https://doi.org/10.1137/030601880>
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, DeserializeOwnedAlias,
-    Error, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, Error, IterState,
+    OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
-use argmin_math::{ArgminDot, ArgminScaledAdd, ArgminSub};
+use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::default::Default;
 
 type Triplet<F> = (F, F, F);
 
@@ -80,21 +79,22 @@ pub struct HagerZhangLineSearch<P, F> {
     best_f: F,
     /// best slope
     best_g: F,
-    /// Search direction (builder)
-    search_direction_b: Option<P>,
     /// initial parameter vector
-    init_param: P,
+    init_param: Option<P>,
     /// initial cost
     finit: F,
     /// initial gradient (builder)
-    init_grad: P,
+    init_grad: Option<P>,
     /// Search direction (builder)
-    search_direction: P,
+    search_direction: Option<P>,
     /// Search direction in 1D
     dginit: F,
 }
 
-impl<P: Default, F: ArgminFloat> HagerZhangLineSearch<P, F> {
+impl<P, F> HagerZhangLineSearch<P, F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new() -> Self {
         HagerZhangLineSearch {
@@ -120,10 +120,9 @@ impl<P: Default, F: ArgminFloat> HagerZhangLineSearch<P, F> {
             best_x: F::from_f64(0.0).unwrap(),
             best_f: F::infinity(),
             best_g: F::nan(),
-            search_direction_b: None,
-            init_param: P::default(),
-            init_grad: P::default(),
-            search_direction: P::default(),
+            init_param: None,
+            init_grad: None,
+            search_direction: None,
             dginit: F::nan(),
             finit: F::infinity(),
         }
@@ -132,12 +131,7 @@ impl<P: Default, F: ArgminFloat> HagerZhangLineSearch<P, F> {
 
 impl<P, F> HagerZhangLineSearch<P, F>
 where
-    P: Clone
-        + Default
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminScaledAdd<P, F, P>
-        + ArgminDot<P, F>,
+    P: ArgminScaledAdd<P, F, P> + ArgminDot<P, F>,
     F: ArgminFloat,
 {
     /// set delta
@@ -362,7 +356,11 @@ where
         op: &mut OpWrapper<O>,
         alpha: F,
     ) -> Result<F, Error> {
-        let tmp = self.init_param.scaled_add(&alpha, &self.search_direction);
+        let tmp = self
+            .init_param
+            .as_ref()
+            .unwrap()
+            .scaled_add(&alpha, self.search_direction.as_ref().unwrap());
         op.apply(&tmp)
     }
 
@@ -371,9 +369,13 @@ where
         op: &mut OpWrapper<O>,
         alpha: F,
     ) -> Result<F, Error> {
-        let tmp = self.init_param.scaled_add(&alpha, &self.search_direction);
+        let tmp = self
+            .init_param
+            .as_ref()
+            .unwrap()
+            .scaled_add(&alpha, self.search_direction.as_ref().unwrap());
         let grad = op.gradient(&tmp)?;
-        Ok(self.search_direction.dot(&grad))
+        Ok(self.search_direction.as_ref().unwrap().dot(&grad))
     }
 
     fn set_best(&mut self) {
@@ -397,25 +399,19 @@ where
     }
 }
 
-impl<P: Default, F: ArgminFloat> Default for HagerZhangLineSearch<P, F> {
+impl<P, F> Default for HagerZhangLineSearch<P, F>
+where
+    F: ArgminFloat,
+{
     fn default() -> Self {
         HagerZhangLineSearch::new()
     }
 }
 
-impl<P, F> ArgminLineSearch<P, F> for HagerZhangLineSearch<P, F>
-where
-    P: Clone
-        + Default
-        + SerializeAlias
-        + ArgminSub<P, P>
-        + ArgminDot<P, f64>
-        + ArgminScaledAdd<P, f64, P>,
-    F: ArgminFloat,
-{
+impl<P, F> ArgminLineSearch<P, F> for HagerZhangLineSearch<P, F> {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {
-        self.search_direction_b = Some(search_direction);
+        self.search_direction = Some(search_direction);
     }
 
     /// Set initial alpha value
@@ -428,13 +424,7 @@ where
 impl<P, O, F> Solver<O> for HagerZhangLineSearch<P, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
-    P: Clone
-        + Default
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminSub<P, P>
-        + ArgminDot<P, F>
-        + ArgminScaledAdd<P, F, P>,
+    P: Clone + SerializeAlias + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Hager-Zhang Line search";
@@ -451,24 +441,27 @@ where
             .into());
         }
 
-        self.search_direction = check_param!(
-            self.search_direction_b,
+        check_param!(
+            self.search_direction,
             "HagerZhangLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
 
-        self.init_param = state.get_param();
+        let init_param = state.get_param();
+        self.init_param = Some(init_param.clone());
 
         let cost = state.get_cost();
         self.finit = if cost.is_infinite() {
-            op.apply(&self.init_param)?
+            op.apply(&init_param)?
         } else {
             cost
         };
 
-        self.init_grad = state
-            .get_grad()
-            .map(Result::Ok)
-            .unwrap_or_else(|| op.gradient(&self.init_param))?;
+        self.init_grad = Some(
+            state
+                .get_grad()
+                .map(Result::Ok)
+                .unwrap_or_else(|| op.gradient(&init_param))?,
+        );
 
         self.a_x = self.a_x_init;
         self.b_x = self.b_x_init;
@@ -486,12 +479,15 @@ where
 
         self.epsilon_k = self.epsilon * self.finit.abs();
 
-        self.dginit = self.init_grad.dot(&self.search_direction);
+        self.dginit = self
+            .init_grad
+            .as_ref()
+            .unwrap()
+            .dot(self.search_direction.as_ref().unwrap());
 
         self.set_best();
-        let new_param = self
-            .init_param
-            .scaled_add(&self.best_x, &self.search_direction);
+        let new_param =
+            init_param.scaled_add(&self.best_x, self.search_direction.as_ref().unwrap());
         let best_f = self.best_f;
 
         Ok(Some(ArgminIterData::new().param(new_param).cost(best_f)))
@@ -511,10 +507,14 @@ where
         // L2
         if bt_x - at_x > self.gamma * (self.b_x - self.a_x) {
             let c_x = (at_x + bt_x) / F::from_f64(2.0).unwrap();
-            let tmp = self.init_param.scaled_add(&c_x, &self.search_direction);
+            let tmp = self
+                .init_param
+                .as_ref()
+                .unwrap()
+                .scaled_add(&c_x, self.search_direction.as_ref().unwrap());
             let c_f = op.apply(&tmp)?;
             let grad = op.gradient(&tmp)?;
-            let c_g = self.search_direction.dot(&grad);
+            let c_g = self.search_direction.as_ref().unwrap().dot(&grad);
             let ((an_x, an_f, an_g), (bn_x, bn_f, bn_g)) =
                 self.update(op, (at_x, at_f, at_g), (bt_x, bt_f, bt_g), (c_x, c_f, c_g))?;
             at_x = an_x;
@@ -536,7 +536,9 @@ where
         self.set_best();
         let new_param = self
             .init_param
-            .scaled_add(&self.best_x, &self.search_direction);
+            .as_ref()
+            .unwrap()
+            .scaled_add(&self.best_x, self.search_direction.as_ref().unwrap());
         Ok(ArgminIterData::new().param(new_param).cost(self.best_f))
     }
 

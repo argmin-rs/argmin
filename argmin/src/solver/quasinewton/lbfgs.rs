@@ -11,15 +11,13 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminKV, ArgminLineSearch, ArgminOp, ArgminResult,
-    DeserializeOwnedAlias, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver,
-    TerminationReason,
+    ArgminFloat, ArgminIterData, ArgminKV, ArgminLineSearch, ArgminOp, ArgminResult, Error,
+    Executor, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
-use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
+use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
-use std::fmt::Debug;
 
 /// L-BFGS method
 ///
@@ -46,7 +44,10 @@ pub struct LBFGS<L, P, F> {
     tol_cost: F,
 }
 
-impl<L, P, F: ArgminFloat> LBFGS<L, P, F> {
+impl<L, P, F> LBFGS<L, P, F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(linesearch: L, m: usize) -> Self {
         LBFGS {
@@ -79,18 +80,12 @@ where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     O::Param: Clone
         + SerializeAlias
-        + DeserializeOwnedAlias
-        + Debug
-        + Default
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
         + ArgminDot<O::Param, O::Float>
-        + ArgminScaledAdd<O::Param, O::Float, O::Param>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    O::Hessian: Clone + Default + SerializeAlias + DeserializeOwnedAlias,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
-    // L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<OpWrapper<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "L-BFGS";

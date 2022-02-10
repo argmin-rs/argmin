@@ -8,14 +8,13 @@
 //! * [Backtracking line search](struct.BacktrackingLineSearch.html)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, DeserializeOwnedAlias,
-    Error, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, Error, IterState,
+    OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
 use crate::solver::linesearch::condition::*;
-use argmin_math::{ArgminDot, ArgminScaledAdd, ArgminSub};
+use argmin_math::ArgminScaledAdd;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::borrow::Cow;
 
 /// The Backtracking line search is a simple method to find a step length which obeys the Armijo
 /// (sufficient decrease) condition.
@@ -30,11 +29,11 @@ use std::borrow::Cow;
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct BacktrackingLineSearch<P, L, F> {
     /// initial parameter vector
-    init_param: P,
+    init_param: Option<P>,
     /// initial cost
     init_cost: F,
     /// initial gradient
-    init_grad: P,
+    init_grad: Option<P>,
     /// Search direction
     search_direction: Option<P>,
     /// Contraction factor rho
@@ -45,13 +44,16 @@ pub struct BacktrackingLineSearch<P, L, F> {
     alpha: F,
 }
 
-impl<P: Default, L, F: ArgminFloat> BacktrackingLineSearch<P, L, F> {
+impl<P, L, F> BacktrackingLineSearch<P, L, F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(condition: L) -> Self {
         BacktrackingLineSearch {
-            init_param: P::default(),
+            init_param: None,
             init_cost: F::infinity(),
-            init_grad: P::default(),
+            init_grad: None,
             search_direction: None,
             rho: F::from_f64(0.9).unwrap(),
             condition,
@@ -75,9 +77,7 @@ impl<P: Default, L, F: ArgminFloat> BacktrackingLineSearch<P, L, F> {
 
 impl<P, L, F> ArgminLineSearch<P, F> for BacktrackingLineSearch<P, L, F>
 where
-    P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminDot<P, f64> + ArgminScaledAdd<P, f64, P>,
-    L: LineSearchCondition<P, F>,
-    F: ArgminFloat + SerializeAlias + DeserializeOwnedAlias,
+    F: ArgminFloat,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {
@@ -97,10 +97,11 @@ where
     }
 }
 
-impl<P, L, F: ArgminFloat> BacktrackingLineSearch<P, L, F>
+impl<P, L, F> BacktrackingLineSearch<P, L, F>
 where
     P: ArgminScaledAdd<P, F, P>,
     L: LineSearchCondition<P, F>,
+    F: ArgminFloat,
 {
     fn backtracking_step<O: ArgminOp<Param = P, Output = F, Float = F>>(
         &self,
@@ -108,6 +109,8 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         let new_param = self
             .init_param
+            .as_ref()
+            .unwrap()
             .scaled_add(&self.alpha, self.search_direction.as_ref().unwrap());
 
         let cur_cost = op.apply(&new_param)?;
@@ -127,7 +130,7 @@ where
 
 impl<O, P, L, F> Solver<O> for BacktrackingLineSearch<P, L, F>
 where
-    P: Clone + Default + SerializeAlias + DeserializeOwnedAlias + ArgminScaledAdd<P, F, P>,
+    P: SerializeAlias + ArgminScaledAdd<P, F, P>,
     O: ArgminOp<Param = P, Output = F, Float = F>,
     L: LineSearchCondition<P, F>,
     F: ArgminFloat,
@@ -139,18 +142,18 @@ where
         op: &mut OpWrapper<O>,
         state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        self.init_param = state.get_param();
+        let init_param = state.get_param();
         let cost = state.get_cost();
         self.init_cost = if cost == F::infinity() {
-            op.apply(&self.init_param)?
+            op.apply(&init_param)?
         } else {
             cost
         };
 
-        self.init_grad = state
+        let init_grad = state
             .get_grad()
             .map(Result::Ok)
-            .unwrap_or_else(|| op.gradient(&self.init_param))?;
+            .unwrap_or_else(|| op.gradient(&init_param))?;
 
         if self.search_direction.is_none() {
             return Err(ArgminError::NotInitialized {
@@ -159,6 +162,8 @@ where
             .into());
         }
 
+        self.init_param = Some(init_param);
+        self.init_grad = Some(init_grad);
         let out = self.backtracking_step(op)?;
         Ok(Some(out))
     }
@@ -175,13 +180,9 @@ where
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if self.condition.eval(
             state.get_cost(),
-            &state
-                .get_grad()
-                .as_ref()
-                .map(Cow::Borrowed)
-                .unwrap_or_else(|| Cow::Owned(P::default())),
+            state.get_grad().as_ref(),
             self.init_cost,
-            &self.init_grad,
+            self.init_grad.as_ref().unwrap(),
             self.search_direction.as_ref().unwrap(),
             self.alpha,
         ) {
@@ -230,10 +231,10 @@ mod tests {
         let ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
-        assert_eq!(ls.init_param, Vec::<f64>::default());
+        assert_eq!(ls.init_param, None);
         assert!(ls.init_cost.is_infinite());
         assert!(ls.init_cost.is_sign_positive());
-        assert_eq!(ls.init_grad, Vec::<f64>::default());
+        assert_eq!(ls.init_grad, None);
         assert_eq!(ls.search_direction, None);
         assert_eq!(ls.rho.to_ne_bytes(), 0.9f64.to_ne_bytes());
         assert_eq!(ls.alpha.to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -316,9 +317,9 @@ mod tests {
         let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
-        ls.init_param = vec![-1.0, 0.0];
+        ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
-        ls.init_grad = vec![-2.0, 0.0];
+        ls.init_grad = Some(vec![-2.0, 0.0]);
         ls.set_search_direction(vec![2.0f64, 0.0]);
         ls.set_init_alpha(0.8).unwrap();
 
@@ -348,9 +349,9 @@ mod tests {
         let mut ls: BacktrackingLineSearch<Vec<f64>, WolfeCondition<f64>, f64> =
             BacktrackingLineSearch::new(wolfe);
 
-        ls.init_param = vec![-1.0, 0.0];
+        ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
-        ls.init_grad = vec![-2.0, 0.0];
+        ls.init_grad = Some(vec![-2.0, 0.0]);
         ls.set_search_direction(vec![2.0f64, 0.0]);
         ls.set_init_alpha(0.8).unwrap();
 
@@ -379,7 +380,7 @@ mod tests {
         let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
-        ls.init_param = vec![-1.0, 0.0];
+        ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
         // in contrast to the step tests above, it is not necessary to set the init_grad here
         // because it will be computed in init if not present.
@@ -388,7 +389,7 @@ mod tests {
         assert_error!(
             ls.init(
                 &mut OpWrapper::new(prob.clone()),
-                &IterState::new(ls.init_param.clone())
+                &IterState::new(ls.init_param.clone().unwrap())
             ),
             ArgminError,
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
@@ -398,7 +399,7 @@ mod tests {
 
         let data = ls.init(
             &mut OpWrapper::new(prob),
-            &IterState::new(ls.init_param.clone()),
+            &IterState::new(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
@@ -426,7 +427,7 @@ mod tests {
         let mut ls: BacktrackingLineSearch<Vec<f64>, WolfeCondition<f64>, f64> =
             BacktrackingLineSearch::new(wolfe);
 
-        ls.init_param = vec![-1.0, 0.0];
+        ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
         // in contrast to the step tests above, it is not necessary to set the init_grad here
         // because it will be computed in init if not present.
@@ -435,7 +436,7 @@ mod tests {
         assert_error!(
             ls.init(
                 &mut OpWrapper::new(prob.clone()),
-                &IterState::new(ls.init_param.clone())
+                &IterState::new(ls.init_param.clone().unwrap())
             ),
             ArgminError,
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
@@ -445,7 +446,7 @@ mod tests {
 
         let data = ls.init(
             &mut OpWrapper::new(prob),
-            &IterState::new(ls.init_param.clone()),
+            &IterState::new(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
@@ -474,15 +475,15 @@ mod tests {
             BacktrackingLineSearch::new(armijo);
 
         let init_alpha = 0.8;
-        ls.init_param = vec![-1.0, 0.0];
+        ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
-        ls.init_grad = vec![-2.0, 0.0];
+        ls.init_grad = Some(vec![-2.0, 0.0]);
         ls.set_search_direction(vec![2.0f64, 0.0]);
         ls.set_init_alpha(init_alpha).unwrap();
 
         let data = ls.next_iter(
             &mut OpWrapper::new(prob),
-            &IterState::new(ls.init_param.clone()),
+            &IterState::new(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
@@ -505,21 +506,21 @@ mod tests {
             BacktrackingLineSearch::new(armijo);
 
         let init_alpha = 0.8;
-        ls.init_param = vec![-1.0, 0.0];
+        ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
-        ls.init_grad = vec![-2.0, 0.0];
+        ls.init_grad = Some(vec![-2.0, 0.0]);
         ls.set_search_direction(vec![2.0f64, 0.0]);
         ls.set_init_alpha(init_alpha).unwrap();
 
         assert_eq!(
-            ls.terminate(&IterState::<Problem>::new(ls.init_param.clone())),
+            ls.terminate(&IterState::<Problem>::new(ls.init_param.clone().unwrap())),
             TerminationReason::LineSearchConditionMet
         );
 
         ls.init_cost = 0.0f64;
 
         assert_eq!(
-            ls.terminate(&IterState::<Problem>::new(ls.init_param.clone())),
+            ls.terminate(&IterState::<Problem>::new(ls.init_param.clone().unwrap())),
             TerminationReason::NotTerminated
         );
     }
@@ -533,14 +534,14 @@ mod tests {
         let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
-        ls.init_param = vec![-1.0, 0.0];
+        ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
         // in contrast to the step tests above, it is not necessary to set the init_grad here
         // because it will be computed in init if not present.
         ls.set_init_alpha(0.8).unwrap();
 
         assert_error!(
-            Executor::new(prob.clone(), ls.clone(), ls.init_param.clone())
+            Executor::new(prob.clone(), ls.clone(), ls.init_param.clone().unwrap())
                 .max_iters(10)
                 .run(),
             ArgminError,
@@ -549,7 +550,7 @@ mod tests {
 
         ls.set_search_direction(vec![2.0f64, 0.0]);
 
-        let data = Executor::new(prob, ls.clone(), ls.init_param.clone())
+        let data = Executor::new(prob, ls.clone(), ls.init_param.clone().unwrap())
             .max_iters(10)
             .run();
         assert!(data.is_ok());
@@ -584,14 +585,14 @@ mod tests {
         let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
-        ls.init_param = vec![-1.0, 0.0];
+        ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
         // in contrast to the step tests above, it is not necessary to set the init_grad here
         // because it will be computed in init if not present.
         ls.set_init_alpha(0.8).unwrap();
 
         assert_error!(
-            Executor::new(prob.clone(), ls.clone(), ls.init_param.clone())
+            Executor::new(prob.clone(), ls.clone(), ls.init_param.clone().unwrap())
                 .max_iters(10)
                 .run(),
             ArgminError,
@@ -600,7 +601,7 @@ mod tests {
 
         ls.set_search_direction(vec![2.0f64, 0.0]);
 
-        let data = Executor::new(prob, ls.clone(), ls.init_param.clone())
+        let data = Executor::new(prob, ls.clone(), ls.init_param.clone().unwrap())
             .max_iters(10)
             .run();
         assert!(data.is_ok());
@@ -621,7 +622,6 @@ mod tests {
             data.termination_reason,
             TerminationReason::LineSearchConditionMet
         );
-
         assert!(data.get_grad().is_none());
     }
 }
