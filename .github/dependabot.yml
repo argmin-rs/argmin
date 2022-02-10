@@ -5,23 +5,3 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: ndarray-linalg
-    versions:
-    - 0.13.0
-  - dependency-name: nalgebra
-    versions:
-    - 0.24.0
-    - 0.24.1
-  - dependency-name: rand
-    versions:
-    - 0.8.3
-  - dependency-name: ndarray
-    versions:
-    - 0.14.0
-  - dependency-name: rand_xorshift
-    versions:
-    - 0.3.0
-  - dependency-name: num-complex
-    versions:
-    - 0.3.0
