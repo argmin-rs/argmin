@@ -1,60 +1,34 @@
 name: argmin CI
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
-  HOST: x86_64-unknown-linux-gnu
-  OPENBLAS_TARGET: sse_generic
 
 jobs:
   tests-argmin:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - stable
-          - beta
-          - nightly
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: stable
           override: true
-      # - name: Install dependencies
-      #   run: sudo apt-get install cmake gfortran libelf-dev libdw-dev binutils-dev libiberty-dev liblapacke-dev libopenblas-dev gcc
-      # - name: Build (default features)
-      #   run: cargo build -p argmin --verbose
       - name: Test (default features)
         run: cargo test -p argmin --verbose
-      # - name: Build (all features)
-      #   run: cargo build -p argmin --verbose --all-features
       - name: Test (all features)
         run: cargo test -p argmin --verbose --all-features
 
   tests-argmin-serde1-feature:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - stable
-          - beta
-          - nightly
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: stable
           override: true
-      # - name: Build (no default features)
-      #   run: cargo build -p argmin --verbose --no-default-features
       - name: Test (no default features)
         run: cargo test -p argmin --verbose --no-default-features
       - name: Test with serde1 feature
@@ -66,10 +40,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        rust:
-          - stable
-          - beta
-          - nightly
         feature:
           - primitives
           - vec
@@ -85,94 +55,56 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: stable
           override: true
           components: clippy
-      # - name: Build 
-      #   run: cargo build -p argmin-math --no-default-features --features ${{ matrix.feature }}
       - name: Test 
         run: cargo test -p argmin-math --no-default-features --features ${{ matrix.feature }}
 
-  clippy-argmin-math:
+  clippy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - beta
-        # feature:
-        #   - primitives
-        #   - vec
-        #   - ndarray_latest-serde
-        #   - ndarray_v0_15-serde
-        #   - ndarray_v0_14-serde
-        #   - ndarray_v0_13-serde
-        #   - nalgebra_latest-serde
-        #   - nalgebra_v0_30-serde
-        #   - nalgebra_v0_29-serde
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: beta
           override: true
           components: clippy
-      # - name: Clippy 
-      #   run: cargo clippy -p argmin-math --all-targets --features ${{ matrix.feature }} -- -D warnings
-      - name: Clippy 
+      - name: Clippy (argmin-math)
         run: cargo clippy -p argmin-math --all-targets --features "primitives,vec,nalgebra_latest-serde,ndarray_latest-serde" -- -D warnings
-
-  clippy-argmin:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - beta
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
-          override: true
-          components: clippy
-      - name: Clippy with default features
+      - name: Clippy (argmin) with default features
         run: cargo clippy -p argmin --all-targets -- -D warnings
-      - name: Clippy without default features
+      - name: Clippy (argmin) without default features
         run: cargo clippy -p argmin --all-targets --no-default-features -- -D warnings
-      - name: Clippy without serde1 feature
+      - name: Clippy (argmin) without serde1 feature
         run: cargo clippy -p argmin --all-targets --no-default-features --features="visualizer,slog-logger" -- -D warnings
-      - name: Clippy with all features
+      - name: Clippy (argmin) with all features
         run: cargo clippy -p argmin --all-targets --all-features -- -D warnings
 
   rustfmt:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - stable
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: stable
           override: true
-          components: rustfmt, rust-src
-      - run: cargo fmt -- --check
+          components: rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
 
   docs-build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - stable
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: stable
           override: true
       - name: argmin docs
         run: cargo rustdoc -p argmin --all-features -- -D warnings
@@ -181,16 +113,12 @@ jobs:
   
   wasm-build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - stable
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: stable
           override: true
       - name: Install toolchains
         run: |
