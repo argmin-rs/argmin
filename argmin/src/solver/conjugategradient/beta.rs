@@ -21,7 +21,7 @@ use serde::{Deserialize, Serialize};
 
 /// Fletcher and Reeves (FR) method
 /// TODO: Reference
-#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+#[derive(Default, Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct FletcherReeves {}
 
@@ -44,7 +44,7 @@ where
 
 /// Polak and Ribiere (PR) method
 /// TODO: Reference
-#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+#[derive(Default, Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct PolakRibiere {}
 
@@ -57,7 +57,7 @@ impl PolakRibiere {
 
 impl<T, F> ArgminNLCGBetaUpdate<T, F> for PolakRibiere
 where
-    T: Clone + ArgminDot<T, F> + ArgminSub<T, T> + ArgminNorm<F>,
+    T: ArgminDot<T, F> + ArgminSub<T, T> + ArgminNorm<F>,
     F: ArgminFloat,
 {
     fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
@@ -68,7 +68,7 @@ where
 
 /// Polak and Ribiere Plus (PR+) method
 /// TODO: Reference
-#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+#[derive(Default, Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct PolakRibierePlus {}
 
@@ -81,7 +81,7 @@ impl PolakRibierePlus {
 
 impl<T, F> ArgminNLCGBetaUpdate<T, F> for PolakRibierePlus
 where
-    T: Clone + ArgminDot<T, F> + ArgminSub<T, T> + ArgminNorm<F>,
+    T: ArgminDot<T, F> + ArgminSub<T, T> + ArgminNorm<F>,
     F: ArgminFloat,
 {
     fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
@@ -93,7 +93,7 @@ where
 
 /// Hestenes and Stiefel (HS) method
 /// TODO: Reference
-#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+#[derive(Default, Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct HestenesStiefel {}
 
@@ -106,7 +106,7 @@ impl HestenesStiefel {
 
 impl<T, F> ArgminNLCGBetaUpdate<T, F> for HestenesStiefel
 where
-    T: Clone + ArgminDot<T, F> + ArgminSub<T, T> + ArgminNorm<F>,
+    T: ArgminDot<T, F> + ArgminSub<T, T>,
     F: ArgminFloat,
 {
     fn update(&self, dfk: &T, dfk1: &T, pk: &T) -> F {

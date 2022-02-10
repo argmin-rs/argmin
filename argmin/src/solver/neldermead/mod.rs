@@ -12,13 +12,12 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, DeserializeOwnedAlias, Error,
-    IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, Error, IterState, OpWrapper,
+    SerializeAlias, Solver, TerminationReason,
 };
-use argmin_math::{ArgminAdd, ArgminMul, ArgminScaledSub, ArgminSub};
+use argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::default::Default;
 
 /// Nelder-Mead method
 ///
@@ -198,13 +197,19 @@ where
     }
 }
 
+#[derive(Debug)]
+enum Action {
+    Reflection,
+    Expansion,
+    Contraction,
+    Shrink,
+}
+
 impl<O, P, F> Solver<O> for NelderMead<P, F>
 where
     O: ArgminOp<Output = F, Param = P, Float = F>,
     P: Clone
         + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminScaledSub<O::Param, O::Float, O::Param>
         + ArgminSub<O::Param, O::Param>
         + ArgminAdd<O::Param, O::Param>
         + ArgminMul<O::Float, O::Param>,
@@ -251,7 +256,7 @@ where
             // reflection
             self.params.last_mut().unwrap().0 = xr;
             self.params.last_mut().unwrap().1 = xr_cost;
-            "reflection"
+            Action::Reflection
         } else if xr_cost < self.params[0].1 {
             // expansion
             let xe = self.expand(&x0, &xr);
@@ -263,7 +268,7 @@ where
                 self.params.last_mut().unwrap().0 = xr;
                 self.params.last_mut().unwrap().1 = xr_cost;
             }
-            "expansion"
+            Action::Expansion
         } else if xr_cost >= self.params[num_param - 2].1 {
             // contraction
             let xc = self.contract(&x0, &self.params[num_param - 1].0);
@@ -272,11 +277,11 @@ where
                 self.params.last_mut().unwrap().0 = xc;
                 self.params.last_mut().unwrap().1 = xc_cost;
             }
-            "contraction"
+            Action::Contraction
         } else {
             // shrink
             self.shrink(|x| op.apply(x))?;
-            "shrink"
+            Action::Shrink
         };
 
         self.sort_param_vecs();

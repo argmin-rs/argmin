@@ -12,13 +12,12 @@
 //! TODO
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, DeserializeOwnedAlias, Error, IterState,
-    OpWrapper, SerializeAlias, Solver,
+    ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, Error, IterState, OpWrapper, SerializeAlias,
+    Solver,
 };
 use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::default::Default;
 
 /// Particle Swarm Optimization (PSO)
 ///
@@ -43,7 +42,7 @@ pub struct ParticleSwarm<P, F> {
 
 impl<P, F> ParticleSwarm<P, F>
 where
-    P: Position<F> + DeserializeOwnedAlias + SerializeAlias,
+    P: Position<F>,
     F: ArgminFloat,
 {
     /// Constructor
@@ -137,7 +136,7 @@ where
 impl<O, P, F> Solver<O> for ParticleSwarm<P, F>
 where
     O: ArgminOp<Output = F, Param = P, Float = F>,
-    P: Position<F> + DeserializeOwnedAlias + SerializeAlias,
+    P: SerializeAlias + Position<F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Particle Swarm Optimization";
@@ -220,9 +219,8 @@ where
 }
 
 /// Position
-pub trait Position<F: ArgminFloat>:
+pub trait Position<F>:
     Clone
-    + Default
     + ArgminAdd<Self, Self>
     + ArgminSub<Self, Self>
     + ArgminMul<F, Self>
@@ -230,12 +228,13 @@ pub trait Position<F: ArgminFloat>:
     + ArgminRandom
     + ArgminMinMax
     + std::fmt::Debug
+where
+    F: ArgminFloat,
 {
 }
-impl<T, F: ArgminFloat> Position<F> for T
+impl<T, F> Position<F> for T
 where
     T: Clone
-        + Default
         + ArgminAdd<Self, Self>
         + ArgminSub<Self, Self>
         + ArgminMul<F, Self>

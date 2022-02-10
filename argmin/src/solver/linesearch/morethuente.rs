@@ -22,10 +22,10 @@
 #![allow(clippy::nonminimal_bool)]
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, DeserializeOwnedAlias,
-    Error, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, Error, IterState,
+    OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
-use argmin_math::{ArgminDot, ArgminScaledAdd, ArgminSub};
+use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
@@ -44,16 +44,14 @@ use std::default::Default;
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct MoreThuenteLineSearch<P, F> {
-    /// Search direction (builder)
-    search_direction_b: Option<P>,
+    /// Search direction
+    search_direction: Option<P>,
     /// initial parameter vector
-    init_param: P,
+    init_param: Option<P>,
     /// initial cost
     finit: F,
     /// initial gradient
-    init_grad: P,
-    /// Search direction
-    search_direction: P,
+    init_grad: Option<P>,
     /// Search direction in 1D
     dginit: F,
     /// dgtest
@@ -106,7 +104,10 @@ impl<F> Step<F> {
     }
 }
 
-impl<F: ArgminFloat> Default for Step<F> {
+impl<F> Default for Step<F>
+where
+    F: ArgminFloat,
+{
     fn default() -> Self {
         Step {
             x: F::from_f64(0.0).unwrap(),
@@ -116,15 +117,17 @@ impl<F: ArgminFloat> Default for Step<F> {
     }
 }
 
-impl<P: Default, F: ArgminFloat> MoreThuenteLineSearch<P, F> {
+impl<P, F> MoreThuenteLineSearch<P, F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new() -> Self {
         MoreThuenteLineSearch {
-            search_direction_b: None,
-            init_param: P::default(),
+            search_direction: None,
+            init_param: None,
             finit: F::infinity(),
-            init_grad: P::default(),
-            search_direction: P::default(),
+            init_grad: None,
             dginit: F::from_f64(0.0).unwrap(),
             dgtest: F::from_f64(0.0).unwrap(),
             ftol: F::from_f64(1e-4).unwrap(),
@@ -186,7 +189,10 @@ impl<P: Default, F: ArgminFloat> MoreThuenteLineSearch<P, F> {
     }
 }
 
-impl<P: Default, F: ArgminFloat> Default for MoreThuenteLineSearch<P, F> {
+impl<P, F: ArgminFloat> Default for MoreThuenteLineSearch<P, F>
+where
+    F: ArgminFloat,
+{
     fn default() -> Self {
         MoreThuenteLineSearch::new()
     }
@@ -194,12 +200,11 @@ impl<P: Default, F: ArgminFloat> Default for MoreThuenteLineSearch<P, F> {
 
 impl<P, F> ArgminLineSearch<P, F> for MoreThuenteLineSearch<P, F>
 where
-    P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
     F: ArgminFloat,
 {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {
-        self.search_direction_b = Some(search_direction);
+        self.search_direction = Some(search_direction);
     }
 
     /// Set initial alpha value
@@ -218,12 +223,7 @@ where
 impl<P, O, F> Solver<O> for MoreThuenteLineSearch<P, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
-    P: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminSub<P, P>
-        + ArgminDot<P, F>
-        + ArgminScaledAdd<P, F, P>,
+    P: Clone + SerializeAlias + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "More-Thuente Line search";
@@ -233,26 +233,32 @@ where
         op: &mut OpWrapper<O>,
         state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        self.search_direction = check_param!(
-            self.search_direction_b,
+        check_param!(
+            self.search_direction,
             "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
 
-        self.init_param = state.get_param();
+        self.init_param = Some(state.get_param());
 
         let cost = state.get_cost();
         self.finit = if cost.is_infinite() {
-            op.apply(&self.init_param)?
+            op.apply(self.init_param.as_ref().unwrap())?
         } else {
             cost
         };
 
-        self.init_grad = state
-            .get_grad()
-            .map(Result::Ok)
-            .unwrap_or_else(|| op.gradient(&self.init_param))?;
+        self.init_grad = Some(
+            state
+                .get_grad()
+                .map(Result::Ok)
+                .unwrap_or_else(|| op.gradient(self.init_param.as_ref().unwrap()))?,
+        );
 
-        self.dginit = self.init_grad.dot(&self.search_direction);
+        self.dginit = self
+            .init_grad
+            .as_ref()
+            .unwrap()
+            .dot(self.search_direction.as_ref().unwrap());
 
         // compute search direction in 1D
         if self.dginit >= F::from_f64(0.0).unwrap() {
@@ -310,14 +316,16 @@ where
         // Evaluate the function and gradient at new stp.x and compute the directional derivative
         let new_param = self
             .init_param
-            .scaled_add(&self.stp.x, &self.search_direction);
+            .as_ref()
+            .unwrap()
+            .scaled_add(&self.stp.x, self.search_direction.as_ref().unwrap());
         self.f = op.apply(&new_param)?;
         let new_grad = op.gradient(&new_param)?;
         let cur_cost = self.f;
         let cur_param = new_param;
         let cur_grad = new_grad.clone();
         // self.stx.fx = new_cost;
-        let dg = self.search_direction.dot(&new_grad);
+        let dg = self.search_direction.as_ref().unwrap().dot(&new_grad);
         let ftest1 = self.finit + self.stp.x * self.dgtest;
         // self.stp.fx = new_cost;
         // self.stp.gx = dg;
@@ -409,10 +417,6 @@ where
             self.width = (self.sty.x - self.stx.x).abs();
         }
 
-        // let new_param = self
-        //     .init_param
-        //     .scaled_add(&self.stp.x, &self.search_direction);
-        // Ok(ArgminIterData::new().param(new_param))
         Ok(ArgminIterData::new())
     }
 }

@@ -45,7 +45,7 @@ pub enum SATempFunc<F> {
     // Custom(Box<Fn(f64, u64) -> f64>),
 }
 
-impl<F> std::default::Default for SATempFunc<F> {
+impl<F> Default for SATempFunc<F> {
     fn default() -> Self {
         SATempFunc::Boltzmann
     }

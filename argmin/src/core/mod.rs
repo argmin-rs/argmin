@@ -338,7 +338,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
 }
 
 /// Defines a common interface for line search methods.
-pub trait ArgminLineSearch<P, F>: SerializeAlias {
+pub trait ArgminLineSearch<P, F> {
     /// Set the search direction
     fn set_search_direction(&mut self, direction: P);
 
@@ -348,7 +348,7 @@ pub trait ArgminLineSearch<P, F>: SerializeAlias {
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods.
-pub trait ArgminTrustRegion<F>: Clone + SerializeAlias {
+pub trait ArgminTrustRegion<F> {
     /// Set the initial step length
     fn set_radius(&mut self, radius: F);
 }

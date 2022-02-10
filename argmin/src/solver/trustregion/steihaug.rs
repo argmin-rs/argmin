@@ -11,12 +11,10 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, ArgminTrustRegion, DeserializeOwnedAlias,
-    Error, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, ArgminTrustRegion, Error, IterState,
+    OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
-use argmin_math::{
-    ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
-};
+use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot, ArgminZeroLike};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -50,7 +48,7 @@ pub struct Steihaug<P, F> {
 
 impl<P, F> Steihaug<P, F>
 where
-    P: Clone + ArgminMul<F, P> + ArgminDot<P, F> + ArgminAdd<P, P>,
+    P: ArgminMul<F, P> + ArgminDot<P, F> + ArgminAdd<P, P>,
     F: ArgminFloat,
 {
     /// Constructor
@@ -91,7 +89,6 @@ where
     where
         P: ArgminWeightedDot<P, F, H>,
     {
-        // self.cur_grad().dot(&p) + 0.5 * p.weighted_dot(&self.cur_hessian(), &p)
         g.dot(p) + F::from_f64(0.5).unwrap() * p.weighted_dot(h, p)
     }
 
@@ -100,7 +97,6 @@ where
     fn tau<G, H>(&self, filter_func: G, eval: bool, g: &P, h: &H) -> F
     where
         G: Fn(F) -> bool,
-        H: ArgminDot<P, P>,
         P: ArgminWeightedDot<P, F, H>,
     {
         let p = self.p.as_ref().unwrap();
@@ -154,16 +150,11 @@ where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
         + SerializeAlias
-        + DeserializeOwnedAlias
-        + Default
         + ArgminMul<F, P>
-        + ArgminWeightedDot<P, F, O::Hessian>
         + ArgminNorm<F>
         + ArgminDot<P, F>
         + ArgminAdd<P, P>
-        + ArgminSub<P, P>
-        + ArgminZeroLike
-        + ArgminMul<F, P>,
+        + ArgminZeroLike,
     O::Hessian: ArgminDot<P, P>,
     F: ArgminFloat,
 {
@@ -175,13 +166,14 @@ where
         state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         let r = state.get_grad().unwrap();
-        self.r = Some(r.clone());
 
         self.r_0_norm = r.norm();
         self.rtr = r.dot(&r);
         self.d = Some(r.mul(&F::from_f64(-1.0).unwrap()));
         let p = r.zero_like();
         self.p = Some(p.clone());
+
+        self.r = Some(r);
 
         Ok(if self.r_0_norm < self.epsilon {
             Some(

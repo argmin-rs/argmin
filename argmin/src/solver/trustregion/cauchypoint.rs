@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminOp, ArgminTrustRegion, Error, IterState, OpWrapper,
-    SerializeAlias, Solver, TerminationReason,
+    ArgminFloat, ArgminIterData, ArgminOp, ArgminTrustRegion, Error, IterState, OpWrapper, Solver,
+    TerminationReason,
 };
 use argmin_math::{ArgminMul, ArgminNorm, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
@@ -33,7 +33,10 @@ pub struct CauchyPoint<F> {
     radius: F,
 }
 
-impl<F: ArgminFloat> CauchyPoint<F> {
+impl<F> CauchyPoint<F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new() -> Self {
         CauchyPoint { radius: F::nan() }
@@ -43,13 +46,9 @@ impl<F: ArgminFloat> CauchyPoint<F> {
 impl<O, F> Solver<O> for CauchyPoint<F>
 where
     O: ArgminOp<Output = F, Float = F>,
-    O::Param: Debug
-        + Clone
-        + SerializeAlias
-        + ArgminMul<O::Float, O::Param>
+    O::Param: ArgminMul<O::Float, O::Param>
         + ArgminWeightedDot<O::Param, F, O::Hessian>
         + ArgminNorm<O::Float>,
-    O::Hessian: Clone + SerializeAlias,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Cauchy Point";
@@ -90,7 +89,10 @@ where
     }
 }
 
-impl<F: ArgminFloat> ArgminTrustRegion<F> for CauchyPoint<F> {
+impl<F> ArgminTrustRegion<F> for CauchyPoint<F>
+where
+    F: ArgminFloat,
+{
     fn set_radius(&mut self, radius: F) {
         self.radius = radius;
     }

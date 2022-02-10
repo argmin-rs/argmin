@@ -11,16 +11,14 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, DeserializeOwnedAlias,
-    Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, Error, Executor,
+    IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
 use argmin_math::{
-    ArgminAdd, ArgminDot, ArgminEye, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub,
-    ArgminTranspose,
+    ArgminAdd, ArgminDot, ArgminEye, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
 
 /// BFGS method
 ///
@@ -41,7 +39,10 @@ pub struct BFGS<L, H, F> {
     tol_cost: F,
 }
 
-impl<L, H, F: ArgminFloat> BFGS<L, H, F> {
+impl<L, H, F> BFGS<L, H, F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         BFGS {
@@ -70,19 +71,13 @@ impl<L, H, F: ArgminFloat> BFGS<L, H, F> {
 impl<O, L, H, F> Solver<O> for BFGS<L, H, F>
 where
     O: ArgminOp<Output = F, Hessian = H, Float = F>,
-    O::Param: Debug
-        + Default
-        + ArgminSub<O::Param, O::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminDot<O::Param, O::Hessian>
-        + ArgminScaledAdd<O::Param, O::Float, O::Param>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    H: Clone
-        + Default
-        + Debug
+    O::Hessian: Clone
         + SerializeAlias
-        + DeserializeOwnedAlias
         + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>

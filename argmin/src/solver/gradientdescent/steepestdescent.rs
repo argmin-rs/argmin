@@ -18,7 +18,7 @@ use crate::core::{
     ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, Error, Executor,
     IterState, OpWrapper, SerializeAlias, Solver,
 };
-use argmin_math::{ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
+use argmin_math::ArgminMul;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -46,16 +46,7 @@ impl<L> SteepestDescent<L> {
 impl<O, L, F> Solver<O> for SteepestDescent<L>
 where
     O: ArgminOp<Output = F, Float = F>,
-    O::Param: Clone
-        + Default
-        + SerializeAlias
-        + ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, O::Float>
-        + ArgminScaledAdd<O::Param, O::Float, O::Param>
-        + ArgminMul<O::Float, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminNorm<O::Float>,
-    O::Hessian: Default,
+    O::Param: SerializeAlias + ArgminMul<O::Float, O::Param>,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
     F: ArgminFloat,
 {

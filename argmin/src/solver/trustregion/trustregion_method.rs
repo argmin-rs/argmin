@@ -12,15 +12,12 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, ArgminTrustRegion,
-    Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    Error, Executor, IterState, OpWrapper, Solver, TerminationReason,
 };
 use crate::solver::trustregion::reduction_ratio;
-use argmin_math::{
-    ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
-};
+use argmin_math::{ArgminAdd, ArgminDot, ArgminNorm, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
 
 /// The trust region method approximates the cost function within a certain region around the
 /// current point in parameter space. Depending on the quality of this approximation, the region is
@@ -57,7 +54,10 @@ pub struct TrustRegion<R, F> {
     mk0: F,
 }
 
-impl<R, F: ArgminFloat> TrustRegion<R, F> {
+impl<R, F> TrustRegion<R, F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(subproblem: R) -> Self {
         TrustRegion {
@@ -100,19 +100,9 @@ impl<R, F: ArgminFloat> TrustRegion<R, F> {
 impl<O, R, F> Solver<O> for TrustRegion<R, F>
 where
     O: ArgminOp<Output = F, Float = F>,
-    O::Param: Clone
-        + Debug
-        + SerializeAlias
-        + ArgminMul<F, O::Param>
-        + ArgminWeightedDot<O::Param, F, O::Hessian>
-        + ArgminNorm<F>
-        + ArgminDot<O::Param, F>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminZeroLike
-        + ArgminMul<F, O::Param>,
-    O::Hessian: Clone + Debug + SerializeAlias + ArgminDot<O::Param, O::Param>,
-    R: ArgminTrustRegion<F> + Solver<O>,
+    O::Param: ArgminNorm<F> + ArgminDot<O::Param, F> + ArgminAdd<O::Param, O::Param>,
+    O::Hessian: ArgminDot<O::Param, O::Param>,
+    R: Clone + ArgminTrustRegion<F> + Solver<O>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Trust region";

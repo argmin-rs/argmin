@@ -11,13 +11,10 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, DeserializeOwnedAlias,
-    Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, Error, Executor,
+    IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
-use argmin_math::{
-    ArgminAdd, ArgminDot, ArgminEye, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub,
-    ArgminTranspose,
-};
+use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -38,7 +35,10 @@ pub struct DFP<L, H, F> {
     tol_grad: F,
 }
 
-impl<L, H, F: ArgminFloat> DFP<L, H, F> {
+impl<L, H, F> DFP<L, H, F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         DFP {
@@ -59,27 +59,16 @@ impl<L, H, F: ArgminFloat> DFP<L, H, F> {
 impl<O, L, H, F> Solver<O> for DFP<L, H, F>
 where
     O: ArgminOp<Output = F, Hessian = H, Float = F>,
-    O::Param: Clone
-        + Default
-        + SerializeAlias
-        + ArgminSub<O::Param, O::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminDot<O::Param, O::Hessian>
-        + ArgminScaledAdd<O::Param, F, O::Param>
         + ArgminNorm<O::Float>
-        + ArgminMul<O::Float, O::Param>
-        + ArgminTranspose<O::Param>,
-    H: Clone
-        + Default
-        + SerializeAlias
-        + DeserializeOwnedAlias
+        + ArgminMul<O::Float, O::Param>,
+    H: SerializeAlias
         + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
-        + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
-        + ArgminMul<F, O::Hessian>
-        + ArgminTranspose<O::Hessian>
-        + ArgminEye,
+        + ArgminMul<F, O::Hessian>,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
     F: ArgminFloat,
 {

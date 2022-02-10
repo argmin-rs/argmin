@@ -12,13 +12,11 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminLineSearch, ArgminOp, ArgminResult,
-    DeserializeOwnedAlias, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver,
-    TerminationReason,
+    Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
 
 /// SR1 method (broken!)
 ///
@@ -41,7 +39,10 @@ pub struct SR1<L, H, F> {
     tol_cost: F,
 }
 
-impl<L, H, F: ArgminFloat> SR1<L, H, F> {
+impl<L, H, F> SR1<L, H, F>
+where
+    F: ArgminFloat,
+{
     /// Constructor
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         SR1 {
@@ -84,23 +85,13 @@ impl<L, H, F: ArgminFloat> SR1<L, H, F> {
 impl<O, L, H, F> Solver<O> for SR1<L, H, F>
 where
     O: ArgminOp<Output = F, Hessian = H, Float = F>,
-    O::Param: Debug
-        + Clone
-        + Default
-        + SerializeAlias
-        + ArgminSub<O::Param, O::Param>
+    O::Param: ArgminSub<O::Param, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminDot<O::Param, O::Hessian>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    H: Debug
-        + Clone
-        + Default
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminSub<O::Hessian, O::Hessian>
+    O::Hessian: SerializeAlias
         + ArgminDot<O::Param, O::Param>
-        + ArgminDot<O::Hessian, O::Hessian>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<F, O::Hessian>,
     L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
