@@ -201,8 +201,6 @@ jobs:
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh 
       - name: Build target wasm32-unknown-unknown
         run: cargo build --target wasm32-unknown-unknown --features wasm-bindgen
-      - name: Build target wasm32-wasi with feature stdweb
-        run: cargo build --target wasm32-wasi --features stdweb
       - name: Build target wasm32-wasi with feature wasm-bindgen
         run: cargo build --target wasm32-wasi --features wasm-bindgen
       - name: Build target wasm32-unknown-emscripten

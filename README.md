@@ -146,7 +146,7 @@ argmin = { version = "0.5.0", features = ["ctrlc"] }
 
 #### Experimental support for compiling to WebAssembly
 
-When compiling to WASM, either the feature `wasm-bindgen` or `stdweb` must be used.
+When compiling to WASM, the feature `wasm-bindgen` must be used.
 
 WASM support is still experimental. Please report any issues you encounter when using argmin in a WASM context.
 
