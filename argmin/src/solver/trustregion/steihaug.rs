@@ -105,9 +105,9 @@ where
     {
         let p = self.p.as_ref().unwrap();
         let d = self.d.as_ref().unwrap();
-        let a = p.dot(&p);
-        let b = d.dot(&d);
-        let c = p.dot(&d);
+        let a = p.dot(p);
+        let b = d.dot(d);
+        let c = p.dot(d);
         let delta = self.radius.powi(2);
         let t1 = (-a * b + b * delta + c.powi(2)).sqrt();
         let tau1 = -(t1 + c) / b;
@@ -202,7 +202,7 @@ where
         let grad = state.get_grad().unwrap();
         let h = state.get_hessian().unwrap();
         let d = self.d.as_ref().unwrap();
-        let dhd = d.weighted_dot(&h, &d);
+        let dhd = d.weighted_dot(&h, d);
 
         // Current search direction d is a direction of zero curvature or negative curvature
         let p = self.p.as_ref().unwrap();
@@ -225,7 +225,7 @@ where
         }
 
         let r = self.r.as_ref().unwrap();
-        let r_n = r.add(&h.dot(&d).mul(&alpha));
+        let r_n = r.add(&h.dot(d).mul(&alpha));
 
         if r_n.norm() < self.epsilon * self.r_0_norm {
             return Ok(ArgminIterData::new()
@@ -237,7 +237,7 @@ where
         let beta = rjtrj / self.rtr;
         self.d = Some(r_n.mul(&F::from_f64(-1.0).unwrap()).add(&d.mul(&beta)));
         self.r = Some(r_n);
-        self.p = Some(p_n.clone());// TODO: is this necessary?
+        self.p = Some(p_n.clone());
         self.rtr = rjtrj;
 
         Ok(ArgminIterData::new()
