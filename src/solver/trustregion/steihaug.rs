@@ -28,22 +28,22 @@ pub struct Steihaug<P, F> {
     /// epsilon
     epsilon: F,
     /// p
-    p: P,
+    p: Option<P>,
     /// residual
-    r: P,
+    r: Option<P>,
     /// r^Tr
     rtr: F,
     /// initial residual
     r_0_norm: F,
     /// direction
-    d: P,
+    d: Option<P>,
     /// max iters
     max_iters: u64,
 }
 
 impl<P, F> Steihaug<P, F>
 where
-    P: Default + Clone + ArgminMul<F, P> + ArgminDot<P, F> + ArgminAdd<P, P>,
+    P: Clone + ArgminMul<F, P> + ArgminDot<P, F> + ArgminAdd<P, P>,
     F: ArgminFloat,
 {
     /// Constructor
@@ -51,11 +51,11 @@ where
         Steihaug {
             radius: F::nan(),
             epsilon: F::from_f64(10e-10).unwrap(),
-            p: P::default(),
-            r: P::default(),
+            p: None,
+            r: None,
             rtr: F::nan(),
             r_0_norm: F::nan(),
-            d: P::default(),
+            d: None,
             max_iters: std::u64::MAX,
         }
     }
@@ -94,9 +94,11 @@ where
         G: Fn(F) -> bool,
         H: ArgminDot<P, P>,
     {
-        let a = self.p.dot(&self.p);
-        let b = self.d.dot(&self.d);
-        let c = self.p.dot(&self.d);
+        let p = self.p.as_ref().unwrap();
+        let d = self.d.as_ref().unwrap();
+        let a = p.dot(p);
+        let b = d.dot(d);
+        let c = p.dot(d);
         let delta = self.radius.powi(2);
         let t1 = (-a * b + b * delta + c.powi(2)).sqrt();
         let tau1 = -(t1 + c) / b;
@@ -116,8 +118,8 @@ where
                 .enumerate()
                 .filter(|(_, tau)| (!tau.is_nan() || !tau.is_infinite()) && filter_func(*tau))
                 .map(|(i, tau)| {
-                    let p = self.p.add(&self.d.mul(&tau));
-                    (i, self.eval_m(&p, g, h))
+                    let p_local = p.add(&d.mul(&tau));
+                    (i, self.eval_m(&p_local, g, h))
                 })
                 .filter(|(_, m)| !m.is_nan() || !m.is_infinite())
                 .collect::<Vec<(usize, F)>>();
@@ -163,17 +165,19 @@ where
         _op: &mut OpWrapper<O>,
         state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        self.r = state.get_grad().unwrap();
+        let r = state.get_grad().unwrap();
+        self.r = Some(r.clone());
 
-        self.r_0_norm = self.r.norm();
-        self.rtr = self.r.dot(&self.r);
-        self.d = self.r.mul(&F::from_f64(-1.0).unwrap());
-        self.p = self.r.zero_like();
+        self.r_0_norm = r.norm();
+        self.rtr = r.dot(&r);
+        self.d = Some(r.mul(&F::from_f64(-1.0).unwrap()));
+        let p = r.zero_like();
+        self.p = Some(p.clone());
 
         Ok(if self.r_0_norm < self.epsilon {
             Some(
                 ArgminIterData::new()
-                    .param(self.p.clone())
+                    .param(p)
                     .termination_reason(TerminationReason::TargetPrecisionReached),
             )
         } else {
@@ -188,28 +192,31 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         let grad = state.get_grad().unwrap();
         let h = state.get_hessian().unwrap();
-        let dhd = self.d.weighted_dot(&h, &self.d);
+        let d = self.d.as_ref().unwrap();
+        let dhd = d.weighted_dot(&h, d);
 
         // Current search direction d is a direction of zero curvature or negative curvature
+        let p = self.p.as_ref().unwrap();
         if dhd <= F::from_f64(0.0).unwrap() {
             let tau = self.tau(|_| true, true, &grad, &h);
             return Ok(ArgminIterData::new()
-                .param(self.p.add(&self.d.mul(&tau)))
+                .param(p.add(&d.mul(&tau)))
                 .termination_reason(TerminationReason::TargetPrecisionReached));
         }
 
         let alpha = self.rtr / dhd;
-        let p_n = self.p.add(&self.d.mul(&alpha));
+        let p_n = p.add(&d.mul(&alpha));
 
         // new p violates trust region bound
         if p_n.norm() >= self.radius {
             let tau = self.tau(|x| x >= F::from_f64(0.0).unwrap(), false, &grad, &h);
             return Ok(ArgminIterData::new()
-                .param(self.p.add(&self.d.mul(&tau)))
+                .param(p.add(&d.mul(&tau)))
                 .termination_reason(TerminationReason::TargetPrecisionReached));
         }
 
-        let r_n = self.r.add(&h.dot(&self.d).mul(&alpha));
+        let r = self.r.as_ref().unwrap();
+        let r_n = r.add(&h.dot(d).mul(&alpha));
 
         if r_n.norm() < self.epsilon * self.r_0_norm {
             return Ok(ArgminIterData::new()
@@ -219,13 +226,13 @@ where
 
         let rjtrj = r_n.dot(&r_n);
         let beta = rjtrj / self.rtr;
-        self.d = r_n.mul(&F::from_f64(-1.0).unwrap()).add(&self.d.mul(&beta));
-        self.r = r_n;
-        self.p = p_n;
+        self.d = Some(r_n.mul(&F::from_f64(-1.0).unwrap()).add(&d.mul(&beta)));
+        self.r = Some(r_n);
+        self.p = Some(p_n.clone());
         self.rtr = rjtrj;
 
         Ok(ArgminIterData::new()
-            .param(self.p.clone())
+            .param(p_n)
             .cost(self.rtr)
             .grad(grad)
             .hessian(h))

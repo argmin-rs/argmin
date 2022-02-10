@@ -90,8 +90,7 @@ impl<R, F: ArgminFloat> TrustRegion<R, F> {
 impl<O, R, F> Solver<O> for TrustRegion<R, F>
 where
     O: ArgminOp<Output = F, Float = F>,
-    O::Param: Default
-        + Clone
+    O::Param: Clone
         + Debug
         + Serialize
         + ArgminMul<F, O::Param>
@@ -102,7 +101,7 @@ where
         + ArgminSub<O::Param, O::Param>
         + ArgminZeroLike
         + ArgminMul<F, O::Param>,
-    O::Hessian: Default + Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
+    O::Hessian: Clone + Debug + Serialize + ArgminDot<O::Param, O::Param>,
     R: ArgminTrustRegion<F> + Solver<O>,
     F: ArgminFloat,
 {
