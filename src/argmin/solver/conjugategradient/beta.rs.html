@@ -149,7 +149,7 @@
 
 <span class="doccomment">/// Fletcher and Reeves (FR) method</span>
 <span class="doccomment">/// TODO: Reference</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FletcherReeves</span> {}
 
@@ -172,7 +172,7 @@
 
 <span class="doccomment">/// Polak and Ribiere (PR) method</span>
 <span class="doccomment">/// TODO: Reference</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PolakRibiere</span> {}
 
@@ -185,7 +185,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">ArgminNLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PolakRibiere</span>
 <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">T</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dfk</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">dfk1</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">_pk</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">F</span> {
@@ -196,7 +196,7 @@
 
 <span class="doccomment">/// Polak and Ribiere Plus (PR+) method</span>
 <span class="doccomment">/// TODO: Reference</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PolakRibierePlus</span> {}
 
@@ -209,7 +209,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">ArgminNLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PolakRibierePlus</span>
 <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">T</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dfk</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">dfk1</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">_pk</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">F</span> {
@@ -221,7 +221,7 @@
 
 <span class="doccomment">/// Hestenes and Stiefel (HS) method</span>
 <span class="doccomment">/// TODO: Reference</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HestenesStiefel</span> {}
 
@@ -234,7 +234,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">ArgminNLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HestenesStiefel</span>
 <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">T</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dfk</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">dfk1</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">F</span> {

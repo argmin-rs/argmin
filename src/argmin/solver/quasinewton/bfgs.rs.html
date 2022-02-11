@@ -217,11 +217,6 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -235,16 +230,14 @@
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">ArgminIterData</span>, <span class="ident">ArgminLineSearch</span>, <span class="ident">ArgminOp</span>, <span class="ident">ArgminResult</span>, <span class="ident">DeserializeOwnedAlias</span>,
-    <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">IterState</span>, <span class="ident">OpWrapper</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
+    <span class="ident">ArgminFloat</span>, <span class="ident">ArgminIterData</span>, <span class="ident">ArgminLineSearch</span>, <span class="ident">ArgminOp</span>, <span class="ident">ArgminResult</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>,
+    <span class="ident">IterState</span>, <span class="ident">OpWrapper</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
 };
 <span class="kw">use</span> <span class="ident">argmin_math</span>::{
-    <span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminEye</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminScaledAdd</span>, <span class="ident">ArgminSub</span>,
-    <span class="ident">ArgminTranspose</span>,
+    <span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminEye</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminSub</span>, <span class="ident">ArgminTranspose</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
 
 <span class="doccomment">/// BFGS method</span>
 <span class="doccomment">///</span>
@@ -265,7 +258,10 @@
     <span class="ident">tol_cost</span>: <span class="ident">F</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">H</span>, <span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">BFGS</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">BFGS</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+{
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">init_inverse_hessian</span>: <span class="ident">H</span>, <span class="ident">linesearch</span>: <span class="ident">L</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">BFGS</span> {
@@ -294,19 +290,13 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">L</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BFGS</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span>, <span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">O::Param</span>: <span class="ident">Debug</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
+    <span class="ident">O::Param</span>: <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Hessian</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">O::Float</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">O::Float</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>,
-    <span class="ident">H</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Debug</span>
+    <span class="ident">O::Hessian</span>: <span class="ident">Clone</span>
         <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O::Hessian</span>, <span class="ident">O::Hessian</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Hessian</span>, <span class="ident">O::Hessian</span><span class="op">&gt;</span>

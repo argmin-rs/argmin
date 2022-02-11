@@ -400,7 +400,7 @@
     <span class="comment">// Custom(Box&lt;Fn(f64, u64) -&gt; f64&gt;),</span>
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">std::default::Default</span> <span class="kw">for</span> <span class="ident">SATempFunc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SATempFunc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">SATempFunc::Boltzmann</span>
     }

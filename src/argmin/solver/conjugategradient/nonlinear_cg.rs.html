@@ -200,15 +200,6 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -216,9 +207,6 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! Important TODO: Find out which line search should be the default choice. Also try to replicate</span>
-<span class="doccomment">//! CG_DESCENT.</span>
-<span class="doccomment">//!</span>
 <span class="doccomment">//! # References:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
@@ -226,13 +214,11 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
     <span class="ident">ArgminFloat</span>, <span class="ident">ArgminIterData</span>, <span class="ident">ArgminKV</span>, <span class="ident">ArgminLineSearch</span>, <span class="ident">ArgminNLCGBetaUpdate</span>, <span class="ident">ArgminOp</span>,
-    <span class="ident">ArgminResult</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">IterState</span>, <span class="ident">OpWrapper</span>, <span class="ident">SerializeAlias</span>,
-    <span class="ident">Solver</span>,
+    <span class="ident">ArgminResult</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">IterState</span>, <span class="ident">OpWrapper</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>,
 };
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminScaledAdd</span>, <span class="ident">ArgminSub</span>};
+<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
 
 <span class="doccomment">/// The nonlinear conjugate gradient is a generalization of the conjugate gradient method for</span>
 <span class="doccomment">/// nonlinear optimization problems.</span>
@@ -245,7 +231,7 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">L</span>, <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// p</span>
-    <span class="ident">p</span>: <span class="ident">P</span>,
+    <span class="ident">p</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
     <span class="doccomment">/// beta</span>
     <span class="ident">beta</span>: <span class="ident">F</span>,
     <span class="doccomment">/// line search</span>
@@ -260,13 +246,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">L</span>, <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">L</span>, <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Default</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="doccomment">/// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">linesearch</span>: <span class="ident">L</span>, <span class="ident">beta_method</span>: <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">NonlinearConjugateGradient</span> {
-            <span class="ident">p</span>: <span class="ident">P::default</span>(),
+            <span class="ident">p</span>: <span class="prelude-val">None</span>,
             <span class="ident">beta</span>: <span class="ident">F::nan</span>(),
             <span class="ident">linesearch</span>,
             <span class="ident">beta_method</span>,
@@ -303,17 +288,11 @@
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span>, <span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">P</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">O::Float</span><span class="op">&gt;</span>,
-    <span class="ident">O::Hessian</span>: <span class="ident">Default</span>,
     <span class="ident">L</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminLineSearch</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     <span class="ident">B</span>: <span class="ident">ArgminNLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
@@ -328,7 +307,7 @@
         <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
         <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="ident">grad</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>()));
+        <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>())));
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
             <span class="ident">ArgminIterData::new</span>().<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">cost</span>(<span class="ident">cost</span>).<span class="ident">grad</span>(<span class="ident">grad</span>),
         ))
@@ -339,6 +318,7 @@
         <span class="ident">op</span>: <span class="kw-2">&amp;mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>) <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_grad</span>() {
             <span class="ident">grad</span>
@@ -348,7 +328,7 @@
         <span class="kw">let</span> <span class="ident">cur_cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
 
         <span class="comment">// Linesearch</span>
-        <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">set_search_direction</span>(<span class="self">self</span>.<span class="ident">p</span>.<span class="ident">clone</span>());
+        <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">set_search_direction</span>(<span class="ident">p</span>.<span class="ident">clone</span>());
 
         <span class="comment">// Run solver</span>
         <span class="kw">let</span> <span class="ident">ArgminResult</span> {
@@ -379,13 +359,15 @@
         <span class="kw">if</span> <span class="ident">restart_iter</span> <span class="op">|</span><span class="op">|</span> <span class="ident">restart_orthogonality</span> {
             <span class="self">self</span>.<span class="ident">beta</span> <span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>();
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_method</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">new_grad</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">p</span>);
+            <span class="self">self</span>.<span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_method</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">new_grad</span>, <span class="ident">p</span>);
         }
 
         <span class="comment">// Update of p</span>
-        <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="ident">new_grad</span>
-            .<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>()))
-            .<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">p</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">beta</span>));
+        <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
+            <span class="ident">new_grad</span>
+                .<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>()))
+                .<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">beta</span>)),
+        );
 
         <span class="comment">// Housekeeping</span>
         <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">xk1</span>)<span class="question-mark">?</span>;

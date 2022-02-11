@@ -142,6 +142,7 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
+<span id="144">144</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -179,7 +180,10 @@
     <span class="ident">radius</span>: <span class="ident">F</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">Dogleg</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Dogleg</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+{
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Dogleg</span> { <span class="ident">radius</span>: <span class="ident">F::nan</span>() }
@@ -189,9 +193,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Dogleg</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span>, <span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">O::Param</span>: <span class="ident">std::fmt::Debug</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span>, <span class="ident">O::Hessian</span><span class="op">&gt;</span>
+    <span class="ident">O::Param</span>: <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>

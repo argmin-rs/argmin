@@ -262,7 +262,6 @@
 <span id="261">261</span>
 <span id="262">262</span>
 <span id="263">263</span>
-<span id="264">264</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -277,13 +276,12 @@
 <span class="doccomment">//! TODO</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">ArgminIterData</span>, <span class="ident">ArgminKV</span>, <span class="ident">ArgminOp</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>,
-    <span class="ident">OpWrapper</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>,
+    <span class="ident">ArgminFloat</span>, <span class="ident">ArgminIterData</span>, <span class="ident">ArgminKV</span>, <span class="ident">ArgminOp</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">OpWrapper</span>, <span class="ident">SerializeAlias</span>,
+    <span class="ident">Solver</span>,
 };
 <span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminMinMax</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminRandom</span>, <span class="ident">ArgminSub</span>, <span class="ident">ArgminZeroLike</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
 
 <span class="doccomment">/// Particle Swarm Optimization (PSO)</span>
 <span class="doccomment">///</span>
@@ -308,7 +306,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span> <span class="op">+</span> <span class="ident">SerializeAlias</span>,
+    <span class="ident">P</span>: <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="doccomment">/// Constructor</span>
@@ -402,7 +400,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span>, <span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span> <span class="op">+</span> <span class="ident">SerializeAlias</span>,
+    <span class="ident">P</span>: <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Particle Swarm Optimization&quot;</span>;
@@ -485,9 +483,8 @@
 }
 
 <span class="doccomment">/// Position</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span>:
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>:
     <span class="ident">Clone</span>
-    <span class="op">+</span> <span class="ident">Default</span>
     <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="op">&gt;</span>
     <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="op">&gt;</span>
     <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="self">Self</span><span class="op">&gt;</span>
@@ -495,12 +492,13 @@
     <span class="op">+</span> <span class="ident">ArgminRandom</span>
     <span class="op">+</span> <span class="ident">ArgminMinMax</span>
     <span class="op">+</span> <span class="ident">std::fmt::Debug</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="self">Self</span><span class="op">&gt;</span>

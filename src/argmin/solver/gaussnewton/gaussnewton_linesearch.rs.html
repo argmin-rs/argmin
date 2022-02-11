@@ -182,12 +182,6 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -204,12 +198,9 @@
     <span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">ArgminIterData</span>, <span class="ident">ArgminLineSearch</span>, <span class="ident">ArgminOp</span>, <span class="ident">ArgminResult</span>, <span class="ident">Error</span>,
     <span class="ident">Executor</span>, <span class="ident">IterState</span>, <span class="ident">OpWrapper</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
 };
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{
-    <span class="ident">ArgminDot</span>, <span class="ident">ArgminInv</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminScaledSub</span>, <span class="ident">ArgminSub</span>, <span class="ident">ArgminTranspose</span>,
-};
+<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminInv</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminTranspose</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
 
 <span class="doccomment">/// Gauss-Newton method with linesearch</span>
 <span class="doccomment">///</span>
@@ -251,10 +242,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GaussNewtonLS</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">O::Param</span>: <span class="ident">std::fmt::Debug</span>
-        <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">O::Float</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>,
+    <span class="ident">O::Param</span>: <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">O::Float</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>,
     <span class="ident">O::Output</span>: <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">O::Float</span><span class="op">&gt;</span>,
     <span class="ident">O::Jacobian</span>: <span class="ident">ArgminTranspose</span><span class="op">&lt;</span><span class="ident">O::Jacobian</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminInv</span><span class="op">&lt;</span><span class="ident">O::Jacobian</span><span class="op">&gt;</span>

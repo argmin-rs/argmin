@@ -622,6 +622,18 @@
 <span id="621">621</span>
 <span id="622">622</span>
 <span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -634,7 +646,7 @@
 <span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">SerializeAlias</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">SerializeAlias</span>};
 <span class="kw">use</span> <span class="ident">argmin_math::ArgminDot</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -645,7 +657,7 @@
     <span class="kw">fn</span> <span class="ident">eval</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cur_cost</span>: <span class="ident">F</span>,
-        <span class="ident">cur_grad</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
+        <span class="ident">cur_grad</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">init_cost</span>: <span class="ident">F</span>,
         <span class="ident">init_grad</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
         <span class="ident">search_direction</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
@@ -663,7 +675,10 @@
     <span class="ident">c</span>: <span class="ident">F</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+{
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
@@ -679,12 +694,12 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">fn</span> <span class="ident">eval</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cur_cost</span>: <span class="ident">F</span>,
-        <span class="ident">_cur_grad</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
+        <span class="ident">_cur_grad</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">init_cost</span>: <span class="ident">F</span>,
         <span class="ident">init_grad</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
         <span class="ident">search_direction</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
@@ -706,7 +721,10 @@
     <span class="ident">c2</span>: <span class="ident">F</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">WolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">WolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+{
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c1</span>: <span class="ident">F</span>, <span class="ident">c2</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
@@ -727,13 +745,13 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span> <span class="op">+</span> <span class="ident">SerializeAlias</span>,
+    <span class="ident">T</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">fn</span> <span class="ident">eval</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cur_cost</span>: <span class="ident">F</span>,
-        <span class="ident">cur_grad</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
+        <span class="ident">cur_grad</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">init_cost</span>: <span class="ident">F</span>,
         <span class="ident">init_grad</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
         <span class="ident">search_direction</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
@@ -741,7 +759,7 @@
     ) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">init_grad</span>.<span class="ident">dot</span>(<span class="ident">search_direction</span>);
         (<span class="ident">cur_cost</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">init_cost</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">c1</span> <span class="op">*</span> <span class="ident">alpha</span> <span class="op">*</span> <span class="ident">tmp</span>)
-            <span class="op">&amp;&amp;</span> <span class="ident">cur_grad</span>.<span class="ident">dot</span>(<span class="ident">search_direction</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">c2</span> <span class="op">*</span> <span class="ident">tmp</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">cur_grad</span>.<span class="ident">unwrap</span>().<span class="ident">dot</span>(<span class="ident">search_direction</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">c2</span> <span class="op">*</span> <span class="ident">tmp</span>
     }
 
     <span class="kw">fn</span> <span class="ident">requires_cur_grad</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
@@ -757,7 +775,10 @@
     <span class="ident">c2</span>: <span class="ident">F</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">StrongWolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">StrongWolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+{
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c1</span>: <span class="ident">F</span>, <span class="ident">c2</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
@@ -778,13 +799,13 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrongWolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>,
+    <span class="ident">T</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">fn</span> <span class="ident">eval</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cur_cost</span>: <span class="ident">F</span>,
-        <span class="ident">cur_grad</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
+        <span class="ident">cur_grad</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">init_cost</span>: <span class="ident">F</span>,
         <span class="ident">init_grad</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
         <span class="ident">search_direction</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
@@ -792,7 +813,7 @@
     ) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">init_grad</span>.<span class="ident">dot</span>(<span class="ident">search_direction</span>);
         (<span class="ident">cur_cost</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">init_cost</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">c1</span> <span class="op">*</span> <span class="ident">alpha</span> <span class="op">*</span> <span class="ident">tmp</span>)
-            <span class="op">&amp;&amp;</span> <span class="ident">cur_grad</span>.<span class="ident">dot</span>(<span class="ident">search_direction</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">c2</span> <span class="op">*</span> <span class="ident">tmp</span>.<span class="ident">abs</span>()
+            <span class="op">&amp;&amp;</span> <span class="ident">cur_grad</span>.<span class="ident">unwrap</span>().<span class="ident">dot</span>(<span class="ident">search_direction</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">c2</span> <span class="op">*</span> <span class="ident">tmp</span>.<span class="ident">abs</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">requires_cur_grad</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
@@ -807,7 +828,10 @@
     <span class="ident">c</span>: <span class="ident">F</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">GoldsteinCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">GoldsteinCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+{
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>() {
@@ -823,12 +847,12 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GoldsteinCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="kw">fn</span> <span class="ident">eval</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cur_cost</span>: <span class="ident">F</span>,
-        <span class="ident">_cur_grad</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
+        <span class="ident">_cur_grad</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">init_cost</span>: <span class="ident">F</span>,
         <span class="ident">init_grad</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
         <span class="ident">search_direction</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
@@ -912,7 +936,7 @@
             <span class="macro">assert_eq!</span>(
                 <span class="ident">cond</span>.<span class="ident">eval</span>(
                     <span class="ident">f</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>)),
                     <span class="ident">f</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
                     <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
                     <span class="kw-2">&amp;</span><span class="ident">search_direction</span>,
@@ -1019,7 +1043,7 @@
             <span class="macro">assert_eq!</span>(
                 <span class="ident">cond</span>.<span class="ident">eval</span>(
                     <span class="ident">f</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>)),
                     <span class="ident">f</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
                     <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
                     <span class="kw-2">&amp;</span><span class="ident">search_direction</span>,
@@ -1127,7 +1151,7 @@
             <span class="macro">assert_eq!</span>(
                 <span class="ident">cond</span>.<span class="ident">eval</span>(
                     <span class="ident">f</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>)),
                     <span class="ident">f</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
                     <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
                     <span class="kw-2">&amp;</span><span class="ident">search_direction</span>,
@@ -1163,7 +1187,7 @@
             <span class="macro">assert_eq!</span>(
                 <span class="ident">cond</span>.<span class="ident">eval</span>(
                     <span class="ident">f</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>)),
                     <span class="ident">f</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
                     <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
                     <span class="kw-2">&amp;</span><span class="ident">search_direction</span>,
@@ -1234,7 +1258,7 @@
             <span class="macro">assert_eq!</span>(
                 <span class="ident">cond</span>.<span class="ident">eval</span>(
                     <span class="ident">f</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>)),
                     <span class="ident">f</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
                     <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
                     <span class="kw-2">&amp;</span><span class="ident">search_direction</span>,
