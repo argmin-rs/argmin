@@ -163,7 +163,7 @@ where
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         let r = state.get_grad().unwrap();
 
@@ -175,24 +175,16 @@ where
 
         self.r = Some(r);
 
-        Ok(if self.r_0_norm < self.epsilon {
-            Some(
-                ArgminIterData::new()
-                    .param(p)
-                    .termination_reason(TerminationReason::TargetPrecisionReached),
-            )
-        } else {
-            None
-        })
+        Ok(Some(ArgminIterData::new().param(p)))
     }
 
     fn next_iter(
         &mut self,
         _op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let grad = state.get_grad().unwrap();
-        let h = state.get_hessian().unwrap();
+        let grad = state.take_grad().unwrap();
+        let h = state.take_hessian().unwrap();
         let d = self.d.as_ref().unwrap();
         let dhd = d.weighted_dot(&h, d);
 
@@ -240,11 +232,13 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if state.get_iter() >= self.max_iters {
-            TerminationReason::MaxItersReached
-        } else {
-            TerminationReason::NotTerminated
+        if self.r_0_norm < self.epsilon {
+            return TerminationReason::TargetPrecisionReached;
         }
+        if state.get_iter() >= self.max_iters {
+            return TerminationReason::MaxItersReached;
+        }
+        TerminationReason::NotTerminated
     }
 }
 

@@ -55,9 +55,9 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param_new = state.get_param();
+        let param_new = state.take_param().unwrap();
         let new_cost = op.apply(&param_new)?;
         let new_grad = op.gradient(&param_new)?;
 
@@ -67,12 +67,7 @@ where
         // Run solver
         let ArgminResult {
             operator: line_op,
-            state:
-                IterState {
-                    param: next_param,
-                    cost: next_cost,
-                    ..
-                },
+            state: mut linesearch_state,
         } = Executor::new(op.take_op().unwrap(), self.linesearch.clone(), param_new)
             .grad(new_grad)
             .cost(new_cost)
@@ -82,7 +77,9 @@ where
         // Get back operator and function evaluation counts
         op.consume_op(line_op);
 
-        Ok(ArgminIterData::new().param(next_param).cost(next_cost))
+        Ok(ArgminIterData::new()
+            .param(linesearch_state.take_param().unwrap())
+            .cost(linesearch_state.get_cost()))
     }
 }
 

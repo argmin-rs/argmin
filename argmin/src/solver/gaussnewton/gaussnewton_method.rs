@@ -90,9 +90,9 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;
 
@@ -233,7 +233,8 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .best_param;
+            .get_best_param()
+            .unwrap();
         assert_relative_eq!(param[0], -1.0, epsilon = f64::EPSILON.sqrt());
         assert_relative_eq!(param[1], 0.25, epsilon = f64::EPSILON.sqrt());
 
@@ -249,7 +250,8 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .best_param;
+            .get_best_param()
+            .unwrap();
         assert_relative_eq!(param[0], -1.4, epsilon = f64::EPSILON.sqrt());
         assert_relative_eq!(param[1], 0.3, epsilon = f64::EPSILON.sqrt());
 
@@ -265,7 +267,8 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .best_param;
+            .get_best_param()
+            .unwrap();
         assert_relative_eq!(param[0], -0.5, epsilon = f64::EPSILON.sqrt());
         assert_relative_eq!(param[1], 0.125, epsilon = f64::EPSILON.sqrt());
 
@@ -281,7 +284,8 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .best_param;
+            .get_best_param()
+            .unwrap();
         assert_relative_eq!(param[0], -0.7, epsilon = f64::EPSILON.sqrt());
         assert_relative_eq!(param[1], 0.15, epsilon = f64::EPSILON.sqrt());
     }

@@ -57,9 +57,9 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let new_param = param.scaled_sub(&self.omega, &grad);
         Ok(ArgminIterData::new().param(new_param))

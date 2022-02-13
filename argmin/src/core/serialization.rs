@@ -178,7 +178,7 @@ mod tests {
         fn next_iter(
             &mut self,
             _op: &mut OpWrapper<O>,
-            _state: &IterState<O>,
+            _state: &mut IterState<O>,
         ) -> Result<ArgminIterData<O>, Error> {
             unimplemented!()
         }

@@ -153,7 +153,7 @@ pub trait Solver<O: ArgminOp>: SerializeAlias {
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error>;
 
     /// Initializes the algorithm
@@ -163,7 +163,7 @@ pub trait Solver<O: ArgminOp>: SerializeAlias {
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         Ok(None)
     }

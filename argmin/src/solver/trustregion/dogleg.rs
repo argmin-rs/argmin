@@ -61,15 +61,17 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let g = state
-            .get_grad()
-            .unwrap_or_else(|| op.gradient(&param).unwrap());
+            .take_grad()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.gradient(&param))?;
         let h = state
-            .get_hessian()
-            .unwrap_or_else(|| op.hessian(&param).unwrap());
+            .take_hessian()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.hessian(&param))?;
         let pstar;
 
         // pb = -H^-1g
@@ -116,8 +118,9 @@ where
                 .into());
             }
         }
-        let out = ArgminIterData::new().param(pstar);
-        Ok(out)
+        // Since we took `grad` and `hessian` from `state`, we return it here again to make sure
+        // that they are put back into `state`.
+        Ok(ArgminIterData::new().param(pstar).grad(g).hessian(h))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

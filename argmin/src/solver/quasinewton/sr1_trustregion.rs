@@ -129,13 +129,13 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
         let hessian = state
-            .get_hessian()
+            .take_hessian()
             .map(Result::Ok)
             .unwrap_or_else(|| op.hessian(&param))?;
         Ok(Some(
@@ -150,20 +150,21 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let xk = state.get_param();
+        let xk = state.take_param().unwrap();
         let cost = state.get_cost();
         let prev_grad = state
-            .get_grad()
-            .unwrap_or_else(|| op.gradient(&xk).unwrap());
-        let hessian: O::Hessian = state.get_hessian().unwrap();
+            .take_grad()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.gradient(&xk))?;
+        let hessian = state.take_hessian().unwrap();
 
         self.subproblem.set_radius(self.radius);
 
         let ArgminResult {
             operator: sub_op,
-            state: IterState { param: sk, .. },
+            state: mut sub_state,
         } = Executor::new(
             op.take_op().unwrap(),
             self.subproblem.clone(),
@@ -174,6 +175,8 @@ where
         .hessian(hessian.clone())
         .ctrlc(false)
         .run()?;
+
+        let sk = sub_state.take_param().unwrap();
 
         op.consume_op(sub_op);
 
@@ -233,7 +236,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if state.get_grad().unwrap().norm() < self.tol_grad {
+        if state.get_grad_ref().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         // if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON {

@@ -110,9 +110,9 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
         self.fxk = op.apply(&param)?;
@@ -129,21 +129,23 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let grad = state
-            .get_grad()
-            .unwrap_or_else(|| op.gradient(&param).unwrap());
+            .take_grad()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.gradient(&param))?;
         let hessian = state
-            .get_hessian()
-            .unwrap_or_else(|| op.hessian(&param).unwrap());
+            .take_hessian()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.hessian(&param))?;
 
         self.subproblem.set_radius(self.radius);
 
         let ArgminResult {
             operator: sub_op,
-            state: IterState { param: pk, .. },
+            state: mut sub_state,
         } = Executor::new(
             op.take_op().unwrap(),
             self.subproblem.clone(),
@@ -153,6 +155,8 @@ where
         .hessian(hessian.clone())
         .ctrlc(false)
         .run()?;
+
+        let pk = sub_state.take_param().unwrap();
 
         // Consume intermediate operator again. This takes care of the function evaluation counts.
         op.consume_op(sub_op);
@@ -188,7 +192,11 @@ where
                 .grad(grad)
                 .hessian(hessian)
         } else {
-            ArgminIterData::new().param(param).cost(self.fxk)
+            ArgminIterData::new()
+                .param(param)
+                .cost(self.fxk)
+                .grad(grad)
+                .hessian(hessian)
         }
         .kv(make_kv!("radius" => cur_radius;)))
     }

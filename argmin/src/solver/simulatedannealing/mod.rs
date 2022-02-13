@@ -245,35 +245,33 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let cost = op.apply(&state.get_param())?;
-        Ok(Some(
-            ArgminIterData::new()
-                .param(state.get_param())
-                .cost(cost)
-                .kv(make_kv!(
-                    "initial_temperature" => self.init_temp;
-                    "stall_iter_accepted_limit" => self.stall_iter_accepted_limit;
-                    "stall_iter_best_limit" => self.stall_iter_best_limit;
-                    "reanneal_fixed" => self.reanneal_fixed;
-                    "reanneal_accepted" => self.reanneal_accepted;
-                    "reanneal_best" => self.reanneal_best;
-                )),
-        ))
+        let param = state.take_param().unwrap();
+        let cost = op.apply(&param)?;
+        Ok(Some(ArgminIterData::new().param(param).cost(cost).kv(
+            make_kv!(
+                "initial_temperature" => self.init_temp;
+                "stall_iter_accepted_limit" => self.stall_iter_accepted_limit;
+                "stall_iter_best_limit" => self.stall_iter_best_limit;
+                "reanneal_fixed" => self.reanneal_fixed;
+                "reanneal_accepted" => self.reanneal_accepted;
+                "reanneal_best" => self.reanneal_best;
+            ),
+        )))
     }
 
     /// Perform one iteration of SA algorithm
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
         // behaviour.
 
-        let prev_param = state.get_param();
+        let prev_param = state.take_param().unwrap();
         let prev_cost = state.get_cost();
 
         // Make a move

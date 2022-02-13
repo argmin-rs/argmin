@@ -56,16 +56,18 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let grad = state
-            .get_grad()
-            .unwrap_or_else(|| op.gradient(&param).unwrap());
+            .take_grad()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.gradient(&param))?;
         let grad_norm = grad.norm();
         let hessian = state
-            .get_hessian()
-            .unwrap_or_else(|| op.hessian(&param).unwrap());
+            .take_hessian()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.hessian(&param))?;
 
         let wdp = grad.weighted_dot(&hessian, &grad);
         let tau: F = if wdp <= F::from_f64(0.0).unwrap() {
@@ -77,7 +79,12 @@ where
         };
 
         let new_param = grad.mul(&(-tau * self.radius / grad_norm));
-        Ok(ArgminIterData::new().param(new_param))
+        // Since we took `grad` and `hessian` from `state`, we return it here again to make sure
+        // that they are put back into `state`.
+        Ok(ArgminIterData::new()
+            .param(new_param)
+            .grad(grad)
+            .hessian(hessian))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

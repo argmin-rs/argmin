@@ -103,7 +103,7 @@ macro_rules! entropy_max_tests {
 				.unwrap();
 
 			assert_relative_eq!(
-				cost.apply(&res.state.param).unwrap(),
+				cost.apply(&res.state.get_param().unwrap()).unwrap(),
 				cost.apply(&cost.param_opt).unwrap(),
 				epsilon = 1e-6
 			);
@@ -133,7 +133,7 @@ fn test_lbfgs_func_count() {
         .unwrap();
 
     assert_relative_eq!(
-        cost.apply(&res.state.param).unwrap(),
+        cost.apply(&res.state.get_param().unwrap()).unwrap(),
         cost.apply(&cost.param_opt).unwrap(),
         epsilon = 1e-6
     );

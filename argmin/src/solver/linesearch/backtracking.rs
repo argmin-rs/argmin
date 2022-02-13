@@ -140,9 +140,9 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let init_param = state.get_param();
+        let init_param = state.get_param().unwrap();
         let cost = state.get_cost();
         self.init_cost = if cost == F::infinity() {
             op.apply(&init_param)?
@@ -151,7 +151,7 @@ where
         };
 
         let init_grad = state
-            .get_grad()
+            .take_grad()
             .map(Result::Ok)
             .unwrap_or_else(|| op.gradient(&init_param))?;
 
@@ -171,7 +171,7 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         self.alpha = self.alpha * self.rho;
         self.backtracking_step(op)
@@ -389,7 +389,7 @@ mod tests {
         assert_error!(
             ls.init(
                 &mut OpWrapper::new(prob.clone()),
-                &IterState::new(ls.init_param.clone().unwrap())
+                &mut IterState::new(ls.init_param.clone().unwrap())
             ),
             ArgminError,
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
@@ -399,7 +399,7 @@ mod tests {
 
         let data = ls.init(
             &mut OpWrapper::new(prob),
-            &IterState::new(ls.init_param.clone().unwrap()),
+            &mut IterState::new(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
@@ -436,7 +436,7 @@ mod tests {
         assert_error!(
             ls.init(
                 &mut OpWrapper::new(prob.clone()),
-                &IterState::new(ls.init_param.clone().unwrap())
+                &mut IterState::new(ls.init_param.clone().unwrap())
             ),
             ArgminError,
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
@@ -446,7 +446,7 @@ mod tests {
 
         let data = ls.init(
             &mut OpWrapper::new(prob),
-            &IterState::new(ls.init_param.clone().unwrap()),
+            &mut IterState::new(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
@@ -483,7 +483,7 @@ mod tests {
 
         let data = ls.next_iter(
             &mut OpWrapper::new(prob),
-            &IterState::new(ls.init_param.clone().unwrap()),
+            &mut IterState::new(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
@@ -557,7 +557,7 @@ mod tests {
 
         let data = data.unwrap().state;
 
-        let param = data.get_param();
+        let param = data.get_param().unwrap();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(data.get_cost(), 0.6.powi(2), epsilon = f64::EPSILON);
@@ -608,7 +608,7 @@ mod tests {
 
         let data = data.unwrap().state;
 
-        let param = data.get_param();
+        let param = data.get_param().unwrap();
         assert_relative_eq!(param[0], 0.44, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(data.get_cost(), 0.44.powi(2), epsilon = f64::EPSILON);

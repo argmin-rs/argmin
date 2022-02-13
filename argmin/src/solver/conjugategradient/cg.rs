@@ -94,10 +94,10 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let init_param = state.get_param();
-        let ap = op.apply(&init_param)?;
+        let init_param = state.get_param_ref().unwrap();
+        let ap = op.apply(init_param)?;
         let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
         self.r = Some(r0.clone());
         self.p = Some(r0.mul(&(F::from_f64(-1.0).unwrap())));
@@ -109,7 +109,7 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let p = self.p.as_ref().unwrap();
         let r = self.r.as_ref().unwrap();
@@ -117,7 +117,7 @@ where
         self.p_prev = Some(p.clone());
         let apk = op.apply(p)?;
         let alpha = self.rtr.div(p.dot(&apk.conj()));
-        let new_param = state.get_param().scaled_add(&alpha, p);
+        let new_param = state.get_param_ref().unwrap().scaled_add(&alpha, p);
         let r = r.scaled_add(&alpha, &apk);
         let rtr_n = r.dot(&r.conj());
         let beta = rtr_n.div(self.rtr);
