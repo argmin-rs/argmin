@@ -159,7 +159,11 @@ where
     fn observe_iter(&mut self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
         // TODO: get particles from `state` or `kv`
 
-        self.iteration(&state.param, state.best_cost, state.get_population());
+        self.iteration(
+            state.get_param_ref().unwrap(),
+            state.best_cost,
+            state.get_population(),
+        );
 
         Ok(())
     }

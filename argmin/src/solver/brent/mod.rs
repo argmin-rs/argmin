@@ -94,7 +94,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         // Brent maintains its own state
-        _state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.fa = op.apply(&self.a)?;
         self.fb = op.apply(&self.b)?;
@@ -111,7 +111,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         // Brent maintains its own state
-        _state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         if (self.fb > F::from_f64(0.0).unwrap() && self.fc > F::from_f64(0.0).unwrap())
             || self.fb < F::from_f64(0.0).unwrap() && self.fc < F::from_f64(0.0).unwrap()

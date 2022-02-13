@@ -77,9 +77,9 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
         let new_param = param.scaled_sub(&self.gamma, &hessian.inv()?.dot(&grad));
@@ -174,7 +174,8 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .best_param;
+            .get_best_param()
+            .unwrap();
         assert_relative_eq!(param[0], -1.0, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], -2.0, epsilon = f64::EPSILON);
 
@@ -188,7 +189,8 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .best_param;
+            .get_best_param()
+            .unwrap();
         assert_relative_eq!(param[0], -2.0, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], -4.0, epsilon = f64::EPSILON);
 
@@ -202,7 +204,8 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .best_param;
+            .get_best_param()
+            .unwrap();
         assert_relative_eq!(param[0], -0.5, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], -1.0, epsilon = f64::EPSILON);
 
@@ -216,7 +219,8 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .best_param;
+            .get_best_param()
+            .unwrap();
         assert_relative_eq!(param[0], -1.0, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], -2.0, epsilon = f64::EPSILON);
     }

@@ -96,10 +96,7 @@ where
                 && self.state.get_cost().is_sign_positive()
                     == self.state.get_best_cost().is_sign_positive())
         {
-            let param = self.state.get_param();
-            let cost = self.state.get_cost();
-            self.state.best_param(param).best_cost(cost);
-            self.state.new_best();
+            self.state.current_param_is_new_best();
         }
 
         if let Some(grad) = data.get_grad() {
@@ -156,7 +153,7 @@ where
         }
 
         // let mut op_wrapper = OpWrapper::new(&self.op);
-        let init_data = self.solver.init(&mut self.op, &self.state)?;
+        let init_data = self.solver.init(&mut self.op, &mut self.state)?;
 
         // If init() returned something, deal with it
         if let Some(data) = &init_data {
@@ -199,7 +196,7 @@ where
                 None
             };
 
-            let data = self.solver.next_iter(&mut self.op, &self.state)?;
+            let data = self.solver.next_iter(&mut self.op, &mut self.state)?;
 
             self.state.set_func_counts(&self.op);
 
@@ -359,7 +356,7 @@ mod tests {
             fn next_iter(
                 &mut self,
                 _op: &mut OpWrapper<O>,
-                _state: &IterState<O>,
+                _state: &mut IterState<O>,
             ) -> Result<ArgminIterData<O>, Error> {
                 Ok(ArgminIterData::new())
             }
@@ -375,7 +372,7 @@ mod tests {
         let new_iterdata: ArgminIterData<MinimalNoOperator> =
             ArgminIterData::new().param(new_param.clone());
         executor.update(&new_iterdata).unwrap();
-        assert_eq!(executor.state.get_best_param(), new_param);
+        assert_eq!(executor.state.get_best_param().unwrap(), new_param);
         assert!(executor.state.get_best_cost().is_infinite());
         assert!(executor.state.get_best_cost().is_sign_positive());
 
@@ -386,7 +383,7 @@ mod tests {
             .param(new_param.clone())
             .cost(new_cost);
         executor.update(&new_iterdata).unwrap();
-        assert_eq!(executor.state.get_best_param(), new_param);
+        assert_eq!(executor.state.get_best_param().unwrap(), new_param);
         assert_relative_eq!(
             executor.state.get_best_cost(),
             new_cost,
@@ -418,18 +415,18 @@ mod tests {
             .param(new_param.clone())
             .cost(new_cost);
         executor.update(&new_iterdata).unwrap();
-        assert_eq!(executor.state.get_best_param(), new_param);
+        assert_eq!(executor.state.get_best_param().unwrap(), new_param);
         assert!(executor.state.get_best_cost().is_infinite());
         assert!(executor.state.get_best_cost().is_sign_negative());
 
         // 5) `Inf` is worse than `-Inf`
-        let old_param = executor.state.get_best_param();
+        let old_param = executor.state.get_best_param().unwrap();
         let new_param = vec![6.0, 6.0];
         let new_cost = std::f64::INFINITY;
         let new_iterdata: ArgminIterData<MinimalNoOperator> =
             ArgminIterData::new().param(new_param).cost(new_cost);
         executor.update(&new_iterdata).unwrap();
-        assert_eq!(executor.state.get_best_param(), old_param);
+        assert_eq!(executor.state.get_best_param().unwrap(), old_param);
         assert!(executor.state.get_best_cost().is_infinite());
         assert!(executor.state.get_best_cost().is_sign_negative());
     }

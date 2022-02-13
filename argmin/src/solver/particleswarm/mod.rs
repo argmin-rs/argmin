@@ -144,7 +144,7 @@ where
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.initialize_particles(_op);
 
@@ -155,7 +155,7 @@ where
     fn next_iter(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let zero = O::Param::zero_like(&self.best_position);
 

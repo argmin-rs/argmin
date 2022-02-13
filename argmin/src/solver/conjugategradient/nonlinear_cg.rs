@@ -100,9 +100,9 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
         self.p = Some(grad.mul(&(F::from_f64(-1.0).unwrap())));
@@ -114,15 +114,14 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let p = self.p.as_ref().unwrap();
-        let xk = state.get_param();
-        let grad = if let Some(grad) = state.get_grad() {
-            grad
-        } else {
-            op.gradient(&xk)?
-        };
+        let xk = state.take_param().unwrap();
+        let grad = state
+            .take_grad()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.gradient(&xk))?;
         let cur_cost = state.get_cost();
 
         // Linesearch
@@ -131,7 +130,7 @@ where
         // Run solver
         let ArgminResult {
             operator: line_op,
-            state: line_state,
+            state: mut line_state,
         } = Executor::new(op.take_op().unwrap(), self.linesearch.clone(), xk)
             .grad(grad.clone())
             .cost(cur_cost)
@@ -141,7 +140,7 @@ where
         // takes care of the counts of function evaluations
         op.consume_op(line_op);
 
-        let xk1 = line_state.get_param();
+        let xk1 = line_state.take_param().unwrap();
 
         // Update of beta
         let new_grad = op.gradient(&xk1)?;

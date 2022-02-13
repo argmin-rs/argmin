@@ -220,7 +220,7 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         self.params = self
             .params
@@ -243,7 +243,7 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         let num_param = self.params.len();
 

@@ -231,14 +231,14 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         check_param!(
             self.search_direction,
             "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
 
-        self.init_param = Some(state.get_param());
+        self.init_param = state.get_param();
 
         let cost = state.get_cost();
         self.finit = if cost.is_infinite() {
@@ -249,7 +249,7 @@ where
 
         self.init_grad = Some(
             state
-                .get_grad()
+                .take_grad()
                 .map(Result::Ok)
                 .unwrap_or_else(|| op.gradient(self.init_param.as_ref().unwrap()))?,
         );
@@ -287,7 +287,7 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;

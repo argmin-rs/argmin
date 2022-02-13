@@ -95,9 +95,9 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let init_estimate = state.param;
+        let init_estimate = state.take_param().unwrap();
         if init_estimate < self.min_bound || init_estimate > self.max_bound {
             Err(ArgminError::InvalidParameter {
                 text: "Initial estimate must be ∈ [min_bound, max_bound].".to_string(),
@@ -126,15 +126,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        if self.tolerance * (self.x1.abs() + self.x2.abs()) >= (self.x3 - self.x0).abs() {
-            return Ok(ArgminIterData::new()
-                .param(state.param)
-                .cost(state.cost)
-                .termination_reason(TerminationReason::TargetToleranceReached));
-        }
-
         if self.f2 < self.f1 {
             self.x0 = self.x1;
             self.x1 = self.x2;
@@ -153,6 +146,13 @@ where
         } else {
             Ok(ArgminIterData::new().param(self.x2).cost(self.f2))
         }
+    }
+
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
+        if self.tolerance * (self.x1.abs() + self.x2.abs()) >= (self.x3 - self.x0).abs() {
+            return TerminationReason::TargetToleranceReached;
+        }
+        TerminationReason::NotTerminated
     }
 }
 

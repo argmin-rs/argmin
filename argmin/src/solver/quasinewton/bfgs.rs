@@ -92,9 +92,9 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
         Ok(Some(
@@ -109,11 +109,11 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let cur_cost = state.get_cost();
-        let prev_grad = state.get_grad().unwrap();
+        let prev_grad = state.take_grad().unwrap();
         let inv_hessian = state.get_inv_hessian().unwrap();
 
         let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
@@ -123,12 +123,7 @@ where
         // Run solver
         let ArgminResult {
             operator: line_op,
-            state:
-                IterState {
-                    param: xk1,
-                    cost: next_cost,
-                    ..
-                },
+            state: mut sub_state,
         } = Executor::new(
             op.take_op().unwrap(),
             self.linesearch.clone(),
@@ -138,6 +133,9 @@ where
         .cost(cur_cost)
         .ctrlc(false)
         .run()?;
+
+        let xk1 = sub_state.take_param().unwrap();
+        let next_cost = sub_state.get_cost();
 
         // take care of function eval counts
         op.consume_op(line_op);

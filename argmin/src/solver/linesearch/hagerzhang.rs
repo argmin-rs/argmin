@@ -432,7 +432,7 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
@@ -446,21 +446,20 @@ where
             "HagerZhangLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
 
-        let init_param = state.get_param();
-        self.init_param = Some(init_param.clone());
+        self.init_param = state.get_param();
 
         let cost = state.get_cost();
         self.finit = if cost.is_infinite() {
-            op.apply(&init_param)?
+            op.apply(self.init_param.as_ref().unwrap())?
         } else {
             cost
         };
 
         self.init_grad = Some(
             state
-                .get_grad()
+                .take_grad()
                 .map(Result::Ok)
-                .unwrap_or_else(|| op.gradient(&init_param))?,
+                .unwrap_or_else(|| op.gradient(self.init_param.as_ref().unwrap()))?,
         );
 
         self.a_x = self.a_x_init;
@@ -486,8 +485,11 @@ where
             .dot(self.search_direction.as_ref().unwrap());
 
         self.set_best();
-        let new_param =
-            init_param.scaled_add(&self.best_x, self.search_direction.as_ref().unwrap());
+        let new_param = self
+            .init_param
+            .as_ref()
+            .unwrap()
+            .scaled_add(&self.best_x, self.search_direction.as_ref().unwrap());
         let best_f = self.best_f;
 
         Ok(Some(ArgminIterData::new().param(new_param).cost(best_f)))
@@ -496,7 +498,7 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &IterState<O>,
+        _state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);

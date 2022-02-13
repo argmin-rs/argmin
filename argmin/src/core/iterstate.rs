@@ -17,13 +17,13 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct IterState<O: ArgminOp> {
     /// Current parameter vector
-    pub param: O::Param,
+    pub param: Option<O::Param>,
     /// Previous parameter vector
-    pub prev_param: O::Param,
+    pub prev_param: Option<O::Param>,
     /// Current best parameter vector
-    pub best_param: O::Param,
+    pub best_param: Option<O::Param>,
     /// Previous best parameter vector
-    pub prev_best_param: O::Param,
+    pub prev_best_param: Option<O::Param>,
     /// Current cost function value
     pub cost: O::Float,
     /// Previous cost function value
@@ -95,6 +95,28 @@ macro_rules! getter_option {
     };
 }
 
+macro_rules! getter_option_ref {
+    ($name:ident, $type:ty, $doc:tt) => {
+        item! {
+            #[doc=$doc]
+            pub fn [<get_ $name _ref>](&self) -> Option<&$type> {
+                self.$name.as_ref()
+            }
+        }
+    };
+}
+
+macro_rules! take {
+    ($name:ident, $type:ty, $doc:tt) => {
+        item! {
+            #[doc=$doc]
+            pub fn [<take_ $name>](&mut self) -> Option<$type> {
+                self.$name.take()
+            }
+        }
+    };
+}
+
 macro_rules! getter {
     ($name:ident, $type:ty, $doc:tt) => {
         item! {
@@ -119,10 +141,10 @@ impl<O: ArgminOp> IterState<O> {
     /// Create new IterState from `param`
     pub fn new(param: O::Param) -> Self {
         IterState {
-            param: param.clone(),
-            prev_param: param.clone(),
-            best_param: param.clone(),
-            prev_best_param: param,
+            param: Some(param.clone()),
+            prev_param: None,
+            best_param: Some(param),
+            prev_best_param: None,
             cost: O::Float::infinity(),
             prev_cost: O::Float::infinity(),
             best_cost: O::Float::infinity(),
@@ -150,11 +172,19 @@ impl<O: ArgminOp> IterState<O> {
         }
     }
 
+    /// Sets the current parameter vector as the new best parameter vector
+    pub fn current_param_is_new_best(&mut self) {
+        let param = self.get_param().unwrap();
+        let cost = self.get_cost();
+        self.best_param(param).best_cost(cost);
+        self.new_best();
+    }
+
     /// Set parameter vector. This shifts the stored parameter vector to the previous parameter
     /// vector.
     pub fn param(&mut self, param: O::Param) -> &mut Self {
         std::mem::swap(&mut self.prev_param, &mut self.param);
-        self.param = param;
+        self.param = Some(param);
         self
     }
 
@@ -162,7 +192,7 @@ impl<O: ArgminOp> IterState<O> {
     /// best parameter vector.
     pub fn best_param(&mut self, param: O::Param) -> &mut Self {
         std::mem::swap(&mut self.prev_best_param, &mut self.best_param);
-        self.best_param = param;
+        self.best_param = Some(param);
         self
     }
 
@@ -229,13 +259,53 @@ impl<O: ArgminOp> IterState<O> {
         "Set termination_reason"
     );
     setter!(time, Option<instant::Duration>, "Set time required so far");
-    getter!(param, O::Param, "Returns current parameter vector");
-    getter!(prev_param, O::Param, "Returns previous parameter vector");
-    getter!(best_param, O::Param, "Returns best parameter vector");
-    getter!(
+    getter_option!(param, O::Param, "Returns current parameter vector");
+    getter_option!(prev_param, O::Param, "Returns previous parameter vector");
+    getter_option_ref!(
+        param,
+        O::Param,
+        "Returns reference to current parameter vector"
+    );
+    take!(
+        param,
+        O::Param,
+        "Moves the current parameter vector out and replaces it internally with `None`"
+    );
+    getter_option_ref!(
+        prev_param,
+        O::Param,
+        "Returns reference to previous parameter vector"
+    );
+    take!(
+        prev_param,
+        O::Param,
+        "Moves the previous parameter vector out and replaces it internally with `None`"
+    );
+    getter_option!(best_param, O::Param, "Returns best parameter vector");
+    getter_option!(
         prev_best_param,
         O::Param,
         "Returns previous best parameter vector"
+    );
+    getter_option_ref!(
+        best_param,
+        O::Param,
+        "Returns reference to best parameter vector"
+    );
+    getter_option_ref!(
+        prev_best_param,
+        O::Param,
+        "Returns reference to previous best parameter vector"
+    );
+    take!(
+        best_param,
+        O::Param,
+        "Moves the best parameter vector out and replaces it internally with `None`"
+    );
+    take!(
+        prev_best_param,
+        O::Param,
+        "Moves the previous best parameter vector out and replaces it internally with `None`"
     );
     getter!(cost, O::Float, "Returns current cost function value");
     getter!(prev_cost, O::Float, "Returns previous cost function value");
@@ -298,6 +368,82 @@ impl<O: ArgminOp> IterState<O> {
     );
     getter_option!(jacobian, O::Jacobian, "Returns current Jacobian");
     getter_option!(prev_jacobian, O::Jacobian, "Returns previous Jacobian");
+    getter_option_ref!(grad, O::Param, "Returns reference to the gradient");
+    getter_option_ref!(
+        prev_grad,
+        O::Param,
+        "Returns reference to the previous gradient"
+    );
+    getter_option_ref!(
+        hessian,
+        O::Hessian,
+        "Returns reference to the current Hessian"
+    );
+    getter_option_ref!(
+        prev_hessian,
+        O::Hessian,
+        "Returns reference to the previous Hessian"
+    );
+    getter_option_ref!(
+        jacobian,
+        O::Jacobian,
+        "Returns reference to the current Jacobian"
+    );
+    getter_option_ref!(
+        prev_jacobian,
+        O::Jacobian,
+        "Returns reference to the previous Jacobian"
+    );
+    getter_option_ref!(
+        inv_hessian,
+        O::Hessian,
+        "Returns reference to the current inverse Hessian"
+    );
+    getter_option_ref!(
+        prev_inv_hessian,
+        O::Hessian,
+        "Returns reference to the previous inverse Hessian"
+    );
+    take!(
+        grad,
+        O::Param,
+        "Moves the gradient out and replaces it internally with `None`"
+    );
+    take!(
+        prev_grad,
+        O::Param,
+        "Moves the previous gradient out and replaces it internally with `None`"
+    );
+    take!(
+        hessian,
+        O::Hessian,
+        "Moves the Hessian out and replaces it internally with `None`"
+    );
+    take!(
+        prev_hessian,
+        O::Hessian,
+        "Moves the previous Hessian out and replaces it internally with `None`"
+    );
+    take!(
+        jacobian,
+        O::Jacobian,
+        "Moves the Jacobian out and replaces it internally with `None`"
+    );
+    take!(
+        prev_jacobian,
+        O::Jacobian,
+        "Moves the previous Jacobian out and replaces it internally with `None`"
+    );
+    take!(
+        inv_hessian,
+        O::Hessian,
+        "Moves the inverse Hessian out and replaces it internally with `None`"
+    );
+    take!(
+        prev_inv_hessian,
+        O::Hessian,
+        "Moves the previous inverse Hessian out and replaces it internally with `None`"
+    );
     getter!(iter, u64, "Returns current number of iterations");
     getter!(max_iters, u64, "Returns maximum number of iterations");
 
@@ -385,10 +531,15 @@ mod tests {
 
         let mut state: IterState<MinimalNoOperator> = IterState::new(param.clone());
 
-        assert_eq!(state.get_param(), param);
-        assert_eq!(state.get_prev_param(), param);
-        assert_eq!(state.get_best_param(), param);
-        assert_eq!(state.get_prev_best_param(), param);
+        assert_eq!(state.get_param().unwrap(), param);
+        assert_eq!(state.get_prev_param(), None);
+        assert_eq!(state.get_best_param().unwrap(), param);
+        assert_eq!(state.get_prev_best_param(), None);
+
+        assert_eq!(*state.get_param_ref().unwrap(), param);
+        assert!(state.get_prev_param_ref().is_none());
+        assert_eq!(*state.get_best_param_ref().unwrap(), param);
+        assert!(state.get_prev_best_param_ref().is_none());
 
         assert!(state.get_cost().is_infinite());
         assert!(state.get_cost().is_sign_positive());
@@ -405,14 +556,22 @@ mod tests {
         assert!(state.get_target_cost().is_infinite());
         assert!(state.get_target_cost().is_sign_negative());
 
-        assert_eq!(state.get_grad(), None);
-        assert_eq!(state.get_prev_grad(), None);
-        assert_eq!(state.get_hessian(), None);
-        assert_eq!(state.get_prev_hessian(), None);
-        assert_eq!(state.get_inv_hessian(), None);
-        assert_eq!(state.get_prev_inv_hessian(), None);
-        assert_eq!(state.get_jacobian(), None);
-        assert_eq!(state.get_prev_jacobian(), None);
+        assert!(state.get_grad().is_none());
+        assert!(state.get_prev_grad().is_none());
+        assert!(state.get_hessian().is_none());
+        assert!(state.get_prev_hessian().is_none());
+        assert!(state.get_inv_hessian().is_none());
+        assert!(state.get_prev_inv_hessian().is_none());
+        assert!(state.get_jacobian().is_none());
+        assert!(state.get_prev_jacobian().is_none());
+        assert!(state.get_grad_ref().is_none());
+        assert!(state.get_prev_grad_ref().is_none());
+        assert!(state.get_hessian_ref().is_none());
+        assert!(state.get_prev_hessian_ref().is_none());
+        assert!(state.get_inv_hessian_ref().is_none());
+        assert!(state.get_prev_inv_hessian_ref().is_none());
+        assert!(state.get_jacobian_ref().is_none());
+        assert!(state.get_prev_jacobian_ref().is_none());
         assert_eq!(state.get_iter(), 0);
 
         assert!(state.is_best());
@@ -444,13 +603,17 @@ mod tests {
 
         state.param(new_param.clone());
 
-        assert_eq!(state.get_param(), new_param);
-        assert_eq!(state.get_prev_param(), param);
+        assert_eq!(state.get_param().unwrap(), new_param);
+        assert_eq!(state.get_prev_param().unwrap(), param);
+        assert_eq!(*state.get_param_ref().unwrap(), new_param);
+        assert_eq!(*state.get_prev_param_ref().unwrap(), param);
 
         state.best_param(new_param.clone());
 
-        assert_eq!(state.get_best_param(), new_param);
-        assert_eq!(state.get_prev_best_param(), param);
+        assert_eq!(state.get_best_param().unwrap(), new_param);
+        assert_eq!(state.get_prev_best_param().unwrap(), param);
+        assert_eq!(*state.get_best_param_ref().unwrap(), new_param);
+        assert_eq!(*state.get_prev_best_param_ref().unwrap(), param);
 
         let new_cost = 21.0;
 
@@ -477,54 +640,70 @@ mod tests {
         let grad = vec![1.0, 2.0];
 
         state.grad(grad.clone());
-        assert_eq!(state.get_grad(), Some(grad.clone()));
-        assert_eq!(state.get_prev_grad(), None);
+        assert_eq!(state.get_grad().unwrap(), grad);
+        assert!(state.get_prev_grad().is_none());
+        assert_eq!(*state.get_grad_ref().unwrap(), grad);
+        assert!(state.get_prev_grad_ref().is_none());
 
         let new_grad = vec![2.0, 1.0];
 
         state.grad(new_grad.clone());
 
-        assert_eq!(state.get_grad(), Some(new_grad.clone()));
-        assert_eq!(state.get_prev_grad(), Some(grad.clone()));
+        assert_eq!(state.get_grad().unwrap(), new_grad);
+        assert_eq!(state.get_prev_grad().unwrap(), grad);
+        assert_eq!(*state.get_grad_ref().unwrap(), new_grad);
+        assert_eq!(*state.get_prev_grad_ref().unwrap(), grad);
 
         let hessian = vec![vec![1.0, 2.0], vec![2.0, 1.0]];
 
         state.hessian(hessian.clone());
-        assert_eq!(state.get_hessian(), Some(hessian.clone()));
-        assert_eq!(state.get_prev_hessian(), None);
+        assert_eq!(state.get_hessian().unwrap(), hessian);
+        assert!(state.get_prev_hessian().is_none());
+        assert_eq!(*state.get_hessian_ref().unwrap(), hessian);
+        assert!(state.get_prev_hessian_ref().is_none());
 
         let new_hessian = vec![vec![2.0, 1.0], vec![1.0, 2.0]];
 
         state.hessian(new_hessian.clone());
 
-        assert_eq!(state.get_hessian(), Some(new_hessian.clone()));
-        assert_eq!(state.get_prev_hessian(), Some(hessian.clone()));
+        assert_eq!(state.get_hessian().unwrap(), new_hessian);
+        assert_eq!(state.get_prev_hessian().unwrap(), hessian);
+        assert_eq!(*state.get_hessian_ref().unwrap(), new_hessian);
+        assert_eq!(*state.get_prev_hessian_ref().unwrap(), hessian);
 
-        let inv_hessian = vec![vec![1.0, 2.0], vec![2.0, 1.0]];
+        let inv_hessian = vec![vec![2.0, 1.0], vec![1.0, 2.0]];
 
         state.inv_hessian(inv_hessian.clone());
-        assert_eq!(state.get_inv_hessian(), Some(inv_hessian.clone()));
-        assert_eq!(state.get_prev_inv_hessian(), None);
+        assert_eq!(state.get_inv_hessian().unwrap(), inv_hessian);
+        assert!(state.get_prev_inv_hessian().is_none());
+        assert_eq!(*state.get_inv_hessian_ref().unwrap(), inv_hessian);
+        assert!(state.get_prev_inv_hessian_ref().is_none());
 
-        let new_inv_hessian = vec![vec![2.0, 1.0], vec![1.0, 2.0]];
+        let new_inv_hessian = vec![vec![3.0, 4.0], vec![4.0, 3.0]];
 
         state.inv_hessian(new_inv_hessian.clone());
 
-        assert_eq!(state.get_inv_hessian(), Some(new_inv_hessian.clone()));
-        assert_eq!(state.get_prev_inv_hessian(), Some(inv_hessian.clone()));
+        assert_eq!(state.get_inv_hessian().unwrap(), new_inv_hessian);
+        assert_eq!(state.get_prev_inv_hessian().unwrap(), inv_hessian);
+        assert_eq!(*state.get_inv_hessian_ref().unwrap(), new_inv_hessian);
+        assert_eq!(*state.get_prev_inv_hessian_ref().unwrap(), inv_hessian);
 
         let jacobian = vec![1.0, 2.0];
 
         state.jacobian(jacobian.clone());
-        assert_eq!(state.get_jacobian(), Some(jacobian.clone()));
-        assert_eq!(state.get_prev_jacobian(), None);
+        assert_eq!(state.get_jacobian().unwrap(), jacobian);
+        assert!(state.get_prev_jacobian().is_none());
+        assert_eq!(*state.get_jacobian_ref().unwrap(), jacobian);
+        assert!(state.get_prev_jacobian_ref().is_none());
 
         let new_jacobian = vec![2.0, 1.0];
 
         state.jacobian(new_jacobian.clone());
 
-        assert_eq!(state.get_jacobian(), Some(new_jacobian.clone()));
-        assert_eq!(state.get_prev_jacobian(), Some(jacobian.clone()));
+        assert_eq!(state.get_jacobian().unwrap(), new_jacobian);
+        assert_eq!(state.get_prev_jacobian().unwrap(), jacobian);
+        assert_eq!(*state.get_jacobian_ref().unwrap(), new_jacobian);
+        assert_eq!(*state.get_prev_jacobian_ref().unwrap(), jacobian);
 
         state.increment_iter();
 
@@ -554,30 +733,77 @@ mod tests {
         assert_eq!(state.get_prev_cost().to_ne_bytes(), cost.to_ne_bytes());
         assert_eq!(state.get_prev_cost().to_ne_bytes(), cost.to_ne_bytes());
 
-        assert_eq!(state.get_param(), new_param);
-        assert_eq!(state.get_prev_param(), param);
+        assert_eq!(state.get_param().unwrap(), new_param);
+        assert_eq!(state.get_prev_param().unwrap(), param);
+        assert_eq!(*state.get_param_ref().unwrap(), new_param);
+        assert_eq!(*state.get_prev_param_ref().unwrap(), param);
 
         assert_eq!(state.get_best_cost().to_ne_bytes(), new_cost.to_ne_bytes());
         assert_eq!(state.get_prev_best_cost().to_ne_bytes(), cost.to_ne_bytes());
 
-        assert_eq!(state.get_best_param(), new_param);
-        assert_eq!(state.get_prev_best_param(), param);
+        assert_eq!(state.get_best_param().unwrap(), new_param);
+        assert_eq!(state.get_prev_best_param().unwrap(), param);
+        assert_eq!(*state.get_best_param_ref().unwrap(), new_param);
+        assert_eq!(*state.get_prev_best_param_ref().unwrap(), param);
 
         assert_eq!(state.get_best_cost().to_ne_bytes(), new_cost.to_ne_bytes());
         assert_eq!(state.get_prev_best_cost().to_ne_bytes(), cost.to_ne_bytes());
 
-        assert_eq!(state.get_grad(), Some(new_grad));
-        assert_eq!(state.get_prev_grad(), Some(grad));
-        assert_eq!(state.get_hessian(), Some(new_hessian));
-        assert_eq!(state.get_prev_hessian(), Some(hessian));
-        assert_eq!(state.get_inv_hessian(), Some(new_inv_hessian));
-        assert_eq!(state.get_prev_inv_hessian(), Some(inv_hessian));
-        assert_eq!(state.get_jacobian(), Some(new_jacobian));
-        assert_eq!(state.get_prev_jacobian(), Some(jacobian));
+        assert_eq!(state.get_grad().unwrap(), new_grad);
+        assert_eq!(state.get_prev_grad().unwrap(), grad);
+        assert_eq!(state.get_hessian().unwrap(), new_hessian);
+        assert_eq!(state.get_prev_hessian().unwrap(), hessian);
+        assert_eq!(state.get_inv_hessian().unwrap(), new_inv_hessian);
+        assert_eq!(state.get_prev_inv_hessian().unwrap(), inv_hessian);
+        assert_eq!(state.get_jacobian().unwrap(), new_jacobian);
+        assert_eq!(state.get_prev_jacobian().unwrap(), jacobian);
+        assert_eq!(*state.get_grad_ref().unwrap(), new_grad);
+        assert_eq!(*state.get_prev_grad_ref().unwrap(), grad);
+        assert_eq!(*state.get_hessian_ref().unwrap(), new_hessian);
+        assert_eq!(*state.get_prev_hessian_ref().unwrap(), hessian);
+        assert_eq!(*state.get_inv_hessian_ref().unwrap(), new_inv_hessian);
+        assert_eq!(*state.get_prev_inv_hessian_ref().unwrap(), inv_hessian);
+        assert_eq!(*state.get_jacobian_ref().unwrap(), new_jacobian);
+        assert_eq!(*state.get_prev_jacobian_ref().unwrap(), jacobian);
+        assert_eq!(state.take_grad().unwrap(), new_grad);
+        assert_eq!(state.take_prev_grad().unwrap(), grad);
+        assert_eq!(state.take_hessian().unwrap(), new_hessian);
+        assert_eq!(state.take_prev_hessian().unwrap(), hessian);
+        assert_eq!(state.take_inv_hessian().unwrap(), new_inv_hessian);
+        assert_eq!(state.take_prev_inv_hessian().unwrap(), inv_hessian);
+        assert_eq!(state.take_jacobian().unwrap(), new_jacobian);
+        assert_eq!(state.take_prev_jacobian().unwrap(), jacobian);
+        assert!(state.get_grad().is_none());
+        assert!(state.get_prev_grad().is_none());
+        assert!(state.get_hessian().is_none());
+        assert!(state.get_prev_hessian().is_none());
+        assert!(state.get_inv_hessian().is_none());
+        assert!(state.get_prev_inv_hessian().is_none());
+        assert!(state.get_jacobian().is_none());
+        assert!(state.get_prev_jacobian().is_none());
         assert_eq!(state.get_cost_func_count(), 42);
         assert_eq!(state.get_grad_func_count(), 43);
         assert_eq!(state.get_hessian_func_count(), 44);
         assert_eq!(state.get_jacobian_func_count(), 46);
         assert_eq!(state.get_modify_func_count(), 45);
+
+        let old_best = vec![1.0, 2.0];
+        let old_cost = 10.0;
+        state.best_param(old_best.clone());
+        state.best_cost(old_cost);
+        let new_param = vec![3.0, 4.0];
+        let new_cost = 5.0;
+        state.param(new_param.clone());
+        state.cost(new_cost);
+
+        state.current_param_is_new_best();
+
+        assert_eq!(state.get_best_param().unwrap(), new_param);
+        assert_eq!(state.get_prev_best_param().unwrap(), old_best);
+        assert_eq!(state.get_best_cost().to_ne_bytes(), new_cost.to_ne_bytes());
+        assert_eq!(
+            state.get_prev_best_cost().to_ne_bytes(),
+            old_cost.to_ne_bytes()
+        );
     }
 }

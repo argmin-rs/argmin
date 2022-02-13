@@ -530,10 +530,10 @@
 //!         // Current state of the optimization. This gives access to the parameter vector,
 //!         // gradient, Hessian and cost function value of the current, previous and best
 //!         // iteration as well as current iteration number, and many more.
-//!         state: &IterState<O>,
+//!         state: &mut IterState<O>,
 //!     ) -> Result<ArgminIterData<O>, Error> {
 //!         // First we obtain the current parameter vector from the `state` struct (`x_k`).
-//!         let xk = state.get_param();
+//!         let xk = state.take_param().unwrap();
 //!         // Then we compute the gradient at `x_k` (`\nabla f(x_k)`)
 //!         let grad = op.gradient(&xk)?;
 //!         // Now subtract `\nabla f(x_k)` scaled by `omega` from `x_k` to compute `x_{k+1}`

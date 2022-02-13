@@ -95,9 +95,9 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
 
@@ -111,10 +111,10 @@ where
         let mut cg = ConjugateGradient::new(grad.mul(&(F::from_f64(-1.0).unwrap())))?;
 
         let mut cg_state = IterState::new(x_p.clone());
-        cg.init(&mut cg_op, &cg_state)?;
+        cg.init(&mut cg_op, &mut cg_state)?;
         let grad_norm = grad.norm();
         for iter in 0.. {
-            let data = cg.next_iter(&mut cg_op, &cg_state)?;
+            let data = cg.next_iter(&mut cg_op, &mut cg_state)?;
             x = data.get_param().unwrap();
             let p = cg.p_prev();
             let curvature = p.dot(&hessian.dot(p));
@@ -142,12 +142,7 @@ where
         // Run solver
         let ArgminResult {
             operator: line_op,
-            state:
-                IterState {
-                    param: next_param,
-                    cost: next_cost,
-                    ..
-                },
+            state: mut linesearch_state,
         } = Executor::new(op.take_op().unwrap(), self.linesearch.clone(), param)
             .grad(grad)
             .cost(state.get_cost())
@@ -156,7 +151,9 @@ where
 
         op.consume_op(line_op);
 
-        Ok(ArgminIterData::new().param(next_param).cost(next_cost))
+        Ok(ArgminIterData::new()
+            .param(linesearch_state.take_param().unwrap())
+            .cost(linesearch_state.get_cost()))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

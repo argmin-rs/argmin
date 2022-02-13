@@ -73,9 +73,9 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;
         let jacobian_t = jacobian.clone().t();
@@ -89,12 +89,7 @@ where
         // perform linesearch
         let ArgminResult {
             operator: mut line_op,
-            state:
-                IterState {
-                    param: next_param,
-                    cost: next_cost,
-                    ..
-                },
+            state: mut linesearch_state,
         } = Executor::new(
             LineSearchOP {
                 op: op.take_op().unwrap(),
@@ -113,7 +108,9 @@ where
         op.op = Some(line_op.take_op().unwrap().op);
         op.consume_func_counts(line_op);
 
-        Ok(ArgminIterData::new().param(next_param).cost(next_cost))
+        Ok(ArgminIterData::new()
+            .param(linesearch_state.take_param().unwrap())
+            .cost(linesearch_state.get_cost()))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

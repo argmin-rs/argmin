@@ -78,9 +78,9 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
         Ok(Some(
@@ -95,28 +95,22 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &IterState<O>,
+        state: &mut IterState<O>,
     ) -> Result<ArgminIterData<O>, Error> {
-        let param = state.get_param();
+        let param = state.take_param().unwrap();
         let cost = state.get_cost();
+        let prev_grad = state
+            .take_grad()
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.gradient(&param))?;
         let inv_hessian = state.get_inv_hessian().unwrap();
-        let prev_grad = if let Some(grad) = state.get_grad() {
-            grad
-        } else {
-            op.gradient(&param)?
-        };
         let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
 
         self.linesearch.set_search_direction(p);
 
         let ArgminResult {
             operator: line_op,
-            state:
-                IterState {
-                    param: xk1,
-                    cost: next_cost,
-                    ..
-                },
+            state: mut linesearch_state,
         } = Executor::new(
             op.take_op().unwrap(),
             self.linesearch.clone(),
@@ -126,6 +120,9 @@ where
         .cost(cost)
         .ctrlc(false)
         .run()?;
+
+        let xk1 = linesearch_state.take_param().unwrap();
+        let next_cost = linesearch_state.get_cost();
 
         // take care of function eval counts
         op.consume_op(line_op);
@@ -156,7 +153,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if state.get_grad().unwrap().norm() < self.tol_grad {
+        if state.get_grad_ref().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         TerminationReason::NotTerminated
