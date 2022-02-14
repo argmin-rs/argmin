@@ -30,7 +30,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct BFGS<L, H, F> {
     /// Inverse Hessian
-    init_inv_hessian: H,
+    inv_hessian: H,
     /// line search
     linesearch: L,
     /// Tolerance for the stopping criterion based on the change of the norm on the gradient
@@ -46,7 +46,7 @@ where
     /// Constructor
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         BFGS {
-            init_inv_hessian: init_inverse_hessian,
+            inv_hessian: init_inverse_hessian,
             linesearch,
             tol_grad: F::epsilon().sqrt(),
             tol_cost: F::epsilon(),
@@ -99,11 +99,7 @@ where
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
         Ok(Some(
-            ArgminIterData::new()
-                .param(param)
-                .cost(cost)
-                .grad(grad)
-                .inv_hessian(self.init_inv_hessian.clone()),
+            ArgminIterData::new().param(param).cost(cost).grad(grad),
         ))
     }
 
@@ -115,9 +111,11 @@ where
         let param = state.get_param();
         let cur_cost = state.get_cost();
         let prev_grad = state.get_grad().unwrap();
-        let inv_hessian = state.get_inv_hessian().unwrap();
 
-        let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
+        let p = self
+            .inv_hessian
+            .dot(&prev_grad)
+            .mul(&F::from_f64(-1.0).unwrap());
 
         self.linesearch.set_search_direction(p);
 
@@ -152,7 +150,7 @@ where
         let yksk: F = yk.dot(&sk);
         let rhok = F::from_f64(1.0).unwrap() / yksk;
 
-        let e = inv_hessian.eye_like();
+        let e = self.inv_hessian.eye_like();
         let mat1: O::Hessian = sk.dot(&yk);
         let mat1 = mat1.mul(&rhok);
 
@@ -170,13 +168,9 @@ where
         //     println!("{:?}", self.inv_hessian);
         // }
 
-        let inv_hessian = tmp1.dot(&inv_hessian.dot(&tmp2)).add(&sksk);
+        self.inv_hessian = tmp1.dot(&self.inv_hessian.dot(&tmp2)).add(&sksk);
 
-        Ok(ArgminIterData::new()
-            .param(xk1)
-            .cost(next_cost)
-            .grad(grad)
-            .inv_hessian(inv_hessian))
+        Ok(ArgminIterData::new().param(xk1).cost(next_cost).grad(grad))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

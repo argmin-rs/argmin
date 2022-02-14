@@ -27,8 +27,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct DFP<L, H, F> {
-    /// Initial inverse Hessian
-    init_inv_hessian: H,
+    /// Inverse Hessian
+    inv_hessian: H,
     /// line search
     linesearch: L,
     /// Tolerance for the stopping criterion based on the change of the norm on the gradient
@@ -42,7 +42,7 @@ where
     /// Constructor
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         DFP {
-            init_inv_hessian: init_inverse_hessian,
+            inv_hessian: init_inverse_hessian,
             linesearch,
             tol_grad: F::epsilon().sqrt(),
         }
@@ -83,11 +83,7 @@ where
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
         Ok(Some(
-            ArgminIterData::new()
-                .param(param)
-                .cost(cost)
-                .grad(grad)
-                .inv_hessian(self.init_inv_hessian.clone()),
+            ArgminIterData::new().param(param).cost(cost).grad(grad),
         ))
     }
 
@@ -98,13 +94,15 @@ where
     ) -> Result<ArgminIterData<O>, Error> {
         let param = state.get_param();
         let cost = state.get_cost();
-        let inv_hessian = state.get_inv_hessian().unwrap();
         let prev_grad = if let Some(grad) = state.get_grad() {
             grad
         } else {
             op.gradient(&param)?
         };
-        let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
+        let p = self
+            .inv_hessian
+            .dot(&prev_grad)
+            .mul(&F::from_f64(-1.0).unwrap());
 
         self.linesearch.set_search_direction(p);
 
@@ -138,20 +136,17 @@ where
 
         let sksk: O::Hessian = sk.dot(&sk);
 
-        let tmp3: O::Param = inv_hessian.dot(&yk);
+        let tmp3: O::Param = self.inv_hessian.dot(&yk);
         let tmp4: F = tmp3.dot(&yk);
         let tmp3: O::Hessian = tmp3.dot(&tmp3);
         let tmp3: O::Hessian = tmp3.mul(&(F::from_f64(1.0).unwrap() / tmp4));
 
-        let inv_hessian = inv_hessian
+        self.inv_hessian = self
+            .inv_hessian
             .sub(&tmp3)
             .add(&sksk.mul(&(F::from_f64(1.0).unwrap() / yksk)));
 
-        Ok(ArgminIterData::new()
-            .param(xk1)
-            .cost(next_cost)
-            .grad(grad)
-            .inv_hessian(inv_hessian))
+        Ok(ArgminIterData::new().param(xk1).cost(next_cost).grad(grad))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
