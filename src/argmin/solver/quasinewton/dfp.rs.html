@@ -182,6 +182,11 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -211,8 +216,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DFP</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Inverse Hessian</span>
-    <span class="ident">inv_hessian</span>: <span class="ident">H</span>,
+    <span class="doccomment">/// Initial inverse Hessian</span>
+    <span class="ident">init_inv_hessian</span>: <span class="ident">H</span>,
     <span class="doccomment">/// line search</span>
     <span class="ident">linesearch</span>: <span class="ident">L</span>,
     <span class="doccomment">/// Tolerance for the stopping criterion based on the change of the norm on the gradient</span>
@@ -226,7 +231,7 @@
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">init_inverse_hessian</span>: <span class="ident">H</span>, <span class="ident">linesearch</span>: <span class="ident">L</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DFP</span> {
-            <span class="ident">inv_hessian</span>: <span class="ident">init_inverse_hessian</span>,
+            <span class="ident">init_inv_hessian</span>: <span class="ident">init_inverse_hessian</span>,
             <span class="ident">linesearch</span>,
             <span class="ident">tol_grad</span>: <span class="ident">F::epsilon</span>().<span class="ident">sqrt</span>(),
         }
@@ -267,7 +272,11 @@
         <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
-            <span class="ident">ArgminIterData::new</span>().<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">cost</span>(<span class="ident">cost</span>).<span class="ident">grad</span>(<span class="ident">grad</span>),
+            <span class="ident">ArgminIterData::new</span>()
+                .<span class="ident">param</span>(<span class="ident">param</span>)
+                .<span class="ident">cost</span>(<span class="ident">cost</span>)
+                .<span class="ident">grad</span>(<span class="ident">grad</span>)
+                .<span class="ident">inv_hessian</span>(<span class="self">self</span>.<span class="ident">init_inv_hessian</span>.<span class="ident">clone</span>()),
         ))
     }
 
@@ -278,15 +287,13 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
         <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
+        <span class="kw">let</span> <span class="ident">inv_hessian</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_inv_hessian</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">prev_grad</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>) <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_grad</span>() {
             <span class="ident">grad</span>
         } <span class="kw">else</span> {
             <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>
         };
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">inv_hessian</span>
-            .<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>)
-            .<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>());
+        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>());
 
         <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">set_search_direction</span>(<span class="ident">p</span>);
 
@@ -320,17 +327,20 @@
 
         <span class="kw">let</span> <span class="ident">sksk</span>: <span class="ident">O::Hessian</span> <span class="op">=</span> <span class="ident">sk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
 
-        <span class="kw">let</span> <span class="ident">tmp3</span>: <span class="ident">O::Param</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">yk</span>);
+        <span class="kw">let</span> <span class="ident">tmp3</span>: <span class="ident">O::Param</span> <span class="op">=</span> <span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">yk</span>);
         <span class="kw">let</span> <span class="ident">tmp4</span>: <span class="ident">F</span> <span class="op">=</span> <span class="ident">tmp3</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">yk</span>);
         <span class="kw">let</span> <span class="ident">tmp3</span>: <span class="ident">O::Hessian</span> <span class="op">=</span> <span class="ident">tmp3</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">tmp3</span>);
         <span class="kw">let</span> <span class="ident">tmp3</span>: <span class="ident">O::Hessian</span> <span class="op">=</span> <span class="ident">tmp3</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() <span class="op">/</span> <span class="ident">tmp4</span>));
 
-        <span class="self">self</span>.<span class="ident">inv_hessian</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">inv_hessian</span>
+        <span class="kw">let</span> <span class="ident">inv_hessian</span> <span class="op">=</span> <span class="ident">inv_hessian</span>
             .<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">tmp3</span>)
             .<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">sksk</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() <span class="op">/</span> <span class="ident">yksk</span>)));
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData::new</span>().<span class="ident">param</span>(<span class="ident">xk1</span>).<span class="ident">cost</span>(<span class="ident">next_cost</span>).<span class="ident">grad</span>(<span class="ident">grad</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData::new</span>()
+            .<span class="ident">param</span>(<span class="ident">xk1</span>)
+            .<span class="ident">cost</span>(<span class="ident">next_cost</span>)
+            .<span class="ident">grad</span>(<span class="ident">grad</span>)
+            .<span class="ident">inv_hessian</span>(<span class="ident">inv_hessian</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {

@@ -546,6 +546,42 @@
 <span id="545">545</span>
 <span id="546">546</span>
 <span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -590,6 +626,10 @@
     <span class="kw">pub</span> <span class="ident">hessian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O::Hessian</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Previous Hessian</span>
     <span class="kw">pub</span> <span class="ident">prev_hessian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O::Hessian</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Current inverse Hessian</span>
+    <span class="kw">pub</span> <span class="ident">inv_hessian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O::Hessian</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Previous inverse Hessian</span>
+    <span class="kw">pub</span> <span class="ident">prev_inv_hessian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O::Hessian</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Current Jacobian</span>
     <span class="kw">pub</span> <span class="ident">jacobian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O::Jacobian</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Previous Jacobian</span>
@@ -676,6 +716,8 @@
             <span class="ident">prev_grad</span>: <span class="prelude-val">None</span>,
             <span class="ident">hessian</span>: <span class="prelude-val">None</span>,
             <span class="ident">prev_hessian</span>: <span class="prelude-val">None</span>,
+            <span class="ident">inv_hessian</span>: <span class="prelude-val">None</span>,
+            <span class="ident">prev_inv_hessian</span>: <span class="prelude-val">None</span>,
             <span class="ident">jacobian</span>: <span class="prelude-val">None</span>,
             <span class="ident">prev_jacobian</span>: <span class="prelude-val">None</span>,
             <span class="ident">population</span>: <span class="prelude-val">None</span>,
@@ -735,6 +777,13 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="ident">O::Hessian</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">prev_hessian</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">hessian</span>);
         <span class="self">self</span>.<span class="ident">hessian</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">hessian</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set inverse Hessian. This shifts the stored inverse Hessian to the previous inverse Hessian.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inv_hessian</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">inv_hessian</span>: <span class="ident">O::Hessian</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">prev_inv_hessian</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inv_hessian</span>);
+        <span class="self">self</span>.<span class="ident">inv_hessian</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">inv_hessian</span>);
         <span class="self">self</span>
     }
 
@@ -825,6 +874,12 @@
     <span class="macro">getter_option!</span>(<span class="ident">prev_grad</span>, <span class="ident">O::Param</span>, <span class="string">&quot;Returns previous gradient&quot;</span>);
     <span class="macro">getter_option!</span>(<span class="ident">hessian</span>, <span class="ident">O::Hessian</span>, <span class="string">&quot;Returns current Hessian&quot;</span>);
     <span class="macro">getter_option!</span>(<span class="ident">prev_hessian</span>, <span class="ident">O::Hessian</span>, <span class="string">&quot;Returns previous Hessian&quot;</span>);
+    <span class="macro">getter_option!</span>(<span class="ident">inv_hessian</span>, <span class="ident">O::Hessian</span>, <span class="string">&quot;Returns current inverse Hessian&quot;</span>);
+    <span class="macro">getter_option!</span>(
+        <span class="ident">prev_inv_hessian</span>,
+        <span class="ident">O::Hessian</span>,
+        <span class="string">&quot;Returns previous inverse Hessian&quot;</span>
+    );
     <span class="macro">getter_option!</span>(<span class="ident">jacobian</span>, <span class="ident">O::Jacobian</span>, <span class="string">&quot;Returns current Jacobian&quot;</span>);
     <span class="macro">getter_option!</span>(<span class="ident">prev_jacobian</span>, <span class="ident">O::Jacobian</span>, <span class="string">&quot;Returns previous Jacobian&quot;</span>);
     <span class="macro">getter!</span>(<span class="ident">iter</span>, <span class="ident">u64</span>, <span class="string">&quot;Returns current number of iterations&quot;</span>);
@@ -938,6 +993,8 @@
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_grad</span>(), <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_hessian</span>(), <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_hessian</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_inv_hessian</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_inv_hessian</span>(), <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_jacobian</span>(), <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_jacobian</span>(), <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_iter</span>(), <span class="number">0</span>);
@@ -1027,6 +1084,19 @@
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">new_hessian</span>.<span class="ident">clone</span>()));
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">hessian</span>.<span class="ident">clone</span>()));
 
+        <span class="kw">let</span> <span class="ident">inv_hessian</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">1.0</span>]];
+
+        <span class="ident">state</span>.<span class="ident">inv_hessian</span>(<span class="ident">inv_hessian</span>.<span class="ident">clone</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_inv_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">inv_hessian</span>.<span class="ident">clone</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_inv_hessian</span>(), <span class="prelude-val">None</span>);
+
+        <span class="kw">let</span> <span class="ident">new_inv_hessian</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>]];
+
+        <span class="ident">state</span>.<span class="ident">inv_hessian</span>(<span class="ident">new_inv_hessian</span>.<span class="ident">clone</span>());
+
+        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_inv_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">new_inv_hessian</span>.<span class="ident">clone</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_inv_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">inv_hessian</span>.<span class="ident">clone</span>()));
+
         <span class="kw">let</span> <span class="ident">jacobian</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>];
 
         <span class="ident">state</span>.<span class="ident">jacobian</span>(<span class="ident">jacobian</span>.<span class="ident">clone</span>());
@@ -1084,6 +1154,8 @@
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_grad</span>(), <span class="prelude-val">Some</span>(<span class="ident">grad</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">new_hessian</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">hessian</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_inv_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">new_inv_hessian</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_inv_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">inv_hessian</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_jacobian</span>(), <span class="prelude-val">Some</span>(<span class="ident">new_jacobian</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_prev_jacobian</span>(), <span class="prelude-val">Some</span>(<span class="ident">jacobian</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_cost_func_count</span>(), <span class="number">42</span>);

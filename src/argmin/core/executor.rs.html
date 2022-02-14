@@ -432,6 +432,9 @@
 <span id="431">431</span>
 <span id="432">432</span>
 <span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -541,6 +544,9 @@
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hessian</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_hessian</span>() {
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">hessian</span>(<span class="ident">hessian</span>);
+        }
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inv_hessian</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_inv_hessian</span>() {
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">inv_hessian</span>(<span class="ident">inv_hessian</span>);
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">jacobian</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_jacobian</span>() {
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">jacobian</span>(<span class="ident">jacobian</span>);
