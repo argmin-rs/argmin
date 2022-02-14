@@ -90,7 +90,8 @@ where
         + ArgminDot<O::Param, O::Hessian>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    O::Hessian: SerializeAlias
+    O::Hessian: Clone
+        + SerializeAlias
         + ArgminDot<O::Param, O::Param>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<F, O::Hessian>,

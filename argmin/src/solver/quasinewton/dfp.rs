@@ -64,7 +64,8 @@ where
         + ArgminDot<O::Param, O::Hessian>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    H: SerializeAlias
+    H: Clone
+        + SerializeAlias
         + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminAdd<O::Hessian, O::Hessian>
