@@ -187,6 +187,7 @@
 <span id="186">186</span>
 <span id="187">187</span>
 <span id="188">188</span>
+<span id="189">189</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -253,7 +254,8 @@
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Hessian</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">O::Float</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">O::Float</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>,
-    <span class="ident">H</span>: <span class="ident">SerializeAlias</span>
+    <span class="ident">H</span>: <span class="ident">Clone</span>
+        <span class="op">+</span> <span class="ident">SerializeAlias</span>
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">O::Hessian</span>, <span class="ident">O::Hessian</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">O::Hessian</span>, <span class="ident">O::Hessian</span><span class="op">&gt;</span>
