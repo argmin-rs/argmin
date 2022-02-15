@@ -136,7 +136,8 @@ where
         let grad = op.gradient(&param)?;
         let hessian = state
             .get_hessian()
-            .unwrap_or_else(|| op.hessian(&param).unwrap());
+            .map(Result::Ok)
+            .unwrap_or_else(|| op.hessian(&param))?;
         Ok(Some(
             ArgminIterData::new()
                 .param(param)

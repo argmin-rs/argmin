@@ -30,7 +30,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct BFGS<L, H, F> {
     /// Inverse Hessian
-    init_inv_hessian: H,
+    init_inv_hessian: Option<H>,
     /// line search
     linesearch: L,
     /// Tolerance for the stopping criterion based on the change of the norm on the gradient
@@ -46,7 +46,7 @@ where
     /// Constructor
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         BFGS {
-            init_inv_hessian: init_inverse_hessian,
+            init_inv_hessian: Some(init_inverse_hessian),
             linesearch,
             tol_grad: F::epsilon().sqrt(),
             tol_cost: F::epsilon(),
@@ -76,8 +76,7 @@ where
         + ArgminDot<O::Param, O::Hessian>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    O::Hessian: Clone
-        + SerializeAlias
+    O::Hessian: SerializeAlias
         + ArgminSub<O::Hessian, O::Hessian>
         + ArgminDot<O::Param, O::Param>
         + ArgminDot<O::Hessian, O::Hessian>
@@ -103,7 +102,7 @@ where
                 .param(param)
                 .cost(cost)
                 .grad(grad)
-                .inv_hessian(self.init_inv_hessian.clone()),
+                .inv_hessian(self.init_inv_hessian.take().unwrap()),
         ))
     }
 
@@ -156,9 +155,9 @@ where
         let mat1: O::Hessian = sk.dot(&yk);
         let mat1 = mat1.mul(&rhok);
 
-        let mat2 = mat1.clone().t();
-
         let tmp1 = e.sub(&mat1);
+
+        let mat2 = mat1.t();
         let tmp2 = e.sub(&mat2);
 
         let sksk: O::Hessian = sk.dot(&sk);
