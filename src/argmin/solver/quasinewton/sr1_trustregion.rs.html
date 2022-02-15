@@ -269,6 +269,7 @@
 <span id="268">268</span>
 <span id="269">269</span>
 <span id="270">270</span>
+<span id="271">271</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2019-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -407,7 +408,8 @@
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="ident">state</span>
             .<span class="ident">get_hessian</span>()
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">op</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>).<span class="ident">unwrap</span>());
+            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">op</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>))<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
             <span class="ident">ArgminIterData::new</span>()
                 .<span class="ident">param</span>(<span class="ident">param</span>)
