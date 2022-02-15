@@ -30,7 +30,7 @@ pub struct SR1<L, H, F> {
     /// parameter for skipping rule
     r: F,
     /// Init inverse Hessian
-    init_inv_hessian: H,
+    init_inv_hessian: Option<H>,
     /// line search
     linesearch: L,
     /// Tolerance for the stopping criterion based on the change of the norm on the gradient
@@ -47,7 +47,7 @@ where
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         SR1 {
             r: F::from_f64(1e-8).unwrap(),
-            init_inv_hessian: init_inverse_hessian,
+            init_inv_hessian: Some(init_inverse_hessian),
             linesearch,
             tol_grad: F::epsilon().sqrt(),
             tol_cost: F::epsilon(),
@@ -90,8 +90,7 @@ where
         + ArgminDot<O::Param, O::Hessian>
         + ArgminNorm<O::Float>
         + ArgminMul<O::Float, O::Param>,
-    O::Hessian: Clone
-        + SerializeAlias
+    O::Hessian: SerializeAlias
         + ArgminDot<O::Param, O::Param>
         + ArgminAdd<O::Hessian, O::Hessian>
         + ArgminMul<F, O::Hessian>,
@@ -113,7 +112,7 @@ where
                 .param(param)
                 .cost(cost)
                 .grad(grad)
-                .inv_hessian(self.init_inv_hessian.clone()),
+                .inv_hessian(self.init_inv_hessian.take().unwrap()),
         ))
     }
 
