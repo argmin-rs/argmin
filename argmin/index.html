@@ -322,10 +322,10 @@ cost function values, iteration number, …), respectively.</p>
         <span class="comment">// Current state of the optimization. This gives access to the parameter vector,</span>
         <span class="comment">// gradient, Hessian and cost function value of the current, previous and best</span>
         <span class="comment">// iteration as well as current iteration number, and many more.</span>
-        <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// First we obtain the current parameter vector from the `state` struct (`x_k`).</span>
-        <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
+        <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
         <span class="comment">// Then we compute the gradient at `x_k` (`\nabla f(x_k)`)</span>
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk</span>)<span class="question-mark">?</span>;
         <span class="comment">// Now subtract `\nabla f(x_k)` scaled by `omega` from `x_k` to compute `x_{k+1}`</span>

@@ -209,6 +209,10 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -370,7 +374,11 @@
     <span class="kw">fn</span> <span class="ident">observe_iter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">_kv</span>: <span class="kw-2">&amp;</span><span class="ident">ArgminKV</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// TODO: get particles from `state` or `kv`</span>
 
-        <span class="self">self</span>.<span class="ident">iteration</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">param</span>, <span class="ident">state</span>.<span class="ident">best_cost</span>, <span class="ident">state</span>.<span class="ident">get_population</span>());
+        <span class="self">self</span>.<span class="ident">iteration</span>(
+            <span class="ident">state</span>.<span class="ident">get_param_ref</span>().<span class="ident">unwrap</span>(),
+            <span class="ident">state</span>.<span class="ident">best_cost</span>,
+            <span class="ident">state</span>.<span class="ident">get_population</span>(),
+        );
 
         <span class="prelude-val">Ok</span>(())
     }

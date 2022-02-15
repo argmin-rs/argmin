@@ -351,8 +351,6 @@
 <span id="350">350</span>
 <span id="351">351</span>
 <span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -600,35 +598,33 @@
     <span class="kw">fn</span> <span class="ident">init</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">op</span>: <span class="kw-2">&amp;mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">get_param</span>())<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
-            <span class="ident">ArgminIterData::new</span>()
-                .<span class="ident">param</span>(<span class="ident">state</span>.<span class="ident">get_param</span>())
-                .<span class="ident">cost</span>(<span class="ident">cost</span>)
-                .<span class="ident">kv</span>(<span class="macro">make_kv!</span>(
-                    <span class="string">&quot;initial_temperature&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">init_temp</span>;
-                    <span class="string">&quot;stall_iter_accepted_limit&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">stall_iter_accepted_limit</span>;
-                    <span class="string">&quot;stall_iter_best_limit&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">stall_iter_best_limit</span>;
-                    <span class="string">&quot;reanneal_fixed&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_fixed</span>;
-                    <span class="string">&quot;reanneal_accepted&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_accepted</span>;
-                    <span class="string">&quot;reanneal_best&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_best</span>;
-                )),
-        ))
+        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ArgminIterData::new</span>().<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">cost</span>(<span class="ident">cost</span>).<span class="ident">kv</span>(
+            <span class="macro">make_kv!</span>(
+                <span class="string">&quot;initial_temperature&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">init_temp</span>;
+                <span class="string">&quot;stall_iter_accepted_limit&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">stall_iter_accepted_limit</span>;
+                <span class="string">&quot;stall_iter_best_limit&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">stall_iter_best_limit</span>;
+                <span class="string">&quot;reanneal_fixed&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_fixed</span>;
+                <span class="string">&quot;reanneal_accepted&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_accepted</span>;
+                <span class="string">&quot;reanneal_best&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_best</span>;
+            ),
+        )))
     }
 
     <span class="doccomment">/// Perform one iteration of SA algorithm</span>
     <span class="kw">fn</span> <span class="ident">next_iter</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">op</span>: <span class="kw-2">&amp;mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// Careful: The order in here is *very* important, even if it may not seem so. Everything</span>
         <span class="comment">// is linked to the iteration number, and getting things mixed up will lead to strange</span>
         <span class="comment">// behaviour.</span>
 
-        <span class="kw">let</span> <span class="ident">prev_param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
+        <span class="kw">let</span> <span class="ident">prev_param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">prev_cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
 
         <span class="comment">// Make a move</span>

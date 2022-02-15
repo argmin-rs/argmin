@@ -199,7 +199,6 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-<span id="201">201</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -302,9 +301,9 @@
     <span class="kw">fn</span> <span class="ident">init</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">op</span>: <span class="kw-2">&amp;mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
+        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>())));
@@ -316,15 +315,14 @@
     <span class="kw">fn</span> <span class="ident">next_iter</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">op</span>: <span class="kw-2">&amp;mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>();
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>) <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_grad</span>() {
-            <span class="ident">grad</span>
-        } <span class="kw">else</span> {
-            <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk</span>)<span class="question-mark">?</span>
-        };
+        <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">state</span>
+            .<span class="ident">take_grad</span>()
+            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">cur_cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
 
         <span class="comment">// Linesearch</span>
@@ -333,7 +331,7 @@
         <span class="comment">// Run solver</span>
         <span class="kw">let</span> <span class="ident">ArgminResult</span> {
             <span class="ident">operator</span>: <span class="ident">line_op</span>,
-            <span class="ident">state</span>: <span class="ident">line_state</span>,
+            <span class="ident">state</span>: <span class="kw-2">mut</span> <span class="ident">line_state</span>,
         } <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">op</span>.<span class="ident">take_op</span>().<span class="ident">unwrap</span>(), <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">clone</span>(), <span class="ident">xk</span>)
             .<span class="ident">grad</span>(<span class="ident">grad</span>.<span class="ident">clone</span>())
             .<span class="ident">cost</span>(<span class="ident">cur_cost</span>)
@@ -343,7 +341,7 @@
         <span class="comment">// takes care of the counts of function evaluations</span>
         <span class="ident">op</span>.<span class="ident">consume_op</span>(<span class="ident">line_op</span>);
 
-        <span class="kw">let</span> <span class="ident">xk1</span> <span class="op">=</span> <span class="ident">line_state</span>.<span class="ident">get_param</span>();
+        <span class="kw">let</span> <span class="ident">xk1</span> <span class="op">=</span> <span class="ident">line_state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
 
         <span class="comment">// Update of beta</span>
         <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk1</span>)<span class="question-mark">?</span>;
