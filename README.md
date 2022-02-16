@@ -76,7 +76,7 @@ problems), developing tests, adding observers, implementing a C interface or
 ## Examples
 
 Examples for each solver can be found
-[here (current released version)](https://github.com/argmin-rs/argmin/tree/v0.5.0/examples) and
+[here (current released version)](https://github.com/argmin-rs/argmin/tree/v0.5.1/examples) and
 [here (main branch)](https://github.com/argmin-rs/argmin/tree/main/examples).
 
 ## Usage
@@ -85,7 +85,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-argmin = "0.5.0"
+argmin = "0.5.1"
 ```
 
 ### Optional features
@@ -96,7 +96,7 @@ There are additional features which can be activated in `Cargo.toml`:
 
 ```toml
 [dependencies]
-argmin = { version = "0.5.0", features = ["ctrlc", "ndarrayl", "nalgebral"] }
+argmin = { version = "0.5.1", features = ["ctrlc", "ndarrayl", "nalgebral"] }
 ```
 
 These may become default features in the future. Without these features compilation to
@@ -119,11 +119,11 @@ ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
 When compiling to WASM, one of the following features must be used:
 
 ```toml
-argmin = { version = "0.5.0", features = ["wasm-bindgen"] }
+argmin = { version = "0.5.1", features = ["wasm-bindgen"] }
 ```
 
 ```toml
-argmin = { version = "0.5.0", features = ["stdweb"] }
+argmin = { version = "0.5.1", features = ["stdweb"] }
 ```
 
 Note that WASM support is still experimental. Please report any issues you encounter when compiling argmin to WASM.

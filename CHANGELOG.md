@@ -2,6 +2,12 @@
 
 ## argmin unreleased (xx xxxxxx xxxx)
 
+## argmin v0.5.1 (16 February 2022)
+
+- Fixed Bug in HagerZhang line search (#2, #184, @wfsteiner)
+- Removed Default trait bounds on TrustRegion and Steihaug implementations (#187, #192, @cfunky)
+- Inverse Hessians are now part of IterState, therefore the final inverse Hessian can be retrieved after an optimization run (#185, #186, @stefan-k)
+
 ## argmin v0.5.0 (10 January 2022)
 
 - Faster CI pipeline (#179, @stefan-k)
