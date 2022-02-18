@@ -10,11 +10,10 @@
 #[cfg(feature = "serde1")]
 use crate::core::{serialization::*, ArgminCheckpoint, DeserializeOwnedAlias};
 use crate::core::{
-    ArgminIterData, ArgminKV, ArgminResult, Error, Observe, Observer, ObserverMode, OpWrapper,
-    Solver, State, TerminationReason,
+    ArgminKV, ArgminResult, Error, Observe, Observer, ObserverMode, OpWrapper, Solver, State,
+    TerminationReason,
 };
 use instant;
-use num_traits::Float;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "serde1")]
@@ -77,50 +76,6 @@ where
         Ok(executor)
     }
 
-    fn update(&mut self, data: &ArgminIterData<I>) -> Result<(), Error> {
-        if let Some(cur_param) = data.get_param() {
-            self.state.param(cur_param);
-        }
-        if let Some(cur_cost) = data.get_cost() {
-            self.state.cost(cur_cost);
-        }
-        // check if parameters are the best so far
-        // Comparison is done using `<` to avoid new solutions with the same cost function value as
-        // the current best to be accepted. However, some solvers to not compute the cost function
-        // value (such as the Newton method). Those will always have `Inf` cost. Therefore if both
-        // the new value and the previous best value are `Inf`, the solution is also accepted. Care
-        // is taken that both `Inf` also have the same sign.
-        if self.state.get_cost() < self.state.get_best_cost()
-            || (self.state.get_cost().is_infinite()
-                && self.state.get_best_cost().is_infinite()
-                && self.state.get_cost().is_sign_positive()
-                    == self.state.get_best_cost().is_sign_positive())
-        {
-            self.state.current_param_is_new_best();
-        }
-
-        if let Some(grad) = data.get_grad() {
-            self.state.grad(grad);
-        }
-        if let Some(hessian) = data.get_hessian() {
-            self.state.hessian(hessian);
-        }
-        if let Some(inv_hessian) = data.get_inv_hessian() {
-            self.state.inv_hessian(inv_hessian);
-        }
-        if let Some(jacobian) = data.get_jacobian() {
-            self.state.jacobian(jacobian);
-        }
-        if let Some(population) = data.get_population() {
-            self.state.population(population.clone());
-        }
-
-        if let Some(termination_reason) = data.get_termination_reason() {
-            self.state.termination_reason(termination_reason);
-        }
-        Ok(())
-    }
-
     /// Run the executor
     pub fn run(mut self) -> Result<ArgminResult<I>, Error> {
         let total_time = if self.timer {
@@ -157,7 +112,7 @@ where
 
         // If init() returned something, deal with it
         if let Some(data) = &init_data {
-            self.update(data)?;
+            self.state.update(data);
         }
 
         if !self.observers.is_empty() {
@@ -207,7 +162,7 @@ where
                 None
             };
 
-            self.update(&data)?;
+            self.state.update(&data);
 
             if !self.observers.is_empty() {
                 let mut log = data.get_kv();
@@ -340,7 +295,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{ArgminOp, IterState, MinimalNoOperator, State};
+    use crate::core::{ArgminIterData, ArgminOp, IterState, MinimalNoOperator, State};
     use approx::assert_relative_eq;
 
     #[test]
@@ -371,7 +326,7 @@ mod tests {
         let new_param = vec![1.0, 1.0];
         let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> =
             ArgminIterData::new().param(new_param.clone());
-        executor.update(&new_iterdata).unwrap();
+        executor.state.update(&new_iterdata);
         assert_eq!(executor.state.get_best_param().unwrap(), new_param);
         assert!(executor.state.get_best_cost().is_infinite());
         assert!(executor.state.get_best_cost().is_sign_positive());
@@ -382,7 +337,7 @@ mod tests {
         let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> = ArgminIterData::new()
             .param(new_param.clone())
             .cost(new_cost);
-        executor.update(&new_iterdata).unwrap();
+        executor.state.update(&new_iterdata);
         assert_eq!(executor.state.get_best_param().unwrap(), new_param);
         assert_relative_eq!(
             executor.state.get_best_cost(),
@@ -397,7 +352,7 @@ mod tests {
         let new_cost = old_cost + 1.0;
         let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> =
             ArgminIterData::new().param(new_param).cost(new_cost);
-        executor.update(&new_iterdata).unwrap();
+        executor.state.update(&new_iterdata);
         assert_eq!(executor.state.get_best_param(), old_param);
         assert_relative_eq!(
             executor.state.get_best_cost(),
@@ -414,7 +369,7 @@ mod tests {
         let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> = ArgminIterData::new()
             .param(new_param.clone())
             .cost(new_cost);
-        executor.update(&new_iterdata).unwrap();
+        executor.state.update(&new_iterdata);
         assert_eq!(executor.state.get_best_param().unwrap(), new_param);
         assert!(executor.state.get_best_cost().is_infinite());
         assert!(executor.state.get_best_cost().is_sign_negative());
@@ -425,7 +380,7 @@ mod tests {
         let new_cost = std::f64::INFINITY;
         let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> =
             ArgminIterData::new().param(new_param).cost(new_cost);
-        executor.update(&new_iterdata).unwrap();
+        executor.state.update(&new_iterdata);
         assert_eq!(executor.state.get_best_param().unwrap(), old_param);
         assert!(executor.state.get_best_cost().is_infinite());
         assert!(executor.state.get_best_cost().is_sign_negative());

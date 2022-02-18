@@ -6,8 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminFloat, ArgminOp, DeserializeOwnedAlias, LinearProgram, OpWrapper, SerializeAlias,
-    TerminationReason,
+    ArgminFloat, ArgminIterData, ArgminOp, DeserializeOwnedAlias, LinearProgram, OpWrapper,
+    SerializeAlias, TerminationReason,
 };
 use instant;
 use num_traits::Float;
@@ -16,7 +16,7 @@ use paste::item;
 use serde::{Deserialize, Serialize};
 
 /// Types implemeting this trait can be used to keep track of a solver's state
-pub trait State: SerializeAlias {
+pub trait State: SerializeAlias + Sized {
     /// Parameter vector
     type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Output of the operator
@@ -32,6 +32,9 @@ pub trait State: SerializeAlias {
 
     /// Constructor
     fn new(param: Self::Param) -> Self;
+
+    /// Update stored data with information from an `ArgminIterData` struct
+    fn update(&mut self, data: &ArgminIterData<Self>);
 
     /// Set the current parameter as the new best parameter
     fn current_param_is_new_best(&mut self);
@@ -596,6 +599,48 @@ impl<O: ArgminOp> State for IterState<O> {
         }
     }
 
+    fn update(&mut self, data: &ArgminIterData<IterState<O>>) {
+        if let Some(cur_param) = data.get_param() {
+            self.param(cur_param);
+        }
+        if let Some(cur_cost) = data.get_cost() {
+            self.cost(cur_cost);
+        }
+        // check if parameters are the best so far
+        // Comparison is done using `<` to avoid new solutions with the same cost function value as
+        // the current best to be accepted. However, some solvers to not compute the cost function
+        // value (such as the Newton method). Those will always have `Inf` cost. Therefore if both
+        // the new value and the previous best value are `Inf`, the solution is also accepted. Care
+        // is taken that both `Inf` also have the same sign.
+        if self.get_cost() < self.get_best_cost()
+            || (self.get_cost().is_infinite()
+                && self.get_best_cost().is_infinite()
+                && self.get_cost().is_sign_positive() == self.get_best_cost().is_sign_positive())
+        {
+            self.current_param_is_new_best();
+        }
+
+        if let Some(grad) = data.get_grad() {
+            self.grad(grad);
+        }
+        if let Some(hessian) = data.get_hessian() {
+            self.hessian(hessian);
+        }
+        if let Some(inv_hessian) = data.get_inv_hessian() {
+            self.inv_hessian(inv_hessian);
+        }
+        if let Some(jacobian) = data.get_jacobian() {
+            self.jacobian(jacobian);
+        }
+        if let Some(population) = data.get_population() {
+            self.population(population.clone());
+        }
+
+        if let Some(termination_reason) = data.get_termination_reason() {
+            self.termination_reason(termination_reason);
+        }
+    }
+
     /// Sets the current parameter vector as the new best parameter vector
     fn current_param_is_new_best(&mut self) {
         let param = self.get_param().unwrap();
@@ -1002,6 +1047,32 @@ impl<O: LinearProgram> State for LinearProgramState<O> {
             max_iters: std::u64::MAX,
             time: Some(instant::Duration::new(0, 0)),
             termination_reason: TerminationReason::NotTerminated,
+        }
+    }
+
+    fn update(&mut self, data: &ArgminIterData<LinearProgramState<O>>) {
+        if let Some(cur_param) = data.get_param() {
+            self.param(cur_param);
+        }
+        if let Some(cur_cost) = data.get_cost() {
+            self.cost(cur_cost);
+        }
+        // check if parameters are the best so far
+        // Comparison is done using `<` to avoid new solutions with the same cost function value as
+        // the current best to be accepted. However, some solvers to not compute the cost function
+        // value (such as the Newton method). Those will always have `Inf` cost. Therefore if both
+        // the new value and the previous best value are `Inf`, the solution is also accepted. Care
+        // is taken that both `Inf` also have the same sign.
+        if self.get_cost() < self.get_best_cost()
+            || (self.get_cost().is_infinite()
+                && self.get_best_cost().is_infinite()
+                && self.get_cost().is_sign_positive() == self.get_best_cost().is_sign_positive())
+        {
+            self.current_param_is_new_best();
+        }
+
+        if let Some(termination_reason) = data.get_termination_reason() {
+            self.termination_reason(termination_reason);
         }
     }
 
