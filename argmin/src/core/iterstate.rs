@@ -5,12 +5,429 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminOp, OpWrapper, TerminationReason};
+use crate::core::{
+    ArgminFloat, ArgminOp, DeserializeOwnedAlias, LinearProgram, OpWrapper, SerializeAlias,
+    TerminationReason,
+};
 use instant;
 use num_traits::Float;
 use paste::item;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
+
+/// Types implemeting this trait can be used to keep track of a solver's state
+pub trait State: SerializeAlias {
+    /// Parameter vector
+    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
+    /// Output of the operator
+    type Output: Clone + SerializeAlias + DeserializeOwnedAlias;
+    /// Type of Hessian
+    type Hessian: Clone + SerializeAlias + DeserializeOwnedAlias;
+    /// Type of Jacobian
+    type Jacobian: Clone + SerializeAlias + DeserializeOwnedAlias;
+    /// Precision of floats
+    type Float: ArgminFloat;
+    /// Operator
+    type Operator;
+
+    /// Constructor
+    fn new(param: Self::Param) -> Self;
+
+    /// Set the current parameter as the new best parameter
+    fn current_param_is_new_best(&mut self);
+
+    /// Set parameter vector. This shifts the stored parameter vector to the previous parameter
+    /// vector.
+    fn param(&mut self, _param: Self::Param) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set best paramater vector. This shifts the stored best parameter vector to the previous
+    /// best parameter vector.
+    fn best_param(&mut self, _param: Self::Param) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set the current cost function value. This shifts the stored cost function value to the
+    /// previous cost function value.
+    fn cost(&mut self, _cost: Self::Float) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set the current best cost function value. This shifts the stored best cost function value to
+    /// the previous cost function value.
+    fn best_cost(&mut self, _cost: Self::Float) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set gradient. This shifts the stored gradient to the previous gradient.
+    fn grad(&mut self, _grad: Self::Param) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set Hessian. This shifts the stored Hessian to the previous Hessian.
+    fn hessian(&mut self, _hessian: Self::Hessian) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set inverse Hessian. This shifts the stored inverse Hessian to the previous inverse Hessian.
+    fn inv_hessian(&mut self, _inv_hessian: Self::Hessian) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set Jacobian. This shifts the stored Jacobian to the previous Jacobian.
+    fn jacobian(&mut self, _jacobian: Self::Jacobian) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set population
+    fn population(&mut self, _population: Vec<(Self::Param, Self::Float)>) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set target cost
+    fn target_cost(&mut self, _target_cost: Self::Float) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set maximum number of iterations
+    fn max_iters(&mut self, _max_iters: u64) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set last best iteration
+    fn last_best_iter(&mut self, _last_best_iter: u64) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set termination reason
+    fn termination_reason(&mut self, _termination_reason: TerminationReason) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Set time required so far
+    fn time(&mut self, _time: Option<instant::Duration>) -> &mut Self {
+        unimplemented!()
+    }
+
+    /// Returns current parameter vector
+    fn get_param(&self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns previous parameter vector
+    fn get_prev_param(&self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns best parameter vector
+    fn get_best_param(&self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns previous best parameter vector
+    fn get_prev_best_param(&self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns reference to current parameter vector
+    fn get_param_ref(&self) -> Option<&Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns reference to previous parameter vector
+    fn get_prev_param_ref(&self) -> Option<&Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns reference to best parameter vector
+    fn get_best_param_ref(&self) -> Option<&Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns reference to previous best parameter vector
+    fn get_prev_best_param_ref(&self) -> Option<&Self::Param> {
+        unimplemented!()
+    }
+
+    /// Takes current parameter vector and resplaces it internally with `None`
+    fn take_param(&mut self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Takes previous parameter vector and resplaces it internally with `None`
+    fn take_prev_param(&mut self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Takes best parameter vector and resplaces it internally with `None`
+    fn take_best_param(&mut self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Takes previous best parameter vector and resplaces it internally with `None`
+    fn take_prev_best_param(&mut self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns current cost function value
+    fn get_cost(&self) -> Self::Float {
+        unimplemented!()
+    }
+
+    /// Returns previous cost function value
+    fn get_prev_cost(&self) -> Self::Float {
+        unimplemented!()
+    }
+
+    /// Returns best cost function value
+    fn get_best_cost(&self) -> Self::Float {
+        unimplemented!()
+    }
+
+    /// Returns previous best cost function value
+    fn get_prev_best_cost(&self) -> Self::Float {
+        unimplemented!()
+    }
+
+    /// Returns target cost
+    fn get_target_cost(&self) -> Self::Float {
+        unimplemented!()
+    }
+
+    /// Returns currecnt cost function evaluation count
+    fn get_cost_func_count(&self) -> u64 {
+        unimplemented!()
+    }
+
+    /// Returns current gradient function evaluation count
+    fn get_grad_func_count(&self) -> u64 {
+        unimplemented!()
+    }
+
+    /// Returns current Hessian function evaluation count
+    fn get_hessian_func_count(&self) -> u64 {
+        unimplemented!()
+    }
+
+    /// Returns current Jacobian function evaluation count
+    fn get_jacobian_func_count(&self) -> u64 {
+        unimplemented!()
+    }
+
+    /// Returns current modify function evaluation count
+    fn get_modify_func_count(&self) -> u64 {
+        unimplemented!()
+    }
+
+    /// Returns iteration number where the last best parameter vector was found
+    fn get_last_best_iter(&self) -> u64 {
+        unimplemented!()
+    }
+
+    /// Returns current number of iterations
+    fn get_iter(&self) -> u64 {
+        unimplemented!()
+    }
+
+    /// Returns maximum number of iterations
+    fn get_max_iters(&self) -> u64 {
+        unimplemented!()
+    }
+
+    /// Returns termination reason
+    fn get_termination_reason(&self) -> TerminationReason {
+        unimplemented!()
+    }
+
+    /// Get time required so far
+    fn get_time(&self) -> Option<instant::Duration> {
+        unimplemented!()
+    }
+
+    /// Returns gradient
+    fn get_grad(&self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns previous gradient
+    fn get_prev_grad(&self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns current Hessian
+    fn get_hessian(&self) -> Option<Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Returns previous Hessian
+    fn get_prev_hessian(&self) -> Option<Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Returns current inverse Hessian
+    fn get_inv_hessian(&self) -> Option<Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Returns previous inverse Hessian
+    fn get_prev_inv_hessian(&self) -> Option<Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Returns current Jacobian
+    fn get_jacobian(&self) -> Option<Self::Jacobian> {
+        unimplemented!()
+    }
+
+    /// Returns previous Jacobian
+    fn get_prev_jacobian(&self) -> Option<Self::Jacobian> {
+        unimplemented!()
+    }
+
+    /// Returns reference to gradient
+    fn get_grad_ref(&self) -> Option<&Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns reference to previous gradient
+    fn get_prev_grad_ref(&self) -> Option<&Self::Param> {
+        unimplemented!()
+    }
+
+    /// Returns reference to current Hessian
+    fn get_hessian_ref(&self) -> Option<&Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Returns reference to previous Hessian
+    fn get_prev_hessian_ref(&self) -> Option<&Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Returns reference to current inverse Hessian
+    fn get_inv_hessian_ref(&self) -> Option<&Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Returns reference to previous inverse Hessian
+    fn get_prev_inv_hessian_ref(&self) -> Option<&Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Returns reference to current Jacobian
+    fn get_jacobian_ref(&self) -> Option<&Self::Jacobian> {
+        unimplemented!()
+    }
+
+    /// Returns reference to previous Jacobian
+    fn get_prev_jacobian_ref(&self) -> Option<&Self::Jacobian> {
+        unimplemented!()
+    }
+
+    /// Takes gradient
+    fn take_grad(&mut self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Takes previous gradient
+    fn take_prev_grad(&mut self) -> Option<Self::Param> {
+        unimplemented!()
+    }
+
+    /// Takes current Hessian
+    fn take_hessian(&mut self) -> Option<Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Takes previous Hessian
+    fn take_prev_hessian(&mut self) -> Option<Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Takes current inverse Hessian
+    fn take_inv_hessian(&mut self) -> Option<Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Takes previous inverse Hessian
+    fn take_prev_inv_hessian(&mut self) -> Option<Self::Hessian> {
+        unimplemented!()
+    }
+
+    /// Takes current Jacobian
+    fn take_jacobian(&mut self) -> Option<Self::Jacobian> {
+        unimplemented!()
+    }
+
+    /// Takes previous Jacobian and replaces it internally with `None`
+    fn take_prev_jacobian(&mut self) -> Option<Self::Jacobian> {
+        unimplemented!()
+    }
+
+    /// Returns population
+    fn get_population(&self) -> Option<&Vec<(Self::Param, Self::Float)>> {
+        unimplemented!()
+    }
+
+    /// Increment the number of iterations by one
+    fn increment_iter(&mut self) {
+        unimplemented!()
+    }
+
+    /// Increment all function evaluation counts by the evaluation counts of another operator
+    /// wrapped in `OpWrapper`.
+    fn increment_func_counts(&mut self, _op: &OpWrapper<Self::Operator>) {
+        unimplemented!()
+    }
+
+    /// Set all function evaluation counts to the evaluation counts of another operator
+    /// wrapped in `OpWrapper`.
+    fn set_func_counts(&mut self, _op: &OpWrapper<Self::Operator>) {
+        unimplemented!()
+    }
+
+    /// Increment cost function evaluation count by `num`
+    fn increment_cost_func_count(&mut self, _num: u64) {
+        unimplemented!()
+    }
+
+    /// Increment gradient function evaluation count by `num`
+    fn increment_grad_func_count(&mut self, _num: u64) {
+        unimplemented!()
+    }
+
+    /// Increment Hessian function evaluation count by `num`
+    fn increment_hessian_func_count(&mut self, _num: u64) {
+        unimplemented!()
+    }
+
+    /// Increment Jacobian function evaluation count by `num`
+    fn increment_jacobian_func_count(&mut self, _num: u64) {
+        unimplemented!()
+    }
+
+    /// Increment modify function evaluation count by `num`
+    fn increment_modify_func_count(&mut self, _num: u64) {
+        unimplemented!()
+    }
+
+    /// Indicate that a new best parameter vector was found
+    fn new_best(&mut self) {
+        unimplemented!()
+    }
+
+    /// Returns whether the current parameter vector is also the best parameter vector found so
+    /// far.
+    fn is_best(&self) -> bool {
+        unimplemented!()
+    }
+
+    /// Return whether the algorithm has terminated or not
+    fn terminated(&self) -> bool {
+        unimplemented!()
+    }
+}
 
 /// Maintains the state from iteration to iteration of a solver
 #[derive(Clone, Debug)]
@@ -77,7 +494,7 @@ pub struct IterState<O: ArgminOp> {
 macro_rules! setter {
     ($name:ident, $type:ty, $doc:tt) => {
         #[doc=$doc]
-        pub fn $name(&mut self, $name: $type) -> &mut Self {
+        fn $name(&mut self, $name: $type) -> &mut Self {
             self.$name = $name;
             self
         }
@@ -88,7 +505,7 @@ macro_rules! getter_option {
     ($name:ident, $type:ty, $doc:tt) => {
         item! {
             #[doc=$doc]
-            pub fn [<get_ $name>](&self) -> Option<$type> {
+            fn [<get_ $name>](&self) -> Option<$type> {
                 self.$name.clone()
             }
         }
@@ -99,7 +516,7 @@ macro_rules! getter_option_ref {
     ($name:ident, $type:ty, $doc:tt) => {
         item! {
             #[doc=$doc]
-            pub fn [<get_ $name _ref>](&self) -> Option<&$type> {
+            fn [<get_ $name _ref>](&self) -> Option<&$type> {
                 self.$name.as_ref()
             }
         }
@@ -110,7 +527,7 @@ macro_rules! take {
     ($name:ident, $type:ty, $doc:tt) => {
         item! {
             #[doc=$doc]
-            pub fn [<take_ $name>](&mut self) -> Option<$type> {
+            fn [<take_ $name>](&mut self) -> Option<$type> {
                 self.$name.take()
             }
         }
@@ -121,15 +538,16 @@ macro_rules! getter {
     ($name:ident, $type:ty, $doc:tt) => {
         item! {
             #[doc=$doc]
-            pub fn [<get_ $name>](&self) -> $type {
+            fn [<get_ $name>](&self) -> $type {
                 self.$name.clone()
             }
         }
     };
 }
 
-impl<O: ArgminOp> std::default::Default for IterState<O>
+impl<O> std::default::Default for IterState<O>
 where
+    O: ArgminOp,
     O::Param: Default,
 {
     fn default() -> Self {
@@ -137,9 +555,19 @@ where
     }
 }
 
-impl<O: ArgminOp> IterState<O> {
+impl<O> State for IterState<O>
+where
+    O: ArgminOp,
+{
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
+    type Jacobian = O::Jacobian;
+    type Float = O::Float;
+    type Operator = O;
+
     /// Create new IterState from `param`
-    pub fn new(param: O::Param) -> Self {
+    fn new(param: O::Param) -> Self {
         IterState {
             param: Some(param.clone()),
             prev_param: None,
@@ -173,7 +601,7 @@ impl<O: ArgminOp> IterState<O> {
     }
 
     /// Sets the current parameter vector as the new best parameter vector
-    pub fn current_param_is_new_best(&mut self) {
+    fn current_param_is_new_best(&mut self) {
         let param = self.get_param().unwrap();
         let cost = self.get_cost();
         self.best_param(param).best_cost(cost);
@@ -182,7 +610,7 @@ impl<O: ArgminOp> IterState<O> {
 
     /// Set parameter vector. This shifts the stored parameter vector to the previous parameter
     /// vector.
-    pub fn param(&mut self, param: O::Param) -> &mut Self {
+    fn param(&mut self, param: O::Param) -> &mut Self {
         std::mem::swap(&mut self.prev_param, &mut self.param);
         self.param = Some(param);
         self
@@ -190,7 +618,7 @@ impl<O: ArgminOp> IterState<O> {
 
     /// Set best paramater vector. This shifts the stored best parameter vector to the previous
     /// best parameter vector.
-    pub fn best_param(&mut self, param: O::Param) -> &mut Self {
+    fn best_param(&mut self, param: O::Param) -> &mut Self {
         std::mem::swap(&mut self.prev_best_param, &mut self.best_param);
         self.best_param = Some(param);
         self
@@ -198,7 +626,7 @@ impl<O: ArgminOp> IterState<O> {
 
     /// Set the current cost function value. This shifts the stored cost function value to the
     /// previous cost function value.
-    pub fn cost(&mut self, cost: O::Float) -> &mut Self {
+    fn cost(&mut self, cost: O::Float) -> &mut Self {
         std::mem::swap(&mut self.prev_cost, &mut self.cost);
         self.cost = cost;
         self
@@ -206,42 +634,42 @@ impl<O: ArgminOp> IterState<O> {
 
     /// Set the current best cost function value. This shifts the stored best cost function value to
     /// the previous cost function value.
-    pub fn best_cost(&mut self, cost: O::Float) -> &mut Self {
+    fn best_cost(&mut self, cost: O::Float) -> &mut Self {
         std::mem::swap(&mut self.prev_best_cost, &mut self.best_cost);
         self.best_cost = cost;
         self
     }
 
     /// Set gradient. This shifts the stored gradient to the previous gradient.
-    pub fn grad(&mut self, grad: O::Param) -> &mut Self {
+    fn grad(&mut self, grad: O::Param) -> &mut Self {
         std::mem::swap(&mut self.prev_grad, &mut self.grad);
         self.grad = Some(grad);
         self
     }
 
     /// Set Hessian. This shifts the stored Hessian to the previous Hessian.
-    pub fn hessian(&mut self, hessian: O::Hessian) -> &mut Self {
+    fn hessian(&mut self, hessian: O::Hessian) -> &mut Self {
         std::mem::swap(&mut self.prev_hessian, &mut self.hessian);
         self.hessian = Some(hessian);
         self
     }
 
     /// Set inverse Hessian. This shifts the stored inverse Hessian to the previous inverse Hessian.
-    pub fn inv_hessian(&mut self, inv_hessian: O::Hessian) -> &mut Self {
+    fn inv_hessian(&mut self, inv_hessian: O::Hessian) -> &mut Self {
         std::mem::swap(&mut self.prev_inv_hessian, &mut self.inv_hessian);
         self.inv_hessian = Some(inv_hessian);
         self
     }
 
     /// Set Jacobian. This shifts the stored Jacobian to the previous Jacobian.
-    pub fn jacobian(&mut self, jacobian: O::Jacobian) -> &mut Self {
+    fn jacobian(&mut self, jacobian: O::Jacobian) -> &mut Self {
         std::mem::swap(&mut self.prev_jacobian, &mut self.jacobian);
         self.jacobian = Some(jacobian);
         self
     }
 
     /// Set population
-    pub fn population(&mut self, population: Vec<(O::Param, O::Float)>) -> &mut Self {
+    fn population(&mut self, population: Vec<(O::Param, O::Float)>) -> &mut Self {
         self.population = Some(population);
         self
     }
@@ -448,18 +876,18 @@ impl<O: ArgminOp> IterState<O> {
     getter!(max_iters, u64, "Returns maximum number of iterations");
 
     /// Returns population
-    pub fn get_population(&self) -> Option<&Vec<(O::Param, O::Float)>> {
+    fn get_population(&self) -> Option<&Vec<(O::Param, O::Float)>> {
         self.population.as_ref()
     }
 
     /// Increment the number of iterations by one
-    pub fn increment_iter(&mut self) {
+    fn increment_iter(&mut self) {
         self.iter += 1;
     }
 
     /// Increment all function evaluation counts by the evaluation counts of another operator
     /// wrapped in `OpWrapper`.
-    pub fn increment_func_counts(&mut self, op: &OpWrapper<O>) {
+    fn increment_func_counts(&mut self, op: &OpWrapper<O>) {
         self.cost_func_count += op.cost_func_count;
         self.grad_func_count += op.grad_func_count;
         self.hessian_func_count += op.hessian_func_count;
@@ -469,7 +897,7 @@ impl<O: ArgminOp> IterState<O> {
 
     /// Set all function evaluation counts to the evaluation counts of another operator
     /// wrapped in `OpWrapper`.
-    pub fn set_func_counts(&mut self, op: &OpWrapper<O>) {
+    fn set_func_counts(&mut self, op: &OpWrapper<O>) {
         self.cost_func_count = op.cost_func_count;
         self.grad_func_count = op.grad_func_count;
         self.hessian_func_count = op.hessian_func_count;
@@ -478,43 +906,230 @@ impl<O: ArgminOp> IterState<O> {
     }
 
     /// Increment cost function evaluation count by `num`
-    pub fn increment_cost_func_count(&mut self, num: u64) {
+    fn increment_cost_func_count(&mut self, num: u64) {
         self.cost_func_count += num;
     }
 
     /// Increment gradient function evaluation count by `num`
-    pub fn increment_grad_func_count(&mut self, num: u64) {
+    fn increment_grad_func_count(&mut self, num: u64) {
         self.grad_func_count += num;
     }
 
     /// Increment Hessian function evaluation count by `num`
-    pub fn increment_hessian_func_count(&mut self, num: u64) {
+    fn increment_hessian_func_count(&mut self, num: u64) {
         self.hessian_func_count += num;
     }
 
     /// Increment Jacobian function evaluation count by `num`
-    pub fn increment_jacobian_func_count(&mut self, num: u64) {
+    fn increment_jacobian_func_count(&mut self, num: u64) {
         self.jacobian_func_count += num;
     }
 
     /// Increment modify function evaluation count by `num`
-    pub fn increment_modify_func_count(&mut self, num: u64) {
+    fn increment_modify_func_count(&mut self, num: u64) {
         self.modify_func_count += num;
     }
 
     /// Indicate that a new best parameter vector was found
-    pub fn new_best(&mut self) {
+    fn new_best(&mut self) {
         self.last_best_iter = self.iter;
     }
 
     /// Returns whether the current parameter vector is also the best parameter vector found so
     /// far.
-    pub fn is_best(&self) -> bool {
+    fn is_best(&self) -> bool {
         self.last_best_iter == self.iter
     }
 
     /// Return whether the algorithm has terminated or not
-    pub fn terminated(&self) -> bool {
+    fn terminated(&self) -> bool {
+        self.termination_reason.terminated()
+    }
+}
+
+/// Maintains the state from iteration to iteration of a solver
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+pub struct LinearProgramState<O: LinearProgram> {
+    /// Current parameter vector
+    pub param: Option<O::Param>,
+    /// Previous parameter vector
+    pub prev_param: Option<O::Param>,
+    /// Current best parameter vector
+    pub best_param: Option<O::Param>,
+    /// Previous best parameter vector
+    pub prev_best_param: Option<O::Param>,
+    /// Current cost function value
+    pub cost: O::Float,
+    /// Previous cost function value
+    pub prev_cost: O::Float,
+    /// Current best cost function value
+    pub best_cost: O::Float,
+    /// Previous best cost function value
+    pub prev_best_cost: O::Float,
+    /// Target cost function value
+    pub target_cost: O::Float,
+    /// Current iteration
+    pub iter: u64,
+    /// Iteration number of last best cost
+    pub last_best_iter: u64,
+    /// Maximum number of iterations
+    pub max_iters: u64,
+    /// Time required so far
+    pub time: Option<instant::Duration>,
+    /// Reason of termination
+    pub termination_reason: TerminationReason,
+}
+
+impl<O> State for LinearProgramState<O>
+where
+    O: LinearProgram,
+{
+    type Param = O::Param;
+    type Output = ();
+    type Hessian = ();
+    type Jacobian = ();
+    type Float = O::Float;
+    type Operator = O;
+
+    /// Create new IterState from `param`
+    fn new(param: Self::Param) -> Self {
+        LinearProgramState {
+            param: Some(param.clone()),
+            prev_param: None,
+            best_param: Some(param),
+            prev_best_param: None,
+            cost: Self::Float::infinity(),
+            prev_cost: Self::Float::infinity(),
+            best_cost: Self::Float::infinity(),
+            prev_best_cost: Self::Float::infinity(),
+            target_cost: Self::Float::neg_infinity(),
+            iter: 0,
+            last_best_iter: 0,
+            max_iters: std::u64::MAX,
+            time: Some(instant::Duration::new(0, 0)),
+            termination_reason: TerminationReason::NotTerminated,
+        }
+    }
+
+    /// Current paramter vector is new best
+    fn current_param_is_new_best(&mut self) {
+        let param = self.get_param().unwrap();
+        let cost = self.get_cost();
+        self.best_param(param).best_cost(cost);
+        self.new_best();
+    }
+
+    /// Set parameter vector. This shifts the stored parameter vector to the previous parameter
+    /// vector.
+    fn param(&mut self, param: Self::Param) -> &mut Self {
+        std::mem::swap(&mut self.prev_param, &mut self.param);
+        self.param = Some(param);
+        self
+    }
+
+    /// Set best paramater vector. This shifts the stored best parameter vector to the previous
+    /// best parameter vector.
+    fn best_param(&mut self, param: Self::Param) -> &mut Self {
+        std::mem::swap(&mut self.prev_best_param, &mut self.best_param);
+        self.best_param = Some(param);
+        self
+    }
+
+    /// Set the current cost function value. This shifts the stored cost function value to the
+    /// previous cost function value.
+    fn cost(&mut self, cost: Self::Float) -> &mut Self {
+        std::mem::swap(&mut self.prev_cost, &mut self.cost);
+        self.cost = cost;
+        self
+    }
+
+    /// Set the current best cost function value. This shifts the stored best cost function value to
+    /// the previous cost function value.
+    fn best_cost(&mut self, cost: Self::Float) -> &mut Self {
+        std::mem::swap(&mut self.prev_best_cost, &mut self.best_cost);
+        self.best_cost = cost;
+        self
+    }
+
+    setter!(target_cost, Self::Float, "Set target cost value");
+    setter!(max_iters, u64, "Set maximum number of iterations");
+    setter!(
+        last_best_iter,
+        u64,
+        "Set iteration number where the previous best parameter vector was found"
+    );
+    setter!(
+        termination_reason,
+        TerminationReason,
+        "Set termination_reason"
+    );
+    setter!(time, Option<instant::Duration>, "Set time required so far");
+    getter_option!(param, Self::Param, "Returns current parameter vector");
+    getter_option!(prev_param, Self::Param, "Returns previous parameter vector");
+    getter_option!(best_param, Self::Param, "Returns best parameter vector");
+    getter_option!(
+        prev_best_param,
+        Self::Param,
+        "Returns previous best parameter vector"
+    );
+    getter!(cost, Self::Float, "Returns current cost function value");
+    getter!(
+        prev_cost,
+        Self::Float,
+        "Returns previous cost function value"
+    );
+    getter!(
+        best_cost,
+        Self::Float,
+        "Returns current best cost function value"
+    );
+    getter!(
+        prev_best_cost,
+        Self::Float,
+        "Returns previous best cost function value"
+    );
+    getter!(target_cost, Self::Float, "Returns target cost");
+    getter!(
+        last_best_iter,
+        u64,
+        "Returns iteration number where the last best parameter vector was found"
+    );
+    getter!(
+        termination_reason,
+        TerminationReason,
+        "Get termination_reason"
+    );
+    getter!(time, Option<instant::Duration>, "Get time required so far");
+    getter!(iter, u64, "Returns current number of iterations");
+    getter!(max_iters, u64, "Returns maximum number of iterations");
+
+    /// Increment the number of iterations by one
+    fn increment_iter(&mut self) {
+        self.iter += 1;
+    }
+
+    /// Increment all function evaluation counts by the evaluation counts of another operator
+    /// wrapped in `OpWrapper`.
+    fn increment_func_counts(&mut self, _op: &OpWrapper<Self::Operator>) {}
+
+    /// Set all function evaluation counts to the evaluation counts of another operator
+    /// wrapped in `OpWrapper`.
+    fn set_func_counts(&mut self, _op: &OpWrapper<Self::Operator>) {}
+
+    /// Indicate that a new best parameter vector was found
+    fn new_best(&mut self) {
+        self.last_best_iter = self.iter;
+    }
+
+    /// Returns whether the current parameter vector is also the best parameter vector found so
+    /// far.
+    fn is_best(&self) -> bool {
+        self.last_best_iter == self.iter
+    }
+
+    /// Return whether the algorithm has terminated or not
+    fn terminated(&self) -> bool {
         self.termination_reason.terminated()
     }
 }

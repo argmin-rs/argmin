@@ -5,9 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminOp, Error};
+use crate::core::{ArgminOp, Error, LinearProgram};
 #[cfg(feature = "serde1")]
-use serde::{Deserialize, Serialize};
+// use serde::{Deserialize, Serialize};
 use std::default::Default;
 
 /// This wraps an operator and keeps track of how often the cost, gradient and Hessian have been
@@ -15,8 +15,8 @@ use std::default::Default;
 /// detail unless a solver is needed within another solver (such as a line search within a gradient
 /// descent method).
 #[derive(Clone, Debug, Default)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct OpWrapper<O: ArgminOp> {
+// #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+pub struct OpWrapper<O> {
     /// Operator
     pub op: Option<O>,
     /// Number of cost function evaluations
@@ -31,7 +31,7 @@ pub struct OpWrapper<O: ArgminOp> {
     pub modify_func_count: u64,
 }
 
-impl<O: ArgminOp> OpWrapper<O> {
+impl<O> OpWrapper<O> {
     /// Construct an `OpWrapper` from an operator
     pub fn new(op: O) -> Self {
         OpWrapper {
@@ -43,7 +43,9 @@ impl<O: ArgminOp> OpWrapper<O> {
             modify_func_count: 0,
         }
     }
+}
 
+impl<O: ArgminOp> OpWrapper<O> {
     /// Calls the `apply` method of `op` and increments `cost_func_count`.
     pub fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
         self.cost_func_count += 1;
@@ -113,5 +115,23 @@ impl<O: ArgminOp> OpWrapper<O> {
     /// Returns the operator `op` by taking ownership of `self`.
     pub fn get_op(self) -> O {
         self.op.unwrap()
+    }
+}
+
+impl<O: LinearProgram> OpWrapper<O> {
+    /// Calls the `c` method of `op`
+    pub fn c(&self) -> Result<&[O::Float], Error> {
+        self.op.as_ref().unwrap().c()
+    }
+
+    /// Calls the `b` method of `op`
+    pub fn b(&self) -> Result<&[O::Float], Error> {
+        self.op.as_ref().unwrap().b()
+    }
+
+    /// Calls the `A` method of `op`
+    #[allow(non_snake_case)]
+    pub fn A(&self) -> Result<&[Vec<O::Float>], Error> {
+        self.op.as_ref().unwrap().A()
     }
 }

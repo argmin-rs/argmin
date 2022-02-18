@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, ArgminTrustRegion,
-    Error, Executor, IterState, OpWrapper, Solver, TerminationReason,
+    Error, Executor, IterState, OpWrapper, Solver, State, TerminationReason,
 };
 use crate::solver::trustregion::reduction_ratio;
 use argmin_math::{ArgminAdd, ArgminDot, ArgminNorm, ArgminWeightedDot};
@@ -97,12 +97,12 @@ where
     }
 }
 
-impl<O, R, F> Solver<O> for TrustRegion<R, F>
+impl<O, R, F> Solver<IterState<O>> for TrustRegion<R, F>
 where
     O: ArgminOp<Output = F, Float = F>,
     O::Param: ArgminNorm<F> + ArgminDot<O::Param, F> + ArgminAdd<O::Param, O::Param>,
     O::Hessian: ArgminDot<O::Param, O::Param>,
-    R: Clone + ArgminTrustRegion<F> + Solver<O>,
+    R: Clone + ArgminTrustRegion<F> + Solver<IterState<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Trust region";
@@ -111,7 +111,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
@@ -130,7 +130,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param = state.take_param().unwrap();
         let grad = state
             .take_grad()

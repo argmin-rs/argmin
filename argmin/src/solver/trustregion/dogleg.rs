@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminOp, ArgminTrustRegion, Error, IterState,
-    OpWrapper, Solver, TerminationReason,
+    OpWrapper, Solver, State, TerminationReason,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot,
@@ -45,7 +45,7 @@ where
     }
 }
 
-impl<O, F> Solver<O> for Dogleg<F>
+impl<O, F> Solver<IterState<O>> for Dogleg<F>
 where
     O: ArgminOp<Output = F, Float = F>,
     O::Param: ArgminMul<F, O::Param>
@@ -62,7 +62,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let param = state.take_param().unwrap();
         let g = state
             .take_grad()

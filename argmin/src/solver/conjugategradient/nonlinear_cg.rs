@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminFloat, ArgminIterData, ArgminKV, ArgminLineSearch, ArgminNLCGBetaUpdate, ArgminOp,
-    ArgminResult, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver,
+    ArgminResult, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, State,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm};
 #[cfg(feature = "serde1")]
@@ -82,7 +82,7 @@ where
     }
 }
 
-impl<O, P, L, B, F> Solver<O> for NonlinearConjugateGradient<P, L, B, F>
+impl<O, P, L, B, F> Solver<IterState<O>> for NonlinearConjugateGradient<P, L, B, F>
 where
     O: ArgminOp<Param = P, Output = F, Float = F>,
     P: Clone
@@ -91,7 +91,7 @@ where
         + ArgminMul<F, O::Param>
         + ArgminDot<O::Param, O::Float>
         + ArgminNorm<O::Float>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<O>,
+    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
     B: ArgminNLCGBetaUpdate<O::Param, O::Float>,
     F: ArgminFloat,
 {
@@ -101,7 +101,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<O>>, Error> {
+    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
         let param = state.take_param().unwrap();
         let cost = op.apply(&param)?;
         let grad = op.gradient(&param)?;
@@ -115,7 +115,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<O>, Error> {
+    ) -> Result<ArgminIterData<IterState<O>>, Error> {
         let p = self.p.as_ref().unwrap();
         let xk = state.take_param().unwrap();
         let grad = state

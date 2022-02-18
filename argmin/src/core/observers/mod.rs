@@ -18,7 +18,7 @@ pub mod slog_logger;
 #[cfg(feature = "visualizer")]
 pub mod visualizer;
 
-use crate::core::{ArgminKV, ArgminOp, Error, IterState};
+use crate::core::{ArgminKV, Error, State};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
@@ -32,7 +32,7 @@ pub use slog_logger::*;
 pub use visualizer::*;
 
 /// Defines the interface every Observer needs to expose
-pub trait Observe<O: ArgminOp> {
+pub trait Observe<I> {
     /// Called once at the beginning of the execution of the solver.
     ///
     /// Parameters:
@@ -49,29 +49,29 @@ pub trait Observe<O: ArgminOp> {
     ///
     /// `state`: Current state of the solver. See documentation of `IterState` for details.
     /// `kv`: Key-Value store of relevant variables defined by the `Solver`
-    fn observe_iter(&mut self, _state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, _state: &I, _kv: &ArgminKV) -> Result<(), Error> {
         Ok(())
     }
 }
 
-type ObserversVec<O> = Vec<(Arc<Mutex<dyn Observe<O>>>, ObserverMode)>;
+type ObserversVec<I> = Vec<(Arc<Mutex<dyn Observe<I>>>, ObserverMode)>;
 
 /// Container for observers which acts just like a single `Observe`r by implementing `Observe` on
 /// it.
 #[derive(Clone, Default)]
-pub struct Observer<O> {
+pub struct Observer<I> {
     /// Vector of `Observe`rs with the corresponding `ObserverMode`
-    observers: ObserversVec<O>,
+    observers: ObserversVec<I>,
 }
 
-impl<O: ArgminOp> Observer<O> {
+impl<I: State> Observer<I> {
     /// Constructor
     pub fn new() -> Self {
         Observer { observers: vec![] }
     }
 
     /// Push another `Observe` to the `observer` field
-    pub fn push<OBS: Observe<O> + 'static>(
+    pub fn push<OBS: Observe<I> + 'static>(
         &mut self,
         observer: OBS,
         mode: ObserverMode,
@@ -88,7 +88,7 @@ impl<O: ArgminOp> Observer<O> {
 
 /// By implementing `Observe` for `Observer` we basically allow a set of `Observer`s to be used
 /// just like a single `Observe`r.
-impl<O: ArgminOp> Observe<O> for Observer<O> {
+impl<I: State> Observe<I> for Observer<I> {
     /// Initial observation
     /// This is called after the initialization in an `Executor` and gets the name of the solver as
     /// string and a `ArgminKV` which includes some solver-specific information.
@@ -102,7 +102,7 @@ impl<O: ArgminOp> Observe<O> for Observer<O> {
     /// This is called after every iteration and gets the current `state` of the solver as well as
     /// a `KV` which can include solver-specific information
     /// This respects the `ObserverMode`: Every `Observe`r is only called as often as specified.
-    fn observe_iter(&mut self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, state: &I, kv: &ArgminKV) -> Result<(), Error> {
         use ObserverMode::*;
         for l in self.observers.iter_mut() {
             let iter = state.get_iter();

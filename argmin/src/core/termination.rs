@@ -39,6 +39,8 @@ pub enum TerminationReason {
     LineSearchConditionMet,
     /// Target tolerance reached
     TargetToleranceReached,
+    /// No improvement possible
+    NoImprovementPossible,
     /// Aborted
     Aborted,
 }
@@ -61,6 +63,7 @@ impl TerminationReason {
             TerminationReason::BestStallIterExceeded => "Best stall iterations exceeded",
             TerminationReason::LineSearchConditionMet => "Line search condition met",
             TerminationReason::TargetToleranceReached => "Target tolerance reached",
+            TerminationReason::NoImprovementPossible => "No improvement possible",
             TerminationReason::Aborted => "Optimization aborted",
         }
     }
