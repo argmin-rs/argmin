@@ -54,8 +54,7 @@ fn run() -> Result<(), Error> {
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(10)
         // the following two are optional. If they are not provided, they will be computed
-        .cost(init_cost)
-        .grad(init_grad)
+        .configure(|config| config.grad(init_grad).cost(init_cost))
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)

@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, ArgminTrustRegion,
-    Error, Executor, IterState, OpWrapper, Solver, State, TerminationReason,
+    Error, Executor, IterState, OpWrapper, Solver, TerminationReason,
 };
 use crate::solver::trustregion::reduction_ratio;
 use argmin_math::{ArgminAdd, ArgminDot, ArgminNorm, ArgminWeightedDot};
@@ -151,8 +151,7 @@ where
             self.subproblem.clone(),
             param.clone(),
         )
-        .grad(grad.clone())
-        .hessian(hessian.clone())
+        .configure(|config| config.grad(grad.clone()))
         .ctrlc(false)
         .run()?;
 

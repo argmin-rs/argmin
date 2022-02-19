@@ -132,8 +132,7 @@ where
             operator: line_op,
             state: mut line_state,
         } = Executor::new(op.take_op().unwrap(), self.linesearch.clone(), xk)
-            .grad(grad.clone())
-            .cost(cur_cost)
+            .configure(|config| config.grad(grad.clone()).cost(cur_cost))
             .ctrlc(false)
             .run()?;
 

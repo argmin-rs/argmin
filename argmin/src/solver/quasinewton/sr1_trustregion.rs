@@ -170,9 +170,12 @@ where
             self.subproblem.clone(),
             xk.zero_like(),
         )
-        .cost(cost)
-        .grad(prev_grad.clone())
-        .hessian(hessian.clone())
+        .configure(|config| {
+            config
+                .hessian(hessian.clone())
+                .grad(prev_grad.clone())
+                .cost(cost)
+        })
         .ctrlc(false)
         .run()?;
 

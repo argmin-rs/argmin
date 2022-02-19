@@ -8,7 +8,9 @@
 // TODO: Logging of "initial info"
 
 #[cfg(feature = "serde1")]
-use crate::core::{serialization::*, ArgminCheckpoint, DeserializeOwnedAlias};
+use crate::core::{
+    serialization::load_checkpoint, ArgminCheckpoint, CheckpointMode, DeserializeOwnedAlias,
+};
 use crate::core::{
     ArgminKV, ArgminResult, Error, Observe, Observer, ObserverMode, OpWrapper, Solver, State,
     TerminationReason,
@@ -31,8 +33,7 @@ pub struct Executor<O, S, I> {
     #[cfg_attr(feature = "serde1", serde(skip))]
     pub op: OpWrapper<O>,
     /// State
-    // #[cfg_attr(feature = "serde1", serde(bound = "IterState<O>: Serialize"))]
-    state: I,
+    pub(crate) state: Option<I>,
     /// Storage for observers
     #[cfg_attr(feature = "serde1", serde(skip))]
     observers: Observer<I>,
@@ -52,7 +53,7 @@ where
 {
     /// Create a new executor with a `solver` and an initial parameter `init_param`
     pub fn new(op: O, solver: S, init_param: I::Param) -> Self {
-        let state = I::new(init_param);
+        let state = Some(I::new(init_param));
         Executor {
             solver,
             op: OpWrapper::new(op),
@@ -71,7 +72,8 @@ where
     where
         Self: Sized + DeserializeOwnedAlias,
     {
-        let mut executor: Self = load_checkpoint(path)?;
+        let (mut executor, state): (Self, I) = load_checkpoint(path)?;
+        executor.state = Some(state);
         executor.op = OpWrapper::new(op);
         Ok(executor)
     }
@@ -83,6 +85,8 @@ where
         } else {
             None
         };
+
+        let mut state = self.state.take().unwrap();
 
         let running = Arc::new(AtomicBool::new(true));
 
@@ -108,15 +112,15 @@ where
         }
 
         // let mut op_wrapper = OpWrapper::new(&self.op);
-        let init_data = self.solver.init(&mut self.op, &mut self.state)?;
+        let init_data = self.solver.init(&mut self.op, &mut state)?;
 
         // If init() returned something, deal with it
         if let Some(data) = &init_data {
-            self.state.update(data);
+            state.update(data);
         }
 
         if !self.observers.is_empty() {
-            let mut logs = make_kv!("max_iters" => self.state.get_max_iters(););
+            let mut logs = make_kv!("max_iters" => state.get_max_iters(););
 
             if let Some(data) = init_data {
                 logs = logs.merge(&mut data.get_kv());
@@ -126,7 +130,7 @@ where
             self.observers.observe_init(S::NAME, &logs)?;
         }
 
-        self.state.set_func_counts(&self.op);
+        state.set_func_counts(&self.op);
 
         while running.load(Ordering::SeqCst) {
             // check first if it has already terminated
@@ -135,12 +139,11 @@ where
             // stopping criteria. If `self.terminate()` is called without the checking
             // whether it has terminated already, then it may overwrite a termination set
             // within `next_iter()`!
-            if !self.state.terminated() {
-                self.state
-                    .termination_reason(self.solver.terminate_internal(&self.state));
+            if !state.terminated() {
+                state.termination_reason(self.solver.terminate_internal(&state));
             }
             // Now check once more if the algorithm has terminated. If yes, then break.
-            if self.state.terminated() {
+            if state.terminated() {
                 break;
             }
 
@@ -151,9 +154,9 @@ where
                 None
             };
 
-            let data = self.solver.next_iter(&mut self.op, &mut self.state)?;
+            let data = self.solver.next_iter(&mut self.op, &mut state)?;
 
-            self.state.set_func_counts(&self.op);
+            state.set_func_counts(&self.op);
 
             // End time measurement
             let duration = if self.timer {
@@ -162,7 +165,7 @@ where
                 None
             };
 
-            self.state.update(&data);
+            state.update(&data);
 
             if !self.observers.is_empty() {
                 let mut log = data.get_kv();
@@ -173,31 +176,32 @@ where
                         "time" => duration.as_secs() as f64 + f64::from(duration.subsec_nanos()) * 1e-9;
                     ));
                 }
-                self.observers.observe_iter(&self.state, &log)?;
+                self.observers.observe_iter(&state, &log)?;
             }
 
             // increment iteration number
-            self.state.increment_iter();
+            state.increment_iter();
 
             #[cfg(feature = "serde1")]
-            self.checkpoint.store_cond(&self, self.state.get_iter())?;
+            self.checkpoint
+                .store_cond(&self, &state, state.get_iter())?;
 
             if self.timer {
-                total_time.map(|total_time| self.state.time(Some(total_time.elapsed())));
+                total_time.map(|total_time| state.time(Some(total_time.elapsed())));
             }
 
             // Check if termination occured inside next_iter()
-            if self.state.terminated() {
+            if state.terminated() {
                 break;
             }
         }
 
         // in case it stopped prematurely and `termination_reason` is still `NotTerminated`,
         // someone must have pulled the handbrake
-        if self.state.get_iter() < self.state.get_max_iters() && !self.state.terminated() {
-            self.state.termination_reason(TerminationReason::Aborted);
+        if state.get_iter() < state.get_max_iters() && !state.terminated() {
+            state.termination_reason(TerminationReason::Aborted);
         }
-        Ok(ArgminResult::new(self.op, self.state))
+        Ok(ArgminResult::new(self.op, state))
     }
 
     /// Attaches a observer which implements `ArgminLog` to the solver.
@@ -214,42 +218,23 @@ where
     /// Set maximum number of iterations
     #[must_use]
     pub fn max_iters(mut self, iters: u64) -> Self {
-        self.state.max_iters(iters);
+        self.state.as_mut().unwrap().max_iters(iters);
         self
     }
 
     /// Set target cost value
     #[must_use]
     pub fn target_cost(mut self, cost: I::Float) -> Self {
-        self.state.target_cost(cost);
+        self.state.as_mut().unwrap().target_cost(cost);
         self
     }
 
-    /// Set cost value
+    /// Configure the solver
     #[must_use]
-    pub fn cost(mut self, cost: I::Float) -> Self {
-        self.state.cost(cost);
-        self
-    }
-
-    /// Set Gradient
-    #[must_use]
-    pub fn grad(mut self, grad: I::Param) -> Self {
-        self.state.grad(grad);
-        self
-    }
-
-    /// Set Hessian
-    #[must_use]
-    pub fn hessian(mut self, hessian: I::Hessian) -> Self {
-        self.state.hessian(hessian);
-        self
-    }
-
-    /// Set Jacobian
-    #[must_use]
-    pub fn jacobian(mut self, jacobian: I::Jacobian) -> Self {
-        self.state.jacobian(jacobian);
+    pub fn configure<F: FnOnce(I) -> I>(mut self, init: F) -> Self {
+        let state = self.state.take().unwrap();
+        let state = init(state);
+        self.state = Some(state);
         self
     }
 
@@ -326,10 +311,23 @@ mod tests {
         let new_param = vec![1.0, 1.0];
         let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> =
             ArgminIterData::new().param(new_param.clone());
-        executor.state.update(&new_iterdata);
-        assert_eq!(executor.state.get_best_param().unwrap(), new_param);
-        assert!(executor.state.get_best_cost().is_infinite());
-        assert!(executor.state.get_best_cost().is_sign_positive());
+        executor.state.as_mut().unwrap().update(&new_iterdata);
+        assert_eq!(
+            executor.state.as_ref().unwrap().get_best_param().unwrap(),
+            new_param
+        );
+        assert!(executor
+            .state
+            .as_ref()
+            .unwrap()
+            .get_best_cost()
+            .is_infinite());
+        assert!(executor
+            .state
+            .as_ref()
+            .unwrap()
+            .get_best_cost()
+            .is_sign_positive());
 
         // 2) Parameter vector and cost changes to something better
         let new_param = vec![2.0, 2.0];
@@ -337,25 +335,28 @@ mod tests {
         let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> = ArgminIterData::new()
             .param(new_param.clone())
             .cost(new_cost);
-        executor.state.update(&new_iterdata);
-        assert_eq!(executor.state.get_best_param().unwrap(), new_param);
+        executor.state.as_mut().unwrap().update(&new_iterdata);
+        assert_eq!(
+            executor.state.as_ref().unwrap().get_best_param().unwrap(),
+            new_param
+        );
         assert_relative_eq!(
-            executor.state.get_best_cost(),
+            executor.state.as_ref().unwrap().get_best_cost(),
             new_cost,
             epsilon = f64::EPSILON
         );
 
         // 3) Parameter vector and cost changes to something worse
-        let old_param = executor.state.get_best_param();
+        let old_param = executor.state.as_ref().unwrap().get_best_param();
         let new_param = vec![3.0, 3.0];
-        let old_cost = executor.state.get_best_cost();
+        let old_cost = executor.state.as_ref().unwrap().get_best_cost();
         let new_cost = old_cost + 1.0;
         let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> =
             ArgminIterData::new().param(new_param).cost(new_cost);
-        executor.state.update(&new_iterdata);
-        assert_eq!(executor.state.get_best_param(), old_param);
+        executor.state.as_mut().unwrap().update(&new_iterdata);
+        assert_eq!(executor.state.as_ref().unwrap().get_best_param(), old_param);
         assert_relative_eq!(
-            executor.state.get_best_cost(),
+            executor.state.as_ref().unwrap().get_best_cost(),
             old_cost,
             epsilon = f64::EPSILON
         );
@@ -369,20 +370,46 @@ mod tests {
         let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> = ArgminIterData::new()
             .param(new_param.clone())
             .cost(new_cost);
-        executor.state.update(&new_iterdata);
-        assert_eq!(executor.state.get_best_param().unwrap(), new_param);
-        assert!(executor.state.get_best_cost().is_infinite());
-        assert!(executor.state.get_best_cost().is_sign_negative());
+        executor.state.as_mut().unwrap().update(&new_iterdata);
+        assert_eq!(
+            executor.state.as_ref().unwrap().get_best_param().unwrap(),
+            new_param
+        );
+        assert!(executor
+            .state
+            .as_ref()
+            .unwrap()
+            .get_best_cost()
+            .is_infinite());
+        assert!(executor
+            .state
+            .as_ref()
+            .unwrap()
+            .get_best_cost()
+            .is_sign_negative());
 
         // 5) `Inf` is worse than `-Inf`
-        let old_param = executor.state.get_best_param().unwrap();
+        let old_param = executor.state.as_ref().unwrap().get_best_param().unwrap();
         let new_param = vec![6.0, 6.0];
         let new_cost = std::f64::INFINITY;
         let new_iterdata: ArgminIterData<IterState<MinimalNoOperator>> =
             ArgminIterData::new().param(new_param).cost(new_cost);
-        executor.state.update(&new_iterdata);
-        assert_eq!(executor.state.get_best_param().unwrap(), old_param);
-        assert!(executor.state.get_best_cost().is_infinite());
-        assert!(executor.state.get_best_cost().is_sign_negative());
+        executor.state.as_mut().unwrap().update(&new_iterdata);
+        assert_eq!(
+            executor.state.as_ref().unwrap().get_best_param().unwrap(),
+            old_param
+        );
+        assert!(executor
+            .state
+            .as_ref()
+            .unwrap()
+            .get_best_cost()
+            .is_infinite());
+        assert!(executor
+            .state
+            .as_ref()
+            .unwrap()
+            .get_best_cost()
+            .is_sign_negative());
     }
 }

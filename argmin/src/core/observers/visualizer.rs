@@ -8,7 +8,7 @@
 //! # Observer which visualizes the progress of the solver
 
 extern crate gnuplot;
-use crate::core::{ArgminFloat, ArgminKV, ArgminOp, Error, IterState, Observe, State};
+use crate::core::{ArgminFloat, ArgminKV, ArgminOp, Error, IterState, Observe};
 use instant;
 use std::sync::Mutex;
 
