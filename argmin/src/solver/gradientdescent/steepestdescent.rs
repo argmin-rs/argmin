@@ -68,8 +68,8 @@ where
         let ArgminResult {
             operator: line_op,
             state: mut linesearch_state,
-        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone(), param_new)
-            .configure(|config| config.grad(new_grad).cost(new_cost))
+        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
+            .configure(|config| config.param(param_new).grad(new_grad).cost(new_cost))
             .ctrlc(false)
             .run()?;
 

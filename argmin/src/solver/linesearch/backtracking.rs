@@ -389,7 +389,7 @@ mod tests {
         assert_error!(
             ls.init(
                 &mut OpWrapper::new(prob.clone()),
-                &mut IterState::new(ls.init_param.clone().unwrap())
+                &mut IterState::new().param(ls.init_param.clone().unwrap())
             ),
             ArgminError,
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
@@ -399,7 +399,7 @@ mod tests {
 
         let data = ls.init(
             &mut OpWrapper::new(prob),
-            &mut IterState::new(ls.init_param.clone().unwrap()),
+            &mut IterState::new().param(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
@@ -436,7 +436,7 @@ mod tests {
         assert_error!(
             ls.init(
                 &mut OpWrapper::new(prob.clone()),
-                &mut IterState::new(ls.init_param.clone().unwrap())
+                &mut IterState::new().param(ls.init_param.clone().unwrap())
             ),
             ArgminError,
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
@@ -446,7 +446,7 @@ mod tests {
 
         let data = ls.init(
             &mut OpWrapper::new(prob),
-            &mut IterState::new(ls.init_param.clone().unwrap()),
+            &mut IterState::new().param(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
@@ -483,7 +483,7 @@ mod tests {
 
         let data = ls.next_iter(
             &mut OpWrapper::new(prob),
-            &mut IterState::new(ls.init_param.clone().unwrap()),
+            &mut IterState::new().param(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
@@ -513,14 +513,14 @@ mod tests {
         ls.set_init_alpha(init_alpha).unwrap();
 
         assert_eq!(
-            ls.terminate(&IterState::<Problem>::new(ls.init_param.clone().unwrap())),
+            ls.terminate(&IterState::<Problem>::new().param(ls.init_param.clone().unwrap())),
             TerminationReason::LineSearchConditionMet
         );
 
         ls.init_cost = 0.0f64;
 
         assert_eq!(
-            ls.terminate(&IterState::<Problem>::new(ls.init_param.clone().unwrap())),
+            ls.terminate(&IterState::<Problem>::new().param(ls.init_param.clone().unwrap())),
             TerminationReason::NotTerminated
         );
     }
@@ -541,7 +541,8 @@ mod tests {
         ls.set_init_alpha(0.8).unwrap();
 
         assert_error!(
-            Executor::new(prob.clone(), ls.clone(), ls.init_param.clone().unwrap())
+            Executor::new(prob.clone(), ls.clone())
+                .configure(|config| config.param(ls.init_param.clone().unwrap()))
                 .max_iters(10)
                 .run(),
             ArgminError,
@@ -550,7 +551,8 @@ mod tests {
 
         ls.set_search_direction(vec![2.0f64, 0.0]);
 
-        let data = Executor::new(prob, ls.clone(), ls.init_param.clone().unwrap())
+        let data = Executor::new(prob, ls.clone())
+            .configure(|config| config.param(ls.init_param.clone().unwrap()))
             .max_iters(10)
             .run();
         assert!(data.is_ok());
@@ -592,7 +594,8 @@ mod tests {
         ls.set_init_alpha(0.8).unwrap();
 
         assert_error!(
-            Executor::new(prob.clone(), ls.clone(), ls.init_param.clone().unwrap())
+            Executor::new(prob.clone(), ls.clone())
+                .configure(|config| config.param(ls.init_param.clone().unwrap()))
                 .max_iters(10)
                 .run(),
             ArgminError,
@@ -601,7 +604,8 @@ mod tests {
 
         ls.set_search_direction(vec![2.0f64, 0.0]);
 
-        let data = Executor::new(prob, ls.clone(), ls.init_param.clone().unwrap())
+        let data = Executor::new(prob, ls.clone())
+            .configure(|config| config.param(ls.init_param.clone().unwrap()))
             .max_iters(10)
             .run();
         assert!(data.is_ok());

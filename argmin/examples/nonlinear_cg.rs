@@ -56,7 +56,8 @@ fn run() -> Result<(), Error> {
         .restart_orthogonality(0.1);
 
     // Run solver
-    let res = Executor::new(operator, solver, init_param)
+    let res = Executor::new(operator, solver)
+        .configure(|config| config.param(init_param))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(20)
         // Set target cost function value

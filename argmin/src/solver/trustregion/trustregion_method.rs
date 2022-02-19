@@ -146,14 +146,10 @@ where
         let ArgminResult {
             operator: sub_op,
             state: mut sub_state,
-        } = Executor::new(
-            op.take_op().unwrap(),
-            self.subproblem.clone(),
-            param.clone(),
-        )
-        .configure(|config| config.grad(grad.clone()))
-        .ctrlc(false)
-        .run()?;
+        } = Executor::new(op.take_op().unwrap(), self.subproblem.clone())
+            .configure(|config| config.param(param.clone()).grad(grad.clone()))
+            .ctrlc(false)
+            .run()?;
 
         let pk = sub_state.take_param().unwrap();
 

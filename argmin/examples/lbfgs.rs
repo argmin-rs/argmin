@@ -48,7 +48,8 @@ fn run() -> Result<(), Error> {
     let solver = LBFGS::new(linesearch, 7);
 
     // Run solver
-    let res = Executor::new(cost, solver, init_param)
+    let res = Executor::new(cost, solver)
+        .configure(|config| config.param(init_param))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(100)
         .run()?;

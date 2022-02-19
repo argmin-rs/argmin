@@ -165,19 +165,16 @@ where
         let ArgminResult {
             operator: sub_op,
             state: mut sub_state,
-        } = Executor::new(
-            op.take_op().unwrap(),
-            self.subproblem.clone(),
-            xk.zero_like(),
-        )
-        .configure(|config| {
-            config
-                .hessian(hessian.clone())
-                .grad(prev_grad.clone())
-                .cost(cost)
-        })
-        .ctrlc(false)
-        .run()?;
+        } = Executor::new(op.take_op().unwrap(), self.subproblem.clone())
+            .configure(|config| {
+                config
+                    .param(xk.zero_like())
+                    .hessian(hessian.clone())
+                    .grad(prev_grad.clone())
+                    .cost(cost)
+            })
+            .ctrlc(false)
+            .run()?;
 
         let sk = sub_state.take_param().unwrap();
 

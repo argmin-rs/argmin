@@ -126,7 +126,8 @@ fn run() -> Result<(), Error> {
     /////////////////////////
     // Run solver          //
     /////////////////////////
-    let res = Executor::new(operator, solver, init_param)
+    let res = Executor::new(operator, solver)
+        .configure(|config| config.param(init_param))
         // Optional: Attach a observer
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)

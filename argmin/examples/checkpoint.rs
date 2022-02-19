@@ -36,7 +36,9 @@ fn run() -> Result<(), Error> {
     let solver = Landweber::new(0.001);
 
     let res = Executor::from_checkpoint(".checkpoints/landweber_exec.arg", Rosenbrock {})
-        .unwrap_or_else(|_| Executor::new(Rosenbrock {}, solver, init_param))
+        .unwrap_or_else(|_| {
+            Executor::new(Rosenbrock {}, solver).configure(|config| config.param(init_param))
+        })
         .max_iters(iters)
         .checkpoint_dir(".checkpoints")
         .checkpoint_name("landweber_exec")

@@ -36,7 +36,8 @@ fn run() -> Result<(), Error> {
     let solver: ConjugateGradient<_, f64> = ConjugateGradient::new(b)?;
 
     // Run solver
-    let res = Executor::new(operator, solver, init_param)
+    let res = Executor::new(operator, solver)
+        .configure(|config| config.param(init_param))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(2)
         .run()?;

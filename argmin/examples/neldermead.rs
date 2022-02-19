@@ -44,7 +44,7 @@ fn run() -> Result<(), Error> {
         .sd_tolerance(0.0001);
 
     // Run solver
-    let res = Executor::new(cost, solver, array![])
+    let res = Executor::new(cost, solver)
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(100)
         .run()?;

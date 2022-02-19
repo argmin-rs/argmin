@@ -31,7 +31,7 @@ pub trait State: SerializeAlias + DeserializeOwnedAlias + Sized {
     type Operator;
 
     /// Constructor
-    fn new(param: Self::Param) -> Self;
+    fn new() -> Self;
 
     /// Update stored data with information from an `ArgminIterData` struct
     fn update(&mut self, data: &ArgminIterData<Self>);
@@ -411,19 +411,17 @@ macro_rules! pub_getter {
     };
 }
 
-impl<O: ArgminOp> std::default::Default for IterState<O>
-where
-    O::Param: Default,
-{
+impl<O: ArgminOp> std::default::Default for IterState<O> {
     fn default() -> Self {
-        IterState::new(O::Param::default())
+        IterState::new()
     }
 }
 
 impl<O: ArgminOp> IterState<O> {
     /// Set parameter vector. This shifts the stored parameter vector to the previous parameter
     /// vector.
-    pub fn param(&mut self, param: O::Param) -> &mut Self {
+    #[must_use]
+    pub fn param(mut self, param: O::Param) -> Self {
         std::mem::swap(&mut self.prev_param, &mut self.param);
         self.param = Some(param);
         self
@@ -653,11 +651,11 @@ impl<O: ArgminOp> State for IterState<O> {
     type Operator = O;
 
     /// Create new IterState from `param`
-    fn new(param: O::Param) -> Self {
+    fn new() -> Self {
         IterState {
-            param: Some(param.clone()),
+            param: None,
             prev_param: None,
-            best_param: Some(param),
+            best_param: None,
             prev_best_param: None,
             cost: O::Float::infinity(),
             prev_cost: O::Float::infinity(),
@@ -688,7 +686,8 @@ impl<O: ArgminOp> State for IterState<O> {
 
     fn update(&mut self, data: &ArgminIterData<IterState<O>>) {
         if let Some(cur_param) = data.get_param() {
-            self.param(cur_param);
+            std::mem::swap(&mut self.prev_param, &mut self.param);
+            self.param = Some(cur_param);
         }
         if let Some(cur_cost) = data.get_cost() {
             std::mem::swap(&mut self.prev_cost, &mut self.cost);
@@ -858,7 +857,8 @@ pub struct LinearProgramState<O: LinearProgram> {
 impl<O: LinearProgram> LinearProgramState<O> {
     /// Set parameter vector. This shifts the stored parameter vector to the previous parameter
     /// vector.
-    fn param(&mut self, param: O::Param) -> &mut Self {
+    #[must_use]
+    pub fn param(mut self, param: O::Param) -> Self {
         std::mem::swap(&mut self.prev_param, &mut self.param);
         self.param = Some(param);
         self
@@ -921,11 +921,11 @@ impl<O: LinearProgram> State for LinearProgramState<O> {
     type Operator = O;
 
     /// Create new IterState from `param`
-    fn new(param: Self::Param) -> Self {
+    fn new() -> Self {
         LinearProgramState {
-            param: Some(param.clone()),
+            param: None,
             prev_param: None,
-            best_param: Some(param),
+            best_param: None,
             prev_best_param: None,
             cost: Self::Float::infinity(),
             prev_cost: Self::Float::infinity(),
@@ -942,9 +942,11 @@ impl<O: LinearProgram> State for LinearProgramState<O> {
 
     fn update(&mut self, data: &ArgminIterData<LinearProgramState<O>>) {
         if let Some(cur_param) = data.get_param() {
-            self.param(cur_param);
+            std::mem::swap(&mut self.prev_param, &mut self.param);
+            self.param = Some(cur_param);
         }
         if let Some(cur_cost) = data.get_cost() {
+            std::mem::swap(&mut self.prev_cost, &mut self.cost);
             self.cost = cur_cost;
         }
         // check if parameters are the best so far
@@ -1056,16 +1058,28 @@ mod tests {
         let param = vec![1.0f64, 2.0];
         let cost: f64 = 42.0;
 
-        let mut state: IterState<MinimalNoOperator> = IterState::new(param.clone());
+        let mut state: IterState<MinimalNoOperator> = IterState::new();
+
+        assert!(state.get_param().is_none());
+        assert!(state.get_prev_param().is_none());
+        assert!(state.get_best_param().is_none());
+        assert!(state.get_prev_best_param().is_none());
+
+        assert!(state.get_param_ref().is_none());
+        assert!(state.get_prev_param_ref().is_none());
+        assert!(state.get_best_param_ref().is_none());
+        assert!(state.get_prev_best_param_ref().is_none());
+
+        state = state.param(param.clone());
 
         assert_eq!(state.get_param().unwrap(), param);
-        assert_eq!(state.get_prev_param(), None);
-        assert_eq!(state.get_best_param().unwrap(), param);
-        assert_eq!(state.get_prev_best_param(), None);
+        assert!(state.get_prev_param().is_none());
+        assert!(state.get_best_param().is_none());
+        assert!(state.get_prev_best_param().is_none());
 
         assert_eq!(*state.get_param_ref().unwrap(), param);
         assert!(state.get_prev_param_ref().is_none());
-        assert_eq!(*state.get_best_param_ref().unwrap(), param);
+        assert!(state.get_best_param_ref().is_none());
         assert!(state.get_prev_best_param_ref().is_none());
 
         assert!(state.get_cost().is_infinite());
@@ -1128,7 +1142,7 @@ mod tests {
 
         let new_param = vec![2.0, 1.0];
 
-        state.param(new_param.clone());
+        state = state.param(new_param.clone());
 
         assert_eq!(state.get_param().unwrap(), new_param);
         assert_eq!(state.get_prev_param().unwrap(), param);
@@ -1138,9 +1152,9 @@ mod tests {
         state.best_param(new_param.clone());
 
         assert_eq!(state.get_best_param().unwrap(), new_param);
-        assert_eq!(state.get_prev_best_param().unwrap(), param);
+        assert!(state.get_prev_best_param().is_none());
         assert_eq!(*state.get_best_param_ref().unwrap(), new_param);
-        assert_eq!(*state.get_prev_best_param_ref().unwrap(), param);
+        assert!(state.get_prev_best_param_ref().is_none());
 
         let new_cost = 21.0;
 
@@ -1258,9 +1272,9 @@ mod tests {
         assert_eq!(state.get_prev_best_cost().to_ne_bytes(), cost.to_ne_bytes());
 
         assert_eq!(state.get_best_param().unwrap(), new_param);
-        assert_eq!(state.get_prev_best_param().unwrap(), param);
+        assert!(state.get_prev_best_param().is_none());
         assert_eq!(*state.get_best_param_ref().unwrap(), new_param);
-        assert_eq!(*state.get_prev_best_param_ref().unwrap(), param);
+        assert!(state.get_prev_best_param_ref().is_none());
 
         assert_eq!(state.get_best_cost().to_ne_bytes(), new_cost.to_ne_bytes());
         assert_eq!(state.get_prev_best_cost().to_ne_bytes(), cost.to_ne_bytes());
@@ -1309,7 +1323,7 @@ mod tests {
         state.best_cost(old_cost);
         let new_param = vec![3.0, 4.0];
         let new_cost = 5.0;
-        state.param(new_param);
+        state = state.param(new_param);
         let _state = state.cost(new_cost);
 
         // TODO: Test update

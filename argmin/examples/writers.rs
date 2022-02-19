@@ -60,7 +60,8 @@ fn run() -> Result<(), Error> {
         // Set serializer to JSON
         .serializer(WriteToFileSerializer::JSON);
 
-    let res = Executor::new(cost, solver, init_param)
+    let res = Executor::new(cost, solver)
+        .configure(|config| config.param(init_param))
         .max_iters(10)
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .add_observer(writer, ObserverMode::Every(3))

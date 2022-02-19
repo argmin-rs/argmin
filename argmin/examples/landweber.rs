@@ -35,7 +35,8 @@ fn run() -> Result<(), Error> {
     let iters = 10;
     let solver = Landweber::new(0.001);
 
-    let res = Executor::new(operator, solver, init_param)
+    let res = Executor::new(operator, solver)
+        .configure(|config| config.param(init_param))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(iters)
         .run()?;

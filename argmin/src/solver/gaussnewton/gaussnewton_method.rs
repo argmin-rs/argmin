@@ -228,7 +228,8 @@ mod tests {
         let solver: GaussNewton<f64> = GaussNewton::new();
         let init_param = Array1::from_vec(vec![0.0, 0.0]);
 
-        let param = Executor::new(problem, solver, init_param)
+        let param = Executor::new(problem, solver)
+            .configure(|config| config.param(init_param))
             .max_iters(1)
             .run()
             .unwrap()
@@ -245,7 +246,8 @@ mod tests {
         let solver: GaussNewton<f64> = GaussNewton::new();
         let init_param = Array1::from_vec(vec![0.0, 0.0]);
 
-        let param = Executor::new(problem, solver, init_param)
+        let param = Executor::new(problem, solver)
+            .configure(|config| config.param(init_param))
             .max_iters(2)
             .run()
             .unwrap()
@@ -262,7 +264,8 @@ mod tests {
         let solver: GaussNewton<f64> = GaussNewton::new().with_gamma(0.5).unwrap();
         let init_param = Array1::from_vec(vec![0.0, 0.0]);
 
-        let param = Executor::new(problem, solver, init_param)
+        let param = Executor::new(problem, solver)
+            .configure(|config| config.param(init_param))
             .max_iters(1)
             .run()
             .unwrap()
@@ -279,7 +282,8 @@ mod tests {
         let solver: GaussNewton<f64> = GaussNewton::new().with_gamma(0.5).unwrap();
         let init_param = Array1::from_vec(vec![0.0, 0.0]);
 
-        let param = Executor::new(problem, solver, init_param)
+        let param = Executor::new(problem, solver)
+            .configure(|config| config.param(init_param))
             .max_iters(2)
             .run()
             .unwrap()

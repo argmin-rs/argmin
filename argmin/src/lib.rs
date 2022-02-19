@@ -279,7 +279,8 @@
 //! let solver = SteepestDescent::new(linesearch);
 //!  
 //! // Run solver
-//! let res = Executor::new(cost, solver, init_param)
+//! let res = Executor::new(cost, solver)
+//!     .configure(|config| config.param(init_param))
 //! # ;
 //! # #[cfg(feature = "slog-logger")]
 //! # let res = res
@@ -369,7 +370,8 @@
 //! # // Set up solver
 //! # let solver = SteepestDescent::new(linesearch);
 //! #
-//! let res = Executor::new(problem, solver, init_param)
+//! let res = Executor::new(problem, solver)
+//!     .configure(|config| config.param(init_param))
 //! # ;
 //! # #[cfg(feature = "slog-logger")]
 //! let res = res
@@ -453,7 +455,9 @@
 //! #
 //! # #[cfg(feature = "serde1")]
 //! let res = Executor::from_checkpoint(".checkpoints/optim.arg", Rosenbrock {})
-//!     .unwrap_or(Executor::new(Rosenbrock {}, solver, init_param))
+//!     .unwrap_or(
+//!         Executor::new(Rosenbrock {}, solver).configure(|config| config.param(init_param))
+//!     )
 //!     .max_iters(iters)
 //!     .checkpoint_dir(".checkpoints")
 //!     .checkpoint_name("optim")

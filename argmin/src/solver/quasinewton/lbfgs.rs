@@ -145,14 +145,15 @@ where
         let ArgminResult {
             operator: line_op,
             state: mut linesearch_state,
-        } = Executor::new(
-            op.take_op().unwrap(),
-            self.linesearch.clone(),
-            param.clone(),
-        )
-        .configure(|config| config.grad(prev_grad.clone()).cost(cur_cost))
-        .ctrlc(false)
-        .run()?;
+        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
+            .configure(|config| {
+                config
+                    .param(param.clone())
+                    .grad(prev_grad.clone())
+                    .cost(cur_cost)
+            })
+            .ctrlc(false)
+            .run()?;
 
         let xk1 = linesearch_state.take_param().unwrap();
         let next_cost = linesearch_state.get_cost();
