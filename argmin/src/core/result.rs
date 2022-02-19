@@ -60,7 +60,8 @@
 #     // Set up solver
 #     let solver = SteepestDescent::new(linesearch);
 #     // Run solver
-#     let result = Executor::new(cost, solver, init_param)
+#     let result = Executor::new(cost, solver)
+#         .configure(|config| config.param(init_param))
 #         // Set maximum iterations to 10
 #         .max_iters(1)
 #         // run the solver on the defined problem

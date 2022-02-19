@@ -63,8 +63,8 @@ fn run() -> Result<(), Error> {
     let solver = SR1TrustRegion::new(subproblem);
 
     // Run solver
-    let res = Executor::new(cost, solver, init_param)
-        .configure(|config| config.hessian(init_hessian))
+    let res = Executor::new(cost, solver)
+        .configure(|config| config.param(init_param).hessian(init_hessian))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(1000)
         .run()?;

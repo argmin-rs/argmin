@@ -95,9 +95,8 @@ where
                 op: op.take_op().unwrap(),
             },
             self.linesearch.clone(),
-            param,
         )
-        .configure(|config| config.grad(grad).cost(residuals.norm()))
+        .configure(|config| config.param(param).grad(grad).cost(residuals.norm()))
         .ctrlc(false)
         .run()?;
 

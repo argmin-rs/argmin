@@ -60,7 +60,8 @@ fn run() -> Result<(), Error> {
     let solver = TrustRegion::new(subproblem);
 
     // Run solver
-    let res = Executor::new(cost, solver, init_param)
+    let res = Executor::new(cost, solver)
+        .configure(|config| config.param(init_param))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(50)
         .run()?;

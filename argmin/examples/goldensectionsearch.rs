@@ -32,7 +32,8 @@ fn main() {
     let init_param = -0.5;
     let solver = GoldenSectionSearch::new(-2.5, 3.0).tolerance(0.0001);
 
-    let res = Executor::new(cost, solver, init_param)
+    let res = Executor::new(cost, solver)
+        .configure(|config| config.param(init_param))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(100)
         .run()

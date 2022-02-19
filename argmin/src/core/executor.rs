@@ -52,8 +52,8 @@ where
     I: State<Operator = O>,
 {
     /// Create a new executor with a `solver` and an initial parameter `init_param`
-    pub fn new(op: O, solver: S, init_param: I::Param) -> Self {
-        let state = Some(I::new(init_param));
+    pub fn new(op: O, solver: S) -> Self {
+        let state = Some(I::new());
         Executor {
             solver,
             op: OpWrapper::new(op),
@@ -305,7 +305,8 @@ mod tests {
         let op = MinimalNoOperator::new();
         let solver = TestSolver {};
 
-        let mut executor = Executor::new(op, solver, vec![0.0, 0.0]);
+        let mut executor =
+            Executor::new(op, solver).configure(|config| config.param(vec![0.0, 0.0]));
 
         // 1) Parameter vector changes, but not cost (continues to be `Inf`)
         let new_param = vec![1.0, 1.0];
@@ -363,7 +364,8 @@ mod tests {
 
         // 4) `-Inf` is better than `Inf`
         let solver = TestSolver {};
-        let mut executor = Executor::new(op, solver, vec![0.0, 0.0]);
+        let mut executor =
+            Executor::new(op, solver).configure(|config| config.param(vec![0.0, 0.0]));
 
         let new_param = vec![1.0, 1.0];
         let new_cost = std::f64::NEG_INFINITY;

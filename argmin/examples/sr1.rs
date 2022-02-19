@@ -50,7 +50,8 @@ fn run() -> Result<(), Error> {
     let solver = SR1::new(init_hessian, linesearch);
 
     // Run solver
-    let res = Executor::new(cost, solver, init_param)
+    let res = Executor::new(cost, solver)
+        .configure(|config| config.param(init_param))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(1000)
         .run()?;

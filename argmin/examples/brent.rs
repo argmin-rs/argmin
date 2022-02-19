@@ -35,7 +35,8 @@ fn main() {
     let init_param = 0.5;
     let solver = Brent::new(-4., 0.5, 1e-11);
 
-    let res = Executor::new(cost, solver, init_param)
+    let res = Executor::new(cost, solver)
+        .configure(|config| config.param(init_param))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(100)
         .run()

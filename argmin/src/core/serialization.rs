@@ -202,7 +202,7 @@ mod tests {
         let op: MinimalNoOperator = MinimalNoOperator::new();
         let solver = PhonySolver::new();
         let mut exec: Executor<MinimalNoOperator, PhonySolver, _> =
-            Executor::new(op, solver, vec![0.0f64, 0.0]);
+            Executor::new(op, solver).configure(|config| config.param(vec![0.0f64, 0.0]));
         let state = exec.state.take().unwrap();
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&exec, &state, 20).unwrap();

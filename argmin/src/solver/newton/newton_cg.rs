@@ -110,7 +110,7 @@ where
         let mut x: O::Param = param.zero_like();
         let mut cg = ConjugateGradient::new(grad.mul(&(F::from_f64(-1.0).unwrap())))?;
 
-        let mut cg_state = IterState::new(x_p.clone());
+        let mut cg_state = IterState::new().param(x_p.clone());
         cg.init(&mut cg_op, &mut cg_state)?;
         let grad_norm = grad.norm();
         for iter in 0.. {
@@ -130,8 +130,7 @@ where
             if cost <= F::from_f64(0.5).unwrap().min(grad_norm.sqrt()) * grad_norm {
                 break;
             }
-            cg_state.param(x.clone());
-            cg_state = cg_state.cost(cost);
+            cg_state = cg_state.param(x.clone()).cost(cost);
             x_p = x.clone();
         }
 
@@ -144,8 +143,8 @@ where
         let ArgminResult {
             operator: line_op,
             state: mut linesearch_state,
-        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone(), param)
-            .configure(|config| config.grad(grad).cost(line_cost))
+        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
+            .configure(|config| config.param(param).grad(grad).cost(line_cost))
             .ctrlc(false)
             .run()?;
 
