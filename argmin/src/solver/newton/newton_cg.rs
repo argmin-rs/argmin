@@ -115,6 +115,7 @@ where
         let grad_norm = grad.norm();
         for iter in 0.. {
             let data = cg.next_iter(&mut cg_op, &mut cg_state)?;
+            let cost = data.get_cost().unwrap();
             x = data.get_param().unwrap();
             let p = cg.p_prev();
             let curvature = p.dot(&hessian.dot(p));
@@ -126,26 +127,25 @@ where
                 }
                 break;
             }
-            if data.get_cost().unwrap()
-                <= F::from_f64(0.5).unwrap().min(grad_norm.sqrt()) * grad_norm
-            {
+            if cost <= F::from_f64(0.5).unwrap().min(grad_norm.sqrt()) * grad_norm {
                 break;
             }
             cg_state.param(x.clone());
-            cg_state.cost(data.get_cost().unwrap());
+            cg_state = cg_state.cost(cost);
             x_p = x.clone();
         }
 
         // perform line search
         self.linesearch.set_search_direction(x);
 
+        let line_cost = state.get_cost();
+
         // Run solver
         let ArgminResult {
             operator: line_op,
             state: mut linesearch_state,
         } = Executor::new(op.take_op().unwrap(), self.linesearch.clone(), param)
-            .grad(grad)
-            .cost(state.get_cost())
+            .configure(|config| config.grad(grad).cost(line_cost))
             .ctrlc(false)
             .run()?;
 

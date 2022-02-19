@@ -117,24 +117,35 @@ impl ArgminCheckpoint {
 
     /// Write checkpoint to disk
     #[inline]
-    pub fn store<T: SerializeAlias>(&self, executor: &T, filename: &str) -> Result<(), Error> {
+    pub fn store<T: SerializeAlias, I: SerializeAlias>(
+        &self,
+        executor: &T,
+        state: &I,
+        filename: &str,
+    ) -> Result<(), Error> {
         let dir = Path::new(&self.directory);
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?
         }
         let fname = dir.join(Path::new(&filename));
-
         let f = BufWriter::new(File::create(fname)?);
-        bincode::serialize_into(f, executor)?;
+        bincode::serialize_into(f, &(executor, state))?;
         Ok(())
     }
 
     /// Write checkpoint based on the desired `CheckpointMode`
     #[inline]
-    pub fn store_cond<T: SerializeAlias>(&self, executor: &T, iter: u64) -> Result<(), Error> {
+    pub fn store_cond<T: SerializeAlias, I: SerializeAlias>(
+        &self,
+        executor: &T,
+        state: &I,
+        iter: u64,
+    ) -> Result<(), Error> {
         match self.mode {
-            CheckpointMode::Always => self.store(executor, &self.filename)?,
-            CheckpointMode::Every(it) if iter % it == 0 => self.store(executor, &self.filename)?,
+            CheckpointMode::Always => self.store(executor, state, &self.filename)?,
+            CheckpointMode::Every(it) if iter % it == 0 => {
+                self.store(executor, state, &self.filename)?
+            }
             CheckpointMode::Never | CheckpointMode::Every(_) => {}
         };
         Ok(())
@@ -142,7 +153,9 @@ impl ArgminCheckpoint {
 }
 
 /// Load a checkpoint from disk
-pub fn load_checkpoint<T: DeserializeOwnedAlias, P: AsRef<Path>>(path: P) -> Result<T, Error> {
+pub fn load_checkpoint<T: DeserializeOwnedAlias, I: DeserializeOwnedAlias, P: AsRef<Path>>(
+    path: P,
+) -> Result<(T, I), Error> {
     let path = path.as_ref();
     if !path.exists() {
         return Err(ArgminError::CheckpointNotFound {
@@ -188,12 +201,15 @@ mod tests {
     fn test_store() {
         let op: MinimalNoOperator = MinimalNoOperator::new();
         let solver = PhonySolver::new();
-        let exec: Executor<MinimalNoOperator, PhonySolver, _> =
+        let mut exec: Executor<MinimalNoOperator, PhonySolver, _> =
             Executor::new(op, solver, vec![0.0f64, 0.0]);
+        let state = exec.state.take().unwrap();
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
-        check.store_cond(&exec, 20).unwrap();
+        check.store_cond(&exec, &state, 20).unwrap();
 
-        let _loaded: Executor<MinimalNoOperator, PhonySolver, IterState<MinimalNoOperator>> =
-            load_checkpoint("checkpoints/solver.arg").unwrap();
+        let (_loaded, _state): (
+            Executor<MinimalNoOperator, PhonySolver, IterState<MinimalNoOperator>>,
+            IterState<MinimalNoOperator>,
+        ) = load_checkpoint("checkpoints/solver.arg").unwrap();
     }
 }

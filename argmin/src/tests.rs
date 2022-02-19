@@ -96,17 +96,17 @@ macro_rules! entropy_max_tests {
     $(
         #[test]
         fn $name() {
-			let cost = MaxEntropy::new();
-			let res = Executor::new(cost.clone(), $solver, cost.param_init.clone())
-				.max_iters(100)
-				.run()
-				.unwrap();
+            let cost_func = MaxEntropy::new();
+            let res = Executor::new(cost_func.clone(), $solver, cost_func.param_init.clone())
+                    .max_iters(100)
+                    .run()
+                    .unwrap();
 
-			assert_relative_eq!(
-				cost.apply(&res.state.get_param().unwrap()).unwrap(),
-				cost.apply(&cost.param_opt).unwrap(),
-				epsilon = 1e-6
-			);
+            assert_relative_eq!(
+                    cost_func.apply(&res.state.get_param().unwrap()).unwrap(),
+                    cost_func.apply(&cost_func.param_opt).unwrap(),
+                    epsilon = 1e-6
+            );
         }
     )*
     }

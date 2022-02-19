@@ -64,9 +64,9 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(cost, solver, init_param)
+        .configure(|config| config.hessian(init_hessian))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
         .max_iters(1000)
-        .hessian(init_hessian)
         .run()?;
 
     // Wait a second (lets the observer flush everything before printing again)

@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver, State,
+    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminScaledSub};
 #[cfg(feature = "serde1")]
@@ -92,6 +92,8 @@ mod tests {
     use super::*;
     #[cfg(feature = "ndarrayl")]
     use crate::core::Executor;
+    #[cfg(feature = "ndarrayl")]
+    use crate::core::State;
     use crate::test_trait_impl;
     #[cfg(feature = "ndarrayl")]
     use approx::assert_relative_eq;

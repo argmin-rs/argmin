@@ -116,8 +116,7 @@ where
             self.linesearch.clone(),
             param.clone(),
         )
-        .grad(prev_grad.clone())
-        .cost(cost)
+        .configure(|config| config.grad(prev_grad.clone()).cost(cost))
         .ctrlc(false)
         .run()?;
 

@@ -97,8 +97,7 @@ where
             self.linesearch.clone(),
             param,
         )
-        .grad(grad)
-        .cost(residuals.norm())
+        .configure(|config| config.grad(grad).cost(residuals.norm()))
         .ctrlc(false)
         .run()?;
 
