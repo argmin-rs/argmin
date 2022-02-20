@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, ArgminTrustRegion, Error, IterState,
-    OpWrapper, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminOp, ArgminTrustRegion, Error, Gradient, Hessian,
+    IterState, OpWrapper, Solver, State, TerminationReason,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot,
@@ -45,15 +45,13 @@ where
     }
 }
 
-impl<O, F> Solver<IterState<O>> for Dogleg<F>
+impl<O, F, P, H> Solver<O, IterState<O>> for Dogleg<F>
 where
-    O: ArgminOp<Output = F, Float = F>,
-    O::Param: ArgminMul<F, O::Param>
-        + ArgminNorm<F>
-        + ArgminDot<O::Param, O::Float>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminSub<O::Param, O::Param>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
+    O: ArgminOp<Param = P, Hessian = H, Output = F, Float = F>
+        + Gradient<Param = P, Gradient = P>
+        + Hessian<Param = P, Hessian = H>,
+    P: ArgminMul<F, P> + ArgminNorm<F> + ArgminDot<P, F> + ArgminAdd<P, P> + ArgminSub<P, P>,
+    H: ArgminInv<H> + ArgminDot<P, P>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Dogleg";
@@ -61,8 +59,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let g = state
             .take_grad()
@@ -118,9 +116,7 @@ where
                 .into());
             }
         }
-        // Since we took `grad` and `hessian` from `state`, we return it here again to make sure
-        // that they are put back into `state`.
-        Ok(ArgminIterData::new().param(pstar).grad(g).hessian(h))
+        Ok((state.param(pstar).grad(g).hessian(h), None))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

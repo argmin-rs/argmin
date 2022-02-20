@@ -5,7 +5,10 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminOp, Error, LinearProgram};
+use crate::core::{
+    ArgminOp, CostFunction, Error, Gradient, Hessian, Jacobian, LinearProgram, Modify, Operator,
+};
+use std::collections::HashMap;
 #[cfg(feature = "serde1")]
 // use serde::{Deserialize, Serialize};
 use std::default::Default;
@@ -15,7 +18,6 @@ use std::default::Default;
 /// detail unless a solver is needed within another solver (such as a line search within a gradient
 /// descent method).
 #[derive(Clone, Debug, Default)]
-// #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct OpWrapper<O> {
     /// Operator
     pub op: Option<O>,
@@ -29,6 +31,63 @@ pub struct OpWrapper<O> {
     pub jacobian_func_count: u64,
     /// Number of `modify` function evaluations
     pub modify_func_count: u64,
+    /// Evaluation counts
+    pub counts: HashMap<&'static str, u64>,
+}
+
+impl<O: Operator> OpWrapper<O> {
+    /// apply
+    pub fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
+        self.op("operator", |op| op.apply(param))
+    }
+}
+
+impl<O: CostFunction> OpWrapper<O> {
+    /// Compute cost function value
+    pub fn cost(&mut self, param: &O::Param) -> Result<O::Output, Error> {
+        self.op("cost", |op| op.cost(param))
+    }
+}
+
+impl<O: Gradient> OpWrapper<O> {
+    /// Compute gradient
+    pub fn gradient(&mut self, param: &O::Param) -> Result<O::Gradient, Error> {
+        self.op("gradient", |op| op.gradient(param))
+    }
+}
+
+impl<O: Hessian> OpWrapper<O> {
+    /// Compute Hessian
+    pub fn hessian(&mut self, param: &O::Param) -> Result<O::Hessian, Error> {
+        self.op("hessian", |op| op.hessian(param))
+    }
+}
+
+impl<O: Jacobian> OpWrapper<O> {
+    /// Compute Jacobian
+    pub fn jacobian(&mut self, param: &O::Param) -> Result<O::Jacobian, Error> {
+        self.op("jacobian", |op| op.jacobian(param))
+    }
+}
+
+impl<O: Modify> OpWrapper<O> {
+    /// Compute TODO
+    pub fn modify(&mut self, param: &O::Param, extent: O::Float) -> Result<O::Output, Error> {
+        self.op("modify", |op| op.modify(param, extent))
+    }
+}
+
+impl<O> OpWrapper<O> {
+    /// general apply
+    pub fn op<T, F: FnOnce(&O) -> Result<T, Error>>(
+        &mut self,
+        name: &'static str,
+        func: F,
+    ) -> Result<T, Error> {
+        let count = self.counts.entry(name).or_insert(0);
+        *count += 1;
+        func(self.op.as_ref().unwrap())
+    }
 }
 
 impl<O> OpWrapper<O> {
@@ -41,39 +100,40 @@ impl<O> OpWrapper<O> {
             hessian_func_count: 0,
             jacobian_func_count: 0,
             modify_func_count: 0,
+            counts: HashMap::new(),
         }
     }
 }
 
 impl<O: ArgminOp> OpWrapper<O> {
     /// Calls the `apply` method of `op` and increments `cost_func_count`.
-    pub fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
+    pub fn apply2(&mut self, param: &O::Param) -> Result<O::Output, Error> {
         self.cost_func_count += 1;
-        self.op.as_ref().unwrap().apply(param)
+        self.op.as_ref().unwrap().apply2(param)
     }
 
     /// Calls the `gradient` method of `op` and increments `gradient_func_count`.
-    pub fn gradient(&mut self, param: &O::Param) -> Result<O::Param, Error> {
+    pub fn gradient2(&mut self, param: &O::Param) -> Result<O::Param, Error> {
         self.grad_func_count += 1;
-        self.op.as_ref().unwrap().gradient(param)
+        self.op.as_ref().unwrap().gradient2(param)
     }
 
     /// Calls the `hessian` method of `op` and increments `hessian_func_count`.
-    pub fn hessian(&mut self, param: &O::Param) -> Result<O::Hessian, Error> {
+    pub fn hessian2(&mut self, param: &O::Param) -> Result<O::Hessian, Error> {
         self.hessian_func_count += 1;
-        self.op.as_ref().unwrap().hessian(param)
+        self.op.as_ref().unwrap().hessian2(param)
     }
 
     /// Calls the `jacobian` method of `op` and increments `jacobian_func_count`.
-    pub fn jacobian(&mut self, param: &O::Param) -> Result<O::Jacobian, Error> {
+    pub fn jacobian2(&mut self, param: &O::Param) -> Result<O::Jacobian, Error> {
         self.jacobian_func_count += 1;
-        self.op.as_ref().unwrap().jacobian(param)
+        self.op.as_ref().unwrap().jacobian2(param)
     }
 
     /// Calls the `modify` method of `op` and increments `modify_func_count`.
-    pub fn modify(&mut self, param: &O::Param, extent: O::Float) -> Result<O::Param, Error> {
+    pub fn modify2(&mut self, param: &O::Param, extent: O::Float) -> Result<O::Param, Error> {
         self.modify_func_count += 1;
-        self.op.as_ref().unwrap().modify(param, extent)
+        self.op.as_ref().unwrap().modify2(param, extent)
     }
 
     /// Moves the operator out of the struct and replaces it with `None`

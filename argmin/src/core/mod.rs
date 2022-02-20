@@ -30,7 +30,7 @@ mod nooperator;
 /// Observers;
 mod observers;
 /// Wrapper around operators which keeps track of function evaluation counts
-mod opwrapper;
+mod opwrapper2;
 /// Definition of the return type of the solvers
 mod result;
 /// Serialization of `ArgminSolver`s
@@ -42,13 +42,14 @@ mod termination;
 pub use anyhow::Error;
 pub use errors::ArgminError;
 pub use executor::Executor;
-pub use iterstate::{IterState, LinearProgramState, State};
+// pub use iterstate::{IterState, LinearProgramState, State};
+pub use iterstate::{IterState, State};
 pub use kv::ArgminKV;
 pub use nooperator::{MinimalNoOperator, NoOperator};
 use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 pub use observers::*;
-pub use opwrapper::OpWrapper;
-pub use result::ArgminResult;
+pub use opwrapper2::OpWrapper;
+pub use result::OptimizationResult;
 #[cfg(feature = "serde1")]
 use serde::{de::DeserializeOwned, Serialize};
 #[cfg(feature = "serde1")]
@@ -80,6 +81,84 @@ impl<I> ArgminFloat for I where
 {
 }
 
+/// TODO
+pub trait Operator {
+    /// Type of the parameter vector
+    type Param;
+    /// Output of the operator
+    type Output;
+    /// Precision of floats
+    type Float;
+
+    /// Applies the operator to parameters
+    fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error>;
+}
+
+/// TODO
+pub trait CostFunction {
+    /// Type of the parameter vector
+    type Param;
+    /// Output of the cost function
+    type Output;
+    /// Precision of floats
+    type Float;
+
+    /// Compute cost function
+    fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error>;
+}
+
+/// TODO
+pub trait Gradient {
+    /// Type of the parameter vector
+    type Param;
+    /// Type of the gradient
+    type Gradient;
+    /// Precision of floats
+    type Float;
+
+    /// Compute gradient
+    fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error>;
+}
+
+/// TODO
+pub trait Hessian {
+    /// Type of the parameter vector
+    type Param;
+    /// Type of the Hessian
+    type Hessian;
+    /// Precision of floats
+    type Float;
+
+    /// Compute Hessian
+    fn hessian(&self, param: &Self::Param) -> Result<Self::Hessian, Error>;
+}
+
+/// TODO
+pub trait Jacobian {
+    /// Type of the parameter vector
+    type Param;
+    /// Output of the cost function
+    type Jacobian;
+    /// Precision of floats
+    type Float;
+
+    /// Compute Jacobian
+    fn jacobian(&self, param: &Self::Param) -> Result<Self::Jacobian, Error>;
+}
+
+/// TODO
+pub trait Modify {
+    /// Type of the parameter vector
+    type Param: SerializeAlias + DeserializeOwnedAlias;
+    /// Output TODO
+    type Output: SerializeAlias + DeserializeOwnedAlias;
+    /// Precision of floats
+    type Float;
+
+    /// Compute Jacobian
+    fn modify(&self, param: &Self::Param, _extent: Self::Float) -> Result<Self::Output, Error>;
+}
+
 /// This trait needs to be implemented for every operator/cost function.
 ///
 /// It is required to implement the `apply` method, all others are optional and provide a default
@@ -101,7 +180,7 @@ pub trait ArgminOp {
     type Float: ArgminFloat;
 
     /// Applies the operator/cost function to parameters
-    fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
+    fn apply2(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `apply` of ArgminOp trait not implemented!".to_string(),
         }
@@ -109,7 +188,7 @@ pub trait ArgminOp {
     }
 
     /// Computes the gradient at the given parameters
-    fn gradient(&self, _param: &Self::Param) -> Result<Self::Param, Error> {
+    fn gradient2(&self, _param: &Self::Param) -> Result<Self::Param, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `gradient` of ArgminOp trait not implemented!".to_string(),
         }
@@ -117,7 +196,7 @@ pub trait ArgminOp {
     }
 
     /// Computes the Hessian at the given parameters
-    fn hessian(&self, _param: &Self::Param) -> Result<Self::Hessian, Error> {
+    fn hessian2(&self, _param: &Self::Param) -> Result<Self::Hessian, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `hessian` of ArgminOp trait not implemented!".to_string(),
         }
@@ -125,7 +204,7 @@ pub trait ArgminOp {
     }
 
     /// Computes the Hessian at the given parameters
-    fn jacobian(&self, _param: &Self::Param) -> Result<Self::Jacobian, Error> {
+    fn jacobian2(&self, _param: &Self::Param) -> Result<Self::Jacobian, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `jacobian` of ArgminOp trait not implemented!".to_string(),
         }
@@ -134,7 +213,7 @@ pub trait ArgminOp {
 
     /// Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
     /// modification.
-    fn modify(&self, _param: &Self::Param, _extent: Self::Float) -> Result<Self::Param, Error> {
+    fn modify2(&self, _param: &Self::Param, _extent: Self::Float) -> Result<Self::Param, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `modify` of ArgminOp trait not implemented!".to_string(),
         }
@@ -179,27 +258,23 @@ pub trait LinearProgram {
 /// Solver
 ///
 /// Every solver needs to implement this trait.
-pub trait Solver<I: State>: SerializeAlias {
+pub trait Solver<O, I: State>: SerializeAlias {
     /// Name of the solver
     const NAME: &'static str = "UNDEFINED";
 
     /// Computes one iteration of the algorithm.
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<I::Operator>,
-        state: &mut I,
-    ) -> Result<ArgminIterData<I>, Error>;
+        op: &mut OpWrapper<O>,
+        state: I,
+    ) -> Result<(I, Option<ArgminKV>), Error>;
 
     /// Initializes the algorithm
     ///
     /// This is executed before any iterations are performed. It can be used to perform
     /// precomputations. The default implementation corresponds to doing nothing.
-    fn init(
-        &mut self,
-        _op: &mut OpWrapper<I::Operator>,
-        _state: &mut I,
-    ) -> Result<Option<ArgminIterData<I>>, Error> {
-        Ok(None)
+    fn init(&mut self, _op: &mut OpWrapper<O>, state: I) -> Result<(I, Option<ArgminKV>), Error> {
+        Ok((state, Some(ArgminKV::new())))
     }
 
     /// Checks whether basic termination reasons apply.
@@ -219,9 +294,10 @@ pub trait Solver<I: State>: SerializeAlias {
         if state.get_iter() >= state.get_max_iters() {
             return TerminationReason::MaxItersReached;
         }
-        if state.get_cost() <= state.get_target_cost() {
-            return TerminationReason::TargetCostReached;
-        }
+        // REENABLE!
+        // if state.get_cost() <= state.get_target_cost() {
+        //     return TerminationReason::TargetCostReached;
+        // }
         TerminationReason::NotTerminated
     }
 
@@ -230,162 +306,162 @@ pub trait Solver<I: State>: SerializeAlias {
         TerminationReason::NotTerminated
     }
 }
-
-/// The datastructure which is returned by the `next_iter` method of the `Solver` trait.
-///
-/// TODO: Rename to IterResult?
-#[derive(Clone, Debug, Default)]
-pub struct ArgminIterData<I: State> {
-    /// Current parameter vector
-    param: Option<I::Param>,
-    /// Current cost function value
-    cost: Option<I::Float>,
-    /// Current gradient
-    grad: Option<I::Param>,
-    /// Current Hessian
-    hessian: Option<I::Hessian>,
-    /// Current inverse Hessian
-    inv_hessian: Option<I::Hessian>,
-    /// Current Jacobian
-    jacobian: Option<I::Jacobian>,
-    /// Current population
-    population: Option<Vec<(I::Param, I::Float)>>,
-    /// terminationreason
-    termination_reason: Option<TerminationReason>,
-    /// Key value pairs which are used to provide additional information for the Observers
-    kv: ArgminKV,
-}
-
-// TODO: Many clones are necessary in the getters.. maybe a complete "deconstruct" method would be
-// better?
-impl<I: State> ArgminIterData<I> {
-    /// Constructor
-    pub fn new() -> Self {
-        ArgminIterData {
-            param: None,
-            cost: None,
-            grad: None,
-            hessian: None,
-            inv_hessian: None,
-            jacobian: None,
-            termination_reason: None,
-            population: None,
-            kv: make_kv!(),
-        }
-    }
-
-    /// Set parameter vector
-    #[must_use]
-    pub fn param(mut self, param: I::Param) -> Self {
-        self.param = Some(param);
-        self
-    }
-
-    /// Set cost function value
-    #[must_use]
-    pub fn cost(mut self, cost: I::Float) -> Self {
-        self.cost = Some(cost);
-        self
-    }
-
-    /// Set gradient
-    #[must_use]
-    pub fn grad(mut self, grad: I::Param) -> Self {
-        self.grad = Some(grad);
-        self
-    }
-
-    /// Set Hessian
-    #[must_use]
-    pub fn hessian(mut self, hessian: I::Hessian) -> Self {
-        self.hessian = Some(hessian);
-        self
-    }
-
-    /// Set inverse Hessian
-    #[must_use]
-    pub fn inv_hessian(mut self, inv_hessian: I::Hessian) -> Self {
-        self.inv_hessian = Some(inv_hessian);
-        self
-    }
-
-    /// Set Jacobian
-    #[must_use]
-    pub fn jacobian(mut self, jacobian: I::Jacobian) -> Self {
-        self.jacobian = Some(jacobian);
-        self
-    }
-
-    /// Set Population
-    #[must_use]
-    pub fn population(mut self, population: Vec<(I::Param, I::Float)>) -> Self {
-        self.population = Some(population);
-        self
-    }
-
-    /// Adds an `ArgminKV`
-    #[must_use]
-    pub fn kv(mut self, kv: ArgminKV) -> Self {
-        self.kv = kv;
-        self
-    }
-
-    /// Set termination reason
-    #[must_use]
-    pub fn termination_reason(mut self, reason: TerminationReason) -> Self {
-        self.termination_reason = Some(reason);
-        self
-    }
-
-    /// Get parameter vector
-    pub fn get_param(&self) -> Option<I::Param> {
-        self.param.clone()
-    }
-
-    /// Get cost function value
-    pub fn get_cost(&self) -> Option<I::Float> {
-        self.cost
-    }
-
-    /// Get gradient
-    pub fn get_grad(&self) -> Option<I::Param> {
-        self.grad.clone()
-    }
-
-    /// Get Hessian
-    pub fn get_hessian(&self) -> Option<I::Hessian> {
-        self.hessian.clone()
-    }
-
-    /// Get inverse Hessian
-    pub fn get_inv_hessian(&self) -> Option<I::Hessian> {
-        self.inv_hessian.clone()
-    }
-
-    /// Get Jacobian
-    pub fn get_jacobian(&self) -> Option<I::Jacobian> {
-        self.jacobian.clone()
-    }
-
-    /// Get reference to population
-    pub fn get_population(&self) -> Option<&Vec<(I::Param, I::Float)>> {
-        match &self.population {
-            Some(population) => Some(population),
-            None => None,
-        }
-    }
-
-    /// Get termination reason
-    pub fn get_termination_reason(&self) -> Option<TerminationReason> {
-        self.termination_reason
-    }
-
-    /// Return KV
-    pub fn get_kv(&self) -> ArgminKV {
-        self.kv.clone()
-    }
-}
-
+//
+// /// The datastructure which is returned by the `next_iter` method of the `Solver` trait.
+// ///
+// /// TODO: Rename to IterResult?
+// #[derive(Clone, Debug, Default)]
+// pub struct ArgminIterData<O: ArgminOp> {
+//     /// Current parameter vector
+//     param: Option<O::Param>,
+//     /// Current cost function value
+//     cost: Option<O::Float>,
+//     /// Current gradient
+//     grad: Option<O::Param>,
+//     /// Current Hessian
+//     hessian: Option<O::Hessian>,
+//     /// Current inverse Hessian
+//     inv_hessian: Option<O::Hessian>,
+//     /// Current Jacobian
+//     jacobian: Option<O::Jacobian>,
+//     /// Current population
+//     population: Option<Vec<(O::Param, O::Float)>>,
+//     /// terminationreason
+//     termination_reason: Option<TerminationReason>,
+//     /// Key value pairs which are used to provide additional information for the Observers
+//     kv: ArgminKV,
+// }
+//
+// // TODO: Many clones are necessary in the getters.. maybe a complete "deconstruct" method would be
+// // better?
+// impl<O: ArgminOp> ArgminIterData<O> {
+//     /// Constructor
+//     pub fn new() -> Self {
+//         ArgminIterData {
+//             param: None,
+//             cost: None,
+//             grad: None,
+//             hessian: None,
+//             inv_hessian: None,
+//             jacobian: None,
+//             termination_reason: None,
+//             population: None,
+//             kv: make_kv!(),
+//         }
+//     }
+//
+//     /// Set parameter vector
+//     #[must_use]
+//     pub fn param(mut self, param: O::Param) -> Self {
+//         self.param = Some(param);
+//         self
+//     }
+//
+//     /// Set cost function value
+//     #[must_use]
+//     pub fn cost(mut self, cost: O::Float) -> Self {
+//         self.cost = Some(cost);
+//         self
+//     }
+//
+//     /// Set gradient
+//     #[must_use]
+//     pub fn grad(mut self, grad: O::Param) -> Self {
+//         self.grad = Some(grad);
+//         self
+//     }
+//
+//     /// Set Hessian
+//     #[must_use]
+//     pub fn hessian(mut self, hessian: O::Hessian) -> Self {
+//         self.hessian = Some(hessian);
+//         self
+//     }
+//
+//     /// Set inverse Hessian
+//     #[must_use]
+//     pub fn inv_hessian(mut self, inv_hessian: O::Hessian) -> Self {
+//         self.inv_hessian = Some(inv_hessian);
+//         self
+//     }
+//
+//     /// Set Jacobian
+//     #[must_use]
+//     pub fn jacobian(mut self, jacobian: O::Jacobian) -> Self {
+//         self.jacobian = Some(jacobian);
+//         self
+//     }
+//
+//     /// Set Population
+//     #[must_use]
+//     pub fn population(mut self, population: Vec<(O::Param, O::Float)>) -> Self {
+//         self.population = Some(population);
+//         self
+//     }
+//
+//     /// Adds an `ArgminKV`
+//     #[must_use]
+//     pub fn kv(mut self, kv: ArgminKV) -> Self {
+//         self.kv = kv;
+//         self
+//     }
+//
+//     /// Set termination reason
+//     #[must_use]
+//     pub fn termination_reason(mut self, reason: TerminationReason) -> Self {
+//         self.termination_reason = Some(reason);
+//         self
+//     }
+//
+//     /// Get parameter vector
+//     pub fn get_param(&self) -> Option<O::Param> {
+//         self.param.clone()
+//     }
+//
+//     /// Get cost function value
+//     pub fn get_cost(&self) -> Option<O::Float> {
+//         self.cost
+//     }
+//
+//     /// Get gradient
+//     pub fn get_grad(&self) -> Option<O::Param> {
+//         self.grad.clone()
+//     }
+//
+//     /// Get Hessian
+//     pub fn get_hessian(&self) -> Option<O::Hessian> {
+//         self.hessian.clone()
+//     }
+//
+//     /// Get inverse Hessian
+//     pub fn get_inv_hessian(&self) -> Option<O::Hessian> {
+//         self.inv_hessian.clone()
+//     }
+//
+//     /// Get Jacobian
+//     pub fn get_jacobian(&self) -> Option<O::Jacobian> {
+//         self.jacobian.clone()
+//     }
+//
+//     /// Get reference to population
+//     pub fn get_population(&self) -> Option<&Vec<(O::Param, O::Float)>> {
+//         match &self.population {
+//             Some(population) => Some(population),
+//             None => None,
+//         }
+//     }
+//
+//     /// Get termination reason
+//     pub fn get_termination_reason(&self) -> Option<TerminationReason> {
+//         self.termination_reason
+//     }
+//
+//     /// Return KV
+//     pub fn get_kv(&self) -> ArgminKV {
+//         self.kv.clone()
+//     }
+// }
+//
 /// Defines a common interface for line search methods.
 pub trait ArgminLineSearch<P, F> {
     /// Set the search direction

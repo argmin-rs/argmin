@@ -5,9 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, ObserverMode};
+use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, Jacobian, ObserverMode, Operator};
 use argmin::solver::gaussnewton::GaussNewton;
-// use argmin::solver::linesearch::MoreThuenteLineSearch;
 use ndarray::{Array1, Array2};
 
 type Rate = f64;
@@ -28,6 +27,12 @@ impl ArgminOp for Problem {
     type Hessian = ();
     type Jacobian = Array2<f64>;
     type Float = f64;
+}
+
+impl Operator for Problem {
+    type Param = Array1<f64>;
+    type Output = Array1<f64>;
+    type Float = f64;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(self
@@ -36,6 +41,12 @@ impl ArgminOp for Problem {
             .map(|(s, rate)| rate - (p[0] * s) / (p[1] + s))
             .collect::<Array1<f64>>())
     }
+}
+
+impl Jacobian for Problem {
+    type Param = Array1<f64>;
+    type Jacobian = Array2<f64>;
+    type Float = f64;
 
     fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {
         Ok(Array2::from_shape_fn((self.data.len(), 2), |(si, i)| {
@@ -62,8 +73,6 @@ fn run() -> Result<(), Error> {
             (3.74, 0.3317),
         ],
     };
-
-    // let linesearch = MoreThuenteLineSearch::new();
 
     // Define initial parameter vector
     let init_param: Array1<f64> = Array1::from(vec![0.9, 0.2]);

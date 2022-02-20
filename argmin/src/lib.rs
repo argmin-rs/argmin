@@ -378,7 +378,7 @@
 //!     .configure(|config| config.param(init_param).max_iters(2))
 //! # ;
 //! # #[cfg(feature = "slog-logger")]
-//! let res = res
+//! # let res = res
 //!     // Add an observer which will log all iterations to the terminal (without blocking)
 //!     .add_observer(ArgminSlogLogger::term_noblock(), ObserverMode::Always)
 //! # ;

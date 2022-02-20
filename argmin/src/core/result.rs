@@ -87,23 +87,24 @@ let num_iters = result.state().get_iter();
 //!
 //! More details can be found in the `IterState` documentation.
 
+// use crate::core::{ArgminOp, OpWrapper, State};
 use crate::core::{OpWrapper, State};
-use num_traits::{Float, FromPrimitive};
-use std::cmp::Ordering;
+// use num_traits::{Float, FromPrimitive};
+// use std::cmp::Ordering;
 
 /// Final struct returned by the `run` method of `Executor`.
 #[derive(Clone)]
-pub struct ArgminResult<I: State> {
+pub struct OptimizationResult<I: State> {
     /// operator
     pub operator: OpWrapper<I::Operator>,
     /// iteration state
     pub state: I,
 }
 
-impl<I: State> ArgminResult<I> {
+impl<I: State> OptimizationResult<I> {
     /// Constructor
     pub fn new(operator: OpWrapper<I::Operator>, state: I) -> Self {
-        ArgminResult { operator, state }
+        OptimizationResult { operator, state }
     }
 
     /// Return handle to operator
@@ -117,58 +118,61 @@ impl<I: State> ArgminResult<I> {
     }
 }
 
-impl<I> std::fmt::Display for ArgminResult<I>
+impl<I> std::fmt::Display for OptimizationResult<I>
 where
     I: State,
-    I::Param: std::fmt::Debug,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(f, "ArgminResult:")?;
-        writeln!(f, "    param (best):  {:?}", self.state.get_best_param())?;
-        writeln!(f, "    cost (best):   {}", self.state.get_best_cost())?;
-        writeln!(f, "    iters (best):  {}", self.state.get_last_best_iter())?;
-        writeln!(f, "    iters (total): {}", self.state.get_iter())?;
-        writeln!(
-            f,
-            "    termination: {}",
-            self.state.get_termination_reason()
-        )?;
-        writeln!(f, "    time:        {:?}", self.state.get_time())?;
+        writeln!(f, "{:?}", self.state)?;
+        // writeln!(f, "ArgminResult:")?;
+        // writeln!(f, "    param (best):  {:?}", self.state.get_best_param())?;
+        // writeln!(f, "    cost (best):   {}", self.state.get_best_cost())?;
+        // writeln!(f, "    iters (best):  {}", self.state.get_last_best_iter())?;
+        // writeln!(f, "    iters (total): {}", self.state.get_iter())?;
+        // writeln!(
+        //     f,
+        //     "    termination: {}",
+        //     self.state.get_termination_reason()
+        // )?;
+        // writeln!(f, "    time:        {:?}", self.state.get_time())?;
         Ok(())
     }
 }
 
-impl<I: State> PartialEq for ArgminResult<I> {
-    fn eq(&self, other: &ArgminResult<I>) -> bool {
-        (self.state.get_cost() - other.state.get_cost()).abs() < I::Float::epsilon()
-    }
-}
+// impl<I: State> PartialEq for OptimizationResult<I> {
+//     fn eq(&self, other: &OptimizationResult<I>) -> bool {
+//         (self.state.get_best_cost() - other.state.get_best_cost()).abs() < I::Float::epsilon()
+//     }
+// }
 
-impl<I: State> Eq for ArgminResult<I> {}
+// impl<I: State> Eq for OptimizationResult<I> {}
+//
+// impl<I: State> Ord for OptimizationResult<I> {
+//     fn cmp(&self, other: &OptimizationResult<I>) -> Ordering {
+//         let t = self.state.get_best_cost() - other.state.get_best_cost();
+//         if t.abs() < I::Float::epsilon() {
+//             Ordering::Equal
+//         } else if t > I::Float::from_f64(0.0).unwrap() {
+//             Ordering::Greater
+//         } else {
+//             Ordering::Less
+//         }
+//     }
+// }
 
-impl<I: State> Ord for ArgminResult<I> {
-    fn cmp(&self, other: &ArgminResult<I>) -> Ordering {
-        let t = self.state.get_cost() - other.state.get_cost();
-        if t.abs() < I::Float::epsilon() {
-            Ordering::Equal
-        } else if t > I::Float::from_f64(0.0).unwrap() {
-            Ordering::Greater
-        } else {
-            Ordering::Less
-        }
-    }
-}
-
-impl<I: State> PartialOrd for ArgminResult<I> {
-    fn partial_cmp(&self, other: &ArgminResult<I>) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
+// impl<I: State> PartialOrd for OptimizationResult<I> {
+//     fn partial_cmp(&self, other: &OptimizationResult<I>) -> Option<Ordering> {
+//         Some(self.cmp(other))
+//     }
+// }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::core::{IterState, MinimalNoOperator};
 
-    send_sync_test!(argmin_result, ArgminResult<IterState<MinimalNoOperator>>);
+    send_sync_test!(
+        argmin_result,
+        OptimizationResult<IterState<MinimalNoOperator>>
+    );
 }

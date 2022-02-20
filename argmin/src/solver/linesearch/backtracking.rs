@@ -8,8 +8,8 @@
 //! * [Backtracking line search](struct.BacktrackingLineSearch.html)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, Error, IterState,
-    OpWrapper, SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Gradient,
+    IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
 use crate::solver::linesearch::condition::*;
 use argmin_math::ArgminScaledAdd;
@@ -103,35 +103,43 @@ where
     L: LineSearchCondition<P, F>,
     F: ArgminFloat,
 {
-    fn backtracking_step<O: ArgminOp<Param = P, Output = F, Float = F>>(
+    fn backtracking_step<O>(
         &self,
         op: &mut OpWrapper<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        state: IterState<O>,
+    ) -> Result<IterState<O>, Error>
+    where
+        O: ArgminOp<Param = P, Output = F, Float = F>
+            + CostFunction<Param = P, Output = F>
+            + Gradient<Param = P, Gradient = P>,
+    {
         let new_param = self
             .init_param
             .as_ref()
             .unwrap()
             .scaled_add(&self.alpha, self.search_direction.as_ref().unwrap());
 
-        let cur_cost = op.apply(&new_param)?;
+        let cur_cost = op.cost(&new_param)?;
 
         let out = if self.condition.requires_cur_grad() {
-            ArgminIterData::new()
+            state
                 .grad(op.gradient(&new_param)?)
                 .param(new_param)
                 .cost(cur_cost)
         } else {
-            ArgminIterData::new().param(new_param).cost(cur_cost)
+            state.param(new_param).cost(cur_cost)
         };
 
         Ok(out)
     }
 }
 
-impl<O, P, L, F> Solver<IterState<O>> for BacktrackingLineSearch<P, L, F>
+impl<O, P, L, F> Solver<O, IterState<O>> for BacktrackingLineSearch<P, L, F>
 where
-    P: SerializeAlias + ArgminScaledAdd<P, F, P>,
-    O: ArgminOp<Param = P, Output = F, Float = F>,
+    P: Clone + SerializeAlias + ArgminScaledAdd<P, F, P>,
+    O: ArgminOp<Param = P, Output = F, Float = F>
+        + CostFunction<Param = P, Output = F>
+        + Gradient<Param = P, Gradient = P>,
     L: LineSearchCondition<P, F>,
     F: ArgminFloat,
 {
@@ -140,12 +148,12 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
-        let init_param = state.get_param().unwrap();
-        let cost = state.get_cost();
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        let init_param = state.param.clone().unwrap();
+        let cost = state.cost;
         self.init_cost = if cost == F::infinity() {
-            op.apply(&init_param)?
+            op.cost(&init_param)?
         } else {
             cost
         };
@@ -164,22 +172,23 @@ where
 
         self.init_param = Some(init_param);
         self.init_grad = Some(init_grad);
-        let out = self.backtracking_step(op)?;
-        Ok(Some(out))
+        let state = self.backtracking_step(op, state)?;
+        Ok((state, None))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         self.alpha = self.alpha * self.rho;
-        self.backtracking_step(op)
+        let state = self.backtracking_step(op, state)?;
+        Ok((state, None))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if self.condition.eval(
-            state.get_cost(),
+            state.cost,
             state.get_grad().as_ref(),
             self.init_cost,
             self.init_grad.as_ref().unwrap(),
@@ -197,7 +206,7 @@ where
 mod tests {
     use super::*;
     use crate::assert_error;
-    use crate::core::{Executor, MinimalNoOperator};
+    use crate::core::{Executor, MinimalNoOperator, State};
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
     use num_traits::Float;
@@ -211,12 +220,24 @@ mod tests {
         type Hessian = ();
         type Jacobian = ();
         type Float = f64;
+    }
 
-        fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+    impl CostFunction for Problem {
+        type Param = Vec<Self::Float>;
+        type Output = Self::Float;
+        type Float = f64;
+
+        fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
             Ok(p[0].powi(2) + p[1].powi(2))
         }
+    }
 
-        fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+    impl Gradient for Problem {
+        type Param = Vec<Self::Float>;
+        type Gradient = Vec<Self::Float>;
+        type Float = f64;
+
+        fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
             Ok(vec![2.0 * p[0], 2.0 * p[1]])
         }
     }
@@ -323,14 +344,14 @@ mod tests {
         ls.set_search_direction(vec![2.0f64, 0.0]);
         ls.set_init_alpha(0.8).unwrap();
 
-        let data = ls.backtracking_step(&mut OpWrapper::new(prob));
+        let data = ls.backtracking_step(&mut OpWrapper::new(prob), IterState::new());
         assert!(data.is_ok());
 
         let param = data.as_ref().unwrap().get_param().unwrap();
-        let cost = data.as_ref().unwrap().get_cost().unwrap();
+        let cost = data.as_ref().unwrap().get_cost();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
-        assert_relative_eq!(cost, 0.6.powi(2), epsilon = f64::EPSILON);
+        assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
 
         assert!(data.as_ref().unwrap().get_grad().is_none());
     }
@@ -355,15 +376,15 @@ mod tests {
         ls.set_search_direction(vec![2.0f64, 0.0]);
         ls.set_init_alpha(0.8).unwrap();
 
-        let data = ls.backtracking_step(&mut OpWrapper::new(prob));
+        let data = ls.backtracking_step(&mut OpWrapper::new(prob), IterState::new());
         assert!(data.is_ok());
 
         let param = data.as_ref().unwrap().get_param().unwrap();
-        let cost = data.as_ref().unwrap().get_cost().unwrap();
+        let cost = data.as_ref().unwrap().get_cost();
         let gradient = data.as_ref().unwrap().get_grad().unwrap();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
-        assert_relative_eq!(cost, 0.6.powi(2), epsilon = f64::EPSILON);
+        assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
         assert_relative_eq!(gradient[0], 2.0 * 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(gradient[1], 0.0, epsilon = f64::EPSILON);
     }
@@ -389,7 +410,7 @@ mod tests {
         assert_error!(
             ls.init(
                 &mut OpWrapper::new(prob.clone()),
-                &mut IterState::new().param(ls.init_param.clone().unwrap())
+                IterState::new().param(ls.init_param.clone().unwrap())
             ),
             ArgminError,
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
@@ -399,17 +420,17 @@ mod tests {
 
         let data = ls.init(
             &mut OpWrapper::new(prob),
-            &mut IterState::new().param(ls.init_param.clone().unwrap()),
+            IterState::new().param(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
-        let data = data.as_ref().unwrap().as_ref().unwrap();
+        let data = data.unwrap().0;
 
         let param = data.get_param().unwrap();
-        let cost = data.get_cost().unwrap();
+        let cost = data.get_cost();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
-        assert_relative_eq!(cost, 0.6.powi(2), epsilon = f64::EPSILON);
+        assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
 
         assert!(data.get_grad().is_none());
     }
@@ -436,7 +457,7 @@ mod tests {
         assert_error!(
             ls.init(
                 &mut OpWrapper::new(prob.clone()),
-                &mut IterState::new().param(ls.init_param.clone().unwrap())
+                IterState::new().param(ls.init_param.clone().unwrap())
             ),
             ArgminError,
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
@@ -446,18 +467,18 @@ mod tests {
 
         let data = ls.init(
             &mut OpWrapper::new(prob),
-            &mut IterState::new().param(ls.init_param.clone().unwrap()),
+            IterState::new().param(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
-        let data = data.as_ref().unwrap().as_ref().unwrap();
+        let data = data.unwrap().0;
 
         let param = data.get_param().unwrap();
-        let cost = data.get_cost().unwrap();
+        let cost = data.get_cost();
         let gradient = data.get_grad().unwrap();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
-        assert_relative_eq!(cost, 0.6.powi(2), epsilon = f64::EPSILON);
+        assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
         assert_relative_eq!(gradient[0], 2.0 * 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(gradient[1], 0.0, epsilon = f64::EPSILON);
     }
@@ -483,18 +504,18 @@ mod tests {
 
         let data = ls.next_iter(
             &mut OpWrapper::new(prob),
-            &mut IterState::new().param(ls.init_param.clone().unwrap()),
+            IterState::new().param(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
 
-        let param = data.as_ref().unwrap().get_param().unwrap();
-        let cost = data.as_ref().unwrap().get_cost().unwrap();
+        let param = data.as_ref().unwrap().0.get_param().unwrap();
+        let cost = data.as_ref().unwrap().0.get_cost();
         // step is smaller than compared to step test, because of the reduced alpha.
         assert_relative_eq!(param[0], 0.44, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
-        assert_relative_eq!(cost, 0.44.powi(2), epsilon = f64::EPSILON);
+        assert_relative_eq!(cost, 0.44f64.powi(2), epsilon = f64::EPSILON);
 
-        assert!(data.as_ref().unwrap().get_grad().is_none());
+        assert!(data.as_ref().unwrap().0.get_grad().is_none());
         assert_relative_eq!(ls.alpha, ls.rho * 0.8, epsilon = f64::EPSILON);
     }
 
@@ -611,7 +632,7 @@ mod tests {
         let param = data.get_param().unwrap();
         assert_relative_eq!(param[0], 0.44, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
-        assert_relative_eq!(data.get_cost(), 0.44.powi(2), epsilon = f64::EPSILON);
+        assert_relative_eq!(data.get_cost(), 0.44f64.powi(2), epsilon = f64::EPSILON);
         assert_eq!(data.iter, 1);
         assert_eq!(data.cost_func_count, 3);
         assert_eq!(data.grad_func_count, 1);

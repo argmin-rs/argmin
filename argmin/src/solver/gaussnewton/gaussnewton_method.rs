@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver, State,
-    TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminOp, Error, IterState, Jacobian, OpWrapper, Operator,
+    Solver, TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose};
 #[cfg(feature = "serde1")]
@@ -73,16 +73,19 @@ impl<F: ArgminFloat> Default for GaussNewton<F> {
     }
 }
 
-impl<O, F> Solver<IterState<O>> for GaussNewton<F>
+impl<O, F, P, J, U> Solver<O, IterState<O>> for GaussNewton<F>
 where
-    O: ArgminOp<Float = F>,
-    O::Param: ArgminSub<O::Param, O::Param> + ArgminMul<O::Float, O::Param>,
-    O::Output: ArgminNorm<O::Float>,
-    O::Jacobian: ArgminTranspose<O::Jacobian>
-        + ArgminInv<O::Jacobian>
-        + ArgminDot<O::Jacobian, O::Jacobian>
-        + ArgminDot<O::Output, O::Param>
-        + ArgminDot<O::Param, O::Param>,
+    O: ArgminOp<Param = P, Jacobian = J, Output = U, Float = F>
+        + Operator<Param = P, Output = U>
+        + Jacobian<Param = P, Jacobian = J>,
+    P: ArgminSub<P, P> + ArgminMul<F, P>,
+    U: ArgminNorm<F>,
+    J: Clone
+        + ArgminTranspose<J>
+        + ArgminInv<J>
+        + ArgminDot<J, J>
+        + ArgminDot<U, P>
+        + ArgminDot<P, P>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Gauss-Newton method";
@@ -90,8 +93,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;
@@ -105,9 +108,7 @@ where
 
         let new_param = param.sub(&p.mul(&self.gamma));
 
-        Ok(ArgminIterData::new()
-            .param(new_param)
-            .cost(residuals.norm()))
+        Ok((state.param(new_param).cost(residuals.norm()), None))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
@@ -205,6 +206,12 @@ mod tests {
             type Hessian = ();
             type Jacobian = Array2<f64>;
             type Float = f64;
+        }
+
+        impl Operator for Problem {
+            type Param = Array1<f64>;
+            type Output = Array1<f64>;
+            type Float = f64;
 
             fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
                 if *self.counter.borrow() == 0 {
@@ -215,6 +222,12 @@ mod tests {
                     Ok(Array1::from_vec(vec![0.3, 1.0]))
                 }
             }
+        }
+
+        impl Jacobian for Problem {
+            type Param = Array1<f64>;
+            type Jacobian = Array2<f64>;
+            type Float = f64;
 
             fn jacobian(&self, _p: &Self::Param) -> Result<Self::Jacobian, Error> {
                 Ok(Array::from_shape_vec((2, 2), vec![1f64, 2.0, 3.0, 4.0])?)

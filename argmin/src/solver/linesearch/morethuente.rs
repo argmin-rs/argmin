@@ -22,8 +22,8 @@
 #![allow(clippy::nonminimal_bool)]
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, Error, IterState,
-    OpWrapper, SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Gradient,
+    IterState, OpWrapper, SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -220,9 +220,11 @@ where
     }
 }
 
-impl<P, O, F> Solver<IterState<O>> for MoreThuenteLineSearch<P, F>
+impl<P, O, F> Solver<O, IterState<O>> for MoreThuenteLineSearch<P, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>,
+    O: ArgminOp<Param = P, Output = F, Float = F>
+        + CostFunction<Param = P, Output = F>
+        + Gradient<Param = P, Gradient = P>,
     P: Clone + SerializeAlias + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
     F: ArgminFloat,
 {
@@ -231,18 +233,18 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         check_param!(
             self.search_direction,
             "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
 
-        self.init_param = state.get_param();
+        self.init_param = state.param.clone();
 
-        let cost = state.get_cost();
+        let cost = state.cost;
         self.finit = if cost.is_infinite() {
-            op.apply(self.init_param.as_ref().unwrap())?
+            op.cost(self.init_param.as_ref().unwrap())?
         } else {
             cost
         };
@@ -281,14 +283,14 @@ where
         self.stx = Step::new(F::from_f64(0.0).unwrap(), self.finit, self.dginit);
         self.sty = Step::new(F::from_f64(0.0).unwrap(), self.finit, self.dginit);
 
-        Ok(None)
+        Ok((state, None))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {
@@ -319,7 +321,7 @@ where
             .as_ref()
             .unwrap()
             .scaled_add(&self.stp.x, self.search_direction.as_ref().unwrap());
-        self.f = op.apply(&new_param)?;
+        self.f = op.cost(&new_param)?;
         let new_grad = op.gradient(&new_param)?;
         let cur_cost = self.f;
         let cur_param = new_param;
@@ -353,11 +355,14 @@ where
         }
 
         if info != 0 {
-            return Ok(ArgminIterData::new()
-                .param(cur_param)
-                .cost(cur_cost)
-                .grad(cur_grad)
-                .termination_reason(TerminationReason::LineSearchConditionMet));
+            return Ok((
+                state
+                    .param(cur_param)
+                    .cost(cur_cost)
+                    .grad(cur_grad)
+                    .termination_reason(TerminationReason::LineSearchConditionMet),
+                None,
+            ));
         }
 
         if self.stage1 && self.f <= ftest1 && dg >= self.ftol.min(self.gtol) * self.dginit {
@@ -417,7 +422,7 @@ where
             self.width = (self.sty.x - self.stx.x).abs();
         }
 
-        Ok(ArgminIterData::new())
+        Ok((state, None))
     }
 }
 

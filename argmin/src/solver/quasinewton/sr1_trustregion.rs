@@ -11,8 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, ArgminTrustRegion,
-    Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminOp, ArgminTrustRegion, CostFunction, Error, Executor,
+    Gradient, Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver,
+    TerminationReason,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
@@ -107,53 +108,50 @@ where
     }
 }
 
-impl<O, B, R, F> Solver<IterState<O>> for SR1TrustRegion<B, R, F>
+impl<O, B, R, F, P> Solver<O, IterState<O>> for SR1TrustRegion<B, R, F>
 where
-    O: ArgminOp<Output = F, Hessian = B, Float = F>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, O::Float>
-        + ArgminDot<O::Param, O::Hessian>
-        + ArgminNorm<O::Float>
+    O: ArgminOp<Param = P, Output = F, Hessian = B, Float = F>
+        + CostFunction<Param = P, Output = F>
+        + Gradient<Param = P, Gradient = P>
+        + Hessian<Param = P, Hessian = B>,
+    P: Clone
+        + ArgminSub<P, P>
+        + ArgminAdd<P, P>
+        + ArgminDot<P, F>
+        + ArgminDot<P, B>
+        + ArgminNorm<F>
         + ArgminZeroLike,
-    B: Clone
-        + SerializeAlias
-        + ArgminDot<O::Param, O::Param>
-        + ArgminAdd<O::Hessian, O::Hessian>
-        + ArgminMul<F, O::Hessian>,
-    R: Clone + ArgminTrustRegion<F> + Solver<IterState<O>>,
-    F: ArgminFloat + ArgminNorm<O::Float>,
+    B: Clone + SerializeAlias + ArgminDot<P, P> + ArgminAdd<B, B> + ArgminMul<F, B>,
+    R: Clone + ArgminTrustRegion<F> + Solver<O, IterState<O>>,
+    F: ArgminFloat + ArgminNorm<F>,
 {
     const NAME: &'static str = "SR1 Trust Region";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = op.apply(&param)?;
+        let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
         let hessian = state
             .take_hessian()
             .map(Result::Ok)
             .unwrap_or_else(|| op.hessian(&param))?;
-        Ok(Some(
-            ArgminIterData::new()
-                .param(param)
-                .cost(cost)
-                .grad(grad)
-                .hessian(hessian),
+        Ok((
+            state.param(param).cost(cost).grad(grad).hessian(hessian),
+            None,
         ))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let xk = state.take_param().unwrap();
-        let cost = state.get_cost();
+        let cost = state.cost;
         let prev_grad = state
             .take_grad()
             .map(Result::Ok)
@@ -162,7 +160,7 @@ where
 
         self.subproblem.set_radius(self.radius);
 
-        let ArgminResult {
+        let OptimizationResult {
             operator: sub_op,
             state: mut sub_state,
         } = Executor::new(op.take_op().unwrap(), self.subproblem.clone())
@@ -183,7 +181,7 @@ where
         let xksk = xk.add(&sk);
         let dfk1 = op.gradient(&xksk)?;
         let yk = dfk1.sub(&prev_grad);
-        let fk1 = op.apply(&xksk)?;
+        let fk1 = op.cost(&xksk)?;
 
         let ared = cost - fk1;
         let tmp1: F = prev_grad.dot(&sk);
@@ -216,23 +214,21 @@ where
 
         let hessian_update = skykbksk.abs() >= self.r * sk.norm() * skykbksk.norm();
         let hessian = if hessian_update {
-            let a: O::Hessian = ykbksk.dot(&ykbksk);
+            let a: B = ykbksk.dot(&ykbksk);
             let b: F = sk.dot(&ykbksk);
             hessian.add(&a.mul(&(F::from_f64(1.0).unwrap() / b)))
         } else {
             hessian
         };
 
-        Ok(ArgminIterData::new()
-            .param(xk1)
-            .cost(fk1)
-            .grad(dfk1)
-            .hessian(hessian)
-            .kv(make_kv!["ared" => ared;
+        Ok((
+            state.param(xk1).cost(fk1).grad(dfk1).hessian(hessian),
+            Some(make_kv!["ared" => ared;
                          "pred" => pred;
                          "ap" => ap;
                          "radius" => self.radius;
-                         "hessian_update" => hessian_update;]))
+                         "hessian_update" => hessian_update;]),
+        ))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

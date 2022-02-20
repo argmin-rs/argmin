@@ -5,7 +5,10 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminLineSearch, ArgminOp, ArgminSlogLogger, Error, Executor, ObserverMode};
+use argmin::core::{
+    ArgminLineSearch, ArgminOp, ArgminSlogLogger, CostFunction, Error, Executor, Gradient,
+    ObserverMode,
+};
 use argmin::solver::linesearch::{ArmijoCondition, BacktrackingLineSearch};
 use argmin_testfunctions::{sphere, sphere_derivative};
 
@@ -18,9 +21,29 @@ impl ArgminOp for Sphere {
     type Jacobian = ();
     type Float = f64;
 
-    fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
+    // fn apply(&self, param: &Vec<f64>) -> Result<f64, Error> {
+    //     Ok(sphere(param))
+    // }
+
+    // fn gradient(&self, param: &Vec<f64>) -> Result<Vec<f64>, Error> {
+    //     Ok(sphere_derivative(param))
+    // }
+}
+
+impl CostFunction for Sphere {
+    type Param = Vec<f64>;
+    type Output = f64;
+    type Float = f64;
+
+    fn cost(&self, param: &Vec<f64>) -> Result<f64, Error> {
         Ok(sphere(param))
     }
+}
+
+impl Gradient for Sphere {
+    type Param = Vec<f64>;
+    type Gradient = Vec<f64>;
+    type Float = f64;
 
     fn gradient(&self, param: &Vec<f64>) -> Result<Vec<f64>, Error> {
         Ok(sphere_derivative(param))
@@ -49,7 +72,8 @@ fn run() -> Result<(), Error> {
     // Set initial position
     solver.set_init_alpha(1.0)?;
 
-    let init_cost = operator.apply(&init_param)?;
+    let init_cost = operator.cost(&init_param)?;
+    // TODO: use correct thing
     let init_grad = operator.gradient(&init_param)?;
 
     // Run solver

@@ -10,20 +10,20 @@
 //! Observers are called after an iteration of a solver was performed and enable the user to observe
 //! the current state of the optimization. This can be used for logging or writing the current
 //! parameter vector to disk.
-
+//
 #[cfg(feature = "serde1")]
 pub mod file;
 #[cfg(feature = "slog-logger")]
 pub mod slog_logger;
 #[cfg(feature = "visualizer")]
 pub mod visualizer;
-
+//
 use crate::core::{ArgminKV, Error, State};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::sync::{Arc, Mutex};
-
+//
 #[cfg(feature = "serde1")]
 pub use file::*;
 #[cfg(feature = "slog-logger")]

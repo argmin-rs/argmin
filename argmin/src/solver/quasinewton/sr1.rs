@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminLineSearch, ArgminOp, ArgminResult,
-    Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Executor,
+    Gradient, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -82,19 +82,19 @@ where
     }
 }
 
-impl<O, L, H, F> Solver<IterState<O>> for SR1<L, H, F>
+impl<O, L, H, F, P> Solver<O, IterState<O>> for SR1<L, H, F>
 where
-    O: ArgminOp<Output = F, Hessian = H, Float = F>,
-    O::Param: ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, O::Float>
-        + ArgminDot<O::Param, O::Hessian>
-        + ArgminNorm<O::Float>
-        + ArgminMul<O::Float, O::Param>,
-    O::Hessian: SerializeAlias
-        + ArgminDot<O::Param, O::Param>
-        + ArgminAdd<O::Hessian, O::Hessian>
-        + ArgminMul<F, O::Hessian>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
+    O: ArgminOp<Param = P, Output = F, Hessian = H, Float = F>
+        + CostFunction<Param = P, Output = F>
+        + Gradient<Param = P, Gradient = P>,
+    P: Clone
+        + ArgminSub<P, P>
+        + ArgminDot<P, F>
+        + ArgminDot<P, H>
+        + ArgminNorm<F>
+        + ArgminMul<F, P>,
+    H: SerializeAlias + ArgminDot<P, P> + ArgminAdd<H, H> + ArgminMul<F, H>,
+    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "SR1";
@@ -102,27 +102,28 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = op.apply(&param)?;
+        let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
-        Ok(Some(
-            ArgminIterData::new()
+        Ok((
+            state
                 .param(param)
                 .cost(cost)
                 .grad(grad)
                 .inv_hessian(self.init_inv_hessian.take().unwrap()),
+            None,
         ))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = state.get_cost();
+        let cost = state.cost;
         let mut inv_hessian = state.get_inv_hessian().unwrap();
         let prev_grad = state
             .take_grad()
@@ -134,7 +135,7 @@ where
         self.linesearch.set_search_direction(p);
 
         // Run solver
-        let ArgminResult {
+        let OptimizationResult {
             operator: line_op,
             state: mut linesearch_state,
         } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
@@ -148,7 +149,7 @@ where
             .run()?;
 
         let xk1 = linesearch_state.take_param().unwrap();
-        let next_cost = linesearch_state.get_cost();
+        let next_cost = linesearch_state.cost;
 
         // take care of function eval counts
         op.consume_op(line_op);
@@ -158,8 +159,8 @@ where
 
         let sk = xk1.sub(&param);
 
-        let skmhkyk: O::Param = sk.sub(&inv_hessian.dot(&yk));
-        let a: O::Hessian = skmhkyk.dot(&skmhkyk);
+        let skmhkyk: P = sk.sub(&inv_hessian.dot(&yk));
+        let a: H = skmhkyk.dot(&skmhkyk);
         let b: F = skmhkyk.dot(&yk);
 
         let hessian_update = b.abs() >= self.r * yk.norm() * skmhkyk.norm();
@@ -176,19 +177,21 @@ where
             inv_hessian = inv_hessian.add(&a.mul(&(F::from_f64(1.0).unwrap() / b)));
         }
 
-        Ok(ArgminIterData::new()
-            .param(xk1)
-            .cost(next_cost)
-            .grad(grad)
-            .inv_hessian(inv_hessian)
-            .kv(make_kv!["denom" => b; "hessian_update" => hessian_update;]))
+        Ok((
+            state
+                .param(xk1)
+                .cost(next_cost)
+                .grad(grad)
+                .inv_hessian(inv_hessian),
+            Some(make_kv!["denom" => b; "hessian_update" => hessian_update;]),
+        ))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
         if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
-        if (state.get_prev_cost() - state.get_cost()).abs() < self.tol_cost {
+        if (state.get_prev_cost() - state.cost).abs() < self.tol_cost {
             return TerminationReason::NoChangeInCost;
         }
         TerminationReason::NotTerminated

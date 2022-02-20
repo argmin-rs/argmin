@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminKV, ArgminLineSearch, ArgminNLCGBetaUpdate, ArgminOp,
-    ArgminResult, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, State,
+    ArgminFloat, ArgminKV, ArgminLineSearch, ArgminNLCGBetaUpdate, ArgminOp, CostFunction, Error,
+    Executor, Gradient, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, State,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm};
 #[cfg(feature = "serde1")]
@@ -82,17 +82,14 @@ where
     }
 }
 
-impl<O, P, L, B, F> Solver<IterState<O>> for NonlinearConjugateGradient<P, L, B, F>
+impl<O, P, L, B, F> Solver<O, IterState<O>> for NonlinearConjugateGradient<P, L, B, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>,
-    P: Clone
-        + SerializeAlias
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminMul<F, O::Param>
-        + ArgminDot<O::Param, O::Float>
-        + ArgminNorm<O::Float>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
-    B: ArgminNLCGBetaUpdate<O::Param, O::Float>,
+    O: ArgminOp<Param = P, Output = F, Float = F>
+        + CostFunction<Param = P, Output = F>
+        + Gradient<Param = P, Gradient = P>,
+    P: Clone + SerializeAlias + ArgminAdd<P, P> + ArgminMul<F, P> + ArgminDot<P, F> + ArgminNorm<F>,
+    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
+    B: ArgminNLCGBetaUpdate<P, F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Nonlinear Conjugate Gradient";
@@ -100,35 +97,33 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = op.apply(&param)?;
+        let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
         self.p = Some(grad.mul(&(F::from_f64(-1.0).unwrap())));
-        Ok(Some(
-            ArgminIterData::new().param(param).cost(cost).grad(grad),
-        ))
+        Ok((state.param(param).cost(cost).grad(grad), None))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let p = self.p.as_ref().unwrap();
         let xk = state.take_param().unwrap();
         let grad = state
             .take_grad()
             .map(Result::Ok)
             .unwrap_or_else(|| op.gradient(&xk))?;
-        let cur_cost = state.get_cost();
+        let cur_cost = state.cost;
 
         // Linesearch
         self.linesearch.set_search_direction(p.clone());
 
         // Run solver
-        let ArgminResult {
+        let OptimizationResult {
             operator: line_op,
             state: mut line_state,
         } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
@@ -166,16 +161,15 @@ where
         );
 
         // Housekeeping
-        let cost = op.apply(&xk1)?;
+        let cost = op.cost(&xk1)?;
 
-        Ok(ArgminIterData::new()
-            .param(xk1)
-            .cost(cost)
-            .grad(new_grad)
-            .kv(make_kv!("beta" => self.beta;
+        Ok((
+            state.param(xk1).cost(cost).grad(new_grad),
+            Some(make_kv!("beta" => self.beta;
              "restart_iter" => restart_iter;
              "restart_orthogonality" => restart_orthogonality;
-            )))
+            )),
+        ))
     }
 }
 
