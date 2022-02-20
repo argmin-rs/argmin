@@ -16,8 +16,8 @@
 //! DOI: 10.1126/science.220.4598.671
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, Error, IterState, OpWrapper,
-    SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminOp, CostFunction, Error, IterState, Modify,
+    OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
 use rand::prelude::*;
 #[cfg(feature = "serde1")]
@@ -235,9 +235,11 @@ where
     }
 }
 
-impl<O, F, R> Solver<IterState<O>> for SimulatedAnnealing<F, R>
+impl<O, P, F, R> Solver<O, IterState<O>> for SimulatedAnnealing<F, R>
 where
-    O: ArgminOp<Output = F, Float = F>,
+    O: ArgminOp<Param = P, Output = F, Float = F>
+        + CostFunction<Param = P, Output = F>
+        + Modify<Param = P, Output = P, Float = F>,
     F: ArgminFloat,
     R: Rng + SerializeAlias,
 {
@@ -245,28 +247,29 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = op.apply(&param)?;
-        Ok(Some(ArgminIterData::new().param(param).cost(cost).kv(
-            make_kv!(
+        let cost = op.cost(&param)?;
+        Ok((
+            state.param(param).cost(cost),
+            Some(make_kv!(
                 "initial_temperature" => self.init_temp;
                 "stall_iter_accepted_limit" => self.stall_iter_accepted_limit;
                 "stall_iter_best_limit" => self.stall_iter_best_limit;
                 "reanneal_fixed" => self.reanneal_fixed;
                 "reanneal_accepted" => self.reanneal_accepted;
                 "reanneal_best" => self.reanneal_best;
-            ),
-        )))
+            )),
+        ))
     }
 
     /// Perform one iteration of SA algorithm
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
         // behaviour.
@@ -278,7 +281,7 @@ where
         let new_param = op.modify(&prev_param, self.cur_temp)?;
 
         // Evaluate cost function with new parameter vector
-        let new_cost = op.apply(&new_param)?;
+        let new_cost = op.cost(&new_param)?;
 
         // Acceptance function
         //
@@ -298,7 +301,7 @@ where
                 / (F::from_f64(1.0).unwrap() + ((new_cost - prev_cost) / self.cur_temp).exp())
                 > prob);
 
-        let new_best_found = new_cost < state.get_best_cost();
+        let new_best_found = new_cost < state.best_cost;
 
         // Update stall iter variables
         self.update_stall_and_reanneal_iter(accepted, new_best_found);
@@ -312,24 +315,26 @@ where
 
         self.update_temperature();
 
-        Ok(if accepted {
-            ArgminIterData::new().param(new_param).cost(new_cost)
-        } else {
-            ArgminIterData::new().param(prev_param).cost(prev_cost)
-        }
-        .kv(make_kv!(
-            "t" => self.cur_temp;
-            "new_be" => new_best_found;
-            "acc" => accepted;
-            "st_i_be" => self.stall_iter_best;
-            "st_i_ac" => self.stall_iter_accepted;
-            "ra_i_fi" => self.reanneal_iter_fixed;
-            "ra_i_be" => self.reanneal_iter_best;
-            "ra_i_ac" => self.reanneal_iter_accepted;
-            "ra_fi" => r_fixed;
-            "ra_be" => r_best;
-            "ra_ac" => r_accepted;
-        )))
+        Ok((
+            if accepted {
+                state.param(new_param).cost(new_cost)
+            } else {
+                state.param(prev_param).cost(prev_cost)
+            },
+            Some(make_kv!(
+                "t" => self.cur_temp;
+                "new_be" => new_best_found;
+                "acc" => accepted;
+                "st_i_be" => self.stall_iter_best;
+                "st_i_ac" => self.stall_iter_accepted;
+                "ra_i_fi" => self.reanneal_iter_fixed;
+                "ra_i_be" => self.reanneal_iter_best;
+                "ra_i_ac" => self.reanneal_iter_accepted;
+                "ra_fi" => r_fixed;
+                "ra_be" => r_best;
+                "ra_ac" => r_accepted;
+            )),
+        ))
     }
 
     fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {

@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, ArgminTrustRegion,
-    Error, Executor, IterState, OpWrapper, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminOp, ArgminTrustRegion, CostFunction, Error, Executor,
+    Gradient, Hessian, IterState, OpWrapper, OptimizationResult, Solver, TerminationReason,
 };
 use crate::solver::trustregion::reduction_ratio;
 use argmin_math::{ArgminAdd, ArgminDot, ArgminNorm, ArgminWeightedDot};
@@ -97,12 +97,15 @@ where
     }
 }
 
-impl<O, R, F> Solver<IterState<O>> for TrustRegion<R, F>
+impl<O, R, F, P, H> Solver<O, IterState<O>> for TrustRegion<R, F>
 where
-    O: ArgminOp<Output = F, Float = F>,
-    O::Param: ArgminNorm<F> + ArgminDot<O::Param, F> + ArgminAdd<O::Param, O::Param>,
-    O::Hessian: ArgminDot<O::Param, O::Param>,
-    R: Clone + ArgminTrustRegion<F> + Solver<IterState<O>>,
+    O: ArgminOp<Param = P, Output = F, Float = F, Hessian = H>
+        + CostFunction<Param = P, Output = F>
+        + Gradient<Param = P, Gradient = P>
+        + Hessian<Param = P, Hessian = H>,
+    P: Clone + ArgminNorm<F> + ArgminDot<P, F> + ArgminAdd<P, P>,
+    H: Clone + ArgminDot<P, P>,
+    R: Clone + ArgminTrustRegion<F> + Solver<O, IterState<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Trust region";
@@ -110,27 +113,28 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
-        self.fxk = op.apply(&param)?;
+        self.fxk = op.cost(&param)?;
         self.mk0 = self.fxk;
-        Ok(Some(
-            ArgminIterData::new()
+        Ok((
+            state
                 .param(param)
                 .cost(self.fxk)
                 .grad(grad)
                 .hessian(hessian),
+            None,
         ))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let grad = state
             .take_grad()
@@ -143,11 +147,16 @@ where
 
         self.subproblem.set_radius(self.radius);
 
-        let ArgminResult {
+        let OptimizationResult {
             operator: sub_op,
             state: mut sub_state,
         } = Executor::new(op.take_op().unwrap(), self.subproblem.clone())
-            .configure(|config| config.param(param.clone()).grad(grad.clone()))
+            .configure(|config| {
+                config
+                    .param(param.clone())
+                    .grad(grad.clone())
+                    .hessian(hessian.clone())
+            })
             .ctrlc(false)
             .run()?;
 
@@ -157,7 +166,7 @@ where
         op.consume_op(sub_op);
 
         let new_param = pk.add(&param);
-        let fxkpk = op.apply(&new_param)?;
+        let fxkpk = op.cost(&new_param)?;
         let mkpk =
             self.fxk + pk.dot(&grad) + F::from_f64(0.5).unwrap() * pk.weighted_dot(&hessian, &pk);
 
@@ -176,24 +185,26 @@ where
             self.radius
         };
 
-        Ok(if rho > self.eta {
-            self.fxk = fxkpk;
-            self.mk0 = fxkpk;
-            let grad = op.gradient(&new_param)?;
-            let hessian = op.hessian(&new_param)?;
-            ArgminIterData::new()
-                .param(new_param)
-                .cost(fxkpk)
-                .grad(grad)
-                .hessian(hessian)
-        } else {
-            ArgminIterData::new()
-                .param(param)
-                .cost(self.fxk)
-                .grad(grad)
-                .hessian(hessian)
-        }
-        .kv(make_kv!("radius" => cur_radius;)))
+        Ok((
+            if rho > self.eta {
+                self.fxk = fxkpk;
+                self.mk0 = fxkpk;
+                let grad = op.gradient(&new_param)?;
+                let hessian = op.hessian(&new_param)?;
+                state
+                    .param(new_param)
+                    .cost(fxkpk)
+                    .grad(grad)
+                    .hessian(hessian)
+            } else {
+                state
+                    .param(param)
+                    .cost(self.fxk)
+                    .grad(grad)
+                    .hessian(hessian)
+            },
+            Some(make_kv!("radius" => cur_radius;)),
+        ))
     }
 
     fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {

@@ -13,9 +13,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult,
-    DeserializeOwnedAlias, Error, Executor, IterState, OpWrapper, SerializeAlias, Solver, State,
-    TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, DeserializeOwnedAlias, Error,
+    Executor, Gradient, Hessian, IterState, OpWrapper, Operator, OptimizationResult,
+    SerializeAlias, Solver, State, TerminationReason,
 };
 use crate::solver::conjugategradient::ConjugateGradient;
 use argmin_math::{
@@ -75,48 +75,52 @@ where
     }
 }
 
-impl<O, L, F> Solver<IterState<O>> for NewtonCG<L, F>
+impl<O, L, P, H, F> Solver<O, IterState<O>> for NewtonCG<L, F>
 where
-    O: ArgminOp<Output = F, Float = F>,
-    O::Param: SerializeAlias
-        + ArgminSub<O::Param, O::Param>
-        + ArgminDot<O::Param, O::Float>
-        + ArgminScaledAdd<O::Param, O::Float, O::Param>
-        + ArgminMul<F, O::Param>
+    O: ArgminOp<Param = P, Hessian = H, Output = F, Float = F>
+        + Gradient<Param = P, Gradient = P, Float = F>
+        + Hessian<Param = P, Hessian = H, Float = F>,
+    P: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminSub<P, P>
+        + ArgminDot<P, F>
+        + ArgminScaledAdd<P, F, P>
+        + ArgminMul<F, P>
         + ArgminConj
         + ArgminZeroLike
-        + ArgminNorm<O::Float>,
-    O::Hessian: ArgminDot<O::Param, O::Param>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
-    F: ArgminFloat + ArgminNorm<O::Float>,
+        + ArgminNorm<F>,
+    H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
+    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
+    F: ArgminFloat + ArgminNorm<F>,
 {
     const NAME: &'static str = "Newton-CG";
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
 
         // Solve CG subproblem
-        let cg_op: CGSubProblem<O::Param, O::Hessian, O::Float> =
-            CGSubProblem::new(hessian.clone());
+        let cg_op: CGSubProblem<P, H, F> = CGSubProblem::new(hessian.clone());
         let mut cg_op = OpWrapper::new(cg_op);
 
         let mut x_p = param.zero_like();
-        let mut x: O::Param = param.zero_like();
+        let mut x: P = param.zero_like();
         let mut cg = ConjugateGradient::new(grad.mul(&(F::from_f64(-1.0).unwrap())))?;
 
-        let mut cg_state = IterState::new().param(x_p.clone());
-        cg.init(&mut cg_op, &mut cg_state)?;
+        let cg_state = IterState::new().param(x_p.clone());
+        let (mut cg_state, _) = cg.init(&mut cg_op, cg_state)?;
         let grad_norm = grad.norm();
         for iter in 0.. {
-            let data = cg.next_iter(&mut cg_op, &mut cg_state)?;
-            let cost = data.get_cost().unwrap();
-            x = data.get_param().unwrap();
+            let (state_tmp, _) = cg.next_iter(&mut cg_op, cg_state)?;
+            cg_state = state_tmp;
+            let cost = cg_state.get_cost();
+            x = cg_state.take_param().unwrap();
             let p = cg.p_prev();
             let curvature = p.dot(&hessian.dot(p));
             if curvature <= self.curvature_threshold {
@@ -140,7 +144,7 @@ where
         let line_cost = state.get_cost();
 
         // Run solver
-        let ArgminResult {
+        let OptimizationResult {
             operator: line_op,
             state: mut linesearch_state,
         } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
@@ -150,9 +154,12 @@ where
 
         op.consume_op(line_op);
 
-        Ok(ArgminIterData::new()
-            .param(linesearch_state.take_param().unwrap())
-            .cost(linesearch_state.get_cost()))
+        Ok((
+            state
+                .param(linesearch_state.take_param().unwrap())
+                .cost(linesearch_state.get_cost()),
+            None,
+        ))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
@@ -183,19 +190,29 @@ impl<T, H, F> CGSubProblem<T, H, F> {
     }
 }
 
-impl<T, H, F> ArgminOp for CGSubProblem<T, H, F>
+impl<P, H, F> ArgminOp for CGSubProblem<P, H, F>
 where
-    T: Clone + SerializeAlias + DeserializeOwnedAlias,
-    H: Clone + ArgminDot<T, T> + SerializeAlias + DeserializeOwnedAlias,
+    P: Clone + SerializeAlias + DeserializeOwnedAlias,
+    H: Clone + ArgminDot<P, P> + SerializeAlias + DeserializeOwnedAlias,
     F: ArgminFloat,
 {
-    type Param = T;
-    type Output = T;
+    type Param = P;
+    type Output = P;
     type Hessian = ();
     type Jacobian = ();
     type Float = F;
+}
 
-    fn apply(&self, p: &T) -> Result<T, Error> {
+impl<P, H, F> Operator for CGSubProblem<P, H, F>
+where
+    H: ArgminDot<P, P>,
+    F: ArgminFloat,
+{
+    type Param = P;
+    type Output = P;
+    type Float = F;
+
+    fn apply(&self, p: &P) -> Result<P, Error> {
         Ok(self.hessian.dot(p))
     }
 }

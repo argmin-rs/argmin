@@ -184,15 +184,15 @@ mod tests {
         }
     }
 
-    impl<O> Solver<IterState<O>> for PhonySolver
+    impl<O> Solver<O, IterState<O>> for PhonySolver
     where
         O: ArgminOp,
     {
         fn next_iter(
             &mut self,
             _op: &mut OpWrapper<O>,
-            _state: &mut IterState<O>,
-        ) -> Result<ArgminIterData<IterState<O>>, Error> {
+            _state: IterState<O>,
+        ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
             unimplemented!()
         }
     }

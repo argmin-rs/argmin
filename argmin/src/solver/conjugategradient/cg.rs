@@ -11,8 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, Error, IterState, OpWrapper, SerializeAlias,
-    Solver,
+    ArgminFloat, ArgminKV, ArgminOp, Error, IterState, OpWrapper, Operator, SerializeAlias, Solver,
 };
 use argmin_math::{ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -77,40 +76,40 @@ where
     }
 }
 
-impl<P, O, F> Solver<IterState<O>> for ConjugateGradient<P, F>
+impl<P, O, F> Solver<O, IterState<O>> for ConjugateGradient<P, F>
 where
-    O: ArgminOp<Param = P, Output = P, Float = F>,
+    O: ArgminOp<Param = P, Output = P, Float = F> + Operator<Param = P, Output = P>,
     P: Clone
         + SerializeAlias
-        + ArgminDot<O::Param, F>
-        + ArgminSub<O::Param, O::Param>
-        + ArgminScaledAdd<O::Param, F, O::Param>
+        + ArgminDot<P, F>
+        + ArgminSub<P, P>
+        + ArgminScaledAdd<P, F, P>
         + ArgminConj
-        + ArgminMul<O::Float, O::Param>,
-    F: ArgminFloat + ArgminNorm<O::Float>,
+        + ArgminMul<F, P>,
+    F: ArgminFloat + ArgminNorm<F>,
 {
     const NAME: &'static str = "Conjugate Gradient";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let init_param = state.get_param_ref().unwrap();
         let ap = op.apply(init_param)?;
         let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
         self.r = Some(r0.clone());
         self.p = Some(r0.mul(&(F::from_f64(-1.0).unwrap())));
         self.rtr = r0.dot(&r0.conj());
-        Ok(None)
+        Ok((state, None))
     }
 
     /// Perform one iteration of CG algorithm
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let p = self.p.as_ref().unwrap();
         let r = self.r.as_ref().unwrap();
 
@@ -128,10 +127,10 @@ where
         self.p = Some(p);
         self.r = Some(r);
 
-        Ok(ArgminIterData::new()
-            .param(new_param)
-            .cost(norm.norm())
-            .kv(make_kv!("alpha" => alpha; "beta" => beta;)))
+        Ok((
+            state.param(new_param).cost(norm.norm()),
+            Some(make_kv!("alpha" => alpha; "beta" => beta;)),
+        ))
     }
 }
 

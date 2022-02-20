@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminKV, ArgminLineSearch, ArgminOp, ArgminResult, Error,
-    Executor, IterState, OpWrapper, SerializeAlias, Solver, State, TerminationReason,
+    ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Executor, Gradient,
+    IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -75,17 +75,19 @@ where
     }
 }
 
-impl<O, L, P, F> Solver<IterState<O>> for LBFGS<L, P, F>
+impl<O, L, P, F> Solver<O, IterState<O>> for LBFGS<L, P, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>,
-    O::Param: Clone
+    O: ArgminOp<Param = P, Output = F, Float = F>
+        + CostFunction<Param = P, Output = F>
+        + Gradient<Param = P, Gradient = P>,
+    P: Clone
         + SerializeAlias
-        + ArgminSub<O::Param, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminDot<O::Param, O::Float>
-        + ArgminNorm<O::Float>
-        + ArgminMul<O::Float, O::Param>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
+        + ArgminSub<P, P>
+        + ArgminAdd<P, P>
+        + ArgminDot<P, F>
+        + ArgminNorm<F>
+        + ArgminMul<F, P>,
+    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "L-BFGS";
@@ -93,21 +95,19 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = op.apply(&param)?;
+        let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
-        Ok(Some(
-            ArgminIterData::new().param(param).cost(cost).grad(grad),
-        ))
+        Ok((state.param(param).cost(cost).grad(grad), None))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let cur_cost = state.get_cost();
         let prev_grad = state.take_grad().unwrap();
@@ -142,7 +142,7 @@ where
             .set_search_direction(r.mul(&F::from_f64(-1.0).unwrap()));
 
         // Run solver
-        let ArgminResult {
+        let OptimizationResult {
             operator: line_op,
             state: mut linesearch_state,
         } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
@@ -171,11 +171,10 @@ where
         self.s.push_back(xk1.sub(&param));
         self.y.push_back(grad.sub(&prev_grad));
 
-        Ok(ArgminIterData::new()
-            .param(xk1)
-            .cost(next_cost)
-            .grad(grad)
-            .kv(make_kv!("gamma" => gamma;)))
+        Ok((
+            state.param(xk1).cost(next_cost).grad(grad),
+            Some(make_kv!("gamma" => gamma;)),
+        ))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

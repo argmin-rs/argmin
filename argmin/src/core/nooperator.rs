@@ -63,22 +63,22 @@ where
     type Float = F;
 
     /// Do nothing, really.
-    fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
+    fn apply2(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(Self::Output::default())
     }
 
     /// Do nothing, really.
-    fn gradient(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
+    fn gradient2(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
         Ok(Self::Param::default())
     }
 
     /// Do nothing, really.
-    fn hessian(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
+    fn hessian2(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
         Ok(Self::Hessian::default())
     }
 
     /// Do nothing, really.
-    fn modify(&self, _p: &Self::Param, _t: Self::Float) -> Result<Self::Param, Error> {
+    fn modify2(&self, _p: &Self::Param, _t: Self::Float) -> Result<Self::Param, Error> {
         Ok(Self::Param::default())
     }
 }
@@ -111,22 +111,22 @@ impl ArgminOp for MinimalNoOperator {
     type Float = f64;
 
     /// Do nothing, really.
-    fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
+    fn apply2(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
         unimplemented!()
     }
 
     /// Do nothing, really.
-    fn gradient(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
+    fn gradient2(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
         unimplemented!()
     }
 
     /// Do nothing, really.
-    fn hessian(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
+    fn hessian2(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
         unimplemented!()
     }
 
     /// Do nothing, really.
-    fn modify(&self, _p: &Self::Param, _t: f64) -> Result<Self::Param, Error> {
+    fn modify2(&self, _p: &Self::Param, _t: f64) -> Result<Self::Param, Error> {
         unimplemented!()
     }
 }

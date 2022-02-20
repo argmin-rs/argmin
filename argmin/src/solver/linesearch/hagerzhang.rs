@@ -14,8 +14,8 @@
 //! DOI: <https://doi.org/10.1137/030601880>
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, Error, IterState,
-    OpWrapper, SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Gradient,
+    IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -249,13 +249,18 @@ where
         Ok(self)
     }
 
-    fn update<O: ArgminOp<Param = P, Output = F>>(
+    fn update<O>(
         &mut self,
         op: &mut OpWrapper<O>,
         (a_x, a_f, a_g): Triplet<F>,
         (b_x, b_f, b_g): Triplet<F>,
         (c_x, c_f, c_g): Triplet<F>,
-    ) -> Result<(Triplet<F>, Triplet<F>), Error> {
+    ) -> Result<(Triplet<F>, Triplet<F>), Error>
+    where
+        O: ArgminOp<Param = P, Output = F, Float = F>
+            + CostFunction<Param = P, Output = F>
+            + Gradient<Param = P, Gradient = P>,
+    {
         // U0
         if c_x <= a_x || c_x >= b_x {
             // nothing changes.
@@ -309,12 +314,17 @@ where
     }
 
     /// double secant step
-    fn secant2<O: ArgminOp<Param = P, Output = F>>(
+    fn secant2<O>(
         &mut self,
         op: &mut OpWrapper<O>,
         (a_x, a_f, a_g): Triplet<F>,
         (b_x, b_f, b_g): Triplet<F>,
-    ) -> Result<(Triplet<F>, Triplet<F>), Error> {
+    ) -> Result<(Triplet<F>, Triplet<F>), Error>
+    where
+        O: ArgminOp<Param = P, Output = F, Float = F>
+            + CostFunction<Param = P, Output = F>
+            + Gradient<Param = P, Gradient = P>,
+    {
         // S1
         let c_x = self.secant(a_x, a_g, b_x, b_g);
         let c_f = self.calc(op, c_x)?;
@@ -351,24 +361,26 @@ where
         }
     }
 
-    fn calc<O: ArgminOp<Param = P, Output = F>>(
-        &mut self,
-        op: &mut OpWrapper<O>,
-        alpha: F,
-    ) -> Result<F, Error> {
+    fn calc<O>(&mut self, op: &mut OpWrapper<O>, alpha: F) -> Result<F, Error>
+    where
+        O: ArgminOp<Param = P, Output = F, Float = F>
+            + CostFunction<Param = P, Output = F>
+            + Gradient<Param = P, Gradient = P>,
+    {
         let tmp = self
             .init_param
             .as_ref()
             .unwrap()
             .scaled_add(&alpha, self.search_direction.as_ref().unwrap());
-        op.apply(&tmp)
+        op.cost(&tmp)
     }
 
-    fn calc_grad<O: ArgminOp<Param = P, Output = F>>(
-        &mut self,
-        op: &mut OpWrapper<O>,
-        alpha: F,
-    ) -> Result<F, Error> {
+    fn calc_grad<O>(&mut self, op: &mut OpWrapper<O>, alpha: F) -> Result<F, Error>
+    where
+        O: ArgminOp<Param = P, Output = F, Float = F>
+            + CostFunction<Param = P, Output = F>
+            + Gradient<Param = P, Gradient = P>,
+    {
         let tmp = self
             .init_param
             .as_ref()
@@ -421,9 +433,11 @@ impl<P, F> ArgminLineSearch<P, F> for HagerZhangLineSearch<P, F> {
     }
 }
 
-impl<P, O, F> Solver<IterState<O>> for HagerZhangLineSearch<P, F>
+impl<P, O, F> Solver<O, IterState<O>> for HagerZhangLineSearch<P, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>,
+    O: ArgminOp<Param = P, Output = F, Float = F>
+        + CostFunction<Param = P, Output = F>
+        + Gradient<Param = P, Gradient = P>,
     P: Clone + SerializeAlias + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
     F: ArgminFloat,
 {
@@ -432,8 +446,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
                 text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),
@@ -446,11 +460,11 @@ where
             "HagerZhangLineSearch: Search direction not initialized. Call `set_search_direction`."
         );
 
-        self.init_param = state.get_param();
+        self.init_param = state.param.clone();
 
-        let cost = state.get_cost();
+        let cost = state.cost;
         self.finit = if cost.is_infinite() {
-            op.apply(self.init_param.as_ref().unwrap())?
+            op.cost(self.init_param.as_ref().unwrap())?
         } else {
             cost
         };
@@ -492,14 +506,14 @@ where
             .scaled_add(&self.best_x, self.search_direction.as_ref().unwrap());
         let best_f = self.best_f;
 
-        Ok(Some(ArgminIterData::new().param(new_param).cost(best_f)))
+        Ok((state.param(new_param).cost(best_f), None))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);
         let bb = (self.b_x, self.b_f, self.b_g);
@@ -514,7 +528,7 @@ where
                 .as_ref()
                 .unwrap()
                 .scaled_add(&c_x, self.search_direction.as_ref().unwrap());
-            let c_f = op.apply(&tmp)?;
+            let c_f = op.cost(&tmp)?;
             let grad = op.gradient(&tmp)?;
             let c_g = self.search_direction.as_ref().unwrap().dot(&grad);
             let ((an_x, an_f, an_g), (bn_x, bn_f, bn_g)) =
@@ -541,7 +555,7 @@ where
             .as_ref()
             .unwrap()
             .scaled_add(&self.best_x, self.search_direction.as_ref().unwrap());
-        Ok(ArgminIterData::new().param(new_param).cost(self.best_f))
+        Ok((state.param(new_param).cost(self.best_f), None))
     }
 
     fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {

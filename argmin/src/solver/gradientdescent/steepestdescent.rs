@@ -15,8 +15,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminLineSearch, ArgminOp, ArgminResult, Error, Executor,
-    IterState, OpWrapper, SerializeAlias, Solver, State,
+    ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Executor, Gradient,
+    IterState, OpWrapper, OptimizationResult, Solver,
 };
 use argmin_math::ArgminMul;
 #[cfg(feature = "serde1")]
@@ -43,11 +43,13 @@ impl<L> SteepestDescent<L> {
     }
 }
 
-impl<O, L, F> Solver<IterState<O>> for SteepestDescent<L>
+impl<O, L, P, F> Solver<O, IterState<O>> for SteepestDescent<L>
 where
-    O: ArgminOp<Output = F, Float = F>,
-    O::Param: SerializeAlias + ArgminMul<O::Float, O::Param>,
-    L: Clone + ArgminLineSearch<O::Param, O::Float> + Solver<IterState<O>>,
+    O: ArgminOp<Param = P, Output = F, Float = F>
+        + CostFunction<Param = P, Output = F, Float = F>
+        + Gradient<Param = P, Gradient = P, Float = F>,
+    P: ArgminMul<F, P>,
+    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Steepest Descent";
@@ -55,17 +57,17 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param_new = state.take_param().unwrap();
-        let new_cost = op.apply(&param_new)?;
+        let new_cost = op.cost(&param_new)?;
         let new_grad = op.gradient(&param_new)?;
 
         self.linesearch
-            .set_search_direction(new_grad.mul(&(O::Float::from_f64(-1.0).unwrap())));
+            .set_search_direction(new_grad.mul(&(F::from_f64(-1.0).unwrap())));
 
         // Run solver
-        let ArgminResult {
+        let OptimizationResult {
             operator: line_op,
             state: mut linesearch_state,
         } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
@@ -76,9 +78,12 @@ where
         // Get back operator and function evaluation counts
         op.consume_op(line_op);
 
-        Ok(ArgminIterData::new()
-            .param(linesearch_state.take_param().unwrap())
-            .cost(linesearch_state.get_cost()))
+        Ok((
+            state
+                .param(linesearch_state.take_param().unwrap())
+                .cost(linesearch_state.get_cost()),
+            None,
+        ))
     }
 }
 

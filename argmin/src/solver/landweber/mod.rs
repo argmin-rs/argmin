@@ -15,7 +15,7 @@
 //! kind. Amer. J. Math. 73, 615–624
 //! \[1\] <https://en.wikipedia.org/wiki/Landweber_iteration>
 
-use crate::core::{ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver};
+use crate::core::{ArgminFloat, ArgminKV, ArgminOp, Error, Gradient, IterState, OpWrapper, Solver};
 use argmin_math::ArgminScaledSub;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -46,10 +46,10 @@ impl<F> Landweber<F> {
     }
 }
 
-impl<O, F> Solver<IterState<O>> for Landweber<F>
+impl<O, F, P> Solver<O, IterState<O>> for Landweber<F>
 where
-    O: ArgminOp<Float = F>,
-    O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>,
+    O: ArgminOp<Param = P, Float = F> + Gradient<Param = P, Gradient = P>,
+    P: ArgminScaledSub<P, F, P>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Landweber";
@@ -57,12 +57,12 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let new_param = param.scaled_sub(&self.omega, &grad);
-        Ok(ArgminIterData::new().param(new_param))
+        Ok((state.param(new_param), None))
     }
 }
 

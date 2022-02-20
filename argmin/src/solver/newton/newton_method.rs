@@ -11,7 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver,
+    ArgminError, ArgminFloat, ArgminKV, ArgminOp, Error, Gradient, Hessian, IterState, OpWrapper,
+    Solver,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminScaledSub};
 #[cfg(feature = "serde1")]
@@ -65,11 +66,13 @@ where
     }
 }
 
-impl<O, F> Solver<IterState<O>> for Newton<F>
+impl<O, P, H, F> Solver<O, IterState<O>> for Newton<F>
 where
-    O: ArgminOp<Float = F>,
-    O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>,
-    O::Hessian: ArgminInv<O::Hessian> + ArgminDot<O::Param, O::Param>,
+    O: ArgminOp<Param = P, Hessian = H, Float = F>
+        + Gradient<Param = P, Gradient = P, Float = F>
+        + Hessian<Param = P, Hessian = H, Float = F>,
+    P: ArgminScaledSub<P, F, P>,
+    H: ArgminInv<H> + ArgminDot<P, P>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Newton method";
@@ -77,13 +80,13 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
         let new_param = param.scaled_sub(&self.gamma, &hessian.inv()?.dot(&grad));
-        Ok(ArgminIterData::new().param(new_param))
+        Ok((state.param(new_param), None))
     }
 }
 
@@ -92,8 +95,6 @@ mod tests {
     use super::*;
     #[cfg(feature = "ndarrayl")]
     use crate::core::Executor;
-    #[cfg(feature = "ndarrayl")]
-    use crate::core::State;
     use crate::test_trait_impl;
     #[cfg(feature = "ndarrayl")]
     use approx::assert_relative_eq;
@@ -156,10 +157,22 @@ mod tests {
             type Hessian = Array2<f64>;
             type Jacobian = ();
             type Float = f64;
+        }
 
-            fn gradient(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
+        impl Gradient for Problem {
+            type Param = Array1<f64>;
+            type Gradient = Array1<f64>;
+            type Float = f64;
+
+            fn gradient(&self, _p: &Self::Param) -> Result<Self::Gradient, Error> {
                 Ok(Array1::from_vec(vec![1.0, 2.0]))
             }
+        }
+
+        impl Hessian for Problem {
+            type Param = Array1<f64>;
+            type Hessian = Array2<f64>;
+            type Float = f64;
 
             fn hessian(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
                 Ok(Array::from_shape_vec((2, 2), vec![1.0f64, 0.0, 0.0, 1.0])?)

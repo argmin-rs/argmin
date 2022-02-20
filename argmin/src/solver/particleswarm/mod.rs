@@ -12,7 +12,7 @@
 //! TODO
 
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, Error, IterState, OpWrapper, SerializeAlias,
+    ArgminFloat, ArgminKV, ArgminOp, CostFunction, Error, IterState, OpWrapper, SerializeAlias,
     Solver,
 };
 use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
@@ -79,7 +79,7 @@ where
         Ok(particle_swarm)
     }
 
-    fn initialize_particles<O: ArgminOp<Param = P, Output = F, Float = F>>(
+    fn initialize_particles<O: CostFunction<Param = P, Output = F, Float = F>>(
         &mut self,
         op: &mut OpWrapper<O>,
     ) {
@@ -88,11 +88,11 @@ where
             .collect();
 
         self.best_position = self.get_best_position();
-        self.best_cost = op.apply(&self.best_position).unwrap();
+        self.best_cost = op.cost(&self.best_position).unwrap();
         // TODO unwrap evil
     }
 
-    fn initialize_particle<O: ArgminOp<Param = P, Output = F, Float = F>>(
+    fn initialize_particle<O: CostFunction<Param = P, Output = F, Float = F>>(
         &mut self,
         op: &mut OpWrapper<O>,
     ) -> Particle<P, F> {
@@ -101,7 +101,7 @@ where
         let delta_neg = delta.mul(&F::from_f64(-1.0).unwrap());
 
         let initial_position = O::Param::rand_from_range(min, max);
-        let initial_cost = op.apply(&initial_position).unwrap(); // FIXME do not unwrap
+        let initial_cost = op.cost(&initial_position).unwrap(); // FIXME do not unwrap
 
         Particle {
             position: initial_position.clone(),
@@ -133,9 +133,9 @@ where
     }
 }
 
-impl<O, P, F> Solver<IterState<O>> for ParticleSwarm<P, F>
+impl<O, P, F> Solver<O, IterState<O>> for ParticleSwarm<P, F>
 where
-    O: ArgminOp<Output = F, Param = P, Float = F>,
+    O: ArgminOp<Param = P, Output = F, Float = F> + CostFunction<Param = P, Output = F, Float = F>,
     P: SerializeAlias + Position<F>,
     F: ArgminFloat,
 {
@@ -143,21 +143,21 @@ where
 
     fn init(
         &mut self,
-        _op: &mut OpWrapper<O>,
-        _state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
-        self.initialize_particles(_op);
+        op: &mut OpWrapper<O>,
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        self.initialize_particles(op);
 
-        Ok(None)
+        Ok((state, None))
     }
 
     /// Perform one iteration of algorithm
     fn next_iter(
         &mut self,
-        _op: &mut OpWrapper<O>,
-        _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
-        let zero = O::Param::zero_like(&self.best_position);
+        op: &mut OpWrapper<O>,
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        let zero = P::zero_like(&self.best_position);
 
         for p in self.particles.iter_mut() {
             // New velocity is composed of
@@ -170,24 +170,24 @@ where
 
             // ad 2)
             let to_optimum = p.best_position.sub(&p.position);
-            let pull_to_optimum = O::Param::rand_from_range(&zero, &to_optimum);
+            let pull_to_optimum = P::rand_from_range(&zero, &to_optimum);
             let pull_to_optimum = pull_to_optimum.mul(&self.weight_particle);
 
             // ad 3)
             let to_global_optimum = self.best_position.sub(&p.position);
             let pull_to_global_optimum =
-                O::Param::rand_from_range(&zero, &to_global_optimum).mul(&self.weight_swarm);
+                P::rand_from_range(&zero, &to_global_optimum).mul(&self.weight_swarm);
 
             p.velocity = momentum.add(&pull_to_optimum).add(&pull_to_global_optimum);
             let new_position = p.position.add(&p.velocity);
 
             // Limit to search window:
-            p.position = O::Param::min(
-                &O::Param::max(&new_position, &self.search_region.0),
+            p.position = P::min(
+                &P::max(&new_position, &self.search_region.0),
                 &self.search_region.1,
             );
 
-            p.cost = _op.apply(&p.position)?;
+            p.cost = op.cost(&p.position)?;
             if p.cost < p.best_cost {
                 p.best_position = p.position.clone();
                 p.best_cost = p.cost;
@@ -206,15 +206,15 @@ where
             .map(|particle| (particle.position.clone(), particle.cost))
             .collect();
 
-        let out = ArgminIterData::new()
-            .param(self.best_position.clone())
-            .cost(self.best_cost)
-            .population(population)
-            .kv(make_kv!(
+        Ok((
+            state
+                .param(self.best_position.clone())
+                .cost(self.best_cost)
+                .population(population),
+            Some(make_kv!(
                 "particles" => &self.particles;
-            ));
-
-        Ok(out)
+            )),
+        ))
     }
 }
 

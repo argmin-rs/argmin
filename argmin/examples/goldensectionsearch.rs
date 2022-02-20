@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, ObserverMode};
+use argmin::core::{ArgminOp, ArgminSlogLogger, CostFunction, Error, Executor, ObserverMode};
 use argmin::solver::goldensectionsearch::GoldenSectionSearch;
 
 /// Test function from Wikipedia example
@@ -15,11 +15,18 @@ impl ArgminOp for TestFunc {
     // one dimensional problem, no vector needed
     type Param = f32;
     type Output = f32;
-    type Float = f32;
     type Hessian = ();
     type Jacobian = ();
+    type Float = f32;
+}
 
-    fn apply(&self, x: &Self::Param) -> Result<Self::Output, Error> {
+impl CostFunction for TestFunc {
+    // one dimensional problem, no vector needed
+    type Param = f32;
+    type Output = f32;
+    type Float = f32;
+
+    fn cost(&self, x: &Self::Param) -> Result<Self::Output, Error> {
         // In interval [2.5, 2.5]
         // Min at 1.0
         // Max at -1.666 (multiply by -1.0 to test)

@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, ArgminTrustRegion, Error, IterState,
-    OpWrapper, SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminOp, ArgminTrustRegion, Error, IterState, OpWrapper,
+    SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot, ArgminZeroLike};
 #[cfg(feature = "serde1")]
@@ -145,9 +145,9 @@ where
     }
 }
 
-impl<P, O, F> Solver<IterState<O>> for Steihaug<P, F>
+impl<P, O, F, H> Solver<O, IterState<O>> for Steihaug<P, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>,
+    O: ArgminOp<Param = P, Hessian = H, Output = F, Float = F>,
     P: Clone
         + SerializeAlias
         + ArgminMul<F, P>
@@ -155,7 +155,7 @@ where
         + ArgminDot<P, F>
         + ArgminAdd<P, P>
         + ArgminZeroLike,
-    O::Hessian: ArgminDot<P, P>,
+    H: ArgminDot<P, P>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Steihaug";
@@ -163,8 +163,8 @@ where
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let r = state.get_grad().unwrap();
 
         self.r_0_norm = r.norm();
@@ -175,14 +175,14 @@ where
 
         self.r = Some(r);
 
-        Ok(Some(ArgminIterData::new().param(p)))
+        Ok((state.param(p), None))
     }
 
     fn next_iter(
         &mut self,
         _op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let grad = state.take_grad().unwrap();
         let h = state.take_hessian().unwrap();
         let d = self.d.as_ref().unwrap();
@@ -192,9 +192,12 @@ where
         let p = self.p.as_ref().unwrap();
         if dhd <= F::from_f64(0.0).unwrap() {
             let tau = self.tau(|_| true, true, &grad, &h);
-            return Ok(ArgminIterData::new()
-                .param(p.add(&d.mul(&tau)))
-                .termination_reason(TerminationReason::TargetPrecisionReached));
+            return Ok((
+                state
+                    .param(p.add(&d.mul(&tau)))
+                    .termination_reason(TerminationReason::TargetPrecisionReached),
+                None,
+            ));
         }
 
         let alpha = self.rtr / dhd;
@@ -203,18 +206,24 @@ where
         // new p violates trust region bound
         if p_n.norm() >= self.radius {
             let tau = self.tau(|x| x >= F::from_f64(0.0).unwrap(), false, &grad, &h);
-            return Ok(ArgminIterData::new()
-                .param(p.add(&d.mul(&tau)))
-                .termination_reason(TerminationReason::TargetPrecisionReached));
+            return Ok((
+                state
+                    .param(p.add(&d.mul(&tau)))
+                    .termination_reason(TerminationReason::TargetPrecisionReached),
+                None,
+            ));
         }
 
         let r = self.r.as_ref().unwrap();
         let r_n = r.add(&h.dot(d).mul(&alpha));
 
         if r_n.norm() < self.epsilon * self.r_0_norm {
-            return Ok(ArgminIterData::new()
-                .param(p_n)
-                .termination_reason(TerminationReason::TargetPrecisionReached));
+            return Ok((
+                state
+                    .param(p_n)
+                    .termination_reason(TerminationReason::TargetPrecisionReached),
+                None,
+            ));
         }
 
         let rjtrj = r_n.dot(&r_n);
@@ -224,11 +233,7 @@ where
         self.p = Some(p_n.clone());
         self.rtr = rjtrj;
 
-        Ok(ArgminIterData::new()
-            .param(p_n)
-            .cost(self.rtr)
-            .grad(grad)
-            .hessian(h))
+        Ok((state.param(p_n).cost(self.rtr).grad(grad).hessian(h), None))
     }
 
     fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {

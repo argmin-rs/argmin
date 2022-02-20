@@ -12,8 +12,8 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver,
-    TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminOp, CostFunction, Error, IterState, OpWrapper,
+    Solver, TerminationReason,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -85,9 +85,9 @@ where
     }
 }
 
-impl<O, F> Solver<IterState<O>> for GoldenSectionSearch<F>
+impl<O, F> Solver<O, IterState<O>> for GoldenSectionSearch<F>
 where
-    O: ArgminOp<Output = F, Param = F, Float = F>,
+    O: ArgminOp<Output = F, Param = F, Float = F> + CostFunction<Param = F, Output = F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Golden-section search";
@@ -95,8 +95,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        mut state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let init_estimate = state.take_param().unwrap();
         if init_estimate < self.min_bound || init_estimate > self.max_bound {
             Err(ArgminError::InvalidParameter {
@@ -113,12 +113,12 @@ where
             };
             self.x1 = x1;
             self.x2 = x2;
-            self.f1 = op.apply(&self.x1)?;
-            self.f2 = op.apply(&self.x2)?;
+            self.f1 = op.cost(&self.x1)?;
+            self.f2 = op.cost(&self.x2)?;
             if self.f1 < self.f2 {
-                Ok(Some(ArgminIterData::new().param(self.x1).cost(self.f1)))
+                Ok((state.param(self.x1).cost(self.f1), None))
             } else {
-                Ok(Some(ArgminIterData::new().param(self.x2).cost(self.f2)))
+                Ok((state.param(self.x2).cost(self.f2), None))
             }
         }
     }
@@ -126,25 +126,25 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         if self.f2 < self.f1 {
             self.x0 = self.x1;
             self.x1 = self.x2;
             self.x2 = self.g1 * self.x1 + self.g2 * self.x3;
             self.f1 = self.f2;
-            self.f2 = op.apply(&self.x2)?;
+            self.f2 = op.cost(&self.x2)?;
         } else {
             self.x3 = self.x2;
             self.x2 = self.x1;
             self.x1 = self.g1 * self.x2 + self.g2 * self.x0;
             self.f2 = self.f1;
-            self.f1 = op.apply(&self.x1)?;
+            self.f1 = op.cost(&self.x1)?;
         }
         if self.f1 < self.f2 {
-            Ok(ArgminIterData::new().param(self.x1).cost(self.f1))
+            Ok((state.param(self.x1).cost(self.f1), None))
         } else {
-            Ok(ArgminIterData::new().param(self.x2).cost(self.f2))
+            Ok((state.param(self.x2).cost(self.f2), None))
         }
     }
 

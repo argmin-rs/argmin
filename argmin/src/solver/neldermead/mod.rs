@@ -12,7 +12,7 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminIterData, ArgminKV, ArgminOp, Error, IterState, OpWrapper,
+    ArgminError, ArgminFloat, ArgminKV, ArgminOp, CostFunction, Error, IterState, OpWrapper,
     SerializeAlias, Solver, TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
@@ -205,52 +205,47 @@ enum Action {
     Shrink,
 }
 
-impl<O, P, F> Solver<IterState<O>> for NelderMead<P, F>
+impl<O, P, F> Solver<O, IterState<O>> for NelderMead<P, F>
 where
-    O: ArgminOp<Output = F, Param = P, Float = F>,
-    P: Clone
-        + SerializeAlias
-        + ArgminSub<O::Param, O::Param>
-        + ArgminAdd<O::Param, O::Param>
-        + ArgminMul<O::Float, O::Param>,
-    F: ArgminFloat + std::iter::Sum<O::Float>,
+    O: ArgminOp<Output = F, Param = P, Float = F> + CostFunction<Param = P, Output = F, Float = F>,
+    P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminAdd<P, P> + ArgminMul<F, P>,
+    F: ArgminFloat + std::iter::Sum<F>,
 {
     const NAME: &'static str = "Nelder-Mead method";
 
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         self.params = self
             .params
             .iter()
             .cloned()
             .map(|(p, _)| {
-                let c = op.apply(&p).unwrap();
+                let c = op.cost(&p).unwrap();
                 (p, c)
             })
             .collect();
         self.sort_param_vecs();
 
-        Ok(Some(
-            ArgminIterData::new()
-                .param(self.params[0].0.clone())
-                .cost(self.params[0].1),
+        Ok((
+            state.param(self.params[0].0.clone()).cost(self.params[0].1),
+            None,
         ))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         let num_param = self.params.len();
 
         let x0 = self.calculate_centroid();
 
         let xr = self.reflect(&x0, &self.params[num_param - 1].0);
-        let xr_cost = op.apply(&xr)?;
+        let xr_cost = op.cost(&xr)?;
 
         let action = if xr_cost < self.params[num_param - 2].1 && xr_cost >= self.params[0].1 {
             // reflection
@@ -260,7 +255,7 @@ where
         } else if xr_cost < self.params[0].1 {
             // expansion
             let xe = self.expand(&x0, &xr);
-            let xe_cost = op.apply(&xe)?;
+            let xe_cost = op.cost(&xe)?;
             if xe_cost < xr_cost {
                 self.params.last_mut().unwrap().0 = xe;
                 self.params.last_mut().unwrap().1 = xe_cost;
@@ -272,7 +267,7 @@ where
         } else if xr_cost >= self.params[num_param - 2].1 {
             // contraction
             let xc = self.contract(&x0, &self.params[num_param - 1].0);
-            let xc_cost = op.apply(&xc)?;
+            let xc_cost = op.cost(&xc)?;
             if xc_cost < self.params[num_param - 1].1 {
                 self.params.last_mut().unwrap().0 = xc;
                 self.params.last_mut().unwrap().1 = xc_cost;
@@ -280,16 +275,16 @@ where
             Action::Contraction
         } else {
             // shrink
-            self.shrink(|x| op.apply(x))?;
+            self.shrink(|x| op.cost(x))?;
             Action::Shrink
         };
 
         self.sort_param_vecs();
 
-        Ok(ArgminIterData::new()
-            .param(self.params[0].0.clone())
-            .cost(self.params[0].1)
-            .kv(make_kv!("action" => action;)))
+        Ok((
+            state.param(self.params[0].0.clone()).cost(self.params[0].1),
+            Some(make_kv!("action" => action;)),
+        ))
     }
 
     fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {

@@ -19,7 +19,8 @@
 /// Implementation of Brent's optimization method,
 /// see <https://en.wikipedia.org/wiki/Brent%27s_method>
 use crate::core::{
-    ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver, TerminationReason,
+    ArgminFloat, ArgminKV, ArgminOp, Error, IterState, OpWrapper, Operator, Solver, State,
+    TerminationReason,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -83,9 +84,10 @@ impl<F: ArgminFloat> Brent<F> {
     }
 }
 
-impl<O, F> Solver<IterState<O>> for Brent<F>
+impl<O, F> Solver<O, IterState<O>> for Brent<F>
 where
     O: ArgminOp<Param = F, Output = F, Float = F>,
+    O: Operator<Param = F, Output = F>, //ArgminOp<Param = F, Output = F, Float = F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Brent";
@@ -94,25 +96,23 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         // Brent maintains its own state
-        _state: &mut IterState<O>,
-    ) -> Result<Option<ArgminIterData<IterState<O>>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         self.fa = op.apply(&self.a)?;
         self.fb = op.apply(&self.b)?;
         if self.fa * self.fb > F::from_f64(0.0).unwrap() {
             return Err(BrentError::WrongSign.into());
         }
         self.fc = self.fb;
-        Ok(Some(
-            ArgminIterData::new().param(self.b).cost(self.fb.abs()),
-        ))
+        Ok((state.param(self.b).cost(self.fb.abs()), None))
     }
 
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
         // Brent maintains its own state
-        _state: &mut IterState<O>,
-    ) -> Result<ArgminIterData<IterState<O>>, Error> {
+        state: IterState<O>,
+    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
         if (self.fb > F::from_f64(0.0).unwrap() && self.fc > F::from_f64(0.0).unwrap())
             || self.fb < F::from_f64(0.0).unwrap() && self.fc < F::from_f64(0.0).unwrap()
         {
@@ -134,10 +134,13 @@ where
             + F::from_f64(0.5).unwrap() * self.tol;
         let mid = F::from_f64(0.5).unwrap() * (self.c - self.b);
         if mid.abs() <= eff_tol || self.fb == F::from_f64(0.0).unwrap() {
-            return Ok(ArgminIterData::new()
-                .termination_reason(TerminationReason::TargetPrecisionReached)
-                .param(self.b)
-                .cost(self.fb.abs()));
+            return Ok((
+                state
+                    .termination_reason(TerminationReason::TargetPrecisionReached)
+                    .param(self.b)
+                    .cost(self.fb.abs()),
+                None,
+            ));
         }
         if self.e.abs() >= eff_tol && self.fa.abs() > self.fb.abs() {
             let s = self.fb / self.fa;
@@ -188,7 +191,7 @@ where
         }
 
         self.fb = op.apply(&self.b)?;
-        Ok(ArgminIterData::new().param(self.b).cost(self.fb.abs()))
+        Ok((state.param(self.b).cost(self.fb.abs()), None))
     }
 }
 
