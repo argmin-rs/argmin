@@ -172,8 +172,7 @@ mod tests {
         let init_param = Array1::from_vec(vec![0.0, 0.0]);
 
         let param = Executor::new(problem, solver)
-            .configure(|config| config.param(init_param))
-            .max_iters(1)
+            .configure(|config| config.param(init_param).max_iters(1))
             .run()
             .unwrap()
             .state
@@ -188,8 +187,7 @@ mod tests {
         let init_param = Array1::from_vec(vec![0.0, 0.0]);
 
         let param = Executor::new(problem, solver)
-            .configure(|config| config.param(init_param))
-            .max_iters(2)
+            .configure(|config| config.param(init_param).max_iters(2))
             .run()
             .unwrap()
             .state
@@ -204,8 +202,7 @@ mod tests {
         let init_param = Array1::from_vec(vec![0.0, 0.0]);
 
         let param = Executor::new(problem, solver)
-            .configure(|config| config.param(init_param))
-            .max_iters(1)
+            .configure(|config| config.param(init_param).max_iters(1))
             .run()
             .unwrap()
             .state
@@ -220,8 +217,7 @@ mod tests {
         let init_param = Array1::from_vec(vec![0.0, 0.0]);
 
         let param = Executor::new(problem, solver)
-            .configure(|config| config.param(init_param))
-            .max_iters(2)
+            .configure(|config| config.param(init_param).max_iters(2))
             .run()
             .unwrap()
             .state

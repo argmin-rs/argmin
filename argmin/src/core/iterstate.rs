@@ -45,12 +45,6 @@ pub trait State: SerializeAlias + DeserializeOwnedAlias + Sized {
     /// Returns current number of iterations
     fn get_iter(&self) -> u64;
 
-    /// Set maximum number of iterations
-    fn max_iters(&mut self, _max_iters: u64) -> &mut Self;
-
-    /// Set target cost
-    fn target_cost(&mut self, target_cost: Self::Float) -> &mut Self;
-
     /// Returns current cost function value
     fn get_cost(&self) -> Self::Float;
 
@@ -435,6 +429,13 @@ impl<O: ArgminOp> IterState<O> {
         self
     }
 
+    /// Set target cost
+    #[must_use]
+    pub fn target_cost(mut self, target_cost: O::Float) -> Self {
+        self.target_cost = target_cost;
+        self
+    }
+
     /// Set the current best cost function value. This shifts the stored best cost function value to
     /// the previous cost function value.
     fn best_cost(&mut self, cost: O::Float) -> &mut Self {
@@ -446,6 +447,13 @@ impl<O: ArgminOp> IterState<O> {
     /// Set population
     fn population(&mut self, population: Vec<(O::Param, O::Float)>) -> &mut Self {
         self.population = Some(population);
+        self
+    }
+
+    /// Set maximum number of iterations
+    #[must_use]
+    pub fn max_iters(mut self, iters: u64) -> Self {
+        self.max_iters = iters;
         self
     }
 
@@ -735,9 +743,6 @@ impl<O: ArgminOp> State for IterState<O> {
         }
     }
 
-    setter!(target_cost, O::Float, "Set target cost value");
-
-    setter!(max_iters, u64, "Set maximum number of iterations");
     setter!(
         termination_reason,
         TerminationReason,
@@ -864,6 +869,13 @@ impl<O: LinearProgram> LinearProgramState<O> {
         self
     }
 
+    /// Set target cost
+    #[must_use]
+    pub fn target_cost(mut self, target_cost: O::Float) -> Self {
+        self.target_cost = target_cost;
+        self
+    }
+
     /// Set best paramater vector. This shifts the stored best parameter vector to the previous
     /// best parameter vector.
     fn best_param(&mut self, param: O::Param) -> &mut Self {
@@ -877,6 +889,13 @@ impl<O: LinearProgram> LinearProgramState<O> {
     fn best_cost(&mut self, cost: O::Float) -> &mut Self {
         std::mem::swap(&mut self.prev_best_cost, &mut self.best_cost);
         self.best_cost = cost;
+        self
+    }
+
+    /// Set maximum number of iterations
+    #[must_use]
+    pub fn max_iters(mut self, iters: u64) -> Self {
+        self.max_iters = iters;
         self
     }
 
@@ -971,8 +990,6 @@ impl<O: LinearProgram> State for LinearProgramState<O> {
         }
     }
 
-    setter!(target_cost, Self::Float, "Set target cost value");
-    setter!(max_iters, u64, "Set maximum number of iterations");
     setter!(
         termination_reason,
         TerminationReason,
@@ -1124,7 +1141,7 @@ mod tests {
         assert_eq!(state.get_jacobian_func_count(), 0);
         assert_eq!(state.get_modify_func_count(), 0);
 
-        state.max_iters(42);
+        state = state.max_iters(42);
 
         assert_eq!(state.get_max_iters(), 42);
 

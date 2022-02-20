@@ -542,8 +542,7 @@ mod tests {
 
         assert_error!(
             Executor::new(prob.clone(), ls.clone())
-                .configure(|config| config.param(ls.init_param.clone().unwrap()))
-                .max_iters(10)
+                .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(10))
                 .run(),
             ArgminError,
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
@@ -552,8 +551,7 @@ mod tests {
         ls.set_search_direction(vec![2.0f64, 0.0]);
 
         let data = Executor::new(prob, ls.clone())
-            .configure(|config| config.param(ls.init_param.clone().unwrap()))
-            .max_iters(10)
+            .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(10))
             .run();
         assert!(data.is_ok());
 
@@ -595,8 +593,7 @@ mod tests {
 
         assert_error!(
             Executor::new(prob.clone(), ls.clone())
-                .configure(|config| config.param(ls.init_param.clone().unwrap()))
-                .max_iters(10)
+                .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(10))
                 .run(),
             ArgminError,
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
@@ -605,8 +602,7 @@ mod tests {
         ls.set_search_direction(vec![2.0f64, 0.0]);
 
         let data = Executor::new(prob, ls.clone())
-            .configure(|config| config.param(ls.init_param.clone().unwrap()))
-            .max_iters(10)
+            .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(10))
             .run();
         assert!(data.is_ok());
 

@@ -280,7 +280,13 @@
 //!  
 //! // Run solver
 //! let res = Executor::new(cost, solver)
-//!     .configure(|config| config.param(init_param))
+//!     .configure(|config|
+//!         config
+//!             // Set initial parameters
+//!             .param(init_param)
+//!             // Set maximum iterations to 10
+//!             .max_iters(10)
+//!     )
 //! # ;
 //! # #[cfg(feature = "slog-logger")]
 //! # let res = res
@@ -288,8 +294,6 @@
 //!     .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
 //! # ;
 //! # let res = res
-//!     // Set maximum iterations to 10
-//!     .max_iters(10)
 //!     // run the solver on the defined problem
 //!     .run()?;
 //! #
@@ -371,7 +375,7 @@
 //! # let solver = SteepestDescent::new(linesearch);
 //! #
 //! let res = Executor::new(problem, solver)
-//!     .configure(|config| config.param(init_param))
+//!     .configure(|config| config.param(init_param).max_iters(2))
 //! # ;
 //! # #[cfg(feature = "slog-logger")]
 //! let res = res
@@ -387,7 +391,6 @@
 //!     .add_observer(WriteToFile::new("params", "param"), ObserverMode::Every(20))
 //! # ;
 //! # let res = res
-//! #     .max_iters(2)
 //!     // run the solver on the defined problem
 //!     .run()?;
 //! #     Ok(())
@@ -456,9 +459,10 @@
 //! # #[cfg(feature = "serde1")]
 //! let res = Executor::from_checkpoint(".checkpoints/optim.arg", Rosenbrock {})
 //!     .unwrap_or(
-//!         Executor::new(Rosenbrock {}, solver).configure(|config| config.param(init_param))
+//!         Executor::new(Rosenbrock {}, solver).configure(
+//!             |config| config.param(init_param).max_iters(iters)
+//!         )
 //!     )
-//!     .max_iters(iters)
 //!     .checkpoint_dir(".checkpoints")
 //!     .checkpoint_name("optim")
 //!     .checkpoint_mode(CheckpointMode::Every(20))

@@ -61,9 +61,7 @@
 #     let solver = SteepestDescent::new(linesearch);
 #     // Run solver
 #     let result = Executor::new(cost, solver)
-#         .configure(|config| config.param(init_param))
-#         // Set maximum iterations to 10
-#         .max_iters(1)
+#         .configure(|config| config.param(init_param).max_iters(1))
 #         // run the solver on the defined problem
 #         .run()?;
 // Get best parameter vector

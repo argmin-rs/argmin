@@ -36,9 +36,8 @@ fn run() -> Result<(), Error> {
     let solver = Landweber::new(0.001);
 
     let res = Executor::new(operator, solver)
-        .configure(|config| config.param(init_param))
+        .configure(|config| config.param(init_param).max_iters(iters))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
-        .max_iters(iters)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)
