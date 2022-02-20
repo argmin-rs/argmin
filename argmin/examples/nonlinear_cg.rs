@@ -57,11 +57,8 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(operator, solver)
-        .configure(|config| config.param(init_param))
+        .configure(|config| config.param(init_param).max_iters(20).target_cost(0.0))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
-        .max_iters(20)
-        // Set target cost function value
-        .target_cost(0.0)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)

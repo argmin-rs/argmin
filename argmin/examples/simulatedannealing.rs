@@ -127,13 +127,16 @@ fn run() -> Result<(), Error> {
     // Run solver          //
     /////////////////////////
     let res = Executor::new(operator, solver)
-        .configure(|config| config.param(init_param))
+        .configure(|config| {
+            config
+                .param(init_param)
+                // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
+                .max_iters(10_000)
+                // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
+                .target_cost(0.0)
+        })
         // Optional: Attach a observer
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
-        // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-        .max_iters(10_000)
-        // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
-        .target_cost(0.0)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)

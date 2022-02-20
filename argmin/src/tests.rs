@@ -98,8 +98,7 @@ macro_rules! entropy_max_tests {
         fn $name() {
             let cost_func = MaxEntropy::new();
             let res = Executor::new(cost_func.clone(), $solver)
-                .configure(|config| config.param(cost_func.param_init.clone()))
-                .max_iters(100)
+                .configure(|config| config.param(cost_func.param_init.clone()).max_iters(100))
                 .run()
                 .unwrap();
 
@@ -129,8 +128,7 @@ fn test_lbfgs_func_count() {
     let linesearch = MoreThuenteLineSearch::new();
     let solver = LBFGS::new(linesearch, 10);
     let res = Executor::new(cost.clone(), solver)
-        .configure(|config| config.param(cost.param_init.clone()))
-        .max_iters(100)
+        .configure(|config| config.param(cost.param_init.clone()).max_iters(100))
         .run()
         .unwrap();
 

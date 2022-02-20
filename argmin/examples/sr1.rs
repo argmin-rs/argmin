@@ -51,9 +51,8 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(cost, solver)
-        .configure(|config| config.param(init_param))
+        .configure(|config| config.param(init_param).max_iters(1000))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
-        .max_iters(1000)
         .run()?;
 
     // Wait a second (lets the observer flush everything before printing again)

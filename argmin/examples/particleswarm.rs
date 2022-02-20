@@ -40,8 +40,7 @@ fn run() -> Result<(), Error> {
         let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
 
         let executor = Executor::new(cost_function, solver)
-            .configure(|config| config.param(init_param))
-            .max_iters(15);
+            .configure(|config| config.param(init_param).max_iters(15));
 
         #[cfg(feature = "visualizer")]
         let executor = executor.add_observer(visualizer, ObserverMode::Always);

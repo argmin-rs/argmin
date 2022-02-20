@@ -51,11 +51,15 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(operator, solver)
-        .configure(|config| config.param(init_param))
         .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
-        .max_iters(10)
-        // the following two are optional. If they are not provided, they will be computed
-        .configure(|config| config.grad(init_grad).cost(init_cost))
+        // Gradient and cost are optional. If they are not provided, they will be computed
+        .configure(|config| {
+            config
+                .param(init_param)
+                .grad(init_grad)
+                .cost(init_cost)
+                .max_iters(10)
+        })
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)

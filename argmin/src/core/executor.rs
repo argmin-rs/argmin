@@ -215,20 +215,6 @@ where
         self
     }
 
-    /// Set maximum number of iterations
-    #[must_use]
-    pub fn max_iters(mut self, iters: u64) -> Self {
-        self.state.as_mut().unwrap().max_iters(iters);
-        self
-    }
-
-    /// Set target cost value
-    #[must_use]
-    pub fn target_cost(mut self, cost: I::Float) -> Self {
-        self.state.as_mut().unwrap().target_cost(cost);
-        self
-    }
-
     /// Configure the solver
     #[must_use]
     pub fn configure<F: FnOnce(I) -> I>(mut self, init: F) -> Self {
