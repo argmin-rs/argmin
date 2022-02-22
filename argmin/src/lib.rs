@@ -184,7 +184,7 @@
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
 //! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
-//! use argmin::core::{ArgminOp, Error};
+//! use argmin::core::{ArgminOp, Error, CostFunction, Gradient, Hessian};
 //!
 //! /// First, create a struct for your problem
 //! struct Rosenbrock {
@@ -204,20 +204,50 @@
 //!     type Jacobian = ();
 //!     /// Floating point precision
 //!     type Float = f64;
+//! }
+//!
+//! /// Implement `CostFunction` for `Rosenbrock`
+//! impl CostFunction for Rosenbrock {
+//!     /// Type of the parameter vector
+//!     type Param = Vec<f64>;
+//!     /// Type of the return value computed by the cost function
+//!     type Output = f64;
+//!     /// Floating point precision
+//!     type Float = f64;
 //!
 //!     /// Apply the cost function to a parameter `p`
-//!     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-//!         Ok(rosenbrock_2d(p, self.a, self.b))
+//!     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//!         Ok(rosenbrock_2d(p, 1.0, 100.0))
 //!     }
+//! }
+//!
+//! /// Implement `Gradient` for `Rosenbrock`
+//! impl Gradient for Rosenbrock {
+//!     /// Type of the parameter vector
+//!     type Param = Vec<f64>;
+//!     /// Type of the return value computed by the cost function
+//!     type Gradient = Vec<f64>;
+//!     /// Floating point precision
+//!     type Float = f64;
 //!
 //!     /// Compute the gradient at parameter `p`.
-//!     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-//!         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+//!     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
+//!         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
 //!     }
+//! }
+//!
+//! /// Implement `Hessian` for `Rosenbrock`
+//! impl Hessian for Rosenbrock {
+//!     /// Type of the parameter vector
+//!     type Param = Vec<f64>;
+//!     /// Type of the Hessian. Can be `()` if not needed.
+//!     type Hessian = Vec<Vec<f64>>;
+//!     /// Floating point precision
+//!     type Float = f64;
 //!
 //!     /// Compute the Hessian at parameter `p`.
 //!     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-//!         let t = rosenbrock_2d_hessian(p, self.a, self.b);
+//!         let t = rosenbrock_2d_hessian(p, 1.0, 100.0);
 //!         Ok(vec![vec![t[0], t[1]], vec![t[2], t[3]]])
 //!     }
 //! }
@@ -236,7 +266,7 @@
 //! # #![allow(unused_imports)]
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
-//! use argmin::core::{ArgminOp, Error, Executor};
+//! use argmin::core::{ArgminOp, Error, Executor, CostFunction, Gradient};
 //! # #[cfg(feature = "slog-logger")]
 //! use argmin::core::{ArgminSlogLogger, ObserverMode};
 //! use argmin::solver::gradientdescent::SteepestDescent;
@@ -248,25 +278,53 @@
 //! #     b: f64,
 //! # }
 //! #
+//! # /// Implement `ArgminOp` for `Rosenbrock`
 //! # impl ArgminOp for Rosenbrock {
+//! #     /// Type of the parameter vector
 //! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
 //! #     type Output = f64;
-//! #     type Hessian = ();
+//! #     /// Type of the Hessian. Can be `()` if not needed.
+//! #     type Hessian = Vec<Vec<f64>>;
+//! #     /// Type of the Jacobian. Can be `()` if not needed.
 //! #     type Jacobian = ();
+//! #     /// Floating point precision
+//! #     type Float = f64;
+//! # }
+//! #
+//! # /// Implement `CostFunction` for `Rosenbrock`
+//! # impl CostFunction for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Output = f64;
+//! #     /// Floating point precision
 //! #     type Float = f64;
 //! #
-//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-//! #         Ok(rosenbrock_2d(p, self.a, self.b))
+//! #     /// Apply the cost function to a parameter `p`
+//! #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
 //! #     }
+//! # }
 //! #
-//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-//! #         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+//! # /// Implement `Gradient` for `Rosenbrock`
+//! # impl Gradient for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Gradient = Vec<f64>;
+//! #     /// Floating point precision
+//! #     type Float = f64;
+//! #
+//! #     /// Compute the gradient at parameter `p`.
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
 //! #     }
 //! # }
 //! #
 //! # fn run() -> Result<(), Error> {
 //!
-//! // Define cost function (must implement `ArgminOperator`)
+//! // Define cost function (must implement `CostFunction` and `Gradient`)
 //! let cost = Rosenbrock { a: 1.0, b: 100.0 };
 //!  
 //! // Define initial parameter vector
@@ -330,7 +388,7 @@
 //! # #![allow(unused_imports)]
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
-//! # use argmin::core::{ArgminOp, Error, Executor, ObserverMode};
+//! # use argmin::core::{ArgminOp, Error, Executor, CostFunction, Gradient, ObserverMode};
 //! # #[cfg(feature = "slog-logger")]
 //! # use argmin::core::ArgminSlogLogger;
 //! # #[cfg(feature = "serde1")]
@@ -344,19 +402,47 @@
 //! #     b: f64,
 //! # }
 //! #
+//! # /// Implement `ArgminOp` for `Rosenbrock`
 //! # impl ArgminOp for Rosenbrock {
+//! #     /// Type of the parameter vector
 //! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
 //! #     type Output = f64;
-//! #     type Hessian = ();
+//! #     /// Type of the Hessian. Can be `()` if not needed.
+//! #     type Hessian = Vec<Vec<f64>>;
+//! #     /// Type of the Jacobian. Can be `()` if not needed.
 //! #     type Jacobian = ();
+//! #     /// Floating point precision
+//! #     type Float = f64;
+//! # }
+//! #
+//! # /// Implement `CostFunction` for `Rosenbrock`
+//! # impl CostFunction for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Output = f64;
+//! #     /// Floating point precision
 //! #     type Float = f64;
 //! #
-//! #     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-//! #         Ok(rosenbrock_2d(p, self.a, self.b))
+//! #     /// Apply the cost function to a parameter `p`
+//! #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
 //! #     }
+//! # }
 //! #
-//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-//! #         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+//! # /// Implement `Gradient` for `Rosenbrock`
+//! # impl Gradient for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Gradient = Vec<f64>;
+//! #     /// Floating point precision
+//! #     type Float = f64;
+//! #
+//! #     /// Compute the gradient at parameter `p`.
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
 //! #     }
 //! # }
 //! #
@@ -422,7 +508,7 @@
 //! ```rust
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
-//! # use argmin::core::{ArgminOp,  Error, Executor, ObserverMode};
+//! # use argmin::core::{ArgminOp, CostFunction, Error, Executor, Gradient, ObserverMode};
 //! # #[cfg(feature = "serde1")]
 //! # use argmin::core::{CheckpointMode};
 //! # #[cfg(feature = "slog-logger")]
@@ -433,18 +519,46 @@
 //! # #[derive(Default)]
 //! # struct Rosenbrock {}
 //! #
+//! # /// Implement `ArgminOp` for `Rosenbrock`
 //! # impl ArgminOp for Rosenbrock {
+//! #     /// Type of the parameter vector
 //! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
 //! #     type Output = f64;
-//! #     type Hessian = ();
+//! #     /// Type of the Hessian. Can be `()` if not needed.
+//! #     type Hessian = Vec<Vec<f64>>;
+//! #     /// Type of the Jacobian. Can be `()` if not needed.
 //! #     type Jacobian = ();
+//! #     /// Floating point precision
+//! #     type Float = f64;
+//! # }
+//! #
+//! # /// Implement `CostFunction` for `Rosenbrock`
+//! # impl CostFunction for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Output = f64;
+//! #     /// Floating point precision
 //! #     type Float = f64;
 //! #
-//! #     fn apply(&self, p: &Vec<f64>) -> Result<f64, Error> {
+//! #     /// Apply the cost function to a parameter `p`
+//! #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 //! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
 //! #     }
+//! # }
 //! #
-//! #     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
+//! # /// Implement `Gradient` for `Rosenbrock`
+//! # impl Gradient for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Gradient = Vec<f64>;
+//! #     /// Floating point precision
+//! #     type Float = f64;
+//! #
+//! #     /// Compute the gradient at parameter `p`.
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
 //! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
 //! #     }
 //! # }
@@ -497,7 +611,7 @@
 //!
 //! ```rust
 //! use argmin::core::{
-//!     ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver, State
+//!     ArgminFloat, ArgminKV, ArgminOp, Error, Gradient, IterState, OpWrapper, Solver, State
 //! };
 //! #[cfg(feature = "serde1")]
 //! use serde::{Deserialize, Serialize};
@@ -519,12 +633,12 @@
 //!     }
 //! }
 //!
-//! impl<O, F> Solver<IterState<O>> for Landweber<F>
+//! impl<O, F, P> Solver<O, IterState<O>> for Landweber<F>
 //! where
 //!     // `O` always needs to implement `ArgminOp`
-//!     O: ArgminOp<Float = F>,
-//!     // `O::Param` needs to implement `ArgminScaledSub` because of the update formula
-//!     O::Param: ArgminScaledSub<O::Param, O::Float, O::Param>,
+//!     O: ArgminOp<Param = P, Float = F> + Gradient<Param = P, Gradient = P, Float = F>,
+//!     // `P` needs to implement `ArgminScaledSub` because of the update formula
+//!     P: ArgminScaledSub<P, F, P>,
 //!     F: ArgminFloat,
 //! {
 //!     // This gives the solver a name which will be used for logging
@@ -540,17 +654,16 @@
 //!         // Current state of the optimization. This gives access to the parameter vector,
 //!         // gradient, Hessian and cost function value of the current, previous and best
 //!         // iteration as well as current iteration number, and many more.
-//!         state: &mut IterState<O>,
-//!     ) -> Result<ArgminIterData<IterState<O>>, Error> {
+//!         mut state: IterState<O>,
+//!     ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
 //!         // First we obtain the current parameter vector from the `state` struct (`x_k`).
 //!         let xk = state.take_param().unwrap();
 //!         // Then we compute the gradient at `x_k` (`\nabla f(x_k)`)
 //!         let grad = op.gradient(&xk)?;
 //!         // Now subtract `\nabla f(x_k)` scaled by `omega` from `x_k` to compute `x_{k+1}`
 //!         let xkp1 = xk.scaled_sub(&self.omega, &grad);
-//!         // Return new paramter vector which will then be used by the `Executor` to update
-//!         // `state`.
-//!         Ok(ArgminIterData::new().param(xkp1))
+//!         // Return new the updated `state`
+//!         Ok((state.param(xkp1), None))
 //!     }
 //! }
 //! ```

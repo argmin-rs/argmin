@@ -22,7 +22,7 @@
 # #![allow(unused_imports)]
 # extern crate argmin;
 # extern crate argmin_testfunctions;
-# use argmin::core::{ArgminOp, Error, Executor, State};
+# use argmin::core::{ArgminOp, Error, Executor, State, CostFunction, Gradient};
 # use argmin::solver::gradientdescent::SteepestDescent;
 # use argmin::solver::linesearch::MoreThuenteLineSearch;
 # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -34,19 +34,47 @@
 #     b: f64,
 # }
 #
+# /// Implement `ArgminOp` for `Rosenbrock`
 # impl ArgminOp for Rosenbrock {
+#     /// Type of the parameter vector
 #     type Param = Vec<f64>;
+#     /// Type of the return value computed by the cost function
 #     type Output = f64;
-#     type Hessian = ();
+#     /// Type of the Hessian. Can be `()` if not needed.
+#     type Hessian = Vec<Vec<f64>>;
+#     /// Type of the Jacobian. Can be `()` if not needed.
 #     type Jacobian = ();
+#     /// Floating point precision
+#     type Float = f64;
+# }
+#
+# /// Implement `CostFunction` for `Rosenbrock`
+# impl CostFunction for Rosenbrock {
+#     /// Type of the parameter vector
+#     type Param = Vec<f64>;
+#     /// Type of the return value computed by the cost function
+#     type Output = f64;
+#     /// Floating point precision
 #     type Float = f64;
 #
-#     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-#         Ok(rosenbrock_2d(p, self.a, self.b))
+#     /// Apply the cost function to a parameter `p`
+#     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+#         Ok(rosenbrock_2d(p, 1.0, 100.0))
 #     }
+# }
 #
-#     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
-#         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+# /// Implement `Gradient` for `Rosenbrock`
+# impl Gradient for Rosenbrock {
+#     /// Type of the parameter vector
+#     type Param = Vec<f64>;
+#     /// Type of the return value computed by the cost function
+#     type Gradient = Vec<f64>;
+#     /// Floating point precision
+#     type Float = f64;
+#
+#     /// Compute the gradient at parameter `p`.
+#     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
+#         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
 #     }
 # }
 #

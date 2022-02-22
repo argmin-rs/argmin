@@ -126,8 +126,7 @@ where
             self.observers.observe_init(S::NAME, &logs)?;
         }
 
-        // REENABLE
-        // state.set_func_counts(&self.op);
+        state.set_func_counts(&self.op);
 
         while running.load(Ordering::SeqCst) {
             // check first if it has already terminated
@@ -157,8 +156,7 @@ where
             let (state_t, kv) = self.solver.next_iter(&mut self.op, state)?;
             state = state_t;
 
-            // REENABLE
-            // state.set_func_counts(&self.op);
+            state.set_func_counts(&self.op);
 
             // End time measurement
             let duration = if self.timer {

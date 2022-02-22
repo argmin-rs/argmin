@@ -158,11 +158,9 @@ fn test_lbfgs_func_count() {
 
     // Check the number of cost function evaluation and gradient
     // evaluation with that in scipy
-    assert!(res.state.cost_func_count <= 7);
+    let func_counts = res.state.get_func_counts();
+    assert!(func_counts["cost"] <= 7);
     // The following value is 5 in scipy.optimize, but the convergence
     // criteria is different
-    // assert!(res.state.grad_func_count <= 6);
-    // NOTE: Changed to 11, because LBFGS now correctly includes the number of evaluations
-    // performed in the linesearch.
-    assert!(res.state.grad_func_count <= 11);
+    assert!(func_counts["gradient"] <= 11);
 }

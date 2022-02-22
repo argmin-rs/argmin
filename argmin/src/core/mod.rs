@@ -30,7 +30,7 @@ mod nooperator;
 /// Observers;
 mod observers;
 /// Wrapper around operators which keeps track of function evaluation counts
-mod opwrapper2;
+mod opwrapper;
 /// Definition of the return type of the solvers
 mod result;
 /// Serialization of `ArgminSolver`s
@@ -48,7 +48,7 @@ pub use kv::ArgminKV;
 pub use nooperator::{MinimalNoOperator, NoOperator};
 use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 pub use observers::*;
-pub use opwrapper2::OpWrapper;
+pub use opwrapper::OpWrapper;
 pub use result::OptimizationResult;
 #[cfg(feature = "serde1")]
 use serde::{de::DeserializeOwned, Serialize};
