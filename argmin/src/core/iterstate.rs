@@ -13,6 +13,7 @@ use crate::core::{
     // LinearProgram
     ArgminOp,
     DeserializeOwnedAlias,
+    OpWrapper,
     SerializeAlias,
     TerminationReason,
 };
@@ -21,6 +22,7 @@ use num_traits::Float;
 use paste::item;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Types implemeting this trait can be used to keep track of a solver's state
 pub trait State: std::fmt::Debug + SerializeAlias + DeserializeOwnedAlias + Sized {
@@ -49,10 +51,10 @@ pub trait State: std::fmt::Debug + SerializeAlias + DeserializeOwnedAlias + Size
     // fn get_target_cost(&self) -> F;
     //
     //
-    // /// Set all function evaluation counts to the evaluation counts of another operator
-    // /// wrapped in `OpWrapper`.
-    // fn set_func_counts(&mut self, op: &OpWrapper<Self::Operator>);
-    //
+    /// Set all function evaluation counts to the evaluation counts of another operator
+    /// wrapped in `OpWrapper`.
+    fn set_func_counts(&mut self, op: &OpWrapper<Self::Operator>);
+
     /// Return whether the algorithm has terminated or not
     fn terminated(&self) -> bool;
 
@@ -85,19 +87,7 @@ pub trait State: std::fmt::Debug + SerializeAlias + DeserializeOwnedAlias + Size
     fn is_best(&self) -> bool;
 
     /// Returns currecnt cost function evaluation count
-    fn get_cost_func_count(&self) -> u64;
-
-    /// Returns current gradient function evaluation count
-    fn get_grad_func_count(&self) -> u64;
-
-    /// Returns current Hessian function evaluation count
-    fn get_hessian_func_count(&self) -> u64;
-
-    /// Returns current Jacobian function evaluation count
-    fn get_jacobian_func_count(&self) -> u64;
-
-    /// Returns current modify function evaluation count
-    fn get_modify_func_count(&self) -> u64;
+    fn get_func_counts(&self) -> &HashMap<String, u64>;
 
     // /// Set parameter vector. This shifts the stored parameter vector to the previous parameter
     // /// vector.
@@ -285,16 +275,8 @@ pub struct IterState<O: ArgminOp> {
     pub last_best_iter: u64,
     /// Maximum number of iterations
     pub max_iters: u64,
-    /// Number of cost function evaluations so far
-    pub cost_func_count: u64,
-    /// Number of gradient evaluations so far
-    pub grad_func_count: u64,
-    /// Number of Hessian evaluations so far
-    pub hessian_func_count: u64,
-    /// Number of Jacobian evaluations so far
-    pub jacobian_func_count: u64,
-    /// Number of modify evaluations so far
-    pub modify_func_count: u64,
+    /// Evaluation counts
+    pub counts: HashMap<String, u64>,
     /// Time required so far
     pub time: Option<instant::Duration>,
     /// Reason of termination
@@ -703,11 +685,7 @@ impl<O: ArgminOp> State for IterState<O> {
             iter: 0,
             last_best_iter: 0,
             max_iters: std::u64::MAX,
-            cost_func_count: 0,
-            grad_func_count: 0,
-            hessian_func_count: 0,
-            jacobian_func_count: 0,
-            modify_func_count: 0,
+            counts: HashMap::new(),
             time: Some(instant::Duration::new(0, 0)),
             termination_reason: TerminationReason::NotTerminated,
         }
@@ -801,13 +779,16 @@ impl<O: ArgminOp> State for IterState<O> {
 
     /// Set all function evaluation counts to the evaluation counts of another operator
     /// wrapped in `OpWrapper`.
-    // fn set_func_counts(&mut self, op: &OpWrapper<O>) {
-    //     self.cost_func_count = op.cost_func_count;
-    //     self.grad_func_count = op.grad_func_count;
-    //     self.hessian_func_count = op.hessian_func_count;
-    //     self.jacobian_func_count = op.jacobian_func_count;
-    //     self.modify_func_count = op.modify_func_count;
-    // }
+    fn set_func_counts(&mut self, op: &OpWrapper<O>) {
+        for (k, &v) in op.counts.iter() {
+            let count = self.counts.entry(k.to_string()).or_insert(0);
+            *count = v
+        }
+    }
+
+    fn get_func_counts(&self) -> &HashMap<String, u64> {
+        &self.counts
+    }
 
     /// Return whether the algorithm has terminated or not
     fn terminated(&self) -> bool {
@@ -819,32 +800,6 @@ impl<O: ArgminOp> State for IterState<O> {
     fn is_best(&self) -> bool {
         self.last_best_iter == self.iter
     }
-
-    getter!(
-        cost_func_count,
-        u64,
-        "Returns current cost function evaluation count"
-    );
-    getter!(
-        grad_func_count,
-        u64,
-        "Returns current gradient function evaluation count"
-    );
-    getter!(
-        hessian_func_count,
-        u64,
-        "Returns current Hessian function evaluation count"
-    );
-    getter!(
-        jacobian_func_count,
-        u64,
-        "Returns current Jacobian function evaluation count"
-    );
-    getter!(
-        modify_func_count,
-        u64,
-        "Returns current Modify function evaluation count"
-    );
 }
 //
 // /// Maintains the state from iteration to iteration of a solver
@@ -1157,11 +1112,13 @@ mod tests {
         assert!(state.is_best());
 
         assert_eq!(state.get_max_iters(), std::u64::MAX);
-        assert_eq!(state.get_cost_func_count(), 0);
-        assert_eq!(state.get_grad_func_count(), 0);
-        assert_eq!(state.get_hessian_func_count(), 0);
-        assert_eq!(state.get_jacobian_func_count(), 0);
-        assert_eq!(state.get_modify_func_count(), 0);
+        let func_counts = state.get_func_counts().clone();
+        assert!(!func_counts.contains_key("cost"));
+        assert!(!func_counts.contains_key("operator"));
+        assert!(!func_counts.contains_key("gradient"));
+        assert!(!func_counts.contains_key("hessian"));
+        assert!(!func_counts.contains_key("jacobian"));
+        assert!(!func_counts.contains_key("modify"));
 
         state = state.max_iters(42);
 
@@ -1350,11 +1307,13 @@ mod tests {
         assert!(state.get_prev_inv_hessian().is_none());
         assert!(state.get_jacobian().is_none());
         assert!(state.get_prev_jacobian().is_none());
-        assert_eq!(state.get_cost_func_count(), 0);
-        assert_eq!(state.get_grad_func_count(), 0);
-        assert_eq!(state.get_hessian_func_count(), 0);
-        assert_eq!(state.get_jacobian_func_count(), 0);
-        assert_eq!(state.get_modify_func_count(), 0);
+        let func_counts = state.get_func_counts().clone();
+        assert!(!func_counts.contains_key("cost"));
+        assert!(!func_counts.contains_key("operator"));
+        assert!(!func_counts.contains_key("gradient"));
+        assert!(!func_counts.contains_key("hessian"));
+        assert!(!func_counts.contains_key("jacobian"));
+        assert!(!func_counts.contains_key("modify"));
 
         let old_best = vec![1.0, 2.0];
         let old_cost = 10.0;

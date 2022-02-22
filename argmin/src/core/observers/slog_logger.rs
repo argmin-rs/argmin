@@ -119,23 +119,14 @@ impl KV for ArgminSlogKV {
 
 impl<O: ArgminOp> KV for IterState<O> {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
-        serializer.emit_str(
-            "modify_func_count",
-            &self.get_modify_func_count().to_string(),
-        )?;
-        serializer.emit_str(
-            "hessian_func_count",
-            &self.get_hessian_func_count().to_string(),
-        )?;
-        serializer.emit_str(
-            "jacobian_func_count",
-            &self.get_jacobian_func_count().to_string(),
-        )?;
-        serializer.emit_str("grad_func_count", &self.get_grad_func_count().to_string())?;
-        serializer.emit_str("cost_func_count", &self.get_cost_func_count().to_string())?;
+        // REENABLE THIS $%£"^! TODO TODO TODO TODO TODO
+        // for (k, v) in self.get_func_counts().into_iter() {
+        //     let key = k.clone();
+        //     serializer.emit_u64(&k, v)?;
+        // }
         serializer.emit_str("best_cost", &self.best_cost.to_string())?;
         serializer.emit_str("cost", &self.cost.to_string())?;
-        serializer.emit_str("iter", &self.get_iter().to_string())?;
+        serializer.emit_u64("iter", self.get_iter())?;
         Ok(())
     }
 }
