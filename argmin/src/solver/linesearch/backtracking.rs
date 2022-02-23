@@ -8,8 +8,8 @@
 //! * [Backtracking line search](struct.BacktrackingLineSearch.html)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Gradient,
-    IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, Gradient, IterState, LineSearch,
+    OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
 use crate::solver::linesearch::condition::*;
 use argmin_math::ArgminScaledAdd;
@@ -27,13 +27,13 @@ use serde::{Deserialize, Serialize};
 /// \[1\] Wikipedia: <https://en.wikipedia.org/wiki/Backtracking_line_search>
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct BacktrackingLineSearch<P, L, F> {
+pub struct BacktrackingLineSearch<P, G, L, F> {
     /// initial parameter vector
     init_param: Option<P>,
     /// initial cost
     init_cost: F,
     /// initial gradient
-    init_grad: Option<P>,
+    init_grad: Option<G>,
     /// Search direction
     search_direction: Option<P>,
     /// Contraction factor rho
@@ -44,7 +44,7 @@ pub struct BacktrackingLineSearch<P, L, F> {
     alpha: F,
 }
 
-impl<P, L, F> BacktrackingLineSearch<P, L, F>
+impl<P, G, L, F> BacktrackingLineSearch<P, G, L, F>
 where
     F: ArgminFloat,
 {
@@ -75,7 +75,7 @@ where
     }
 }
 
-impl<P, L, F> ArgminLineSearch<P, F> for BacktrackingLineSearch<P, L, F>
+impl<P, G, L, F> LineSearch<P, F> for BacktrackingLineSearch<P, G, L, F>
 where
     F: ArgminFloat,
 {
@@ -97,21 +97,19 @@ where
     }
 }
 
-impl<P, L, F> BacktrackingLineSearch<P, L, F>
+impl<P, G, L, F> BacktrackingLineSearch<P, G, L, F>
 where
     P: ArgminScaledAdd<P, F, P>,
-    L: LineSearchCondition<P, F>,
+    L: LineSearchCondition<P, G, F>,
     F: ArgminFloat,
 {
     fn backtracking_step<O>(
         &self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<IterState<O>, Error>
+        state: IterState<P, G, (), (), F>,
+    ) -> Result<IterState<P, G, (), (), F>, Error>
     where
-        O: ArgminOp<Param = P, Output = F, Float = F>
-            + CostFunction<Param = P, Output = F>
-            + Gradient<Param = P, Gradient = P>,
+        O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     {
         let new_param = self
             .init_param
@@ -134,13 +132,12 @@ where
     }
 }
 
-impl<O, P, L, F> Solver<O, IterState<O>> for BacktrackingLineSearch<P, L, F>
+impl<O, P, G, L, F> Solver<O, IterState<P, G, (), (), F>> for BacktrackingLineSearch<P, G, L, F>
 where
     P: Clone + SerializeAlias + ArgminScaledAdd<P, F, P>,
-    O: ArgminOp<Param = P, Output = F, Float = F>
-        + CostFunction<Param = P, Output = F>
-        + Gradient<Param = P, Gradient = P>,
-    L: LineSearchCondition<P, F>,
+    G: SerializeAlias + ArgminScaledAdd<P, F, P>,
+    O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
+    L: LineSearchCondition<P, G, F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Backtracking Line search";
@@ -148,8 +145,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         let init_param = state.param.clone().unwrap();
         let cost = state.cost;
         self.init_cost = if cost == F::infinity() {
@@ -179,17 +176,17 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         self.alpha = self.alpha * self.rho;
         let state = self.backtracking_step(op, state)?;
         Ok((state, None))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, (), (), F>) -> TerminationReason {
         if self.condition.eval(
             state.cost,
-            state.get_grad().as_ref(),
+            state.get_grad_ref(),
             self.init_cost,
             self.init_grad.as_ref().unwrap(),
             self.search_direction.as_ref().unwrap(),
@@ -214,18 +211,9 @@ mod tests {
     #[derive(Debug, Clone)]
     struct Problem {}
 
-    impl ArgminOp for Problem {
-        type Param = Vec<Self::Float>;
-        type Output = Self::Float;
-        type Hessian = ();
-        type Jacobian = ();
-        type Float = f64;
-    }
-
     impl CostFunction for Problem {
-        type Param = Vec<Self::Float>;
-        type Output = Self::Float;
-        type Float = f64;
+        type Param = Vec<f64>;
+        type Output = f64;
 
         fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
             Ok(p[0].powi(2) + p[1].powi(2))
@@ -233,9 +221,8 @@ mod tests {
     }
 
     impl Gradient for Problem {
-        type Param = Vec<Self::Float>;
-        type Gradient = Vec<Self::Float>;
-        type Float = f64;
+        type Param = Vec<f64>;
+        type Gradient = Vec<f64>;
 
         fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
             Ok(vec![2.0 * p[0], 2.0 * p[1]])
@@ -243,13 +230,13 @@ mod tests {
     }
 
     test_trait_impl!(backtrackinglinesearch,
-                    BacktrackingLineSearch<MinimalNoOperator, ArmijoCondition<f64>, f64>);
+                    BacktrackingLineSearch<MinimalNoOperator, Vec<f64>, ArmijoCondition<f64>, f64>);
 
     #[test]
     fn test_new() {
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         assert_eq!(ls.init_param, None);
@@ -265,7 +252,7 @@ mod tests {
     fn test_rho() {
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         assert_error!(
@@ -276,7 +263,7 @@ mod tests {
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         assert_error!(
@@ -287,14 +274,14 @@ mod tests {
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         assert!(ls.rho(0.0f64 + f64::EPSILON).is_ok());
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         assert!(ls.rho(1.0f64 - f64::EPSILON).is_ok());
@@ -304,7 +291,7 @@ mod tests {
     fn test_set_search_direction() {
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
         ls.set_search_direction(vec![1.0f64, 1.0]);
 
@@ -315,7 +302,7 @@ mod tests {
     fn test_set_init_alpha() {
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         assert!(ls.set_init_alpha(f64::EPSILON).is_ok());
@@ -335,7 +322,7 @@ mod tests {
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         ls.init_param = Some(vec![-1.0, 0.0]);
@@ -347,13 +334,13 @@ mod tests {
         let data = ls.backtracking_step(&mut OpWrapper::new(prob), IterState::new());
         assert!(data.is_ok());
 
-        let param = data.as_ref().unwrap().get_param().unwrap();
+        let param = data.as_ref().unwrap().get_param_ref().unwrap();
         let cost = data.as_ref().unwrap().get_cost();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
 
-        assert!(data.as_ref().unwrap().get_grad().is_none());
+        assert!(data.as_ref().unwrap().get_grad_ref().is_none());
     }
 
     #[test]
@@ -367,7 +354,7 @@ mod tests {
         let c1: f64 = 0.01;
         let c2: f64 = 0.9;
         let wolfe = WolfeCondition::new(c1, c2).unwrap();
-        let mut ls: BacktrackingLineSearch<Vec<f64>, WolfeCondition<f64>, f64> =
+        let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, WolfeCondition<f64>, f64> =
             BacktrackingLineSearch::new(wolfe);
 
         ls.init_param = Some(vec![-1.0, 0.0]);
@@ -379,9 +366,9 @@ mod tests {
         let data = ls.backtracking_step(&mut OpWrapper::new(prob), IterState::new());
         assert!(data.is_ok());
 
-        let param = data.as_ref().unwrap().get_param().unwrap();
+        let param = data.as_ref().unwrap().get_param_ref().unwrap();
         let cost = data.as_ref().unwrap().get_cost();
-        let gradient = data.as_ref().unwrap().get_grad().unwrap();
+        let gradient = data.as_ref().unwrap().get_grad_ref().unwrap();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
@@ -398,7 +385,7 @@ mod tests {
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         ls.init_param = Some(vec![-1.0, 0.0]);
@@ -426,13 +413,13 @@ mod tests {
 
         let data = data.unwrap().0;
 
-        let param = data.get_param().unwrap();
+        let param = data.get_param_ref().unwrap();
         let cost = data.get_cost();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
 
-        assert!(data.get_grad().is_none());
+        assert!(data.get_grad_ref().is_none());
     }
 
     #[test]
@@ -445,7 +432,7 @@ mod tests {
         let c1: f64 = 0.01;
         let c2: f64 = 0.9;
         let wolfe = WolfeCondition::new(c1, c2).unwrap();
-        let mut ls: BacktrackingLineSearch<Vec<f64>, WolfeCondition<f64>, f64> =
+        let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, WolfeCondition<f64>, f64> =
             BacktrackingLineSearch::new(wolfe);
 
         ls.init_param = Some(vec![-1.0, 0.0]);
@@ -473,9 +460,9 @@ mod tests {
 
         let data = data.unwrap().0;
 
-        let param = data.get_param().unwrap();
+        let param = data.get_param_ref().unwrap();
         let cost = data.get_cost();
-        let gradient = data.get_grad().unwrap();
+        let gradient = data.get_grad_ref().unwrap();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
@@ -492,7 +479,7 @@ mod tests {
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         let init_alpha = 0.8;
@@ -508,14 +495,14 @@ mod tests {
         );
         assert!(data.is_ok());
 
-        let param = data.as_ref().unwrap().0.get_param().unwrap();
+        let param = data.as_ref().unwrap().0.get_param_ref().unwrap();
         let cost = data.as_ref().unwrap().0.get_cost();
         // step is smaller than compared to step test, because of the reduced alpha.
         assert_relative_eq!(param[0], 0.44, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(cost, 0.44f64.powi(2), epsilon = f64::EPSILON);
 
-        assert!(data.as_ref().unwrap().0.get_grad().is_none());
+        assert!(data.as_ref().unwrap().0.get_grad_ref().is_none());
         assert_relative_eq!(ls.alpha, ls.rho * 0.8, epsilon = f64::EPSILON);
     }
 
@@ -523,7 +510,7 @@ mod tests {
     fn test_termination() {
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         let init_alpha = 0.8;
@@ -533,15 +520,29 @@ mod tests {
         ls.set_search_direction(vec![2.0f64, 0.0]);
         ls.set_init_alpha(init_alpha).unwrap();
 
+        let init_param = ls.init_param.clone().unwrap();
         assert_eq!(
-            ls.terminate(&IterState::<Problem>::new().param(ls.init_param.clone().unwrap())),
+            <BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> as Solver<
+                Problem,
+                IterState<Vec<f64>, Vec<f64>, (), (), f64>,
+            >>::terminate(
+                &mut ls,
+                &IterState::<Vec<f64>, Vec<f64>, (), (), f64>::new().param(init_param)
+            ),
             TerminationReason::LineSearchConditionMet
         );
 
         ls.init_cost = 0.0f64;
 
+        let init_param = ls.init_param.clone().unwrap();
         assert_eq!(
-            ls.terminate(&IterState::<Problem>::new().param(ls.init_param.clone().unwrap())),
+            <BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> as Solver<
+                Problem,
+                IterState<Vec<f64>, Vec<f64>, (), (), f64>,
+            >>::terminate(
+                &mut ls,
+                &IterState::<Vec<f64>, Vec<f64>, (), (), f64>::new().param(init_param)
+            ),
             TerminationReason::NotTerminated
         );
     }
@@ -552,7 +553,7 @@ mod tests {
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         ls.init_param = Some(vec![-1.0, 0.0]);
@@ -578,7 +579,7 @@ mod tests {
 
         let data = data.unwrap().state;
 
-        let param = data.get_param().unwrap();
+        let param = data.get_param_ref().unwrap();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(data.get_cost(), 0.6.powi(2), epsilon = f64::EPSILON);
@@ -591,7 +592,7 @@ mod tests {
             TerminationReason::LineSearchConditionMet
         );
 
-        assert!(data.get_grad().is_none());
+        assert!(data.get_grad_ref().is_none());
     }
 
     #[test]
@@ -601,7 +602,7 @@ mod tests {
         // difference compared to test_executor_1: c is larger to force another backtracking step
         let c: f64 = 0.2;
         let armijo = ArmijoCondition::new(c).unwrap();
-        let mut ls: BacktrackingLineSearch<Vec<f64>, ArmijoCondition<f64>, f64> =
+        let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
         ls.init_param = Some(vec![-1.0, 0.0]);
@@ -627,7 +628,7 @@ mod tests {
 
         let data = data.unwrap().state;
 
-        let param = data.get_param().unwrap();
+        let param = data.get_param_ref().unwrap();
         assert_relative_eq!(param[0], 0.44, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(data.get_cost(), 0.44f64.powi(2), epsilon = f64::EPSILON);
@@ -639,6 +640,6 @@ mod tests {
             data.termination_reason,
             TerminationReason::LineSearchConditionMet
         );
-        assert!(data.get_grad().is_none());
+        assert!(data.get_grad_ref().is_none());
     }
 }

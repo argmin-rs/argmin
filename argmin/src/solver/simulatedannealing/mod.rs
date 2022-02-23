@@ -16,8 +16,8 @@
 //! DOI: 10.1126/science.220.4598.671
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminOp, CostFunction, Error, IterState, Modify,
-    OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, IterState, Modify, OpWrapper,
+    SerializeAlias, Solver, TerminationReason,
 };
 use rand::prelude::*;
 #[cfg(feature = "serde1")]
@@ -235,11 +235,10 @@ where
     }
 }
 
-impl<O, P, F, R> Solver<O, IterState<O>> for SimulatedAnnealing<F, R>
+impl<O, P, F, R> Solver<O, IterState<P, (), (), (), F>> for SimulatedAnnealing<F, R>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>
-        + CostFunction<Param = P, Output = F>
-        + Modify<Param = P, Output = P, Float = F>,
+    O: CostFunction<Param = P, Output = F> + Modify<Param = P, Output = P, Float = F>,
+    P: Clone,
     F: ArgminFloat,
     R: Rng + SerializeAlias,
 {
@@ -247,8 +246,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let cost = op.cost(&param)?;
         Ok((
@@ -268,8 +267,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
         // behaviour.
@@ -337,7 +336,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationReason {
         if self.stall_iter_accepted > self.stall_iter_accepted_limit {
             return TerminationReason::AcceptedStallIterExceeded;
         }

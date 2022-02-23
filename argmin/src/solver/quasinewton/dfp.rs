@@ -11,8 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Executor, Gradient,
-    IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, TerminationReason,
+    ArgminFloat, ArgminKV, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
+    IterState, LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver,
+    TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -56,24 +57,30 @@ where
     }
 }
 
-impl<O, L, H, F, P> Solver<O, IterState<O>> for DFP<L, H, F>
+impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, F>> for DFP<L, H, F>
 where
-    O: ArgminOp<Param = P, Output = F, Hessian = H, Float = F>
-        + CostFunction<Param = P, Output = F>
-        + Gradient<Param = P, Gradient = P>,
+    O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<P, P>
-        + ArgminDot<P, F>
+        + ArgminDot<G, F>
         + ArgminDot<P, H>
-        + ArgminNorm<F>
         + ArgminMul<F, P>,
+    G: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminSub<G, G>
+        + ArgminNorm<F>
+        + ArgminDot<P, F>,
     H: Clone
         + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<H, H>
-        + ArgminDot<P, P>
+        + ArgminDot<G, P>
         + ArgminAdd<H, H>
         + ArgminMul<F, H>,
-    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "DFP";
@@ -81,8 +88,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), H, F>,
+    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
@@ -99,15 +106,15 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), H, F>,
+    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let cost = state.get_cost();
         let prev_grad = state
             .take_grad()
             .map(Result::Ok)
             .unwrap_or_else(|| op.gradient(&param))?;
-        let inv_hessian = state.get_inv_hessian().unwrap();
+        let inv_hessian = state.take_inv_hessian().unwrap();
         let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
 
         self.linesearch.set_search_direction(p);
@@ -138,12 +145,12 @@ where
 
         let yksk: F = yk.dot(&sk);
 
-        let sksk: O::Hessian = sk.dot(&sk);
+        let sksk: H = sk.dot(&sk);
 
         let tmp3: P = inv_hessian.dot(&yk);
         let tmp4: F = tmp3.dot(&yk);
-        let tmp3: O::Hessian = tmp3.dot(&tmp3);
-        let tmp3: O::Hessian = tmp3.mul(&(F::from_f64(1.0).unwrap() / tmp4));
+        let tmp3: H = tmp3.dot(&tmp3);
+        let tmp3: H = tmp3.mul(&(F::from_f64(1.0).unwrap() / tmp4));
 
         let inv_hessian = inv_hessian
             .sub(&tmp3)
@@ -159,7 +166,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationReason {
         if state.get_grad_ref().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
@@ -170,17 +177,17 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::MinimalNoOperator;
     use crate::solver::linesearch::MoreThuenteLineSearch;
     use crate::test_trait_impl;
 
-    type Operator = MinimalNoOperator;
-
-    test_trait_impl!(dfp, DFP<Operator, MoreThuenteLineSearch<Operator, f64>, f64>);
+    test_trait_impl!(
+        dfp,
+        DFP<MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>, Vec<Vec<f64>>, f64>
+    );
 
     #[test]
     fn test_tolerances() {
-        let linesearch: MoreThuenteLineSearch<f64, f64> =
+        let linesearch: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
             MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
         let init_hessian: Vec<Vec<f64>> = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
 

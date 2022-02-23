@@ -12,8 +12,8 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminOp, CostFunction, Error, IterState, OpWrapper,
-    SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, IterState, OpWrapper, SerializeAlias,
+    Solver, TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -205,9 +205,9 @@ enum Action {
     Shrink,
 }
 
-impl<O, P, F> Solver<O, IterState<O>> for NelderMead<P, F>
+impl<O, P, F> Solver<O, IterState<P, (), (), (), F>> for NelderMead<P, F>
 where
-    O: ArgminOp<Output = F, Param = P, Float = F> + CostFunction<Param = P, Output = F, Float = F>,
+    O: CostFunction<Param = P, Output = F>,
     P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminAdd<P, P> + ArgminMul<F, P>,
     F: ArgminFloat + std::iter::Sum<F>,
 {
@@ -216,8 +216,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        state: IterState<P, (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
         self.params = self
             .params
             .iter()
@@ -238,8 +238,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        state: IterState<P, (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
         let num_param = self.params.len();
 
         let x0 = self.calculate_centroid();
@@ -287,7 +287,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationReason {
         let n = F::from_usize(self.params.len()).unwrap();
         let c0: F = self.params.iter().map(|(_, c)| *c).sum::<F>() / n;
         let s: F = (F::from_f64(1.0).unwrap() / (n - F::from_f64(1.0).unwrap())

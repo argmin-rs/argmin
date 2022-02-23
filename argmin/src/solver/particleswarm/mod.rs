@@ -12,8 +12,7 @@
 //! TODO
 
 use crate::core::{
-    ArgminFloat, ArgminKV, ArgminOp, CostFunction, Error, IterState, OpWrapper, SerializeAlias,
-    Solver,
+    ArgminFloat, ArgminKV, CostFunction, Error, IterState, OpWrapper, SerializeAlias, Solver,
 };
 use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
 #[cfg(feature = "serde1")]
@@ -79,7 +78,7 @@ where
         Ok(particle_swarm)
     }
 
-    fn initialize_particles<O: CostFunction<Param = P, Output = F, Float = F>>(
+    fn initialize_particles<O: CostFunction<Param = P, Output = F>>(
         &mut self,
         op: &mut OpWrapper<O>,
     ) {
@@ -92,7 +91,7 @@ where
         // TODO unwrap evil
     }
 
-    fn initialize_particle<O: CostFunction<Param = P, Output = F, Float = F>>(
+    fn initialize_particle<O: CostFunction<Param = P, Output = F>>(
         &mut self,
         op: &mut OpWrapper<O>,
     ) -> Particle<P, F> {
@@ -133,9 +132,9 @@ where
     }
 }
 
-impl<O, P, F> Solver<O, IterState<O>> for ParticleSwarm<P, F>
+impl<O, P, F> Solver<O, IterState<P, (), (), (), F>> for ParticleSwarm<P, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F> + CostFunction<Param = P, Output = F, Float = F>,
+    O: CostFunction<Param = P, Output = F>,
     P: SerializeAlias + Position<F>,
     F: ArgminFloat,
 {
@@ -144,8 +143,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        state: IterState<P, (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
         self.initialize_particles(op);
 
         Ok((state, None))
@@ -155,8 +154,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        state: IterState<P, (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
         let zero = P::zero_like(&self.best_position);
 
         for p in self.particles.iter_mut() {

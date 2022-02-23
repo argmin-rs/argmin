@@ -7,9 +7,7 @@
 
 #![allow(unused_imports)]
 
-use argmin::core::{
-    ArgminOp, ArgminSlogLogger, CostFunction, Error, Executor, Gradient, ObserverMode,
-};
+use argmin::core::{ArgminSlogLogger, CostFunction, Error, Executor, Gradient, ObserverMode};
 use argmin::solver::gradientdescent::SteepestDescent;
 use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
@@ -20,18 +18,9 @@ struct Rosenbrock {
     b: f64,
 }
 
-impl ArgminOp for Rosenbrock {
-    type Param = Vec<f64>;
-    type Output = f64;
-    type Hessian = ();
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl CostFunction for Rosenbrock {
     type Param = Vec<f64>;
     type Output = f64;
-    type Float = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(rosenbrock_2d(p, self.a, self.b))
@@ -41,7 +30,6 @@ impl CostFunction for Rosenbrock {
 impl Gradient for Rosenbrock {
     type Param = Vec<f64>;
     type Gradient = Vec<f64>;
-    type Float = f64;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
         Ok(rosenbrock_2d_derivative(p, self.a, self.b))

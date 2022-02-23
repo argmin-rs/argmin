@@ -64,7 +64,7 @@ pub struct Observer<I> {
     observers: ObserversVec<I>,
 }
 
-impl<I: State> Observer<I> {
+impl<I> Observer<I> {
     /// Constructor
     pub fn new() -> Self {
         Observer { observers: vec![] }

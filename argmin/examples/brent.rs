@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, ObserverMode, Operator};
+use argmin::core::{ArgminSlogLogger, Error, Executor, ObserverMode, Operator};
 use argmin::solver::brent::Brent;
 
 /// Test function generalise from Wikipedia example
@@ -14,20 +14,10 @@ struct TestFunc {
     zero2: f64,
 }
 
-impl ArgminOp for TestFunc {
-    // one dimensional problem, no vector needed
-    type Param = f64;
-    type Output = f64;
-    type Hessian = ();
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl Operator for TestFunc {
     // one dimensional problem, no vector needed
     type Param = f64;
     type Output = f64;
-    type Float = f64;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok((p + self.zero1) * (p - self.zero2) * (p - self.zero2))

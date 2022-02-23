@@ -5,24 +5,15 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, Gradient, ObserverMode};
+use argmin::core::{ArgminSlogLogger, Error, Executor, Gradient, ObserverMode};
 use argmin::solver::landweber::Landweber;
 use argmin_testfunctions::rosenbrock_2d_derivative;
 
 struct Rosenbrock {}
 
-impl ArgminOp for Rosenbrock {
-    type Param = Vec<f64>;
-    type Output = f64;
-    type Hessian = ();
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl Gradient for Rosenbrock {
     type Param = Vec<f64>;
     type Gradient = Vec<f64>;
-    type Float = f64;
 
     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))

@@ -11,9 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminOp, ArgminTrustRegion, CostFunction, Error, Executor,
-    Gradient, Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver,
-    TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminTrustRegion, CostFunction, DeserializeOwnedAlias,
+    Error, Executor, Gradient, Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias,
+    Solver, TerminationReason,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
@@ -60,8 +60,7 @@ where
         }
     }
 
-    /// provide initial Hessian (if not provided, the algorithm will try to compute it using the
-    /// `hessian` method of `ArgminOp`.
+    /// provide initial Hessian (it will be computed if not provided)
     #[must_use]
     pub fn hessian(mut self, init_hessian: B) -> Self {
         self.init_hessian = Some(init_hessian);
@@ -108,21 +107,33 @@ where
     }
 }
 
-impl<O, B, R, F, P> Solver<O, IterState<O>> for SR1TrustRegion<B, R, F>
+impl<O, R, P, G, B, F> Solver<O, IterState<P, G, (), B, F>> for SR1TrustRegion<B, R, F>
 where
-    O: ArgminOp<Param = P, Output = F, Hessian = B, Float = F>
-        + CostFunction<Param = P, Output = F>
-        + Gradient<Param = P, Gradient = P>
+    O: CostFunction<Param = P, Output = F>
+        + Gradient<Param = P, Gradient = G>
         + Hessian<Param = P, Hessian = B>,
     P: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<P, P>
         + ArgminAdd<P, P>
         + ArgminDot<P, F>
         + ArgminDot<P, B>
         + ArgminNorm<F>
         + ArgminZeroLike,
-    B: Clone + SerializeAlias + ArgminDot<P, P> + ArgminAdd<B, B> + ArgminMul<F, B>,
-    R: Clone + ArgminTrustRegion<F> + Solver<O, IterState<O>>,
+    G: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminNorm<F>
+        + ArgminDot<P, F>
+        + ArgminSub<G, P>,
+    B: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminDot<P, P>
+        + ArgminAdd<B, B>
+        + ArgminMul<F, B>,
+    R: Clone + ArgminTrustRegion<F> + Solver<O, IterState<P, G, (), B, F>>,
     F: ArgminFloat + ArgminNorm<F>,
 {
     const NAME: &'static str = "SR1 Trust Region";
@@ -130,8 +141,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), B, F>,
+    ) -> Result<(IterState<P, G, (), B, F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
@@ -148,8 +159,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), B, F>,
+    ) -> Result<(IterState<P, G, (), B, F>, Option<ArgminKV>), Error> {
         let xk = state.take_param().unwrap();
         let cost = state.cost;
         let prev_grad = state
@@ -231,7 +242,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, (), B, F>) -> TerminationReason {
         if state.get_grad_ref().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }

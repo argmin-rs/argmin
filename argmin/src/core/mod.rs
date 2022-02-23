@@ -84,11 +84,9 @@ impl<I> ArgminFloat for I where
 /// TODO
 pub trait Operator {
     /// Type of the parameter vector
-    type Param;
+    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Output of the operator
-    type Output;
-    /// Precision of floats
-    type Float;
+    type Output: Clone + SerializeAlias + DeserializeOwnedAlias;
 
     /// Applies the operator to parameters
     fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error>;
@@ -97,11 +95,9 @@ pub trait Operator {
 /// TODO
 pub trait CostFunction {
     /// Type of the parameter vector
-    type Param;
+    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Output of the cost function
-    type Output;
-    /// Precision of floats
-    type Float;
+    type Output: Clone + SerializeAlias + DeserializeOwnedAlias;
 
     /// Compute cost function
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error>;
@@ -110,11 +106,9 @@ pub trait CostFunction {
 /// TODO
 pub trait Gradient {
     /// Type of the parameter vector
-    type Param;
+    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Type of the gradient
-    type Gradient;
-    /// Precision of floats
-    type Float;
+    type Gradient: Clone + SerializeAlias + DeserializeOwnedAlias;
 
     /// Compute gradient
     fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error>;
@@ -123,11 +117,9 @@ pub trait Gradient {
 /// TODO
 pub trait Hessian {
     /// Type of the parameter vector
-    type Param;
+    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Type of the Hessian
-    type Hessian;
-    /// Precision of floats
-    type Float;
+    type Hessian: Clone + SerializeAlias + DeserializeOwnedAlias;
 
     /// Compute Hessian
     fn hessian(&self, param: &Self::Param) -> Result<Self::Hessian, Error>;
@@ -136,11 +128,9 @@ pub trait Hessian {
 /// TODO
 pub trait Jacobian {
     /// Type of the parameter vector
-    type Param;
+    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Output of the cost function
-    type Jacobian;
-    /// Precision of floats
-    type Float;
+    type Jacobian: Clone + SerializeAlias + DeserializeOwnedAlias;
 
     /// Compute Jacobian
     fn jacobian(&self, param: &Self::Param) -> Result<Self::Jacobian, Error>;
@@ -149,76 +139,14 @@ pub trait Jacobian {
 /// TODO
 pub trait Modify {
     /// Type of the parameter vector
-    type Param: SerializeAlias + DeserializeOwnedAlias;
+    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Output TODO
-    type Output: SerializeAlias + DeserializeOwnedAlias;
+    type Output: Clone + SerializeAlias + DeserializeOwnedAlias;
     /// Precision of floats
     type Float;
 
     /// Compute Jacobian
     fn modify(&self, param: &Self::Param, _extent: Self::Float) -> Result<Self::Output, Error>;
-}
-
-/// This trait needs to be implemented for every operator/cost function.
-///
-/// It is required to implement the `apply` method, all others are optional and provide a default
-/// implementation which is essentially returning an error which indicates that the method has not
-/// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
-/// uses solver requires it.
-pub trait ArgminOp {
-    // TODO: Once associated type defaults are stable, it hopefully will be possible to define
-    // default types for `Hessian` and `Jacobian`.
-    /// Type of the parameter vector
-    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
-    /// Output of the operator
-    type Output: Clone + SerializeAlias + DeserializeOwnedAlias;
-    /// Type of Hessian
-    type Hessian: Clone + SerializeAlias + DeserializeOwnedAlias;
-    /// Type of Jacobian
-    type Jacobian: Clone + SerializeAlias + DeserializeOwnedAlias;
-    /// Precision of floats
-    type Float: ArgminFloat;
-
-    /// Applies the operator/cost function to parameters
-    fn apply2(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `apply` of ArgminOp trait not implemented!".to_string(),
-        }
-        .into())
-    }
-
-    /// Computes the gradient at the given parameters
-    fn gradient2(&self, _param: &Self::Param) -> Result<Self::Param, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `gradient` of ArgminOp trait not implemented!".to_string(),
-        }
-        .into())
-    }
-
-    /// Computes the Hessian at the given parameters
-    fn hessian2(&self, _param: &Self::Param) -> Result<Self::Hessian, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `hessian` of ArgminOp trait not implemented!".to_string(),
-        }
-        .into())
-    }
-
-    /// Computes the Hessian at the given parameters
-    fn jacobian2(&self, _param: &Self::Param) -> Result<Self::Jacobian, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `jacobian` of ArgminOp trait not implemented!".to_string(),
-        }
-        .into())
-    }
-
-    /// Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
-    /// modification.
-    fn modify2(&self, _param: &Self::Param, _extent: Self::Float) -> Result<Self::Param, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `modify` of ArgminOp trait not implemented!".to_string(),
-        }
-        .into())
-    }
 }
 
 /// Problems which implement this trait can be used for linear programming solvers
@@ -306,164 +234,9 @@ pub trait Solver<O, I: State>: SerializeAlias {
         TerminationReason::NotTerminated
     }
 }
-//
-// /// The datastructure which is returned by the `next_iter` method of the `Solver` trait.
-// ///
-// /// TODO: Rename to IterResult?
-// #[derive(Clone, Debug, Default)]
-// pub struct ArgminIterData<O: ArgminOp> {
-//     /// Current parameter vector
-//     param: Option<O::Param>,
-//     /// Current cost function value
-//     cost: Option<O::Float>,
-//     /// Current gradient
-//     grad: Option<O::Param>,
-//     /// Current Hessian
-//     hessian: Option<O::Hessian>,
-//     /// Current inverse Hessian
-//     inv_hessian: Option<O::Hessian>,
-//     /// Current Jacobian
-//     jacobian: Option<O::Jacobian>,
-//     /// Current population
-//     population: Option<Vec<(O::Param, O::Float)>>,
-//     /// terminationreason
-//     termination_reason: Option<TerminationReason>,
-//     /// Key value pairs which are used to provide additional information for the Observers
-//     kv: ArgminKV,
-// }
-//
-// // TODO: Many clones are necessary in the getters.. maybe a complete "deconstruct" method would be
-// // better?
-// impl<O: ArgminOp> ArgminIterData<O> {
-//     /// Constructor
-//     pub fn new() -> Self {
-//         ArgminIterData {
-//             param: None,
-//             cost: None,
-//             grad: None,
-//             hessian: None,
-//             inv_hessian: None,
-//             jacobian: None,
-//             termination_reason: None,
-//             population: None,
-//             kv: make_kv!(),
-//         }
-//     }
-//
-//     /// Set parameter vector
-//     #[must_use]
-//     pub fn param(mut self, param: O::Param) -> Self {
-//         self.param = Some(param);
-//         self
-//     }
-//
-//     /// Set cost function value
-//     #[must_use]
-//     pub fn cost(mut self, cost: O::Float) -> Self {
-//         self.cost = Some(cost);
-//         self
-//     }
-//
-//     /// Set gradient
-//     #[must_use]
-//     pub fn grad(mut self, grad: O::Param) -> Self {
-//         self.grad = Some(grad);
-//         self
-//     }
-//
-//     /// Set Hessian
-//     #[must_use]
-//     pub fn hessian(mut self, hessian: O::Hessian) -> Self {
-//         self.hessian = Some(hessian);
-//         self
-//     }
-//
-//     /// Set inverse Hessian
-//     #[must_use]
-//     pub fn inv_hessian(mut self, inv_hessian: O::Hessian) -> Self {
-//         self.inv_hessian = Some(inv_hessian);
-//         self
-//     }
-//
-//     /// Set Jacobian
-//     #[must_use]
-//     pub fn jacobian(mut self, jacobian: O::Jacobian) -> Self {
-//         self.jacobian = Some(jacobian);
-//         self
-//     }
-//
-//     /// Set Population
-//     #[must_use]
-//     pub fn population(mut self, population: Vec<(O::Param, O::Float)>) -> Self {
-//         self.population = Some(population);
-//         self
-//     }
-//
-//     /// Adds an `ArgminKV`
-//     #[must_use]
-//     pub fn kv(mut self, kv: ArgminKV) -> Self {
-//         self.kv = kv;
-//         self
-//     }
-//
-//     /// Set termination reason
-//     #[must_use]
-//     pub fn termination_reason(mut self, reason: TerminationReason) -> Self {
-//         self.termination_reason = Some(reason);
-//         self
-//     }
-//
-//     /// Get parameter vector
-//     pub fn get_param(&self) -> Option<O::Param> {
-//         self.param.clone()
-//     }
-//
-//     /// Get cost function value
-//     pub fn get_cost(&self) -> Option<O::Float> {
-//         self.cost
-//     }
-//
-//     /// Get gradient
-//     pub fn get_grad(&self) -> Option<O::Param> {
-//         self.grad.clone()
-//     }
-//
-//     /// Get Hessian
-//     pub fn get_hessian(&self) -> Option<O::Hessian> {
-//         self.hessian.clone()
-//     }
-//
-//     /// Get inverse Hessian
-//     pub fn get_inv_hessian(&self) -> Option<O::Hessian> {
-//         self.inv_hessian.clone()
-//     }
-//
-//     /// Get Jacobian
-//     pub fn get_jacobian(&self) -> Option<O::Jacobian> {
-//         self.jacobian.clone()
-//     }
-//
-//     /// Get reference to population
-//     pub fn get_population(&self) -> Option<&Vec<(O::Param, O::Float)>> {
-//         match &self.population {
-//             Some(population) => Some(population),
-//             None => None,
-//         }
-//     }
-//
-//     /// Get termination reason
-//     pub fn get_termination_reason(&self) -> Option<TerminationReason> {
-//         self.termination_reason
-//     }
-//
-//     /// Return KV
-//     pub fn get_kv(&self) -> ArgminKV {
-//         self.kv.clone()
-//     }
-// }
-//
+
 /// Defines a common interface for line search methods.
-pub trait ArgminLineSearch<P, F> {
+pub trait LineSearch<P, F> {
     /// Set the search direction
     fn set_search_direction(&mut self, direction: P);
 
@@ -479,12 +252,12 @@ pub trait ArgminTrustRegion<F> {
 }
 //
 /// Common interface for beta update methods (Nonlinear-CG)
-pub trait ArgminNLCGBetaUpdate<T, F: ArgminFloat>: SerializeAlias {
+pub trait NLCGBetaUpdate<G, P, F: ArgminFloat>: SerializeAlias {
     /// Update beta
     /// Parameter 1: \nabla f_k
     /// Parameter 2: \nabla f_{k+1}
     /// Parameter 3: p_k
-    fn update(&self, nabla_f_k: &T, nabla_f_k_p_1: &T, p_k: &T) -> F;
+    fn update(&self, nabla_f_k: &G, nabla_f_k_p_1: &G, p_k: &P) -> F;
 }
 
 /// If the `serde1` feature is set, it acts as an alias for `Serialize` and is implemented for all

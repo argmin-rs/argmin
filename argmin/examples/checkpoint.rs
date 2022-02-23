@@ -6,8 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use argmin::core::{
-    ArgminOp, ArgminSlogLogger, CheckpointMode, CostFunction, Error, Executor, Gradient,
-    ObserverMode,
+    ArgminSlogLogger, CheckpointMode, CostFunction, Error, Executor, Gradient, ObserverMode,
 };
 use argmin::solver::landweber::Landweber;
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -15,18 +14,9 @@ use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 #[derive(Default)]
 struct Rosenbrock {}
 
-impl ArgminOp for Rosenbrock {
-    type Param = Vec<f64>;
-    type Output = f64;
-    type Hessian = ();
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl CostFunction for Rosenbrock {
     type Param = Vec<f64>;
     type Output = f64;
-    type Float = f64;
 
     fn cost(&self, p: &Vec<f64>) -> Result<f64, Error> {
         Ok(rosenbrock_2d(p, 1.0, 100.0))
@@ -36,7 +26,6 @@ impl CostFunction for Rosenbrock {
 impl Gradient for Rosenbrock {
     type Param = Vec<f64>;
     type Gradient = Vec<f64>;
-    type Float = f64;
 
     fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))

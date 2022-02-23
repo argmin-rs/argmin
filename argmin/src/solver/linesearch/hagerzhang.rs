@@ -14,8 +14,8 @@
 //! DOI: <https://doi.org/10.1137/030601880>
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Gradient,
-    IterState, OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, Gradient, IterState, LineSearch,
+    OpWrapper, SerializeAlias, Solver, TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -33,7 +33,7 @@ type Triplet<F> = (F, F, F);
 /// DOI: <https://doi.org/10.1137/030601880>
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct HagerZhangLineSearch<P, F> {
+pub struct HagerZhangLineSearch<P, G, F> {
     /// delta: (0, 0.5), used in the Wolfe conditions
     delta: F,
     /// sigma: [delta, 1), used in the Wolfe conditions
@@ -84,14 +84,14 @@ pub struct HagerZhangLineSearch<P, F> {
     /// initial cost
     finit: F,
     /// initial gradient (builder)
-    init_grad: Option<P>,
+    init_grad: Option<G>,
     /// Search direction (builder)
     search_direction: Option<P>,
     /// Search direction in 1D
     dginit: F,
 }
 
-impl<P, F> HagerZhangLineSearch<P, F>
+impl<P, G, F> HagerZhangLineSearch<P, G, F>
 where
     F: ArgminFloat,
 {
@@ -129,9 +129,9 @@ where
     }
 }
 
-impl<P, F> HagerZhangLineSearch<P, F>
+impl<P, G, F> HagerZhangLineSearch<P, G, F>
 where
-    P: ArgminScaledAdd<P, F, P> + ArgminDot<P, F>,
+    P: ArgminScaledAdd<P, F, P> + ArgminDot<G, F>,
     F: ArgminFloat,
 {
     /// set delta
@@ -257,9 +257,7 @@ where
         (c_x, c_f, c_g): Triplet<F>,
     ) -> Result<(Triplet<F>, Triplet<F>), Error>
     where
-        O: ArgminOp<Param = P, Output = F, Float = F>
-            + CostFunction<Param = P, Output = F>
-            + Gradient<Param = P, Gradient = P>,
+        O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     {
         // U0
         if c_x <= a_x || c_x >= b_x {
@@ -321,9 +319,7 @@ where
         (b_x, b_f, b_g): Triplet<F>,
     ) -> Result<(Triplet<F>, Triplet<F>), Error>
     where
-        O: ArgminOp<Param = P, Output = F, Float = F>
-            + CostFunction<Param = P, Output = F>
-            + Gradient<Param = P, Gradient = P>,
+        O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     {
         // S1
         let c_x = self.secant(a_x, a_g, b_x, b_g);
@@ -363,9 +359,7 @@ where
 
     fn calc<O>(&mut self, op: &mut OpWrapper<O>, alpha: F) -> Result<F, Error>
     where
-        O: ArgminOp<Param = P, Output = F, Float = F>
-            + CostFunction<Param = P, Output = F>
-            + Gradient<Param = P, Gradient = P>,
+        O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     {
         let tmp = self
             .init_param
@@ -377,9 +371,7 @@ where
 
     fn calc_grad<O>(&mut self, op: &mut OpWrapper<O>, alpha: F) -> Result<F, Error>
     where
-        O: ArgminOp<Param = P, Output = F, Float = F>
-            + CostFunction<Param = P, Output = F>
-            + Gradient<Param = P, Gradient = P>,
+        O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     {
         let tmp = self
             .init_param
@@ -411,7 +403,7 @@ where
     }
 }
 
-impl<P, F> Default for HagerZhangLineSearch<P, F>
+impl<P, G, F> Default for HagerZhangLineSearch<P, G, F>
 where
     F: ArgminFloat,
 {
@@ -420,7 +412,7 @@ where
     }
 }
 
-impl<P, F> ArgminLineSearch<P, F> for HagerZhangLineSearch<P, F> {
+impl<P, G, F> LineSearch<P, F> for HagerZhangLineSearch<P, G, F> {
     /// Set search direction
     fn set_search_direction(&mut self, search_direction: P) {
         self.search_direction = Some(search_direction);
@@ -433,12 +425,11 @@ impl<P, F> ArgminLineSearch<P, F> for HagerZhangLineSearch<P, F> {
     }
 }
 
-impl<P, O, F> Solver<O, IterState<O>> for HagerZhangLineSearch<P, F>
+impl<P, G, O, F> Solver<O, IterState<P, G, (), (), F>> for HagerZhangLineSearch<P, G, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>
-        + CostFunction<Param = P, Output = F>
-        + Gradient<Param = P, Gradient = P>,
-    P: Clone + SerializeAlias + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
+    O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
+    P: Clone + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<P, F, P>,
+    G: Clone + SerializeAlias + ArgminDot<P, F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Hager-Zhang Line search";
@@ -446,8 +437,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
                 text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),
@@ -512,8 +503,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);
         let bb = (self.b_x, self.b_f, self.b_g);
@@ -558,7 +549,7 @@ where
         Ok((state.param(new_param).cost(self.best_f), None))
     }
 
-    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<P, G, (), (), F>) -> TerminationReason {
         if self.best_f - self.finit <= self.delta * self.best_x * self.dginit
             && self.best_g >= self.sigma * self.dginit
         {
@@ -578,8 +569,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::MinimalNoOperator;
     use crate::test_trait_impl;
 
-    test_trait_impl!(hagerzhang, HagerZhangLineSearch<MinimalNoOperator, f64>);
+    test_trait_impl!(hagerzhang, HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64>);
 }

@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminKV, ArgminOp, ArgminTrustRegion, Error, Gradient, Hessian, IterState,
-    OpWrapper, Solver, State, TerminationReason,
+    ArgminFloat, ArgminKV, ArgminTrustRegion, Error, Gradient, Hessian, IterState, OpWrapper,
+    Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminMul, ArgminNorm, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
@@ -43,12 +43,11 @@ where
     }
 }
 
-impl<O, F, P, H> Solver<O, IterState<O>> for CauchyPoint<F>
+impl<O, F, P, G, H> Solver<O, IterState<P, G, (), H, F>> for CauchyPoint<F>
 where
-    O: ArgminOp<Param = P, Hessian = H, Output = F, Float = F>
-        + Gradient<Param = P, Gradient = P>
-        + Hessian<Param = P, Hessian = H>,
-    P: ArgminMul<F, P> + ArgminWeightedDot<P, F, H> + ArgminNorm<F>,
+    O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
+    P: Clone + ArgminMul<F, P> + ArgminWeightedDot<P, F, H> + ArgminNorm<F>,
+    G: ArgminMul<F, P> + ArgminWeightedDot<G, F, H> + ArgminNorm<F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Cauchy Point";
@@ -56,8 +55,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), H, F>,
+    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let grad = state
             .take_grad()
@@ -82,7 +81,7 @@ where
         Ok((state.param(new_param).grad(grad).hessian(hessian), None))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationReason {
         if state.get_iter() >= 1 {
             TerminationReason::MaxItersReached
         } else {

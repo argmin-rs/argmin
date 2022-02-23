@@ -8,7 +8,7 @@
 //! # Observer which visualizes the progress of the solver
 
 extern crate gnuplot;
-use crate::core::{ArgminFloat, ArgminKV, ArgminOp, CostFunction, Error, IterState, Observe};
+use crate::core::{ArgminFloat, ArgminKV, CostFunction, Error, IterState, Observe};
 use instant;
 use std::sync::Mutex;
 
@@ -152,11 +152,12 @@ impl std::default::Default for Visualizer3d {
     }
 }
 
-impl<O> Observe<IterState<O>> for Visualizer3d
-where
-    O: ArgminOp<Param = Vec<f64>, Float = f64>,
-{
-    fn observe_iter(&mut self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
+impl Observe<IterState<Vec<f64>, (), (), (), f64>> for Visualizer3d {
+    fn observe_iter(
+        &mut self,
+        state: &IterState<Vec<f64>, (), (), (), f64>,
+        _kv: &ArgminKV,
+    ) -> Result<(), Error> {
         // TODO: get particles from `state` or `kv`
 
         self.iteration(
@@ -185,7 +186,7 @@ impl Surface {
     /// Create a new surface
     pub fn new<O>(op: O, window: (f64, f64, f64, f64), resolution: f64) -> Self
     where
-        O: ArgminOp<Param = Vec<f64>, Output = f64> + CostFunction<Param = Vec<f64>, Output = f64>,
+        O: CostFunction<Param = Vec<f64>, Output = f64>,
     {
         let width = window.2 - window.0;
         let height = window.3 - window.1;

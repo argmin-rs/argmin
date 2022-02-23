@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminOp, ArgminTrustRegion, Error, IterState, OpWrapper,
+    ArgminError, ArgminFloat, ArgminKV, ArgminTrustRegion, Error, IterState, OpWrapper,
     SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot, ArgminZeroLike};
@@ -145,9 +145,8 @@ where
     }
 }
 
-impl<P, O, F, H> Solver<O, IterState<O>> for Steihaug<P, F>
+impl<P, O, F, H> Solver<O, IterState<P, P, (), H, F>> for Steihaug<P, F>
 where
-    O: ArgminOp<Param = P, Hessian = H, Output = F, Float = F>,
     P: Clone
         + SerializeAlias
         + ArgminMul<F, P>
@@ -163,9 +162,9 @@ where
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
-        let r = state.get_grad().unwrap();
+        state: IterState<P, P, (), H, F>,
+    ) -> Result<(IterState<P, P, (), H, F>, Option<ArgminKV>), Error> {
+        let r = state.get_grad_ref().unwrap().clone();
 
         self.r_0_norm = r.norm();
         self.rtr = r.dot(&r);
@@ -181,8 +180,8 @@ where
     fn next_iter(
         &mut self,
         _op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, P, (), H, F>,
+    ) -> Result<(IterState<P, P, (), H, F>, Option<ArgminKV>), Error> {
         let grad = state.take_grad().unwrap();
         let h = state.take_hessian().unwrap();
         let d = self.d.as_ref().unwrap();
@@ -236,7 +235,7 @@ where
         Ok((state.param(p_n).cost(self.rtr).grad(grad).hessian(h), None))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, P, (), H, F>) -> TerminationReason {
         if self.r_0_norm < self.epsilon {
             return TerminationReason::TargetPrecisionReached;
         }

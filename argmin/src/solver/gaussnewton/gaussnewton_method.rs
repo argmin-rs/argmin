@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminOp, Error, IterState, Jacobian, OpWrapper, Operator,
-    Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, Error, IterState, Jacobian, OpWrapper, Operator, Solver,
+    TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose};
 #[cfg(feature = "serde1")]
@@ -73,12 +73,10 @@ impl<F: ArgminFloat> Default for GaussNewton<F> {
     }
 }
 
-impl<O, F, P, J, U> Solver<O, IterState<O>> for GaussNewton<F>
+impl<O, F, P, J, U> Solver<O, IterState<P, (), J, (), F>> for GaussNewton<F>
 where
-    O: ArgminOp<Param = P, Jacobian = J, Output = U, Float = F>
-        + Operator<Param = P, Output = U>
-        + Jacobian<Param = P, Jacobian = J>,
-    P: ArgminSub<P, P> + ArgminMul<F, P>,
+    O: Operator<Param = P, Output = U> + Jacobian<Param = P, Jacobian = J>,
+    P: Clone + ArgminSub<P, P> + ArgminMul<F, P>,
     U: ArgminNorm<F>,
     J: Clone
         + ArgminTranspose<J>
@@ -93,8 +91,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, (), J, (), F>,
+    ) -> Result<(IterState<P, (), J, (), F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;
@@ -111,7 +109,7 @@ where
         Ok((state.param(new_param).cost(residuals.norm()), None))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, (), J, (), F>) -> TerminationReason {
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
             return TerminationReason::NoChangeInCost;
         }
@@ -200,18 +198,9 @@ mod tests {
             counter: RefCell<usize>,
         }
 
-        impl ArgminOp for Problem {
-            type Param = Array1<f64>;
-            type Output = Array1<f64>;
-            type Hessian = ();
-            type Jacobian = Array2<f64>;
-            type Float = f64;
-        }
-
         impl Operator for Problem {
             type Param = Array1<f64>;
             type Output = Array1<f64>;
-            type Float = f64;
 
             fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
                 if *self.counter.borrow() == 0 {
@@ -227,7 +216,6 @@ mod tests {
         impl Jacobian for Problem {
             type Param = Array1<f64>;
             type Jacobian = Array2<f64>;
-            type Float = f64;
 
             fn jacobian(&self, _p: &Self::Param) -> Result<Self::Jacobian, Error> {
                 Ok(Array::from_shape_vec((2, 2), vec![1f64, 2.0, 3.0, 4.0])?)
@@ -246,8 +234,9 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .get_best_param()
-            .unwrap();
+            .get_best_param_ref()
+            .unwrap()
+            .clone();
         assert_relative_eq!(param[0], -1.0, epsilon = f64::EPSILON.sqrt());
         assert_relative_eq!(param[1], 0.25, epsilon = f64::EPSILON.sqrt());
 
@@ -263,8 +252,9 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .get_best_param()
-            .unwrap();
+            .get_best_param_ref()
+            .unwrap()
+            .clone();
         assert_relative_eq!(param[0], -1.4, epsilon = f64::EPSILON.sqrt());
         assert_relative_eq!(param[1], 0.3, epsilon = f64::EPSILON.sqrt());
 
@@ -280,8 +270,9 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .get_best_param()
-            .unwrap();
+            .get_best_param_ref()
+            .unwrap()
+            .clone();
         assert_relative_eq!(param[0], -0.5, epsilon = f64::EPSILON.sqrt());
         assert_relative_eq!(param[1], 0.125, epsilon = f64::EPSILON.sqrt());
 
@@ -297,8 +288,9 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .get_best_param()
-            .unwrap();
+            .get_best_param_ref()
+            .unwrap()
+            .clone();
         assert_relative_eq!(param[0], -0.7, epsilon = f64::EPSILON.sqrt());
         assert_relative_eq!(param[1], 0.15, epsilon = f64::EPSILON.sqrt());
     }

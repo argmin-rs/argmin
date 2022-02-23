@@ -14,7 +14,7 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::core::{ArgminFloat, ArgminNLCGBetaUpdate};
+use crate::core::{ArgminFloat, NLCGBetaUpdate};
 use argmin_math::{ArgminDot, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -32,12 +32,12 @@ impl FletcherReeves {
     }
 }
 
-impl<T, F> ArgminNLCGBetaUpdate<T, F> for FletcherReeves
+impl<G, P, F> NLCGBetaUpdate<G, P, F> for FletcherReeves
 where
-    T: Clone + ArgminDot<T, F>,
+    G: ArgminDot<G, F>,
     F: ArgminFloat,
 {
-    fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
+    fn update(&self, dfk: &G, dfk1: &G, _pk: &P) -> F {
         dfk1.dot(dfk1) / dfk.dot(dfk)
     }
 }
@@ -55,12 +55,12 @@ impl PolakRibiere {
     }
 }
 
-impl<T, F> ArgminNLCGBetaUpdate<T, F> for PolakRibiere
+impl<G, P, F> NLCGBetaUpdate<G, P, F> for PolakRibiere
 where
-    T: ArgminDot<T, F> + ArgminSub<T, T> + ArgminNorm<F>,
+    G: ArgminDot<G, F> + ArgminSub<G, G> + ArgminNorm<F>,
     F: ArgminFloat,
 {
-    fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
+    fn update(&self, dfk: &G, dfk1: &G, _pk: &P) -> F {
         let dfk_norm_sq = dfk.norm().powi(2);
         dfk1.dot(&dfk1.sub(dfk)) / dfk_norm_sq
     }
@@ -79,12 +79,12 @@ impl PolakRibierePlus {
     }
 }
 
-impl<T, F> ArgminNLCGBetaUpdate<T, F> for PolakRibierePlus
+impl<G, P, F> NLCGBetaUpdate<G, P, F> for PolakRibierePlus
 where
-    T: ArgminDot<T, F> + ArgminSub<T, T> + ArgminNorm<F>,
+    G: ArgminDot<G, F> + ArgminSub<G, G> + ArgminNorm<F>,
     F: ArgminFloat,
 {
-    fn update(&self, dfk: &T, dfk1: &T, _pk: &T) -> F {
+    fn update(&self, dfk: &G, dfk1: &G, _pk: &P) -> F {
         let dfk_norm_sq = dfk.norm().powi(2);
         let beta = dfk1.dot(&dfk1.sub(dfk)) / dfk_norm_sq;
         F::from_f64(0.0).unwrap().max(beta)
@@ -104,12 +104,12 @@ impl HestenesStiefel {
     }
 }
 
-impl<T, F> ArgminNLCGBetaUpdate<T, F> for HestenesStiefel
+impl<G, P, F> NLCGBetaUpdate<G, P, F> for HestenesStiefel
 where
-    T: ArgminDot<T, F> + ArgminSub<T, T>,
+    G: ArgminDot<G, F> + ArgminDot<P, F> + ArgminSub<G, G>,
     F: ArgminFloat,
 {
-    fn update(&self, dfk: &T, dfk1: &T, pk: &T) -> F {
+    fn update(&self, dfk: &G, dfk1: &G, pk: &P) -> F {
         let d = dfk1.sub(dfk);
         dfk1.dot(&d) / d.dot(pk)
     }

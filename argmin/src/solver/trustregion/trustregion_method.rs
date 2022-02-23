@@ -11,8 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminOp, ArgminTrustRegion, CostFunction, Error, Executor,
-    Gradient, Hessian, IterState, OpWrapper, OptimizationResult, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminTrustRegion, CostFunction, DeserializeOwnedAlias,
+    Error, Executor, Gradient, Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias,
+    Solver, TerminationReason,
 };
 use crate::solver::trustregion::reduction_ratio;
 use argmin_math::{ArgminAdd, ArgminDot, ArgminNorm, ArgminWeightedDot};
@@ -97,15 +98,21 @@ where
     }
 }
 
-impl<O, R, F, P, H> Solver<O, IterState<O>> for TrustRegion<R, F>
+impl<O, R, F, P, G, H> Solver<O, IterState<P, G, (), H, F>> for TrustRegion<R, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F, Hessian = H>
-        + CostFunction<Param = P, Output = F>
-        + Gradient<Param = P, Gradient = P>
+    O: CostFunction<Param = P, Output = F>
+        + Gradient<Param = P, Gradient = G>
         + Hessian<Param = P, Hessian = H>,
-    P: Clone + ArgminNorm<F> + ArgminDot<P, F> + ArgminAdd<P, P>,
-    H: Clone + ArgminDot<P, P>,
-    R: Clone + ArgminTrustRegion<F> + Solver<O, IterState<O>>,
+    P: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminNorm<F>
+        + ArgminDot<P, F>
+        + ArgminDot<G, F>
+        + ArgminAdd<P, P>,
+    G: Clone + SerializeAlias + DeserializeOwnedAlias,
+    H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
+    R: Clone + ArgminTrustRegion<F> + Solver<O, IterState<P, G, (), H, F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Trust region";
@@ -113,8 +120,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), H, F>,
+    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
@@ -133,8 +140,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), H, F>,
+    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let grad = state
             .take_grad()
@@ -207,7 +214,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<P, G, (), H, F>) -> TerminationReason {
         // todo
         TerminationReason::NotTerminated
     }

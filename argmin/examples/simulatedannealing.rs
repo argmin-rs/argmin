@@ -5,9 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{
-    ArgminOp, ArgminSlogLogger, CostFunction, Error, Executor, Modify, ObserverMode,
-};
+use argmin::core::{ArgminSlogLogger, CostFunction, Error, Executor, Modify, ObserverMode};
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin_testfunctions::rosenbrock;
 use rand::distributions::Uniform;
@@ -31,6 +29,7 @@ struct Rosenbrock {
     rng: Arc<Mutex<Xoshiro256PlusPlus>>,
 }
 
+// TODO: REMOVE?
 impl Default for Rosenbrock {
     fn default() -> Self {
         let lower_bound: Vec<f64> = vec![-5.0, -5.0];
@@ -52,18 +51,9 @@ impl Rosenbrock {
     }
 }
 
-impl ArgminOp for Rosenbrock {
-    type Param = Vec<f64>;
-    type Output = f64;
-    type Hessian = ();
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl CostFunction for Rosenbrock {
     type Param = Vec<f64>;
     type Output = f64;
-    type Float = f64;
 
     fn cost(&self, param: &Vec<f64>) -> Result<f64, Error> {
         Ok(rosenbrock(param, self.a, self.b))

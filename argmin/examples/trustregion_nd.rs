@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use argmin::core::{
-    ArgminOp, ArgminSlogLogger, CostFunction, Error, Executor, Gradient, Hessian, ObserverMode,
+    ArgminSlogLogger, CostFunction, Error, Executor, Gradient, Hessian, ObserverMode,
 };
 #[allow(unused_imports)]
 use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
@@ -18,18 +18,9 @@ struct Rosenbrock {
     b: f64,
 }
 
-impl ArgminOp for Rosenbrock {
-    type Param = Array1<f64>;
-    type Output = f64;
-    type Hessian = Array2<f64>;
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl CostFunction for Rosenbrock {
     type Param = Array1<f64>;
     type Output = f64;
-    type Float = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
@@ -38,7 +29,6 @@ impl CostFunction for Rosenbrock {
 impl Gradient for Rosenbrock {
     type Param = Array1<f64>;
     type Gradient = Array1<f64>;
-    type Float = f64;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
         Ok(Array1::from(rosenbrock_2d_derivative(
@@ -52,7 +42,6 @@ impl Gradient for Rosenbrock {
 impl Hessian for Rosenbrock {
     type Param = Array1<f64>;
     type Hessian = Array2<f64>;
-    type Float = f64;
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
         let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);

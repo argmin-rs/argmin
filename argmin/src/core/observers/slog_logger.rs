@@ -7,7 +7,7 @@
 
 //! # Loggers based on the `slog` crate
 
-use crate::core::{ArgminKV, ArgminOp, Error, IterState, Observe, State};
+use crate::core::{ArgminFloat, ArgminKV, Error, IterState, Observe, State};
 use slog;
 use slog::{info, o, Drain, Record, Serializer, KV};
 use slog_async;
@@ -117,7 +117,11 @@ impl KV for ArgminSlogKV {
     }
 }
 
-impl<O: ArgminOp> KV for IterState<O> {
+impl<P, G, H, J, F> KV for IterState<P, G, H, J, F>
+where
+    P: Clone,
+    F: ArgminFloat,
+{
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
         // REENABLE THIS $%£"^! TODO TODO TODO TODO TODO
         // for (k, v) in self.get_func_counts().into_iter() {

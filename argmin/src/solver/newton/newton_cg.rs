@@ -13,9 +13,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, DeserializeOwnedAlias, Error,
-    Executor, Gradient, Hessian, IterState, OpWrapper, Operator, OptimizationResult,
-    SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
+    IterState, LineSearch, OpWrapper, Operator, OptimizationResult, SerializeAlias, Solver, State,
+    TerminationReason,
 };
 use crate::solver::conjugategradient::ConjugateGradient;
 use argmin_math::{
@@ -75,11 +75,9 @@ where
     }
 }
 
-impl<O, L, P, H, F> Solver<O, IterState<O>> for NewtonCG<L, F>
+impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, F>> for NewtonCG<L, F>
 where
-    O: ArgminOp<Param = P, Hessian = H, Output = F, Float = F>
-        + Gradient<Param = P, Gradient = P, Float = F>
-        + Hessian<Param = P, Hessian = H, Float = F>,
+    O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
     P: Clone
         + SerializeAlias
         + DeserializeOwnedAlias
@@ -88,10 +86,10 @@ where
         + ArgminScaledAdd<P, F, P>
         + ArgminMul<F, P>
         + ArgminConj
-        + ArgminZeroLike
-        + ArgminNorm<F>,
+        + ArgminZeroLike,
+    G: SerializeAlias + DeserializeOwnedAlias + ArgminNorm<F> + ArgminMul<F, P>,
     H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
-    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
     F: ArgminFloat + ArgminNorm<F>,
 {
     const NAME: &'static str = "Newton-CG";
@@ -99,14 +97,14 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), H, F>,
+    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
 
         // Solve CG subproblem
-        let cg_op: CGSubProblem<P, H, F> = CGSubProblem::new(hessian.clone());
+        let cg_op: CGSubProblem<P, H> = CGSubProblem::new(hessian.clone());
         let mut cg_op = OpWrapper::new(cg_op);
 
         let mut x_p = param.zero_like();
@@ -162,7 +160,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationReason {
         if (state.get_cost() - state.get_prev_cost()).abs() < self.tol {
             TerminationReason::NoChangeInCost
         } else {
@@ -173,44 +171,28 @@ where
 
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-struct CGSubProblem<T, H, F> {
+struct CGSubProblem<P, H> {
     hessian: H,
-    phantom: std::marker::PhantomData<T>,
-    float: std::marker::PhantomData<F>,
+    phantom: std::marker::PhantomData<P>,
 }
 
-impl<T, H, F> CGSubProblem<T, H, F> {
+impl<T, H> CGSubProblem<T, H> {
     /// constructor
     pub fn new(hessian: H) -> Self {
         CGSubProblem {
             hessian,
             phantom: std::marker::PhantomData,
-            float: std::marker::PhantomData,
         }
     }
 }
 
-impl<P, H, F> ArgminOp for CGSubProblem<P, H, F>
-where
-    P: Clone + SerializeAlias + DeserializeOwnedAlias,
-    H: Clone + ArgminDot<P, P> + SerializeAlias + DeserializeOwnedAlias,
-    F: ArgminFloat,
-{
-    type Param = P;
-    type Output = P;
-    type Hessian = ();
-    type Jacobian = ();
-    type Float = F;
-}
-
-impl<P, H, F> Operator for CGSubProblem<P, H, F>
+impl<P, H> Operator for CGSubProblem<P, H>
 where
     H: ArgminDot<P, P>,
-    F: ArgminFloat,
+    P: Clone + SerializeAlias + DeserializeOwnedAlias,
 {
     type Param = P;
     type Output = P;
-    type Float = F;
 
     fn apply(&self, p: &P) -> Result<P, Error> {
         Ok(self.hessian.dot(p))
@@ -225,18 +207,19 @@ mod tests {
 
     test_trait_impl!(
         newton_cg,
-        NewtonCG<MoreThuenteLineSearch<Vec<f64>, f64>, f64>
+        NewtonCG<MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>, f64>
     );
 
-    test_trait_impl!(cg_subproblem, CGSubProblem<Vec<f64>, Vec<Vec<f64>>, f64>);
+    test_trait_impl!(cg_subproblem, CGSubProblem<Vec<f64>, Vec<Vec<f64>>>);
 
     #[test]
     fn test_tolerance() {
         let tol1: f64 = 1e-4;
 
-        let linesearch: MoreThuenteLineSearch<Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let linesearch: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
+            MoreThuenteLineSearch::new();
 
-        let NewtonCG { tol: t, .. }: NewtonCG<MoreThuenteLineSearch<Vec<f64>, f64>, f64> =
+        let NewtonCG { tol: t, .. }: NewtonCG<MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>, f64> =
             NewtonCG::new(linesearch).with_tol(tol1).unwrap();
 
         assert!((t - tol1).abs() < std::f64::EPSILON);

@@ -11,8 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Executor, Gradient,
-    IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, State, TerminationReason,
+    ArgminFloat, ArgminKV, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
+    IterState, LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver, State,
+    TerminationReason,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -29,7 +30,7 @@ use std::collections::VecDeque;
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct LBFGS<L, P, F> {
+pub struct LBFGS<L, P, G, F> {
     /// line search
     linesearch: L,
     /// m
@@ -37,14 +38,14 @@ pub struct LBFGS<L, P, F> {
     /// s_{k-1}
     s: VecDeque<P>,
     /// y_{k-1}
-    y: VecDeque<P>,
+    y: VecDeque<G>,
     /// Tolerance for the stopping criterion based on the change of the norm on the gradient
     tol_grad: F,
     /// Tolerance for the stopping criterion based on the change of the cost stopping criterion
     tol_cost: F,
 }
 
-impl<L, P, F> LBFGS<L, P, F>
+impl<L, P, G, F> LBFGS<L, P, G, F>
 where
     F: ArgminFloat,
 {
@@ -75,19 +76,26 @@ where
     }
 }
 
-impl<O, L, P, F> Solver<O, IterState<O>> for LBFGS<L, P, F>
+impl<O, L, P, G, F> Solver<O, IterState<P, G, (), (), F>> for LBFGS<L, P, G, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>
-        + CostFunction<Param = P, Output = F>
-        + Gradient<Param = P, Gradient = P>,
+    O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone
         + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<P, P>
         + ArgminAdd<P, P>
-        + ArgminDot<P, F>
-        + ArgminNorm<F>
+        + ArgminDot<G, F>
         + ArgminMul<F, P>,
-    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
+    G: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminNorm<F>
+        + ArgminSub<G, G>
+        + ArgminDot<G, F>
+        + ArgminDot<P, F>
+        + ArgminMul<F, G>
+        + ArgminMul<F, P>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "L-BFGS";
@@ -95,8 +103,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
@@ -106,8 +114,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let cur_cost = state.get_cost();
         let prev_grad = state.take_grad().unwrap();
@@ -132,9 +140,10 @@ where
             rho[cur_m - i - 1] = rho_t;
             alpha[cur_m - i - 1] = alpha_t;
         }
-        let mut r = q.mul(&gamma);
+        let mut r: P = q.mul(&gamma);
         for (i, (sk, yk)) in self.s.iter().zip(self.y.iter()).enumerate() {
-            let beta = yk.dot(&r).mul(rho[i]);
+            let beta: F = yk.dot(&r);
+            let beta = beta.mul(rho[i]);
             r = r.add(&sk.mul(&(alpha[i] - beta)));
         }
 
@@ -177,7 +186,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, (), (), F>) -> TerminationReason {
         if state.get_grad_ref().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
@@ -191,27 +200,27 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::MinimalNoOperator;
     use crate::solver::linesearch::MoreThuenteLineSearch;
     use crate::test_trait_impl;
 
-    type Operator = MinimalNoOperator;
-
-    test_trait_impl!(lbfgs, LBFGS<Operator, MoreThuenteLineSearch<Operator, f64>, f64>);
+    test_trait_impl!(
+        lbfgs,
+        LBFGS<MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>, Vec<f64>, Vec<f64>, f64>
+    );
 
     #[test]
     fn test_tolerances() {
-        let linesearch: MoreThuenteLineSearch<f64, f64> =
+        let linesearch: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
             MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
 
-        let tol1 = 1e-4;
+        let tol1 = 1e-4f64;
         let tol2 = 1e-2;
 
         let LBFGS {
             tol_grad: t1,
             tol_cost: t2,
             ..
-        }: LBFGS<_, f64, f64> = LBFGS::new(linesearch, 7)
+        }: LBFGS<_, Vec<f64>, Vec<f64>, f64> = LBFGS::new(linesearch, 7)
             .with_tol_grad(tol1)
             .with_tol_cost(tol2);
 

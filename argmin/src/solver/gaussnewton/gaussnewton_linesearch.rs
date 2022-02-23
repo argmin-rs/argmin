@@ -11,9 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction,
-    DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState, Jacobian, OpWrapper,
-    Operator, OptimizationResult, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, CostFunction, DeserializeOwnedAlias, Error, Executor,
+    Gradient, Hessian, IterState, Jacobian, LineSearch, OpWrapper, Operator, OptimizationResult,
+    SerializeAlias, Solver, TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminTranspose};
 #[cfg(feature = "serde1")]
@@ -56,20 +56,21 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
     }
 }
 
-impl<O, L, F, P, J, U> Solver<O, IterState<O>> for GaussNewtonLS<L, F>
+impl<O, L, F, P, G, J, U> Solver<O, IterState<P, G, J, (), F>> for GaussNewtonLS<L, F>
 where
-    O: ArgminOp<Param = P, Float = F, Jacobian = J, Output = U>
-        + Operator<Param = P, Output = U>
-        + Jacobian<Param = P, Jacobian = J>,
-    P: ArgminMul<F, P>,
+    O: Operator<Param = P, Output = U> + Jacobian<Param = P, Jacobian = J>,
+    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminMul<F, P>,
+    G: Clone + SerializeAlias + DeserializeOwnedAlias,
     U: ArgminNorm<F>,
     J: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminTranspose<J>
         + ArgminInv<J>
         + ArgminDot<J, J>
-        + ArgminDot<U, P>
-        + ArgminDot<P, P>,
-    L: Clone + ArgminLineSearch<P, F> + Solver<LineSearchOP<O>, IterState<LineSearchOP<O>>>,
+        + ArgminDot<G, P>
+        + ArgminDot<U, G>,
+    L: Clone + LineSearch<P, F> + Solver<LineSearchOP<O, F>, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Gauss-Newton method with Linesearch";
@@ -77,15 +78,15 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, J, (), F>,
+    ) -> Result<(IterState<P, G, J, (), F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;
         let jacobian_t = jacobian.clone().t();
         let grad = jacobian_t.dot(&residuals);
 
-        let p = jacobian_t.dot(&jacobian).inv()?.dot(&grad);
+        let p: P = jacobian_t.dot(&jacobian).inv()?.dot(&grad);
 
         self.linesearch
             .set_search_direction(p.mul(&(F::from_f64(-1.0).unwrap())));
@@ -95,9 +96,7 @@ where
             operator: mut line_op,
             state: mut linesearch_state,
         } = Executor::new(
-            LineSearchOP {
-                op: op.take_op().unwrap(),
-            },
+            LineSearchOP::new(op.take_op().unwrap()),
             self.linesearch.clone(),
         )
         .configure(|config| config.param(param).grad(grad).cost(residuals.norm()))
@@ -118,7 +117,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, J, (), F>) -> TerminationReason {
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
             return TerminationReason::NoChangeInCost;
         }
@@ -129,72 +128,71 @@ where
 #[doc(hidden)]
 #[derive(Clone, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct LineSearchOP<O> {
+pub struct LineSearchOP<O, F> {
     pub op: O,
+    _phantom: std::marker::PhantomData<F>,
 }
 
-impl<O> ArgminOp for LineSearchOP<O>
-where
-    O: ArgminOp,
-    O::Jacobian: ArgminTranspose<O::Jacobian> + ArgminDot<O::Output, O::Param>,
-    O::Output: ArgminNorm<O::Float>,
-{
-    type Param = O::Param;
-    type Output = O::Float;
-    type Hessian = O::Hessian;
-    type Jacobian = O::Jacobian;
-    type Float = O::Float;
+impl<O, F> LineSearchOP<O, F> {
+    /// constructor
+    pub fn new(operator: O) -> Self {
+        LineSearchOP {
+            op: operator,
+            _phantom: std::marker::PhantomData,
+        }
+    }
 }
 
-impl<O, P, F> CostFunction for LineSearchOP<O>
+impl<O, P, F> CostFunction for LineSearchOP<O, F>
 where
-    O: Operator<Param = P, Output = P, Float = F>,
-    P: ArgminNorm<F>,
+    O: Operator<Param = P, Output = P>,
+    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminNorm<F>,
+    F: ArgminFloat,
 {
     type Param = P;
     type Output = F;
-    type Float = F;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(self.op.apply(p)?.norm())
     }
 }
 
-impl<O, P, J, F> Gradient for LineSearchOP<O>
+impl<O, P, J, F> Gradient for LineSearchOP<O, F>
 where
-    O: Operator<Param = P, Output = P, Float = F> + Jacobian<Param = P, Jacobian = J, Float = F>,
+    O: Operator<Param = P, Output = P> + Jacobian<Param = P, Jacobian = J>,
     P: Clone + SerializeAlias + DeserializeOwnedAlias,
     J: ArgminTranspose<J> + ArgminDot<P, P>,
 {
     type Param = P;
     type Gradient = P;
-    type Float = F;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
         Ok(self.op.jacobian(p)?.t().dot(&self.op.apply(p)?))
     }
 }
 
-impl<O, P, H, F> Hessian for LineSearchOP<O>
+impl<O, P, H, F> Hessian for LineSearchOP<O, F>
 where
-    O: Hessian<Param = P, Hessian = H, Float = F>,
+    P: Clone + SerializeAlias + DeserializeOwnedAlias,
+    H: Clone + SerializeAlias + DeserializeOwnedAlias,
+    O: Hessian<Param = P, Hessian = H>,
 {
     type Param = P;
     type Hessian = H;
-    type Float = F;
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
         self.op.hessian(p)
     }
 }
 
-impl<O, P, J, F> Jacobian for LineSearchOP<O>
+impl<O, P, J, F> Jacobian for LineSearchOP<O, F>
 where
-    O: Jacobian<Param = P, Jacobian = J, Float = F>,
+    O: Jacobian<Param = P, Jacobian = J>,
+    P: Clone + SerializeAlias + DeserializeOwnedAlias,
+    J: Clone + SerializeAlias + DeserializeOwnedAlias,
 {
     type Param = P;
     type Jacobian = J;
-    type Float = F;
 
     fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {
         self.op.jacobian(p)
@@ -209,14 +207,15 @@ mod tests {
 
     test_trait_impl!(
         gauss_newton_linesearch_method,
-        GaussNewtonLS<MoreThuenteLineSearch<Vec<f64>, f64>, f64>
+        GaussNewtonLS<MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>, f64>
     );
 
     #[test]
     fn test_tolerance() {
         let tol1: f64 = 1e-4;
 
-        let linesearch: MoreThuenteLineSearch<Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let linesearch: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
+            MoreThuenteLineSearch::new();
         let GaussNewtonLS { tol: t1, .. } = GaussNewtonLS::new(linesearch).with_tol(tol1).unwrap();
 
         assert!((t1 - tol1).abs() < std::f64::EPSILON);
