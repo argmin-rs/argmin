@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminOp, ArgminTrustRegion, Error, Gradient, Hessian,
-    IterState, OpWrapper, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, ArgminTrustRegion, Error, Gradient, Hessian, IterState,
+    OpWrapper, Solver, State, TerminationReason,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot,
@@ -45,12 +45,15 @@ where
     }
 }
 
-impl<O, F, P, H> Solver<O, IterState<O>> for Dogleg<F>
+impl<O, F, P, H> Solver<O, IterState<P, P, (), H, F>> for Dogleg<F>
 where
-    O: ArgminOp<Param = P, Hessian = H, Output = F, Float = F>
-        + Gradient<Param = P, Gradient = P>
-        + Hessian<Param = P, Hessian = H>,
-    P: ArgminMul<F, P> + ArgminNorm<F> + ArgminDot<P, F> + ArgminAdd<P, P> + ArgminSub<P, P>,
+    O: Gradient<Param = P, Gradient = P> + Hessian<Param = P, Hessian = H>,
+    P: Clone
+        + ArgminMul<F, P>
+        + ArgminNorm<F>
+        + ArgminDot<P, F>
+        + ArgminAdd<P, P>
+        + ArgminSub<P, P>,
     H: ArgminInv<H> + ArgminDot<P, P>,
     F: ArgminFloat,
 {
@@ -59,8 +62,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, P, (), H, F>,
+    ) -> Result<(IterState<P, P, (), H, F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let g = state
             .take_grad()
@@ -119,7 +122,7 @@ where
         Ok((state.param(pstar).grad(g).hessian(h), None))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, P, (), H, F>) -> TerminationReason {
         if state.get_iter() >= 1 {
             TerminationReason::MaxItersReached
         } else {

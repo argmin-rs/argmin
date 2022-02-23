@@ -6,26 +6,16 @@
 // copied, modified, or distributed except according to those terms.
 
 use argmin::core::{
-    ArgminLineSearch, ArgminOp, ArgminSlogLogger, CostFunction, Error, Executor, Gradient,
-    ObserverMode,
+    ArgminSlogLogger, CostFunction, Error, Executor, Gradient, LineSearch, ObserverMode,
 };
 use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin_testfunctions::{sphere, sphere_derivative};
 
 struct Sphere {}
 
-impl ArgminOp for Sphere {
-    type Param = Vec<f64>;
-    type Output = f64;
-    type Hessian = ();
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl CostFunction for Sphere {
     type Param = Vec<f64>;
     type Output = f64;
-    type Float = f64;
 
     fn cost(&self, param: &Vec<f64>) -> Result<f64, Error> {
         Ok(sphere(param))
@@ -35,7 +25,6 @@ impl CostFunction for Sphere {
 impl Gradient for Sphere {
     type Param = Vec<f64>;
     type Gradient = Vec<f64>;
-    type Float = f64;
 
     fn gradient(&self, param: &Vec<f64>) -> Result<Vec<f64>, Error> {
         Ok(sphere_derivative(param))
@@ -53,7 +42,7 @@ fn run() -> Result<(), Error> {
     let mut solver = HagerZhangLineSearch::new();
 
     // The following parameters do not follow the builder pattern because they are part of the
-    // ArgminLineSearch trait which needs to be object safe.
+    // LineSearch trait which needs to be object safe.
 
     // Set search direction
     solver.set_search_direction(vec![-1.5, 0.0]);

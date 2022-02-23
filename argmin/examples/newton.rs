@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, Gradient, Hessian, ObserverMode};
+use argmin::core::{ArgminSlogLogger, Error, Executor, Gradient, Hessian, ObserverMode};
 use argmin::solver::newton::Newton;
 use argmin_testfunctions::{rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
@@ -15,18 +15,9 @@ struct Rosenbrock {
     b: f64,
 }
 
-impl ArgminOp for Rosenbrock {
-    type Param = Array1<f64>;
-    type Output = f64;
-    type Hessian = Array2<f64>;
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl Gradient for Rosenbrock {
     type Param = Array1<f64>;
     type Gradient = Array1<f64>;
-    type Float = f64;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
         Ok(Array1::from(rosenbrock_2d_derivative(
@@ -40,7 +31,6 @@ impl Gradient for Rosenbrock {
 impl Hessian for Rosenbrock {
     type Param = Array1<f64>;
     type Hessian = Array2<f64>;
-    type Float = f64;
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
         let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);

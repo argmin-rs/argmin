@@ -22,8 +22,8 @@
 #![allow(clippy::nonminimal_bool)]
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Gradient,
-    IterState, OpWrapper, SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, Gradient, IterState, LineSearch,
+    OpWrapper, SerializeAlias, Solver, State, TerminationReason,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -43,7 +43,7 @@ use std::default::Default;
 /// DOI: <https://doi.org/10.1145/192115.192132>
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct MoreThuenteLineSearch<P, F> {
+pub struct MoreThuenteLineSearch<P, G, F> {
     /// Search direction
     search_direction: Option<P>,
     /// initial parameter vector
@@ -51,7 +51,7 @@ pub struct MoreThuenteLineSearch<P, F> {
     /// initial cost
     finit: F,
     /// initial gradient
-    init_grad: Option<P>,
+    init_grad: Option<G>,
     /// Search direction in 1D
     dginit: F,
     /// dgtest
@@ -117,7 +117,7 @@ where
     }
 }
 
-impl<P, F> MoreThuenteLineSearch<P, F>
+impl<P, G, F> MoreThuenteLineSearch<P, G, F>
 where
     F: ArgminFloat,
 {
@@ -189,7 +189,7 @@ where
     }
 }
 
-impl<P, F: ArgminFloat> Default for MoreThuenteLineSearch<P, F>
+impl<P, G, F> Default for MoreThuenteLineSearch<P, G, F>
 where
     F: ArgminFloat,
 {
@@ -198,7 +198,7 @@ where
     }
 }
 
-impl<P, F> ArgminLineSearch<P, F> for MoreThuenteLineSearch<P, F>
+impl<P, G, F> LineSearch<P, F> for MoreThuenteLineSearch<P, G, F>
 where
     F: ArgminFloat,
 {
@@ -220,12 +220,11 @@ where
     }
 }
 
-impl<P, O, F> Solver<O, IterState<O>> for MoreThuenteLineSearch<P, F>
+impl<P, G, O, F> Solver<O, IterState<P, G, (), (), F>> for MoreThuenteLineSearch<P, G, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>
-        + CostFunction<Param = P, Output = F>
-        + Gradient<Param = P, Gradient = P>,
-    P: Clone + SerializeAlias + ArgminDot<P, F> + ArgminScaledAdd<P, F, P>,
+    O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
+    P: Clone + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<P, F, P>,
+    G: Clone + SerializeAlias + ArgminDot<P, F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "More-Thuente Line search";
@@ -233,8 +232,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         check_param!(
             self.search_direction,
             "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
@@ -289,8 +288,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {
@@ -649,8 +648,7 @@ fn cstep<F: ArgminFloat>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::MinimalNoOperator;
     use crate::test_trait_impl;
 
-    test_trait_impl!(morethuente, MoreThuenteLineSearch<MinimalNoOperator, f64>);
+    test_trait_impl!(morethuente, MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>);
 }

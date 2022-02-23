@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, Jacobian, ObserverMode, Operator};
+use argmin::core::{ArgminSlogLogger, Error, Executor, Jacobian, ObserverMode, Operator};
 use argmin::solver::gaussnewton::GaussNewton;
 use ndarray::{Array1, Array2};
 
@@ -21,18 +21,9 @@ struct Problem {
     data: Vec<Measurement>,
 }
 
-impl ArgminOp for Problem {
-    type Param = Array1<f64>;
-    type Output = Array1<f64>;
-    type Hessian = ();
-    type Jacobian = Array2<f64>;
-    type Float = f64;
-}
-
 impl Operator for Problem {
     type Param = Array1<f64>;
     type Output = Array1<f64>;
-    type Float = f64;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(self
@@ -46,7 +37,6 @@ impl Operator for Problem {
 impl Jacobian for Problem {
     type Param = Array1<f64>;
     type Jacobian = Array2<f64>;
-    type Float = f64;
 
     fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {
         Ok(Array2::from_shape_fn((self.data.len(), 2), |(si, i)| {

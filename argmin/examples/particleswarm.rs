@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminOp, CostFunction, Error, Executor};
+use argmin::core::{CostFunction, Error, Executor};
 #[cfg(feature = "visualizer")]
 use argmin::core::{ObserverMode, Surface, Visualizer3d};
 use argmin::solver::particleswarm::ParticleSwarm;
@@ -13,18 +13,9 @@ use argmin_testfunctions::himmelblau;
 
 struct Himmelblau {}
 
-impl ArgminOp for Himmelblau {
-    type Param = Vec<f64>;
-    type Output = f64;
-    type Hessian = ();
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl CostFunction for Himmelblau {
     type Param = Vec<f64>;
     type Output = f64;
-    type Float = f64;
 
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
         Ok(himmelblau(param))

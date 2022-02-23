@@ -8,12 +8,10 @@
 // TODO: Logging of "initial info"
 
 #[cfg(feature = "serde1")]
+use crate::core::{serialization::load_checkpoint, ArgminCheckpoint, CheckpointMode};
 use crate::core::{
-    serialization::load_checkpoint, ArgminCheckpoint, CheckpointMode, DeserializeOwnedAlias,
-};
-use crate::core::{
-    ArgminKV, ArgminOp, Error, Observe, Observer, ObserverMode, OpWrapper, OptimizationResult,
-    Solver, State, TerminationReason,
+    ArgminKV, DeserializeOwnedAlias, Error, Observe, Observer, ObserverMode, OpWrapper,
+    OptimizationResult, SerializeAlias, Solver, State, TerminationReason,
 };
 use instant;
 #[cfg(feature = "serde1")]
@@ -48,9 +46,8 @@ pub struct Executor<O, S, I> {
 
 impl<O, S, I> Executor<O, S, I>
 where
-    O: ArgminOp,
     S: Solver<O, I>,
-    I: State<Operator = O>,
+    I: State + SerializeAlias + DeserializeOwnedAlias,
 {
     /// Create a new executor with a `solver` and an initial parameter `init_param`
     pub fn new(op: O, solver: S) -> Self {
@@ -80,7 +77,7 @@ where
     }
 
     /// Run the executor
-    pub fn run(mut self) -> Result<OptimizationResult<I>, Error> {
+    pub fn run(mut self) -> Result<OptimizationResult<O, I>, Error> {
         let total_time = if self.timer {
             Some(instant::Instant::now())
         } else {
@@ -270,7 +267,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{ArgminOp, IterState, MinimalNoOperator};
+    use crate::core::{ArgminFloat, IterState, MinimalNoOperator};
     use approx::assert_relative_eq;
 
     #[test]
@@ -279,15 +276,16 @@ mod tests {
         #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
         struct TestSolver {}
 
-        impl<O> Solver<O, IterState<O>> for TestSolver
+        impl<O, P, G, J, H, F> Solver<O, IterState<P, G, J, H, F>> for TestSolver
         where
-            O: ArgminOp,
+            P: Clone,
+            F: ArgminFloat,
         {
             fn next_iter(
                 &mut self,
                 _op: &mut OpWrapper<O>,
-                state: IterState<O>,
-            ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+                state: IterState<P, G, J, H, F>,
+            ) -> Result<(IterState<P, G, J, H, F>, Option<ArgminKV>), Error> {
                 Ok((state, None))
             }
         }
@@ -295,15 +293,20 @@ mod tests {
         let op = MinimalNoOperator::new();
         let solver = TestSolver {};
 
-        let mut executor =
-            Executor::new(op, solver).configure(|config| config.param(vec![0.0, 0.0]));
+        let mut executor = Executor::new(op, solver)
+            .configure(|config: IterState<Vec<f64>, (), (), (), f64>| config.param(vec![0.0, 0.0]));
 
         // 1) Parameter vector changes, but not cost (continues to be `Inf`)
         let new_param = vec![1.0, 1.0];
         executor.state = Some(executor.state.take().unwrap().param(new_param.clone()));
         executor.state.as_mut().unwrap().update();
         assert_eq!(
-            executor.state.as_ref().unwrap().get_best_param().unwrap(),
+            *executor
+                .state
+                .as_ref()
+                .unwrap()
+                .get_best_param_ref()
+                .unwrap(),
             new_param
         );
         assert!(executor
@@ -332,7 +335,12 @@ mod tests {
         );
         executor.state.as_mut().unwrap().update();
         assert_eq!(
-            executor.state.as_ref().unwrap().get_best_param().unwrap(),
+            *executor
+                .state
+                .as_ref()
+                .unwrap()
+                .get_best_param_ref()
+                .unwrap(),
             new_param
         );
         assert_relative_eq!(
@@ -342,7 +350,13 @@ mod tests {
         );
 
         // 3) Parameter vector and cost changes to something worse
-        let old_param = executor.state.as_ref().unwrap().get_best_param();
+        let old_param = executor
+            .state
+            .as_ref()
+            .unwrap()
+            .get_best_param_ref()
+            .unwrap()
+            .clone();
         let new_param = vec![3.0, 3.0];
         let old_cost = executor.state.as_ref().unwrap().get_best_cost();
         let new_cost = old_cost + 1.0;
@@ -355,7 +369,16 @@ mod tests {
                 .cost(new_cost),
         );
         executor.state.as_mut().unwrap().update();
-        assert_eq!(executor.state.as_ref().unwrap().get_best_param(), old_param);
+        assert_eq!(
+            executor
+                .state
+                .as_ref()
+                .unwrap()
+                .get_best_param_ref()
+                .unwrap()
+                .clone(),
+            old_param
+        );
         assert_relative_eq!(
             executor.state.as_ref().unwrap().get_best_cost(),
             old_cost,
@@ -364,8 +387,8 @@ mod tests {
 
         // 4) `-Inf` is better than `Inf`
         let solver = TestSolver {};
-        let mut executor =
-            Executor::new(op, solver).configure(|config| config.param(vec![0.0, 0.0]));
+        let mut executor = Executor::new(op, solver)
+            .configure(|config: IterState<Vec<f64>, (), (), (), f64>| config.param(vec![0.0, 0.0]));
 
         let new_param = vec![1.0, 1.0];
         let new_cost = std::f64::NEG_INFINITY;
@@ -379,7 +402,12 @@ mod tests {
         );
         executor.state.as_mut().unwrap().update();
         assert_eq!(
-            executor.state.as_ref().unwrap().get_best_param().unwrap(),
+            *executor
+                .state
+                .as_ref()
+                .unwrap()
+                .get_best_param_ref()
+                .unwrap(),
             new_param
         );
         assert!(executor
@@ -396,7 +424,13 @@ mod tests {
             .is_sign_negative());
 
         // 5) `Inf` is worse than `-Inf`
-        let old_param = executor.state.as_ref().unwrap().get_best_param().unwrap();
+        let old_param = executor
+            .state
+            .as_ref()
+            .unwrap()
+            .get_best_param_ref()
+            .unwrap()
+            .clone();
         let new_param = vec![6.0, 6.0];
         let new_cost = std::f64::INFINITY;
         executor.state = Some(
@@ -409,7 +443,13 @@ mod tests {
         );
         executor.state.as_mut().unwrap().update();
         assert_eq!(
-            executor.state.as_ref().unwrap().get_best_param().unwrap(),
+            executor
+                .state
+                .as_ref()
+                .unwrap()
+                .get_best_param_ref()
+                .unwrap()
+                .clone(),
             old_param
         );
         assert!(executor

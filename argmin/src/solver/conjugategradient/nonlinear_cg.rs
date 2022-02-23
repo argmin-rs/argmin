@@ -11,8 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminKV, ArgminLineSearch, ArgminNLCGBetaUpdate, ArgminOp, CostFunction, Error,
-    Executor, Gradient, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, State,
+    ArgminFloat, ArgminKV, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
+    IterState, LineSearch, NLCGBetaUpdate, OpWrapper, OptimizationResult, SerializeAlias, Solver,
+    State,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm};
 #[cfg(feature = "serde1")]
@@ -82,14 +83,19 @@ where
     }
 }
 
-impl<O, P, L, B, F> Solver<O, IterState<O>> for NonlinearConjugateGradient<P, L, B, F>
+impl<O, P, G, L, B, F> Solver<O, IterState<P, G, (), (), F>>
+    for NonlinearConjugateGradient<P, L, B, F>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>
-        + CostFunction<Param = P, Output = F>
-        + Gradient<Param = P, Gradient = P>,
-    P: Clone + SerializeAlias + ArgminAdd<P, P> + ArgminMul<F, P> + ArgminDot<P, F> + ArgminNorm<F>,
-    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
-    B: ArgminNLCGBetaUpdate<P, F>,
+    O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
+    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminAdd<P, P> + ArgminMul<F, P>,
+    G: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminMul<F, P>
+        + ArgminDot<G, F>
+        + ArgminNorm<F>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
+    B: NLCGBetaUpdate<G, P, F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Nonlinear Conjugate Gradient";
@@ -97,8 +103,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
@@ -109,8 +115,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         let p = self.p.as_ref().unwrap();
         let xk = state.take_param().unwrap();
         let grad = state
@@ -185,7 +191,7 @@ mod tests {
         nonlinear_cg,
         NonlinearConjugateGradient<
             MinimalNoOperator,
-            MoreThuenteLineSearch<MinimalNoOperator, f64>,
+            MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>,
             PolakRibiere,
             f64
         >

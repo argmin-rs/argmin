@@ -11,7 +11,7 @@ use approx::assert_relative_eq;
 use ndarray::prelude::*;
 use ndarray::{Array1, Array2};
 
-use crate::core::{ArgminOp, CostFunction, Error, Executor, Gradient, Hessian, State};
+use crate::core::{CostFunction, Error, Executor, Gradient, Hessian, State};
 use crate::solver::gradientdescent::SteepestDescent;
 use crate::solver::linesearch::{HagerZhangLineSearch, MoreThuenteLineSearch};
 use crate::solver::newton::NewtonCG;
@@ -55,18 +55,9 @@ impl MaxEntropy {
     }
 }
 
-impl ArgminOp for MaxEntropy {
-    type Param = Array1<f64>;
-    type Output = f64;
-    type Hessian = Array2<f64>;
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl CostFunction for MaxEntropy {
     type Param = Array1<f64>;
     type Output = f64;
-    type Float = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         let log_pdot = self.F.dot(&p.t());
@@ -79,7 +70,6 @@ impl CostFunction for MaxEntropy {
 impl Gradient for MaxEntropy {
     type Param = Array1<f64>;
     type Gradient = Array1<f64>;
-    type Float = f64;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
         let log_pdot = self.F.dot(&p.t());
@@ -93,7 +83,6 @@ impl Gradient for MaxEntropy {
 impl Hessian for MaxEntropy {
     type Param = Array1<f64>;
     type Hessian = Array2<f64>;
-    type Float = f64;
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
         let log_pdot = self.F.dot(&p.t());
@@ -121,7 +110,7 @@ macro_rules! entropy_max_tests {
                 .unwrap();
 
             assert_relative_eq!(
-                cost_func.cost(&res.state.get_param().unwrap()).unwrap(),
+                cost_func.cost(res.state.get_param_ref().unwrap()).unwrap(),
                 cost_func.cost(&cost_func.param_opt).unwrap(),
                 epsilon = 1e-6
             );
@@ -151,7 +140,7 @@ fn test_lbfgs_func_count() {
         .unwrap();
 
     assert_relative_eq!(
-        cost.cost(&res.state.get_param().unwrap()).unwrap(),
+        cost.cost(res.state.get_param_ref().unwrap()).unwrap(),
         cost.cost(&cost.param_opt).unwrap(),
         epsilon = 1e-6
     );

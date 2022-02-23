@@ -16,14 +16,14 @@ use argmin_math::ArgminDot;
 use serde::{Deserialize, Serialize};
 
 /// Needs to be implemented by everything that wants to be a LineSearchCondition
-pub trait LineSearchCondition<T, F>: SerializeAlias {
+pub trait LineSearchCondition<T, G, F>: SerializeAlias {
     /// Evaluate the condition
     fn eval(
         &self,
         cur_cost: F,
-        cur_grad: Option<&T>,
+        cur_grad: Option<&G>,
         init_cost: F,
-        init_grad: &T,
+        init_grad: &G,
         search_direction: &T,
         alpha: F,
     ) -> bool;
@@ -55,17 +55,17 @@ where
     }
 }
 
-impl<T, F> LineSearchCondition<T, F> for ArmijoCondition<F>
+impl<T, G, F> LineSearchCondition<T, G, F> for ArmijoCondition<F>
 where
-    T: ArgminDot<T, F>,
+    G: ArgminDot<T, F>,
     F: ArgminFloat,
 {
     fn eval(
         &self,
         cur_cost: F,
-        _cur_grad: Option<&T>,
+        _cur_grad: Option<&G>,
         init_cost: F,
-        init_grad: &T,
+        init_grad: &G,
         search_direction: &T,
         alpha: F,
     ) -> bool {
@@ -107,17 +107,17 @@ where
     }
 }
 
-impl<T, F> LineSearchCondition<T, F> for WolfeCondition<F>
+impl<T, G, F> LineSearchCondition<T, G, F> for WolfeCondition<F>
 where
-    T: ArgminDot<T, F>,
+    G: ArgminDot<T, F>,
     F: ArgminFloat,
 {
     fn eval(
         &self,
         cur_cost: F,
-        cur_grad: Option<&T>,
+        cur_grad: Option<&G>,
         init_cost: F,
-        init_grad: &T,
+        init_grad: &G,
         search_direction: &T,
         alpha: F,
     ) -> bool {
@@ -161,17 +161,17 @@ where
     }
 }
 
-impl<T, F> LineSearchCondition<T, F> for StrongWolfeCondition<F>
+impl<T, G, F> LineSearchCondition<T, G, F> for StrongWolfeCondition<F>
 where
-    T: ArgminDot<T, F>,
+    G: ArgminDot<T, F>,
     F: ArgminFloat,
 {
     fn eval(
         &self,
         cur_cost: F,
-        cur_grad: Option<&T>,
+        cur_grad: Option<&G>,
         init_cost: F,
-        init_grad: &T,
+        init_grad: &G,
         search_direction: &T,
         alpha: F,
     ) -> bool {
@@ -208,17 +208,17 @@ where
     }
 }
 
-impl<T, F> LineSearchCondition<T, F> for GoldsteinCondition<F>
+impl<T, G, F> LineSearchCondition<T, G, F> for GoldsteinCondition<F>
 where
-    T: ArgminDot<T, F>,
+    G: ArgminDot<T, F>,
     F: ArgminFloat,
 {
     fn eval(
         &self,
         cur_cost: F,
-        _cur_grad: Option<&T>,
+        _cur_grad: Option<&G>,
         init_cost: F,
-        init_grad: &T,
+        init_grad: &G,
         search_direction: &T,
         alpha: F,
     ) -> bool {

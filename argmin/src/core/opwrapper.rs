@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminOp, CostFunction, Error, Gradient, Hessian, Jacobian, LinearProgram, Modify, Operator,
+    CostFunction, Error, Gradient, Hessian, Jacobian, LinearProgram, Modify, Operator,
 };
 use std::collections::HashMap;
 #[cfg(feature = "serde1")]
@@ -90,7 +90,7 @@ impl<O> OpWrapper<O> {
     }
 }
 
-impl<O: ArgminOp> OpWrapper<O> {
+impl<O> OpWrapper<O> {
     /// Moves the operator out of the struct and replaces it with `None`
     pub fn take_op(&mut self) -> Option<O> {
         self.op.take()
@@ -104,7 +104,7 @@ impl<O: ArgminOp> OpWrapper<O> {
     }
 
     /// Adds function evaluation counts of another operator.
-    pub fn consume_func_counts<O2: ArgminOp>(&mut self, other: OpWrapper<O2>) {
+    pub fn consume_func_counts<O2>(&mut self, other: OpWrapper<O2>) {
         for (k, v) in other.counts.iter() {
             let count = self.counts.entry(k).or_insert(0);
             *count += v

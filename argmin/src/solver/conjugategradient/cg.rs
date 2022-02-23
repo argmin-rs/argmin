@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminKV, ArgminOp, Error, IterState, OpWrapper, Operator, SerializeAlias, Solver,
+    ArgminFloat, ArgminKV, Error, IterState, OpWrapper, Operator, SerializeAlias, Solver,
 };
 use argmin_math::{ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -76,9 +76,9 @@ where
     }
 }
 
-impl<P, O, F> Solver<O, IterState<O>> for ConjugateGradient<P, F>
+impl<P, O, F> Solver<O, IterState<P, (), (), (), F>> for ConjugateGradient<P, F>
 where
-    O: ArgminOp<Param = P, Output = P, Float = F> + Operator<Param = P, Output = P>,
+    O: Operator<Param = P, Output = P>,
     P: Clone
         + SerializeAlias
         + ArgminDot<P, F>
@@ -93,8 +93,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        state: IterState<P, (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
         let init_param = state.get_param_ref().unwrap();
         let ap = op.apply(init_param)?;
         let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
@@ -108,8 +108,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        state: IterState<P, (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
         let p = self.p.as_ref().unwrap();
         let r = self.r.as_ref().unwrap();
 

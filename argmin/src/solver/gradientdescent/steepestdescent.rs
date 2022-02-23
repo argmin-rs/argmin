@@ -15,8 +15,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Executor, Gradient,
-    IterState, OpWrapper, OptimizationResult, Solver,
+    ArgminFloat, ArgminKV, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
+    IterState, LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver,
 };
 use argmin_math::ArgminMul;
 #[cfg(feature = "serde1")]
@@ -43,13 +43,12 @@ impl<L> SteepestDescent<L> {
     }
 }
 
-impl<O, L, P, F> Solver<O, IterState<O>> for SteepestDescent<L>
+impl<O, L, P, G, F> Solver<O, IterState<P, G, (), (), F>> for SteepestDescent<L>
 where
-    O: ArgminOp<Param = P, Output = F, Float = F>
-        + CostFunction<Param = P, Output = F, Float = F>
-        + Gradient<Param = P, Gradient = P, Float = F>,
-    P: ArgminMul<F, P>,
-    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
+    O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
+    P: Clone + SerializeAlias + DeserializeOwnedAlias,
+    G: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminMul<F, P>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Steepest Descent";
@@ -57,8 +56,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
         let param_new = state.take_param().unwrap();
         let new_cost = op.cost(&param_new)?;
         let new_grad = op.gradient(&param_new)?;
@@ -95,6 +94,6 @@ mod tests {
 
     test_trait_impl!(
         steepest_descent,
-        SteepestDescent<MoreThuenteLineSearch<Vec<f64>, f64>>
+        SteepestDescent<MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>>
     );
 }

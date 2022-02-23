@@ -12,8 +12,8 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminOp, CostFunction, Error, IterState, OpWrapper,
-    Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, IterState, OpWrapper, Solver,
+    TerminationReason,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -85,9 +85,9 @@ where
     }
 }
 
-impl<O, F> Solver<O, IterState<O>> for GoldenSectionSearch<F>
+impl<O, F> Solver<O, IterState<F, (), (), (), F>> for GoldenSectionSearch<F>
 where
-    O: ArgminOp<Output = F, Param = F, Float = F> + CostFunction<Param = F, Output = F>,
+    O: CostFunction<Param = F, Output = F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Golden-section search";
@@ -95,8 +95,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<F, (), (), (), F>,
+    ) -> Result<(IterState<F, (), (), (), F>, Option<ArgminKV>), Error> {
         let init_estimate = state.take_param().unwrap();
         if init_estimate < self.min_bound || init_estimate > self.max_bound {
             Err(ArgminError::InvalidParameter {
@@ -126,8 +126,8 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        state: IterState<F, (), (), (), F>,
+    ) -> Result<(IterState<F, (), (), (), F>, Option<ArgminKV>), Error> {
         if self.f2 < self.f1 {
             self.x0 = self.x1;
             self.x1 = self.x2;
@@ -148,7 +148,7 @@ where
         }
     }
 
-    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<F, (), (), (), F>) -> TerminationReason {
         if self.tolerance * (self.x1.abs() + self.x2.abs()) >= (self.x3 - self.x0).abs() {
             return TerminationReason::TargetToleranceReached;
         }

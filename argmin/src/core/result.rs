@@ -22,7 +22,7 @@
 # #![allow(unused_imports)]
 # extern crate argmin;
 # extern crate argmin_testfunctions;
-# use argmin::core::{ArgminOp, Error, Executor, State, CostFunction, Gradient};
+# use argmin::core::{Error, Executor, State, CostFunction, Gradient};
 # use argmin::solver::gradientdescent::SteepestDescent;
 # use argmin::solver::linesearch::MoreThuenteLineSearch;
 # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -34,28 +34,12 @@
 #     b: f64,
 # }
 #
-# /// Implement `ArgminOp` for `Rosenbrock`
-# impl ArgminOp for Rosenbrock {
-#     /// Type of the parameter vector
-#     type Param = Vec<f64>;
-#     /// Type of the return value computed by the cost function
-#     type Output = f64;
-#     /// Type of the Hessian. Can be `()` if not needed.
-#     type Hessian = Vec<Vec<f64>>;
-#     /// Type of the Jacobian. Can be `()` if not needed.
-#     type Jacobian = ();
-#     /// Floating point precision
-#     type Float = f64;
-# }
-#
 # /// Implement `CostFunction` for `Rosenbrock`
 # impl CostFunction for Rosenbrock {
 #     /// Type of the parameter vector
 #     type Param = Vec<f64>;
 #     /// Type of the return value computed by the cost function
 #     type Output = f64;
-#     /// Floating point precision
-#     type Float = f64;
 #
 #     /// Apply the cost function to a parameter `p`
 #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
@@ -69,8 +53,6 @@
 #     type Param = Vec<f64>;
 #     /// Type of the return value computed by the cost function
 #     type Gradient = Vec<f64>;
-#     /// Floating point precision
-#     type Float = f64;
 #
 #     /// Compute the gradient at parameter `p`.
 #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
@@ -79,7 +61,6 @@
 # }
 #
 # fn run() -> Result<(), Error> {
-#     // Define cost function (must implement `ArgminOp`)
 #     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 #     // Define initial parameter vector
 #     let init_param: Vec<f64> = vec![-1.2, 1.0];
@@ -93,7 +74,7 @@
 #         // run the solver on the defined problem
 #         .run()?;
 // Get best parameter vector
-let best_parameter = result.state().get_best_param();
+let best_parameter = result.state().get_best_param_ref().unwrap();
 
 // Get best cost function value
 let best_cost = result.state().get_best_cost();
@@ -122,21 +103,21 @@ use crate::core::{OpWrapper, State};
 
 /// Final struct returned by the `run` method of `Executor`.
 #[derive(Clone)]
-pub struct OptimizationResult<I: State> {
+pub struct OptimizationResult<O, I> {
     /// operator
-    pub operator: OpWrapper<I::Operator>,
+    pub operator: OpWrapper<O>,
     /// iteration state
     pub state: I,
 }
 
-impl<I: State> OptimizationResult<I> {
+impl<O, I> OptimizationResult<O, I> {
     /// Constructor
-    pub fn new(operator: OpWrapper<I::Operator>, state: I) -> Self {
+    pub fn new(operator: OpWrapper<O>, state: I) -> Self {
         OptimizationResult { operator, state }
     }
 
     /// Return handle to operator
-    pub fn operator(&self) -> &OpWrapper<I::Operator> {
+    pub fn operator(&self) -> &OpWrapper<O> {
         &self.operator
     }
 
@@ -146,7 +127,7 @@ impl<I: State> OptimizationResult<I> {
     }
 }
 
-impl<I> std::fmt::Display for OptimizationResult<I>
+impl<O, I> std::fmt::Display for OptimizationResult<O, I>
 where
     I: State,
 {
@@ -201,6 +182,6 @@ mod tests {
 
     send_sync_test!(
         argmin_result,
-        OptimizationResult<IterState<MinimalNoOperator>>
+        OptimizationResult<MinimalNoOperator, IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>>
     );
 }

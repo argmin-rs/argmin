@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, Jacobian, ObserverMode, Operator};
+use argmin::core::{ArgminSlogLogger, Error, Executor, Jacobian, ObserverMode, Operator};
 use argmin::solver::gaussnewton::GaussNewton;
 
 use nalgebra::{DMatrix, DVector};
@@ -22,18 +22,9 @@ struct Problem {
     data: Vec<Measurement>,
 }
 
-impl ArgminOp for Problem {
-    type Param = DVector<f64>;
-    type Output = DVector<f64>;
-    type Hessian = ();
-    type Jacobian = DMatrix<f64>;
-    type Float = f64;
-}
-
 impl Operator for Problem {
     type Param = DVector<f64>;
     type Output = DVector<f64>;
-    type Float = f64;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(DVector::from_vec(
@@ -48,7 +39,6 @@ impl Operator for Problem {
 impl Jacobian for Problem {
     type Param = DVector<f64>;
     type Jacobian = DMatrix<f64>;
-    type Float = f64;
 
     fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {
         Ok(DMatrix::from_fn(7, 2, |si, i| {

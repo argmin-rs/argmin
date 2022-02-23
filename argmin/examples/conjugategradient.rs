@@ -5,23 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminOp, ArgminSlogLogger, Error, Executor, ObserverMode, Operator};
+use argmin::core::{ArgminSlogLogger, Error, Executor, ObserverMode, Operator};
 use argmin::solver::conjugategradient::ConjugateGradient;
 
 struct MyProblem {}
 
-impl ArgminOp for MyProblem {
-    type Param = Vec<f64>;
-    type Output = Vec<f64>;
-    type Hessian = ();
-    type Jacobian = ();
-    type Float = f64;
-}
-
 impl Operator for MyProblem {
     type Param = Vec<f64>;
     type Output = Vec<f64>;
-    type Float = f64;
 
     fn apply(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
         Ok(vec![4.0 * p[0] + 1.0 * p[1], 1.0 * p[0] + 3.0 * p[1]])

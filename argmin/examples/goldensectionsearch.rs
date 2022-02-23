@@ -5,26 +5,16 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminOp, ArgminSlogLogger, CostFunction, Error, Executor, ObserverMode};
+use argmin::core::{ArgminSlogLogger, CostFunction, Error, Executor, ObserverMode};
 use argmin::solver::goldensectionsearch::GoldenSectionSearch;
 
 /// Test function from Wikipedia example
 struct TestFunc {}
 
-impl ArgminOp for TestFunc {
-    // one dimensional problem, no vector needed
-    type Param = f32;
-    type Output = f32;
-    type Hessian = ();
-    type Jacobian = ();
-    type Float = f32;
-}
-
 impl CostFunction for TestFunc {
     // one dimensional problem, no vector needed
     type Param = f32;
     type Output = f32;
-    type Float = f32;
 
     fn cost(&self, x: &Self::Param) -> Result<Self::Output, Error> {
         // In interval [2.5, 2.5]

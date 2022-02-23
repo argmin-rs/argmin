@@ -171,8 +171,9 @@ pub fn load_checkpoint<T: DeserializeOwnedAlias, I: DeserializeOwnedAlias, P: As
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::*;
-    use crate::core::{IterState, MinimalNoOperator};
+    use crate::core::{
+        ArgminFloat, ArgminKV, Executor, IterState, MinimalNoOperator, OpWrapper, Solver,
+    };
 
     #[derive(Serialize, Deserialize, Clone, Debug)]
     pub struct PhonySolver {}
@@ -184,32 +185,42 @@ mod tests {
         }
     }
 
-    impl<O> Solver<O, IterState<O>> for PhonySolver
+    impl<O, P, G, J, H, F> Solver<O, IterState<P, G, J, H, F>> for PhonySolver
     where
-        O: ArgminOp,
+        P: Clone,
+        F: ArgminFloat,
     {
         fn next_iter(
             &mut self,
             _op: &mut OpWrapper<O>,
-            _state: IterState<O>,
-        ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+            _state: IterState<P, G, J, H, F>,
+        ) -> Result<(IterState<P, G, J, H, F>, Option<ArgminKV>), Error> {
             unimplemented!()
         }
     }
 
     #[test]
+    #[allow(clippy::type_complexity)]
     fn test_store() {
         let op: MinimalNoOperator = MinimalNoOperator::new();
         let solver = PhonySolver::new();
-        let mut exec: Executor<MinimalNoOperator, PhonySolver, _> =
-            Executor::new(op, solver).configure(|config| config.param(vec![0.0f64, 0.0]));
+        let mut exec: Executor<MinimalNoOperator, PhonySolver, _> = Executor::new(op, solver)
+            .configure(
+                |config: IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>| {
+                    config.param(vec![0.0f64, 0.0])
+                },
+            );
         let state = exec.state.take().unwrap();
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&exec, &state, 20).unwrap();
 
         let (_loaded, _state): (
-            Executor<MinimalNoOperator, PhonySolver, IterState<MinimalNoOperator>>,
-            IterState<MinimalNoOperator>,
+            Executor<
+                MinimalNoOperator,
+                PhonySolver,
+                IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>,
+            >,
+            IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>,
         ) = load_checkpoint("checkpoints/solver.arg").unwrap();
     }
 }

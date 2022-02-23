@@ -7,7 +7,7 @@
 
 //! # Output parameter vectors to file
 
-use crate::core::{ArgminKV, Error, Observe, State};
+use crate::core::{ArgminFloat, ArgminKV, Error, IterState, Observe, State};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fs::File;
@@ -58,20 +58,24 @@ impl WriteToFile {
     }
 }
 
-impl<I: State> Observe<I> for WriteToFile {
-    fn observe_iter(&mut self, state: &I, _kv: &ArgminKV) -> Result<(), Error> {
-        let param = state.get_param();
+impl<P, G, J, H, F> Observe<IterState<P, G, J, H, F>> for WriteToFile
+where
+    P: Clone + Serialize,
+    F: ArgminFloat,
+{
+    fn observe_iter(
+        &mut self,
+        state: &IterState<P, G, J, H, F>,
+        _kv: &ArgminKV,
+    ) -> Result<(), Error> {
+        let param = state.get_param_ref().unwrap().clone();
         let iter = state.get_iter();
         let dir = Path::new(&self.dir);
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?
         }
 
-        let mut fname = self.prefix.clone();
-        fname.push('_');
-        fname.push_str(&iter.to_string());
-        fname.push_str(".arp");
-        let fname = dir.join(fname);
+        let fname = dir.join(format!("{}_{}.arp", self.prefix, iter));
 
         let f = BufWriter::new(File::create(fname)?);
         match self.serializer {

@@ -11,8 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminKV, ArgminLineSearch, ArgminOp, CostFunction, Error, Executor, Gradient,
-    IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, TerminationReason,
+    ArgminFloat, ArgminKV, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
+    IterState, LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver,
+    TerminationReason,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminEye, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose,
@@ -68,26 +69,32 @@ where
     }
 }
 
-impl<O, L, H, F, P> Solver<O, IterState<O>> for BFGS<L, H, F>
+impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, F>> for BFGS<L, H, F>
 where
-    O: ArgminOp<Param = P, Output = F, Hessian = H, Float = F>
-        + CostFunction<Param = P, Output = F>
-        + Gradient<Param = P, Gradient = P>,
+    O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<P, P>
-        + ArgminDot<P, F>
-        + ArgminDot<P, H>
+        + ArgminDot<G, H>
+        + ArgminDot<P, H>,
+    G: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminNorm<F>
-        + ArgminMul<F, P>,
-    O::Hessian: SerializeAlias
+        + ArgminMul<F, P>
+        + ArgminDot<P, F>
+        + ArgminSub<G, G>,
+    H: SerializeAlias
+        + DeserializeOwnedAlias
         + ArgminSub<H, H>
-        + ArgminDot<P, P>
+        + ArgminDot<G, G>
         + ArgminDot<H, H>
         + ArgminAdd<H, H>
         + ArgminMul<F, H>
         + ArgminTranspose<H>
         + ArgminEye,
-    L: Clone + ArgminLineSearch<P, F> + Solver<O, IterState<O>>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "BFGS";
@@ -95,8 +102,8 @@ where
     fn init(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), H, F>,
+    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
@@ -113,12 +120,12 @@ where
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        mut state: IterState<O>,
-    ) -> Result<(IterState<O>, Option<ArgminKV>), Error> {
+        mut state: IterState<P, G, (), H, F>,
+    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
         let param = state.take_param().unwrap();
         let cur_cost = state.cost;
         let prev_grad = state.take_grad().unwrap();
-        let inv_hessian = state.get_inv_hessian().unwrap();
+        let inv_hessian = state.take_inv_hessian().unwrap();
 
         let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
 
@@ -154,7 +161,7 @@ where
         let rhok = F::from_f64(1.0).unwrap() / yksk;
 
         let e = inv_hessian.eye_like();
-        let mat1: O::Hessian = sk.dot(&yk);
+        let mat1: H = sk.dot(&yk);
         let mat1 = mat1.mul(&rhok);
 
         let tmp1 = e.sub(&mat1);
@@ -162,7 +169,7 @@ where
         let mat2 = mat1.t();
         let tmp2 = e.sub(&mat2);
 
-        let sksk: O::Hessian = sk.dot(&sk);
+        let sksk: H = sk.dot(&sk);
         let sksk = sksk.mul(&rhok);
 
         // if state.get_iter() == 0 {
@@ -183,8 +190,8 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<O>) -> TerminationReason {
-        if state.get_grad().unwrap().norm() < self.tol_grad {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationReason {
+        if state.get_grad_ref().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         if (state.get_prev_cost() - state.cost).abs() < self.tol_cost {
@@ -197,17 +204,17 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::MinimalNoOperator;
     use crate::solver::linesearch::MoreThuenteLineSearch;
     use crate::test_trait_impl;
 
-    type Operator = MinimalNoOperator;
-
-    test_trait_impl!(bfgs, BFGS<Operator, MoreThuenteLineSearch<Operator, f64>, f64>);
+    test_trait_impl!(
+        bfgs,
+        BFGS<MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>, Vec<Vec<f64>>, f64>
+    );
 
     #[test]
     fn test_tolerances() {
-        let linesearch: MoreThuenteLineSearch<f64, f64> =
+        let linesearch: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
             MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
         let init_hessian: Vec<Vec<f64>> = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
 
