@@ -12,8 +12,8 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, IterState, OpWrapper, SerializeAlias,
-    Solver, TerminationReason,
+    ArgminError, ArgminFloat, CostFunction, Error, IterState, OpWrapper, SerializeAlias, Solver,
+    TerminationReason, KV,
 };
 use argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -217,7 +217,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         self.params = self
             .params
             .iter()
@@ -239,7 +239,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         let num_param = self.params.len();
 
         let x0 = self.calculate_centroid();

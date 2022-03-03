@@ -16,8 +16,8 @@
 //! DOI: 10.1126/science.220.4598.671
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, IterState, Modify, OpWrapper,
-    SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, CostFunction, Error, IterState, Modify, OpWrapper, SerializeAlias,
+    Solver, TerminationReason, KV,
 };
 use rand::prelude::*;
 #[cfg(feature = "serde1")]
@@ -247,7 +247,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let cost = op.cost(&param)?;
         Ok((
@@ -268,7 +268,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up will lead to strange
         // behaviour.

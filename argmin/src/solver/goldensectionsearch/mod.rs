@@ -12,8 +12,8 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, IterState, OpWrapper, Solver,
-    TerminationReason,
+    ArgminError, ArgminFloat, CostFunction, Error, IterState, OpWrapper, Solver, TerminationReason,
+    KV,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -96,7 +96,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<F, (), (), (), F>,
-    ) -> Result<(IterState<F, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
         let init_estimate = state.take_param().unwrap();
         if init_estimate < self.min_bound || init_estimate > self.max_bound {
             Err(ArgminError::InvalidParameter {
@@ -127,7 +127,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<F, (), (), (), F>,
-    ) -> Result<(IterState<F, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
         if self.f2 < self.f1 {
             self.x0 = self.x1;
             self.x1 = self.x2;

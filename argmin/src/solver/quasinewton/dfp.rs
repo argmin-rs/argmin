@@ -11,9 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminKV, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    IterState, LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver,
-    TerminationReason,
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
+    LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver, TerminationReason, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -89,7 +88,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
@@ -107,7 +106,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let cost = state.get_cost();
         let prev_grad = state

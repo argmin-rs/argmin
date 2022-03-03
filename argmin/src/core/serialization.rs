@@ -171,9 +171,7 @@ pub fn load_checkpoint<T: DeserializeOwnedAlias, I: DeserializeOwnedAlias, P: As
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{
-        ArgminFloat, ArgminKV, Executor, IterState, MinimalNoOperator, OpWrapper, Solver,
-    };
+    use crate::core::{ArgminFloat, Executor, IterState, MinimalNoOperator, OpWrapper, Solver, KV};
 
     #[derive(Serialize, Deserialize, Clone, Debug)]
     pub struct PhonySolver {}
@@ -194,7 +192,7 @@ mod tests {
             &mut self,
             _op: &mut OpWrapper<O>,
             _state: IterState<P, G, J, H, F>,
-        ) -> Result<(IterState<P, G, J, H, F>, Option<ArgminKV>), Error> {
+        ) -> Result<(IterState<P, G, J, H, F>, Option<KV>), Error> {
             unimplemented!()
         }
     }

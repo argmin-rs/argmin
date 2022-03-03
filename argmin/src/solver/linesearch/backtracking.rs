@@ -8,8 +8,8 @@
 //! * [Backtracking line search](struct.BacktrackingLineSearch.html)
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, Gradient, IterState, LineSearch,
-    OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, OpWrapper,
+    SerializeAlias, Solver, TerminationReason, KV,
 };
 use crate::solver::linesearch::condition::*;
 use argmin_math::ArgminScaledAdd;
@@ -146,7 +146,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         let init_param = state.param.clone().unwrap();
         let cost = state.cost;
         self.init_cost = if cost == F::infinity() {
@@ -177,7 +177,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         self.alpha = self.alpha * self.rho;
         let state = self.backtracking_step(op, state)?;
         Ok((state, None))

@@ -10,8 +10,8 @@
 #[cfg(feature = "serde1")]
 use crate::core::{serialization::load_checkpoint, ArgminCheckpoint, CheckpointMode};
 use crate::core::{
-    ArgminKV, DeserializeOwnedAlias, Error, Observe, Observer, ObserverMode, OpWrapper,
-    OptimizationResult, SerializeAlias, Solver, State, TerminationReason,
+    DeserializeOwnedAlias, Error, Observe, Observer, ObserverMode, OpWrapper, OptimizationResult,
+    SerializeAlias, Solver, State, TerminationReason, KV,
 };
 use instant;
 #[cfg(feature = "serde1")]
@@ -165,11 +165,7 @@ where
             state.update();
 
             if !self.observers.is_empty() {
-                let mut log = if let Some(kv) = kv {
-                    kv
-                } else {
-                    ArgminKV::new()
-                };
+                let mut log = if let Some(kv) = kv { kv } else { KV::new() };
 
                 if self.timer {
                     let duration = duration.unwrap();
@@ -285,7 +281,7 @@ mod tests {
                 &mut self,
                 _op: &mut OpWrapper<O>,
                 state: IterState<P, G, J, H, F>,
-            ) -> Result<(IterState<P, G, J, H, F>, Option<ArgminKV>), Error> {
+            ) -> Result<(IterState<P, G, J, H, F>, Option<KV>), Error> {
                 Ok((state, None))
             }
         }

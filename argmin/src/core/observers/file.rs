@@ -7,7 +7,7 @@
 
 //! # Output parameter vectors to file
 
-use crate::core::{ArgminFloat, ArgminKV, Error, IterState, Observe, State};
+use crate::core::{ArgminFloat, Error, IterState, Observe, State, KV};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fs::File;
@@ -63,11 +63,7 @@ where
     P: Clone + Serialize,
     F: ArgminFloat,
 {
-    fn observe_iter(
-        &mut self,
-        state: &IterState<P, G, J, H, F>,
-        _kv: &ArgminKV,
-    ) -> Result<(), Error> {
+    fn observe_iter(&mut self, state: &IterState<P, G, J, H, F>, _kv: &KV) -> Result<(), Error> {
         let param = state.get_param_ref().unwrap().clone();
         let iter = state.get_iter();
         let dir = Path::new(&self.dir);

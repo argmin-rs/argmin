@@ -44,7 +44,7 @@ pub use errors::ArgminError;
 pub use executor::Executor;
 // pub use iterstate::{IterState, LinearProgramState, State};
 pub use iterstate::{IterState, State};
-pub use kv::ArgminKV;
+pub use kv::KV;
 pub use nooperator::{MinimalNoOperator, NoOperator};
 use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 pub use observers::*;
@@ -191,18 +191,14 @@ pub trait Solver<O, I: State>: SerializeAlias {
     const NAME: &'static str = "UNDEFINED";
 
     /// Computes one iteration of the algorithm.
-    fn next_iter(
-        &mut self,
-        op: &mut OpWrapper<O>,
-        state: I,
-    ) -> Result<(I, Option<ArgminKV>), Error>;
+    fn next_iter(&mut self, op: &mut OpWrapper<O>, state: I) -> Result<(I, Option<KV>), Error>;
 
     /// Initializes the algorithm
     ///
     /// This is executed before any iterations are performed. It can be used to perform
     /// precomputations. The default implementation corresponds to doing nothing.
-    fn init(&mut self, _op: &mut OpWrapper<O>, state: I) -> Result<(I, Option<ArgminKV>), Error> {
-        Ok((state, Some(ArgminKV::new())))
+    fn init(&mut self, _op: &mut OpWrapper<O>, state: I) -> Result<(I, Option<KV>), Error> {
+        Ok((state, Some(KV::new())))
     }
 
     /// Checks whether basic termination reasons apply.

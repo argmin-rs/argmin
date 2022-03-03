@@ -11,9 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, CostFunction, DeserializeOwnedAlias, Error, Executor,
-    Gradient, Hessian, IterState, Jacobian, LineSearch, OpWrapper, Operator, OptimizationResult,
-    SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
+    Hessian, IterState, Jacobian, LineSearch, OpWrapper, Operator, OptimizationResult,
+    SerializeAlias, Solver, TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminTranspose};
 #[cfg(feature = "serde1")]
@@ -79,7 +79,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, J, (), F>,
-    ) -> Result<(IterState<P, G, J, (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, J, (), F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;

@@ -15,7 +15,7 @@
 //! kind. Amer. J. Math. 73, 615–624
 //! \[1\] <https://en.wikipedia.org/wiki/Landweber_iteration>
 
-use crate::core::{ArgminFloat, ArgminKV, Error, Gradient, IterState, OpWrapper, Solver};
+use crate::core::{ArgminFloat, Error, Gradient, IterState, OpWrapper, Solver, KV};
 use argmin_math::ArgminScaledSub;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -58,7 +58,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let new_param = param.scaled_sub(&self.omega, &grad);

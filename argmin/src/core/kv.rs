@@ -20,15 +20,15 @@ use std;
 /// A simple key-value storage
 #[derive(Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct ArgminKV {
+pub struct KV {
     /// The actual key value storage
     #[cfg_attr(feature = "serde1", serde(borrow))]
     pub kv: Vec<(&'static str, String)>,
 }
 
-impl std::fmt::Display for ArgminKV {
+impl std::fmt::Display for KV {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(f, "ArgminKV")?;
+        writeln!(f, "KV")?;
         self.kv
             .iter()
             .map(|(key, val)| -> std::fmt::Result { writeln!(f, "   {}: {}", key, val) })
@@ -37,10 +37,10 @@ impl std::fmt::Display for ArgminKV {
     }
 }
 
-impl ArgminKV {
+impl KV {
     /// Constructor
     pub fn new() -> Self {
-        ArgminKV { kv: vec![] }
+        KV { kv: vec![] }
     }
 
     /// Push a key-value pair to the `kv` vector.
@@ -53,15 +53,15 @@ impl ArgminKV {
 
     /// Merge another `kv` into `self.kv`
     #[must_use]
-    pub fn merge(mut self, other: &mut ArgminKV) -> Self {
+    pub fn merge(mut self, other: &mut KV) -> Self {
         self.kv.append(&mut other.kv);
         self
     }
 }
 
-impl std::iter::FromIterator<(&'static str, String)> for ArgminKV {
+impl std::iter::FromIterator<(&'static str, String)> for KV {
     fn from_iter<I: IntoIterator<Item = (&'static str, String)>>(iter: I) -> Self {
-        let mut c = ArgminKV::new();
+        let mut c = KV::new();
 
         for i in iter {
             c.push(i.0, i.1);
@@ -71,7 +71,7 @@ impl std::iter::FromIterator<(&'static str, String)> for ArgminKV {
     }
 }
 
-impl std::iter::Extend<(&'static str, String)> for ArgminKV {
+impl std::iter::Extend<(&'static str, String)> for KV {
     fn extend<I: IntoIterator<Item = (&'static str, String)>>(&mut self, iter: I) {
         for i in iter {
             self.push(i.0, i.1);
@@ -83,5 +83,5 @@ impl std::iter::Extend<(&'static str, String)> for ArgminKV {
 mod tests {
     use super::*;
 
-    send_sync_test!(argmin_kv, ArgminKV);
+    send_sync_test!(argmin_kv, KV);
 }

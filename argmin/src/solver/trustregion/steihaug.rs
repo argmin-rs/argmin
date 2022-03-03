@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminTrustRegion, Error, IterState, OpWrapper,
-    SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminTrustRegion, Error, IterState, OpWrapper, SerializeAlias,
+    Solver, State, TerminationReason, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot, ArgminZeroLike};
 #[cfg(feature = "serde1")]
@@ -163,7 +163,7 @@ where
         &mut self,
         _op: &mut OpWrapper<O>,
         state: IterState<P, P, (), H, F>,
-    ) -> Result<(IterState<P, P, (), H, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
         let r = state.get_grad_ref().unwrap().clone();
 
         self.r_0_norm = r.norm();
@@ -181,7 +181,7 @@ where
         &mut self,
         _op: &mut OpWrapper<O>,
         mut state: IterState<P, P, (), H, F>,
-    ) -> Result<(IterState<P, P, (), H, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
         let grad = state.take_grad().unwrap();
         let h = state.take_hessian().unwrap();
         let d = self.d.as_ref().unwrap();

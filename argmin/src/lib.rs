@@ -538,7 +538,7 @@
 //!
 //! ```rust
 //! use argmin::core::{
-//!     ArgminFloat, ArgminKV, Error, Gradient, IterState, OpWrapper, Solver, State
+//!     ArgminFloat, KV, Error, Gradient, IterState, OpWrapper, Solver, State
 //! };
 //! #[cfg(feature = "serde1")]
 //! use serde::{Deserialize, Serialize};
@@ -582,7 +582,7 @@
 //!         // gradient, Hessian and cost function value of the current, previous and best
 //!         // iteration as well as current iteration number, and many more.
 //!         mut state: IterState<P, G, (), (), F>,
-//!     ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
+//!     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
 //!         // First we obtain the current parameter vector from the `state` struct (`x_k`).
 //!         let xk = state.take_param().unwrap();
 //!         // Then we compute the gradient at `x_k` (`\nabla f(x_k)`)

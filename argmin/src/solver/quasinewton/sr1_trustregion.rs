@@ -11,9 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminTrustRegion, CostFunction, DeserializeOwnedAlias,
-    Error, Executor, Gradient, Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias,
-    Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminTrustRegion, CostFunction, DeserializeOwnedAlias, Error,
+    Executor, Gradient, Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver,
+    TerminationReason, KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
@@ -142,7 +142,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), B, F>,
-    ) -> Result<(IterState<P, G, (), B, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), B, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let cost = op.cost(&param)?;
         let grad = op.gradient(&param)?;
@@ -160,7 +160,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), B, F>,
-    ) -> Result<(IterState<P, G, (), B, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), B, F>, Option<KV>), Error> {
         let xk = state.take_param().unwrap();
         let cost = state.cost;
         let prev_grad = state
