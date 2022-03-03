@@ -15,8 +15,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminKV, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    IterState, LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver,
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
+    LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver, KV,
 };
 use argmin_math::ArgminMul;
 #[cfg(feature = "serde1")]
@@ -57,7 +57,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         let param_new = state.take_param().unwrap();
         let new_cost = op.cost(&param_new)?;
         let new_grad = op.gradient(&param_new)?;

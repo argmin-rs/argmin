@@ -7,11 +7,11 @@
 
 //! # Macros
 
-/// Creates an `ArgminKV` at compile time in order to avoid pushing to the `kv` vector.
+/// Creates an `KV` at compile time in order to avoid pushing to the `kv` vector.
 #[macro_export]
 macro_rules! make_kv {
     ($($k:expr =>  $v:expr;)*) => {
-        ArgminKV { kv: vec![ $(($k, format!("{:?}", $v))),* ] }
+        KV { kv: vec![ $(($k, format!("{:?}", $v))),* ] }
     };
 }
 

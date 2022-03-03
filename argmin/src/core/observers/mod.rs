@@ -18,7 +18,7 @@ pub mod slog_logger;
 #[cfg(feature = "visualizer")]
 pub mod visualizer;
 //
-use crate::core::{ArgminKV, Error, State};
+use crate::core::{Error, State, KV};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
@@ -39,7 +39,7 @@ pub trait Observe<I> {
     ///
     /// `name`: Name of the solver
     /// `kv`: Key-Value storage of initial configurations defined by the `Solver`
-    fn observe_init(&self, _name: &str, _kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_init(&self, _name: &str, _kv: &KV) -> Result<(), Error> {
         Ok(())
     }
 
@@ -49,7 +49,7 @@ pub trait Observe<I> {
     ///
     /// `state`: Current state of the solver. See documentation of `IterState` for details.
     /// `kv`: Key-Value store of relevant variables defined by the `Solver`
-    fn observe_iter(&mut self, _state: &I, _kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, _state: &I, _kv: &KV) -> Result<(), Error> {
         Ok(())
     }
 }
@@ -91,8 +91,8 @@ impl<I> Observer<I> {
 impl<I: State> Observe<I> for Observer<I> {
     /// Initial observation
     /// This is called after the initialization in an `Executor` and gets the name of the solver as
-    /// string and a `ArgminKV` which includes some solver-specific information.
-    fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
+    /// string and a `KV` which includes some solver-specific information.
+    fn observe_init(&self, msg: &str, kv: &KV) -> Result<(), Error> {
         for l in self.observers.iter() {
             l.0.lock().unwrap().observe_init(msg, kv)?
         }
@@ -102,7 +102,7 @@ impl<I: State> Observe<I> for Observer<I> {
     /// This is called after every iteration and gets the current `state` of the solver as well as
     /// a `KV` which can include solver-specific information
     /// This respects the `ObserverMode`: Every `Observe`r is only called as often as specified.
-    fn observe_iter(&mut self, state: &I, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, state: &I, kv: &KV) -> Result<(), Error> {
         use ObserverMode::*;
         for l in self.observers.iter_mut() {
             let iter = state.get_iter();

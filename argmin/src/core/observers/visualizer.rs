@@ -8,7 +8,7 @@
 //! # Observer which visualizes the progress of the solver
 
 extern crate gnuplot;
-use crate::core::{ArgminFloat, ArgminKV, CostFunction, Error, IterState, Observe};
+use crate::core::{ArgminFloat, CostFunction, Error, IterState, Observe, KV};
 use instant;
 use std::sync::Mutex;
 
@@ -156,7 +156,7 @@ impl Observe<IterState<Vec<f64>, (), (), (), f64>> for Visualizer3d {
     fn observe_iter(
         &mut self,
         state: &IterState<Vec<f64>, (), (), (), f64>,
-        _kv: &ArgminKV,
+        _kv: &KV,
     ) -> Result<(), Error> {
         // TODO: get particles from `state` or `kv`
 

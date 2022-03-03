@@ -10,9 +10,7 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::core::{
-    ArgminFloat, ArgminKV, Error, IterState, OpWrapper, Operator, SerializeAlias, Solver,
-};
+use crate::core::{ArgminFloat, Error, IterState, OpWrapper, Operator, SerializeAlias, Solver, KV};
 use argmin_math::{ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -94,7 +92,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         let init_param = state.get_param_ref().unwrap();
         let ap = op.apply(init_param)?;
         let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
@@ -109,7 +107,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         let p = self.p.as_ref().unwrap();
         let r = self.r.as_ref().unwrap();
 

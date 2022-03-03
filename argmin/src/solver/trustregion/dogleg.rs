@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminTrustRegion, Error, Gradient, Hessian, IterState,
-    OpWrapper, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, ArgminTrustRegion, Error, Gradient, Hessian, IterState, OpWrapper,
+    Solver, State, TerminationReason, KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot,
@@ -63,7 +63,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, P, (), H, F>,
-    ) -> Result<(IterState<P, P, (), H, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let g = state
             .take_grad()

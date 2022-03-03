@@ -14,8 +14,8 @@
 //! DOI: <https://doi.org/10.1137/030601880>
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, Gradient, IterState, LineSearch,
-    OpWrapper, SerializeAlias, Solver, TerminationReason,
+    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, OpWrapper,
+    SerializeAlias, Solver, TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -438,7 +438,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         if self.sigma < self.delta {
             return Err(ArgminError::InvalidParameter {
                 text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),
@@ -504,7 +504,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);
         let bb = (self.b_x, self.b_f, self.b_g);

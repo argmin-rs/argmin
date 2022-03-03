@@ -12,7 +12,7 @@
 //! TODO
 
 use crate::core::{
-    ArgminFloat, ArgminKV, CostFunction, Error, IterState, OpWrapper, SerializeAlias, Solver,
+    ArgminFloat, CostFunction, Error, IterState, OpWrapper, SerializeAlias, Solver, KV,
 };
 use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
 #[cfg(feature = "serde1")]
@@ -144,7 +144,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         self.initialize_particles(op);
 
         Ok((state, None))
@@ -155,7 +155,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         let zero = P::zero_like(&self.best_position);
 
         for p in self.particles.iter_mut() {

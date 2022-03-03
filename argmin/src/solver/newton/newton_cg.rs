@@ -13,9 +13,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
-    IterState, LineSearch, OpWrapper, Operator, OptimizationResult, SerializeAlias, Solver, State,
-    TerminationReason,
+    ArgminError, ArgminFloat, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState,
+    LineSearch, OpWrapper, Operator, OptimizationResult, SerializeAlias, Solver, State,
+    TerminationReason, KV,
 };
 use crate::solver::conjugategradient::ConjugateGradient;
 use argmin_math::{
@@ -98,7 +98,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;

@@ -11,9 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, ArgminTrustRegion, CostFunction, DeserializeOwnedAlias,
-    Error, Executor, Gradient, Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias,
-    Solver, TerminationReason,
+    ArgminError, ArgminFloat, ArgminTrustRegion, CostFunction, DeserializeOwnedAlias, Error,
+    Executor, Gradient, Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver,
+    TerminationReason, KV,
 };
 use crate::solver::trustregion::reduction_ratio;
 use argmin_math::{ArgminAdd, ArgminDot, ArgminNorm, ArgminWeightedDot};
@@ -121,7 +121,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let grad = op.gradient(&param)?;
         let hessian = op.hessian(&param)?;
@@ -141,7 +141,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let grad = state
             .take_grad()

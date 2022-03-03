@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminKV, ArgminTrustRegion, Error, Gradient, Hessian, IterState, OpWrapper,
-    Solver, State, TerminationReason,
+    ArgminFloat, ArgminTrustRegion, Error, Gradient, Hessian, IterState, OpWrapper, Solver, State,
+    TerminationReason, KV,
 };
 use argmin_math::{ArgminMul, ArgminNorm, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
@@ -56,7 +56,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let grad = state
             .take_grad()

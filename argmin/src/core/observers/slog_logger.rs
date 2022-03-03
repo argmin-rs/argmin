@@ -7,9 +7,9 @@
 
 //! # Loggers based on the `slog` crate
 
-use crate::core::{ArgminFloat, ArgminKV, Error, IterState, Observe, State};
+use crate::core::{ArgminFloat, Error, IterState, Observe, State, KV};
 use slog;
-use slog::{info, o, Drain, Record, Serializer, KV};
+use slog::{info, o, Drain, Record, Serializer};
 use slog_async;
 use slog_async::OverflowStrategy;
 #[cfg(feature = "serde1")]
@@ -102,13 +102,13 @@ impl SlogLogger {
     }
 }
 
-/// This type is necessary in order to be able to implement `slog::KV` on `ArgminKV`
+/// This type is necessary in order to be able to implement `slog::KV` on `KV`
 pub struct SlogKV {
     /// Key value store
     pub kv: Vec<(&'static str, String)>,
 }
 
-impl KV for SlogKV {
+impl slog::KV for SlogKV {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
         for idx in self.kv.clone().iter().rev() {
             serializer.emit_str(idx.0, &idx.1.to_string())?;
@@ -117,7 +117,7 @@ impl KV for SlogKV {
     }
 }
 
-impl<P, G, H, J, F> KV for IterState<P, G, H, J, F>
+impl<P, G, H, J, F> slog::KV for IterState<P, G, H, J, F>
 where
     P: Clone,
     F: ArgminFloat,
@@ -135,22 +135,22 @@ where
     }
 }
 
-impl<'a> From<&'a ArgminKV> for SlogKV {
-    fn from(i: &'a ArgminKV) -> SlogKV {
+impl<'a> From<&'a KV> for SlogKV {
+    fn from(i: &'a KV) -> SlogKV {
         SlogKV { kv: i.kv.clone() }
     }
 }
 
-impl<I: KV> Observe<I> for SlogLogger {
+impl<I: slog::KV> Observe<I> for SlogLogger {
     /// Log general info
-    fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_init(&self, msg: &str, kv: &KV) -> Result<(), Error> {
         info!(self.logger, "{}", msg; SlogKV::from(kv));
         Ok(())
     }
 
     /// This should be used to log iteration data only (because this is what may be saved in a CSV
     /// file or a database)
-    fn observe_iter(&mut self, state: &I, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, state: &I, kv: &KV) -> Result<(), Error> {
         info!(self.logger, ""; state, SlogKV::from(kv));
         Ok(())
     }

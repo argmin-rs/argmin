@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, Error, IterState, Jacobian, OpWrapper, Operator, Solver,
-    TerminationReason,
+    ArgminError, ArgminFloat, Error, IterState, Jacobian, OpWrapper, Operator, Solver,
+    TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose};
 #[cfg(feature = "serde1")]
@@ -92,7 +92,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, (), J, (), F>,
-    ) -> Result<(IterState<P, (), J, (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, (), J, (), F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let residuals = op.apply(&param)?;
         let jacobian = op.jacobian(&param)?;

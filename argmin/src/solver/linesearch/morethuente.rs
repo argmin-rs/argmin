@@ -22,8 +22,8 @@
 #![allow(clippy::nonminimal_bool)]
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminKV, CostFunction, Error, Gradient, IterState, LineSearch,
-    OpWrapper, SerializeAlias, Solver, State, TerminationReason,
+    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, OpWrapper,
+    SerializeAlias, Solver, State, TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -233,7 +233,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         check_param!(
             self.search_direction,
             "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
@@ -289,7 +289,7 @@ where
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {

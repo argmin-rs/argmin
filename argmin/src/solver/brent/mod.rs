@@ -19,7 +19,7 @@
 /// Implementation of Brent's optimization method,
 /// see <https://en.wikipedia.org/wiki/Brent%27s_method>
 use crate::core::{
-    ArgminFloat, ArgminKV, Error, IterState, OpWrapper, Operator, Solver, State, TerminationReason,
+    ArgminFloat, Error, IterState, OpWrapper, Operator, Solver, State, TerminationReason, KV,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -95,7 +95,7 @@ where
         op: &mut OpWrapper<O>,
         // Brent maintains its own state
         state: IterState<F, (), (), (), F>,
-    ) -> Result<(IterState<F, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
         self.fa = op.apply(&self.a)?;
         self.fb = op.apply(&self.b)?;
         if self.fa * self.fb > F::from_f64(0.0).unwrap() {
@@ -110,7 +110,7 @@ where
         op: &mut OpWrapper<O>,
         // Brent maintains its own state
         state: IterState<F, (), (), (), F>,
-    ) -> Result<(IterState<F, (), (), (), F>, Option<ArgminKV>), Error> {
+    ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
         if (self.fb > F::from_f64(0.0).unwrap() && self.fc > F::from_f64(0.0).unwrap())
             || self.fb < F::from_f64(0.0).unwrap() && self.fc < F::from_f64(0.0).unwrap()
         {
