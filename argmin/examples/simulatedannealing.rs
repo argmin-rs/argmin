@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminSlogLogger, CostFunction, Error, Executor, Modify, ObserverMode};
+use argmin::core::{CostFunction, Error, Executor, Modify, ObserverMode, SlogLogger};
 use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
 use argmin_testfunctions::rosenbrock;
 use rand::distributions::Uniform;
@@ -140,7 +140,7 @@ fn run() -> Result<(), Error> {
                 .target_cost(0.0)
         })
         // Optional: Attach a observer
-        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)

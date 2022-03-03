@@ -5,9 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{
-    ArgminSlogLogger, CostFunction, Error, Executor, Gradient, Hessian, ObserverMode,
-};
+use argmin::core::{CostFunction, Error, Executor, Gradient, Hessian, ObserverMode, SlogLogger};
 use argmin::solver::quasinewton::SR1TrustRegion;
 #[allow(unused_imports)]
 use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
@@ -73,7 +71,7 @@ fn run() -> Result<(), Error> {
                 .hessian(init_hessian)
                 .max_iters(1000)
         })
-        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the observer flush everything before printing again)

@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use argmin::core::{
-    ArgminSlogLogger, CheckpointMode, CostFunction, Error, Executor, Gradient, ObserverMode,
+    CheckpointMode, CostFunction, Error, Executor, Gradient, ObserverMode, SlogLogger,
 };
 use argmin::solver::landweber::Landweber;
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -47,7 +47,7 @@ fn run() -> Result<(), Error> {
         .checkpoint_dir(".checkpoints")
         .checkpoint_name("landweber_exec")
         .checkpoint_mode(CheckpointMode::Every(20))
-        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)

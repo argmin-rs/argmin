@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminSlogLogger, Error, Executor, ObserverMode, Operator};
+use argmin::core::{Error, Executor, ObserverMode, Operator, SlogLogger};
 use argmin::solver::conjugategradient::ConjugateGradient;
 
 struct MyProblem {}
@@ -35,7 +35,7 @@ fn run() -> Result<(), Error> {
     // Run solver
     let res = Executor::new(operator, solver)
         .configure(|config| config.param(init_param).max_iters(2))
-        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)

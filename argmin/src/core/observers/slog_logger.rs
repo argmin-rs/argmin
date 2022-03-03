@@ -22,20 +22,20 @@ use std::sync::Mutex;
 
 /// A logger based on `slog`
 #[derive(Clone)]
-pub struct ArgminSlogLogger {
+pub struct SlogLogger {
     /// the logger
     logger: slog::Logger,
 }
 
-impl ArgminSlogLogger {
+impl SlogLogger {
     /// Log to the terminal in a blocking way
     pub fn term() -> Self {
-        ArgminSlogLogger::term_internal(OverflowStrategy::Block)
+        SlogLogger::term_internal(OverflowStrategy::Block)
     }
 
     /// Log to the terminal in a non-blocking way (in case of overflow, messages are dropped)
     pub fn term_noblock() -> Self {
-        ArgminSlogLogger::term_internal(OverflowStrategy::Drop)
+        SlogLogger::term_internal(OverflowStrategy::Drop)
     }
 
     /// Actual implementation of the logging to the terminal
@@ -49,7 +49,7 @@ impl ArgminSlogLogger {
             .overflow_strategy(overflow_strategy)
             .build()
             .fuse();
-        ArgminSlogLogger {
+        SlogLogger {
             logger: slog::Logger::root(drain, o!()),
         }
     }
@@ -62,7 +62,7 @@ impl ArgminSlogLogger {
     /// Only available when the `serde1` feature is set.
     #[cfg(feature = "serde1")]
     pub fn file(file: &str, truncate: bool) -> Result<Self, Error> {
-        ArgminSlogLogger::file_internal(file, OverflowStrategy::Block, truncate)
+        SlogLogger::file_internal(file, OverflowStrategy::Block, truncate)
     }
 
     /// Log JSON to a file in a non-blocking way (in case of overflow, messages are dropped)
@@ -73,7 +73,7 @@ impl ArgminSlogLogger {
     /// Only available when the `serde1` feature is set.
     #[cfg(feature = "serde1")]
     pub fn file_noblock(file: &str, truncate: bool) -> Result<Self, Error> {
-        ArgminSlogLogger::file_internal(file, OverflowStrategy::Drop, truncate)
+        SlogLogger::file_internal(file, OverflowStrategy::Drop, truncate)
     }
 
     #[cfg(feature = "serde1")]
@@ -96,19 +96,19 @@ impl ArgminSlogLogger {
             .overflow_strategy(overflow_strategy)
             .build()
             .fuse();
-        Ok(ArgminSlogLogger {
+        Ok(SlogLogger {
             logger: slog::Logger::root(drain, o!()),
         })
     }
 }
 
 /// This type is necessary in order to be able to implement `slog::KV` on `ArgminKV`
-pub struct ArgminSlogKV {
+pub struct SlogKV {
     /// Key value store
     pub kv: Vec<(&'static str, String)>,
 }
 
-impl KV for ArgminSlogKV {
+impl KV for SlogKV {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
         for idx in self.kv.clone().iter().rev() {
             serializer.emit_str(idx.0, &idx.1.to_string())?;
@@ -135,23 +135,23 @@ where
     }
 }
 
-impl<'a> From<&'a ArgminKV> for ArgminSlogKV {
-    fn from(i: &'a ArgminKV) -> ArgminSlogKV {
-        ArgminSlogKV { kv: i.kv.clone() }
+impl<'a> From<&'a ArgminKV> for SlogKV {
+    fn from(i: &'a ArgminKV) -> SlogKV {
+        SlogKV { kv: i.kv.clone() }
     }
 }
 
-impl<I: KV> Observe<I> for ArgminSlogLogger {
+impl<I: KV> Observe<I> for SlogLogger {
     /// Log general info
     fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
-        info!(self.logger, "{}", msg; ArgminSlogKV::from(kv));
+        info!(self.logger, "{}", msg; SlogKV::from(kv));
         Ok(())
     }
 
     /// This should be used to log iteration data only (because this is what may be saved in a CSV
     /// file or a database)
     fn observe_iter(&mut self, state: &I, kv: &ArgminKV) -> Result<(), Error> {
-        info!(self.logger, ""; state, ArgminSlogKV::from(kv));
+        info!(self.logger, ""; state, SlogKV::from(kv));
         Ok(())
     }
 }
@@ -160,5 +160,5 @@ impl<I: KV> Observe<I> for ArgminSlogLogger {
 mod tests {
     use super::*;
 
-    send_sync_test!(argmin_slog_loggerv, ArgminSlogLogger);
+    send_sync_test!(argmin_slog_loggerv, SlogLogger);
 }

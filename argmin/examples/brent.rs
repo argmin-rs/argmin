@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminSlogLogger, Error, Executor, ObserverMode, Operator};
+use argmin::core::{Error, Executor, ObserverMode, Operator, SlogLogger};
 use argmin::solver::brent::Brent;
 
 /// Test function generalise from Wikipedia example
@@ -34,7 +34,7 @@ fn main() {
 
     let res = Executor::new(cost, solver)
         .configure(|config| config.param(init_param).max_iters(100))
-        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()
         .unwrap();
     println!("Result of brent:\n{}", res);

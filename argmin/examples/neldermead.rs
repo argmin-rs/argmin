@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminSlogLogger, CostFunction, Error, Executor, ObserverMode};
+use argmin::core::{CostFunction, Error, Executor, ObserverMode, SlogLogger};
 use argmin::solver::neldermead::NelderMead;
 use argmin_testfunctions::rosenbrock;
 use ndarray::{array, Array1};
@@ -43,7 +43,7 @@ fn run() -> Result<(), Error> {
     // Run solver
     let res = Executor::new(cost, solver)
         .configure(|config| config.max_iters(100))
-        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)

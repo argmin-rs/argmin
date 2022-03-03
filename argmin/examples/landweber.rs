@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{ArgminSlogLogger, Error, Executor, Gradient, ObserverMode};
+use argmin::core::{Error, Executor, Gradient, ObserverMode, SlogLogger};
 use argmin::solver::landweber::Landweber;
 use argmin_testfunctions::rosenbrock_2d_derivative;
 
@@ -30,7 +30,7 @@ fn run() -> Result<(), Error> {
 
     let res = Executor::new(operator, solver)
         .configure(|config| config.param(init_param).max_iters(iters))
-        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing to screen again)

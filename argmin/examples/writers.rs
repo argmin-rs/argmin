@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use argmin::core::{
-    ArgminSlogLogger, CostFunction, Error, Executor, Gradient, ObserverMode, WriteToFile,
+    CostFunction, Error, Executor, Gradient, ObserverMode, SlogLogger, WriteToFile,
     WriteToFileSerializer,
 };
 use argmin::solver::linesearch::MoreThuenteLineSearch;
@@ -65,7 +65,7 @@ fn run() -> Result<(), Error> {
 
     let res = Executor::new(cost, solver)
         .configure(|config| config.param(init_param).max_iters(10))
-        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .add_observer(SlogLogger::term(), ObserverMode::Always)
         .add_observer(writer, ObserverMode::Every(3))
         .add_observer(writer2, ObserverMode::NewBest)
         .run()?;
