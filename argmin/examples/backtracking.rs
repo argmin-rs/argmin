@@ -5,9 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{
-    ArgminSlogLogger, CostFunction, Error, Executor, Gradient, LineSearch, ObserverMode,
-};
+use argmin::core::{CostFunction, Error, Executor, Gradient, LineSearch, ObserverMode, SlogLogger};
 use argmin::solver::linesearch::{ArmijoCondition, BacktrackingLineSearch};
 use argmin_testfunctions::{sphere, sphere_derivative};
 
@@ -59,7 +57,7 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(operator, solver)
-        .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+        .add_observer(SlogLogger::term(), ObserverMode::Always)
         // Gradient and cost are optional. If they are not provided, they will be computed
         .configure(|config| {
             config

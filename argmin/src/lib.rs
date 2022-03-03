@@ -249,7 +249,7 @@
 //! # extern crate argmin_testfunctions;
 //! use argmin::core::{Error, Executor, CostFunction, Gradient};
 //! # #[cfg(feature = "slog-logger")]
-//! use argmin::core::{ArgminSlogLogger, ObserverMode};
+//! use argmin::core::{SlogLogger, ObserverMode};
 //! use argmin::solver::gradientdescent::SteepestDescent;
 //! use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -312,7 +312,7 @@
 //! # #[cfg(feature = "slog-logger")]
 //! # let res = res
 //!     // Add an observer which will log all iterations to the terminal
-//!     .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)
+//!     .add_observer(SlogLogger::term(), ObserverMode::Always)
 //! # ;
 //! # let res = res
 //!     // run the solver on the defined problem
@@ -338,8 +338,8 @@
 //! cost values and many more as well as solver-specific metrics. This interface can be used to
 //! implement loggers, send the information to a storage or to plot metrics.
 //! Observers need to implement the `Observe` trait.
-//! Argmin ships with a logger based on the `slog` crate. `ArgminSlogLogger::term` logs to the
-//! terminal and `ArgminSlogLogger::file` logs to a file in JSON format. Both loggers also come
+//! Argmin ships with a logger based on the `slog` crate. `SlogLogger::term` logs to the
+//! terminal and `SlogLogger::file` logs to a file in JSON format. Both loggers also come
 //! with a `*_noblock` version which does not block the execution of logging, but may drop some
 //! messages in case of a full buffer.
 //! Parameter vectors can be written to disk using `WriteToFile`.
@@ -353,7 +353,7 @@
 //! # extern crate argmin_testfunctions;
 //! # use argmin::core::{Error, Executor, CostFunction, Gradient, ObserverMode};
 //! # #[cfg(feature = "slog-logger")]
-//! # use argmin::core::ArgminSlogLogger;
+//! # use argmin::core::SlogLogger;
 //! # #[cfg(feature = "serde1")]
 //! # use argmin::core::WriteToFile;
 //! # use argmin::solver::gradientdescent::SteepestDescent;
@@ -411,13 +411,13 @@
 //! # #[cfg(feature = "slog-logger")]
 //! # let res = res
 //!     // Add an observer which will log all iterations to the terminal (without blocking)
-//!     .add_observer(ArgminSlogLogger::term_noblock(), ObserverMode::Always)
+//!     .add_observer(SlogLogger::term_noblock(), ObserverMode::Always)
 //! # ;
 //! # #[cfg(feature = "serde1")]
 //! # #[cfg(feature = "slog-logger")]
 //! # let res = res
 //!     // Log to file whenever a new best solution is found
-//!     .add_observer(ArgminSlogLogger::file("solver.log", false)?, ObserverMode::NewBest)
+//!     .add_observer(SlogLogger::file("solver.log", false)?, ObserverMode::NewBest)
 //!     // Write parameter vector to `params/param.arg` every 20th iteration
 //!     .add_observer(WriteToFile::new("params", "param"), ObserverMode::Every(20))
 //! # ;
@@ -457,7 +457,7 @@
 //! # #[cfg(feature = "serde1")]
 //! # use argmin::core::{CheckpointMode};
 //! # #[cfg(feature = "slog-logger")]
-//! # use argmin::core::{ArgminSlogLogger};
+//! # use argmin::core::SlogLogger;
 //! # use argmin::solver::landweber::Landweber;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! #
