@@ -26,6 +26,9 @@ use std::fmt::Debug;
 
 /// Types implemeting this trait can be used to keep track of a solver's state
 pub trait State: Debug + Sized {
+    /// Floating Point Precision
+    type Float: ArgminFloat;
+
     /// Constructor
     fn new() -> Self;
 
@@ -40,14 +43,16 @@ pub trait State: Debug + Sized {
 
     /// Returns current number of iterations
     fn get_iter(&self) -> u64;
-    //
-    // /// Returns current cost function value
-    // fn get_cost(&self) -> F;
-    //
-    // /// Returns target cost
-    // fn get_target_cost(&self) -> F;
-    //
-    //
+
+    /// Returns current cost function value
+    fn get_cost(&self) -> Self::Float;
+
+    /// Returns best cost function value
+    fn get_best_cost(&self) -> Self::Float;
+
+    /// Returns target cost
+    fn get_target_cost(&self) -> Self::Float;
+
     /// Set all function evaluation counts to the evaluation counts of another operator
     /// wrapped in `OpWrapper`.
     fn set_func_counts<O>(&mut self, op: &OpWrapper<O>);
@@ -70,158 +75,17 @@ pub trait State: Debug + Sized {
 
     /// Returns iteration number where the last best parameter vector was found
     fn get_last_best_iter(&self) -> u64;
-    //
-    // /// Returns best cost function value
-    // fn get_best_cost(&self) -> F;
-    //
-    // /// Returns current parameter vector
-    // fn get_param<P>(&self) -> Option<P>;
 
-    // /// Returns best parameter vector
-    // fn get_best_param(&self) -> Option<P>;
-    //
     /// Returns whether the current parameter vector is also the best parameter vector found so
     /// far.
     fn is_best(&self) -> bool;
 
     /// Returns currecnt cost function evaluation count
     fn get_func_counts(&self) -> &HashMap<String, u64>;
-
-    // /// Set parameter vector. This shifts the stored parameter vector to the previous parameter
-    // /// vector.
-    // fn param(&mut self, _param: Self::Param) -> &mut Self {
-    //
-    // /// Set best paramater vector. This shifts the stored best parameter vector to the previous
-    // /// best parameter vector.
-    // fn best_param(&mut self, _param: Self::Param) -> &mut Self {
-    //
-    // /// Set the current best cost function value. This shifts the stored best cost function value to
-    // /// the previous cost function value.
-    // fn best_cost(&mut self, _cost: Self::Float) -> &mut Self {
-    //
-    // /// Set population
-    // fn population(&mut self, _population: Vec<(Self::Param, Self::Float)>) -> &mut Self {
-    //
-    // /// Set last best iteration
-    // fn last_best_iter(&mut self, _last_best_iter: u64) -> &mut Self {
-    //
-    // /// Returns previous parameter vector
-    // fn get_prev_param(&self) -> Option<Self::Param> {
-    //
-    // /// Returns previous best parameter vector
-    // fn get_prev_best_param(&self) -> Option<Self::Param> {
-    //
-    // /// Returns reference to current parameter vector
-    // fn get_param_ref(&self) -> Option<&Self::Param> {
-    //
-    // /// Returns reference to previous parameter vector
-    // fn get_prev_param_ref(&self) -> Option<&Self::Param> {
-    //
-    // /// Returns reference to best parameter vector
-    // fn get_best_param_ref(&self) -> Option<&Self::Param> {
-    //
-    // /// Returns reference to previous best parameter vector
-    // fn get_prev_best_param_ref(&self) -> Option<&Self::Param> {
-    //
-    // /// Takes current parameter vector and resplaces it internally with `None`
-    // fn take_param(&mut self) -> Option<Self::Param> {
-    //
-    // /// Takes previous parameter vector and resplaces it internally with `None`
-    // fn take_prev_param(&mut self) -> Option<Self::Param> {
-    //
-    // /// Takes best parameter vector and resplaces it internally with `None`
-    // fn take_best_param(&mut self) -> Option<Self::Param> {
-    //
-    // /// Takes previous best parameter vector and resplaces it internally with `None`
-    // fn take_prev_best_param(&mut self) -> Option<Self::Param> {
-    //
-    // /// Returns previous cost function value
-    // fn get_prev_cost(&self) -> Self::Float {
-    //
-    // /// Returns previous best cost function value
-    // fn get_prev_best_cost(&self) -> Self::Float {
-    //
-    // /// Returns gradient
-    // fn get_grad(&self) -> Option<Self::Param> {
-    //
-    // /// Returns previous gradient
-    // fn get_prev_grad(&self) -> Option<Self::Param> {
-    //
-    // /// Returns current Hessian
-    // fn get_hessian(&self) -> Option<Self::Hessian> {
-    //
-    // /// Returns previous Hessian
-    // fn get_prev_hessian(&self) -> Option<Self::Hessian> {
-    //
-    // /// Returns current inverse Hessian
-    // fn get_inv_hessian(&self) -> Option<Self::Hessian> {
-    //
-    // /// Returns previous inverse Hessian
-    // fn get_prev_inv_hessian(&self) -> Option<Self::Hessian> {
-    //
-    // /// Returns current Jacobian
-    // fn get_jacobian(&self) -> Option<Self::Jacobian> {
-    //
-    // /// Returns previous Jacobian
-    // fn get_prev_jacobian(&self) -> Option<Self::Jacobian> {
-    //
-    // /// Returns reference to gradient
-    // fn get_grad_ref(&self) -> Option<&Self::Param> {
-    //
-    // /// Returns reference to previous gradient
-    // fn get_prev_grad_ref(&self) -> Option<&Self::Param> {
-    //
-    // /// Returns reference to current Hessian
-    // fn get_hessian_ref(&self) -> Option<&Self::Hessian> {
-    //
-    // /// Returns reference to previous Hessian
-    // fn get_prev_hessian_ref(&self) -> Option<&Self::Hessian> {
-    //
-    // /// Returns reference to current inverse Hessian
-    // fn get_inv_hessian_ref(&self) -> Option<&Self::Hessian> {
-    //
-    // /// Returns reference to previous inverse Hessian
-    // fn get_prev_inv_hessian_ref(&self) -> Option<&Self::Hessian> {
-    //
-    // /// Returns reference to current Jacobian
-    // fn get_jacobian_ref(&self) -> Option<&Self::Jacobian> {
-    //
-    // /// Returns reference to previous Jacobian
-    // fn get_prev_jacobian_ref(&self) -> Option<&Self::Jacobian> {
-    //
-    // /// Takes gradient
-    // fn take_grad(&mut self) -> Option<Self::Param> {
-    //
-    // /// Takes previous gradient
-    // fn take_prev_grad(&mut self) -> Option<Self::Param> {
-    //
-    // /// Takes current Hessian
-    // fn take_hessian(&mut self) -> Option<Self::Hessian> {
-    //
-    // /// Takes previous Hessian
-    // fn take_prev_hessian(&mut self) -> Option<Self::Hessian> {
-    //
-    // /// Takes current inverse Hessian
-    // fn take_inv_hessian(&mut self) -> Option<Self::Hessian> {
-    //
-    // /// Takes previous inverse Hessian
-    // fn take_prev_inv_hessian(&mut self) -> Option<Self::Hessian> {
-    //
-    // /// Takes current Jacobian
-    // fn take_jacobian(&mut self) -> Option<Self::Jacobian> {
-    //
-    // /// Takes previous Jacobian and replaces it internally with `None`
-    // fn take_prev_jacobian(&mut self) -> Option<Self::Jacobian> {
-    //
-    // /// Returns population
-    // fn get_population(&self) -> Option<&Vec<(Self::Param, Self::Float)>> {
-    //
-    // /// Indicate that a new best parameter vector was found
-    // fn new_best(&mut self) {
-    //
 }
 impl<P, G, J, H, F> std::fmt::Debug for IterState<P, G, J, H, F>
 where
+    Self: State<Float = F>,
     F: ArgminFloat,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -395,6 +259,7 @@ macro_rules! pub_getter {
 
 impl<P, G, J, H, F> IterState<P, G, J, H, F>
 where
+    Self: State<Float = F>,
     F: ArgminFloat,
 {
     /// Set parameter vector. This shifts the stored parameter vector to the previous parameter
@@ -443,11 +308,9 @@ where
         self
     }
 
-    // pub_getter_option!(param, P, "Returns current parameter vector");
     pub_getter!(cost, F, "Returns current cost function value");
     pub_getter!(best_cost, F, "Returns current best cost function value");
     pub_getter!(target_cost, F, "Returns current best cost function value");
-    // pub_getter_option!(prev_param, P, "Returns previous parameter vector");
     pub_getter_option_ref!(param, P, "Returns reference to current parameter vector");
     pub_take!(
         param,
@@ -464,8 +327,6 @@ where
         P,
         "Moves the previous parameter vector out and replaces it internally with `None`"
     );
-    // pub_getter_option!(best_param, P, "Returns previous best parameter vector");
-    // pub_getter_option!(prev_best_param, P, "Returns previous best parameter vector");
     pub_getter_option_ref!(best_param, P, "Returns reference to best parameter vector");
     pub_getter_option_ref!(
         prev_best_param,
@@ -488,14 +349,6 @@ where
         F,
         "Returns previous best cost function value"
     );
-    // pub_getter_option!(grad, G, "Returns gradient");
-    // pub_getter_option!(prev_grad, G, "Returns previous gradient");
-    // pub_getter_option!(hessian, H, "Returns current Hessian");
-    // pub_getter_option!(prev_hessian, H, "Returns previous Hessian");
-    // pub_getter_option!(inv_hessian, H, "Returns current inverse Hessian");
-    // pub_getter_option!(prev_inv_hessian, H, "Returns previous inverse Hessian");
-    // pub_getter_option!(jacobian, J, "Returns current Jacobian");
-    // pub_getter_option!(prev_jacobian, J, "Returns previous Jacobian");
     pub_getter_option_ref!(grad, G, "Returns reference to the gradient");
     pub_getter_option_ref!(prev_grad, G, "Returns reference to the previous gradient");
     pub_getter_option_ref!(hessian, H, "Returns reference to the current Hessian");
@@ -612,12 +465,11 @@ where
 impl<P, G, J, H, F> State for IterState<P, G, J, H, F>
 where
     P: Clone,
-    // P: SerializeAlias + DeserializeOwnedAlias,
-    // G: SerializeAlias + DeserializeOwnedAlias,
-    // J: SerializeAlias + DeserializeOwnedAlias,
-    // H: SerializeAlias + DeserializeOwnedAlias,
     F: ArgminFloat,
 {
+    /// Floating point precision
+    type Float = F;
+
     /// Create new IterState from `param`
     fn new() -> Self {
         IterState {
@@ -674,10 +526,19 @@ where
     }
 
     setter!(time, Option<instant::Duration>, "Set time required so far");
+    getter!(cost, Self::Float, "Returns current cost function value");
+    getter!(
+        best_cost,
+        Self::Float,
+        "Returns current best cost function value"
+    );
+    getter!(
+        target_cost,
+        Self::Float,
+        "Returns current best cost function value"
+    );
     getter!(iter, u64, "Returns current number of iterations");
     getter!(max_iters, u64, "Returns maximum number of iterations");
-    // getter!(target_cost, F, "Returns target cost");
-    // getter!(cost, F, "Returns current cost function value");
     getter!(
         termination_reason,
         TerminationReason,
@@ -689,12 +550,6 @@ where
         u64,
         "Returns iteration number where the last best parameter vector was found"
     );
-    // getter_option!(best_param, P, "Returns best parameter vector");
-    // getter!(
-    //     best_cost,
-    //     F,
-    //     "Returns current best cost function value"
-    // );
 
     /// Increment the number of iterations by one
     fn increment_iter(&mut self) {

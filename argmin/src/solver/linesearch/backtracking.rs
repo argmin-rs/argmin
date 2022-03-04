@@ -9,7 +9,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, OpWrapper,
-    SerializeAlias, Solver, TerminationReason, KV,
+    SerializeAlias, Solver, State, TerminationReason, KV,
 };
 use crate::solver::linesearch::condition::*;
 use argmin_math::ArgminScaledAdd;
@@ -101,6 +101,7 @@ impl<P, G, L, F> BacktrackingLineSearch<P, G, L, F>
 where
     P: ArgminScaledAdd<P, F, P>,
     L: LineSearchCondition<P, G, F>,
+    IterState<P, G, (), (), F>: State<Float = F>,
     F: ArgminFloat,
 {
     fn backtracking_step<O>(
