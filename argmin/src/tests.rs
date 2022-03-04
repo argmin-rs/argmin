@@ -88,10 +88,7 @@ impl Hessian for MaxEntropy {
         let log_pdot = self.F.dot(&p.t());
         let log_z = log_pdot.mapv(|x| x.exp()).sum().ln();
         let y = (log_pdot - log_z).mapv(|x| x.exp());
-        // TODO: replace with Array2::from_diag when it is available
-        // ndarray#673
-        let mut y2_diag = Array2::zeros((y.len(), y.len()));
-        y2_diag.diag_mut().assign(&y);
+        let y2_diag = Array2::from_diag(&y);
         let tmp = self.F.clone() - self.F.clone().t().dot(&y);
         let hess = self.F.clone().t().dot(&y2_diag.dot(&tmp));
         Ok(hess)
