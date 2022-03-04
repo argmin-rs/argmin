@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminFloat, ArgminTrustRegion, Error, Gradient, Hessian, IterState, OpWrapper, Solver, State,
-    TerminationReason, KV,
+    ArgminFloat, Error, Gradient, Hessian, IterState, OpWrapper, Solver, State, TerminationReason,
+    TrustRegion, KV,
 };
 use argmin_math::{ArgminMul, ArgminNorm, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
@@ -90,7 +90,7 @@ where
     }
 }
 
-impl<F> ArgminTrustRegion<F> for CauchyPoint<F>
+impl<F> TrustRegion<F> for CauchyPoint<F>
 where
     F: ArgminFloat,
 {

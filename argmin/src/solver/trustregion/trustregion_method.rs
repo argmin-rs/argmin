@@ -11,9 +11,9 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminTrustRegion, CostFunction, DeserializeOwnedAlias, Error,
-    Executor, Gradient, Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver,
-    TerminationReason, KV,
+    ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
+    Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, TerminationReason,
+    KV,
 };
 use crate::solver::trustregion::reduction_ratio;
 use argmin_math::{ArgminAdd, ArgminDot, ArgminNorm, ArgminWeightedDot};
@@ -112,7 +112,7 @@ where
         + ArgminAdd<P, P>,
     G: Clone + SerializeAlias + DeserializeOwnedAlias,
     H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
-    R: Clone + ArgminTrustRegion<F> + Solver<O, IterState<P, G, (), H, F>>,
+    R: Clone + crate::core::TrustRegion<F> + Solver<O, IterState<P, G, (), H, F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Trust region";
