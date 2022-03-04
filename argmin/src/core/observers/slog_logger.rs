@@ -9,7 +9,7 @@
 
 use crate::core::{ArgminFloat, Error, IterState, Observe, State, KV};
 use slog;
-use slog::{info, o, Drain, Record, Serializer};
+use slog::{info, o, Drain, Key, Record, Serializer};
 use slog_async;
 use slog_async::OverflowStrategy;
 #[cfg(feature = "serde1")]
@@ -111,7 +111,7 @@ pub struct SlogKV {
 impl slog::KV for SlogKV {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
         for idx in self.kv.clone().iter().rev() {
-            serializer.emit_str(idx.0, &idx.1.to_string())?;
+            serializer.emit_str(Key::from(idx.0), &idx.1.to_string())?;
         }
         Ok(())
     }
@@ -123,14 +123,12 @@ where
     F: ArgminFloat,
 {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
-        // REENABLE THIS $%£"^! TODO TODO TODO TODO TODO
-        // for (k, v) in self.get_func_counts().into_iter() {
-        //     let key = k.clone();
-        //     serializer.emit_u64(&k, v)?;
-        // }
-        serializer.emit_str("best_cost", &self.best_cost.to_string())?;
-        serializer.emit_str("cost", &self.cost.to_string())?;
-        serializer.emit_u64("iter", self.get_iter())?;
+        for (k, &v) in self.get_func_counts().iter() {
+            serializer.emit_u64(Key::from(k.clone()), v)?;
+        }
+        serializer.emit_str(Key::from("best_cost"), &self.best_cost.to_string())?;
+        serializer.emit_str(Key::from("cost"), &self.cost.to_string())?;
+        serializer.emit_u64(Key::from("iter"), self.get_iter())?;
         Ok(())
     }
 }

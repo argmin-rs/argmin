@@ -875,12 +875,12 @@ mod tests {
 
         assert_eq!(state.get_max_iters(), std::u64::MAX);
         let func_counts = state.get_func_counts().clone();
-        assert!(!func_counts.contains_key("cost"));
-        assert!(!func_counts.contains_key("operator"));
-        assert!(!func_counts.contains_key("gradient"));
-        assert!(!func_counts.contains_key("hessian"));
-        assert!(!func_counts.contains_key("jacobian"));
-        assert!(!func_counts.contains_key("modify"));
+        assert!(!func_counts.contains_key("cost_count"));
+        assert!(!func_counts.contains_key("operator_count"));
+        assert!(!func_counts.contains_key("gradient_count"));
+        assert!(!func_counts.contains_key("hessian_count"));
+        assert!(!func_counts.contains_key("jacobian_count"));
+        assert!(!func_counts.contains_key("modify_count"));
 
         state = state.max_iters(42);
 
@@ -1029,12 +1029,12 @@ mod tests {
         assert_eq!(state.take_jacobian().unwrap(), new_jacobian);
         assert_eq!(state.take_prev_jacobian().unwrap(), jacobian);
         let func_counts = state.get_func_counts().clone();
-        assert!(!func_counts.contains_key("cost"));
-        assert!(!func_counts.contains_key("operator"));
-        assert!(!func_counts.contains_key("gradient"));
-        assert!(!func_counts.contains_key("hessian"));
-        assert!(!func_counts.contains_key("jacobian"));
-        assert!(!func_counts.contains_key("modify"));
+        assert!(!func_counts.contains_key("cost_count"));
+        assert!(!func_counts.contains_key("operator_count"));
+        assert!(!func_counts.contains_key("gradient_count"));
+        assert!(!func_counts.contains_key("hessian_count"));
+        assert!(!func_counts.contains_key("jacobian_count"));
+        assert!(!func_counts.contains_key("modify_count"));
 
         let old_best = vec![1.0, 2.0];
         let old_cost: f64 = 10.0;

@@ -586,8 +586,8 @@ mod tests {
         assert_relative_eq!(data.get_cost(), 0.6.powi(2), epsilon = f64::EPSILON);
         assert_eq!(data.iter, 0);
         let func_counts = data.get_func_counts();
-        assert_eq!(func_counts["cost"], 2);
-        assert_eq!(func_counts["gradient"], 1);
+        assert_eq!(func_counts["cost_count"], 2);
+        assert_eq!(func_counts["gradient_count"], 1);
         assert_eq!(
             data.termination_reason,
             TerminationReason::LineSearchConditionMet
@@ -635,8 +635,8 @@ mod tests {
         assert_relative_eq!(data.get_cost(), 0.44f64.powi(2), epsilon = f64::EPSILON);
         assert_eq!(data.iter, 1);
         let func_counts = data.get_func_counts();
-        assert_eq!(func_counts["cost"], 3);
-        assert_eq!(func_counts["gradient"], 1);
+        assert_eq!(func_counts["cost_count"], 3);
+        assert_eq!(func_counts["gradient_count"], 1);
         assert_eq!(
             data.termination_reason,
             TerminationReason::LineSearchConditionMet
