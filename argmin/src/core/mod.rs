@@ -218,10 +218,9 @@ pub trait Solver<O, I: State>: SerializeAlias {
         if state.get_iter() >= state.get_max_iters() {
             return TerminationReason::MaxItersReached;
         }
-        // REENABLE!
-        // if state.get_cost() <= state.get_target_cost() {
-        //     return TerminationReason::TargetCostReached;
-        // }
+        if state.get_cost() <= state.get_target_cost() {
+            return TerminationReason::TargetCostReached;
+        }
         TerminationReason::NotTerminated
     }
 

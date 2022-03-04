@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # `ArgminResult`
+//! # `OptimizationResult`
 //!
 //! Returned by a solver and consists of the used operator and the last `IterState` of the solver.
 //! Both can be accessed by the methods `operator()` and `state()`.
@@ -133,7 +133,7 @@ where
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "{:?}", self.state)?;
-        // writeln!(f, "ArgminResult:")?;
+        // writeln!(f, "OptimizationResult:")?;
         // writeln!(f, "    param (best):  {:?}", self.state.get_best_param())?;
         // writeln!(f, "    cost (best):   {}", self.state.get_best_cost())?;
         // writeln!(f, "    iters (best):  {}", self.state.get_last_best_iter())?;
