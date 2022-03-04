@@ -241,7 +241,7 @@ pub trait LineSearch<P, F> {
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods.
-pub trait ArgminTrustRegion<F> {
+pub trait TrustRegion<F> {
     /// Set the initial step length
     fn set_radius(&mut self, radius: F);
 }

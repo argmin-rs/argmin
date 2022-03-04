@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminTrustRegion, Error, IterState, OpWrapper, SerializeAlias,
-    Solver, State, TerminationReason, KV,
+    ArgminError, ArgminFloat, Error, IterState, OpWrapper, SerializeAlias, Solver, State,
+    TerminationReason, TrustRegion, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot, ArgminZeroLike};
 #[cfg(feature = "serde1")]
@@ -246,7 +246,7 @@ where
     }
 }
 
-impl<P: Clone + SerializeAlias, F: ArgminFloat> ArgminTrustRegion<F> for Steihaug<P, F> {
+impl<P: Clone + SerializeAlias, F: ArgminFloat> TrustRegion<F> for Steihaug<P, F> {
     fn set_radius(&mut self, radius: F) {
         self.radius = radius;
     }

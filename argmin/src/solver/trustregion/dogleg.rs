@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, ArgminTrustRegion, Error, Gradient, Hessian, IterState, OpWrapper,
-    Solver, State, TerminationReason, KV,
+    ArgminError, ArgminFloat, Error, Gradient, Hessian, IterState, OpWrapper, Solver, State,
+    TerminationReason, TrustRegion, KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot,
@@ -131,7 +131,7 @@ where
     }
 }
 
-impl<F: ArgminFloat> ArgminTrustRegion<F> for Dogleg<F> {
+impl<F: ArgminFloat> TrustRegion<F> for Dogleg<F> {
     fn set_radius(&mut self, radius: F) {
         self.radius = radius;
     }
