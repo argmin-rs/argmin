@@ -28,42 +28,42 @@ pub struct OpWrapper<O> {
 impl<O: Operator> OpWrapper<O> {
     /// apply
     pub fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
-        self.op("operator", |op| op.apply(param))
+        self.op("operator_count", |op| op.apply(param))
     }
 }
 
 impl<O: CostFunction> OpWrapper<O> {
     /// Compute cost function value
     pub fn cost(&mut self, param: &O::Param) -> Result<O::Output, Error> {
-        self.op("cost", |op| op.cost(param))
+        self.op("cost_count", |op| op.cost(param))
     }
 }
 
 impl<O: Gradient> OpWrapper<O> {
     /// Compute gradient
     pub fn gradient(&mut self, param: &O::Param) -> Result<O::Gradient, Error> {
-        self.op("gradient", |op| op.gradient(param))
+        self.op("gradient_count", |op| op.gradient(param))
     }
 }
 
 impl<O: Hessian> OpWrapper<O> {
     /// Compute Hessian
     pub fn hessian(&mut self, param: &O::Param) -> Result<O::Hessian, Error> {
-        self.op("hessian", |op| op.hessian(param))
+        self.op("hessian_count", |op| op.hessian(param))
     }
 }
 
 impl<O: Jacobian> OpWrapper<O> {
     /// Compute Jacobian
     pub fn jacobian(&mut self, param: &O::Param) -> Result<O::Jacobian, Error> {
-        self.op("jacobian", |op| op.jacobian(param))
+        self.op("jacobian_count", |op| op.jacobian(param))
     }
 }
 
 impl<O: Modify> OpWrapper<O> {
     /// Compute TODO
     pub fn modify(&mut self, param: &O::Param, extent: O::Float) -> Result<O::Output, Error> {
-        self.op("modify", |op| op.modify(param, extent))
+        self.op("modify_count", |op| op.modify(param, extent))
     }
 }
 
