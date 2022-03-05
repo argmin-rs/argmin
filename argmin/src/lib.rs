@@ -620,7 +620,7 @@
 // this is just to make sure that it will always stay this way.)
 #![deny(clippy::float_cmp)]
 
-extern crate rand;
+// extern crate rand;
 
 #[macro_use]
 pub mod core;

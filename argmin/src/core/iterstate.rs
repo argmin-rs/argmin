@@ -5,10 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-// use crate::core::{
-//     ArgminFloat, ArgminIterData, ArgminOp, DeserializeOwnedAlias, LinearProgram, OpWrapper,
-//     SerializeAlias, TerminationReason,
-// };
 use crate::core::{
     ArgminFloat,
     // LinearProgram
@@ -17,6 +13,7 @@ use crate::core::{
     // SerializeAlias,
     TerminationReason,
 };
+use crate::{getter, pub_getter, pub_getter_option_ref, pub_take, setter};
 use instant;
 use paste::item;
 #[cfg(feature = "serde1")]
@@ -147,114 +144,6 @@ pub struct IterState<P, G, J, H, F> {
     pub time: Option<instant::Duration>,
     /// Reason of termination
     pub termination_reason: TerminationReason,
-}
-
-macro_rules! setter {
-    ($name:ident, $type:ty, $doc:tt) => {
-        #[doc=$doc]
-        fn $name(&mut self, $name: $type) -> &mut Self {
-            self.$name = $name;
-            self
-        }
-    };
-}
-
-// macro_rules! pub_setter {
-//     ($name:ident, $type:ty, $doc:tt) => {
-//         #[doc=$doc]
-//         pub fn $name(&mut self, $name: $type) -> &mut Self {
-//             self.$name = $name;
-//             self
-//         }
-//     };
-// }
-
-// macro_rules! getter_option {
-//     ($name:ident, $type:ty, $doc:tt) => {
-//         item! {
-//             #[doc=$doc]
-//             fn [<get_ $name>](&self) -> Option<$type> {
-//                 self.$name.clone()
-//             }
-//         }
-//     };
-// }
-
-// macro_rules! pub_getter_option {
-//     ($name:ident, $type:ty, $doc:tt) => {
-//         item! {
-//             #[doc=$doc]
-//             pub fn [<get_ $name>](&self) -> Option<$type> {
-//                 self.$name.clone()
-//             }
-//         }
-//     };
-// }
-
-// macro_rules! getter_option_ref {
-//     ($name:ident, $type:ty, $doc:tt) => {
-//         item! {
-//             #[doc=$doc]
-//             fn [<get_ $name _ref>](&self) -> Option<&$type> {
-//                 self.$name.as_ref()
-//             }
-//         }
-//     };
-// }
-
-macro_rules! pub_getter_option_ref {
-    ($name:ident, $type:ty, $doc:tt) => {
-        item! {
-            #[doc=$doc]
-            pub fn [<get_ $name _ref>](&self) -> Option<&$type> {
-                self.$name.as_ref()
-            }
-        }
-    };
-}
-
-// macro_rules! take {
-//     ($name:ident, $type:ty, $doc:tt) => {
-//         item! {
-//             #[doc=$doc]
-//             fn [<take_ $name>](&mut self) -> Option<$type> {
-//                 self.$name.take()
-//             }
-//         }
-//     };
-// }
-
-macro_rules! pub_take {
-    ($name:ident, $type:ty, $doc:tt) => {
-        item! {
-            #[doc=$doc]
-            pub fn [<take_ $name>](&mut self) -> Option<$type> {
-                self.$name.take()
-            }
-        }
-    };
-}
-
-macro_rules! getter {
-    ($name:ident, $type:ty, $doc:tt) => {
-        item! {
-            #[doc=$doc]
-            fn [<get_ $name>](&self) -> $type {
-                self.$name.clone()
-            }
-        }
-    };
-}
-
-macro_rules! pub_getter {
-    ($name:ident, $type:ty, $doc:tt) => {
-        item! {
-            #[doc=$doc]
-            pub fn [<get_ $name>](&self) -> $type {
-                self.$name.clone()
-            }
-        }
-    };
 }
 
 impl<P, G, J, H, F> IterState<P, G, J, H, F>
