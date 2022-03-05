@@ -145,6 +145,7 @@ mod tests {
     #[cfg(feature = "ndarrayl")]
     #[test]
     fn test_solver() {
+        use crate::core::State;
         use ndarray::{Array, Array1, Array2};
         struct Problem {}
 

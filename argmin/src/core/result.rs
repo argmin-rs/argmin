@@ -96,10 +96,10 @@ let num_iters = result.state().get_iter();
 //!
 //! More details can be found in the `IterState` documentation.
 
-// use crate::core::{ArgminOp, OpWrapper, State};
-use crate::core::{OpWrapper, State};
-// use num_traits::{Float, FromPrimitive};
-// use std::cmp::Ordering;
+use crate::core::{ArgminFloat, OpWrapper, State};
+use num_traits::{Float, FromPrimitive};
+use std::cmp::Ordering;
+use std::fmt;
 
 /// Final struct returned by the `run` method of `Executor`.
 #[derive(Clone)]
@@ -130,50 +130,69 @@ impl<O, I> OptimizationResult<O, I> {
 impl<O, I> std::fmt::Display for OptimizationResult<O, I>
 where
     I: State,
+    I::Param: fmt::Debug,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(f, "{:?}", self.state)?;
-        // writeln!(f, "OptimizationResult:")?;
-        // writeln!(f, "    param (best):  {:?}", self.state.get_best_param())?;
-        // writeln!(f, "    cost (best):   {}", self.state.get_best_cost())?;
-        // writeln!(f, "    iters (best):  {}", self.state.get_last_best_iter())?;
-        // writeln!(f, "    iters (total): {}", self.state.get_iter())?;
-        // writeln!(
-        //     f,
-        //     "    termination: {}",
-        //     self.state.get_termination_reason()
-        // )?;
-        // writeln!(f, "    time:        {:?}", self.state.get_time())?;
+        writeln!(f, "OptimizationResult:")?;
+        writeln!(
+            f,
+            "    param (best):  {}",
+            if let Some(best_param) = self.state.get_best_param_ref() {
+                format!("{:?}", best_param)
+            } else {
+                String::from("None")
+            }
+        )?;
+        writeln!(f, "    cost (best):   {}", self.state.get_best_cost())?;
+        writeln!(f, "    iters (best):  {}", self.state.get_last_best_iter())?;
+        writeln!(f, "    iters (total): {}", self.state.get_iter())?;
+        writeln!(
+            f,
+            "    termination:   {}",
+            self.state.get_termination_reason()
+        )?;
+        writeln!(
+            f,
+            "    time:          {}",
+            if let Some(time) = self.state.get_time() {
+                format!("{:?}", time)
+            } else {
+                String::new()
+            }
+        )?;
         Ok(())
     }
 }
 
-// impl<I: State> PartialEq for OptimizationResult<I> {
-//     fn eq(&self, other: &OptimizationResult<I>) -> bool {
-//         (self.state.get_best_cost() - other.state.get_best_cost()).abs() < I::Float::epsilon()
-//     }
-// }
+impl<O, I: State> PartialEq for OptimizationResult<O, I>
+where
+    I::Float: ArgminFloat,
+{
+    fn eq(&self, other: &OptimizationResult<O, I>) -> bool {
+        (self.state.get_best_cost() - other.state.get_best_cost()).abs() < I::Float::epsilon()
+    }
+}
 
-// impl<I: State> Eq for OptimizationResult<I> {}
-//
-// impl<I: State> Ord for OptimizationResult<I> {
-//     fn cmp(&self, other: &OptimizationResult<I>) -> Ordering {
-//         let t = self.state.get_best_cost() - other.state.get_best_cost();
-//         if t.abs() < I::Float::epsilon() {
-//             Ordering::Equal
-//         } else if t > I::Float::from_f64(0.0).unwrap() {
-//             Ordering::Greater
-//         } else {
-//             Ordering::Less
-//         }
-//     }
-// }
+impl<O, I: State> Eq for OptimizationResult<O, I> {}
 
-// impl<I: State> PartialOrd for OptimizationResult<I> {
-//     fn partial_cmp(&self, other: &OptimizationResult<I>) -> Option<Ordering> {
-//         Some(self.cmp(other))
-//     }
-// }
+impl<O, I: State> Ord for OptimizationResult<O, I> {
+    fn cmp(&self, other: &OptimizationResult<O, I>) -> Ordering {
+        let t = self.state.get_best_cost() - other.state.get_best_cost();
+        if t.abs() < I::Float::epsilon() {
+            Ordering::Equal
+        } else if t > I::Float::from_f64(0.0).unwrap() {
+            Ordering::Greater
+        } else {
+            Ordering::Less
+        }
+    }
+}
+
+impl<O, I: State> PartialOrd for OptimizationResult<O, I> {
+    fn partial_cmp(&self, other: &OptimizationResult<O, I>) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
 
 #[cfg(test)]
 mod tests {
