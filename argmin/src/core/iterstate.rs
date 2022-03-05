@@ -5,32 +5,31 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{
-    ArgminFloat,
-    // LinearProgram
-    // DeserializeOwnedAlias,
-    OpWrapper,
-    // SerializeAlias,
-    TerminationReason,
-};
-use crate::{getter, pub_getter, pub_getter_option_ref, pub_take, setter};
+use crate::core::{ArgminFloat, OpWrapper, TerminationReason};
+use crate::{getter, getter_option_ref, pub_getter, pub_getter_option_ref, pub_take, setter};
 use instant;
 use paste::item;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fmt::Debug;
 
 /// Types implemeting this trait can be used to keep track of a solver's state
-pub trait State: Debug + Sized {
+pub trait State {
+    /// Type of Parameter vector
+    type Param: Clone;
     /// Floating Point Precision
     type Float: ArgminFloat;
 
     /// Constructor
     fn new() -> Self;
 
-    /// TODO
+    /// This method is called after each iteration and checks if the new parameter vector is better
+    /// than the previous one. If so, it will update the current best parameter vector and current
+    /// best cost function value.
     fn update(&mut self);
+
+    /// Returns a reference to the best parameter vector
+    fn get_best_param_ref(&self) -> Option<&Self::Param>;
 
     /// Returns maximum number of iterations
     fn get_max_iters(&self) -> u64;
@@ -80,17 +79,18 @@ pub trait State: Debug + Sized {
     /// Returns currecnt cost function evaluation count
     fn get_func_counts(&self) -> &HashMap<String, u64>;
 }
-impl<P, G, J, H, F> std::fmt::Debug for IterState<P, G, J, H, F>
-where
-    Self: State<Float = F>,
-    F: ArgminFloat,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        // TODO!
-        writeln!(f, "{:?}", self.best_cost)?;
-        Ok(())
-    }
-}
+
+// impl<P, G, J, H, F> Debug for IterState<P, G, J, H, F>
+// where
+//     Self: State<Float = F>,
+//     F: ArgminFloat,
+// {
+//     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+//         // TODO!
+//         writeln!(f, "{:?}", self.best_cost)?;
+//         Ok(())
+//     }
+// }
 
 /// Maintains the state from iteration to iteration of a solver
 #[derive(Clone, Default)]
@@ -216,7 +216,6 @@ where
         P,
         "Moves the previous parameter vector out and replaces it internally with `None`"
     );
-    pub_getter_option_ref!(best_param, P, "Returns reference to best parameter vector");
     pub_getter_option_ref!(
         prev_best_param,
         P,
@@ -356,6 +355,8 @@ where
     P: Clone,
     F: ArgminFloat,
 {
+    /// Type of parameter vector
+    type Param = P;
     /// Floating point precision
     type Float = F;
 
@@ -407,6 +408,8 @@ where
             self.new_best();
         }
     }
+
+    getter_option_ref!(best_param, P, "Returns reference to best parameter vector");
 
     #[must_use]
     fn termination_reason(mut self, reason: TerminationReason) -> Self {
