@@ -1,4 +1,4 @@
-// Copyright 2018-2022-2022 argmin developers
+// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
@@ -20,8 +20,6 @@ pub mod macros;
 mod errors;
 /// Executor
 pub mod executor;
-/// iteration state
-mod iterstate;
 /// Key value datastructure
 mod kv;
 /// Phony Operator
@@ -36,6 +34,8 @@ mod result;
 /// Serialization of `ArgminSolver`s
 #[cfg(feature = "serde1")]
 mod serialization;
+/// iteration state
+mod state;
 /// Definition of termination reasons
 mod termination;
 
@@ -43,7 +43,6 @@ pub use anyhow::Error;
 pub use errors::ArgminError;
 pub use executor::Executor;
 // pub use iterstate::{IterState, LinearProgramState, State};
-pub use iterstate::{IterState, State};
 pub use kv::KV;
 pub use nooperator::{MinimalNoOperator, NoOperator};
 use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
@@ -54,6 +53,7 @@ pub use result::OptimizationResult;
 use serde::{de::DeserializeOwned, Serialize};
 #[cfg(feature = "serde1")]
 pub use serialization::{load_checkpoint, ArgminCheckpoint, CheckpointMode};
+pub use state::{IterState, LinearProgramState, State};
 use std::fmt::{Debug, Display};
 pub use termination::TerminationReason;
 
