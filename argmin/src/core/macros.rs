@@ -11,7 +11,7 @@
 #[macro_export]
 macro_rules! make_kv {
     ($($k:expr =>  $v:expr;)*) => {
-        KV { kv: vec![ $(($k, format!("{:?}", $v))),* ] }
+        KV { kv: vec![ $(($k, std::rc::Rc::new($v))),* ] }
     };
 }
 
