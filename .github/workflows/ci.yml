@@ -78,7 +78,7 @@ jobs:
       - name: Clippy (argmin) without default features
         run: cargo clippy -p argmin --all-targets --no-default-features -- -D warnings
       - name: Clippy (argmin) without serde1 feature
-        run: cargo clippy -p argmin --all-targets --no-default-features --features="visualizer,slog-logger" -- -D warnings
+        run: cargo clippy -p argmin --all-targets --no-default-features --features="slog-logger" -- -D warnings
       - name: Clippy (argmin) with all features
         run: cargo clippy -p argmin --all-targets --all-features -- -D warnings
 

@@ -5,11 +5,12 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Observer which visualizes the progress of the solver
-
-extern crate gnuplot;
-use crate::core::{ArgminFloat, CostFunction, Error, IterState, Observe, KV};
-use instant;
+use argmin::core::{
+    ArgminFloat, CostFunction, Error, Executor, IterState, Observe, ObserverMode, KV,
+};
+use argmin::solver::particleswarm::ParticleSwarm;
+use argmin_testfunctions::himmelblau;
+use gnuplot::{Color, PointSize};
 use std::sync::Mutex;
 
 /// Visualize iterations of a solver for cost functions of type
@@ -70,8 +71,6 @@ impl Visualizer3d {
 
     /// Draw
     fn draw(&mut self) {
-        use gnuplot::*;
-
         // TODO: unwrap evil
         let mut figure = self.fg.lock().unwrap();
 
@@ -211,5 +210,52 @@ impl Surface {
             height: num_y,
             zvalues,
         }
+    }
+}
+
+struct Himmelblau {}
+
+impl CostFunction for Himmelblau {
+    type Param = Vec<f64>;
+    type Output = f64;
+
+    fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+        Ok(himmelblau(param))
+    }
+}
+
+fn run() -> Result<(), Error> {
+    // Define inital parameter vector
+    let init_param: Vec<f64> = vec![0.1, 0.1];
+
+    let cost_function = Himmelblau {};
+
+    let visualizer = Visualizer3d::new()
+        .delay(std::time::Duration::from_secs(1))
+        .surface(Surface::new(Himmelblau {}, (-4.0, -4.0, 4.0, 4.0), 0.1));
+
+    {
+        let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
+
+        let executor = Executor::new(cost_function, solver)
+            .configure(|config| config.param(init_param).max_iters(15));
+
+        let executor = executor.add_observer(visualizer, ObserverMode::Always);
+
+        let res = executor.run()?;
+
+        // Wait a second (lets the logger flush everything before printing again)
+        std::thread::sleep(std::time::Duration::from_secs(1));
+
+        // Print Result
+        println!("{}", res);
+    }
+
+    Ok(())
+}
+
+fn main() {
+    if let Err(ref e) = run() {
+        println!("{}", e);
     }
 }

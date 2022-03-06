@@ -46,7 +46,6 @@ argmin-math = { path = "../argmin-math" }
 
 [features]
 default = ["slog-logger", "serde1"]
-visualizer = ["gnuplot"]
 wasm-bindgen = ["instant/wasm-bindgen", "getrandom/js"]
 slog-logger = ["slog", "slog-term", "slog-async"]
 serde1 = ["serde", "serde_json", "rand/serde1", "bincode", "slog-json"]
@@ -131,6 +130,10 @@ required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 [[example]]
 name = "nonlinear_cg"
 required-features = ["slog-logger"]
+
+[[example]]
+name = "observer"
+required-features = ["slog-logger", "gnuplot"]
 
 [[example]]
 name = "particleswarm"
