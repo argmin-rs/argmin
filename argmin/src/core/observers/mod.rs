@@ -15,9 +15,6 @@
 pub mod file;
 #[cfg(feature = "slog-logger")]
 pub mod slog_logger;
-#[cfg(feature = "visualizer")]
-pub mod visualizer;
-//
 use crate::core::{Error, State, KV};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -28,8 +25,6 @@ use std::sync::{Arc, Mutex};
 pub use file::*;
 #[cfg(feature = "slog-logger")]
 pub use slog_logger::*;
-#[cfg(feature = "visualizer")]
-pub use visualizer::*;
 
 /// Defines the interface every Observer needs to expose
 pub trait Observe<I> {

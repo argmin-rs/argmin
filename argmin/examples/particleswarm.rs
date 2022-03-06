@@ -6,8 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 
 use argmin::core::{CostFunction, Error, Executor};
-#[cfg(feature = "visualizer")]
-use argmin::core::{ObserverMode, Surface, Visualizer3d};
 use argmin::solver::particleswarm::ParticleSwarm;
 use argmin_testfunctions::himmelblau;
 
@@ -28,28 +26,17 @@ fn run() -> Result<(), Error> {
 
     let cost_function = Himmelblau {};
 
-    #[cfg(feature = "visualizer")]
-    let visualizer = Visualizer3d::new()
-        .delay(std::time::Duration::from_secs(1))
-        .surface(Surface::new(Himmelblau {}, (-4.0, -4.0, 4.0, 4.0), 0.1));
+    let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
 
-    {
-        let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
+    let res = Executor::new(cost_function, solver)
+        .configure(|config| config.param(init_param).max_iters(15))
+        .run()?;
 
-        let executor = Executor::new(cost_function, solver)
-            .configure(|config| config.param(init_param).max_iters(15));
+    // Wait a second (lets the logger flush everything before printing again)
+    std::thread::sleep(std::time::Duration::from_secs(1));
 
-        #[cfg(feature = "visualizer")]
-        let executor = executor.add_observer(visualizer, ObserverMode::Always);
-
-        let res = executor.run()?;
-
-        // Wait a second (lets the logger flush everything before printing again)
-        std::thread::sleep(std::time::Duration::from_secs(1));
-
-        // Print Result
-        println!("{}", res);
-    }
+    // Print Result
+    println!("{}", res);
 
     Ok(())
 }
