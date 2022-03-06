@@ -18,6 +18,7 @@ use crate::core::{
 use argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 /// Nelder-Mead method
 ///
@@ -203,6 +204,17 @@ enum Action {
     Expansion,
     Contraction,
     Shrink,
+}
+
+impl fmt::Display for Action {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Action::Reflection => write!(f, "Reflection"),
+            Action::Expansion => write!(f, "Expansion"),
+            Action::Contraction => write!(f, "Contraction"),
+            Action::Shrink => write!(f, "Shrink"),
+        }
+    }
 }
 
 impl<O, P, F> Solver<O, IterState<P, (), (), (), F>> for NelderMead<P, F>

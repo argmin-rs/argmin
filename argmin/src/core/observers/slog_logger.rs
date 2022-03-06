@@ -15,6 +15,7 @@ use slog_async::OverflowStrategy;
 #[cfg(feature = "serde1")]
 use slog_json;
 use slog_term;
+use std::fmt::Display;
 #[cfg(feature = "serde1")]
 use std::fs::OpenOptions;
 #[cfg(feature = "serde1")]
@@ -105,7 +106,7 @@ impl SlogLogger {
 /// This type is necessary in order to be able to implement `slog::KV` on `KV`
 pub struct SlogKV {
     /// Key value store
-    pub kv: Vec<(&'static str, String)>,
+    pub kv: Vec<(&'static str, std::rc::Rc<dyn Display>)>,
 }
 
 impl slog::KV for SlogKV {

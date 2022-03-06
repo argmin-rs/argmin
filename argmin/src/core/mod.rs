@@ -59,7 +59,8 @@ pub use termination::TerminationReason;
 
 /// Trait alias to simplify common trait bounds
 pub trait ArgminFloat:
-    Float
+    'static
+    + Float
     + FloatConst
     + FromPrimitive
     + ToPrimitive
@@ -70,7 +71,8 @@ pub trait ArgminFloat:
 {
 }
 impl<I> ArgminFloat for I where
-    I: Float
+    I: 'static
+        + Float
         + FloatConst
         + FromPrimitive
         + ToPrimitive

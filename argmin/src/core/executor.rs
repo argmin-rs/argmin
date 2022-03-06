@@ -115,8 +115,8 @@ where
         if !self.observers.is_empty() {
             let mut logs = make_kv!("max_iters" => state.get_max_iters(););
 
-            if let Some(mut kv) = kv {
-                logs = logs.merge(&mut kv);
+            if let Some(kv) = kv {
+                logs = logs.merge(kv);
             }
 
             // Observe after init
@@ -169,9 +169,10 @@ where
 
                 if self.timer {
                     let duration = duration.unwrap();
-                    log = log.merge(&mut make_kv!(
+                    let tmp = make_kv!(
                         "time" => duration.as_secs() as f64 + f64::from(duration.subsec_nanos()) * 1e-9;
-                    ));
+                    );
+                    log = log.merge(tmp);
                 }
                 self.observers.observe_iter(&state, &log)?;
             }

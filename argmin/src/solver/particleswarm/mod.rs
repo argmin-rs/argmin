@@ -210,9 +210,7 @@ where
                 .param(self.best_position.clone())
                 .cost(self.best_cost)
                 .population(population),
-            Some(make_kv!(
-                "particles" => &self.particles;
-            )),
+            None,
         ))
     }
 }

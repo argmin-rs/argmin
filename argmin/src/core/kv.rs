@@ -13,17 +13,15 @@
 //!   * Either use something existing, or at least evaluate the performance and if necessary,
 //!     improve performance.
 
-#[cfg(feature = "serde1")]
-use serde::{Deserialize, Serialize};
 use std;
+use std::fmt::Display;
+use std::rc::Rc;
 
 /// A simple key-value storage
-#[derive(Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[derive(Clone, Default)]
 pub struct KV {
     /// The actual key value storage
-    #[cfg_attr(feature = "serde1", serde(borrow))]
-    pub kv: Vec<(&'static str, String)>,
+    pub kv: Vec<(&'static str, Rc<dyn Display>)>,
 }
 
 impl std::fmt::Display for KV {
@@ -44,23 +42,21 @@ impl KV {
     }
 
     /// Push a key-value pair to the `kv` vector.
-    ///
-    /// This formats the `val` using `format!`. Therefore `T` has to implement `Display`.
-    pub fn push<T: std::fmt::Display>(&mut self, key: &'static str, val: T) -> &mut Self {
-        self.kv.push((key, format!("{}", val)));
+    pub fn push(&mut self, key: &'static str, val: Rc<dyn Display>) -> &mut Self {
+        self.kv.push((key, val));
         self
     }
 
     /// Merge another `kv` into `self.kv`
     #[must_use]
-    pub fn merge(mut self, other: &mut KV) -> Self {
+    pub fn merge(mut self, mut other: KV) -> Self {
         self.kv.append(&mut other.kv);
         self
     }
 }
 
-impl std::iter::FromIterator<(&'static str, String)> for KV {
-    fn from_iter<I: IntoIterator<Item = (&'static str, String)>>(iter: I) -> Self {
+impl std::iter::FromIterator<(&'static str, Rc<dyn Display>)> for KV {
+    fn from_iter<I: IntoIterator<Item = (&'static str, Rc<dyn Display>)>>(iter: I) -> Self {
         let mut c = KV::new();
 
         for i in iter {
@@ -71,17 +67,10 @@ impl std::iter::FromIterator<(&'static str, String)> for KV {
     }
 }
 
-impl std::iter::Extend<(&'static str, String)> for KV {
-    fn extend<I: IntoIterator<Item = (&'static str, String)>>(&mut self, iter: I) {
+impl std::iter::Extend<(&'static str, Rc<dyn Display>)> for KV {
+    fn extend<I: IntoIterator<Item = (&'static str, Rc<dyn Display>)>>(&mut self, iter: I) {
         for i in iter {
             self.push(i.0, i.1);
         }
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    send_sync_test!(argmin_kv, KV);
 }
