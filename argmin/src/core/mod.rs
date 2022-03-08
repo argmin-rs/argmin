@@ -32,10 +32,11 @@ mod observers;
 /// Wrapper around operators which keeps track of function evaluation counts
 mod opwrapper;
 /// Pseudo Operator
-// #[cfg(test)]
 mod pseudooperator;
 /// Definition of the return type of the solvers
 mod result;
+/// Trait alias for `serde`s `Serialize` and `DeserializeOwned`
+mod serialization;
 /// iteration state
 mod state;
 /// Definition of termination reasons
@@ -50,10 +51,10 @@ pub use float::ArgminFloat;
 pub use kv::KV;
 pub use observers::*;
 pub use opwrapper::OpWrapper;
+#[cfg(test)]
 pub use pseudooperator::PseudoOperator;
 pub use result::OptimizationResult;
-#[cfg(feature = "serde1")]
-use serde::{de::DeserializeOwned, Serialize};
+pub use serialization::{DeserializeOwnedAlias, SerializeAlias};
 pub use state::{IterState, LinearProgramState, State};
 pub use termination::TerminationReason;
 
@@ -230,36 +231,3 @@ pub trait NLCGBetaUpdate<G, P, F: ArgminFloat>: SerializeAlias {
     /// Parameter 3: p_k
     fn update(&self, nabla_f_k: &G, nabla_f_k_p_1: &G, p_k: &P) -> F;
 }
-
-/// If the `serde1` feature is set, it acts as an alias for `Serialize` and is implemented for all
-/// types which implement `Serialize`. If `serde1` is not set, it will be an "empty" trait
-/// implemented for all types.
-#[cfg(feature = "serde1")]
-pub trait SerializeAlias: Serialize {}
-
-/// If the `serde1` feature is set, it acts as an alias for `Serialize` and is implemented for all
-/// types which implement `Serialize`. If `serde1` is not set, it will be an "empty" trait
-/// implemented for all types.
-#[cfg(not(feature = "serde1"))]
-pub trait SerializeAlias {}
-
-#[cfg(feature = "serde1")]
-impl<T> SerializeAlias for T where T: Serialize {}
-#[cfg(not(feature = "serde1"))]
-impl<T> SerializeAlias for T {}
-
-/// If the `serde1` feature is set, it acts as an alias for `DeserializeOwned` and is implemented
-/// for all types which implement `DeserializeOwned`. If `serde1` is not set, it will be an "empty"
-/// trait implemented for all types.
-#[cfg(feature = "serde1")]
-pub trait DeserializeOwnedAlias: DeserializeOwned {}
-/// If the `serde1` feature is set, it acts as an alias for `DeserializeOwned` and is implemented
-/// for all types which implement `DeserializeOwned`. If `serde1` is not set, it will be an "empty"
-/// trait implemented for all types.
-#[cfg(not(feature = "serde1"))]
-pub trait DeserializeOwnedAlias {}
-
-#[cfg(feature = "serde1")]
-impl<T> DeserializeOwnedAlias for T where T: DeserializeOwned {}
-#[cfg(not(feature = "serde1"))]
-impl<T> DeserializeOwnedAlias for T {}
