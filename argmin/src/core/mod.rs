@@ -23,6 +23,8 @@ mod checkpointing;
 mod errors;
 /// Executor
 pub mod executor;
+/// Trait alias for float types
+mod float;
 /// Key value datastructure
 mod kv;
 /// Observers;
@@ -44,8 +46,8 @@ pub use anyhow::Error;
 pub use checkpointing::{load_checkpoint, Checkpoint, CheckpointMode};
 pub use errors::ArgminError;
 pub use executor::Executor;
+pub use float::ArgminFloat;
 pub use kv::KV;
-use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 pub use observers::*;
 pub use opwrapper::OpWrapper;
 pub use pseudooperator::PseudoOperator;
@@ -53,34 +55,7 @@ pub use result::OptimizationResult;
 #[cfg(feature = "serde1")]
 use serde::{de::DeserializeOwned, Serialize};
 pub use state::{IterState, LinearProgramState, State};
-use std::fmt::{Debug, Display};
 pub use termination::TerminationReason;
-
-/// Trait alias to simplify common trait bounds
-pub trait ArgminFloat:
-    'static
-    + Float
-    + FloatConst
-    + FromPrimitive
-    + ToPrimitive
-    + Debug
-    + Display
-    + SerializeAlias
-    + DeserializeOwnedAlias
-{
-}
-impl<I> ArgminFloat for I where
-    I: 'static
-        + Float
-        + FloatConst
-        + FromPrimitive
-        + ToPrimitive
-        + Debug
-        + Display
-        + SerializeAlias
-        + DeserializeOwnedAlias
-{
-}
 
 /// TODO
 pub trait Operator {
