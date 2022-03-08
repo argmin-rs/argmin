@@ -255,8 +255,8 @@ impl<P: Clone + SerializeAlias, F: ArgminFloat> TrustRegion<F> for Steihaug<P, F
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::MinimalNoOperator;
+    use crate::core::PseudoOperator;
     use crate::test_trait_impl;
 
-    test_trait_impl!(steihaug, Steihaug<MinimalNoOperator, f64>);
+    test_trait_impl!(steihaug, Steihaug<PseudoOperator, f64>);
 }

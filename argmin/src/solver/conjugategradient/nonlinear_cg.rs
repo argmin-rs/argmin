@@ -181,7 +181,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::MinimalNoOperator;
+    use crate::core::PseudoOperator;
     use crate::solver::conjugategradient::beta::PolakRibiere;
     use crate::solver::linesearch::MoreThuenteLineSearch;
     use crate::test_trait_impl;
@@ -189,7 +189,7 @@ mod tests {
     test_trait_impl!(
         nonlinear_cg,
         NonlinearConjugateGradient<
-            MinimalNoOperator,
+            PseudoOperator,
             MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>,
             PolakRibiere,
             f64

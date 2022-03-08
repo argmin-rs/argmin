@@ -264,7 +264,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{ArgminFloat, IterState, MinimalNoOperator};
+    use crate::core::{ArgminFloat, IterState, PseudoOperator};
     use approx::assert_relative_eq;
 
     #[test]
@@ -287,7 +287,7 @@ mod tests {
             }
         }
 
-        let op = MinimalNoOperator::new();
+        let op = PseudoOperator::new();
         let solver = TestSolver {};
 
         let mut executor = Executor::new(op, solver)

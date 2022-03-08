@@ -319,9 +319,9 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::MinimalNoOperator;
+    use crate::core::PseudoOperator;
     use crate::test_trait_impl;
-    type Operator = MinimalNoOperator;
+    type Operator = PseudoOperator;
 
     test_trait_impl!(nelder_mead, NelderMead<Operator, f64>);
 }

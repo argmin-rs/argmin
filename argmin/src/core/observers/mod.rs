@@ -136,11 +136,9 @@ impl Default for ObserverMode {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     use crate::core::MinimalNoOperator;
-//
-//     send_sync_test!(observer, Observer<MinimalNoOperator>);
-//     send_sync_test!(observermode, ObserverMode);
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    send_sync_test!(observermode, ObserverMode);
+}
