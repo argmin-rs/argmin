@@ -628,10 +628,6 @@ pub mod core;
 /// Solvers
 pub mod solver;
 
-/// Macros
-#[macro_use]
-mod macros;
-
 #[cfg(test)]
 #[cfg(feature = "ndarrayl")]
 mod tests;
