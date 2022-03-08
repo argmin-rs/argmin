@@ -13,7 +13,7 @@
 use crate::core::{
     ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
     Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, TerminationReason,
-    KV,
+    TrustRegionRadius, KV,
 };
 use crate::solver::trustregion::reduction_ratio;
 use argmin_math::{ArgminAdd, ArgminDot, ArgminNorm, ArgminWeightedDot};
@@ -112,7 +112,7 @@ where
         + ArgminAdd<P, P>,
     G: Clone + SerializeAlias + DeserializeOwnedAlias,
     H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
-    R: Clone + crate::core::TrustRegion<F> + Solver<O, IterState<P, G, (), H, F>>,
+    R: Clone + TrustRegionRadius<F> + Solver<O, IterState<P, G, (), H, F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Trust region";

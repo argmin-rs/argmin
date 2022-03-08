@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminFloat, Error, Gradient, Hessian, IterState, OpWrapper, Solver, State, TerminationReason,
-    TrustRegion, KV,
+    TrustRegionRadius, KV,
 };
 use argmin_math::{ArgminMul, ArgminNorm, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
@@ -90,7 +90,7 @@ where
     }
 }
 
-impl<F> TrustRegion<F> for CauchyPoint<F>
+impl<F> TrustRegionRadius<F> for CauchyPoint<F>
 where
     F: ArgminFloat,
 {

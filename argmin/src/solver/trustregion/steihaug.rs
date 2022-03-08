@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, Error, IterState, OpWrapper, SerializeAlias, Solver, State,
-    TerminationReason, TrustRegion, KV,
+    TerminationReason, TrustRegionRadius, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot, ArgminZeroLike};
 #[cfg(feature = "serde1")]
@@ -246,7 +246,7 @@ where
     }
 }
 
-impl<P: Clone + SerializeAlias, F: ArgminFloat> TrustRegion<F> for Steihaug<P, F> {
+impl<P: Clone + SerializeAlias, F: ArgminFloat> TrustRegionRadius<F> for Steihaug<P, F> {
     fn set_radius(&mut self, radius: F) {
         self.radius = radius;
     }

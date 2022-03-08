@@ -37,3 +37,14 @@ pub use self::backtracking::*;
 pub use self::condition::*;
 pub use self::hagerzhang::*;
 pub use self::morethuente::*;
+
+use crate::core::Error;
+
+/// Defines a common interface for line search methods.
+pub trait LineSearch<P, F> {
+    /// Set the search direction
+    fn set_search_direction(&mut self, direction: P);
+
+    /// Set the initial step length
+    fn set_init_alpha(&mut self, step_length: F) -> Result<(), Error>;
+}
