@@ -8,7 +8,7 @@
 // TODO: Logging of "initial info"
 
 #[cfg(feature = "serde1")]
-use crate::core::{serialization::load_checkpoint, ArgminCheckpoint, CheckpointMode};
+use crate::core::{load_checkpoint, Checkpoint, CheckpointMode};
 use crate::core::{
     DeserializeOwnedAlias, Error, Observe, Observer, ObserverMode, OpWrapper, OptimizationResult,
     SerializeAlias, Solver, State, TerminationReason, KV,
@@ -37,7 +37,7 @@ pub struct Executor<O, S, I> {
     observers: Observer<I>,
     /// Checkpoint
     #[cfg(feature = "serde1")]
-    checkpoint: ArgminCheckpoint,
+    checkpoint: Checkpoint,
     /// Indicates whether Ctrl-C functionality should be active or not
     ctrlc: bool,
     /// Indicates whether to time execution or not
@@ -58,7 +58,7 @@ where
             state,
             observers: Observer::new(),
             #[cfg(feature = "serde1")]
-            checkpoint: ArgminCheckpoint::default(),
+            checkpoint: Checkpoint::default(),
             ctrlc: true,
             timer: true,
         }
