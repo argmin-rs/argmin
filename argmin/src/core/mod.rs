@@ -22,13 +22,13 @@ mod errors;
 pub mod executor;
 /// Key value datastructure
 mod kv;
-/// Phony Operator
-// #[cfg(test)]
-mod nooperator;
 /// Observers;
 mod observers;
 /// Wrapper around operators which keeps track of function evaluation counts
 mod opwrapper;
+/// Pseudo Operator
+// #[cfg(test)]
+mod pseudooperator;
 /// Definition of the return type of the solvers
 mod result;
 /// Serialization of `ArgminSolver`s
@@ -42,12 +42,11 @@ mod termination;
 pub use anyhow::Error;
 pub use errors::ArgminError;
 pub use executor::Executor;
-// pub use iterstate::{IterState, LinearProgramState, State};
 pub use kv::KV;
-pub use nooperator::{MinimalNoOperator, NoOperator};
 use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 pub use observers::*;
 pub use opwrapper::OpWrapper;
+pub use pseudooperator::PseudoOperator;
 pub use result::OptimizationResult;
 #[cfg(feature = "serde1")]
 use serde::{de::DeserializeOwned, Serialize};
@@ -162,7 +161,7 @@ pub trait LinearProgram {
     /// Those three could maybe be merged into a single function; name unclear
     fn c(&self) -> Result<Vec<Self::Float>, Error> {
         Err(ArgminError::NotImplemented {
-            text: "Method `c` of ArgminOp trait not implemented!".to_string(),
+            text: "Method `c` of LinearProgram trait not implemented!".to_string(),
         }
         .into())
     }
@@ -170,7 +169,7 @@ pub trait LinearProgram {
     /// TODO b for linear programs
     fn b(&self) -> Result<Vec<Self::Float>, Error> {
         Err(ArgminError::NotImplemented {
-            text: "Method `b` of ArgminOp trait not implemented!".to_string(),
+            text: "Method `b` of LinearProgram trait not implemented!".to_string(),
         }
         .into())
     }
@@ -179,7 +178,7 @@ pub trait LinearProgram {
     #[allow(non_snake_case)]
     fn A(&self) -> Result<Vec<Vec<Self::Float>>, Error> {
         Err(ArgminError::NotImplemented {
-            text: "Method `A` of ArgminOp trait not implemented!".to_string(),
+            text: "Method `A` of LinearProgram trait not implemented!".to_string(),
         }
         .into())
     }

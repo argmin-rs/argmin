@@ -52,7 +52,6 @@ fn run() -> Result<(), Error> {
     solver.set_init_alpha(1.0)?;
 
     let init_cost = operator.cost(&init_param)?;
-    // TODO: use correct thing
     let init_grad = operator.gradient(&init_param)?;
 
     // Run solver

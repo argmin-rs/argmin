@@ -11,7 +11,6 @@ use argmin_testfunctions::rosenbrock;
 use rand::distributions::Uniform;
 use rand::prelude::*;
 use rand_xoshiro::Xoshiro256PlusPlus;
-use std::default::Default;
 use std::sync::{Arc, Mutex};
 
 struct Rosenbrock {
@@ -27,15 +26,6 @@ struct Rosenbrock {
     /// `self` to be passed as an immutable reference. This gives us thread safe interior
     /// mutability.
     rng: Arc<Mutex<Xoshiro256PlusPlus>>,
-}
-
-// TODO: REMOVE?
-impl Default for Rosenbrock {
-    fn default() -> Self {
-        let lower_bound: Vec<f64> = vec![-5.0, -5.0];
-        let upper_bound: Vec<f64> = vec![5.0, 5.0];
-        Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound)
-    }
 }
 
 impl Rosenbrock {
