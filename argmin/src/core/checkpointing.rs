@@ -44,16 +44,16 @@ impl Display for CheckpointMode {
 ///
 /// Defines how often and where a checkpoint is saved.
 #[derive(Clone, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
-pub struct ArgminCheckpoint {
+pub struct Checkpoint {
     mode: CheckpointMode,
     directory: String,
     name: String,
     filename: String,
 }
 
-impl Default for ArgminCheckpoint {
-    fn default() -> ArgminCheckpoint {
-        ArgminCheckpoint {
+impl Default for Checkpoint {
+    fn default() -> Checkpoint {
+        Checkpoint {
             mode: CheckpointMode::Never,
             directory: ".checkpoints".to_string(),
             name: "default".to_string(),
@@ -62,7 +62,7 @@ impl Default for ArgminCheckpoint {
     }
 }
 
-impl ArgminCheckpoint {
+impl Checkpoint {
     /// Define a new checkpoint
     pub fn new(directory: &str, mode: CheckpointMode) -> Result<Self, Error> {
         match mode {
@@ -74,7 +74,7 @@ impl ArgminCheckpoint {
         let name = "solver".to_string();
         let filename = "solver.arg".to_string();
         let directory = directory.to_string();
-        Ok(ArgminCheckpoint {
+        Ok(Checkpoint {
             mode,
             directory,
             name,
@@ -209,7 +209,7 @@ mod tests {
                 },
             );
         let state = exec.state.take().unwrap();
-        let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
+        let check = Checkpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&exec, &state, 20).unwrap();
 
         let (_loaded, _state): (

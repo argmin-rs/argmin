@@ -16,6 +16,9 @@
 /// Macros
 #[macro_use]
 pub mod macros;
+/// Checkpointing
+#[cfg(feature = "serde1")]
+mod checkpointing;
 /// Error handling
 mod errors;
 /// Executor
@@ -31,15 +34,14 @@ mod opwrapper;
 mod pseudooperator;
 /// Definition of the return type of the solvers
 mod result;
-/// Serialization of `ArgminSolver`s
-#[cfg(feature = "serde1")]
-mod serialization;
 /// iteration state
 mod state;
 /// Definition of termination reasons
 mod termination;
 
 pub use anyhow::Error;
+#[cfg(feature = "serde1")]
+pub use checkpointing::{load_checkpoint, Checkpoint, CheckpointMode};
 pub use errors::ArgminError;
 pub use executor::Executor;
 pub use kv::KV;
@@ -50,8 +52,6 @@ pub use pseudooperator::PseudoOperator;
 pub use result::OptimizationResult;
 #[cfg(feature = "serde1")]
 use serde::{de::DeserializeOwned, Serialize};
-#[cfg(feature = "serde1")]
-pub use serialization::{load_checkpoint, ArgminCheckpoint, CheckpointMode};
 pub use state::{IterState, LinearProgramState, State};
 use std::fmt::{Debug, Display};
 pub use termination::TerminationReason;
