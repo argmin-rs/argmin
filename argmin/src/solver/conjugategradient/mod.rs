@@ -27,3 +27,14 @@ pub mod beta;
 pub use self::beta::*;
 pub use self::cg::*;
 pub use self::nonlinear_cg::*;
+
+use crate::core::SerializeAlias;
+
+/// Common interface for beta update methods (Nonlinear-CG)
+pub trait NLCGBetaUpdate<G, P, F>: SerializeAlias {
+    /// Update beta
+    /// Parameter 1: \nabla f_k
+    /// Parameter 2: \nabla f_{k+1}
+    /// Parameter 3: p_k
+    fn update(&self, nabla_f_k: &G, nabla_f_k_p_1: &G, p_k: &P) -> F;
+}

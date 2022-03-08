@@ -21,6 +21,13 @@ pub use self::dogleg::*;
 pub use self::steihaug::*;
 pub use self::trustregion_method::*;
 
+/// Defines a common interface to methods which calculate approximate steps for trust region
+/// methods.
+pub trait TrustRegionRadius<F> {
+    /// Set the initial step length
+    fn set_radius(&mut self, radius: F);
+}
+
 /// Computes reduction ratio
 pub fn reduction_ratio<F: crate::core::ArgminFloat>(fxk: F, fxkpk: F, mk0: F, mkpk: F) -> F {
     (fxk - fxkpk) / (mk0 - mkpk)
