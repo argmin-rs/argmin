@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Argmin Optimizaton toolbox core
+//! Argmin Optimization toolbox core
 //!
 //! This module contains the traits and types necessary for implementing optimization algorithms
 //! and tools for observing the state of optimization runs and checkpointing.
@@ -55,7 +55,7 @@ pub use float::ArgminFloat;
 pub use kv::KV;
 pub use observers::*;
 pub use opwrapper::OpWrapper;
-pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Modify, Operator};
+pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator};
 #[cfg(test)]
 pub use pseudooperator::PseudoOperator;
 pub use result::OptimizationResult;

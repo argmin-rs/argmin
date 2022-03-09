@@ -5,7 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{CostFunction, Error, Gradient, Hessian, Jacobian, Modify, Operator};
+use crate::core::{CostFunction, Error, Gradient, Hessian, Jacobian, Operator};
+use crate::solver::simulatedannealing::Anneal;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -75,13 +76,13 @@ impl Jacobian for PseudoOperator {
     }
 }
 
-impl Modify for PseudoOperator {
+impl Anneal for PseudoOperator {
     type Param = Vec<f64>;
     type Output = f64;
     type Float = f64;
 
     /// Do nothing.
-    fn modify(&self, _p: &Self::Param, _t: Self::Float) -> Result<Self::Output, Error> {
+    fn anneal(&self, _p: &Self::Param, _t: Self::Float) -> Result<Self::Output, Error> {
         unimplemented!()
     }
 }

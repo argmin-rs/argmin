@@ -5,8 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{CostFunction, Error, Executor, Modify, ObserverMode, SlogLogger};
-use argmin::solver::simulatedannealing::{SATempFunc, SimulatedAnnealing};
+use argmin::core::{CostFunction, Error, Executor, ObserverMode, SlogLogger};
+use argmin::solver::simulatedannealing::{Anneal, SATempFunc, SimulatedAnnealing};
 use argmin_testfunctions::rosenbrock;
 use rand::distributions::Uniform;
 use rand::prelude::*;
@@ -50,13 +50,13 @@ impl CostFunction for Rosenbrock {
     }
 }
 
-impl Modify for Rosenbrock {
+impl Anneal for Rosenbrock {
     type Param = Vec<f64>;
     type Output = Vec<f64>;
     type Float = f64;
 
-    /// This function is called by the annealing function
-    fn modify(&self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
+    /// Anneal a parameter vector
+    fn anneal(&self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
         let mut param_n = param.clone();
         let mut rng = self.rng.lock().unwrap();
         let distr = Uniform::from(0..param.len());
