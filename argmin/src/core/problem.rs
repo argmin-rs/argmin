@@ -10,9 +10,9 @@ pub use crate::core::{ArgminError, ArgminFloat, DeserializeOwnedAlias, Error, Se
 /// TODO
 pub trait Operator {
     /// Type of the parameter vector
-    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
-    /// Output of the operator
-    type Output: Clone + SerializeAlias + DeserializeOwnedAlias;
+    type Param;
+    /// Return value of the operator
+    type Output;
 
     /// Applies the operator to parameters
     fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error>;
@@ -21,9 +21,9 @@ pub trait Operator {
 /// TODO
 pub trait CostFunction {
     /// Type of the parameter vector
-    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
-    /// Output of the cost function
-    type Output: Clone + SerializeAlias + DeserializeOwnedAlias;
+    type Param;
+    /// Return value of the cost function
+    type Output;
 
     /// Compute cost function
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error>;
@@ -32,9 +32,9 @@ pub trait CostFunction {
 /// TODO
 pub trait Gradient {
     /// Type of the parameter vector
-    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
+    type Param;
     /// Type of the gradient
-    type Gradient: Clone + SerializeAlias + DeserializeOwnedAlias;
+    type Gradient;
 
     /// Compute gradient
     fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error>;
@@ -43,9 +43,9 @@ pub trait Gradient {
 /// TODO
 pub trait Hessian {
     /// Type of the parameter vector
-    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
+    type Param;
     /// Type of the Hessian
-    type Hessian: Clone + SerializeAlias + DeserializeOwnedAlias;
+    type Hessian;
 
     /// Compute Hessian
     fn hessian(&self, param: &Self::Param) -> Result<Self::Hessian, Error>;
@@ -54,25 +54,12 @@ pub trait Hessian {
 /// TODO
 pub trait Jacobian {
     /// Type of the parameter vector
-    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
-    /// Output of the cost function
-    type Jacobian: Clone + SerializeAlias + DeserializeOwnedAlias;
+    type Param;
+    /// Type of the Jacobian
+    type Jacobian;
 
     /// Compute Jacobian
     fn jacobian(&self, param: &Self::Param) -> Result<Self::Jacobian, Error>;
-}
-
-/// TODO
-pub trait Modify {
-    /// Type of the parameter vector
-    type Param: Clone + SerializeAlias + DeserializeOwnedAlias;
-    /// Output TODO
-    type Output: Clone + SerializeAlias + DeserializeOwnedAlias;
-    /// Precision of floats
-    type Float;
-
-    /// Compute Jacobian
-    fn modify(&self, param: &Self::Param, _extent: Self::Float) -> Result<Self::Output, Error>;
 }
 
 /// Problems which implement this trait can be used for linear programming solvers

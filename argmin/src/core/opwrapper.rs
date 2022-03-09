@@ -5,18 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{
-    CostFunction, Error, Gradient, Hessian, Jacobian, LinearProgram, Modify, Operator,
-};
+use crate::core::{CostFunction, Error, Gradient, Hessian, Jacobian, LinearProgram, Operator};
 use std::collections::HashMap;
 #[cfg(feature = "serde1")]
-// use serde::{Deserialize, Serialize};
 use std::default::Default;
 
 /// This wraps an operator and keeps track of how often the cost, gradient and Hessian have been
-/// computed and how often the modify function has been called. Usually, this is an implementation
-/// detail unless a solver is needed within another solver (such as a line search within a gradient
-/// descent method).
+/// computed Usually, this is an implementation detail unless a solver is needed within another
+/// solver (such as a line search within a gradient descent method).
 #[derive(Clone, Debug, Default)]
 pub struct OpWrapper<O> {
     /// Operator
@@ -60,15 +56,8 @@ impl<O: Jacobian> OpWrapper<O> {
     }
 }
 
-impl<O: Modify> OpWrapper<O> {
-    /// Compute TODO
-    pub fn modify(&mut self, param: &O::Param, extent: O::Float) -> Result<O::Output, Error> {
-        self.op("modify_count", |op| op.modify(param, extent))
-    }
-}
-
 impl<O> OpWrapper<O> {
-    /// general apply
+    /// TODO
     pub fn op<T, F: FnOnce(&O) -> Result<T, Error>>(
         &mut self,
         name: &'static str,

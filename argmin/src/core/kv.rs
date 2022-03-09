@@ -6,18 +6,12 @@
 // copied, modified, or distributed except according to those terms.
 
 //! # Key Value storage
-//!
-//! A very simple key-value storage.
-//!
-//! TODOs:
-//!   * Either use something existing, or at least evaluate the performance and if necessary,
-//!     improve performance.
 
 use std;
 use std::fmt::Display;
 use std::rc::Rc;
 
-/// A simple key-value storage
+/// A key-value storage which keeps pairs of `(&'static str, Rc<dyn Display>)`
 #[derive(Clone, Default)]
 pub struct KV {
     /// The actual key value storage
@@ -27,10 +21,9 @@ pub struct KV {
 impl std::fmt::Display for KV {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "KV")?;
-        self.kv
-            .iter()
-            .map(|(key, val)| -> std::fmt::Result { writeln!(f, "   {}: {}", key, val) })
-            .count();
+        for (key, val) in self.kv.iter() {
+            writeln!(f, "   {}: {}", key, val)?;
+        }
         Ok(())
     }
 }

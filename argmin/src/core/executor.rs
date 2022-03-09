@@ -5,8 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-// TODO: Logging of "initial info"
-
 #[cfg(feature = "serde1")]
 use crate::core::{load_checkpoint, Checkpoint, CheckpointMode};
 use crate::core::{

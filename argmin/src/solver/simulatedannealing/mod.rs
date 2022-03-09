@@ -16,12 +16,32 @@
 //! DOI: 10.1126/science.220.4598.671
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, IterState, Modify, OpWrapper, SerializeAlias,
-    Solver, TerminationReason, KV,
+    ArgminError, ArgminFloat, CostFunction, Error, IterState, OpWrapper, SerializeAlias, Solver,
+    TerminationReason, KV,
 };
 use rand::prelude::*;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
+
+/// This trait handles the annealing of a parameter vector.
+pub trait Anneal {
+    /// Type of the parameter vector
+    type Param;
+    /// Return type of the anneal function
+    type Output;
+    /// Precision of floats
+    type Float;
+
+    /// Anneal a parameter vector
+    fn anneal(&self, param: &Self::Param, _extent: Self::Float) -> Result<Self::Output, Error>;
+}
+
+impl<O: Anneal> OpWrapper<O> {
+    /// Anneal a parameter vector
+    pub fn anneal(&mut self, param: &O::Param, extent: O::Float) -> Result<O::Output, Error> {
+        self.op("anneal_count", |op| op.anneal(param, extent))
+    }
+}
 
 /// Temperature functions for Simulated Annealing.
 ///
@@ -237,7 +257,7 @@ where
 
 impl<O, P, F, R> Solver<O, IterState<P, (), (), (), F>> for SimulatedAnnealing<F, R>
 where
-    O: CostFunction<Param = P, Output = F> + Modify<Param = P, Output = P, Float = F>,
+    O: CostFunction<Param = P, Output = F> + Anneal<Param = P, Output = P, Float = F>,
     P: Clone,
     F: ArgminFloat,
     R: Rng + SerializeAlias,
@@ -277,7 +297,7 @@ where
         let prev_cost = state.get_cost();
 
         // Make a move
-        let new_param = op.modify(&prev_param, self.cur_temp)?;
+        let new_param = op.anneal(&prev_param, self.cur_temp)?;
 
         // Evaluate cost function with new parameter vector
         let new_cost = op.cost(&new_param)?;
