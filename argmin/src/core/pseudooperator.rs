@@ -31,8 +31,8 @@ impl Operator for PseudoOperator {
     type Output = Vec<f64>;
 
     /// Do nothing.
-    fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
-        unimplemented!()
+    fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+        Ok(p.clone())
     }
 }
 
@@ -42,7 +42,7 @@ impl CostFunction for PseudoOperator {
 
     /// Do nothing.
     fn cost(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
-        unimplemented!()
+        Ok(1.0f64)
     }
 }
 
@@ -51,8 +51,8 @@ impl Gradient for PseudoOperator {
     type Gradient = Vec<f64>;
 
     /// Do nothing.
-    fn gradient(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
-        unimplemented!()
+    fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+        Ok(p.clone())
     }
 }
 
@@ -61,8 +61,8 @@ impl Hessian for PseudoOperator {
     type Hessian = Vec<Vec<f64>>;
 
     /// Do nothing.
-    fn hessian(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
-        unimplemented!()
+    fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
+        Ok(vec![p.clone(), p.clone()])
     }
 }
 
@@ -71,18 +71,18 @@ impl Jacobian for PseudoOperator {
     type Jacobian = Vec<Vec<f64>>;
 
     /// Do nothing.
-    fn jacobian(&self, _p: &Self::Param) -> Result<Self::Jacobian, Error> {
-        unimplemented!()
+    fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {
+        Ok(vec![p.clone(), p.clone()])
     }
 }
 
 impl Anneal for PseudoOperator {
     type Param = Vec<f64>;
-    type Output = f64;
+    type Output = Vec<f64>;
     type Float = f64;
 
     /// Do nothing.
-    fn anneal(&self, _p: &Self::Param, _t: Self::Float) -> Result<Self::Output, Error> {
-        unimplemented!()
+    fn anneal(&self, p: &Self::Param, _t: Self::Float) -> Result<Self::Output, Error> {
+        Ok(p.clone())
     }
 }
