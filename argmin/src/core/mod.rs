@@ -56,7 +56,6 @@ pub use kv::KV;
 pub use observers::*;
 pub use opwrapper::OpWrapper;
 pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator};
-#[cfg(test)]
 pub use pseudooperator::PseudoOperator;
 pub use result::OptimizationResult;
 pub use serialization::{DeserializeOwnedAlias, SerializeAlias};

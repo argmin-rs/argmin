@@ -33,7 +33,7 @@ pub trait Anneal {
     type Float;
 
     /// Anneal a parameter vector
-    fn anneal(&self, param: &Self::Param, _extent: Self::Float) -> Result<Self::Output, Error>;
+    fn anneal(&self, param: &Self::Param, extent: Self::Float) -> Result<Self::Output, Error>;
 }
 
 impl<O: Anneal> OpWrapper<O> {
