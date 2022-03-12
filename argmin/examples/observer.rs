@@ -183,7 +183,7 @@ pub struct Surface {
 
 impl Surface {
     /// Create a new surface
-    pub fn new<O>(op: O, window: (f64, f64, f64, f64), resolution: f64) -> Self
+    pub fn new<O>(problem: O, window: (f64, f64, f64, f64), resolution: f64) -> Self
     where
         O: CostFunction<Param = Vec<f64>, Output = f64>,
     {
@@ -198,7 +198,7 @@ impl Surface {
             for j in 0..num_x {
                 let y = height * (i as f64) / num_y as f64 - (0.5 * height);
                 let x = width * (j as f64) / num_x as f64 - (0.5 * width);
-                if let Ok(zvalue) = op.cost(&vec![x, y]) {
+                if let Ok(zvalue) = problem.cost(&vec![x, y]) {
                     zvalues.push(zvalue);
                 }
             }

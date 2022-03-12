@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver, TerminationReason, KV,
+    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason, KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminEye, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose,
@@ -100,12 +100,12 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), H, F>,
     ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = op.cost(&param)?;
-        let grad = op.gradient(&param)?;
+        let cost = problem.cost(&param)?;
+        let grad = problem.gradient(&param)?;
         Ok((
             state
                 .param(param)
@@ -118,7 +118,7 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), H, F>,
     ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
@@ -132,9 +132,9 @@ where
 
         // Run solver
         let OptimizationResult {
-            operator: line_op,
+            operator: line_problem,
             state: mut sub_state,
-        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
+        } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| {
                 config
                     .param(param.clone())
@@ -148,9 +148,9 @@ where
         let next_cost = sub_state.cost;
 
         // take care of function eval counts
-        op.consume_op(line_op);
+        problem.consume_problem(line_problem);
 
-        let grad = op.gradient(&xk1)?;
+        let grad = problem.gradient(&xk1)?;
 
         let yk = grad.sub(&prev_grad);
 

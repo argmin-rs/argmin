@@ -16,7 +16,7 @@
 
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver, KV,
+    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, KV,
 };
 use argmin_math::ArgminMul;
 #[cfg(feature = "serde1")]
@@ -55,27 +55,27 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         let param_new = state.take_param().unwrap();
-        let new_cost = op.cost(&param_new)?;
-        let new_grad = op.gradient(&param_new)?;
+        let new_cost = problem.cost(&param_new)?;
+        let new_grad = problem.gradient(&param_new)?;
 
         self.linesearch
             .set_search_direction(new_grad.mul(&(F::from_f64(-1.0).unwrap())));
 
         // Run solver
         let OptimizationResult {
-            operator: line_op,
+            operator: line_problem,
             state: mut linesearch_state,
-        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
+        } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| config.param(param_new).grad(new_grad).cost(new_cost))
             .ctrlc(false)
             .run()?;
 
         // Get back operator and function evaluation counts
-        op.consume_op(line_op);
+        problem.consume_problem(line_problem);
 
         Ok((
             state

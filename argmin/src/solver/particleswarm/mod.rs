@@ -12,7 +12,7 @@
 //! TODO
 
 use crate::core::{
-    ArgminFloat, CostFunction, Error, IterState, OpWrapper, SerializeAlias, Solver, KV,
+    ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver, KV,
 };
 use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
 #[cfg(feature = "serde1")]
@@ -80,27 +80,27 @@ where
 
     fn initialize_particles<O: CostFunction<Param = P, Output = F>>(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
     ) {
         self.particles = (0..self.num_particles)
-            .map(|_| self.initialize_particle(op))
+            .map(|_| self.initialize_particle(problem))
             .collect();
 
         self.best_position = self.get_best_position();
-        self.best_cost = op.cost(&self.best_position).unwrap();
+        self.best_cost = problem.cost(&self.best_position).unwrap();
         // TODO unwrap evil
     }
 
     fn initialize_particle<O: CostFunction<Param = P, Output = F>>(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
     ) -> Particle<P, F> {
         let (min, max) = &self.search_region;
         let delta = max.sub(min);
         let delta_neg = delta.mul(&F::from_f64(-1.0).unwrap());
 
         let initial_position = O::Param::rand_from_range(min, max);
-        let initial_cost = op.cost(&initial_position).unwrap(); // FIXME do not unwrap
+        let initial_cost = problem.cost(&initial_position).unwrap(); // FIXME do not unwrap
 
         Particle {
             position: initial_position.clone(),
@@ -142,10 +142,10 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
-        self.initialize_particles(op);
+        self.initialize_particles(problem);
 
         Ok((state, None))
     }
@@ -153,7 +153,7 @@ where
     /// Perform one iteration of algorithm
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         let zero = P::zero_like(&self.best_position);
@@ -186,7 +186,7 @@ where
                 &self.search_region.1,
             );
 
-            p.cost = op.cost(&p.position)?;
+            p.cost = problem.cost(&p.position)?;
             if p.cost < p.best_cost {
                 p.best_position = p.position.clone();
                 p.best_cost = p.cost;

@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, TerminationReason,
+    Hessian, IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
     TrustRegionRadius, KV,
 };
 use argmin_math::{
@@ -140,16 +140,16 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), B, F>,
     ) -> Result<(IterState<P, G, (), B, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = op.cost(&param)?;
-        let grad = op.gradient(&param)?;
+        let cost = problem.cost(&param)?;
+        let grad = problem.gradient(&param)?;
         let hessian = state
             .take_hessian()
             .map(Result::Ok)
-            .unwrap_or_else(|| op.hessian(&param))?;
+            .unwrap_or_else(|| problem.hessian(&param))?;
         Ok((
             state.param(param).cost(cost).grad(grad).hessian(hessian),
             None,
@@ -158,7 +158,7 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), B, F>,
     ) -> Result<(IterState<P, G, (), B, F>, Option<KV>), Error> {
         let xk = state.take_param().unwrap();
@@ -166,15 +166,15 @@ where
         let prev_grad = state
             .take_grad()
             .map(Result::Ok)
-            .unwrap_or_else(|| op.gradient(&xk))?;
+            .unwrap_or_else(|| problem.gradient(&xk))?;
         let hessian = state.take_hessian().unwrap();
 
         self.subproblem.set_radius(self.radius);
 
         let OptimizationResult {
-            operator: sub_op,
+            operator: sub_problem,
             state: mut sub_state,
-        } = Executor::new(op.take_op().unwrap(), self.subproblem.clone())
+        } = Executor::new(problem.take_problem().unwrap(), self.subproblem.clone())
             .configure(|config| {
                 config
                     .param(xk.zero_like())
@@ -187,12 +187,12 @@ where
 
         let sk = sub_state.take_param().unwrap();
 
-        op.consume_op(sub_op);
+        problem.consume_problem(sub_problem);
 
         let xksk = xk.add(&sk);
-        let dfk1 = op.gradient(&xksk)?;
+        let dfk1 = problem.gradient(&xksk)?;
         let yk = dfk1.sub(&prev_grad);
-        let fk1 = op.cost(&xksk)?;
+        let fk1 = problem.cost(&xksk)?;
 
         let ared = cost - fk1;
         let tmp1: F = prev_grad.dot(&sk);

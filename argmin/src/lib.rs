@@ -532,13 +532,13 @@
 //! holds data specific to the solver. Then, the `Solver` trait needs to be implemented for the
 //! struct. This requires setting the associated constant `NAME` which gives your solver a name.
 //! The `next_iter` method defines the computations performed in a single iteration of the solver.
-//! Via the parameters `op` and `state` one has access to the operator (cost function, gradient
+//! Via the parameters `problem` and `state` one has access to the problem (cost function, gradient
 //! computation, Hessian, ...) and to the current state of the optimization (parameter vectors,
 //! cost function values, iteration number, ...), respectively.
 //!
 //! ```rust
 //! use argmin::core::{
-//!     ArgminFloat, KV, Error, Gradient, IterState, OpWrapper, Solver, State
+//!     ArgminFloat, KV, Error, Gradient, IterState, Problem, Solver, State
 //! };
 //! #[cfg(feature = "serde1")]
 //! use serde::{Deserialize, Serialize};
@@ -574,10 +574,10 @@
 //!     // Defines the computations performed in a single iteration.
 //!     fn next_iter(
 //!         &mut self,
-//!         // This gives access to the operator supplied to the `Executor`. `O` implements
-//!         // `Gradient` and `OpWrapper` takes care of counting the calls to the respective
+//!         // This gives access to the problem supplied to the `Executor`. `O` implements
+//!         // `Gradient` and `Problem` takes care of counting the calls to the respective
 //!         // functions.
-//!         op: &mut OpWrapper<O>,
+//!         problem: &mut Problem<O>,
 //!         // Current state of the optimization. This gives access to the parameter vector,
 //!         // gradient, Hessian and cost function value of the current, previous and best
 //!         // iteration as well as current iteration number, and many more.
@@ -586,7 +586,7 @@
 //!         // First we obtain the current parameter vector from the `state` struct (`x_k`).
 //!         let xk = state.take_param().unwrap();
 //!         // Then we compute the gradient at `x_k` (`\nabla f(x_k)`)
-//!         let grad = op.gradient(&xk)?;
+//!         let grad = problem.gradient(&xk)?;
 //!         // Now subtract `\nabla f(x_k)` scaled by `omega` from `x_k` to compute `x_{k+1}`
 //!         let xkp1 = xk.scaled_sub(&self.omega, &grad);
 //!         // Return new the updated `state`

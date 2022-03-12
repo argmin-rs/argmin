@@ -13,7 +13,7 @@ pub mod linearprogramstate;
 pub use iterstate::IterState;
 pub use linearprogramstate::LinearProgramState;
 
-use crate::core::{ArgminFloat, OpWrapper, TerminationReason};
+use crate::core::{ArgminFloat, Problem, TerminationReason};
 use std::collections::HashMap;
 
 /// Types implemeting this trait can be used to keep track of a solver's state
@@ -53,8 +53,8 @@ pub trait State {
     fn get_target_cost(&self) -> Self::Float;
 
     /// Set all function evaluation counts to the evaluation counts of another operator
-    /// wrapped in `OpWrapper`.
-    fn set_func_counts<O>(&mut self, op: &OpWrapper<O>);
+    /// wrapped in `Problem`.
+    fn set_func_counts<O>(&mut self, problem: &Problem<O>);
 
     /// Return whether the algorithm has terminated or not
     fn terminated(&self) -> bool;

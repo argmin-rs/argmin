@@ -8,7 +8,7 @@
 //! * [Backtracking line search](struct.BacktrackingLineSearch.html)
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, OpWrapper,
+    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem,
     SerializeAlias, Solver, State, TerminationReason, KV,
 };
 use crate::solver::linesearch::condition::*;
@@ -106,7 +106,7 @@ where
 {
     fn backtracking_step<O>(
         &self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<P, G, (), (), F>,
     ) -> Result<IterState<P, G, (), (), F>, Error>
     where
@@ -118,11 +118,11 @@ where
             .unwrap()
             .scaled_add(&self.alpha, self.search_direction.as_ref().unwrap());
 
-        let cur_cost = op.cost(&new_param)?;
+        let cur_cost = problem.cost(&new_param)?;
 
         let out = if self.condition.requires_cur_grad() {
             state
-                .grad(op.gradient(&new_param)?)
+                .grad(problem.gradient(&new_param)?)
                 .param(new_param)
                 .cost(cur_cost)
         } else {
@@ -145,13 +145,13 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         let init_param = state.param.clone().unwrap();
         let cost = state.cost;
         self.init_cost = if cost == F::infinity() {
-            op.cost(&init_param)?
+            problem.cost(&init_param)?
         } else {
             cost
         };
@@ -159,7 +159,7 @@ where
         let init_grad = state
             .take_grad()
             .map(Result::Ok)
-            .unwrap_or_else(|| op.gradient(&init_param))?;
+            .unwrap_or_else(|| problem.gradient(&init_param))?;
 
         if self.search_direction.is_none() {
             return Err(ArgminError::NotInitialized {
@@ -170,17 +170,17 @@ where
 
         self.init_param = Some(init_param);
         self.init_grad = Some(init_grad);
-        let state = self.backtracking_step(op, state)?;
+        let state = self.backtracking_step(problem, state)?;
         Ok((state, None))
     }
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         self.alpha = self.alpha * self.rho;
-        let state = self.backtracking_step(op, state)?;
+        let state = self.backtracking_step(problem, state)?;
         Ok((state, None))
     }
 
@@ -210,9 +210,9 @@ mod tests {
     use num_traits::Float;
 
     #[derive(Debug, Clone)]
-    struct Problem {}
+    struct TestProblem {}
 
-    impl CostFunction for Problem {
+    impl CostFunction for TestProblem {
         type Param = Vec<f64>;
         type Output = f64;
 
@@ -221,7 +221,7 @@ mod tests {
         }
     }
 
-    impl Gradient for Problem {
+    impl Gradient for TestProblem {
         type Param = Vec<f64>;
         type Gradient = Vec<f64>;
 
@@ -317,9 +317,9 @@ mod tests {
 
     #[test]
     fn test_step_armijo() {
-        use crate::core::OpWrapper;
+        use crate::core::Problem;
 
-        let prob = Problem {};
+        let prob = TestProblem {};
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
@@ -332,7 +332,7 @@ mod tests {
         ls.set_search_direction(vec![2.0f64, 0.0]);
         ls.set_init_alpha(0.8).unwrap();
 
-        let data = ls.backtracking_step(&mut OpWrapper::new(prob), IterState::new());
+        let data = ls.backtracking_step(&mut Problem::new(prob), IterState::new());
         assert!(data.is_ok());
 
         let param = data.as_ref().unwrap().get_param_ref().unwrap();
@@ -348,9 +348,9 @@ mod tests {
     fn test_step_wolfe() {
         // Wolfe, in contrast to Armijo, requires the current gradient. This test makes sure that
         // the implementation of the backtracking linesearch properly considers this.
-        use crate::core::OpWrapper;
+        use crate::core::Problem;
 
-        let prob = Problem {};
+        let prob = TestProblem {};
 
         let c1: f64 = 0.01;
         let c2: f64 = 0.9;
@@ -364,7 +364,7 @@ mod tests {
         ls.set_search_direction(vec![2.0f64, 0.0]);
         ls.set_init_alpha(0.8).unwrap();
 
-        let data = ls.backtracking_step(&mut OpWrapper::new(prob), IterState::new());
+        let data = ls.backtracking_step(&mut Problem::new(prob), IterState::new());
         assert!(data.is_ok());
 
         let param = data.as_ref().unwrap().get_param_ref().unwrap();
@@ -380,9 +380,9 @@ mod tests {
     #[test]
     fn test_init_armijo() {
         use crate::core::IterState;
-        use crate::core::OpWrapper;
+        use crate::core::Problem;
 
-        let prob = Problem {};
+        let prob = TestProblem {};
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
@@ -397,7 +397,7 @@ mod tests {
 
         assert_error!(
             ls.init(
-                &mut OpWrapper::new(prob.clone()),
+                &mut Problem::new(prob.clone()),
                 IterState::new().param(ls.init_param.clone().unwrap())
             ),
             ArgminError,
@@ -407,7 +407,7 @@ mod tests {
         ls.set_search_direction(vec![2.0f64, 0.0]);
 
         let data = ls.init(
-            &mut OpWrapper::new(prob),
+            &mut Problem::new(prob),
             IterState::new().param(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
@@ -426,9 +426,9 @@ mod tests {
     #[test]
     fn test_init_wolfe() {
         use crate::core::IterState;
-        use crate::core::OpWrapper;
+        use crate::core::Problem;
 
-        let prob = Problem {};
+        let prob = TestProblem {};
 
         let c1: f64 = 0.01;
         let c2: f64 = 0.9;
@@ -444,7 +444,7 @@ mod tests {
 
         assert_error!(
             ls.init(
-                &mut OpWrapper::new(prob.clone()),
+                &mut Problem::new(prob.clone()),
                 IterState::new().param(ls.init_param.clone().unwrap())
             ),
             ArgminError,
@@ -454,7 +454,7 @@ mod tests {
         ls.set_search_direction(vec![2.0f64, 0.0]);
 
         let data = ls.init(
-            &mut OpWrapper::new(prob),
+            &mut Problem::new(prob),
             IterState::new().param(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
@@ -474,9 +474,9 @@ mod tests {
     #[test]
     fn test_next_iter() {
         // Similar to step test, but with the added check that self.alpha is reduced.
-        use crate::core::OpWrapper;
+        use crate::core::Problem;
 
-        let prob = Problem {};
+        let prob = TestProblem {};
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
@@ -491,7 +491,7 @@ mod tests {
         ls.set_init_alpha(init_alpha).unwrap();
 
         let data = ls.next_iter(
-            &mut OpWrapper::new(prob),
+            &mut Problem::new(prob),
             IterState::new().param(ls.init_param.clone().unwrap()),
         );
         assert!(data.is_ok());
@@ -524,7 +524,7 @@ mod tests {
         let init_param = ls.init_param.clone().unwrap();
         assert_eq!(
             <BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> as Solver<
-                Problem,
+                TestProblem,
                 IterState<Vec<f64>, Vec<f64>, (), (), f64>,
             >>::terminate(
                 &mut ls,
@@ -538,7 +538,7 @@ mod tests {
         let init_param = ls.init_param.clone().unwrap();
         assert_eq!(
             <BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> as Solver<
-                Problem,
+                TestProblem,
                 IterState<Vec<f64>, Vec<f64>, (), (), f64>,
             >>::terminate(
                 &mut ls,
@@ -550,7 +550,7 @@ mod tests {
 
     #[test]
     fn test_executor_1() {
-        let prob = Problem {};
+        let prob = TestProblem {};
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
@@ -598,7 +598,7 @@ mod tests {
 
     #[test]
     fn test_executor_2() {
-        let prob = Problem {};
+        let prob = TestProblem {};
 
         // difference compared to test_executor_1: c is larger to force another backtracking step
         let c: f64 = 0.2;

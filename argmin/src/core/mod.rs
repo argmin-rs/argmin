@@ -26,9 +26,7 @@ mod float;
 mod kv;
 /// Observers;
 mod observers;
-/// Wrapper around operators which keeps track of function evaluation counts
-mod opwrapper;
-/// Traits needed to define optimization problems
+/// Traits and structs for defining and handling optimization problems
 mod problem;
 /// Pseudo Operator
 mod pseudooperator;
@@ -54,8 +52,7 @@ pub use executor::Executor;
 pub use float::ArgminFloat;
 pub use kv::KV;
 pub use observers::*;
-pub use opwrapper::OpWrapper;
-pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator};
+pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator, Problem};
 pub use pseudooperator::PseudoOperator;
 pub use result::OptimizationResult;
 pub use serialization::{DeserializeOwnedAlias, SerializeAlias};

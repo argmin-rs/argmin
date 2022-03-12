@@ -22,7 +22,7 @@
 #![allow(clippy::nonminimal_bool)]
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, OpWrapper,
+    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem,
     SerializeAlias, Solver, State, TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
@@ -231,7 +231,7 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         check_param!(
@@ -243,7 +243,7 @@ where
 
         let cost = state.cost;
         self.finit = if cost.is_infinite() {
-            op.cost(self.init_param.as_ref().unwrap())?
+            problem.cost(self.init_param.as_ref().unwrap())?
         } else {
             cost
         };
@@ -252,7 +252,7 @@ where
             state
                 .take_grad()
                 .map(Result::Ok)
-                .unwrap_or_else(|| op.gradient(self.init_param.as_ref().unwrap()))?,
+                .unwrap_or_else(|| problem.gradient(self.init_param.as_ref().unwrap()))?,
         );
 
         self.dginit = self
@@ -287,7 +287,7 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
@@ -320,8 +320,8 @@ where
             .as_ref()
             .unwrap()
             .scaled_add(&self.stp.x, self.search_direction.as_ref().unwrap());
-        self.f = op.cost(&new_param)?;
-        let new_grad = op.gradient(&new_param)?;
+        self.f = problem.cost(&new_param)?;
+        let new_grad = problem.gradient(&new_param)?;
         let cur_cost = self.f;
         let cur_param = new_param;
         let cur_grad = new_grad.clone();

@@ -14,7 +14,7 @@
 //! DOI: <https://doi.org/10.1137/030601880>
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, OpWrapper,
+    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem,
     SerializeAlias, Solver, TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
@@ -251,7 +251,7 @@ where
 
     fn update<O>(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         (a_x, a_f, a_g): Triplet<F>,
         (b_x, b_f, b_g): Triplet<F>,
         (c_x, c_f, c_g): Triplet<F>,
@@ -283,8 +283,8 @@ where
             let mut bh_x = c_x;
             loop {
                 let d_x = (F::from_f64(1.0).unwrap() - self.theta) * ah_x + self.theta * bh_x;
-                let d_f = self.calc(op, d_x)?;
-                let d_g = self.calc_grad(op, d_x)?;
+                let d_f = self.calc(problem, d_x)?;
+                let d_g = self.calc_grad(problem, d_x)?;
                 if d_g >= F::from_f64(0.0).unwrap() {
                     return Ok(((ah_x, ah_f, ah_g), (d_x, d_f, d_g)));
                 }
@@ -314,7 +314,7 @@ where
     /// double secant step
     fn secant2<O>(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         (a_x, a_f, a_g): Triplet<F>,
         (b_x, b_f, b_g): Triplet<F>,
     ) -> Result<(Triplet<F>, Triplet<F>), Error>
@@ -323,12 +323,12 @@ where
     {
         // S1
         let c_x = self.secant(a_x, a_g, b_x, b_g);
-        let c_f = self.calc(op, c_x)?;
-        let c_g = self.calc_grad(op, c_x)?;
+        let c_f = self.calc(problem, c_x)?;
+        let c_g = self.calc_grad(problem, c_x)?;
         let mut c_bar_x: F = F::from_f64(0.0).unwrap();
 
         let ((aa_x, aa_f, aa_g), (bb_x, bb_f, bb_g)) =
-            self.update(op, (a_x, a_f, a_g), (b_x, b_f, b_g), (c_x, c_f, c_g))?;
+            self.update(problem, (a_x, a_f, a_g), (b_x, b_f, b_g), (c_x, c_f, c_g))?;
 
         // S2
         if (c_x - bb_x).abs() < F::epsilon() {
@@ -342,11 +342,11 @@ where
 
         // S4
         if (c_x - aa_x).abs() < F::epsilon() || (c_x - bb_x).abs() < F::epsilon() {
-            let c_bar_f = self.calc(op, c_bar_x)?;
-            let c_bar_g = self.calc_grad(op, c_bar_x)?;
+            let c_bar_f = self.calc(problem, c_bar_x)?;
+            let c_bar_g = self.calc_grad(problem, c_bar_x)?;
 
             let (a_bar, b_bar) = self.update(
-                op,
+                problem,
                 (aa_x, aa_f, aa_g),
                 (bb_x, bb_f, bb_g),
                 (c_bar_x, c_bar_f, c_bar_g),
@@ -357,7 +357,7 @@ where
         }
     }
 
-    fn calc<O>(&mut self, op: &mut OpWrapper<O>, alpha: F) -> Result<F, Error>
+    fn calc<O>(&mut self, problem: &mut Problem<O>, alpha: F) -> Result<F, Error>
     where
         O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     {
@@ -366,10 +366,10 @@ where
             .as_ref()
             .unwrap()
             .scaled_add(&alpha, self.search_direction.as_ref().unwrap());
-        op.cost(&tmp)
+        problem.cost(&tmp)
     }
 
-    fn calc_grad<O>(&mut self, op: &mut OpWrapper<O>, alpha: F) -> Result<F, Error>
+    fn calc_grad<O>(&mut self, problem: &mut Problem<O>, alpha: F) -> Result<F, Error>
     where
         O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     {
@@ -378,7 +378,7 @@ where
             .as_ref()
             .unwrap()
             .scaled_add(&alpha, self.search_direction.as_ref().unwrap());
-        let grad = op.gradient(&tmp)?;
+        let grad = problem.gradient(&tmp)?;
         Ok(self.search_direction.as_ref().unwrap().dot(&grad))
     }
 
@@ -436,7 +436,7 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         if self.sigma < self.delta {
@@ -455,7 +455,7 @@ where
 
         let cost = state.cost;
         self.finit = if cost.is_infinite() {
-            op.cost(self.init_param.as_ref().unwrap())?
+            problem.cost(self.init_param.as_ref().unwrap())?
         } else {
             cost
         };
@@ -464,7 +464,7 @@ where
             state
                 .take_grad()
                 .map(Result::Ok)
-                .unwrap_or_else(|| op.gradient(self.init_param.as_ref().unwrap()))?,
+                .unwrap_or_else(|| problem.gradient(self.init_param.as_ref().unwrap()))?,
         );
 
         self.a_x = self.a_x_init;
@@ -472,14 +472,14 @@ where
         self.c_x = self.c_x_init;
 
         let at = self.a_x;
-        self.a_f = self.calc(op, at)?;
-        self.a_g = self.calc_grad(op, at)?;
+        self.a_f = self.calc(problem, at)?;
+        self.a_g = self.calc_grad(problem, at)?;
         let bt = self.b_x;
-        self.b_f = self.calc(op, bt)?;
-        self.b_g = self.calc_grad(op, bt)?;
+        self.b_f = self.calc(problem, bt)?;
+        self.b_g = self.calc_grad(problem, bt)?;
         let ct = self.c_x;
-        self.c_f = self.calc(op, ct)?;
-        self.c_g = self.calc_grad(op, ct)?;
+        self.c_f = self.calc(problem, ct)?;
+        self.c_g = self.calc_grad(problem, ct)?;
 
         self.epsilon_k = self.epsilon * self.finit.abs();
 
@@ -502,14 +502,14 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);
         let bb = (self.b_x, self.b_f, self.b_g);
         let ((mut at_x, mut at_f, mut at_g), (mut bt_x, mut bt_f, mut bt_g)) =
-            self.secant2(op, aa, bb)?;
+            self.secant2(problem, aa, bb)?;
 
         // L2
         if bt_x - at_x > self.gamma * (self.b_x - self.a_x) {
@@ -519,11 +519,15 @@ where
                 .as_ref()
                 .unwrap()
                 .scaled_add(&c_x, self.search_direction.as_ref().unwrap());
-            let c_f = op.cost(&tmp)?;
-            let grad = op.gradient(&tmp)?;
+            let c_f = problem.cost(&tmp)?;
+            let grad = problem.gradient(&tmp)?;
             let c_g = self.search_direction.as_ref().unwrap().dot(&grad);
-            let ((an_x, an_f, an_g), (bn_x, bn_f, bn_g)) =
-                self.update(op, (at_x, at_f, at_g), (bt_x, bt_f, bt_g), (c_x, c_f, c_g))?;
+            let ((an_x, an_f, an_g), (bn_x, bn_f, bn_g)) = self.update(
+                problem,
+                (at_x, at_f, at_g),
+                (bt_x, bt_f, bt_g),
+                (c_x, c_f, c_g),
+            )?;
             at_x = an_x;
             at_f = an_f;
             at_g = an_g;

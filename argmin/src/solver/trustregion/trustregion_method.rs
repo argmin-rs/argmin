@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    Hessian, IterState, OpWrapper, OptimizationResult, SerializeAlias, Solver, TerminationReason,
+    Hessian, IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
     TrustRegionRadius, KV,
 };
 use crate::solver::trustregion::reduction_ratio;
@@ -119,13 +119,13 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), H, F>,
     ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
-        let grad = op.gradient(&param)?;
-        let hessian = op.hessian(&param)?;
-        self.fxk = op.cost(&param)?;
+        let grad = problem.gradient(&param)?;
+        let hessian = problem.hessian(&param)?;
+        self.fxk = problem.cost(&param)?;
         self.mk0 = self.fxk;
         Ok((
             state
@@ -139,25 +139,25 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), H, F>,
     ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let grad = state
             .take_grad()
             .map(Result::Ok)
-            .unwrap_or_else(|| op.gradient(&param))?;
+            .unwrap_or_else(|| problem.gradient(&param))?;
         let hessian = state
             .take_hessian()
             .map(Result::Ok)
-            .unwrap_or_else(|| op.hessian(&param))?;
+            .unwrap_or_else(|| problem.hessian(&param))?;
 
         self.subproblem.set_radius(self.radius);
 
         let OptimizationResult {
-            operator: sub_op,
+            operator: sub_problem,
             state: mut sub_state,
-        } = Executor::new(op.take_op().unwrap(), self.subproblem.clone())
+        } = Executor::new(problem.take_problem().unwrap(), self.subproblem.clone())
             .configure(|config| {
                 config
                     .param(param.clone())
@@ -170,10 +170,10 @@ where
         let pk = sub_state.take_param().unwrap();
 
         // Consume intermediate operator again. This takes care of the function evaluation counts.
-        op.consume_op(sub_op);
+        problem.consume_problem(sub_problem);
 
         let new_param = pk.add(&param);
-        let fxkpk = op.cost(&new_param)?;
+        let fxkpk = problem.cost(&new_param)?;
         let mkpk =
             self.fxk + pk.dot(&grad) + F::from_f64(0.5).unwrap() * pk.weighted_dot(&hessian, &pk);
 
@@ -196,8 +196,8 @@ where
             if rho > self.eta {
                 self.fxk = fxkpk;
                 self.mk0 = fxkpk;
-                let grad = op.gradient(&new_param)?;
-                let hessian = op.hessian(&new_param)?;
+                let grad = problem.gradient(&new_param)?;
+                let hessian = problem.hessian(&new_param)?;
                 state
                     .param(new_param)
                     .cost(fxkpk)

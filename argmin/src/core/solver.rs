@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{Error, OpWrapper, SerializeAlias, State, TerminationReason, KV};
+use crate::core::{Error, Problem, SerializeAlias, State, TerminationReason, KV};
 
 /// Solver
 ///
@@ -15,13 +15,13 @@ pub trait Solver<O, I: State>: SerializeAlias {
     const NAME: &'static str = "UNDEFINED";
 
     /// Computes one iteration of the algorithm.
-    fn next_iter(&mut self, op: &mut OpWrapper<O>, state: I) -> Result<(I, Option<KV>), Error>;
+    fn next_iter(&mut self, problem: &mut Problem<O>, state: I) -> Result<(I, Option<KV>), Error>;
 
     /// Initializes the algorithm
     ///
     /// This is executed before any iterations are performed. It can be used to perform
     /// precomputations. The default implementation corresponds to doing nothing.
-    fn init(&mut self, _op: &mut OpWrapper<O>, state: I) -> Result<(I, Option<KV>), Error> {
+    fn init(&mut self, _problem: &mut Problem<O>, state: I) -> Result<(I, Option<KV>), Error> {
         Ok((state, None))
     }
 

@@ -8,7 +8,7 @@
 #[cfg(feature = "serde1")]
 use crate::core::{load_checkpoint, Checkpoint, CheckpointMode};
 use crate::core::{
-    DeserializeOwnedAlias, Error, Observe, Observer, ObserverMode, OpWrapper, OptimizationResult,
+    DeserializeOwnedAlias, Error, Observe, Observer, ObserverMode, OptimizationResult, Problem,
     SerializeAlias, Solver, State, TerminationReason, KV,
 };
 use instant;
@@ -27,7 +27,7 @@ pub struct Executor<O, S, I> {
     solver: S,
     /// operator
     #[cfg_attr(feature = "serde1", serde(skip))]
-    pub op: OpWrapper<O>,
+    pub problem: Problem<O>,
     /// State
     pub(crate) state: Option<I>,
     /// Storage for observers
@@ -48,11 +48,11 @@ where
     I: State + SerializeAlias + DeserializeOwnedAlias,
 {
     /// Create a new executor with a `solver` and an initial parameter `init_param`
-    pub fn new(op: O, solver: S) -> Self {
+    pub fn new(problem: O, solver: S) -> Self {
         let state = Some(I::new());
         Executor {
             solver,
-            op: OpWrapper::new(op),
+            problem: Problem::new(problem),
             state,
             observers: Observer::new(),
             #[cfg(feature = "serde1")]
@@ -64,13 +64,13 @@ where
 
     /// Create a new executor from a checkpoint
     #[cfg(feature = "serde1")]
-    pub fn from_checkpoint<P: AsRef<Path>>(path: P, op: O) -> Result<Self, Error>
+    pub fn from_checkpoint<P: AsRef<Path>>(path: P, problem: O) -> Result<Self, Error>
     where
         Self: Sized + DeserializeOwnedAlias,
     {
         let (mut executor, state): (Self, I) = load_checkpoint(path)?;
         executor.state = Some(state);
-        executor.op = OpWrapper::new(op);
+        executor.problem = Problem::new(problem);
         Ok(executor)
     }
 
@@ -107,7 +107,7 @@ where
             }
         }
 
-        let (mut state, kv) = self.solver.init(&mut self.op, state)?;
+        let (mut state, kv) = self.solver.init(&mut self.problem, state)?;
         state.update();
 
         if !self.observers.is_empty() {
@@ -121,7 +121,7 @@ where
             self.observers.observe_init(S::NAME, &logs)?;
         }
 
-        state.set_func_counts(&self.op);
+        state.set_func_counts(&self.problem);
 
         while running.load(Ordering::SeqCst) {
             // check first if it has already terminated
@@ -148,10 +148,10 @@ where
                 None
             };
 
-            let (state_t, kv) = self.solver.next_iter(&mut self.op, state)?;
+            let (state_t, kv) = self.solver.next_iter(&mut self.problem, state)?;
             state = state_t;
 
-            state.set_func_counts(&self.op);
+            state.set_func_counts(&self.problem);
 
             // End time measurement
             let duration = if self.timer {
@@ -197,7 +197,7 @@ where
         if state.get_iter() < state.get_max_iters() && !state.terminated() {
             state = state.termination_reason(TerminationReason::Aborted);
         }
-        Ok(OptimizationResult::new(self.op, state))
+        Ok(OptimizationResult::new(self.problem, state))
     }
 
     /// Attaches a observer which implements `ArgminLog` to the solver.
@@ -278,17 +278,17 @@ mod tests {
         {
             fn next_iter(
                 &mut self,
-                _op: &mut OpWrapper<O>,
+                _problem: &mut Problem<O>,
                 state: IterState<P, G, J, H, F>,
             ) -> Result<(IterState<P, G, J, H, F>, Option<KV>), Error> {
                 Ok((state, None))
             }
         }
 
-        let op = PseudoOperator::new();
+        let problem = PseudoOperator::new();
         let solver = TestSolver {};
 
-        let mut executor = Executor::new(op, solver)
+        let mut executor = Executor::new(problem, solver)
             .configure(|config: IterState<Vec<f64>, (), (), (), f64>| config.param(vec![0.0, 0.0]));
 
         // 1) Parameter vector changes, but not cost (continues to be `Inf`)
@@ -382,7 +382,7 @@ mod tests {
 
         // 4) `-Inf` is better than `Inf`
         let solver = TestSolver {};
-        let mut executor = Executor::new(op, solver)
+        let mut executor = Executor::new(problem, solver)
             .configure(|config: IterState<Vec<f64>, (), (), (), f64>| config.param(vec![0.0, 0.0]));
 
         let new_param = vec![1.0, 1.0];

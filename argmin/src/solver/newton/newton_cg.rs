@@ -14,7 +14,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState,
-    LineSearch, OpWrapper, Operator, OptimizationResult, SerializeAlias, Solver, State,
+    LineSearch, Operator, OptimizationResult, Problem, SerializeAlias, Solver, State,
     TerminationReason, KV,
 };
 use crate::solver::conjugategradient::ConjugateGradient;
@@ -96,26 +96,26 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), H, F>,
     ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
-        let grad = op.gradient(&param)?;
-        let hessian = op.hessian(&param)?;
+        let grad = problem.gradient(&param)?;
+        let hessian = problem.hessian(&param)?;
 
         // Solve CG subproblem
-        let cg_op: CGSubProblem<P, H> = CGSubProblem::new(hessian.clone());
-        let mut cg_op = OpWrapper::new(cg_op);
+        let cg_problem: CGSubProblem<P, H> = CGSubProblem::new(hessian.clone());
+        let mut cg_problem = Problem::new(cg_problem);
 
         let mut x_p = param.zero_like();
         let mut x: P = param.zero_like();
         let mut cg = ConjugateGradient::new(grad.mul(&(F::from_f64(-1.0).unwrap())))?;
 
         let cg_state = IterState::new().param(x_p.clone());
-        let (mut cg_state, _) = cg.init(&mut cg_op, cg_state)?;
+        let (mut cg_state, _) = cg.init(&mut cg_problem, cg_state)?;
         let grad_norm = grad.norm();
         for iter in 0.. {
-            let (state_tmp, _) = cg.next_iter(&mut cg_op, cg_state)?;
+            let (state_tmp, _) = cg.next_iter(&mut cg_problem, cg_state)?;
             cg_state = state_tmp;
             let cost = cg_state.get_cost();
             x = cg_state.take_param().unwrap();
@@ -143,14 +143,14 @@ where
 
         // Run solver
         let OptimizationResult {
-            operator: line_op,
+            operator: line_problem,
             state: mut linesearch_state,
-        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
+        } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| config.param(param).grad(grad).cost(line_cost))
             .ctrlc(false)
             .run()?;
 
-        op.consume_op(line_op);
+        problem.consume_problem(line_problem);
 
         Ok((
             state

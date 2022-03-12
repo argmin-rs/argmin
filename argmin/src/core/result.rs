@@ -96,7 +96,7 @@ let num_iters = result.state().get_iter();
 //!
 //! More details can be found in the `IterState` documentation.
 
-use crate::core::{ArgminFloat, OpWrapper, State};
+use crate::core::{ArgminFloat, Problem, State};
 use num_traits::{Float, FromPrimitive};
 use std::cmp::Ordering;
 use std::fmt;
@@ -105,19 +105,19 @@ use std::fmt;
 #[derive(Clone)]
 pub struct OptimizationResult<O, I> {
     /// operator
-    pub operator: OpWrapper<O>,
+    pub operator: Problem<O>,
     /// iteration state
     pub state: I,
 }
 
 impl<O, I> OptimizationResult<O, I> {
     /// Constructor
-    pub fn new(operator: OpWrapper<O>, state: I) -> Self {
+    pub fn new(operator: Problem<O>, state: I) -> Self {
         OptimizationResult { operator, state }
     }
 
     /// Return handle to operator
-    pub fn operator(&self) -> &OpWrapper<O> {
+    pub fn operator(&self) -> &Problem<O> {
         &self.operator
     }
 

@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, OpWrapper, OptimizationResult, SerializeAlias, Solver, TerminationReason, KV,
+    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -86,12 +86,12 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), H, F>,
     ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = op.cost(&param)?;
-        let grad = op.gradient(&param)?;
+        let cost = problem.cost(&param)?;
+        let grad = problem.gradient(&param)?;
         Ok((
             state
                 .param(param)
@@ -104,7 +104,7 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), H, F>,
     ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
@@ -112,16 +112,16 @@ where
         let prev_grad = state
             .take_grad()
             .map(Result::Ok)
-            .unwrap_or_else(|| op.gradient(&param))?;
+            .unwrap_or_else(|| problem.gradient(&param))?;
         let inv_hessian = state.take_inv_hessian().unwrap();
         let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
 
         self.linesearch.set_search_direction(p);
 
         let OptimizationResult {
-            operator: line_op,
+            operator: line_problem,
             state: mut linesearch_state,
-        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
+        } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| {
                 config
                     .param(param.clone())
@@ -135,9 +135,9 @@ where
         let next_cost = linesearch_state.get_cost();
 
         // take care of function eval counts
-        op.consume_op(line_op);
+        problem.consume_problem(line_problem);
 
-        let grad = op.gradient(&xk1)?;
+        let grad = problem.gradient(&xk1)?;
         let yk = grad.sub(&prev_grad);
 
         let sk = xk1.sub(&param);

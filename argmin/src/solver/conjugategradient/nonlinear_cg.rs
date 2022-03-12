@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, NLCGBetaUpdate, OpWrapper, OptimizationResult, SerializeAlias, Solver, State, KV,
+    LineSearch, NLCGBetaUpdate, OptimizationResult, Problem, SerializeAlias, Solver, State, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm};
 #[cfg(feature = "serde1")]
@@ -101,19 +101,19 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = op.cost(&param)?;
-        let grad = op.gradient(&param)?;
+        let cost = problem.cost(&param)?;
+        let grad = problem.gradient(&param)?;
         self.p = Some(grad.mul(&(F::from_f64(-1.0).unwrap())));
         Ok((state.param(param).cost(cost).grad(grad), None))
     }
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         let p = self.p.as_ref().unwrap();
@@ -121,7 +121,7 @@ where
         let grad = state
             .take_grad()
             .map(Result::Ok)
-            .unwrap_or_else(|| op.gradient(&xk))?;
+            .unwrap_or_else(|| problem.gradient(&xk))?;
         let cur_cost = state.cost;
 
         // Linesearch
@@ -129,20 +129,20 @@ where
 
         // Run solver
         let OptimizationResult {
-            operator: line_op,
+            operator: line_problem,
             state: mut line_state,
-        } = Executor::new(op.take_op().unwrap(), self.linesearch.clone())
+        } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| config.param(xk).grad(grad.clone()).cost(cur_cost))
             .ctrlc(false)
             .run()?;
 
         // takes care of the counts of function evaluations
-        op.consume_op(line_op);
+        problem.consume_problem(line_problem);
 
         let xk1 = line_state.take_param().unwrap();
 
         // Update of beta
-        let new_grad = op.gradient(&xk1)?;
+        let new_grad = problem.gradient(&xk1)?;
 
         let restart_orthogonality = match self.restart_orthogonality {
             Some(v) => new_grad.dot(&grad).abs() / new_grad.norm().powi(2) >= v,
@@ -166,7 +166,7 @@ where
         );
 
         // Housekeeping
-        let cost = op.cost(&xk1)?;
+        let cost = problem.cost(&xk1)?;
 
         Ok((
             state.param(xk1).cost(cost).grad(new_grad),

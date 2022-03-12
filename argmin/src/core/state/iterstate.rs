@@ -7,7 +7,7 @@
 
 //! TODO: Documentation
 
-use crate::core::{ArgminFloat, OpWrapper, State, TerminationReason};
+use crate::core::{ArgminFloat, Problem, State, TerminationReason};
 use crate::{getter, getter_option_ref, pub_getter, pub_getter_option_ref, pub_take, setter};
 use instant;
 use paste::item;
@@ -372,9 +372,9 @@ where
     }
 
     /// Set all function evaluation counts to the evaluation counts of another operator
-    /// wrapped in `OpWrapper`.
-    fn set_func_counts<O>(&mut self, op: &OpWrapper<O>) {
-        for (k, &v) in op.counts.iter() {
+    /// wrapped in `Problem`.
+    fn set_func_counts<O>(&mut self, problem: &Problem<O>) {
+        for (k, &v) in problem.counts.iter() {
             let count = self.counts.entry(k.to_string()).or_insert(0);
             *count = v
         }
