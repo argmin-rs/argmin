@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, Error, IterState, OpWrapper, SerializeAlias, Solver, State,
+    ArgminError, ArgminFloat, Error, IterState, Problem, SerializeAlias, Solver, State,
     TerminationReason, TrustRegionRadius, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot, ArgminZeroLike};
@@ -161,7 +161,7 @@ where
 
     fn init(
         &mut self,
-        _op: &mut OpWrapper<O>,
+        _problem: &mut Problem<O>,
         state: IterState<P, P, (), H, F>,
     ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
         let r = state.get_grad_ref().unwrap().clone();
@@ -179,7 +179,7 @@ where
 
     fn next_iter(
         &mut self,
-        _op: &mut OpWrapper<O>,
+        _problem: &mut Problem<O>,
         mut state: IterState<P, P, (), H, F>,
     ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
         let grad = state.take_grad().unwrap();

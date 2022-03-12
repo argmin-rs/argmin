@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, Error, Gradient, Hessian, IterState, OpWrapper, Solver, State,
+    ArgminError, ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, State,
     TerminationReason, TrustRegionRadius, KV,
 };
 use argmin_math::{
@@ -61,18 +61,18 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, P, (), H, F>,
     ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
         let g = state
             .take_grad()
             .map(Result::Ok)
-            .unwrap_or_else(|| op.gradient(&param))?;
+            .unwrap_or_else(|| problem.gradient(&param))?;
         let h = state
             .take_hessian()
             .map(Result::Ok)
-            .unwrap_or_else(|| op.hessian(&param))?;
+            .unwrap_or_else(|| problem.hessian(&param))?;
         let pstar;
 
         // pb = -H^-1g

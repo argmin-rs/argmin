@@ -12,7 +12,7 @@
 
 use crate::core::{
     ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    Hessian, IterState, Jacobian, LineSearch, OpWrapper, Operator, OptimizationResult,
+    Hessian, IterState, Jacobian, LineSearch, Operator, OptimizationResult, Problem,
     SerializeAlias, Solver, TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminTranspose};
@@ -70,19 +70,19 @@ where
         + ArgminDot<J, J>
         + ArgminDot<G, P>
         + ArgminDot<U, G>,
-    L: Clone + LineSearch<P, F> + Solver<LineSearchOP<O, F>, IterState<P, G, (), (), F>>,
+    L: Clone + LineSearch<P, F> + Solver<LineSearchProblem<O, F>, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Gauss-Newton method with Linesearch";
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, G, J, (), F>,
     ) -> Result<(IterState<P, G, J, (), F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
-        let residuals = op.apply(&param)?;
-        let jacobian = op.jacobian(&param)?;
+        let residuals = problem.apply(&param)?;
+        let jacobian = problem.jacobian(&param)?;
         let jacobian_t = jacobian.clone().t();
         let grad = jacobian_t.dot(&residuals);
 
@@ -93,21 +93,21 @@ where
 
         // perform linesearch
         let OptimizationResult {
-            operator: mut line_op,
+            operator: mut line_problem,
             state: mut linesearch_state,
         } = Executor::new(
-            LineSearchOP::new(op.take_op().unwrap()),
+            LineSearchProblem::new(problem.take_problem().unwrap()),
             self.linesearch.clone(),
         )
         .configure(|config| config.param(param).grad(grad).cost(residuals.norm()))
         .ctrlc(false)
         .run()?;
 
-        // Here we cannot use `consume_op` because the operator we need is hidden inside a
-        // `LineSearchOP` hidden inside a `OpWrapper`. Therefore we have to split this in two
+        // Here we cannot use `consume_problem` because the problem we need is hidden inside a
+        // `LineSearchProblem` hidden inside a `Problem`. Therefore we have to split this in two
         // separate tasks: first getting the operator, then dealing with the function counts.
-        op.op = Some(line_op.take_op().unwrap().op);
-        op.consume_func_counts(line_op);
+        problem.problem = Some(line_problem.take_problem().unwrap().problem);
+        problem.consume_func_counts(line_problem);
 
         Ok((
             state
@@ -128,22 +128,22 @@ where
 #[doc(hidden)]
 #[derive(Clone, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct LineSearchOP<O, F> {
-    pub op: O,
+pub struct LineSearchProblem<O, F> {
+    pub problem: O,
     _phantom: std::marker::PhantomData<F>,
 }
 
-impl<O, F> LineSearchOP<O, F> {
+impl<O, F> LineSearchProblem<O, F> {
     /// constructor
     pub fn new(operator: O) -> Self {
-        LineSearchOP {
-            op: operator,
+        LineSearchProblem {
+            problem: operator,
             _phantom: std::marker::PhantomData,
         }
     }
 }
 
-impl<O, P, F> CostFunction for LineSearchOP<O, F>
+impl<O, P, F> CostFunction for LineSearchProblem<O, F>
 where
     O: Operator<Param = P, Output = P>,
     P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminNorm<F>,
@@ -153,11 +153,11 @@ where
     type Output = F;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(self.op.apply(p)?.norm())
+        Ok(self.problem.apply(p)?.norm())
     }
 }
 
-impl<O, P, J, F> Gradient for LineSearchOP<O, F>
+impl<O, P, J, F> Gradient for LineSearchProblem<O, F>
 where
     O: Operator<Param = P, Output = P> + Jacobian<Param = P, Jacobian = J>,
     P: Clone + SerializeAlias + DeserializeOwnedAlias,
@@ -167,11 +167,11 @@ where
     type Gradient = P;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(self.op.jacobian(p)?.t().dot(&self.op.apply(p)?))
+        Ok(self.problem.jacobian(p)?.t().dot(&self.problem.apply(p)?))
     }
 }
 
-impl<O, P, H, F> Hessian for LineSearchOP<O, F>
+impl<O, P, H, F> Hessian for LineSearchProblem<O, F>
 where
     P: Clone + SerializeAlias + DeserializeOwnedAlias,
     H: Clone + SerializeAlias + DeserializeOwnedAlias,
@@ -181,11 +181,11 @@ where
     type Hessian = H;
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-        self.op.hessian(p)
+        self.problem.hessian(p)
     }
 }
 
-impl<O, P, J, F> Jacobian for LineSearchOP<O, F>
+impl<O, P, J, F> Jacobian for LineSearchProblem<O, F>
 where
     O: Jacobian<Param = P, Jacobian = J>,
     P: Clone + SerializeAlias + DeserializeOwnedAlias,
@@ -195,7 +195,7 @@ where
     type Jacobian = J;
 
     fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {
-        self.op.jacobian(p)
+        self.problem.jacobian(p)
     }
 }
 

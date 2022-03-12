@@ -12,7 +12,7 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, IterState, OpWrapper, SerializeAlias, Solver,
+    ArgminError, ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
     TerminationReason, KV,
 };
 use argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
@@ -227,7 +227,7 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         self.params = self
@@ -235,7 +235,7 @@ where
             .iter()
             .cloned()
             .map(|(p, _)| {
-                let c = op.cost(&p).unwrap();
+                let c = problem.cost(&p).unwrap();
                 (p, c)
             })
             .collect();
@@ -249,7 +249,7 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         let num_param = self.params.len();
@@ -257,7 +257,7 @@ where
         let x0 = self.calculate_centroid();
 
         let xr = self.reflect(&x0, &self.params[num_param - 1].0);
-        let xr_cost = op.cost(&xr)?;
+        let xr_cost = problem.cost(&xr)?;
 
         let action = if xr_cost < self.params[num_param - 2].1 && xr_cost >= self.params[0].1 {
             // reflection
@@ -267,7 +267,7 @@ where
         } else if xr_cost < self.params[0].1 {
             // expansion
             let xe = self.expand(&x0, &xr);
-            let xe_cost = op.cost(&xe)?;
+            let xe_cost = problem.cost(&xe)?;
             if xe_cost < xr_cost {
                 self.params.last_mut().unwrap().0 = xe;
                 self.params.last_mut().unwrap().1 = xe_cost;
@@ -279,7 +279,7 @@ where
         } else if xr_cost >= self.params[num_param - 2].1 {
             // contraction
             let xc = self.contract(&x0, &self.params[num_param - 1].0);
-            let xc_cost = op.cost(&xc)?;
+            let xc_cost = problem.cost(&xc)?;
             if xc_cost < self.params[num_param - 1].1 {
                 self.params.last_mut().unwrap().0 = xc;
                 self.params.last_mut().unwrap().1 = xc_cost;
@@ -287,7 +287,7 @@ where
             Action::Contraction
         } else {
             // shrink
-            self.shrink(|x| op.cost(x))?;
+            self.shrink(|x| problem.cost(x))?;
             Action::Shrink
         };
 
@@ -321,7 +321,6 @@ mod tests {
     use super::*;
     use crate::core::PseudoOperator;
     use crate::test_trait_impl;
-    type Operator = PseudoOperator;
 
-    test_trait_impl!(nelder_mead, NelderMead<Operator, f64>);
+    test_trait_impl!(nelder_mead, NelderMead<PseudoOperator, f64>);
 }

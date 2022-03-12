@@ -12,7 +12,7 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, IterState, OpWrapper, Solver, TerminationReason,
+    ArgminError, ArgminFloat, CostFunction, Error, IterState, Problem, Solver, TerminationReason,
     KV,
 };
 #[cfg(feature = "serde1")]
@@ -94,7 +94,7 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<F, (), (), (), F>,
     ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
         let init_estimate = state.take_param().unwrap();
@@ -113,8 +113,8 @@ where
             };
             self.x1 = x1;
             self.x2 = x2;
-            self.f1 = op.cost(&self.x1)?;
-            self.f2 = op.cost(&self.x2)?;
+            self.f1 = problem.cost(&self.x1)?;
+            self.f2 = problem.cost(&self.x2)?;
             if self.f1 < self.f2 {
                 Ok((state.param(self.x1).cost(self.f1), None))
             } else {
@@ -125,7 +125,7 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<F, (), (), (), F>,
     ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
         if self.f2 < self.f1 {
@@ -133,13 +133,13 @@ where
             self.x1 = self.x2;
             self.x2 = self.g1 * self.x1 + self.g2 * self.x3;
             self.f1 = self.f2;
-            self.f2 = op.cost(&self.x2)?;
+            self.f2 = problem.cost(&self.x2)?;
         } else {
             self.x3 = self.x2;
             self.x2 = self.x1;
             self.x1 = self.g1 * self.x2 + self.g2 * self.x0;
             self.f2 = self.f1;
-            self.f1 = op.cost(&self.x1)?;
+            self.f1 = problem.cost(&self.x1)?;
         }
         if self.f1 < self.f2 {
             Ok((state.param(self.x1).cost(self.f1), None))

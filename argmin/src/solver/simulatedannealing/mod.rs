@@ -16,7 +16,7 @@
 //! DOI: 10.1126/science.220.4598.671
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, IterState, OpWrapper, SerializeAlias, Solver,
+    ArgminError, ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
     TerminationReason, KV,
 };
 use rand::prelude::*;
@@ -36,10 +36,10 @@ pub trait Anneal {
     fn anneal(&self, param: &Self::Param, extent: Self::Float) -> Result<Self::Output, Error>;
 }
 
-impl<O: Anneal> OpWrapper<O> {
+impl<O: Anneal> Problem<O> {
     /// Anneal a parameter vector
     pub fn anneal(&mut self, param: &O::Param, extent: O::Float) -> Result<O::Output, Error> {
-        self.op("anneal_count", |op| op.anneal(param, extent))
+        self.problem("anneal_count", |problem| problem.anneal(param, extent))
     }
 }
 
@@ -265,11 +265,11 @@ where
     const NAME: &'static str = "Simulated Annealing";
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
-        let cost = op.cost(&param)?;
+        let cost = problem.cost(&param)?;
         Ok((
             state.param(param).cost(cost),
             Some(make_kv!(
@@ -286,7 +286,7 @@ where
     /// Perform one iteration of SA algorithm
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
@@ -297,10 +297,10 @@ where
         let prev_cost = state.get_cost();
 
         // Make a move
-        let new_param = op.anneal(&prev_param, self.cur_temp)?;
+        let new_param = problem.anneal(&prev_param, self.cur_temp)?;
 
         // Evaluate cost function with new parameter vector
-        let new_cost = op.cost(&new_param)?;
+        let new_cost = problem.cost(&new_param)?;
 
         // Acceptance function
         //

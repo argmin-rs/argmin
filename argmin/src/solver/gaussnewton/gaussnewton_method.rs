@@ -11,7 +11,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, Error, IterState, Jacobian, OpWrapper, Operator, Solver,
+    ArgminError, ArgminFloat, Error, IterState, Jacobian, Operator, Problem, Solver,
     TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose};
@@ -90,12 +90,12 @@ where
 
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         mut state: IterState<P, (), J, (), F>,
     ) -> Result<(IterState<P, (), J, (), F>, Option<KV>), Error> {
         let param = state.take_param().unwrap();
-        let residuals = op.apply(&param)?;
-        let jacobian = op.jacobian(&param)?;
+        let residuals = problem.apply(&param)?;
+        let jacobian = problem.jacobian(&param)?;
 
         let p = jacobian
             .clone()

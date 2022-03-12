@@ -10,7 +10,7 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::core::{ArgminFloat, Error, IterState, OpWrapper, Operator, SerializeAlias, Solver, KV};
+use crate::core::{ArgminFloat, Error, IterState, Operator, Problem, SerializeAlias, Solver, KV};
 use argmin_math::{ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -90,11 +90,11 @@ where
 
     fn init(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         let init_param = state.get_param_ref().unwrap();
-        let ap = op.apply(init_param)?;
+        let ap = problem.apply(init_param)?;
         let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
         self.r = Some(r0.clone());
         self.p = Some(r0.mul(&(F::from_f64(-1.0).unwrap())));
@@ -105,14 +105,14 @@ where
     /// Perform one iteration of CG algorithm
     fn next_iter(
         &mut self,
-        op: &mut OpWrapper<O>,
+        problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         let p = self.p.as_ref().unwrap();
         let r = self.r.as_ref().unwrap();
 
         self.p_prev = Some(p.clone());
-        let apk = op.apply(p)?;
+        let apk = problem.apply(p)?;
         let alpha = self.rtr.div(p.dot(&apk.conj()));
         let new_param = state.get_param_ref().unwrap().scaled_add(&alpha, p);
         let r = r.scaled_add(&alpha, &apk);
