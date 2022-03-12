@@ -204,7 +204,7 @@ where
 mod tests {
     use super::*;
     use crate::assert_error;
-    use crate::core::{Executor, PseudoOperator, State};
+    use crate::core::{Executor, PseudoProblem, State};
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
     use num_traits::Float;
@@ -231,7 +231,7 @@ mod tests {
     }
 
     test_trait_impl!(backtrackinglinesearch,
-                    BacktrackingLineSearch<PseudoOperator, Vec<f64>, ArmijoCondition<f64>, f64>);
+                    BacktrackingLineSearch<PseudoProblem, Vec<f64>, ArmijoCondition<f64>, f64>);
 
     #[test]
     fn test_new() {

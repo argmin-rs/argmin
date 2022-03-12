@@ -16,17 +16,17 @@ use std::fmt::Debug;
 /// Pseudo operator which is used in tests
 #[derive(Clone, Default, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Copy)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct PseudoOperator {}
+pub struct PseudoProblem {}
 
-impl PseudoOperator {
+impl PseudoProblem {
     /// Constructor
     #[allow(dead_code)]
     pub fn new() -> Self {
-        PseudoOperator {}
+        PseudoProblem {}
     }
 }
 
-impl Operator for PseudoOperator {
+impl Operator for PseudoProblem {
     type Param = Vec<f64>;
     type Output = Vec<f64>;
 
@@ -36,7 +36,7 @@ impl Operator for PseudoOperator {
     }
 }
 
-impl CostFunction for PseudoOperator {
+impl CostFunction for PseudoProblem {
     type Param = Vec<f64>;
     type Output = f64;
 
@@ -46,7 +46,7 @@ impl CostFunction for PseudoOperator {
     }
 }
 
-impl Gradient for PseudoOperator {
+impl Gradient for PseudoProblem {
     type Param = Vec<f64>;
     type Gradient = Vec<f64>;
 
@@ -56,7 +56,7 @@ impl Gradient for PseudoOperator {
     }
 }
 
-impl Hessian for PseudoOperator {
+impl Hessian for PseudoProblem {
     type Param = Vec<f64>;
     type Hessian = Vec<Vec<f64>>;
 
@@ -66,7 +66,7 @@ impl Hessian for PseudoOperator {
     }
 }
 
-impl Jacobian for PseudoOperator {
+impl Jacobian for PseudoProblem {
     type Param = Vec<f64>;
     type Jacobian = Vec<Vec<f64>>;
 
@@ -76,7 +76,7 @@ impl Jacobian for PseudoOperator {
     }
 }
 
-impl Anneal for PseudoOperator {
+impl Anneal for PseudoProblem {
     type Param = Vec<f64>;
     type Output = Vec<f64>;
     type Float = f64;

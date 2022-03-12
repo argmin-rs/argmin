@@ -223,11 +223,11 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::PseudoOperator;
+    use crate::core::PseudoProblem;
     use crate::solver::trustregion::steihaug::Steihaug;
     use crate::test_trait_impl;
 
-    type Operator = PseudoOperator;
+    type Operator = PseudoProblem;
 
     test_trait_impl!(trustregion, TrustRegion<Steihaug<Operator, f64>, f64>);
 }

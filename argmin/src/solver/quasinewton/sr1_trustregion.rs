@@ -256,11 +256,11 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::PseudoOperator;
+    use crate::core::PseudoProblem;
     use crate::solver::trustregion::CauchyPoint;
     use crate::test_trait_impl;
 
-    type Operator = PseudoOperator;
+    type Operator = PseudoProblem;
 
     test_trait_impl!(sr1, SR1TrustRegion<Operator, CauchyPoint<f64>, f64>);
 
@@ -271,7 +271,7 @@ mod tests {
         let tol: f64 = 1e-4;
 
         let SR1TrustRegion { tol_grad: t, .. }: SR1TrustRegion<
-            PseudoOperator,
+            PseudoProblem,
             CauchyPoint<f64>,
             f64,
         > = SR1TrustRegion::new(subproblem).with_tol_grad(tol);
