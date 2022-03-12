@@ -255,8 +255,8 @@ impl<P: Clone + SerializeAlias, F: ArgminFloat> TrustRegionRadius<F> for Steihau
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::PseudoOperator;
+    use crate::core::PseudoProblem;
     use crate::test_trait_impl;
 
-    test_trait_impl!(steihaug, Steihaug<PseudoOperator, f64>);
+    test_trait_impl!(steihaug, Steihaug<PseudoProblem, f64>);
 }

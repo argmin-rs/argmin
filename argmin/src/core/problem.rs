@@ -28,8 +28,8 @@ impl<O> Problem<O> {
     ///
     /// Example
     /// ```
-    /// # use argmin::core::{PseudoOperator, Problem, CostFunction};
-    /// # let mut problem = Problem::new(PseudoOperator::new());
+    /// # use argmin::core::{PseudoProblem, Problem, CostFunction};
+    /// # let mut problem = Problem::new(PseudoProblem::new());
     /// # let param = vec![1.0f64, 0.0];
     /// let cost = problem.problem("cost_count", |problem| problem.cost(&param));
     /// # assert_eq!(problem.counts["cost_count"], 1)

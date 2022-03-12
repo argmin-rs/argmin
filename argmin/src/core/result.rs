@@ -197,10 +197,10 @@ impl<O, I: State> PartialOrd for OptimizationResult<O, I> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{IterState, PseudoOperator};
+    use crate::core::{IterState, PseudoProblem};
 
     send_sync_test!(
         argmin_result,
-        OptimizationResult<PseudoOperator, IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>>
+        OptimizationResult<PseudoProblem, IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>>
     );
 }

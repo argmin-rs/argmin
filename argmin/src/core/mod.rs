@@ -29,7 +29,7 @@ mod observers;
 /// Traits and structs for defining and handling optimization problems
 mod problem;
 /// Pseudo Operator
-mod pseudooperator;
+mod pseudoproblem;
 /// Definition of the return type of the solvers
 mod result;
 /// Trait alias for `serde`s `Serialize` and `DeserializeOwned`
@@ -53,7 +53,7 @@ pub use float::ArgminFloat;
 pub use kv::KV;
 pub use observers::*;
 pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator, Problem};
-pub use pseudooperator::PseudoOperator;
+pub use pseudoproblem::PseudoProblem;
 pub use result::OptimizationResult;
 pub use serialization::{DeserializeOwnedAlias, SerializeAlias};
 pub use solver::Solver;
