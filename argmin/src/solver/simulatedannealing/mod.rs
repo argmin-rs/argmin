@@ -36,8 +36,39 @@ pub trait Anneal {
     fn anneal(&self, param: &Self::Param, extent: Self::Float) -> Result<Self::Output, Error>;
 }
 
+/// Wraps a call to `anneal` defined in the `Anneal` trait and as such allows to call `anneal` on
+/// an instance of `Problem`. Internally, the number of evaluations of `anneal` is counted.
 impl<O: Anneal> Problem<O> {
-    /// Anneal a parameter vector
+    /// Calls `anneal` defined in the `Anneal` trait and keeps track of the number of evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Error};
+    /// # use argmin::solver::simulatedannealing::Anneal;
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Anneal for UserDefinedProblem {
+    /// #     type Param = Vec<f64>;
+    /// #     type Output = Vec<f64>;
+    /// #     type Float = f64;
+    /// #
+    /// #     fn anneal(&self, param: &Self::Param, extent: Self::Float) -> Result<Self::Output, Error> {
+    /// #         Ok(vec![1.0f64, 1.0f64])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Anneal`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param = vec![2.0f64, 1.0f64];
+    ///
+    /// let res = problem1.anneal(&param, 1.0);
+    ///
+    /// assert_eq!(problem1.counts["anneal_count"], 1);
+    /// # assert_eq!(res.unwrap(), vec![1.0f64, 1.0f64]);
+    /// ```
     pub fn anneal(&mut self, param: &O::Param, extent: O::Float) -> Result<O::Output, Error> {
         self.problem("anneal_count", |problem| problem.anneal(param, extent))
     }
