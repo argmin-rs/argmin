@@ -98,15 +98,14 @@ impl<I: State> Observe<I> for Observer<I> {
     /// a `KV` which can include solver-specific information
     /// This respects the `ObserverMode`: Every `Observe`r is only called as often as specified.
     fn observe_iter(&mut self, state: &I, kv: &KV) -> Result<(), Error> {
-        use ObserverMode::*;
         for l in self.observers.iter_mut() {
             let iter = state.get_iter();
             let observer = &mut l.0.lock().unwrap();
             match l.1 {
-                Always => observer.observe_iter(state, kv),
-                Every(i) if iter % i == 0 => observer.observe_iter(state, kv),
-                NewBest if state.is_best() => observer.observe_iter(state, kv),
-                Never | Every(_) | NewBest => Ok(()),
+                ObserverMode::Always => observer.observe_iter(state, kv),
+                ObserverMode::Every(i) if iter % i == 0 => observer.observe_iter(state, kv),
+                ObserverMode::NewBest if state.is_best() => observer.observe_iter(state, kv),
+                ObserverMode::Never | ObserverMode::Every(_) | ObserverMode::NewBest => Ok(()),
             }?
         }
         Ok(())

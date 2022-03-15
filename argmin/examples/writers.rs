@@ -64,7 +64,7 @@ fn run() -> Result<(), Error> {
         .serializer(WriteToFileSerializer::JSON);
 
     let res = Executor::new(cost, solver)
-        .configure(|config| config.param(init_param).max_iters(10))
+        .configure(|state| state.param(init_param).max_iters(10))
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .add_observer(writer, ObserverMode::Every(3))
         .add_observer(writer2, ObserverMode::NewBest)

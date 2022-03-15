@@ -19,17 +19,17 @@ use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-/// Executes a solver
+/// Solves an optimization problem with a solver
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Executor<O, S, I> {
-    /// solver
+    /// Solver
     solver: S,
-    /// operator
+    /// Problem
     #[cfg_attr(feature = "serde1", serde(skip))]
-    pub problem: Problem<O>,
+    problem: Problem<O>,
     /// State
-    pub(crate) state: Option<I>,
+    state: Option<I>,
     /// Storage for observers
     #[cfg_attr(feature = "serde1", serde(skip))]
     observers: Observer<I>,
@@ -47,7 +47,29 @@ where
     S: Solver<O, I>,
     I: State + SerializeAlias + DeserializeOwnedAlias,
 {
-    /// Create a new executor with a `solver` and an initial parameter `init_param`
+    /// Constructs an `Executor` from a user defined problem and a solver.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Executor, PseudoProblem};
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+    /// #
+    /// # type Rosenbrock = PseudoProblem;
+    /// #
+    /// // Construct an instance of the desired solver
+    /// let linesearch = MoreThuenteLineSearch::new();
+    /// let solver = SteepestDescent::new(linesearch);
+    ///
+    /// // `Rosenbrock` implements `CostFunction` and `Gradient` as required by the
+    /// // `SteepestDescent` solver
+    /// let problem = Rosenbrock {};
+    ///
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let executor = Executor::new(problem, solver);
+    /// ```
     pub fn new(problem: O, solver: S) -> Self {
         let state = Some(I::new());
         Executor {
@@ -62,7 +84,41 @@ where
         }
     }
 
-    /// Create a new executor from a checkpoint
+    /// Constructs an `Executor` from a checkpoint
+    ///
+    /// # Example
+    ///
+    /// This example either constructs the `Executor` from a checkpoint on disk, or creates a new
+    /// `Executor` if this fails. It also configures checkpointing using the methods
+    /// [`checkpoint_dir`](`crate::core::Executor::checkpoint_dir`),
+    /// [`checkpoint_name`](`crate::core::Executor::checkpoint_name`), and
+    /// [`checkpoint_mode`](`crate::core::Executor::checkpoint_mode`).
+    ///
+    /// ```
+    /// # use argmin::core::{Executor, PseudoProblem};
+    /// # use argmin::core::CheckpointMode;
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+    /// #
+    /// # type Rosenbrock = PseudoProblem;
+    /// #
+    /// // Construct an instance of the desired solver
+    /// let linesearch = MoreThuenteLineSearch::new();
+    /// let solver = SteepestDescent::new(linesearch);
+    ///
+    /// // Create instance of `Executor` from a checkpoint. Create a new `Executor` if the
+    /// // checkpoint does not exist.
+    /// let executor = Executor::from_checkpoint(".checkpoints/rosenbrock_optim.arg", Rosenbrock {})
+    ///     // Create a new Executor if it cannot be loaded from a checkpoint.
+    ///     .unwrap_or_else(|_| {
+    ///         Executor::new(Rosenbrock {}, solver)
+    ///     })
+    ///     // Configure checkpointing
+    ///     .checkpoint_dir(".checkpoints")
+    ///     .checkpoint_name("rosenbrock_optim")
+    ///     .checkpoint_mode(CheckpointMode::Every(20));
+    /// ```
     #[cfg(feature = "serde1")]
     pub fn from_checkpoint<P: AsRef<Path>>(path: P, problem: O) -> Result<Self, Error>
     where
@@ -74,7 +130,68 @@ where
         Ok(executor)
     }
 
-    /// Run the executor
+    /// This method gives mutable access to the internal state of the solver. This allows for
+    /// initializing the state before running the `Executor`. The options for initialization depend
+    /// on the type of state used by the chosen solver. Common types of state are
+    /// [`IterState`](`crate::core::IterState`) and
+    /// [`LinearProgramState`](`crate::core::LinearProgramState`). Please see the documentation of
+    /// the desired solver for information about which state is used.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Executor, PseudoProblem};
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// #
+    /// #  let linesearch = MoreThuenteLineSearch::new();
+    /// #  let solver = SteepestDescent::new(linesearch);
+    /// #
+    /// #  let problem = PseudoProblem {};
+    /// #
+    /// #  let init_param: Vec<f64> = vec![1.2, 1.2];
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let executor = Executor::new(problem, solver)
+    ///     // Configure and initialize internal state.
+    ///     .configure(|state| state.param(init_param).max_iters(10));
+    /// ```
+    #[must_use]
+    pub fn configure<F: FnOnce(I) -> I>(mut self, init: F) -> Self {
+        let state = self.state.take().unwrap();
+        let state = init(state);
+        self.state = Some(state);
+        self
+    }
+
+    /// Runs the executor by applying the solver to the optimization problem.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Error, Executor, PseudoProblem};
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// #
+    /// # fn main() -> Result<(), Error> {
+    /// # // Construct an instance of the desired solver
+    /// # let linesearch = MoreThuenteLineSearch::new();
+    /// # let solver = SteepestDescent::new(linesearch);
+    /// #
+    /// # let problem = PseudoProblem {};
+    /// #
+    /// # let init_param: Vec<f64> = vec![1.2, 1.2];
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let result = Executor::new(problem, solver)
+    ///     // Configure and initialize internal state.
+    ///     .configure(|state| state.param(init_param).max_iters(100))
+    /// #   .configure(|state| state.max_iters(1))
+    ///     // Execute solver
+    ///     .run()?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn run(mut self) -> Result<OptimizationResult<O, I>, Error> {
         let total_time = if self.timer {
             Some(instant::Instant::now())
@@ -200,7 +317,37 @@ where
         Ok(OptimizationResult::new(self.problem, state))
     }
 
-    /// Attaches a observer which implements `ArgminLog` to the solver.
+    /// Adds an observer to the executor. Observers are required to implement the
+    /// [`Observe`](`crate::core::Observe`) trait.
+    /// The parameter `mode` defines the conditions under which the observer will be called. See
+    /// [`ObserverMode`](`crate::core::ObserverMode`) for details.
+    ///
+    /// It is possible to add multiple observers.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Error, Executor, ObserverMode, PseudoProblem};
+    /// # #[cfg(feature = "slog-logger")]
+    /// # use argmin::core::SlogLogger;
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// #
+    /// # fn main() -> Result<(), Error> {
+    /// # #[cfg(feature = "slog-logger")]
+    /// # let linesearch = MoreThuenteLineSearch::new();
+    /// # #[cfg(feature = "slog-logger")]
+    /// # let solver = SteepestDescent::new(linesearch);
+    /// #
+    /// # let problem = PseudoProblem {};
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// # #[cfg(feature = "slog-logger")]
+    /// let executor = Executor::new(problem, solver)
+    ///     .add_observer(SlogLogger::term(), ObserverMode::Always);
+    /// # Ok(())
+    /// # }
+    /// ```
     #[must_use]
     pub fn add_observer<OBS: Observe<I> + 'static>(
         mut self,
@@ -211,16 +358,26 @@ where
         self
     }
 
-    /// Configure the solver
-    #[must_use]
-    pub fn configure<F: FnOnce(I) -> I>(mut self, init: F) -> Self {
-        let state = self.state.take().unwrap();
-        let state = init(state);
-        self.state = Some(state);
-        self
-    }
-
-    /// Set checkpoint directory
+    /// Sets the directory where checkpoints are saved.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Error, Executor, PseudoProblem};
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// #
+    /// # fn main() -> Result<(), Error> {
+    /// # let linesearch = MoreThuenteLineSearch::new();
+    /// # let solver = SteepestDescent::new(linesearch);
+    /// #
+    /// # let problem = PseudoProblem {};
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let executor = Executor::new(problem, solver).checkpoint_dir("/path/to/checkpoints");
+    /// # Ok(())
+    /// # }
+    /// ```
     #[cfg(feature = "serde1")]
     #[must_use]
     pub fn checkpoint_dir(mut self, dir: &str) -> Self {
@@ -228,7 +385,26 @@ where
         self
     }
 
-    /// Set checkpoint name
+    /// Sets the filename prefix for checkpoints.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Error, Executor, PseudoProblem};
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// #
+    /// # fn main() -> Result<(), Error> {
+    /// # let linesearch = MoreThuenteLineSearch::new();
+    /// # let solver = SteepestDescent::new(linesearch);
+    /// #
+    /// # let problem = PseudoProblem {};
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let executor = Executor::new(problem, solver).checkpoint_name("optim1");
+    /// # Ok(())
+    /// # }
+    /// ```
     #[cfg(feature = "serde1")]
     #[must_use]
     pub fn checkpoint_name(mut self, dir: &str) -> Self {
@@ -236,7 +412,27 @@ where
         self
     }
 
-    /// Set the checkpoint mode
+    /// Sets the conditions under which checkpoints are created. For the available options please
+    /// see [`CheckpointMode`](`crate::core::CheckpointMode`).
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Error, Executor, PseudoProblem, CheckpointMode};
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// #
+    /// # fn main() -> Result<(), Error> {
+    /// # let linesearch = MoreThuenteLineSearch::new();
+    /// # let solver = SteepestDescent::new(linesearch);
+    /// #
+    /// # let problem = PseudoProblem {};
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let executor = Executor::new(problem, solver).checkpoint_mode(CheckpointMode::Always);
+    /// # Ok(())
+    /// # }
+    /// ```
     #[cfg(feature = "serde1")]
     #[must_use]
     pub fn checkpoint_mode(mut self, mode: CheckpointMode) -> Self {
@@ -244,18 +440,89 @@ where
         self
     }
 
-    /// Turn Ctrl-C handling on or off (default: on)
+    /// Enables or disables CTRL-C handling (default: enabled). The CTRL-C handling gracefully
+    /// stops the solver if it is cancelled via CTRL-C (SIGINT). Requires the optional `ctrlc`
+    /// feature to be set.
+    ///
+    /// Note that this does not work with nested `Executor`s. If a solver executes another solver
+    /// internally, the inner solver needs to disable CTRL-C handling.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Error, Executor, PseudoProblem};
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// #
+    /// # fn main() -> Result<(), Error> {
+    /// # let linesearch = MoreThuenteLineSearch::new();
+    /// # let solver = SteepestDescent::new(linesearch);
+    /// #
+    /// # let problem = PseudoProblem {};
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let executor = Executor::new(problem, solver).ctrlc(false);
+    /// # Ok(())
+    /// # }
+    /// ```
     #[must_use]
     pub fn ctrlc(mut self, ctrlc: bool) -> Self {
         self.ctrlc = ctrlc;
         self
     }
 
-    /// Turn timer on or off (default: on)
+    /// Enables or disables timing of individual iterations (default: enabled).
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Error, Executor, PseudoProblem};
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// #
+    /// # fn main() -> Result<(), Error> {
+    /// # let linesearch = MoreThuenteLineSearch::new();
+    /// # let solver = SteepestDescent::new(linesearch);
+    /// #
+    /// # let problem = PseudoProblem {};
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let executor = Executor::new(problem, solver).timer(false);
+    /// # Ok(())
+    /// # }
+    /// ```
     #[must_use]
     pub fn timer(mut self, timer: bool) -> Self {
         self.timer = timer;
         self
+    }
+
+    /// Only needed for testing. Takes and returns the internally stored `state` and replaces it
+    /// with `None`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Error, Executor, PseudoProblem, CheckpointMode};
+    /// # use argmin::solver::gradientdescent::SteepestDescent;
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// #
+    /// # fn main() -> Result<(), Error> {
+    /// # let linesearch = MoreThuenteLineSearch::new();
+    /// # let solver = SteepestDescent::new(linesearch);
+    /// #
+    /// # let problem = PseudoProblem {};
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let executor = Executor::new(problem, solver);
+    /// let state = executor.take_state();
+    /// # assert!(executor.take_state().is_none());
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(all(test, feature = "serde1"))]
+    pub(crate) fn take_state(&mut self) -> Option<I> {
+        self.state.take()
     }
 }
 

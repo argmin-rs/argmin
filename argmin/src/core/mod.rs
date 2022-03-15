@@ -19,7 +19,7 @@ mod checkpointing;
 /// Error handling
 mod errors;
 /// Executor
-pub mod executor;
+mod executor;
 /// Trait alias for float types
 mod float;
 /// Key value datastructure

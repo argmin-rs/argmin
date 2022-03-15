@@ -65,8 +65,8 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(cost, solver)
-        .configure(|config| {
-            config
+        .configure(|state| {
+            state
                 .param(init_param)
                 .hessian(init_hessian)
                 .max_iters(1000)
