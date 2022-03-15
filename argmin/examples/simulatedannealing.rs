@@ -121,8 +121,8 @@ fn run() -> Result<(), Error> {
     // Run solver          //
     /////////////////////////
     let res = Executor::new(operator, solver)
-        .configure(|config| {
-            config
+        .configure(|state| {
+            state
                 .param(init_param)
                 // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
                 .max_iters(10_000)

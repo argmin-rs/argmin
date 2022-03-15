@@ -208,7 +208,7 @@ mod tests {
                     config.param(vec![0.0f64, 0.0])
                 },
             );
-        let state = exec.state.take().unwrap();
+        let state = exec.take_state().unwrap();
         let check = Checkpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&exec, &state, 20).unwrap();
 

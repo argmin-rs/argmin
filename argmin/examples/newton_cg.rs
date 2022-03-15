@@ -64,7 +64,7 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(cost, solver)
-        .configure(|config| config.param(init_param).max_iters(100))
+        .configure(|state| state.param(init_param).max_iters(100))
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 

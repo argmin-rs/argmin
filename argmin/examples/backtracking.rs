@@ -58,8 +58,8 @@ fn run() -> Result<(), Error> {
     let res = Executor::new(operator, solver)
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         // Gradient and cost are optional. If they are not provided, they will be computed
-        .configure(|config| {
-            config
+        .configure(|state| {
+            state
                 .param(init_param)
                 .grad(init_grad)
                 .cost(init_cost)

@@ -29,7 +29,7 @@ fn run() -> Result<(), Error> {
     let solver = Landweber::new(0.001);
 
     let res = Executor::new(operator, solver)
-        .configure(|config| config.param(init_param).max_iters(iters))
+        .configure(|state| state.param(init_param).max_iters(iters))
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 
