@@ -67,14 +67,14 @@ where
 
         // Run solver
         let OptimizationResult {
-            operator: line_problem,
+            problem: line_problem,
             state: mut linesearch_state,
         } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| config.param(param_new).grad(new_grad).cost(new_cost))
             .ctrlc(false)
             .run()?;
 
-        // Get back operator and function evaluation counts
+        // Get back problem and function evaluation counts
         problem.consume_problem(line_problem);
 
         Ok((

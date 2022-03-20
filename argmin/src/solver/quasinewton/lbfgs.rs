@@ -151,7 +151,7 @@ where
 
         // Run solver
         let OptimizationResult {
-            operator: line_problem,
+            problem: line_problem,
             state: mut linesearch_state,
         } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| {
@@ -166,7 +166,7 @@ where
         let xk1 = linesearch_state.take_param().unwrap();
         let next_cost = linesearch_state.get_cost();
 
-        // take back operator and take care of function evaluation counts
+        // take back problem and take care of function evaluation counts
         problem.consume_problem(line_problem);
 
         if state.get_iter() >= self.m as u64 {

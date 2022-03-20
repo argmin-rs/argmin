@@ -129,7 +129,7 @@ where
 
         // Run solver
         let OptimizationResult {
-            operator: line_problem,
+            problem: line_problem,
             state: mut line_state,
         } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| config.param(xk).grad(grad.clone()).cost(cur_cost))

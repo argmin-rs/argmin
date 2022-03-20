@@ -195,8 +195,7 @@ where
         self.iter += 1;
     }
 
-    /// Set all function evaluation counts to the evaluation counts of another operator
-    /// wrapped in `Problem`.
+    /// Set all function evaluation counts to the evaluation counts of another `Problem`.
     fn set_func_counts<O>(&mut self, problem: &Problem<O>) {
         for (k, &v) in problem.counts.iter() {
             let count = self.counts.entry(k.to_string()).or_insert(0);

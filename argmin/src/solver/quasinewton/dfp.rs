@@ -119,7 +119,7 @@ where
         self.linesearch.set_search_direction(p);
 
         let OptimizationResult {
-            operator: line_problem,
+            problem: line_problem,
             state: mut linesearch_state,
         } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| {

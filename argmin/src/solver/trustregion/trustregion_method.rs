@@ -155,7 +155,7 @@ where
         self.subproblem.set_radius(self.radius);
 
         let OptimizationResult {
-            operator: sub_problem,
+            problem: sub_problem,
             state: mut sub_state,
         } = Executor::new(problem.take_problem().unwrap(), self.subproblem.clone())
             .configure(|config| {
@@ -169,7 +169,7 @@ where
 
         let pk = sub_state.take_param().unwrap();
 
-        // Consume intermediate operator again. This takes care of the function evaluation counts.
+        // Consume intermediate problem again. This takes care of the function evaluation counts.
         problem.consume_problem(sub_problem);
 
         let new_param = pk.add(&param);
