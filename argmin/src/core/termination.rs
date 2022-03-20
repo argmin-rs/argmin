@@ -5,51 +5,106 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Termination
-//!
-//! Defines reasons for termination.
-//!
-//! TODO:
-//!   * Maybe it is better to define a trait (with `terminated` and `text` methods), because it
-//!     would allow implementers of solvers to define their own `TerminationReason`s. However, this
-//!     would require a lot of work.
-
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
-/// Indicates why the optimization algorithm stopped
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+/// Reasons for optimization algorithms to stop
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub enum TerminationReason {
-    /// In case it has not terminated yet
+    /// The optimization algorithm is not terminated
     NotTerminated,
-    /// Maximum number of iterations reached
+    /// Reached maximum number of iterations
     MaxItersReached,
-    /// Target cost function value reached
+    /// Reached target cost function value
     TargetCostReached,
-    /// Target precision reached
+    /// Reached target precision
     TargetPrecisionReached,
-    /// Cost function value did not change
+    /// No change in cost function value
     NoChangeInCost,
-    /// Acceped stall iter exceeded
+    /// Acceped stall iter exceeded (Simulated Annealing)
     AcceptedStallIterExceeded,
-    /// Best stall iter exceeded
+    /// Best stall iter exceeded (Simulated Annealing)
     BestStallIterExceeded,
-    /// Condition for Line search met
+    /// Condition for line search met
     LineSearchConditionMet,
-    /// Target tolerance reached
+    /// Reached target tolerance
     TargetToleranceReached,
-    /// Aborted
+    /// Algorithm aborted
     Aborted,
 }
 
 impl TerminationReason {
-    /// Returns `true` if a solver terminated and `false` otherwise
+    /// Returns `true` if a solver terminated and `false` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::TerminationReason;
+    ///
+    /// assert!(TerminationReason::MaxItersReached.terminated());
+    /// assert!(TerminationReason::TargetCostReached.terminated());
+    /// assert!(TerminationReason::TargetPrecisionReached.terminated());
+    /// assert!(TerminationReason::NoChangeInCost.terminated());
+    /// assert!(TerminationReason::AcceptedStallIterExceeded.terminated());
+    /// assert!(TerminationReason::BestStallIterExceeded.terminated());
+    /// assert!(TerminationReason::LineSearchConditionMet.terminated());
+    /// assert!(TerminationReason::TargetToleranceReached.terminated());
+    /// assert!(TerminationReason::Aborted.terminated());
+    /// assert!(!TerminationReason::NotTerminated.terminated());
+    /// ```
     pub fn terminated(self) -> bool {
         !matches!(self, TerminationReason::NotTerminated)
     }
 
-    /// Returns a texual representation of what happened
+    /// Returns a textual representation of what happened.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::TerminationReason;
+    ///
+    /// assert_eq!(
+    ///     TerminationReason::MaxItersReached.text(),
+    ///     "Maximum number of iterations reached"
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::TargetCostReached.text(),
+    ///     "Target cost value reached"
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::TargetPrecisionReached.text(),
+    ///     "Target precision reached"
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::NoChangeInCost.text(),
+    ///     "No change in cost function value"
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::AcceptedStallIterExceeded.text(),
+    ///     "Accepted stall iterations exceeded"
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::BestStallIterExceeded.text(),
+    ///     "Best stall iterations exceeded"
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::LineSearchConditionMet.text(),
+    ///     "Line search condition met"
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::TargetToleranceReached.text(),
+    ///     "Target tolerance reached"
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::Aborted.text(),
+    ///     "Optimization aborted"
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::NotTerminated.text(),
+    ///     "Not terminated"
+    /// );
+    /// ```
     pub fn text(&self) -> &str {
         match *self {
             TerminationReason::NotTerminated => "Not terminated",
