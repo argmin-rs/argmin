@@ -102,6 +102,8 @@ impl TestSolver {
 }
 
 impl<O> Solver<O, IterState<Vec<f64>, (), (), (), f64>> for TestSolver {
+    const NAME: &'static str = "TestSolver";
+
     fn next_iter(
         &mut self,
         _problem: &mut Problem<O>,
