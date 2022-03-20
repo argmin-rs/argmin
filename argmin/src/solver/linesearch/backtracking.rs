@@ -204,15 +204,15 @@ where
 mod tests {
     use super::*;
     use crate::assert_error;
-    use crate::core::{Executor, PseudoProblem, State};
+    use crate::core::{Executor, State, TestProblem};
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
     use num_traits::Float;
 
     #[derive(Debug, Clone)]
-    struct TestProblem {}
+    struct BTTestProblem {}
 
-    impl CostFunction for TestProblem {
+    impl CostFunction for BTTestProblem {
         type Param = Vec<f64>;
         type Output = f64;
 
@@ -221,7 +221,7 @@ mod tests {
         }
     }
 
-    impl Gradient for TestProblem {
+    impl Gradient for BTTestProblem {
         type Param = Vec<f64>;
         type Gradient = Vec<f64>;
 
@@ -231,7 +231,7 @@ mod tests {
     }
 
     test_trait_impl!(backtrackinglinesearch,
-                    BacktrackingLineSearch<PseudoProblem, Vec<f64>, ArmijoCondition<f64>, f64>);
+                    BacktrackingLineSearch<TestProblem, Vec<f64>, ArmijoCondition<f64>, f64>);
 
     #[test]
     fn test_new() {
@@ -319,7 +319,7 @@ mod tests {
     fn test_step_armijo() {
         use crate::core::Problem;
 
-        let prob = TestProblem {};
+        let prob = BTTestProblem {};
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
@@ -350,7 +350,7 @@ mod tests {
         // the implementation of the backtracking linesearch properly considers this.
         use crate::core::Problem;
 
-        let prob = TestProblem {};
+        let prob = BTTestProblem {};
 
         let c1: f64 = 0.01;
         let c2: f64 = 0.9;
@@ -382,7 +382,7 @@ mod tests {
         use crate::core::IterState;
         use crate::core::Problem;
 
-        let prob = TestProblem {};
+        let prob = BTTestProblem {};
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
@@ -428,7 +428,7 @@ mod tests {
         use crate::core::IterState;
         use crate::core::Problem;
 
-        let prob = TestProblem {};
+        let prob = BTTestProblem {};
 
         let c1: f64 = 0.01;
         let c2: f64 = 0.9;
@@ -476,7 +476,7 @@ mod tests {
         // Similar to step test, but with the added check that self.alpha is reduced.
         use crate::core::Problem;
 
-        let prob = TestProblem {};
+        let prob = BTTestProblem {};
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
@@ -550,7 +550,7 @@ mod tests {
 
     #[test]
     fn test_executor_1() {
-        let prob = TestProblem {};
+        let prob = BTTestProblem {};
 
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
@@ -598,7 +598,7 @@ mod tests {
 
     #[test]
     fn test_executor_2() {
-        let prob = TestProblem {};
+        let prob = BTTestProblem {};
 
         // difference compared to test_executor_1: c is larger to force another backtracking step
         let c: f64 = 0.2;

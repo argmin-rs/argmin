@@ -52,12 +52,12 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Executor, PseudoProblem};
+    /// # use argmin::core::{Executor, TestProblem};
     /// # use argmin::solver::gradientdescent::SteepestDescent;
     /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
     /// # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
     /// #
-    /// # type Rosenbrock = PseudoProblem;
+    /// # type Rosenbrock = TestProblem;
     /// #
     /// // Construct an instance of the desired solver
     /// let linesearch = MoreThuenteLineSearch::new();
@@ -95,13 +95,13 @@ where
     /// [`checkpoint_mode`](`crate::core::Executor::checkpoint_mode`).
     ///
     /// ```
-    /// # use argmin::core::{Executor, PseudoProblem};
+    /// # use argmin::core::{Executor, TestProblem};
     /// # use argmin::core::CheckpointMode;
     /// # use argmin::solver::gradientdescent::SteepestDescent;
     /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
     /// # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
     /// #
-    /// # type Rosenbrock = PseudoProblem;
+    /// # type Rosenbrock = TestProblem;
     /// #
     /// // Construct an instance of the desired solver
     /// let linesearch = MoreThuenteLineSearch::new();
@@ -140,14 +140,14 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Executor, PseudoProblem};
+    /// # use argmin::core::{Executor, TestProblem};
     /// # use argmin::solver::gradientdescent::SteepestDescent;
     /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
     /// #
     /// #  let linesearch = MoreThuenteLineSearch::new();
     /// #  let solver = SteepestDescent::new(linesearch);
     /// #
-    /// #  let problem = PseudoProblem {};
+    /// #  let problem = TestProblem {};
     /// #
     /// #  let init_param: Vec<f64> = vec![1.2, 1.2];
     /// #
@@ -169,7 +169,7 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Error, Executor, PseudoProblem};
+    /// # use argmin::core::{Error, Executor, TestProblem};
     /// # use argmin::solver::gradientdescent::SteepestDescent;
     /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
     /// #
@@ -178,7 +178,7 @@ where
     /// # let linesearch = MoreThuenteLineSearch::new();
     /// # let solver = SteepestDescent::new(linesearch);
     /// #
-    /// # let problem = PseudoProblem {};
+    /// # let problem = TestProblem {};
     /// #
     /// # let init_param: Vec<f64> = vec![1.2, 1.2];
     /// #
@@ -327,7 +327,7 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Error, Executor, ObserverMode, PseudoProblem};
+    /// # use argmin::core::{Error, Executor, ObserverMode, TestProblem};
     /// # #[cfg(feature = "slog-logger")]
     /// # use argmin::core::SlogLogger;
     /// # use argmin::solver::gradientdescent::SteepestDescent;
@@ -339,7 +339,7 @@ where
     /// # #[cfg(feature = "slog-logger")]
     /// # let solver = SteepestDescent::new(linesearch);
     /// #
-    /// # let problem = PseudoProblem {};
+    /// # let problem = TestProblem {};
     /// #
     /// // Create instance of `Executor` with `problem` and `solver`
     /// # #[cfg(feature = "slog-logger")]
@@ -363,7 +363,7 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Error, Executor, PseudoProblem};
+    /// # use argmin::core::{Error, Executor, TestProblem};
     /// # use argmin::solver::gradientdescent::SteepestDescent;
     /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
     /// #
@@ -371,7 +371,7 @@ where
     /// # let linesearch = MoreThuenteLineSearch::new();
     /// # let solver = SteepestDescent::new(linesearch);
     /// #
-    /// # let problem = PseudoProblem {};
+    /// # let problem = TestProblem {};
     /// #
     /// // Create instance of `Executor` with `problem` and `solver`
     /// let executor = Executor::new(problem, solver).checkpoint_dir("/path/to/checkpoints");
@@ -390,7 +390,7 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Error, Executor, PseudoProblem};
+    /// # use argmin::core::{Error, Executor, TestProblem};
     /// # use argmin::solver::gradientdescent::SteepestDescent;
     /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
     /// #
@@ -398,7 +398,7 @@ where
     /// # let linesearch = MoreThuenteLineSearch::new();
     /// # let solver = SteepestDescent::new(linesearch);
     /// #
-    /// # let problem = PseudoProblem {};
+    /// # let problem = TestProblem {};
     /// #
     /// // Create instance of `Executor` with `problem` and `solver`
     /// let executor = Executor::new(problem, solver).checkpoint_name("optim1");
@@ -418,7 +418,7 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Error, Executor, PseudoProblem, CheckpointMode};
+    /// # use argmin::core::{Error, Executor, TestProblem, CheckpointMode};
     /// # use argmin::solver::gradientdescent::SteepestDescent;
     /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
     /// #
@@ -426,7 +426,7 @@ where
     /// # let linesearch = MoreThuenteLineSearch::new();
     /// # let solver = SteepestDescent::new(linesearch);
     /// #
-    /// # let problem = PseudoProblem {};
+    /// # let problem = TestProblem {};
     /// #
     /// // Create instance of `Executor` with `problem` and `solver`
     /// let executor = Executor::new(problem, solver).checkpoint_mode(CheckpointMode::Always);
@@ -450,7 +450,7 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Error, Executor, PseudoProblem};
+    /// # use argmin::core::{Error, Executor, TestProblem};
     /// # use argmin::solver::gradientdescent::SteepestDescent;
     /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
     /// #
@@ -458,7 +458,7 @@ where
     /// # let linesearch = MoreThuenteLineSearch::new();
     /// # let solver = SteepestDescent::new(linesearch);
     /// #
-    /// # let problem = PseudoProblem {};
+    /// # let problem = TestProblem {};
     /// #
     /// // Create instance of `Executor` with `problem` and `solver`
     /// let executor = Executor::new(problem, solver).ctrlc(false);
@@ -476,7 +476,7 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Error, Executor, PseudoProblem};
+    /// # use argmin::core::{Error, Executor, TestProblem};
     /// # use argmin::solver::gradientdescent::SteepestDescent;
     /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
     /// #
@@ -484,7 +484,7 @@ where
     /// # let linesearch = MoreThuenteLineSearch::new();
     /// # let solver = SteepestDescent::new(linesearch);
     /// #
-    /// # let problem = PseudoProblem {};
+    /// # let problem = TestProblem {};
     /// #
     /// // Create instance of `Executor` with `problem` and `solver`
     /// let executor = Executor::new(problem, solver).timer(false);
@@ -503,7 +503,7 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Error, Executor, PseudoProblem, CheckpointMode};
+    /// # use argmin::core::{Error, Executor, TestProblem, CheckpointMode};
     /// # use argmin::solver::gradientdescent::SteepestDescent;
     /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
     /// #
@@ -511,7 +511,7 @@ where
     /// # let linesearch = MoreThuenteLineSearch::new();
     /// # let solver = SteepestDescent::new(linesearch);
     /// #
-    /// # let problem = PseudoProblem {};
+    /// # let problem = TestProblem {};
     /// #
     /// // Create instance of `Executor` with `problem` and `solver`
     /// let executor = Executor::new(problem, solver);
@@ -529,7 +529,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{ArgminFloat, IterState, PseudoProblem};
+    use crate::core::{ArgminFloat, IterState, TestProblem};
     use approx::assert_relative_eq;
 
     #[test]
@@ -552,7 +552,7 @@ mod tests {
             }
         }
 
-        let problem = PseudoProblem::new();
+        let problem = TestProblem::new();
         let solver = TestSolver {};
 
         let mut executor = Executor::new(problem, solver)

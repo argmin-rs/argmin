@@ -28,8 +28,6 @@ mod kv;
 mod observers;
 /// Traits and structs for defining and handling optimization problems
 mod problem;
-/// Pseudo Operator
-mod pseudoproblem;
 /// Definition of the return type of the solvers
 mod result;
 /// Trait alias for `serde`s `Serialize` and `DeserializeOwned`
@@ -40,6 +38,8 @@ mod solver;
 mod state;
 /// Definition of termination reasons
 mod termination;
+/// Utilities for testing
+mod test_utils;
 
 pub use crate::solver::conjugategradient::NLCGBetaUpdate;
 pub use crate::solver::linesearch::LineSearch;
@@ -53,9 +53,9 @@ pub use float::ArgminFloat;
 pub use kv::KV;
 pub use observers::*;
 pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator, Problem};
-pub use pseudoproblem::PseudoProblem;
 pub use result::OptimizationResult;
 pub use serialization::{DeserializeOwnedAlias, SerializeAlias};
 pub use solver::Solver;
 pub use state::{IterState, LinearProgramState, State};
 pub use termination::TerminationReason;
+pub use test_utils::TestProblem;

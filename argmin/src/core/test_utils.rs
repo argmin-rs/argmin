@@ -16,17 +16,17 @@ use std::fmt::Debug;
 /// Pseudo operator which is used in tests
 #[derive(Clone, Default, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Copy)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct PseudoProblem {}
+pub struct TestProblem {}
 
-impl PseudoProblem {
+impl TestProblem {
     /// Constructor
     #[allow(dead_code)]
     pub fn new() -> Self {
-        PseudoProblem {}
+        TestProblem {}
     }
 }
 
-impl Operator for PseudoProblem {
+impl Operator for TestProblem {
     type Param = Vec<f64>;
     type Output = Vec<f64>;
 
@@ -36,7 +36,7 @@ impl Operator for PseudoProblem {
     }
 }
 
-impl CostFunction for PseudoProblem {
+impl CostFunction for TestProblem {
     type Param = Vec<f64>;
     type Output = f64;
 
@@ -46,7 +46,7 @@ impl CostFunction for PseudoProblem {
     }
 }
 
-impl Gradient for PseudoProblem {
+impl Gradient for TestProblem {
     type Param = Vec<f64>;
     type Gradient = Vec<f64>;
 
@@ -56,7 +56,7 @@ impl Gradient for PseudoProblem {
     }
 }
 
-impl Hessian for PseudoProblem {
+impl Hessian for TestProblem {
     type Param = Vec<f64>;
     type Hessian = Vec<Vec<f64>>;
 
@@ -66,7 +66,7 @@ impl Hessian for PseudoProblem {
     }
 }
 
-impl Jacobian for PseudoProblem {
+impl Jacobian for TestProblem {
     type Param = Vec<f64>;
     type Jacobian = Vec<Vec<f64>>;
 
@@ -76,7 +76,7 @@ impl Jacobian for PseudoProblem {
     }
 }
 
-impl Anneal for PseudoProblem {
+impl Anneal for TestProblem {
     type Param = Vec<f64>;
     type Output = Vec<f64>;
     type Float = f64;

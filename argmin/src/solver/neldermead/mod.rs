@@ -319,8 +319,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::PseudoProblem;
+    use crate::core::TestProblem;
     use crate::test_trait_impl;
 
-    test_trait_impl!(nelder_mead, NelderMead<PseudoProblem, f64>);
+    test_trait_impl!(nelder_mead, NelderMead<TestProblem, f64>);
 }

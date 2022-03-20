@@ -171,7 +171,7 @@ pub fn load_checkpoint<T: DeserializeOwnedAlias, I: DeserializeOwnedAlias, P: As
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{ArgminFloat, Executor, IterState, Problem, PseudoProblem, Solver, KV};
+    use crate::core::{ArgminFloat, Executor, IterState, Problem, Solver, TestProblem, KV};
 
     #[derive(Serialize, Deserialize, Clone, Debug)]
     pub struct PhonySolver {}
@@ -200,9 +200,9 @@ mod tests {
     #[test]
     #[allow(clippy::type_complexity)]
     fn test_store() {
-        let problem = PseudoProblem::new();
+        let problem = TestProblem::new();
         let solver = PhonySolver::new();
-        let mut exec: Executor<PseudoProblem, PhonySolver, _> = Executor::new(problem, solver)
+        let mut exec: Executor<TestProblem, PhonySolver, _> = Executor::new(problem, solver)
             .configure(
                 |config: IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>| {
                     config.param(vec![0.0f64, 0.0])
@@ -214,7 +214,7 @@ mod tests {
 
         let (_loaded, _state): (
             Executor<
-                PseudoProblem,
+                TestProblem,
                 PhonySolver,
                 IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>,
             >,
