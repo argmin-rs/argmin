@@ -50,7 +50,7 @@ impl<O> Problem<O> {
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{TestProblem, Problem, CostFunction};
+    /// # use argmin::core::{test_utils::TestProblem, Problem, CostFunction};
     /// # let mut problem = Problem::new(TestProblem::new());
     /// # let param = vec![1.0f64, 0.0];
     /// let cost = problem.problem("cost_count", |problem| problem.cost(&param));

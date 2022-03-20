@@ -5,7 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{CostFunction, Error, Gradient, Hessian, Jacobian, Operator};
+use crate::core::{
+    CostFunction, Error, Gradient, Hessian, IterState, Jacobian, Operator, Problem, Solver, KV,
+};
 use crate::solver::simulatedannealing::Anneal;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -84,5 +86,27 @@ impl Anneal for TestProblem {
     /// Do nothing.
     fn anneal(&self, p: &Self::Param, _t: Self::Float) -> Result<Self::Output, Error> {
         Ok(p.clone())
+    }
+}
+
+/// TODO
+#[derive(Clone, Default)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+pub struct TestSolver {}
+
+impl TestSolver {
+    /// Construct a new TestSolver instance
+    pub fn new() -> TestSolver {
+        TestSolver {}
+    }
+}
+
+impl<O> Solver<O, IterState<Vec<f64>, (), (), (), f64>> for TestSolver {
+    fn next_iter(
+        &mut self,
+        _problem: &mut Problem<O>,
+        state: IterState<Vec<f64>, (), (), (), f64>,
+    ) -> Result<(IterState<Vec<f64>, (), (), (), f64>, Option<KV>), Error> {
+        Ok((state, None))
     }
 }

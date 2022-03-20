@@ -171,54 +171,49 @@ pub fn load_checkpoint<T: DeserializeOwnedAlias, I: DeserializeOwnedAlias, P: As
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{ArgminFloat, Executor, IterState, Problem, Solver, TestProblem, KV};
+    use crate::core::test_utils::{TestProblem, TestSolver};
+    use crate::core::{Executor, IterState};
 
-    #[derive(Serialize, Deserialize, Clone, Debug)]
-    pub struct PhonySolver {}
-
-    impl PhonySolver {
-        /// Constructor
-        pub fn new() -> Self {
-            PhonySolver {}
-        }
-    }
-
-    impl<O, P, G, J, H, F> Solver<O, IterState<P, G, J, H, F>> for PhonySolver
-    where
-        P: Clone,
-        F: ArgminFloat,
-    {
-        fn next_iter(
-            &mut self,
-            _problem: &mut Problem<O>,
-            _state: IterState<P, G, J, H, F>,
-        ) -> Result<(IterState<P, G, J, H, F>, Option<KV>), Error> {
-            unimplemented!()
-        }
-    }
+    // #[derive(Serialize, Deserialize, Clone, Debug)]
+    // pub struct PhonySolver {}
+    //
+    // impl PhonySolver {
+    //     /// Constructor
+    //     pub fn new() -> Self {
+    //         PhonySolver {}
+    //     }
+    // }
+    //
+    // impl<O, P, G, J, H, F> Solver<O, IterState<P, G, J, H, F>> for PhonySolver
+    // where
+    //     P: Clone,
+    //     F: ArgminFloat,
+    // {
+    //     fn next_iter(
+    //         &mut self,
+    //         _problem: &mut Problem<O>,
+    //         _state: IterState<P, G, J, H, F>,
+    //     ) -> Result<(IterState<P, G, J, H, F>, Option<KV>), Error> {
+    //         unimplemented!()
+    //     }
+    // }
 
     #[test]
     #[allow(clippy::type_complexity)]
     fn test_store() {
         let problem = TestProblem::new();
-        let solver = PhonySolver::new();
-        let mut exec: Executor<TestProblem, PhonySolver, _> = Executor::new(problem, solver)
-            .configure(
-                |config: IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>| {
-                    config.param(vec![0.0f64, 0.0])
-                },
-            );
+        let solver = TestSolver::new();
+        let mut exec: Executor<TestProblem, TestSolver, _> = Executor::new(problem, solver)
+            .configure(|config: IterState<Vec<f64>, (), (), (), f64>| {
+                config.param(vec![1.0f64, 0.0])
+            });
         let state = exec.take_state().unwrap();
         let check = Checkpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&exec, &state, 20).unwrap();
 
         let (_loaded, _state): (
-            Executor<
-                TestProblem,
-                PhonySolver,
-                IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>,
-            >,
-            IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64>,
+            Executor<TestProblem, TestSolver, IterState<Vec<f64>, (), (), (), f64>>,
+            IterState<Vec<f64>, (), (), (), f64>,
         ) = load_checkpoint("checkpoints/solver.arg").unwrap();
     }
 }

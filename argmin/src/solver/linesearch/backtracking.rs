@@ -204,7 +204,7 @@ where
 mod tests {
     use super::*;
     use crate::assert_error;
-    use crate::core::{Executor, State, TestProblem};
+    use crate::core::{test_utils::TestProblem, Executor, State};
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
     use num_traits::Float;
