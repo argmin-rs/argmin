@@ -38,7 +38,7 @@ mod solver;
 mod state;
 /// Definition of termination reasons
 mod termination;
-/// Utilities for testing
+/// Convenience utilities for testing
 pub mod test_utils;
 
 pub use crate::solver::conjugategradient::NLCGBetaUpdate;

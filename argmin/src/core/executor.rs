@@ -504,7 +504,7 @@ mod tests {
         let problem = TestProblem::new();
         let solver = TestSolver::new();
 
-        let mut executor = Executor::new(problem, solver)
+        let mut executor = Executor::new(problem.clone(), solver)
             .configure(|config: IterState<Vec<f64>, (), (), (), f64>| config.param(vec![0.0, 0.0]));
 
         // 1) Parameter vector changes, but not cost (continues to be `Inf`)
