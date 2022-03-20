@@ -6,9 +6,9 @@
 // copied, modified, or distributed except according to those terms.
 
 #[cfg(feature = "serde1")]
-use crate::core::{load_checkpoint, Checkpoint, CheckpointMode};
+use crate::core::checkpointing::{load_checkpoint, Checkpoint, CheckpointMode};
+use crate::core::observers::{Observe, Observer, ObserverMode};
 use crate::core::{
-    observers::{Observe, Observer, ObserverMode},
     DeserializeOwnedAlias, Error, OptimizationResult, Problem, SerializeAlias, Solver, State,
     TerminationReason, KV,
 };
@@ -96,7 +96,7 @@ where
     /// ```
     /// # use argmin::core::Executor;
     /// # use argmin::core::test_utils::{TestSolver, TestProblem};
-    /// # use argmin::core::CheckpointMode;
+    /// # use argmin::core::checkpointing::CheckpointMode;
     /// #
     /// # type Rosenbrock = TestProblem;
     /// # type Newton = TestSolver;
@@ -391,12 +391,12 @@ where
     }
 
     /// Sets the conditions under which checkpoints are created. For the available options please
-    /// see [`CheckpointMode`](`crate::core::CheckpointMode`).
+    /// see [`CheckpointMode`](`crate::core::checkpointing::CheckpointMode`).
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Error, Executor, CheckpointMode};
+    /// # use argmin::core::{Error, Executor, checkpointing::CheckpointMode};
     /// # use argmin::core::test_utils::{TestSolver, TestProblem};
     /// #
     /// # fn main() -> Result<(), Error> {

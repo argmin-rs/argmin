@@ -15,7 +15,7 @@
 pub mod macros;
 /// Checkpointing
 #[cfg(feature = "serde1")]
-mod checkpointing;
+pub mod checkpointing;
 /// Error handling
 mod errors;
 /// Executor
@@ -45,8 +45,6 @@ pub use crate::solver::conjugategradient::NLCGBetaUpdate;
 pub use crate::solver::linesearch::LineSearch;
 pub use crate::solver::trustregion::TrustRegionRadius;
 pub use anyhow::Error;
-#[cfg(feature = "serde1")]
-pub use checkpointing::{load_checkpoint, Checkpoint, CheckpointMode};
 pub use errors::ArgminError;
 pub use executor::Executor;
 pub use float::ArgminFloat;
