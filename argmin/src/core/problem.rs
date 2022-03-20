@@ -43,7 +43,7 @@ impl<O> Problem<O> {
         }
     }
 
-    /// Gives access to the stored operator `op` via the closure `func` and keeps track of how many
+    /// Gives access to the stored `problem` via the closure `func` and keeps track of how many
     /// times the function has been called. The function counts will be passed to observers labelled
     /// with `counts_string`. Per convention, `counts_string` is chosen as `<something>_count`.
     ///

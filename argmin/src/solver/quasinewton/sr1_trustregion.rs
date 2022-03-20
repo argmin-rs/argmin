@@ -172,7 +172,7 @@ where
         self.subproblem.set_radius(self.radius);
 
         let OptimizationResult {
-            operator: sub_problem,
+            problem: sub_problem,
             state: mut sub_state,
         } = Executor::new(problem.take_problem().unwrap(), self.subproblem.clone())
             .configure(|config| {
@@ -260,9 +260,7 @@ mod tests {
     use crate::solver::trustregion::CauchyPoint;
     use crate::test_trait_impl;
 
-    type Operator = TestProblem;
-
-    test_trait_impl!(sr1, SR1TrustRegion<Operator, CauchyPoint<f64>, f64>);
+    test_trait_impl!(sr1, SR1TrustRegion<TestProblem, CauchyPoint<f64>, f64>);
 
     #[test]
     fn test_tolerances() {

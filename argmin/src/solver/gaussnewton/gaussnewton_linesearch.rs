@@ -93,7 +93,7 @@ where
 
         // perform linesearch
         let OptimizationResult {
-            operator: mut line_problem,
+            problem: mut line_problem,
             state: mut linesearch_state,
         } = Executor::new(
             LineSearchProblem::new(problem.take_problem().unwrap()),
@@ -105,7 +105,7 @@ where
 
         // Here we cannot use `consume_problem` because the problem we need is hidden inside a
         // `LineSearchProblem` hidden inside a `Problem`. Therefore we have to split this in two
-        // separate tasks: first getting the operator, then dealing with the function counts.
+        // separate tasks: first getting the problem, then dealing with the function counts.
         problem.problem = Some(line_problem.take_problem().unwrap().problem);
         problem.consume_func_counts(line_problem);
 

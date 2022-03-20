@@ -132,7 +132,7 @@ where
 
         // Run solver
         let OptimizationResult {
-            operator: line_problem,
+            problem: line_problem,
             state: mut sub_state,
         } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| {
