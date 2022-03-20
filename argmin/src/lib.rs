@@ -455,7 +455,7 @@
 //! # extern crate argmin_testfunctions;
 //! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
 //! # #[cfg(feature = "serde1")]
-//! # use argmin::core::{CheckpointMode};
+//! # use argmin::core::checkpointing::CheckpointMode;
 //! # #[cfg(feature = "slog-logger")]
 //! # use argmin::core::observers::SlogLogger;
 //! # use argmin::solver::landweber::Landweber;
