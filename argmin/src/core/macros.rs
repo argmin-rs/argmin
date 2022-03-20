@@ -7,16 +7,35 @@
 
 //! # Macros
 
-/// Creates an `KV` at compile time in order to avoid pushing to the `kv` vector.
+/// Creates an `KV` at compile time
+///
+/// # Example
+///
+/// ```
+/// use argmin::make_kv;
+///
+/// let kv = make_kv!(
+///     "key1" => "value1";
+///     "key2" => "value2";
+///     "key3" => 1234;
+/// );
+/// # assert_eq!(kv.kv.len(), 3);
+/// # assert_eq!(kv.kv[0].0, "key1");
+/// # assert_eq!(format!("{}", kv.kv[0].1), "value1");
+/// # assert_eq!(kv.kv[1].0, "key2");
+/// # assert_eq!(format!("{}", kv.kv[1].1), "value2");
+/// # assert_eq!(kv.kv[2].0, "key3");
+/// # assert_eq!(format!("{}", kv.kv[2].1), "1234");
+/// ```
 #[macro_export]
 macro_rules! make_kv {
     ($($k:expr =>  $v:expr;)*) => {
-        KV { kv: vec![ $(($k, std::rc::Rc::new($v))),* ] }
+        $crate::core::KV { kv: vec![ $(($k, std::rc::Rc::new($v))),* ] }
     };
 }
 
 /// Release an `T` from an `Option<T>` if it is not `None`. If it is `None`, return an
-/// `ArgminError` with a message that needs to be provided.
+/// `ArgminError` with a provided message.
 #[macro_export]
 macro_rules! check_param {
     ($param:expr, $msg:expr, $error:ident) => {
