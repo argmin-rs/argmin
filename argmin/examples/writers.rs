@@ -5,10 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{
-    CostFunction, Error, Executor, Gradient, ObserverMode, SlogLogger, WriteToFile,
-    WriteToFileSerializer,
-};
+use argmin::core::observers::{ObserverMode, SlogLogger, WriteToFile, WriteToFileSerializer};
+use argmin::core::{CostFunction, Error, Executor, Gradient};
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin::solver::quasinewton::BFGS;
 use argmin_testfunctions::rosenbrock;

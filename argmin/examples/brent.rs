@@ -5,7 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{Error, Executor, ObserverMode, Operator, SlogLogger};
+use argmin::core::observers::{ObserverMode, SlogLogger};
+use argmin::core::{Error, Executor, Operator};
 use argmin::solver::brent::Brent;
 
 /// Test function generalise from Wikipedia example

@@ -249,7 +249,7 @@
 //! # extern crate argmin_testfunctions;
 //! use argmin::core::{Error, Executor, CostFunction, Gradient};
 //! # #[cfg(feature = "slog-logger")]
-//! use argmin::core::{SlogLogger, ObserverMode};
+//! use argmin::core::observers::{SlogLogger, ObserverMode};
 //! use argmin::solver::gradientdescent::SteepestDescent;
 //! use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -351,11 +351,11 @@
 //! # #![allow(unused_imports)]
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
-//! # use argmin::core::{Error, Executor, CostFunction, Gradient, ObserverMode};
+//! # use argmin::core::{Error, Executor, CostFunction, Gradient, observers::ObserverMode};
 //! # #[cfg(feature = "slog-logger")]
-//! # use argmin::core::SlogLogger;
+//! # use argmin::core::observers::SlogLogger;
 //! # #[cfg(feature = "serde1")]
-//! # use argmin::core::WriteToFile;
+//! # use argmin::core::observers::WriteToFile;
 //! # use argmin::solver::gradientdescent::SteepestDescent;
 //! # use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -453,11 +453,11 @@
 //! ```rust
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
-//! # use argmin::core::{CostFunction, Error, Executor, Gradient, ObserverMode};
+//! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
 //! # #[cfg(feature = "serde1")]
 //! # use argmin::core::{CheckpointMode};
 //! # #[cfg(feature = "slog-logger")]
-//! # use argmin::core::SlogLogger;
+//! # use argmin::core::observers::SlogLogger;
 //! # use argmin::solver::landweber::Landweber;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! #

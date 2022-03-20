@@ -5,7 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{CostFunction, Error, Executor, Gradient, ObserverMode, SlogLogger};
+use argmin::core::observers::{ObserverMode, SlogLogger};
+use argmin::core::{CostFunction, Error, Executor, Gradient};
 use argmin::solver::conjugategradient::NonlinearConjugateGradient;
 use argmin::solver::conjugategradient::PolakRibiere;
 use argmin::solver::linesearch::MoreThuenteLineSearch;

@@ -7,7 +7,8 @@
 
 //! # Loggers based on the `slog` crate
 
-use crate::core::{ArgminFloat, Error, IterState, Observe, State, KV};
+use crate::core::observers::Observe;
+use crate::core::{ArgminFloat, Error, IterState, State, KV};
 use slog;
 use slog::{info, o, Drain, Key, Record, Serializer};
 use slog_async;

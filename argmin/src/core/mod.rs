@@ -24,8 +24,8 @@ mod executor;
 mod float;
 /// Key value datastructure
 mod kv;
-/// Observers;
-mod observers;
+/// Observers
+pub mod observers;
 /// Traits and structs for defining and handling optimization problems
 mod problem;
 /// Definition of the return type of the solvers
@@ -51,7 +51,6 @@ pub use errors::ArgminError;
 pub use executor::Executor;
 pub use float::ArgminFloat;
 pub use kv::KV;
-pub use observers::*;
 pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator, Problem};
 pub use result::OptimizationResult;
 pub use serialization::{DeserializeOwnedAlias, SerializeAlias};

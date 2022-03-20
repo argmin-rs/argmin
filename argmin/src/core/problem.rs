@@ -8,9 +8,11 @@
 use crate::core::{ArgminError, ArgminFloat, Error};
 use std::collections::HashMap;
 
-/// Wrapper around problems defined by users. Keeps track of how many times methods such as
-/// `apply`, `cost`, `gradient`, `jacobian`, `hessian`, `anneal` and so on are called.
-/// It is used to pass the problem from one iteration of a solver to the next.
+/// Wrapper around problems defined by users.
+///
+/// Keeps track of how many times methods such as `apply`, `cost`, `gradient`, `jacobian`,
+/// `hessian`, `anneal` and so on are called. It is used to pass the problem from one iteration of
+/// a solver to the next.
 #[derive(Clone, Debug, Default)]
 pub struct Problem<O> {
     /// Problem defined by user

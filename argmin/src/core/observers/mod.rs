@@ -17,14 +17,13 @@ pub mod file;
 pub mod slog_logger;
 use crate::core::{Error, State, KV};
 #[cfg(feature = "serde1")]
-use serde::{Deserialize, Serialize};
-use std::default::Default;
-use std::sync::{Arc, Mutex};
-//
-#[cfg(feature = "serde1")]
 pub use file::*;
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "slog-logger")]
 pub use slog_logger::*;
+use std::default::Default;
+use std::sync::{Arc, Mutex};
 
 /// Defines the interface every Observer needs to expose
 pub trait Observe<I> {

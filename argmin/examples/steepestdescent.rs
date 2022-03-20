@@ -7,7 +7,8 @@
 
 #![allow(unused_imports)]
 
-use argmin::core::{CostFunction, Error, Executor, Gradient, ObserverMode, SlogLogger};
+use argmin::core::observers::{ObserverMode, SlogLogger};
+use argmin::core::{CostFunction, Error, Executor, Gradient};
 use argmin::solver::gradientdescent::SteepestDescent;
 use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin::solver::linesearch::MoreThuenteLineSearch;

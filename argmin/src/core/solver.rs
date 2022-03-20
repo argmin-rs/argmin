@@ -66,7 +66,7 @@ use crate::core::{Error, Problem, SerializeAlias, State, TerminationReason, KV};
 /// }
 /// ```
 pub trait Solver<O, I: State>: SerializeAlias {
-    /// Name of the solver. Mainly used in [Observers](`crate::core::Observe`).
+    /// Name of the solver. Mainly used in [Observers](`crate::core::observers::Observe`).
     const NAME: &'static str;
 
     /// Initializes the algorithm.
@@ -74,7 +74,7 @@ pub trait Solver<O, I: State>: SerializeAlias {
     /// Executed before any iterations are performed and has access to the optimization problem
     /// definition and the internal state of the solver.
     /// Returns an updated `state` and optionally a `KV` which holds key-value pairs used in
-    /// [Observers](`crate::core::Observe`).
+    /// [Observers](`crate::core::observers::Observe`).
     /// The default implementation returns the unaltered `state` and no `KV`.
     fn init(&mut self, _problem: &mut Problem<O>, state: I) -> Result<(I, Option<KV>), Error> {
         Ok((state, None))
@@ -83,7 +83,7 @@ pub trait Solver<O, I: State>: SerializeAlias {
     /// Computes a single iteration of the algorithm and has access to the optimization problem
     /// definition and the internal state of the solver.
     /// Returns an updated `state` and optionally a `KV` which holds key-value pairs used in
-    /// [Observers](`crate::core::Observe`).
+    /// [Observers](`crate::core::observers::Observe`).
     fn next_iter(&mut self, problem: &mut Problem<O>, state: I) -> Result<(I, Option<KV>), Error>;
 
     /// Checks whether basic termination reasons apply.
