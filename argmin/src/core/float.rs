@@ -10,7 +10,9 @@ use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 use std::fmt::{Debug, Display};
 
 /// An alias for float types (`f32`, `f64`) which combines multiple commonly needed traits from
-/// `num_traits`, `std::fmt` and for serialization/deserialization.
+/// `num_traits`, `std::fmt` and for serialization/deserialization (the latter only if the `serde1`
+/// feature is enabled). It is automatically implemented for all types which fulfill the trait
+/// bounds.
 pub trait ArgminFloat:
     'static
     + Float
@@ -23,6 +25,8 @@ pub trait ArgminFloat:
     + DeserializeOwnedAlias
 {
 }
+
+/// `ArgminFloat` is automatically implemented for all types which fulfill the trait bounds.
 impl<I> ArgminFloat for I where
     I: 'static
         + Float
