@@ -5,7 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{CostFunction, Error, Executor, Gradient, Hessian, ObserverMode, SlogLogger};
+use argmin::core::observers::{ObserverMode, SlogLogger};
+use argmin::core::{CostFunction, Error, Executor, Gradient, Hessian};
 use argmin::solver::quasinewton::SR1TrustRegion;
 #[allow(unused_imports)]
 use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};

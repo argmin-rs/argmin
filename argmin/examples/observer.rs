@@ -5,9 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{
-    ArgminFloat, CostFunction, Error, Executor, IterState, Observe, ObserverMode, KV,
-};
+use argmin::core::observers::{Observe, ObserverMode};
+use argmin::core::{ArgminFloat, CostFunction, Error, Executor, IterState, KV};
 use argmin::solver::particleswarm::ParticleSwarm;
 use argmin_testfunctions::himmelblau;
 use gnuplot::{Color, PointSize};

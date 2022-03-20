@@ -7,7 +7,8 @@
 
 //! # Output parameter vectors to file
 
-use crate::core::{ArgminFloat, Error, IterState, Observe, State, KV};
+use crate::core::observers::Observe;
+use crate::core::{ArgminFloat, Error, IterState, State, KV};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fs::File;

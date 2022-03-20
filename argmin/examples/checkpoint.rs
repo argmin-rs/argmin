@@ -5,9 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{
-    CheckpointMode, CostFunction, Error, Executor, Gradient, ObserverMode, SlogLogger,
-};
+use argmin::core::observers::{ObserverMode, SlogLogger};
+use argmin::core::{CheckpointMode, CostFunction, Error, Executor, Gradient};
 use argmin::solver::landweber::Landweber;
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 

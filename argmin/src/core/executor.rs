@@ -8,8 +8,9 @@
 #[cfg(feature = "serde1")]
 use crate::core::{load_checkpoint, Checkpoint, CheckpointMode};
 use crate::core::{
-    DeserializeOwnedAlias, Error, Observe, Observer, ObserverMode, OptimizationResult, Problem,
-    SerializeAlias, Solver, State, TerminationReason, KV,
+    observers::{Observe, Observer, ObserverMode},
+    DeserializeOwnedAlias, Error, OptimizationResult, Problem, SerializeAlias, Solver, State,
+    TerminationReason, KV,
 };
 use instant;
 #[cfg(feature = "serde1")]
@@ -306,19 +307,19 @@ where
     }
 
     /// Adds an observer to the executor. Observers are required to implement the
-    /// [`Observe`](`crate::core::Observe`) trait.
+    /// [`Observe`](`crate::core::observers::Observe`) trait.
     /// The parameter `mode` defines the conditions under which the observer will be called. See
-    /// [`ObserverMode`](`crate::core::ObserverMode`) for details.
+    /// [`ObserverMode`](`crate::core::observers::ObserverMode`) for details.
     ///
     /// It is possible to add multiple observers.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{Error, Executor, ObserverMode};
+    /// # use argmin::core::{Error, Executor, observers::ObserverMode};
     /// # use argmin::core::test_utils::{TestSolver, TestProblem};
     /// # #[cfg(feature = "slog-logger")]
-    /// # use argmin::core::SlogLogger;
+    /// # use argmin::core::observers::SlogLogger;
     /// #
     /// # fn main() -> Result<(), Error> {
     /// # let solver = TestSolver::new();

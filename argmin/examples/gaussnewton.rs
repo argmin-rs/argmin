@@ -5,7 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::{Error, Executor, Jacobian, ObserverMode, Operator, SlogLogger};
+use argmin::core::observers::{ObserverMode, SlogLogger};
+use argmin::core::{Error, Executor, Jacobian, Operator};
 use argmin::solver::gaussnewton::GaussNewton;
 use ndarray::{Array1, Array2};
 
