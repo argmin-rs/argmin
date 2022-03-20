@@ -255,7 +255,7 @@ impl<P: Clone + SerializeAlias, F: ArgminFloat> TrustRegionRadius<F> for Steihau
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::TestProblem;
+    use crate::core::test_utils::TestProblem;
     use crate::test_trait_impl;
 
     test_trait_impl!(steihaug, Steihaug<TestProblem, f64>);

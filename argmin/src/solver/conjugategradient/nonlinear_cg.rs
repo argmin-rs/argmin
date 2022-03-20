@@ -181,7 +181,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::TestProblem;
+    use crate::core::test_utils::TestProblem;
     use crate::solver::conjugategradient::beta::PolakRibiere;
     use crate::solver::linesearch::MoreThuenteLineSearch;
     use crate::test_trait_impl;

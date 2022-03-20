@@ -319,7 +319,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::TestProblem;
+    use crate::core::test_utils::TestProblem;
     use crate::test_trait_impl;
 
     test_trait_impl!(nelder_mead, NelderMead<TestProblem, f64>);

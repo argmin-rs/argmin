@@ -197,7 +197,7 @@ impl<O, I: State> PartialOrd for OptimizationResult<O, I> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{IterState, TestProblem};
+    use crate::core::{test_utils::TestProblem, IterState};
 
     send_sync_test!(
         argmin_result,
