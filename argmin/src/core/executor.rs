@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 #[cfg(feature = "serde1")]
-use crate::core::checkpointing::{load_checkpoint, Checkpoint, CheckpointMode};
+use crate::core::checkpointing::{load_checkpoint, Checkpoint, CheckpointingFrequency};
 use crate::core::observers::{Observe, Observer, ObserverMode};
 use crate::core::{
     DeserializeOwnedAlias, Error, OptimizationResult, Problem, SerializeAlias, Solver, State,
@@ -36,7 +36,7 @@ pub struct Executor<O, S, I> {
     observers: Observer<I>,
     /// Checkpoint
     #[cfg(feature = "serde1")]
-    checkpoint: Checkpoint,
+    checkpoint: Option<Checkpoint>,
     /// Indicates whether Ctrl-C functionality should be active or not
     ctrlc: bool,
     /// Indicates whether to time execution or not
@@ -77,7 +77,7 @@ where
             state,
             observers: Observer::new(),
             #[cfg(feature = "serde1")]
-            checkpoint: Checkpoint::default(),
+            checkpoint: None,
             ctrlc: true,
             timer: true,
         }
@@ -88,15 +88,13 @@ where
     /// # Example
     ///
     /// This example either constructs the `Executor` from a checkpoint on disk, or creates a new
-    /// `Executor` if this fails. It also configures checkpointing using the methods
-    /// [`checkpoint_dir`](`crate::core::Executor::checkpoint_dir`),
-    /// [`checkpoint_name`](`crate::core::Executor::checkpoint_name`), and
-    /// [`checkpoint_mode`](`crate::core::Executor::checkpoint_mode`).
+    /// `Executor` if this fails. It also configures checkpointing using the method
+    /// [`checkpointing`](`crate::core::Executor::checkpointing`).
     ///
     /// ```
     /// # use argmin::core::Executor;
     /// # use argmin::core::test_utils::{TestSolver, TestProblem};
-    /// # use argmin::core::checkpointing::CheckpointMode;
+    /// # use argmin::core::checkpointing::CheckpointingFrequency;
     /// #
     /// # type Rosenbrock = TestProblem;
     /// # type Newton = TestSolver;
@@ -112,9 +110,14 @@ where
     ///         Executor::new(Rosenbrock {}, solver)
     ///     })
     ///     // Configure checkpointing
-    ///     .checkpoint_dir(".checkpoints")
-    ///     .checkpoint_name("rosenbrock_optim")
-    ///     .checkpoint_mode(CheckpointMode::Every(20));
+    ///     .checkpointing(
+    ///         // Path where checkpoints are saved
+    ///         ".checkpoints",
+    ///         // Filename of checkpoint
+    ///         "rosenbrock_optim",
+    ///         // Checkpointing frequency (In this case every 10 iterations)
+    ///         CheckpointingFrequency::Every(20)
+    ///     );
     /// ```
     #[cfg(feature = "serde1")]
     pub fn from_checkpoint<P: AsRef<Path>>(path: P, problem: O) -> Result<Self, Error>
@@ -285,8 +288,9 @@ where
             state.increment_iter();
 
             #[cfg(feature = "serde1")]
-            self.checkpoint
-                .store_cond(&self, &state, state.get_iter())?;
+            if let Some(checkpoint) = self.checkpoint.as_ref() {
+                checkpoint.store_cond(&self, &state, state.get_iter())?;
+            }
 
             if self.timer {
                 total_time.map(|total_time| state.time(Some(total_time.elapsed())));
@@ -342,12 +346,13 @@ where
         self
     }
 
-    /// Sets the directory where checkpoints are saved.
+    /// Configures checkpointing
     ///
     /// # Example
     ///
     /// ```
     /// # use argmin::core::{Error, Executor};
+    /// # use argmin::core::checkpointing::CheckpointingFrequency;
     /// # use argmin::core::test_utils::{TestSolver, TestProblem};
     /// #
     /// # fn main() -> Result<(), Error> {
@@ -355,63 +360,28 @@ where
     /// # let problem = TestProblem::new();
     /// #
     /// // Create instance of `Executor` with `problem` and `solver`
-    /// let executor = Executor::new(problem, solver).checkpoint_dir("/path/to/checkpoints");
+    /// let executor = Executor::new(problem, solver)
+    ///     // Configure checkpointing
+    ///     .checkpointing(
+    ///         // Path where checkpoints are saved
+    ///         "/path/to/checkpoints",
+    ///         // Filename of checkpoint
+    ///         "checkpointfilename",
+    ///         // Checkpointing frequency (In this case every 10 iterations)
+    ///         CheckpointingFrequency::Every(10)
+    ///     );
     /// # Ok(())
     /// # }
     /// ```
     #[cfg(feature = "serde1")]
     #[must_use]
-    pub fn checkpoint_dir(mut self, dir: &str) -> Self {
-        self.checkpoint.set_dir(dir);
-        self
-    }
-
-    /// Sets the filename prefix for checkpoints.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::{Error, Executor};
-    /// # use argmin::core::test_utils::{TestSolver, TestProblem};
-    /// #
-    /// # fn main() -> Result<(), Error> {
-    /// # let solver = TestSolver::new();
-    /// # let problem = TestProblem::new();
-    /// #
-    /// // Create instance of `Executor` with `problem` and `solver`
-    /// let executor = Executor::new(problem, solver).checkpoint_name("optim1");
-    /// # Ok(())
-    /// # }
-    /// ```
-    #[cfg(feature = "serde1")]
-    #[must_use]
-    pub fn checkpoint_name(mut self, dir: &str) -> Self {
-        self.checkpoint.set_name(dir);
-        self
-    }
-
-    /// Sets the conditions under which checkpoints are created. For the available options please
-    /// see [`CheckpointMode`](`crate::core::checkpointing::CheckpointMode`).
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::{Error, Executor, checkpointing::CheckpointMode};
-    /// # use argmin::core::test_utils::{TestSolver, TestProblem};
-    /// #
-    /// # fn main() -> Result<(), Error> {
-    /// # let solver = TestSolver::new();
-    /// # let problem = TestProblem::new();
-    /// #
-    /// // Create instance of `Executor` with `problem` and `solver`
-    /// let executor = Executor::new(problem, solver).checkpoint_mode(CheckpointMode::Always);
-    /// # Ok(())
-    /// # }
-    /// ```
-    #[cfg(feature = "serde1")]
-    #[must_use]
-    pub fn checkpoint_mode(mut self, mode: CheckpointMode) -> Self {
-        self.checkpoint.set_mode(mode);
+    pub fn checkpointing(
+        mut self,
+        dir: &str,
+        name: &str,
+        frequency: CheckpointingFrequency,
+    ) -> Self {
+        self.checkpoint = Some(Checkpoint::new(dir, name, frequency));
         self
     }
 

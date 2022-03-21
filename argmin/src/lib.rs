@@ -439,7 +439,7 @@
 //!
 //! The probability of crashes increases with runtime, therefore one may want to save checkpoints
 //! in order to be able to resume the optimization after a crash.
-//! The `CheckpointMode` defines how often checkpoints are saved and is either `Never` (default),
+//! The `CheckpointingFrequency` defines how often checkpoints are saved and is either `Never` (default),
 //! `Always` (every iteration) or `Every(u64)` (every Nth iteration). It is set via the setter
 //! method `checkpoint_mode` of `Executor`.
 //! In addition, the directory where the checkpoints and a prefix for every file can be set via
@@ -455,7 +455,7 @@
 //! # extern crate argmin_testfunctions;
 //! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
 //! # #[cfg(feature = "serde1")]
-//! # use argmin::core::checkpointing::CheckpointMode;
+//! # use argmin::core::checkpointing::CheckpointingFrequency;
 //! # #[cfg(feature = "slog-logger")]
 //! # use argmin::core::observers::SlogLogger;
 //! # use argmin::solver::landweber::Landweber;
@@ -504,9 +504,14 @@
 //!             |config| config.param(init_param).max_iters(iters)
 //!         )
 //!     )
-//!     .checkpoint_dir(".checkpoints")
-//!     .checkpoint_name("optim")
-//!     .checkpoint_mode(CheckpointMode::Every(20))
+//!     .checkpointing(
+//!         // Path where checkpoints are saved
+//!         ".checkpoints",
+//!         // Filename of checkpoint
+//!         "optim",
+//!         // Checkpointing frequency (In this case every 10 iterations)
+//!         CheckpointingFrequency::Every(20)
+//!     )
 //!     .run()?;
 //! #
 //! #     Ok(())
