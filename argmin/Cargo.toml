@@ -23,7 +23,7 @@ rand = { version = "0.8.3" }
 thiserror = "1.0"
 argmin-math = { path = "../argmin-math", default-features = false }
 # optional
-bincode = { version = "1.1.4", optional = true }
+bincode = { version = "1.3.3", optional = true }
 ctrlc = { version = "3.1.2", optional = true }
 getrandom = { version = "0.2", features = ["js"], optional = true }
 gnuplot = { version = "0.0.37", optional = true }

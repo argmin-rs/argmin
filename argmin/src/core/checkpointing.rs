@@ -5,93 +5,109 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminError, DeserializeOwnedAlias, Error, SerializeAlias};
-use serde::{Deserialize, Serialize};
+use crate::core::Error;
+#[cfg(feature = "serde1")]
+use crate::core::{DeserializeOwnedAlias, SerializeAlias};
 use std::default::Default;
 use std::fmt::Display;
+#[cfg(feature = "serde1")]
 use std::fs::File;
+#[cfg(feature = "serde1")]
 use std::io::{BufReader, BufWriter};
+#[cfg(feature = "serde1")]
 use std::path::Path;
+
+/// TODO
+pub trait Checkpoint<S, I> {
+    /// TODO
+    fn store(&self, solver: &S, state: &I) -> Result<(), Error>;
+
+    /// TODO
+    fn store_cond(&self, solver: &S, state: &I, iter: u64) -> Result<(), Error> {
+        match self.frequency() {
+            CheckpointingFrequency::Always => self.store(solver, state)?,
+            CheckpointingFrequency::Every(it) if iter % it == 0 => self.store(solver, state)?,
+            CheckpointingFrequency::Never | CheckpointingFrequency::Every(_) => {}
+        };
+        Ok(())
+    }
+
+    /// TODO
+    fn load(&self) -> Result<Option<(S, I)>, Error>;
+
+    /// TODO
+    fn frequency(&self) -> CheckpointingFrequency;
+}
 
 /// Checkpoint
 ///
 /// Defines how often and where a checkpoint is saved.
-#[derive(Clone, Serialize, Deserialize, Eq, PartialEq, Debug, Hash)]
-pub struct Checkpoint {
+#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+#[cfg(feature = "serde1")]
+pub struct FileCheckpoint {
     /// Indicates how often a checkpoint is created
-    mode: CheckpointingFrequency,
+    frequency: CheckpointingFrequency,
     /// Directory where the checkpoints are stored
     directory: String,
     /// Name of the checkpoint files
     filename: String,
 }
 
-impl Default for Checkpoint {
-    fn default() -> Checkpoint {
-        Checkpoint {
-            mode: CheckpointingFrequency::default(),
+#[cfg(feature = "serde1")]
+impl Default for FileCheckpoint {
+    fn default() -> FileCheckpoint {
+        FileCheckpoint {
+            frequency: CheckpointingFrequency::default(),
             directory: ".checkpoints".to_string(),
             filename: "default.arg".to_string(),
         }
     }
 }
 
-impl Checkpoint {
+#[cfg(feature = "serde1")]
+impl FileCheckpoint {
     /// Define a new checkpoint
-    pub fn new(directory: &str, name: &str, mode: CheckpointingFrequency) -> Self {
-        Checkpoint {
-            mode,
+    pub fn new(directory: &str, name: &str, frequency: CheckpointingFrequency) -> Self {
+        FileCheckpoint {
+            frequency,
             directory: directory.to_string(),
             filename: format!("{}.arg", name),
         }
     }
+}
 
+#[cfg(feature = "serde1")]
+impl<S, I> Checkpoint<S, I> for FileCheckpoint
+where
+    S: SerializeAlias + DeserializeOwnedAlias,
+    I: SerializeAlias + DeserializeOwnedAlias,
+{
     /// Write checkpoint to disk
-    fn store<E: SerializeAlias, I: SerializeAlias>(
-        &self,
-        executor: &E,
-        state: &I,
-    ) -> Result<(), Error> {
+    fn store(&self, solver: &S, state: &I) -> Result<(), Error> {
         let dir = Path::new(&self.directory);
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?
         }
         let fname = dir.join(Path::new(&self.filename));
         let f = BufWriter::new(File::create(fname)?);
-        bincode::serialize_into(f, &(executor, state))?;
+        bincode::serialize_into(f, &(solver, state))?;
         Ok(())
     }
 
-    /// Write checkpoint based on the desired `CheckpointingFrequency`
-    pub fn store_cond<E: SerializeAlias, I: SerializeAlias>(
-        &self,
-        executor: &E,
-        state: &I,
-        iter: u64,
-    ) -> Result<(), Error> {
-        match self.mode {
-            CheckpointingFrequency::Always => self.store(executor, state)?,
-            CheckpointingFrequency::Every(it) if iter % it == 0 => self.store(executor, state)?,
-            CheckpointingFrequency::Never | CheckpointingFrequency::Every(_) => {}
-        };
-        Ok(())
-    }
-}
-
-/// Load a checkpoint from disk
-pub fn load_checkpoint<T: DeserializeOwnedAlias, I: DeserializeOwnedAlias, P: AsRef<Path>>(
-    path: P,
-) -> Result<(T, I), Error> {
-    let path = path.as_ref();
-    if !path.exists() {
-        return Err(ArgminError::CheckpointNotFound {
-            text: path.to_str().unwrap().to_string(),
+    /// Load a checkpoint from disk
+    fn load(&self) -> Result<Option<(S, I)>, Error> {
+        let path = Path::new(&self.directory).join(Path::new(&self.filename));
+        if !path.exists() {
+            return Ok(None);
         }
-        .into());
+        let file = File::open(path)?;
+        let reader = BufReader::new(file);
+        Ok(Some(bincode::deserialize_from(reader)?))
     }
-    let file = File::open(path)?;
-    let reader = BufReader::new(file);
-    Ok(bincode::deserialize_from(reader)?)
+
+    fn frequency(&self) -> CheckpointingFrequency {
+        self.frequency
+    }
 }
 
 /// Defines at which intervals a checkpoint is saved.
@@ -110,7 +126,7 @@ pub fn load_checkpoint<T: DeserializeOwnedAlias, I: DeserializeOwnedAlias, P: As
 /// // The default is `CheckpointingFrequency::Never`
 /// assert_eq!(CheckpointingFrequency::default(), CheckpointingFrequency::Never);
 /// ```
-#[derive(Clone, Serialize, Deserialize, Eq, PartialEq, Debug, Hash, Copy)]
+#[derive(Clone, Eq, PartialEq, Debug, Hash, Copy)]
 pub enum CheckpointingFrequency {
     /// Never create checkpoint
     Never,
@@ -137,27 +153,23 @@ impl Display for CheckpointingFrequency {
 }
 
 #[cfg(test)]
+#[cfg(feature = "serde1")]
 mod tests {
     use super::*;
-    use crate::core::test_utils::{TestProblem, TestSolver};
-    use crate::core::{Executor, IterState};
+    use crate::core::test_utils::TestSolver;
+    use crate::core::{IterState, State};
 
     #[test]
     #[allow(clippy::type_complexity)]
     fn test_store() {
-        let problem = TestProblem::new();
         let solver = TestSolver::new();
-        let mut exec: Executor<TestProblem, TestSolver, _> = Executor::new(problem, solver)
-            .configure(|config: IterState<Vec<f64>, (), (), (), f64>| {
-                config.param(vec![1.0f64, 0.0])
-            });
-        let state = exec.take_state().unwrap();
-        let check = Checkpoint::new("checkpoints", "solver", CheckpointingFrequency::Always);
-        check.store_cond(&exec, &state, 20).unwrap();
+        let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new().param(vec![1.0f64, 0.0]);
+        // let state: usize = 12;
+        let check = FileCheckpoint::new("checkpoints", "solver", CheckpointingFrequency::Always);
+        check.store_cond(&solver, &state, 20).unwrap();
 
-        let (_loaded, _state): (
-            Executor<TestProblem, TestSolver, IterState<Vec<f64>, (), (), (), f64>>,
-            IterState<Vec<f64>, (), (), (), f64>,
-        ) = load_checkpoint("checkpoints/solver.arg").unwrap();
+        // let _loaded: Option<(TestSolver, usize)> = check.load().unwrap();
+        let _loaded: Option<(TestSolver, IterState<Vec<f64>, (), (), (), f64>)> =
+            check.load().unwrap();
     }
 }

@@ -5,38 +5,28 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#[cfg(feature = "serde1")]
-use crate::core::checkpointing::{load_checkpoint, Checkpoint, CheckpointingFrequency};
+use crate::core::checkpointing::Checkpoint;
 use crate::core::observers::{Observe, Observer, ObserverMode};
 use crate::core::{
     DeserializeOwnedAlias, Error, OptimizationResult, Problem, SerializeAlias, Solver, State,
     TerminationReason, KV,
 };
 use instant;
-#[cfg(feature = "serde1")]
-use serde::{Deserialize, Serialize};
-#[cfg(feature = "serde1")]
-use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
 /// Solves an optimization problem with a solver
-#[derive(Clone)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Executor<O, S, I> {
     /// Solver
     solver: S,
     /// Problem
-    #[cfg_attr(feature = "serde1", serde(skip))]
     problem: Problem<O>,
     /// State
     state: Option<I>,
     /// Storage for observers
-    #[cfg_attr(feature = "serde1", serde(skip))]
     observers: Observer<I>,
     /// Checkpoint
-    #[cfg(feature = "serde1")]
-    checkpoint: Option<Checkpoint>,
+    checkpoint: Option<Box<dyn Checkpoint<S, I>>>,
     /// Indicates whether Ctrl-C functionality should be active or not
     ctrlc: bool,
     /// Indicates whether to time execution or not
@@ -76,58 +66,10 @@ where
             problem: Problem::new(problem),
             state,
             observers: Observer::new(),
-            #[cfg(feature = "serde1")]
             checkpoint: None,
             ctrlc: true,
             timer: true,
         }
-    }
-
-    /// Constructs an `Executor` from a checkpoint
-    ///
-    /// # Example
-    ///
-    /// This example either constructs the `Executor` from a checkpoint on disk, or creates a new
-    /// `Executor` if this fails. It also configures checkpointing using the method
-    /// [`checkpointing`](`crate::core::Executor::checkpointing`).
-    ///
-    /// ```
-    /// # use argmin::core::Executor;
-    /// # use argmin::core::test_utils::{TestSolver, TestProblem};
-    /// # use argmin::core::checkpointing::CheckpointingFrequency;
-    /// #
-    /// # type Rosenbrock = TestProblem;
-    /// # type Newton = TestSolver;
-    /// #
-    /// // Construct an instance of the desired solver
-    /// let solver = Newton::new();
-    ///
-    /// // Create instance of `Executor` from a checkpoint. Create a new `Executor` if the
-    /// // checkpoint does not exist.
-    /// let executor = Executor::from_checkpoint(".checkpoints/rosenbrock_optim.arg", Rosenbrock {})
-    ///     // Create a new Executor if it cannot be loaded from a checkpoint.
-    ///     .unwrap_or_else(|_| {
-    ///         Executor::new(Rosenbrock {}, solver)
-    ///     })
-    ///     // Configure checkpointing
-    ///     .checkpointing(
-    ///         // Path where checkpoints are saved
-    ///         ".checkpoints",
-    ///         // Filename of checkpoint
-    ///         "rosenbrock_optim",
-    ///         // Checkpointing frequency (In this case every 10 iterations)
-    ///         CheckpointingFrequency::Every(20)
-    ///     );
-    /// ```
-    #[cfg(feature = "serde1")]
-    pub fn from_checkpoint<P: AsRef<Path>>(path: P, problem: O) -> Result<Self, Error>
-    where
-        Self: Sized + DeserializeOwnedAlias,
-    {
-        let (mut executor, state): (Self, I) = load_checkpoint(path)?;
-        executor.state = Some(state);
-        executor.problem = Problem::new(problem);
-        Ok(executor)
     }
 
     /// This method gives mutable access to the internal state of the solver. This allows for
@@ -185,6 +127,13 @@ where
     /// # }
     /// ```
     pub fn run(mut self) -> Result<OptimizationResult<O, I>, Error> {
+        // First, load checkpoint if given.
+        if let Some(checkpoint) = self.checkpoint.as_ref() {
+            if let Some((solver, state)) = checkpoint.load()? {
+                self.state = Some(state);
+                self.solver = solver;
+            }
+        }
         let total_time = if self.timer {
             Some(instant::Instant::now())
         } else {
@@ -289,7 +238,7 @@ where
 
             #[cfg(feature = "serde1")]
             if let Some(checkpoint) = self.checkpoint.as_ref() {
-                checkpoint.store_cond(&self, &state, state.get_iter())?;
+                checkpoint.store_cond(&self.solver, &state, state.get_iter())?;
             }
 
             if self.timer {
@@ -352,36 +301,33 @@ where
     ///
     /// ```
     /// # use argmin::core::{Error, Executor};
-    /// # use argmin::core::checkpointing::CheckpointingFrequency;
+    /// # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
     /// # use argmin::core::test_utils::{TestSolver, TestProblem};
     /// #
     /// # fn main() -> Result<(), Error> {
     /// # let solver = TestSolver::new();
     /// # let problem = TestProblem::new();
     /// #
+    /// let checkpoint = FileCheckpoint::new(
+    ///     // Directory where to store checkpoints
+    ///     ".checkpoints",
+    ///     // Filename of checkpoint
+    ///     "rosenbrock_optim",
+    ///     // How often checkpoints should be saved
+    ///     CheckpointingFrequency::Every(20)
+    /// );
+    ///
     /// // Create instance of `Executor` with `problem` and `solver`
     /// let executor = Executor::new(problem, solver)
-    ///     // Configure checkpointing
-    ///     .checkpointing(
-    ///         // Path where checkpoints are saved
-    ///         "/path/to/checkpoints",
-    ///         // Filename of checkpoint
-    ///         "checkpointfilename",
-    ///         // Checkpointing frequency (In this case every 10 iterations)
-    ///         CheckpointingFrequency::Every(10)
-    ///     );
+    ///     // Add checkpointing
+    ///     .checkpointing(checkpoint);
     /// # Ok(())
     /// # }
     /// ```
     #[cfg(feature = "serde1")]
     #[must_use]
-    pub fn checkpointing(
-        mut self,
-        dir: &str,
-        name: &str,
-        frequency: CheckpointingFrequency,
-    ) -> Self {
-        self.checkpoint = Some(Checkpoint::new(dir, name, frequency));
+    pub fn checkpointing<C: 'static + Checkpoint<S, I>>(mut self, checkpoint: C) -> Self {
+        self.checkpoint = Some(Box::new(checkpoint));
         self
     }
 
@@ -435,31 +381,6 @@ where
         self.timer = timer;
         self
     }
-
-    /// Only needed for testing. Takes and returns the internally stored `state` and replaces it
-    /// with `None`.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::{Error, Executor};
-    /// # use argmin::core::test_utils::{TestSolver, TestProblem};
-    /// #
-    /// # fn main() -> Result<(), Error> {
-    /// # let solver = TestSolver::new();
-    /// # let problem = TestProblem::new();
-    /// #
-    /// // Create instance of `Executor` with `problem` and `solver`
-    /// let executor = Executor::new(problem, solver);
-    /// let state = executor.take_state();
-    /// # assert!(executor.take_state().is_none());
-    /// # Ok(())
-    /// # }
-    /// ```
-    #[cfg(all(test, feature = "serde1"))]
-    pub(crate) fn take_state(&mut self) -> Option<I> {
-        self.state.take()
-    }
 }
 
 #[cfg(test)]
@@ -474,7 +395,7 @@ mod tests {
         let problem = TestProblem::new();
         let solver = TestSolver::new();
 
-        let mut executor = Executor::new(problem.clone(), solver)
+        let mut executor = Executor::new(problem, solver)
             .configure(|config: IterState<Vec<f64>, (), (), (), f64>| config.param(vec![0.0, 0.0]));
 
         // 1) Parameter vector changes, but not cost (continues to be `Inf`)
