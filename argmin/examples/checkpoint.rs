@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::checkpointing::CheckpointingFrequency;
+use argmin::core::checkpointing::{CheckpointingFrequency, FileCheckpoint};
 use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{CostFunction, Error, Executor, Gradient};
 use argmin::solver::landweber::Landweber;
@@ -39,16 +39,16 @@ fn run() -> Result<(), Error> {
     let iters = 35;
     let solver = Landweber::new(0.001);
 
-    let res = Executor::from_checkpoint(".checkpoints/landweber_exec.arg", Rosenbrock {})
-        .unwrap_or_else(|_| {
-            Executor::new(Rosenbrock {}, solver)
-                .configure(|state| state.param(init_param).max_iters(iters))
-        })
-        .checkpointing(
-            ".checkpoints",
-            "landweber_exec",
-            CheckpointingFrequency::Every(20),
-        )
+    // Configure checkpointing
+    let checkpoint = FileCheckpoint::new(
+        ".checkpoints",
+        "rosenbrock_optim",
+        CheckpointingFrequency::Always,
+    );
+
+    let res = Executor::new(Rosenbrock {}, solver)
+        .configure(|state| state.param(init_param).max_iters(iters))
+        .checkpointing(checkpoint)
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 

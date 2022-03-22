@@ -14,7 +14,6 @@
 #[macro_use]
 pub mod macros;
 /// Checkpointing
-#[cfg(feature = "serde1")]
 pub mod checkpointing;
 /// Error handling
 mod errors;

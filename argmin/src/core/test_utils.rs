@@ -17,7 +17,7 @@ use std::fmt::Debug;
 ///
 /// Implements [`CostFunction`], [`Operator`], [`Gradient`], [`Jacobian`], [`Hessian`], and
 /// [`Anneal`].
-#[derive(Clone, Default, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Default, Debug, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct TestProblem {}
 
@@ -210,7 +210,7 @@ impl Anneal for TestProblem {
 /// A (non-working) solver useful for testing
 ///
 /// Implements the [`Solver`] trait.
-#[derive(Clone, Default, Eq, PartialEq, Debug)]
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct TestSolver {}
 

@@ -455,7 +455,7 @@
 //! # extern crate argmin_testfunctions;
 //! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
 //! # #[cfg(feature = "serde1")]
-//! # use argmin::core::checkpointing::CheckpointingFrequency;
+//! # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
 //! # #[cfg(feature = "slog-logger")]
 //! # use argmin::core::observers::SlogLogger;
 //! # use argmin::solver::landweber::Landweber;
@@ -496,22 +496,18 @@
 //! #
 //! #     let iters = 35;
 //! #     let solver = Landweber::new(0.001);
+//! # #[cfg(feature = "serde1")]
+//! let checkpoint = FileCheckpoint::new(
+//!     ".checkpoints",
+//!     "optim",
+//!     CheckpointingFrequency::Every(20)
+//! );
+//!
 //! #
 //! # #[cfg(feature = "serde1")]
-//! let res = Executor::from_checkpoint(".checkpoints/optim.arg", Rosenbrock {})
-//!     .unwrap_or(
-//!         Executor::new(Rosenbrock {}, solver).configure(
-//!             |config| config.param(init_param).max_iters(iters)
-//!         )
-//!     )
-//!     .checkpointing(
-//!         // Path where checkpoints are saved
-//!         ".checkpoints",
-//!         // Filename of checkpoint
-//!         "optim",
-//!         // Checkpointing frequency (In this case every 10 iterations)
-//!         CheckpointingFrequency::Every(20)
-//!     )
+//! let res = Executor::new(Rosenbrock {}, solver)
+//!     .configure(|config| config.param(init_param).max_iters(iters))
+//!     .checkpointing(checkpoint)
 //!     .run()?;
 //! #
 //! #     Ok(())
