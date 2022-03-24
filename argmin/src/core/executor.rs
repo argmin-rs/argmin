@@ -236,9 +236,8 @@ where
             // increment iteration number
             state.increment_iter();
 
-            #[cfg(feature = "serde1")]
             if let Some(checkpoint) = self.checkpoint.as_ref() {
-                checkpoint.store_cond(&self.solver, &state, state.get_iter())?;
+                checkpoint.save_cond(&self.solver, &state, state.get_iter())?;
             }
 
             if self.timer {
@@ -301,6 +300,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{Error, Executor};
+    /// # #[cfg(feature = "serde1")]
     /// # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
     /// # use argmin::core::test_utils::{TestSolver, TestProblem};
     /// #
@@ -308,8 +308,9 @@ where
     /// # let solver = TestSolver::new();
     /// # let problem = TestProblem::new();
     /// #
+    /// # #[cfg(feature = "serde1")]
     /// let checkpoint = FileCheckpoint::new(
-    ///     // Directory where to store checkpoints
+    ///     // Directory where checkpoints are saved to
     ///     ".checkpoints",
     ///     // Filename of checkpoint
     ///     "rosenbrock_optim",
@@ -318,13 +319,13 @@ where
     /// );
     ///
     /// // Create instance of `Executor` with `problem` and `solver`
+    /// # #[cfg(feature = "serde1")]
     /// let executor = Executor::new(problem, solver)
     ///     // Add checkpointing
     ///     .checkpointing(checkpoint);
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "serde1")]
     #[must_use]
     pub fn checkpointing<C: 'static + Checkpoint<S, I>>(mut self, checkpoint: C) -> Self {
         self.checkpoint = Some(Box::new(checkpoint));
