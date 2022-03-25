@@ -145,6 +145,7 @@ where
         let OptimizationResult {
             problem: line_problem,
             state: mut linesearch_state,
+            ..
         } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
             .configure(|config| config.param(param).grad(grad).cost(line_cost))
             .ctrlc(false)
