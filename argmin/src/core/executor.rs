@@ -165,21 +165,29 @@ where
             }
         }
 
-        let (mut state, kv) = self.solver.init(&mut self.problem, state)?;
-        state.update();
+        // Only call `init` of `solver` if the current iteration number is 0. This avoids that
+        // `init` is called when starting from a checkpoint (because `init` could change the state
+        // of the `solver`, which would overwrite the state restored from the checkpoint).
+        let mut state = if state.get_iter() == 0 {
+            let (mut state, kv) = self.solver.init(&mut self.problem, state)?;
+            state.update();
 
-        if !self.observers.is_empty() {
-            let mut logs = make_kv!("max_iters" => state.get_max_iters(););
+            if !self.observers.is_empty() {
+                let mut logs = make_kv!("max_iters" => state.get_max_iters(););
 
-            if let Some(kv) = kv {
-                logs = logs.merge(kv);
+                if let Some(kv) = kv {
+                    logs = logs.merge(kv);
+                }
+
+                // Observe after init
+                self.observers.observe_init(S::NAME, &logs)?;
             }
 
-            // Observe after init
-            self.observers.observe_init(S::NAME, &logs)?;
-        }
-
-        state.set_func_counts(&self.problem);
+            state.set_func_counts(&self.problem);
+            state
+        } else {
+            state
+        };
 
         while running.load(Ordering::SeqCst) {
             // check first if it has already terminated
@@ -567,5 +575,108 @@ mod tests {
             .unwrap()
             .get_best_cost()
             .is_sign_negative());
+    }
+
+    /// The solver's `init` should not be called when started from a checkpoint.
+    /// See https://github.com/argmin-rs/argmin/issues/199.
+    #[test]
+    #[cfg(feature = "serde1")]
+    fn test_checkpointing_solver_initialization() {
+        use crate::core::checkpointing::{CheckpointingFrequency, FileCheckpoint};
+        use crate::core::test_utils::TestProblem;
+        use crate::core::{ArgminFloat, CostFunction};
+        use serde::{Deserialize, Serialize};
+
+        // Fake optimization algorithm which holds internal state which changes over time
+        #[derive(Clone)]
+        #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+        struct OptimizationAlgorithm {
+            pub internal_state: u64,
+        }
+
+        // Implement Solver for OptimizationAlgorithm
+        impl<O, P, F> Solver<O, IterState<P, (), (), (), F>> for OptimizationAlgorithm
+        where
+            O: CostFunction<Param = P, Output = F>,
+            P: Clone,
+            F: ArgminFloat,
+        {
+            const NAME: &'static str = "OptimizationAlgorithm";
+
+            // Only resets internal_state to 1
+            fn init(
+                &mut self,
+                _problem: &mut Problem<O>,
+                state: IterState<P, (), (), (), F>,
+            ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+                self.internal_state = 1;
+                Ok((state, None))
+            }
+
+            // Increment internal_state
+            fn next_iter(
+                &mut self,
+                _problem: &mut Problem<O>,
+                state: IterState<P, (), (), (), F>,
+            ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+                self.internal_state += 1;
+                Ok((state, None))
+            }
+
+            // Avoid terminating early because param does not change
+            fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationReason {
+                TerminationReason::NotTerminated
+            }
+
+            // Avoid terminating early because param does not change
+            fn terminate_internal(
+                &mut self,
+                state: &IterState<P, (), (), (), F>,
+            ) -> TerminationReason {
+                if state.get_iter() >= state.get_max_iters() {
+                    TerminationReason::MaxItersReached
+                } else {
+                    TerminationReason::NotTerminated
+                }
+            }
+        }
+
+        // Create random test problem
+        let problem = TestProblem::new();
+
+        // solver instance
+        let solver = OptimizationAlgorithm { internal_state: 0 };
+
+        // Delete old checkpointing file
+        let _ = std::fs::remove_file(".checkpoints/init_test.arg");
+
+        // Create a checkpoint
+        let checkpoint =
+            FileCheckpoint::new(".checkpoints", "init_test", CheckpointingFrequency::Always);
+
+        // Create and run executor
+        let executor = Executor::new(problem, solver)
+            .configure(|state| state.param(vec![1.0f64, 1.0]).max_iters(10))
+            .checkpointing(checkpoint.clone());
+
+        let OptimizationResult { solver, .. } = executor.run().unwrap();
+
+        // internal_state should be 11
+        // (1 from init plus 10 iterations where it is incremented by 1)
+        assert_eq!(solver.internal_state, 11);
+
+        // Create and run solver again
+        let executor = Executor::new(problem, solver)
+            .configure(|state| state.param(vec![1.0f64, 1.0]).max_iters(10))
+            .checkpointing(checkpoint);
+
+        let OptimizationResult { solver, .. } = executor.run().unwrap();
+
+        // internal_state should still be 11
+        // (1 from init plus 10 iterations where it is incremented by 1)
+        assert_eq!(solver.internal_state, 11);
+
+        // Delete old checkpointing file
+        let _ = std::fs::remove_file(".checkpoints/init_test.arg");
     }
 }
