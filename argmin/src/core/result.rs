@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminFloat, Problem, State};
+use crate::core::{ArgminFloat, Problem, Solver, State};
 use num_traits::{Float, FromPrimitive};
 use std::cmp::Ordering;
 use std::fmt;
@@ -16,14 +16,16 @@ use std::fmt;
 /// Both can be accessed via deconstructing or via the methods
 /// [`problem`](`OptimizationResult::problem`) and [`state`](`OptimizationResult::state`).
 #[derive(Clone)]
-pub struct OptimizationResult<O, I> {
+pub struct OptimizationResult<O, S, I> {
     /// Problem
     pub problem: Problem<O>,
+    /// Solver
+    pub solver: S,
     /// Iteration state
     pub state: I,
 }
 
-impl<O, I> OptimizationResult<O, I> {
+impl<O, S, I> OptimizationResult<O, S, I> {
     /// Constructs a new instance of `OptimizationResult` from a `problem` and a `state`.
     ///
     /// # Example
@@ -33,16 +35,24 @@ impl<O, I> OptimizationResult<O, I> {
     /// # use argmin::core::test_utils::TestProblem;
     /// #
     /// # type Rosenbrock = TestProblem;
+    /// # #[derive(Eq, PartialEq, Debug)]
+    /// # struct SomeSolver {}
     /// #
     /// let rosenbrock = Rosenbrock::new();
     /// let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// let solver = SomeSolver {};
     ///
-    /// let result = OptimizationResult::new(Problem::new(rosenbrock), state);
-    /// # let OptimizationResult { mut problem, state } = result;
+    /// let result = OptimizationResult::new(Problem::new(rosenbrock), solver, state);
+    /// # let OptimizationResult { mut problem, solver, state } = result;
     /// # assert_eq!(problem.take_problem().unwrap(), TestProblem::new());
+    /// # assert_eq!(solver, SomeSolver {});
     /// ```
-    pub fn new(problem: Problem<O>, state: I) -> Self {
-        OptimizationResult { problem, state }
+    pub fn new(problem: Problem<O>, solver: S, state: I) -> Self {
+        OptimizationResult {
+            problem,
+            solver,
+            state,
+        }
     }
 
     /// Returns a reference to the stored problem.
@@ -53,15 +63,36 @@ impl<O, I> OptimizationResult<O, I> {
     /// # use argmin::core::{Problem, OptimizationResult, IterState, State};
     /// #
     /// # struct Rosenbrock {}
+    /// # let solver = ();
     /// #
     /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
     /// #
-    /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), state);
+    /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
     /// #
     /// let problem: &Problem<Rosenbrock> = result.problem();
     /// ```
     pub fn problem(&self) -> &Problem<O> {
         &self.problem
+    }
+
+    /// Returns a reference to the stored solver.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, OptimizationResult, IterState, State};
+    /// #
+    /// # struct Rosenbrock {}
+    /// # let solver = ();
+    /// #
+    /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// #
+    /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
+    /// #
+    /// let solver = result.solver();
+    /// ```
+    pub fn solver(&self) -> &S {
+        &self.solver
     }
 
     /// Returns a reference to the stored state.
@@ -72,10 +103,11 @@ impl<O, I> OptimizationResult<O, I> {
     /// # use argmin::core::{Problem, OptimizationResult, IterState, State};
     /// #
     /// # struct Rosenbrock {}
+    /// # let solver = ();
     /// #
     /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
     /// #
-    /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), state);
+    /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
     /// #
     /// let state: &IterState<Vec<f64>, (), (), (), f64> = result.state();
     /// ```
@@ -84,13 +116,15 @@ impl<O, I> OptimizationResult<O, I> {
     }
 }
 
-impl<O, I> std::fmt::Display for OptimizationResult<O, I>
+impl<O, S, I> std::fmt::Display for OptimizationResult<O, S, I>
 where
     I: State,
     I::Param: fmt::Debug,
+    S: Solver<O, I>,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "OptimizationResult:")?;
+        writeln!(f, "    Solver:        {}", S::NAME)?;
         writeln!(
             f,
             "    param (best):  {}",
@@ -115,25 +149,25 @@ where
     }
 }
 
-impl<O, I: State> PartialEq for OptimizationResult<O, I>
+impl<O, S, I: State> PartialEq for OptimizationResult<O, S, I>
 where
     I::Float: ArgminFloat,
 {
     /// Two `OptimizationResult`s are equal if the absolute of the difference between their best
     /// cost values is smaller than epsilon.
-    fn eq(&self, other: &OptimizationResult<O, I>) -> bool {
+    fn eq(&self, other: &OptimizationResult<O, S, I>) -> bool {
         (self.state.get_best_cost() - other.state.get_best_cost()).abs() < I::Float::epsilon()
     }
 }
 
-impl<O, I: State> Eq for OptimizationResult<O, I> {}
+impl<O, S, I: State> Eq for OptimizationResult<O, S, I> {}
 
-impl<O, I: State> Ord for OptimizationResult<O, I> {
+impl<O, S, I: State> Ord for OptimizationResult<O, S, I> {
     /// Two `OptimizationResult`s are equal if the absolute of the difference between their best
     /// cost values is smaller than epsilon.
     /// Else, an `OptimizationResult` is better if the best cost function value is strictly better
     /// than the other's.
-    fn cmp(&self, other: &OptimizationResult<O, I>) -> Ordering {
+    fn cmp(&self, other: &OptimizationResult<O, S, I>) -> Ordering {
         let t = self.state.get_best_cost() - other.state.get_best_cost();
         if t.abs() < I::Float::epsilon() {
             Ordering::Equal
@@ -145,12 +179,12 @@ impl<O, I: State> Ord for OptimizationResult<O, I> {
     }
 }
 
-impl<O, I: State> PartialOrd for OptimizationResult<O, I> {
+impl<O, S, I: State> PartialOrd for OptimizationResult<O, S, I> {
     /// Two `OptimizationResult`s are equal if the absolute of the difference between their best
     /// cost values is smaller than epsilon.
     /// Else, an `OptimizationResult` is better if the best cost function value is strictly better
     /// than the other's.
-    fn partial_cmp(&self, other: &OptimizationResult<O, I>) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &OptimizationResult<O, S, I>) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -158,11 +192,14 @@ impl<O, I: State> PartialOrd for OptimizationResult<O, I> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{test_utils::TestProblem, IterState};
+    use crate::core::{
+        test_utils::{TestProblem, TestSolver},
+        IterState,
+    };
 
     send_sync_test!(
         optimizationresult,
-        OptimizationResult<TestProblem, IterState<(), (), (), (), f64>>
+        OptimizationResult<TestProblem, TestSolver, IterState<(), (), (), (), f64>>
     );
 
     // TODO: More tests, in particular the checking that the output is as intended.

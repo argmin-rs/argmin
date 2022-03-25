@@ -95,6 +95,7 @@ where
         let OptimizationResult {
             problem: mut line_problem,
             state: mut linesearch_state,
+            ..
         } = Executor::new(
             LineSearchProblem::new(problem.take_problem().unwrap()),
             self.linesearch.clone(),

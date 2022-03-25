@@ -126,7 +126,7 @@ where
     /// # Ok(())
     /// # }
     /// ```
-    pub fn run(mut self) -> Result<OptimizationResult<O, I>, Error> {
+    pub fn run(mut self) -> Result<OptimizationResult<O, S, I>, Error> {
         // First, load checkpoint if given.
         if let Some(checkpoint) = self.checkpoint.as_ref() {
             if let Some((solver, state)) = checkpoint.load()? {
@@ -255,7 +255,7 @@ where
         if state.get_iter() < state.get_max_iters() && !state.terminated() {
             state = state.termination_reason(TerminationReason::Aborted);
         }
-        Ok(OptimizationResult::new(self.problem, state))
+        Ok(OptimizationResult::new(self.problem, self.solver, state))
     }
 
     /// Adds an observer to the executor. Observers are required to implement the

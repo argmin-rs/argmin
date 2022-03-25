@@ -157,6 +157,7 @@ where
         let OptimizationResult {
             problem: sub_problem,
             state: mut sub_state,
+            ..
         } = Executor::new(problem.take_problem().unwrap(), self.subproblem.clone())
             .configure(|config| {
                 config
