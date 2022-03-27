@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::checkpointing::Checkpoint;
-use crate::core::observers::{Observe, Observer, ObserverMode};
+use crate::core::observers::{Observe, ObserverMode, Observers};
 use crate::core::{
     DeserializeOwnedAlias, Error, OptimizationResult, Problem, SerializeAlias, Solver, State,
     TerminationReason, KV,
@@ -24,7 +24,7 @@ pub struct Executor<O, S, I> {
     /// State
     state: Option<I>,
     /// Storage for observers
-    observers: Observer<I>,
+    observers: Observers<I>,
     /// Checkpoint
     checkpoint: Option<Box<dyn Checkpoint<S, I>>>,
     /// Indicates whether Ctrl-C functionality should be active or not
@@ -65,7 +65,7 @@ where
             solver,
             problem: Problem::new(problem),
             state,
-            observers: Observer::new(),
+            observers: Observers::new(),
             checkpoint: None,
             ctrlc: true,
             timer: true,
