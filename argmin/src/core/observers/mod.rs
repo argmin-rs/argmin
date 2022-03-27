@@ -170,8 +170,6 @@ impl<I: State> Observe<I> for Observers<I> {
     ///
     /// Loops over all observers, and based on whether the condition for calling the observers are
     /// met, calls them.
-    ///
-    /// TODO: Test this!
     fn observe_iter(&mut self, state: &I, kv: &KV) -> Result<(), Error> {
         for l in self.observers.iter_mut() {
             let iter = state.get_iter();
@@ -216,4 +214,134 @@ mod tests {
     use super::*;
 
     send_sync_test!(observermode, ObserverMode);
+
+    #[test]
+    fn test_observers() {
+        use crate::core::observers::Observe;
+        use crate::core::{Error, IterState, KV};
+
+        struct TestStor {
+            pub solver_name: String,
+            pub init_called: usize,
+            pub iter_called: usize,
+        }
+
+        impl TestStor {
+            fn new() -> Arc<Mutex<TestStor>> {
+                Arc::new(Mutex::new(TestStor {
+                    solver_name: String::new(),
+                    init_called: 0,
+                    iter_called: 0,
+                }))
+            }
+        }
+
+        struct TestObs {
+            data: Arc<Mutex<TestStor>>,
+        }
+
+        impl<I> Observe<I> for TestObs {
+            fn observe_init(&mut self, name: &str, _kv: &KV) -> Result<(), Error> {
+                self.data.lock().unwrap().solver_name = name.into();
+                self.data.lock().unwrap().init_called += 1;
+                Ok(())
+            }
+
+            fn observe_iter(&mut self, _state: &I, _kv: &KV) -> Result<(), Error> {
+                self.data.lock().unwrap().iter_called += 1;
+                Ok(())
+            }
+        }
+
+        let test_stor_1 = TestStor::new();
+        let test_obs_1 = TestObs {
+            data: test_stor_1.clone(),
+        };
+
+        let test_stor_2 = TestStor::new();
+        let test_obs_2 = TestObs {
+            data: test_stor_2.clone(),
+        };
+
+        let test_stor_3 = TestStor::new();
+        let test_obs_3 = TestObs {
+            data: test_stor_3.clone(),
+        };
+
+        let test_stor_4 = TestStor::new();
+        let test_obs_4 = TestObs {
+            data: test_stor_4.clone(),
+        };
+
+        let storages = [test_stor_1, test_stor_2, test_stor_3, test_stor_4];
+
+        type TState = IterState<Vec<f64>, (), (), (), f64>;
+
+        let mut obs: Observers<TState> = Observers::new();
+        obs.push(test_obs_1, ObserverMode::Never)
+            .push(test_obs_2, ObserverMode::Always)
+            .push(test_obs_3, ObserverMode::Every(3))
+            .push(test_obs_4, ObserverMode::NewBest);
+
+        obs.observe_init("test_solver", &make_kv!()).unwrap();
+
+        // all `init_called` should be 1, all `iter_called` 0
+        for s in storages.iter() {
+            let observer = s.lock().unwrap();
+            assert_eq!(observer.solver_name, "test_solver");
+            assert_eq!(observer.init_called, 1);
+            assert_eq!(observer.iter_called, 0);
+        }
+
+        let mut state: TState = IterState::new();
+        obs.observe_iter(&state, &make_kv!()).unwrap();
+
+        assert_eq!(storages[0].lock().unwrap().init_called, 1);
+        assert_eq!(storages[0].lock().unwrap().iter_called, 0);
+        assert_eq!(storages[1].lock().unwrap().init_called, 1);
+        assert_eq!(storages[1].lock().unwrap().iter_called, 1);
+        assert_eq!(storages[2].lock().unwrap().init_called, 1);
+        assert_eq!(storages[2].lock().unwrap().iter_called, 1);
+        assert_eq!(storages[3].lock().unwrap().init_called, 1);
+        assert_eq!(storages[3].lock().unwrap().iter_called, 1);
+
+        state.increment_iter();
+        obs.observe_iter(&state, &make_kv!()).unwrap();
+
+        assert_eq!(storages[0].lock().unwrap().init_called, 1);
+        assert_eq!(storages[0].lock().unwrap().iter_called, 0);
+        assert_eq!(storages[1].lock().unwrap().init_called, 1);
+        assert_eq!(storages[1].lock().unwrap().iter_called, 2);
+        assert_eq!(storages[2].lock().unwrap().init_called, 1);
+        assert_eq!(storages[2].lock().unwrap().iter_called, 1);
+        assert_eq!(storages[3].lock().unwrap().init_called, 1);
+        assert_eq!(storages[3].lock().unwrap().iter_called, 1);
+
+        state.increment_iter();
+        state.increment_iter();
+        obs.observe_iter(&state, &make_kv!()).unwrap();
+
+        assert_eq!(storages[0].lock().unwrap().init_called, 1);
+        assert_eq!(storages[0].lock().unwrap().iter_called, 0);
+        assert_eq!(storages[1].lock().unwrap().init_called, 1);
+        assert_eq!(storages[1].lock().unwrap().iter_called, 3);
+        assert_eq!(storages[2].lock().unwrap().init_called, 1);
+        assert_eq!(storages[2].lock().unwrap().iter_called, 2);
+        assert_eq!(storages[3].lock().unwrap().init_called, 1);
+        assert_eq!(storages[3].lock().unwrap().iter_called, 1);
+
+        state.increment_iter();
+        // "new best found"
+        state.last_best_iter = state.iter;
+        obs.observe_iter(&state, &make_kv!()).unwrap();
+
+        assert_eq!(storages[0].lock().unwrap().init_called, 1);
+        assert_eq!(storages[0].lock().unwrap().iter_called, 0);
+        assert_eq!(storages[1].lock().unwrap().init_called, 1);
+        assert_eq!(storages[1].lock().unwrap().iter_called, 4);
+        assert_eq!(storages[2].lock().unwrap().init_called, 1);
+        assert_eq!(storages[2].lock().unwrap().iter_called, 2);
+        assert_eq!(storages[3].lock().unwrap().init_called, 1);
+        assert_eq!(storages[3].lock().unwrap().iter_called, 2);
+    }
 }
