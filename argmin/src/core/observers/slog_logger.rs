@@ -143,7 +143,7 @@ impl<'a> From<&'a KV> for SlogKV {
 
 impl<I: slog::KV> Observe<I> for SlogLogger {
     /// Log general info
-    fn observe_init(&self, msg: &str, kv: &KV) -> Result<(), Error> {
+    fn observe_init(&mut self, msg: &str, kv: &KV) -> Result<(), Error> {
         info!(self.logger, "{}", msg; SlogKV::from(kv));
         Ok(())
     }
