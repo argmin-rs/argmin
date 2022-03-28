@@ -8,7 +8,7 @@
 //! # Loggers based on the `slog` crate
 
 use crate::core::observers::Observe;
-use crate::core::{ArgminFloat, Error, IterState, State, KV};
+use crate::core::{Error, State, KV};
 use slog;
 use slog::{info, o, Drain, Key, Record, Serializer};
 use slog_async;
@@ -16,7 +16,6 @@ use slog_async::OverflowStrategy;
 #[cfg(feature = "serde1")]
 use slog_json;
 use slog_term;
-use std::fmt::Display;
 #[cfg(feature = "serde1")]
 use std::fs::OpenOptions;
 #[cfg(feature = "serde1")]
@@ -78,10 +77,10 @@ impl SlogLogger {
         SlogLogger::file_internal(file, OverflowStrategy::Drop, truncate)
     }
 
-    #[cfg(feature = "serde1")]
     /// Actual implementaiton of logging JSON to file
     ///
     /// Only available when the `serde1` feature is set.
+    #[cfg(feature = "serde1")]
     fn file_internal(
         file: &str,
         overflow_strategy: OverflowStrategy,
@@ -104,54 +103,46 @@ impl SlogLogger {
     }
 }
 
-/// This type is necessary in order to be able to implement `slog::KV` on `KV`
-pub struct SlogKV {
-    /// Key value store
-    pub kv: Vec<(&'static str, std::rc::Rc<dyn Display>)>,
-}
-
-impl slog::KV for SlogKV {
+impl slog::KV for KV {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
-        for idx in self.kv.clone().iter().rev() {
+        for idx in self.kv.iter().rev() {
             serializer.emit_str(Key::from(idx.0), &idx.1.to_string())?;
         }
         Ok(())
     }
 }
 
-impl<P, G, H, J, F> slog::KV for IterState<P, G, H, J, F>
+struct LogState<I>(I);
+
+impl<I> slog::KV for LogState<&'_ I>
 where
-    P: Clone,
-    F: ArgminFloat,
+    I: State,
 {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
-        for (k, &v) in self.get_func_counts().iter() {
+        for (k, &v) in self.0.get_func_counts().iter() {
             serializer.emit_u64(Key::from(k.clone()), v)?;
         }
-        serializer.emit_str(Key::from("best_cost"), &self.best_cost.to_string())?;
-        serializer.emit_str(Key::from("cost"), &self.cost.to_string())?;
-        serializer.emit_u64(Key::from("iter"), self.get_iter())?;
+        serializer.emit_str(Key::from("best_cost"), &self.0.get_best_cost().to_string())?;
+        serializer.emit_str(Key::from("cost"), &self.0.get_cost().to_string())?;
+        serializer.emit_u64(Key::from("iter"), self.0.get_iter())?;
         Ok(())
     }
 }
 
-impl<'a> From<&'a KV> for SlogKV {
-    fn from(i: &'a KV) -> SlogKV {
-        SlogKV { kv: i.kv.clone() }
-    }
-}
-
-impl<I: slog::KV> Observe<I> for SlogLogger {
+impl<I> Observe<I> for SlogLogger
+where
+    I: State,
+{
     /// Log general info
     fn observe_init(&mut self, msg: &str, kv: &KV) -> Result<(), Error> {
-        info!(self.logger, "{}", msg; SlogKV::from(kv));
+        info!(self.logger, "{}", msg; kv);
         Ok(())
     }
 
     /// This should be used to log iteration data only (because this is what may be saved in a CSV
     /// file or a database)
     fn observe_iter(&mut self, state: &I, kv: &KV) -> Result<(), Error> {
-        info!(self.logger, ""; state, SlogKV::from(kv));
+        info!(self.logger, ""; LogState(state), kv);
         Ok(())
     }
 }
