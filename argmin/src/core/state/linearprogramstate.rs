@@ -156,6 +156,8 @@ where
         }
     }
 
+    getter_option_ref!(param, P, "Returns reference to parameter vector");
+
     getter_option_ref!(best_param, P, "Returns reference to best parameter vector");
 
     #[must_use]
