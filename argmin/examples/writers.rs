@@ -52,14 +52,12 @@ fn run() -> Result<(), Error> {
     let solver = BFGS::new(init_hessian, linesearch);
 
     // Create writer
-    let writer = WriteToFile::new("params", "param")
-        // Set serializer to JSON
-        .serializer(WriteToFileSerializer::JSON);
+    // Set serializer to Bincode
+    let writer = WriteToFile::new("params", "param", WriteToFileSerializer::Bincode);
 
     // Create writer which only saves new best ones
-    let writer2 = WriteToFile::new("params", "best")
-        // Set serializer to JSON
-        .serializer(WriteToFileSerializer::JSON);
+    // Set serializer to JSON
+    let writer2 = WriteToFile::new("params", "best", WriteToFileSerializer::JSON);
 
     let res = Executor::new(cost, solver)
         .configure(|state| state.param(init_param).max_iters(10))

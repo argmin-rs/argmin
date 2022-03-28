@@ -355,7 +355,7 @@
 //! # #[cfg(feature = "slog-logger")]
 //! # use argmin::core::observers::SlogLogger;
 //! # #[cfg(feature = "serde1")]
-//! # use argmin::core::observers::WriteToFile;
+//! # use argmin::core::observers::{WriteToFile, WriteToFileSerializer};
 //! # use argmin::solver::gradientdescent::SteepestDescent;
 //! # use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -419,7 +419,10 @@
 //!     // Log to file whenever a new best solution is found
 //!     .add_observer(SlogLogger::file("solver.log", false)?, ObserverMode::NewBest)
 //!     // Write parameter vector to `params/param.arg` every 20th iteration
-//!     .add_observer(WriteToFile::new("params", "param"), ObserverMode::Every(20))
+//!     .add_observer(
+//!         WriteToFile::new("params", "param", WriteToFileSerializer::JSON),
+//!         ObserverMode::Every(20)
+//!     )
 //! # ;
 //! # let res = res
 //!     // run the solver on the defined problem

@@ -31,6 +31,9 @@ pub trait State {
     /// best cost function value.
     fn update(&mut self);
 
+    /// Returns a reference to parameter vector
+    fn get_param_ref(&self) -> Option<&Self::Param>;
+
     /// Returns a reference to the best parameter vector
     fn get_best_param_ref(&self) -> Option<&Self::Param>;
 

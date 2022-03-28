@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use argmin::core::observers::{Observe, ObserverMode};
-use argmin::core::{ArgminFloat, CostFunction, Error, Executor, IterState, KV};
+use argmin::core::{ArgminFloat, CostFunction, Error, Executor, IterState, State, KV};
 use argmin::solver::particleswarm::ParticleSwarm;
 use argmin_testfunctions::himmelblau;
 use gnuplot::{Color, PointSize};

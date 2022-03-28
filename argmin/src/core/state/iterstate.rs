@@ -123,7 +123,6 @@ where
     pub_getter!(cost, F, "Returns current cost function value");
     pub_getter!(best_cost, F, "Returns current best cost function value");
     pub_getter!(target_cost, F, "Returns current best cost function value");
-    pub_getter_option_ref!(param, P, "Returns reference to current parameter vector");
     pub_take!(
         param,
         P,
@@ -331,6 +330,8 @@ where
             self.new_best();
         }
     }
+
+    getter_option_ref!(param, P, "Returns reference to current parameter vector");
 
     getter_option_ref!(best_param, P, "Returns reference to best parameter vector");
 
