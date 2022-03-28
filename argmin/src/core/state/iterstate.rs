@@ -324,9 +324,11 @@ where
                 && self.best_cost.is_infinite()
                 && self.cost.is_sign_positive() == self.best_cost.is_sign_positive())
         {
-            let param = (*self.param.as_ref().unwrap()).clone();
-            let cost = self.cost;
-            self.best_param(param).best_cost(cost);
+            // If there is no parameter vector, then also don't set the best param.
+            if let Some(param) = self.param.as_ref().cloned() {
+                self.best_param(param);
+            }
+            self.best_cost(self.cost);
             self.new_best();
         }
     }

@@ -19,7 +19,7 @@ use std::collections::HashMap;
 /// Types implemeting this trait can be used to keep track of a solver's state
 pub trait State {
     /// Type of Parameter vector
-    type Param: Clone;
+    type Param;
     /// Floating Point Precision
     type Float: ArgminFloat;
 
