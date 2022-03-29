@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../argmin/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../argmin/index.html"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -586,6 +587,56 @@
 <span id="585">585</span>
 <span id="586">586</span>
 <span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -749,6 +800,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Defining a problem</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! TODO TODO TODO TODO Rewrite!</span>
 <span class="doccomment">//! A problem can be defined by implementing the `ArgminOp` trait which comes with the</span>
 <span class="doccomment">//! associated types `Param`, `Output` and `Hessian`. `Param` is the type of your</span>
 <span class="doccomment">//! parameter vector (i.e. the input to your cost function), `Output` is the type returned</span>
@@ -772,7 +824,7 @@
 <span class="doccomment">//! # extern crate argmin;</span>
 <span class="doccomment">//! # extern crate argmin_testfunctions;</span>
 <span class="doccomment">//! use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};</span>
-<span class="doccomment">//! use argmin::core::{ArgminOp, Error};</span>
+<span class="doccomment">//! use argmin::core::{Error, CostFunction, Gradient, Hessian};</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! /// First, create a struct for your problem</span>
 <span class="doccomment">//! struct Rosenbrock {</span>
@@ -780,32 +832,42 @@
 <span class="doccomment">//!     b: f64,</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! /// Implement `ArgminOp` for `Rosenbrock`</span>
-<span class="doccomment">//! impl ArgminOp for Rosenbrock {</span>
+<span class="doccomment">//! /// Implement `CostFunction` for `Rosenbrock`</span>
+<span class="doccomment">//! impl CostFunction for Rosenbrock {</span>
 <span class="doccomment">//!     /// Type of the parameter vector</span>
 <span class="doccomment">//!     type Param = Vec&lt;f64&gt;;</span>
 <span class="doccomment">//!     /// Type of the return value computed by the cost function</span>
 <span class="doccomment">//!     type Output = f64;</span>
-<span class="doccomment">//!     /// Type of the Hessian. Can be `()` if not needed.</span>
-<span class="doccomment">//!     type Hessian = Vec&lt;Vec&lt;f64&gt;&gt;;</span>
-<span class="doccomment">//!     /// Type of the Jacobian. Can be `()` if not needed.</span>
-<span class="doccomment">//!     type Jacobian = ();</span>
-<span class="doccomment">//!     /// Floating point precision</span>
-<span class="doccomment">//!     type Float = f64;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     /// Apply the cost function to a parameter `p`</span>
-<span class="doccomment">//!     fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-<span class="doccomment">//!         Ok(rosenbrock_2d(p, self.a, self.b))</span>
+<span class="doccomment">//!     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
+<span class="doccomment">//!         Ok(rosenbrock_2d(p, 1.0, 100.0))</span>
 <span class="doccomment">//!     }</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! /// Implement `Gradient` for `Rosenbrock`</span>
+<span class="doccomment">//! impl Gradient for Rosenbrock {</span>
+<span class="doccomment">//!     /// Type of the parameter vector</span>
+<span class="doccomment">//!     type Param = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//!     /// Type of the return value computed by the cost function</span>
+<span class="doccomment">//!     type Gradient = Vec&lt;f64&gt;;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     /// Compute the gradient at parameter `p`.</span>
-<span class="doccomment">//!     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Param, Error&gt; {</span>
-<span class="doccomment">//!         Ok(rosenbrock_2d_derivative(p, self.a, self.b))</span>
+<span class="doccomment">//!     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {</span>
+<span class="doccomment">//!         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))</span>
 <span class="doccomment">//!     }</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! /// Implement `Hessian` for `Rosenbrock`</span>
+<span class="doccomment">//! impl Hessian for Rosenbrock {</span>
+<span class="doccomment">//!     /// Type of the parameter vector</span>
+<span class="doccomment">//!     type Param = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//!     /// Type of the Hessian. Can be `()` if not needed.</span>
+<span class="doccomment">//!     type Hessian = Vec&lt;Vec&lt;f64&gt;&gt;;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     /// Compute the Hessian at parameter `p`.</span>
 <span class="doccomment">//!     fn hessian(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt; {</span>
-<span class="doccomment">//!         let t = rosenbrock_2d_hessian(p, self.a, self.b);</span>
+<span class="doccomment">//!         let t = rosenbrock_2d_hessian(p, 1.0, 100.0);</span>
 <span class="doccomment">//!         Ok(vec![vec![t[0], t[1]], vec![t[2], t[3]]])</span>
 <span class="doccomment">//!     }</span>
 <span class="doccomment">//! }</span>
@@ -824,9 +886,9 @@
 <span class="doccomment">//! # #![allow(unused_imports)]</span>
 <span class="doccomment">//! # extern crate argmin;</span>
 <span class="doccomment">//! # extern crate argmin_testfunctions;</span>
-<span class="doccomment">//! use argmin::core::{ArgminOp, Error, Executor};</span>
+<span class="doccomment">//! use argmin::core::{Error, Executor, CostFunction, Gradient};</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-<span class="doccomment">//! use argmin::core::{ArgminSlogLogger, ObserverMode};</span>
+<span class="doccomment">//! use argmin::core::observers::{SlogLogger, ObserverMode};</span>
 <span class="doccomment">//! use argmin::solver::gradientdescent::SteepestDescent;</span>
 <span class="doccomment">//! use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
 <span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
@@ -836,25 +898,35 @@
 <span class="doccomment">//! #     b: f64,</span>
 <span class="doccomment">//! # }</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # impl ArgminOp for Rosenbrock {</span>
+<span class="doccomment">//! # /// Implement `CostFunction` for `Rosenbrock`</span>
+<span class="doccomment">//! # impl CostFunction for Rosenbrock {</span>
+<span class="doccomment">//! #     /// Type of the parameter vector</span>
 <span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
 <span class="doccomment">//! #     type Output = f64;</span>
-<span class="doccomment">//! #     type Hessian = ();</span>
-<span class="doccomment">//! #     type Jacobian = ();</span>
-<span class="doccomment">//! #     type Float = f64;</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-<span class="doccomment">//! #         Ok(rosenbrock_2d(p, self.a, self.b))</span>
+<span class="doccomment">//! #     /// Apply the cost function to a parameter `p`</span>
+<span class="doccomment">//! #     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
+<span class="doccomment">//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))</span>
 <span class="doccomment">//! #     }</span>
+<span class="doccomment">//! # }</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Param, Error&gt; {</span>
-<span class="doccomment">//! #         Ok(rosenbrock_2d_derivative(p, self.a, self.b))</span>
+<span class="doccomment">//! # /// Implement `Gradient` for `Rosenbrock`</span>
+<span class="doccomment">//! # impl Gradient for Rosenbrock {</span>
+<span class="doccomment">//! #     /// Type of the parameter vector</span>
+<span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
+<span class="doccomment">//! #     type Gradient = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! #     /// Compute the gradient at parameter `p`.</span>
+<span class="doccomment">//! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {</span>
+<span class="doccomment">//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))</span>
 <span class="doccomment">//! #     }</span>
 <span class="doccomment">//! # }</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! # fn run() -&gt; Result&lt;(), Error&gt; {</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! // Define cost function (must implement `ArgminOperator`)</span>
+<span class="doccomment">//! // Define cost function (must implement `CostFunction` and `Gradient`)</span>
 <span class="doccomment">//! let cost = Rosenbrock { a: 1.0, b: 100.0 };</span>
 <span class="doccomment">//!  </span>
 <span class="doccomment">//! // Define initial parameter vector</span>
@@ -867,16 +939,21 @@
 <span class="doccomment">//! let solver = SteepestDescent::new(linesearch);</span>
 <span class="doccomment">//!  </span>
 <span class="doccomment">//! // Run solver</span>
-<span class="doccomment">//! let res = Executor::new(cost, solver, init_param)</span>
+<span class="doccomment">//! let res = Executor::new(cost, solver)</span>
+<span class="doccomment">//!     .configure(|config|</span>
+<span class="doccomment">//!         config</span>
+<span class="doccomment">//!             // Set initial parameters</span>
+<span class="doccomment">//!             .param(init_param)</span>
+<span class="doccomment">//!             // Set maximum iterations to 10</span>
+<span class="doccomment">//!             .max_iters(10)</span>
+<span class="doccomment">//!     )</span>
 <span class="doccomment">//! # ;</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
 <span class="doccomment">//! # let res = res</span>
 <span class="doccomment">//!     // Add an observer which will log all iterations to the terminal</span>
-<span class="doccomment">//!     .add_observer(ArgminSlogLogger::term(), ObserverMode::Always)</span>
+<span class="doccomment">//!     .add_observer(SlogLogger::term(), ObserverMode::Always)</span>
 <span class="doccomment">//! # ;</span>
 <span class="doccomment">//! # let res = res</span>
-<span class="doccomment">//!     // Set maximum iterations to 10</span>
-<span class="doccomment">//!     .max_iters(10)</span>
 <span class="doccomment">//!     // run the solver on the defined problem</span>
 <span class="doccomment">//!     .run()?;</span>
 <span class="doccomment">//! #</span>
@@ -900,8 +977,8 @@
 <span class="doccomment">//! cost values and many more as well as solver-specific metrics. This interface can be used to</span>
 <span class="doccomment">//! implement loggers, send the information to a storage or to plot metrics.</span>
 <span class="doccomment">//! Observers need to implement the `Observe` trait.</span>
-<span class="doccomment">//! Argmin ships with a logger based on the `slog` crate. `ArgminSlogLogger::term` logs to the</span>
-<span class="doccomment">//! terminal and `ArgminSlogLogger::file` logs to a file in JSON format. Both loggers also come</span>
+<span class="doccomment">//! Argmin ships with a logger based on the `slog` crate. `SlogLogger::term` logs to the</span>
+<span class="doccomment">//! terminal and `SlogLogger::file` logs to a file in JSON format. Both loggers also come</span>
 <span class="doccomment">//! with a `*_noblock` version which does not block the execution of logging, but may drop some</span>
 <span class="doccomment">//! messages in case of a full buffer.</span>
 <span class="doccomment">//! Parameter vectors can be written to disk using `WriteToFile`.</span>
@@ -913,11 +990,11 @@
 <span class="doccomment">//! # #![allow(unused_imports)]</span>
 <span class="doccomment">//! # extern crate argmin;</span>
 <span class="doccomment">//! # extern crate argmin_testfunctions;</span>
-<span class="doccomment">//! # use argmin::core::{ArgminOp, Error, Executor, ObserverMode};</span>
+<span class="doccomment">//! # use argmin::core::{Error, Executor, CostFunction, Gradient, observers::ObserverMode};</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-<span class="doccomment">//! # use argmin::core::ArgminSlogLogger;</span>
+<span class="doccomment">//! # use argmin::core::observers::SlogLogger;</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
-<span class="doccomment">//! # use argmin::core::WriteToFile;</span>
+<span class="doccomment">//! # use argmin::core::observers::{WriteToFile, WriteToFileSerializer};</span>
 <span class="doccomment">//! # use argmin::solver::gradientdescent::SteepestDescent;</span>
 <span class="doccomment">//! # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
 <span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
@@ -927,25 +1004,35 @@
 <span class="doccomment">//! #     b: f64,</span>
 <span class="doccomment">//! # }</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # impl ArgminOp for Rosenbrock {</span>
+<span class="doccomment">//! # /// Implement `CostFunction` for `Rosenbrock`</span>
+<span class="doccomment">//! # impl CostFunction for Rosenbrock {</span>
+<span class="doccomment">//! #     /// Type of the parameter vector</span>
 <span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
 <span class="doccomment">//! #     type Output = f64;</span>
-<span class="doccomment">//! #     type Hessian = ();</span>
-<span class="doccomment">//! #     type Jacobian = ();</span>
-<span class="doccomment">//! #     type Float = f64;</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-<span class="doccomment">//! #         Ok(rosenbrock_2d(p, self.a, self.b))</span>
+<span class="doccomment">//! #     /// Apply the cost function to a parameter `p`</span>
+<span class="doccomment">//! #     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
+<span class="doccomment">//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))</span>
 <span class="doccomment">//! #     }</span>
+<span class="doccomment">//! # }</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Param, Error&gt; {</span>
-<span class="doccomment">//! #         Ok(rosenbrock_2d_derivative(p, self.a, self.b))</span>
+<span class="doccomment">//! # /// Implement `Gradient` for `Rosenbrock`</span>
+<span class="doccomment">//! # impl Gradient for Rosenbrock {</span>
+<span class="doccomment">//! #     /// Type of the parameter vector</span>
+<span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
+<span class="doccomment">//! #     type Gradient = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! #     /// Compute the gradient at parameter `p`.</span>
+<span class="doccomment">//! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {</span>
+<span class="doccomment">//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))</span>
 <span class="doccomment">//! #     }</span>
 <span class="doccomment">//! # }</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! # fn run() -&gt; Result&lt;(), Error&gt; {</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # // Define cost function (must implement `ArgminOperator`)</span>
+<span class="doccomment">//! # // Define cost function (must implement `CostFunction` and `Gradient`)</span>
 <span class="doccomment">//! # let problem = Rosenbrock { a: 1.0, b: 100.0 };</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! # // Define initial parameter vector</span>
@@ -957,23 +1044,26 @@
 <span class="doccomment">//! # // Set up solver</span>
 <span class="doccomment">//! # let solver = SteepestDescent::new(linesearch);</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! let res = Executor::new(problem, solver, init_param)</span>
+<span class="doccomment">//! let res = Executor::new(problem, solver)</span>
+<span class="doccomment">//!     .configure(|config| config.param(init_param).max_iters(2))</span>
 <span class="doccomment">//! # ;</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-<span class="doccomment">//! let res = res</span>
+<span class="doccomment">//! # let res = res</span>
 <span class="doccomment">//!     // Add an observer which will log all iterations to the terminal (without blocking)</span>
-<span class="doccomment">//!     .add_observer(ArgminSlogLogger::term_noblock(), ObserverMode::Always)</span>
+<span class="doccomment">//!     .add_observer(SlogLogger::term_noblock(), ObserverMode::Always)</span>
 <span class="doccomment">//! # ;</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
 <span class="doccomment">//! # let res = res</span>
 <span class="doccomment">//!     // Log to file whenever a new best solution is found</span>
-<span class="doccomment">//!     .add_observer(ArgminSlogLogger::file(&quot;solver.log&quot;, false)?, ObserverMode::NewBest)</span>
+<span class="doccomment">//!     .add_observer(SlogLogger::file(&quot;solver.log&quot;, false)?, ObserverMode::NewBest)</span>
 <span class="doccomment">//!     // Write parameter vector to `params/param.arg` every 20th iteration</span>
-<span class="doccomment">//!     .add_observer(WriteToFile::new(&quot;params&quot;, &quot;param&quot;), ObserverMode::Every(20))</span>
+<span class="doccomment">//!     .add_observer(</span>
+<span class="doccomment">//!         WriteToFile::new(&quot;params&quot;, &quot;param&quot;, WriteToFileSerializer::JSON),</span>
+<span class="doccomment">//!         ObserverMode::Every(20)</span>
+<span class="doccomment">//!     )</span>
 <span class="doccomment">//! # ;</span>
 <span class="doccomment">//! # let res = res</span>
-<span class="doccomment">//! #     .max_iters(2)</span>
 <span class="doccomment">//!     // run the solver on the defined problem</span>
 <span class="doccomment">//!     .run()?;</span>
 <span class="doccomment">//! #     Ok(())</span>
@@ -991,7 +1081,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The probability of crashes increases with runtime, therefore one may want to save checkpoints</span>
 <span class="doccomment">//! in order to be able to resume the optimization after a crash.</span>
-<span class="doccomment">//! The `CheckpointMode` defines how often checkpoints are saved and is either `Never` (default),</span>
+<span class="doccomment">//! The `CheckpointingFrequency` defines how often checkpoints are saved and is either `Never` (default),</span>
 <span class="doccomment">//! `Always` (every iteration) or `Every(u64)` (every Nth iteration). It is set via the setter</span>
 <span class="doccomment">//! method `checkpoint_mode` of `Executor`.</span>
 <span class="doccomment">//! In addition, the directory where the checkpoints and a prefix for every file can be set via</span>
@@ -1005,29 +1095,39 @@
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # extern crate argmin;</span>
 <span class="doccomment">//! # extern crate argmin_testfunctions;</span>
-<span class="doccomment">//! # use argmin::core::{ArgminOp,  Error, Executor, ObserverMode};</span>
+<span class="doccomment">//! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
-<span class="doccomment">//! # use argmin::core::{CheckpointMode};</span>
+<span class="doccomment">//! # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-<span class="doccomment">//! # use argmin::core::{ArgminSlogLogger};</span>
+<span class="doccomment">//! # use argmin::core::observers::SlogLogger;</span>
 <span class="doccomment">//! # use argmin::solver::landweber::Landweber;</span>
 <span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! # #[derive(Default)]</span>
 <span class="doccomment">//! # struct Rosenbrock {}</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # impl ArgminOp for Rosenbrock {</span>
+<span class="doccomment">//! # /// Implement `CostFunction` for `Rosenbrock`</span>
+<span class="doccomment">//! # impl CostFunction for Rosenbrock {</span>
+<span class="doccomment">//! #     /// Type of the parameter vector</span>
 <span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
 <span class="doccomment">//! #     type Output = f64;</span>
-<span class="doccomment">//! #     type Hessian = ();</span>
-<span class="doccomment">//! #     type Jacobian = ();</span>
-<span class="doccomment">//! #     type Float = f64;</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn apply(&amp;self, p: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;f64, Error&gt; {</span>
+<span class="doccomment">//! #     /// Apply the cost function to a parameter `p`</span>
+<span class="doccomment">//! #     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
 <span class="doccomment">//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))</span>
 <span class="doccomment">//! #     }</span>
+<span class="doccomment">//! # }</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn gradient(&amp;self, p: &amp;Vec&lt;f64&gt;) -&gt; Result&lt;Vec&lt;f64&gt;, Error&gt; {</span>
+<span class="doccomment">//! # /// Implement `Gradient` for `Rosenbrock`</span>
+<span class="doccomment">//! # impl Gradient for Rosenbrock {</span>
+<span class="doccomment">//! #     /// Type of the parameter vector</span>
+<span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
+<span class="doccomment">//! #     type Gradient = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! #     /// Compute the gradient at parameter `p`.</span>
+<span class="doccomment">//! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {</span>
 <span class="doccomment">//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))</span>
 <span class="doccomment">//! #     }</span>
 <span class="doccomment">//! # }</span>
@@ -1038,14 +1138,18 @@
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! #     let iters = 35;</span>
 <span class="doccomment">//! #     let solver = Landweber::new(0.001);</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
+<span class="doccomment">//! let checkpoint = FileCheckpoint::new(</span>
+<span class="doccomment">//!     &quot;.checkpoints&quot;,</span>
+<span class="doccomment">//!     &quot;optim&quot;,</span>
+<span class="doccomment">//!     CheckpointingFrequency::Every(20)</span>
+<span class="doccomment">//! );</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
-<span class="doccomment">//! let res = Executor::from_checkpoint(&quot;.checkpoints/optim.arg&quot;, Rosenbrock {})</span>
-<span class="doccomment">//!     .unwrap_or(Executor::new(Rosenbrock {}, solver, init_param))</span>
-<span class="doccomment">//!     .max_iters(iters)</span>
-<span class="doccomment">//!     .checkpoint_dir(&quot;.checkpoints&quot;)</span>
-<span class="doccomment">//!     .checkpoint_name(&quot;optim&quot;)</span>
-<span class="doccomment">//!     .checkpoint_mode(CheckpointMode::Every(20))</span>
+<span class="doccomment">//! let res = Executor::new(Rosenbrock {}, solver)</span>
+<span class="doccomment">//!     .configure(|config| config.param(init_param).max_iters(iters))</span>
+<span class="doccomment">//!     .checkpointing(checkpoint)</span>
 <span class="doccomment">//!     .run()?;</span>
 <span class="doccomment">//! #</span>
 <span class="doccomment">//! #     Ok(())</span>
@@ -1071,12 +1175,14 @@
 <span class="doccomment">//! holds data specific to the solver. Then, the `Solver` trait needs to be implemented for the</span>
 <span class="doccomment">//! struct. This requires setting the associated constant `NAME` which gives your solver a name.</span>
 <span class="doccomment">//! The `next_iter` method defines the computations performed in a single iteration of the solver.</span>
-<span class="doccomment">//! Via the parameters `op` and `state` one has access to the operator (cost function, gradient</span>
+<span class="doccomment">//! Via the parameters `problem` and `state` one has access to the problem (cost function, gradient</span>
 <span class="doccomment">//! computation, Hessian, ...) and to the current state of the optimization (parameter vectors,</span>
 <span class="doccomment">//! cost function values, iteration number, ...), respectively.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use argmin::core::{ArgminFloat, ArgminIterData, ArgminOp, Error, IterState, OpWrapper, Solver};</span>
+<span class="doccomment">//! use argmin::core::{</span>
+<span class="doccomment">//!     ArgminFloat, KV, Error, Gradient, IterState, Problem, Solver, State</span>
+<span class="doccomment">//! };</span>
 <span class="doccomment">//! #[cfg(feature = &quot;serde1&quot;)]</span>
 <span class="doccomment">//! use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">//! use argmin_math::ArgminScaledSub;</span>
@@ -1097,12 +1203,12 @@
 <span class="doccomment">//!     }</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! impl&lt;O, F&gt; Solver&lt;O&gt; for Landweber&lt;F&gt;</span>
+<span class="doccomment">//! impl&lt;O, F, P, G&gt; Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt; for Landweber&lt;F&gt;</span>
 <span class="doccomment">//! where</span>
-<span class="doccomment">//!     // `O` always needs to implement `ArgminOp`</span>
-<span class="doccomment">//!     O: ArgminOp&lt;Float = F&gt;,</span>
-<span class="doccomment">//!     // `O::Param` needs to implement `ArgminScaledSub` because of the update formula</span>
-<span class="doccomment">//!     O::Param: ArgminScaledSub&lt;O::Param, O::Float, O::Param&gt;,</span>
+<span class="doccomment">//!     // `O` needs to implement `Gradient` for the Landweber solver</span>
+<span class="doccomment">//!     O: Gradient&lt;Param = P, Gradient = G&gt;,</span>
+<span class="doccomment">//!     // `P` needs to implement `ArgminScaledSub` because of the update formula</span>
+<span class="doccomment">//!     P: Clone + ArgminScaledSub&lt;G, F, P&gt;,</span>
 <span class="doccomment">//!     F: ArgminFloat,</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     // This gives the solver a name which will be used for logging</span>
@@ -1111,24 +1217,23 @@
 <span class="doccomment">//!     // Defines the computations performed in a single iteration.</span>
 <span class="doccomment">//!     fn next_iter(</span>
 <span class="doccomment">//!         &amp;mut self,</span>
-<span class="doccomment">//!         // This gives access to the operator supplied to the `Executor`. `O` implements</span>
-<span class="doccomment">//!         // `ArgminOp` and `OpWrapper` takes care of counting the calls to the respective</span>
+<span class="doccomment">//!         // This gives access to the problem supplied to the `Executor`. `O` implements</span>
+<span class="doccomment">//!         // `Gradient` and `Problem` takes care of counting the calls to the respective</span>
 <span class="doccomment">//!         // functions.</span>
-<span class="doccomment">//!         op: &amp;mut OpWrapper&lt;O&gt;,</span>
+<span class="doccomment">//!         problem: &amp;mut Problem&lt;O&gt;,</span>
 <span class="doccomment">//!         // Current state of the optimization. This gives access to the parameter vector,</span>
 <span class="doccomment">//!         // gradient, Hessian and cost function value of the current, previous and best</span>
 <span class="doccomment">//!         // iteration as well as current iteration number, and many more.</span>
-<span class="doccomment">//!         state: &amp;mut IterState&lt;O&gt;,</span>
-<span class="doccomment">//!     ) -&gt; Result&lt;ArgminIterData&lt;O&gt;, Error&gt; {</span>
+<span class="doccomment">//!         mut state: IterState&lt;P, G, (), (), F&gt;,</span>
+<span class="doccomment">//!     ) -&gt; Result&lt;(IterState&lt;P, G, (), (), F&gt;, Option&lt;KV&gt;), Error&gt; {</span>
 <span class="doccomment">//!         // First we obtain the current parameter vector from the `state` struct (`x_k`).</span>
 <span class="doccomment">//!         let xk = state.take_param().unwrap();</span>
 <span class="doccomment">//!         // Then we compute the gradient at `x_k` (`\nabla f(x_k)`)</span>
-<span class="doccomment">//!         let grad = op.gradient(&amp;xk)?;</span>
+<span class="doccomment">//!         let grad = problem.gradient(&amp;xk)?;</span>
 <span class="doccomment">//!         // Now subtract `\nabla f(x_k)` scaled by `omega` from `x_k` to compute `x_{k+1}`</span>
 <span class="doccomment">//!         let xkp1 = xk.scaled_sub(&amp;self.omega, &amp;grad);</span>
-<span class="doccomment">//!         // Return new paramter vector which will then be used by the `Executor` to update</span>
-<span class="doccomment">//!         // `state`.</span>
-<span class="doccomment">//!         Ok(ArgminIterData::new().param(xkp1))</span>
+<span class="doccomment">//!         // Return new the updated `state`</span>
+<span class="doccomment">//!         Ok((state.param(xkp1), None))</span>
 <span class="doccomment">//!     }</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//! ```</span>
@@ -1158,7 +1263,7 @@
 <span class="comment">// this is just to make sure that it will always stay this way.)</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">clippy::float_cmp</span>)]</span>
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rand</span>;
+<span class="comment">// extern crate rand;</span>
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">core</span>;
@@ -1166,13 +1271,9 @@
 <span class="doccomment">/// Solvers</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">solver</span>;
 
-<span class="doccomment">/// Macros</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">macros</span>;
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="argmin" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

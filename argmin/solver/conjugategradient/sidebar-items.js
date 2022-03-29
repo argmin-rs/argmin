@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["beta","Beta update methods for nonlinear CG"],["cg","Conjugate gradient method"],["nonlinear_cg","Nonlinear conjugate gradient method"]]});
+initSidebarItems({"mod":[["beta","Beta update methods for nonlinear CG"],["cg","Conjugate gradient method"],["nonlinear_cg","Nonlinear conjugate gradient method"]],"trait":[["NLCGBetaUpdate","Common interface for beta update methods (Nonlinear-CG)"]]});

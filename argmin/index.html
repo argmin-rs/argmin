@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="argmin is a numerical optimization library written entirely in Rust."><meta name="keywords" content="rust, rustlang, rust-lang, argmin"><title>argmin - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
-    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../argmin/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate argmin</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.5.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all argmin's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div><div id="sidebar-vars" data-name="argmin" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/argmin/lib.rs.html#8-587" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="argmin is a numerical optimization library written entirely in Rust."><meta name="keywords" content="rust, rustlang, rust-lang, argmin"><title>argmin - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.png" alt="logo"></div>
+        </a><h2 class="location">Crate argmin</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.5.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all argmin's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div><div id="sidebar-vars" data-name="argmin" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../argmin/index.html"><img class="rust-logo" src="../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/argmin/lib.rs.html#8-637" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
 <p><a href="https://docs.rs/argmin/latest/argmin/">Documentation of most recent release</a></p>
 <p><a href="https://argmin-rs.github.io/argmin/argmin/">Documentation of main branch</a></p>
 <h2 id="design-goals" class="section-header"><a href="#design-goals">Design goals</a></h2>
@@ -130,7 +131,8 @@ checkpointing.</p>
 <h3 id="running-the-tests-and-building-the-examples" class="section-header"><a href="#running-the-tests-and-building-the-examples">Running the tests and building the examples</a></h3>
 <p>The tests and examples require a set of features to be enabled:</p>
 <div class="example-wrap"><pre class="language-bash"><code>cargo test --features &quot;argmin/ctrlc,argmin-math/ndarray_latest-serde,argmin-math/nalgebra_latest-serde,argmin/ndarrayl&quot;</code></pre></div><h2 id="defining-a-problem" class="section-header"><a href="#defining-a-problem">Defining a problem</a></h2>
-<p>A problem can be defined by implementing the <code>ArgminOp</code> trait which comes with the
+<p>TODO TODO TODO TODO Rewrite!
+A problem can be defined by implementing the <code>ArgminOp</code> trait which comes with the
 associated types <code>Param</code>, <code>Output</code> and <code>Hessian</code>. <code>Param</code> is the type of your
 parameter vector (i.e. the input to your cost function), <code>Output</code> is the type returned
 by the cost function, <code>Hessian</code> is the type of the Hessian and <code>Jacobian</code> is the type of the
@@ -150,7 +152,7 @@ at <code>p</code>.</li>
 <code>argmin-testfunctions</code> in argmin:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">argmin_testfunctions</span>::{<span class="ident">rosenbrock_2d</span>, <span class="ident">rosenbrock_2d_derivative</span>, <span class="ident">rosenbrock_2d_hessian</span>};
-<span class="kw">use</span> <span class="ident">argmin::core</span>::{<span class="ident">ArgminOp</span>, <span class="ident">Error</span>};
+<span class="kw">use</span> <span class="ident">argmin::core</span>::{<span class="ident">Error</span>, <span class="ident">CostFunction</span>, <span class="ident">Gradient</span>, <span class="ident">Hessian</span>};
 
 <span class="doccomment">/// First, create a struct for your problem</span>
 <span class="kw">struct</span> <span class="ident">Rosenbrock</span> {
@@ -158,32 +160,42 @@ at <code>p</code>.</li>
     <span class="ident">b</span>: <span class="ident">f64</span>,
 }
 
-<span class="doccomment">/// Implement `ArgminOp` for `Rosenbrock`</span>
-<span class="kw">impl</span> <span class="ident">ArgminOp</span> <span class="kw">for</span> <span class="ident">Rosenbrock</span> {
+<span class="doccomment">/// Implement `CostFunction` for `Rosenbrock`</span>
+<span class="kw">impl</span> <span class="ident">CostFunction</span> <span class="kw">for</span> <span class="ident">Rosenbrock</span> {
     <span class="doccomment">/// Type of the parameter vector</span>
     <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
     <span class="doccomment">/// Type of the return value computed by the cost function</span>
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
-    <span class="doccomment">/// Type of the Hessian. Can be `()` if not needed.</span>
-    <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="doccomment">/// Type of the Jacobian. Can be `()` if not needed.</span>
-    <span class="kw">type</span> <span class="ident">Jacobian</span> <span class="op">=</span> ();
-    <span class="doccomment">/// Floating point precision</span>
-    <span class="kw">type</span> <span class="ident">Float</span> <span class="op">=</span> <span class="ident">f64</span>;
 
     <span class="doccomment">/// Apply the cost function to a parameter `p`</span>
-    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">rosenbrock_2d</span>(<span class="ident">p</span>, <span class="self">self</span>.<span class="ident">a</span>, <span class="self">self</span>.<span class="ident">b</span>))
+    <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">rosenbrock_2d</span>(<span class="ident">p</span>, <span class="number">1.0</span>, <span class="number">100.0</span>))
     }
+}
+
+<span class="doccomment">/// Implement `Gradient` for `Rosenbrock`</span>
+<span class="kw">impl</span> <span class="ident">Gradient</span> <span class="kw">for</span> <span class="ident">Rosenbrock</span> {
+    <span class="doccomment">/// Type of the parameter vector</span>
+    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Type of the return value computed by the cost function</span>
+    <span class="kw">type</span> <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Compute the gradient at parameter `p`.</span>
-    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Param</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">rosenbrock_2d_derivative</span>(<span class="ident">p</span>, <span class="self">self</span>.<span class="ident">a</span>, <span class="self">self</span>.<span class="ident">b</span>))
+    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Gradient</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">rosenbrock_2d_derivative</span>(<span class="ident">p</span>, <span class="number">1.0</span>, <span class="number">100.0</span>))
     }
+}
+
+<span class="doccomment">/// Implement `Hessian` for `Rosenbrock`</span>
+<span class="kw">impl</span> <span class="ident">Hessian</span> <span class="kw">for</span> <span class="ident">Rosenbrock</span> {
+    <span class="doccomment">/// Type of the parameter vector</span>
+    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Type of the Hessian. Can be `()` if not needed.</span>
+    <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Compute the Hessian at parameter `p`.</span>
     <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">rosenbrock_2d_hessian</span>(<span class="ident">p</span>, <span class="self">self</span>.<span class="ident">a</span>, <span class="self">self</span>.<span class="ident">b</span>);
+        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">rosenbrock_2d_hessian</span>(<span class="ident">p</span>, <span class="number">1.0</span>, <span class="number">100.0</span>);
         <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="ident">t</span>[<span class="number">0</span>], <span class="ident">t</span>[<span class="number">1</span>]], <span class="macro">vec!</span>[<span class="ident">t</span>[<span class="number">2</span>], <span class="ident">t</span>[<span class="number">3</span>]]])
     }
 }</code></pre></div>
@@ -194,12 +206,12 @@ of the solver that is to be used.</p>
 <p>The following example shows how to use the previously shown definition of a problem in a
 Steepest Descent (Gradient Descent) solver.</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">argmin::core</span>::{<span class="ident">ArgminOp</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>};
-<span class="kw">use</span> <span class="ident">argmin::core</span>::{<span class="ident">ArgminSlogLogger</span>, <span class="ident">ObserverMode</span>};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">argmin::core</span>::{<span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">CostFunction</span>, <span class="ident">Gradient</span>};
+<span class="kw">use</span> <span class="ident">argmin::core::observers</span>::{<span class="ident">SlogLogger</span>, <span class="ident">ObserverMode</span>};
 <span class="kw">use</span> <span class="ident">argmin::solver::gradientdescent::SteepestDescent</span>;
 <span class="kw">use</span> <span class="ident">argmin::solver::linesearch::MoreThuenteLineSearch</span>;
 
-<span class="comment">// Define cost function (must implement `ArgminOperator`)</span>
+<span class="comment">// Define cost function (must implement `CostFunction` and `Gradient`)</span>
 <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">Rosenbrock</span> { <span class="ident">a</span>: <span class="number">1.0</span>, <span class="ident">b</span>: <span class="number">100.0</span> };
   
 <span class="comment">// Define initial parameter vector</span>
@@ -212,11 +224,16 @@ Steepest Descent (Gradient Descent) solver.</p>
 <span class="kw">let</span> <span class="ident">solver</span> <span class="op">=</span> <span class="ident">SteepestDescent::new</span>(<span class="ident">linesearch</span>);
   
 <span class="comment">// Run solver</span>
-<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">cost</span>, <span class="ident">solver</span>, <span class="ident">init_param</span>)
+<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">cost</span>, <span class="ident">solver</span>)
+    .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span>
+        <span class="ident">config</span>
+            <span class="comment">// Set initial parameters</span>
+            .<span class="ident">param</span>(<span class="ident">init_param</span>)
+            <span class="comment">// Set maximum iterations to 10</span>
+            .<span class="ident">max_iters</span>(<span class="number">10</span>)
+    )
     <span class="comment">// Add an observer which will log all iterations to the terminal</span>
-    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger::term</span>(), <span class="ident">ObserverMode::Always</span>)
-    <span class="comment">// Set maximum iterations to 10</span>
-    .<span class="ident">max_iters</span>(<span class="number">10</span>)
+    .<span class="ident">add_observer</span>(<span class="ident">SlogLogger::term</span>(), <span class="ident">ObserverMode::Always</span>)
     <span class="comment">// run the solver on the defined problem</span>
     .<span class="ident">run</span>()<span class="question-mark">?</span>;
 <span class="comment">// print result</span>
@@ -227,8 +244,8 @@ after every iteration. This includes the parameter vector, gradient, Hessian, it
 cost values and many more as well as solver-specific metrics. This interface can be used to
 implement loggers, send the information to a storage or to plot metrics.
 Observers need to implement the <code>Observe</code> trait.
-Argmin ships with a logger based on the <code>slog</code> crate. <code>ArgminSlogLogger::term</code> logs to the
-terminal and <code>ArgminSlogLogger::file</code> logs to a file in JSON format. Both loggers also come
+Argmin ships with a logger based on the <code>slog</code> crate. <code>SlogLogger::term</code> logs to the
+terminal and <code>SlogLogger::file</code> logs to a file in JSON format. Both loggers also come
 with a <code>*_noblock</code> version which does not block the execution of logging, but may drop some
 messages in case of a full buffer.
 Parameter vectors can be written to disk using <code>WriteToFile</code>.
@@ -236,20 +253,23 @@ For each observer it can be defined how often it will observe the progress of th
 is indicated via the enum <code>ObserverMode</code> which can be either <code>Always</code>, <code>Never</code>, <code>NewBest</code>
 (whenever a new best solution is found) or <code>Every(i)</code> which means every <code>i</code>th iteration.</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>, <span class="ident">init_param</span>)
-<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
+    .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">init_param</span>).<span class="ident">max_iters</span>(<span class="number">2</span>))
     <span class="comment">// Add an observer which will log all iterations to the terminal (without blocking)</span>
-    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger::term_noblock</span>(), <span class="ident">ObserverMode::Always</span>)
+    .<span class="ident">add_observer</span>(<span class="ident">SlogLogger::term_noblock</span>(), <span class="ident">ObserverMode::Always</span>)
     <span class="comment">// Log to file whenever a new best solution is found</span>
-    .<span class="ident">add_observer</span>(<span class="ident">ArgminSlogLogger::file</span>(<span class="string">&quot;solver.log&quot;</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">ObserverMode::NewBest</span>)
+    .<span class="ident">add_observer</span>(<span class="ident">SlogLogger::file</span>(<span class="string">&quot;solver.log&quot;</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">ObserverMode::NewBest</span>)
     <span class="comment">// Write parameter vector to `params/param.arg` every 20th iteration</span>
-    .<span class="ident">add_observer</span>(<span class="ident">WriteToFile::new</span>(<span class="string">&quot;params&quot;</span>, <span class="string">&quot;param&quot;</span>), <span class="ident">ObserverMode::Every</span>(<span class="number">20</span>))
+    .<span class="ident">add_observer</span>(
+        <span class="ident">WriteToFile::new</span>(<span class="string">&quot;params&quot;</span>, <span class="string">&quot;param&quot;</span>, <span class="ident">WriteToFileSerializer::JSON</span>),
+        <span class="ident">ObserverMode::Every</span>(<span class="number">20</span>)
+    )
     <span class="comment">// run the solver on the defined problem</span>
     .<span class="ident">run</span>()<span class="question-mark">?</span>;</code></pre></div>
 <h2 id="checkpoints" class="section-header"><a href="#checkpoints">Checkpoints</a></h2>
 <p>The probability of crashes increases with runtime, therefore one may want to save checkpoints
 in order to be able to resume the optimization after a crash.
-The <code>CheckpointMode</code> defines how often checkpoints are saved and is either <code>Never</code> (default),
+The <code>CheckpointingFrequency</code> defines how often checkpoints are saved and is either <code>Never</code> (default),
 <code>Always</code> (every iteration) or <code>Every(u64)</code> (every Nth iteration). It is set via the setter
 method <code>checkpoint_mode</code> of <code>Executor</code>.
 In addition, the directory where the checkpoints and a prefix for every file can be set via
@@ -259,12 +279,15 @@ checkpoint. In case this fails (for instance because the file does not exist, wh
 that this is the first run and there is nothing to resume from), it will resort to creating a
 new <code>Executor</code>, thus starting from scratch.</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::from_checkpoint</span>(<span class="string">&quot;.checkpoints/optim.arg&quot;</span>, <span class="ident">Rosenbrock</span> {})
-    .<span class="ident">unwrap_or</span>(<span class="ident">Executor::new</span>(<span class="ident">Rosenbrock</span> {}, <span class="ident">solver</span>, <span class="ident">init_param</span>))
-    .<span class="ident">max_iters</span>(<span class="ident">iters</span>)
-    .<span class="ident">checkpoint_dir</span>(<span class="string">&quot;.checkpoints&quot;</span>)
-    .<span class="ident">checkpoint_name</span>(<span class="string">&quot;optim&quot;</span>)
-    .<span class="ident">checkpoint_mode</span>(<span class="ident">CheckpointMode::Every</span>(<span class="number">20</span>))
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">checkpoint</span> <span class="op">=</span> <span class="ident">FileCheckpoint::new</span>(
+    <span class="string">&quot;.checkpoints&quot;</span>,
+    <span class="string">&quot;optim&quot;</span>,
+    <span class="ident">CheckpointingFrequency::Every</span>(<span class="number">20</span>)
+);
+
+<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">Rosenbrock</span> {}, <span class="ident">solver</span>)
+    .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">init_param</span>).<span class="ident">max_iters</span>(<span class="ident">iters</span>))
+    .<span class="ident">checkpointing</span>(<span class="ident">checkpoint</span>)
     .<span class="ident">run</span>()<span class="question-mark">?</span>;</code></pre></div>
 <h2 id="implementing-an-optimization-algorithm" class="section-header"><a href="#implementing-an-optimization-algorithm">Implementing an optimization algorithm</a></h2>
 <p>In this section we are going to implement the Landweber solver, which essentially is a special
@@ -276,11 +299,13 @@ update rule:</p>
 holds data specific to the solver. Then, the <code>Solver</code> trait needs to be implemented for the
 struct. This requires setting the associated constant <code>NAME</code> which gives your solver a name.
 The <code>next_iter</code> method defines the computations performed in a single iteration of the solver.
-Via the parameters <code>op</code> and <code>state</code> one has access to the operator (cost function, gradient
+Via the parameters <code>problem</code> and <code>state</code> one has access to the problem (cost function, gradient
 computation, Hessian, …) and to the current state of the optimization (parameter vectors,
 cost function values, iteration number, …), respectively.</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">argmin::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">ArgminIterData</span>, <span class="ident">ArgminOp</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">OpWrapper</span>, <span class="ident">Solver</span>};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">argmin::core</span>::{
+    <span class="ident">ArgminFloat</span>, <span class="ident">KV</span>, <span class="ident">Error</span>, <span class="ident">Gradient</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">State</span>
+};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">argmin_math::ArgminScaledSub</span>;
@@ -301,12 +326,12 @@ cost function values, iteration number, …), respectively.</p>
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Landweber</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span>, <span class="ident">P</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Landweber</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="comment">// `O` always needs to implement `ArgminOp`</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&lt;</span><span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="comment">// `O::Param` needs to implement `ArgminScaledSub` because of the update formula</span>
-    <span class="ident">O::Param</span>: <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">O::Param</span>, <span class="ident">O::Float</span>, <span class="ident">O::Param</span><span class="op">&gt;</span>,
+    <span class="comment">// `O` needs to implement `Gradient` for the Landweber solver</span>
+    <span class="ident">O</span>: <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
+    <span class="comment">// `P` needs to implement `ArgminScaledSub` because of the update formula</span>
+    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="comment">// This gives the solver a name which will be used for logging</span>
@@ -315,24 +340,23 @@ cost function values, iteration number, …), respectively.</p>
     <span class="comment">// Defines the computations performed in a single iteration.</span>
     <span class="kw">fn</span> <span class="ident">next_iter</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="comment">// This gives access to the operator supplied to the `Executor`. `O` implements</span>
-        <span class="comment">// `ArgminOp` and `OpWrapper` takes care of counting the calls to the respective</span>
+        <span class="comment">// This gives access to the problem supplied to the `Executor`. `O` implements</span>
+        <span class="comment">// `Gradient` and `Problem` takes care of counting the calls to the respective</span>
         <span class="comment">// functions.</span>
-        <span class="ident">op</span>: <span class="kw-2">&amp;mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="comment">// Current state of the optimization. This gives access to the parameter vector,</span>
         <span class="comment">// gradient, Hessian and cost function value of the current, previous and best</span>
         <span class="comment">// iteration as well as current iteration number, and many more.</span>
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// First we obtain the current parameter vector from the `state` struct (`x_k`).</span>
         <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
         <span class="comment">// Then we compute the gradient at `x_k` (`\nabla f(x_k)`)</span>
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk</span>)<span class="question-mark">?</span>;
         <span class="comment">// Now subtract `\nabla f(x_k)` scaled by `omega` from `x_k` to compute `x_{k+1}`</span>
         <span class="kw">let</span> <span class="ident">xkp1</span> <span class="op">=</span> <span class="ident">xk</span>.<span class="ident">scaled_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">omega</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>);
-        <span class="comment">// Return new paramter vector which will then be used by the `Executor` to update</span>
-        <span class="comment">// `state`.</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData::new</span>().<span class="ident">param</span>(<span class="ident">xkp1</span>))
+        <span class="comment">// Return new the updated `state`</span>
+        <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">xkp1</span>), <span class="prelude-val">None</span>))
     }
 }</code></pre></div>
 <h2 id="license" class="section-header"><a href="#license">License</a></h2>
@@ -350,13 +374,35 @@ cost function values, iteration number, …), respectively.</p>
 in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
 without any additional terms or conditions.</p>
 </div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="core/index.html" title="argmin::core mod">core</a></div><div class="item-right docblock-short"><p>Argmin Optimizaton toolbox core</p>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="core/index.html" title="argmin::core mod">core</a></div><div class="item-right docblock-short"><p>Argmin Optimization toolbox core</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="solver/index.html" title="argmin::solver mod">solver</a></div><div class="item-right docblock-short"><p>Solvers</p>
 </div></div></div><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.check_param.html" title="argmin::check_param macro">check_param</a></div><div class="item-right docblock-short"><p>Release an <code>T</code> from an <code>Option&lt;T&gt;</code> if it is not <code>None</code>. If it is <code>None</code>, return an
-<code>ArgminError</code> with a message that needs to be provided.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.make_kv.html" title="argmin::make_kv macro">make_kv</a></div><div class="item-right docblock-short"><p>Creates an <code>ArgminKV</code> at compile time in order to avoid pushing to the <code>kv</code> vector.</p>
+<code>ArgminError</code> with a provided message.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.getter.html" title="argmin::getter macro">getter</a></div><div class="item-right docblock-short"><p>Implements a (private) getter method for field <code>$name</code> of type <code>$type</code> via an immutable
+reference to <code>Self</code>. Clones when returning a <code>$type</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.getter_option.html" title="argmin::getter_option macro">getter_option</a></div><div class="item-right docblock-short"><p>Implements a (private) getter method for field <code>$name</code> of type <code>Option&lt;$type&gt;</code> via an immutable
+reference to <code>Self</code>. Clones when returning a <code>Option&lt;$type&gt;</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.getter_option_ref.html" title="argmin::getter_option_ref macro">getter_option_ref</a></div><div class="item-right docblock-short"><p>Implements a (private) getter method for field <code>$name</code> of type <code>Option&lt;$type&gt;</code> via an immutable
+reference to <code>Self</code>. Returns a reference to the inner <code>$type</code> as a <code>Option&lt;&amp;$type&gt;</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.make_kv.html" title="argmin::make_kv macro">make_kv</a></div><div class="item-right docblock-short"><p>Creates an <code>KV</code> at compile time</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.pub_getter.html" title="argmin::pub_getter macro">pub_getter</a></div><div class="item-right docblock-short"><p>Implements a (public) getter method for field <code>$name</code> of type <code>$type</code> via an immutable
+reference to <code>Self</code>. Clones when returning a <code>$type</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.pub_getter_option.html" title="argmin::pub_getter_option macro">pub_getter_option</a></div><div class="item-right docblock-short"><p>Implements a (public) getter method for field <code>$name</code> of type <code>Option&lt;$type&gt;</code> via an immutable
+reference to <code>Self</code>. Clones when returning a <code>Option&lt;$type&gt;</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.pub_getter_option_ref.html" title="argmin::pub_getter_option_ref macro">pub_getter_option_ref</a></div><div class="item-right docblock-short"><p>Implements a (public) getter method for field <code>$name</code> of type <code>Option&lt;$type&gt;</code> via an immutable
+reference to <code>Self</code>. Returns a reference to the inner <code>$type</code> as a <code>Option&lt;&amp;$type&gt;</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.pub_setter.html" title="argmin::pub_setter macro">pub_setter</a></div><div class="item-right docblock-short"><p>Implements a (public) setter method for field <code>$name</code> of type <code>$type</code> via a mutable reference
+to <code>Self</code>. Returns <code>&amp;mut Self</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.pub_take.html" title="argmin::pub_take macro">pub_take</a></div><div class="item-right docblock-short"><p>Implements a (public) getter method for field <code>$name</code> of type <code>Option&lt;$type&gt;</code> via a mutable
+reference to <code>Self</code>. Returns the inner <code>$type</code> as a <code>Option&lt;$type&gt;</code> by <code>take</code>ing it (therefore
+the content of the field will be replaced with <code>None</code>).</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.setter.html" title="argmin::setter macro">setter</a></div><div class="item-right docblock-short"><p>Implements a (private) setter method for field <code>$name</code> of type <code>$type</code> via a mutable reference
+to <code>Self</code>. Returns <code>&amp;mut Self</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.take.html" title="argmin::take macro">take</a></div><div class="item-right docblock-short"><p>Implements a (private) getter method for field <code>$name</code> of type <code>Option&lt;$type&gt;</code> via a mutable
+reference to <code>Self</code>. Returns the inner <code>$type</code> as a <code>Option&lt;$type&gt;</code> by <code>take</code>ing it (therefore
+the content of the field will be replaced with <code>None</code>).</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.trait_bound.html" title="argmin::trait_bound macro">trait_bound</a></div><div class="item-right docblock-short"><p>Reuse a list of trait bounds by giving it a name,
 e.g. trait_bound!(CopyAndDefault; Copy, Default);</p>
-</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="argmin" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

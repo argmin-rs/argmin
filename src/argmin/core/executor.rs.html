@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin&#x2F;src&#x2F;core&#x2F;executor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>executor.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../argmin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin&#x2F;src&#x2F;core&#x2F;executor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>executor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../argmin/index.html"><img class="rust-logo" src="../../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -432,6 +433,255 @@
 <span id="431">431</span>
 <span id="432">432</span>
 <span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -439,129 +689,142 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="comment">// TODO: Logging of &quot;initial info&quot;</span>
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">serialization</span>::<span class="kw-2">*</span>, <span class="ident">ArgminCheckpoint</span>, <span class="ident">DeserializeOwnedAlias</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::checkpointing::Checkpoint</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::observers</span>::{<span class="ident">Observe</span>, <span class="ident">ObserverMode</span>, <span class="ident">Observers</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminIterData</span>, <span class="ident">ArgminKV</span>, <span class="ident">ArgminOp</span>, <span class="ident">ArgminResult</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Observe</span>, <span class="ident">Observer</span>,
-    <span class="ident">ObserverMode</span>, <span class="ident">OpWrapper</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
+    <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">State</span>,
+    <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
 };
 <span class="kw">use</span> <span class="ident">instant</span>;
-<span class="kw">use</span> <span class="ident">num_traits::Float</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
 <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
-<span class="doccomment">/// Executes a solver</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Executor</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// solver</span>
+<span class="doccomment">/// Solves an optimization problem with a solver</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Executor</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Solver</span>
     <span class="ident">solver</span>: <span class="ident">S</span>,
-    <span class="doccomment">/// operator</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">serde</span>(<span class="ident">skip</span>))]</span>
-    <span class="kw">pub</span> <span class="ident">op</span>: <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Problem</span>
+    <span class="ident">problem</span>: <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     <span class="doccomment">/// State</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">serde</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;IterState&lt;O&gt;: Serialize&quot;</span>))]</span>
-    <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+    <span class="ident">state</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Storage for observers</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">serde</span>(<span class="ident">skip</span>))]</span>
-    <span class="ident">observers</span>: <span class="ident">Observer</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+    <span class="ident">observers</span>: <span class="ident">Observers</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Checkpoint</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-    <span class="ident">checkpoint</span>: <span class="ident">ArgminCheckpoint</span>,
+    <span class="ident">checkpoint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Checkpoint</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Indicates whether Ctrl-C functionality should be active or not</span>
     <span class="ident">ctrlc</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Indicates whether to time execution or not</span>
     <span class="ident">timer</span>: <span class="ident">bool</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Executor</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Executor</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">ArgminOp</span>,
-    <span class="ident">S</span>: <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+    <span class="ident">S</span>: <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">State</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>,
 {
-    <span class="doccomment">/// Create a new executor with a `solver` and an initial parameter `init_param`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">op</span>: <span class="ident">O</span>, <span class="ident">solver</span>: <span class="ident">S</span>, <span class="ident">init_param</span>: <span class="ident">O::Param</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">IterState::new</span>(<span class="ident">init_param</span>);
+    <span class="doccomment">/// Constructs an `Executor` from a user defined problem and a solver.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::core::Executor;</span>
+    <span class="doccomment">/// # use argmin::core::test_utils::{TestSolver, TestProblem};</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # type Rosenbrock = TestProblem;</span>
+    <span class="doccomment">/// # type Newton = TestSolver;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// // Construct an instance of the desired solver</span>
+    <span class="doccomment">/// let solver = Newton::new();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // `Rosenbrock` implements `CostFunction` and `Gradient` as required by the</span>
+    <span class="doccomment">/// // `SteepestDescent` solver</span>
+    <span class="doccomment">/// let problem = Rosenbrock {};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Create instance of `Executor` with `problem` and `solver`</span>
+    <span class="doccomment">/// let executor = Executor::new(problem, solver);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">problem</span>: <span class="ident">O</span>, <span class="ident">solver</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">I::new</span>());
         <span class="ident">Executor</span> {
             <span class="ident">solver</span>,
-            <span class="ident">op</span>: <span class="ident">OpWrapper::new</span>(<span class="ident">op</span>),
+            <span class="ident">problem</span>: <span class="ident">Problem::new</span>(<span class="ident">problem</span>),
             <span class="ident">state</span>,
-            <span class="ident">observers</span>: <span class="ident">Observer::new</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-            <span class="ident">checkpoint</span>: <span class="ident">ArgminCheckpoint::default</span>(),
+            <span class="ident">observers</span>: <span class="ident">Observers::new</span>(),
+            <span class="ident">checkpoint</span>: <span class="prelude-val">None</span>,
             <span class="ident">ctrlc</span>: <span class="bool-val">true</span>,
             <span class="ident">timer</span>: <span class="bool-val">true</span>,
         }
     }
 
-    <span class="doccomment">/// Create a new executor from a checkpoint</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_checkpoint</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>, <span class="ident">op</span>: <span class="ident">O</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">executor</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">load_checkpoint</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
-        <span class="ident">executor</span>.<span class="ident">op</span> <span class="op">=</span> <span class="ident">OpWrapper::new</span>(<span class="ident">op</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">executor</span>)
+    <span class="doccomment">/// This method gives mutable access to the internal state of the solver. This allows for</span>
+    <span class="doccomment">/// initializing the state before running the `Executor`. The options for initialization depend</span>
+    <span class="doccomment">/// on the type of state used by the chosen solver. Common types of state are</span>
+    <span class="doccomment">/// [`IterState`](`crate::core::IterState`) and</span>
+    <span class="doccomment">/// [`LinearProgramState`](`crate::core::LinearProgramState`). Please see the documentation of</span>
+    <span class="doccomment">/// the desired solver for information about which state is used.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::core::Executor;</span>
+    <span class="doccomment">/// # use argmin::core::test_utils::{TestSolver, TestProblem};</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// #  let solver = TestSolver::new();</span>
+    <span class="doccomment">/// #  let problem = TestProblem::new();</span>
+    <span class="doccomment">/// #  let init_param = vec![1.0f64, 0.0];</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// // Create instance of `Executor` with `problem` and `solver`</span>
+    <span class="doccomment">/// let executor = Executor::new(problem, solver)</span>
+    <span class="doccomment">///     // Configure and initialize internal state.</span>
+    <span class="doccomment">///     .configure(|state| state.param(init_param).max_iters(10));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configure</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">init</span>(<span class="ident">state</span>);
+        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">state</span>);
+        <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cur_param</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_param</span>() {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">cur_param</span>);
+    <span class="doccomment">/// Runs the executor by applying the solver to the optimization problem.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::core::{Error, Executor};</span>
+    <span class="doccomment">/// # use argmin::core::test_utils::{TestSolver, TestProblem};</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
+    <span class="doccomment">/// # let solver = TestSolver::new();</span>
+    <span class="doccomment">/// # let problem = TestProblem::new();</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # let init_param = vec![1.0f64, 0.0];</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// // Create instance of `Executor` with `problem` and `solver`</span>
+    <span class="doccomment">/// let result = Executor::new(problem, solver)</span>
+    <span class="doccomment">///     // Configure and initialize internal state.</span>
+    <span class="doccomment">///     .configure(|state| state.param(init_param).max_iters(100))</span>
+    <span class="doccomment">/// #   .configure(|state| state.max_iters(1))</span>
+    <span class="doccomment">///     // Execute solver</span>
+    <span class="doccomment">///     .run()?;</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="comment">// First, load checkpoint if given.</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">checkpoint</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">checkpoint</span>.<span class="ident">as_ref</span>() {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">solver</span>, <span class="ident">state</span>)) <span class="op">=</span> <span class="ident">checkpoint</span>.<span class="ident">load</span>()<span class="question-mark">?</span> {
+                <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">state</span>);
+                <span class="self">self</span>.<span class="ident">solver</span> <span class="op">=</span> <span class="ident">solver</span>;
+            }
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cur_cost</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_cost</span>() {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cost</span>(<span class="ident">cur_cost</span>);
-        }
-        <span class="comment">// check if parameters are the best so far</span>
-        <span class="comment">// Comparison is done using `&lt;` to avoid new solutions with the same cost function value as</span>
-        <span class="comment">// the current best to be accepted. However, some solvers to not compute the cost function</span>
-        <span class="comment">// value (such as the Newton method). Those will always have `Inf` cost. Therefore if both</span>
-        <span class="comment">// the new value and the previous best value are `Inf`, the solution is also accepted. Care</span>
-        <span class="comment">// is taken that both `Inf` also have the same sign.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_cost</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>()
-            <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_cost</span>().<span class="ident">is_infinite</span>()
-                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>().<span class="ident">is_infinite</span>()
-                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_cost</span>().<span class="ident">is_sign_positive</span>()
-                    <span class="op">==</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>().<span class="ident">is_sign_positive</span>())
-        {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">current_param_is_new_best</span>();
-        }
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_grad</span>() {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">grad</span>(<span class="ident">grad</span>);
-        }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hessian</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_hessian</span>() {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">hessian</span>(<span class="ident">hessian</span>);
-        }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inv_hessian</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_inv_hessian</span>() {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">inv_hessian</span>(<span class="ident">inv_hessian</span>);
-        }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">jacobian</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_jacobian</span>() {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">jacobian</span>(<span class="ident">jacobian</span>);
-        }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">population</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_population</span>() {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">population</span>(<span class="ident">population</span>.<span class="ident">clone</span>());
-        }
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">termination_reason</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_termination_reason</span>() {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">termination_reason</span>(<span class="ident">termination_reason</span>);
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Run the executor</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">total_time</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">timer</span> {
             <span class="prelude-val">Some</span>(<span class="ident">instant::Instant::now</span>())
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         };
+
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">running</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::new</span>(<span class="bool-val">true</span>));
 
@@ -586,26 +849,29 @@
             }
         }
 
-        <span class="comment">// let mut op_wrapper = OpWrapper::new(&amp;self.op);</span>
-        <span class="kw">let</span> <span class="ident">init_data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">solver</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">op</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Only call `init` of `solver` if the current iteration number is 0. This avoids that</span>
+        <span class="comment">// `init` is called when starting from a checkpoint (because `init` could change the state</span>
+        <span class="comment">// of the `solver`, which would overwrite the state restored from the checkpoint).</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">==</span> <span class="number">0</span> {
+            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">solver</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">problem</span>, <span class="ident">state</span>)<span class="question-mark">?</span>;
+            <span class="ident">state</span>.<span class="ident">update</span>();
 
-        <span class="comment">// If init() returned something, deal with it</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">init_data</span> {
-            <span class="self">self</span>.<span class="ident">update</span>(<span class="ident">data</span>)<span class="question-mark">?</span>;
-        }
+            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">is_empty</span>() {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">logs</span> <span class="op">=</span> <span class="macro">make_kv!</span>(<span class="string">&quot;max_iters&quot;</span> =&gt; <span class="ident">state</span>.<span class="ident">get_max_iters</span>(););
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">logs</span> <span class="op">=</span> <span class="macro">make_kv!</span>(<span class="string">&quot;max_iters&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_max_iters</span>(););
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">kv</span>) <span class="op">=</span> <span class="ident">kv</span> {
+                    <span class="ident">logs</span> <span class="op">=</span> <span class="ident">logs</span>.<span class="ident">merge</span>(<span class="ident">kv</span>);
+                }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">init_data</span> {
-                <span class="ident">logs</span> <span class="op">=</span> <span class="ident">logs</span>.<span class="ident">merge</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>.<span class="ident">get_kv</span>());
+                <span class="comment">// Observe after init</span>
+                <span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">observe_init</span>(<span class="ident">S::NAME</span>, <span class="kw-2">&amp;</span><span class="ident">logs</span>)<span class="question-mark">?</span>;
             }
 
-            <span class="comment">// Observe after init</span>
-            <span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">observe_init</span>(<span class="ident">S::NAME</span>, <span class="kw-2">&amp;</span><span class="ident">logs</span>)<span class="question-mark">?</span>;
-        }
-
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">set_func_counts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">op</span>);
+            <span class="ident">state</span>.<span class="ident">set_func_counts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">problem</span>);
+            <span class="ident">state</span>
+        } <span class="kw">else</span> {
+            <span class="ident">state</span>
+        };
 
         <span class="kw">while</span> <span class="ident">running</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) {
             <span class="comment">// check first if it has already terminated</span>
@@ -614,12 +880,14 @@
             <span class="comment">// stopping criteria. If `self.terminate()` is called without the checking</span>
             <span class="comment">// whether it has terminated already, then it may overwrite a termination set</span>
             <span class="comment">// within `next_iter()`!</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">terminated</span>() {
-                <span class="self">self</span>.<span class="ident">state</span>
-                    .<span class="ident">termination_reason</span>(<span class="self">self</span>.<span class="ident">solver</span>.<span class="ident">terminate_internal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>));
-            }
+            <span class="ident">state</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">state</span>.<span class="ident">terminated</span>() {
+                <span class="kw">let</span> <span class="ident">term</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">solver</span>.<span class="ident">terminate_internal</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>);
+                <span class="ident">state</span>.<span class="ident">termination_reason</span>(<span class="ident">term</span>)
+            } <span class="kw">else</span> {
+                <span class="ident">state</span>
+            };
             <span class="comment">// Now check once more if the algorithm has terminated. If yes, then break.</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">terminated</span>() {
+            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">terminated</span>() {
                 <span class="kw">break</span>;
             }
 
@@ -630,9 +898,10 @@
                 <span class="prelude-val">None</span>
             };
 
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">solver</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">op</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> (<span class="ident">state_t</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">solver</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">problem</span>, <span class="ident">state</span>)<span class="question-mark">?</span>;
+            <span class="ident">state</span> <span class="op">=</span> <span class="ident">state_t</span>;
 
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">set_func_counts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">op</span>);
+            <span class="ident">state</span>.<span class="ident">set_func_counts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">problem</span>);
 
             <span class="comment">// End time measurement</span>
             <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">timer</span> {
@@ -641,47 +910,74 @@
                 <span class="prelude-val">None</span>
             };
 
-            <span class="self">self</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>)<span class="question-mark">?</span>;
+            <span class="ident">state</span>.<span class="ident">update</span>();
 
             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">log</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_kv</span>();
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">log</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">kv</span>) <span class="op">=</span> <span class="ident">kv</span> { <span class="ident">kv</span> } <span class="kw">else</span> { <span class="ident">KV::new</span>() };
 
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">timer</span> {
                     <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">duration</span>.<span class="ident">unwrap</span>();
-                    <span class="ident">log</span> <span class="op">=</span> <span class="ident">log</span>.<span class="ident">merge</span>(<span class="kw-2">&amp;mut</span> <span class="macro">make_kv!</span>(
+                    <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="macro">make_kv!</span>(
                         <span class="string">&quot;time&quot;</span> =&gt; <span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">f64::from</span>(<span class="ident">duration</span>.<span class="ident">subsec_nanos</span>()) <span class="op">*</span> <span class="number">1e-9</span>;
-                    ));
+                    );
+                    <span class="ident">log</span> <span class="op">=</span> <span class="ident">log</span>.<span class="ident">merge</span>(<span class="ident">tmp</span>);
                 }
-                <span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">observe_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="ident">log</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">observe_iter</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="ident">log</span>)<span class="question-mark">?</span>;
             }
 
             <span class="comment">// increment iteration number</span>
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">increment_iter</span>();
+            <span class="ident">state</span>.<span class="ident">increment_iter</span>();
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-            <span class="self">self</span>.<span class="ident">checkpoint</span>.<span class="ident">store_cond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_iter</span>())<span class="question-mark">?</span>;
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">checkpoint</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">checkpoint</span>.<span class="ident">as_ref</span>() {
+                <span class="ident">checkpoint</span>.<span class="ident">save_cond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">solver</span>, <span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="ident">state</span>.<span class="ident">get_iter</span>())<span class="question-mark">?</span>;
+            }
 
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">timer</span> {
-                <span class="ident">total_time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">total_time</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">time</span>(<span class="prelude-val">Some</span>(<span class="ident">total_time</span>.<span class="ident">elapsed</span>())));
+                <span class="ident">total_time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">total_time</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">time</span>(<span class="prelude-val">Some</span>(<span class="ident">total_time</span>.<span class="ident">elapsed</span>())));
             }
 
             <span class="comment">// Check if termination occured inside next_iter()</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">terminated</span>() {
+            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">terminated</span>() {
                 <span class="kw">break</span>;
             }
         }
 
         <span class="comment">// in case it stopped prematurely and `termination_reason` is still `NotTerminated`,</span>
         <span class="comment">// someone must have pulled the handbrake</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_max_iters</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">terminated</span>() {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">termination_reason</span>(<span class="ident">TerminationReason::Aborted</span>);
+        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">&lt;</span> <span class="ident">state</span>.<span class="ident">get_max_iters</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">state</span>.<span class="ident">terminated</span>() {
+            <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">termination_reason</span>(<span class="ident">TerminationReason::Aborted</span>);
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">ArgminResult::new</span>(<span class="self">self</span>.<span class="ident">op</span>, <span class="self">self</span>.<span class="ident">state</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">OptimizationResult::new</span>(<span class="self">self</span>.<span class="ident">problem</span>, <span class="self">self</span>.<span class="ident">solver</span>, <span class="ident">state</span>))
     }
 
-    <span class="doccomment">/// Attaches a observer which implements `ArgminLog` to the solver.</span>
+    <span class="doccomment">/// Adds an observer to the executor. Observers are required to implement the</span>
+    <span class="doccomment">/// [`Observe`](`crate::core::observers::Observe`) trait.</span>
+    <span class="doccomment">/// The parameter `mode` defines the conditions under which the observer will be called. See</span>
+    <span class="doccomment">/// [`ObserverMode`](`crate::core::observers::ObserverMode`) for details.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It is possible to add multiple observers.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::core::{Error, Executor, observers::ObserverMode};</span>
+    <span class="doccomment">/// # use argmin::core::test_utils::{TestSolver, TestProblem};</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;slog-logger&quot;)]</span>
+    <span class="doccomment">/// # use argmin::core::observers::SlogLogger;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
+    <span class="doccomment">/// # let solver = TestSolver::new();</span>
+    <span class="doccomment">/// # let problem = TestProblem::new();</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// // Create instance of `Executor` with `problem` and `solver`</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;slog-logger&quot;)]</span>
+    <span class="doccomment">/// let executor = Executor::new(problem, solver)</span>
+    <span class="doccomment">///     .add_observer(SlogLogger::term(), ObserverMode::Always);</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_observer</span><span class="op">&lt;</span><span class="ident">OBS</span>: <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_observer</span><span class="op">&lt;</span><span class="ident">OBS</span>: <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">observer</span>: <span class="ident">OBS</span>,
         <span class="ident">mode</span>: <span class="ident">ObserverMode</span>,
@@ -690,80 +986,89 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set maximum number of iterations</span>
+    <span class="doccomment">/// Configures checkpointing</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::core::{Error, Executor};</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;serde1&quot;)]</span>
+    <span class="doccomment">/// # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};</span>
+    <span class="doccomment">/// # use argmin::core::test_utils::{TestSolver, TestProblem};</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
+    <span class="doccomment">/// # let solver = TestSolver::new();</span>
+    <span class="doccomment">/// # let problem = TestProblem::new();</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;serde1&quot;)]</span>
+    <span class="doccomment">/// let checkpoint = FileCheckpoint::new(</span>
+    <span class="doccomment">///     // Directory where checkpoints are saved to</span>
+    <span class="doccomment">///     &quot;.checkpoints&quot;,</span>
+    <span class="doccomment">///     // Filename of checkpoint</span>
+    <span class="doccomment">///     &quot;rosenbrock_optim&quot;,</span>
+    <span class="doccomment">///     // How often checkpoints should be saved</span>
+    <span class="doccomment">///     CheckpointingFrequency::Every(20)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Create instance of `Executor` with `problem` and `solver`</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;serde1&quot;)]</span>
+    <span class="doccomment">/// let executor = Executor::new(problem, solver)</span>
+    <span class="doccomment">///     // Add checkpointing</span>
+    <span class="doccomment">///     .checkpointing(checkpoint);</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_iters</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iters</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">max_iters</span>(<span class="ident">iters</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checkpointing</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Checkpoint</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">checkpoint</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">checkpoint</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">checkpoint</span>));
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set target cost value</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">O::Float</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">target_cost</span>(<span class="ident">cost</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set cost value</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">O::Float</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cost</span>(<span class="ident">cost</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set Gradient</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grad</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="ident">O::Param</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">grad</span>(<span class="ident">grad</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set Hessian</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="ident">O::Hessian</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">hessian</span>(<span class="ident">hessian</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set Jacobian</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">jacobian</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">jacobian</span>: <span class="ident">O::Jacobian</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">jacobian</span>(<span class="ident">jacobian</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set checkpoint directory</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checkpoint_dir</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dir</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">checkpoint</span>.<span class="ident">set_dir</span>(<span class="ident">dir</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set checkpoint name</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checkpoint_name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dir</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">checkpoint</span>.<span class="ident">set_name</span>(<span class="ident">dir</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set the checkpoint mode</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checkpoint_mode</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">CheckpointMode</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">checkpoint</span>.<span class="ident">set_mode</span>(<span class="ident">mode</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Turn Ctrl-C handling on or off (default: on)</span>
+    <span class="doccomment">/// Enables or disables CTRL-C handling (default: enabled). The CTRL-C handling gracefully</span>
+    <span class="doccomment">/// stops the solver if it is cancelled via CTRL-C (SIGINT). Requires the optional `ctrlc`</span>
+    <span class="doccomment">/// feature to be set.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this does not work with nested `Executor`s. If a solver executes another solver</span>
+    <span class="doccomment">/// internally, the inner solver needs to disable CTRL-C handling.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::core::{Error, Executor};</span>
+    <span class="doccomment">/// # use argmin::core::test_utils::{TestSolver, TestProblem};</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
+    <span class="doccomment">/// # let solver = TestSolver::new();</span>
+    <span class="doccomment">/// # let problem = TestProblem::new();</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// // Create instance of `Executor` with `problem` and `solver`</span>
+    <span class="doccomment">/// let executor = Executor::new(problem, solver).ctrlc(false);</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ctrlc</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctrlc</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">ctrlc</span> <span class="op">=</span> <span class="ident">ctrlc</span>;
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Turn timer on or off (default: on)</span>
+    <span class="doccomment">/// Enables or disables timing of individual iterations (default: enabled).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::core::{Error, Executor};</span>
+    <span class="doccomment">/// # use argmin::core::test_utils::{TestSolver, TestProblem};</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
+    <span class="doccomment">/// # let solver = TestSolver::new();</span>
+    <span class="doccomment">/// # let problem = TestProblem::new();</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// // Create instance of `Executor` with `problem` and `solver`</span>
+    <span class="doccomment">/// let executor = Executor::new(problem, solver).timer(false);</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timer</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timer</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">timer</span> <span class="op">=</span> <span class="ident">timer</span>;
@@ -774,97 +1079,291 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::MinimalNoOperator</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::test_utils</span>::{<span class="ident">TestProblem</span>, <span class="ident">TestSolver</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::IterState</span>;
     <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_update</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-        <span class="kw">struct</span> <span class="ident">TestSolver</span> {}
+        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
+        <span class="kw">let</span> <span class="ident">solver</span> <span class="op">=</span> <span class="ident">TestSolver::new</span>();
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TestSolver</span>
-        <span class="kw">where</span>
-            <span class="ident">O</span>: <span class="ident">ArgminOp</span>,
-        {
-            <span class="kw">fn</span> <span class="ident">next_iter</span>(
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                <span class="ident">_op</span>: <span class="kw-2">&amp;mut</span> <span class="ident">OpWrapper</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-                <span class="ident">_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">ArgminIterData::new</span>())
-            }
-        }
-
-        <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">MinimalNoOperator::new</span>();
-        <span class="kw">let</span> <span class="ident">solver</span> <span class="op">=</span> <span class="ident">TestSolver</span> {};
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">executor</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">op</span>, <span class="ident">solver</span>, <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">executor</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
+            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]));
 
         <span class="comment">// 1) Parameter vector changes, but not cost (continues to be `Inf`)</span>
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">new_iterdata</span>: <span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">MinimalNoOperator</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">ArgminIterData::new</span>().<span class="ident">param</span>(<span class="ident">new_param</span>.<span class="ident">clone</span>());
-        <span class="ident">executor</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">new_iterdata</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_param</span>().<span class="ident">unwrap</span>(), <span class="ident">new_param</span>);
-        <span class="macro">assert!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>().<span class="ident">is_infinite</span>());
-        <span class="macro">assert!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>().<span class="ident">is_sign_positive</span>());
+        <span class="ident">executor</span>.<span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>().<span class="ident">param</span>(<span class="ident">new_param</span>.<span class="ident">clone</span>()));
+        <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">update</span>();
+        <span class="macro">assert_eq!</span>(
+            <span class="kw-2">*</span><span class="ident">executor</span>
+                .<span class="ident">state</span>
+                .<span class="ident">as_ref</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">get_best_param_ref</span>()
+                .<span class="ident">unwrap</span>(),
+            <span class="ident">new_param</span>
+        );
+        <span class="macro">assert!</span>(<span class="ident">executor</span>
+            .<span class="ident">state</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">get_best_cost</span>()
+            .<span class="ident">is_infinite</span>());
+        <span class="macro">assert!</span>(<span class="ident">executor</span>
+            .<span class="ident">state</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">get_best_cost</span>()
+            .<span class="ident">is_sign_positive</span>());
 
         <span class="comment">// 2) Parameter vector and cost changes to something better</span>
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">2.0</span>];
         <span class="kw">let</span> <span class="ident">new_cost</span> <span class="op">=</span> <span class="number">10.0</span>;
-        <span class="kw">let</span> <span class="ident">new_iterdata</span>: <span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">MinimalNoOperator</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ArgminIterData::new</span>()
-            .<span class="ident">param</span>(<span class="ident">new_param</span>.<span class="ident">clone</span>())
-            .<span class="ident">cost</span>(<span class="ident">new_cost</span>);
-        <span class="ident">executor</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">new_iterdata</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_param</span>().<span class="ident">unwrap</span>(), <span class="ident">new_param</span>);
+        <span class="ident">executor</span>.<span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
+            <span class="ident">executor</span>
+                .<span class="ident">state</span>
+                .<span class="ident">take</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">param</span>(<span class="ident">new_param</span>.<span class="ident">clone</span>())
+                .<span class="ident">cost</span>(<span class="ident">new_cost</span>),
+        );
+        <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">update</span>();
+        <span class="macro">assert_eq!</span>(
+            <span class="kw-2">*</span><span class="ident">executor</span>
+                .<span class="ident">state</span>
+                .<span class="ident">as_ref</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">get_best_param_ref</span>()
+                .<span class="ident">unwrap</span>(),
+            <span class="ident">new_param</span>
+        );
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>(),
+            <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_best_cost</span>(),
             <span class="ident">new_cost</span>,
             <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
         );
 
         <span class="comment">// 3) Parameter vector and cost changes to something worse</span>
-        <span class="kw">let</span> <span class="ident">old_param</span> <span class="op">=</span> <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_param</span>();
+        <span class="kw">let</span> <span class="ident">old_param</span> <span class="op">=</span> <span class="ident">executor</span>
+            .<span class="ident">state</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">get_best_param_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">3.0</span>];
-        <span class="kw">let</span> <span class="ident">old_cost</span> <span class="op">=</span> <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>();
+        <span class="kw">let</span> <span class="ident">old_cost</span> <span class="op">=</span> <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_best_cost</span>();
         <span class="kw">let</span> <span class="ident">new_cost</span> <span class="op">=</span> <span class="ident">old_cost</span> <span class="op">+</span> <span class="number">1.0</span>;
-        <span class="kw">let</span> <span class="ident">new_iterdata</span>: <span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">MinimalNoOperator</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">ArgminIterData::new</span>().<span class="ident">param</span>(<span class="ident">new_param</span>).<span class="ident">cost</span>(<span class="ident">new_cost</span>);
-        <span class="ident">executor</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">new_iterdata</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_param</span>(), <span class="ident">old_param</span>);
+        <span class="ident">executor</span>.<span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
+            <span class="ident">executor</span>
+                .<span class="ident">state</span>
+                .<span class="ident">take</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">param</span>(<span class="ident">new_param</span>)
+                .<span class="ident">cost</span>(<span class="ident">new_cost</span>),
+        );
+        <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">update</span>();
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">executor</span>
+                .<span class="ident">state</span>
+                .<span class="ident">as_ref</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">get_best_param_ref</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">clone</span>(),
+            <span class="ident">old_param</span>
+        );
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>(),
+            <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_best_cost</span>(),
             <span class="ident">old_cost</span>,
             <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
         );
 
         <span class="comment">// 4) `-Inf` is better than `Inf`</span>
         <span class="kw">let</span> <span class="ident">solver</span> <span class="op">=</span> <span class="ident">TestSolver</span> {};
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">executor</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">op</span>, <span class="ident">solver</span>, <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">executor</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
+            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]));
 
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
         <span class="kw">let</span> <span class="ident">new_cost</span> <span class="op">=</span> <span class="ident">std::f64::NEG_INFINITY</span>;
-        <span class="kw">let</span> <span class="ident">new_iterdata</span>: <span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">MinimalNoOperator</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ArgminIterData::new</span>()
-            .<span class="ident">param</span>(<span class="ident">new_param</span>.<span class="ident">clone</span>())
-            .<span class="ident">cost</span>(<span class="ident">new_cost</span>);
-        <span class="ident">executor</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">new_iterdata</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_param</span>().<span class="ident">unwrap</span>(), <span class="ident">new_param</span>);
-        <span class="macro">assert!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>().<span class="ident">is_infinite</span>());
-        <span class="macro">assert!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>().<span class="ident">is_sign_negative</span>());
+        <span class="ident">executor</span>.<span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
+            <span class="ident">executor</span>
+                .<span class="ident">state</span>
+                .<span class="ident">take</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">param</span>(<span class="ident">new_param</span>.<span class="ident">clone</span>())
+                .<span class="ident">cost</span>(<span class="ident">new_cost</span>),
+        );
+        <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">update</span>();
+        <span class="macro">assert_eq!</span>(
+            <span class="kw-2">*</span><span class="ident">executor</span>
+                .<span class="ident">state</span>
+                .<span class="ident">as_ref</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">get_best_param_ref</span>()
+                .<span class="ident">unwrap</span>(),
+            <span class="ident">new_param</span>
+        );
+        <span class="macro">assert!</span>(<span class="ident">executor</span>
+            .<span class="ident">state</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">get_best_cost</span>()
+            .<span class="ident">is_infinite</span>());
+        <span class="macro">assert!</span>(<span class="ident">executor</span>
+            .<span class="ident">state</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">get_best_cost</span>()
+            .<span class="ident">is_sign_negative</span>());
 
         <span class="comment">// 5) `Inf` is worse than `-Inf`</span>
-        <span class="kw">let</span> <span class="ident">old_param</span> <span class="op">=</span> <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">old_param</span> <span class="op">=</span> <span class="ident">executor</span>
+            .<span class="ident">state</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">get_best_param_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">6.0</span>, <span class="number">6.0</span>];
         <span class="kw">let</span> <span class="ident">new_cost</span> <span class="op">=</span> <span class="ident">std::f64::INFINITY</span>;
-        <span class="kw">let</span> <span class="ident">new_iterdata</span>: <span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">MinimalNoOperator</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">ArgminIterData::new</span>().<span class="ident">param</span>(<span class="ident">new_param</span>).<span class="ident">cost</span>(<span class="ident">new_cost</span>);
-        <span class="ident">executor</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">new_iterdata</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_param</span>().<span class="ident">unwrap</span>(), <span class="ident">old_param</span>);
-        <span class="macro">assert!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>().<span class="ident">is_infinite</span>());
-        <span class="macro">assert!</span>(<span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>().<span class="ident">is_sign_negative</span>());
+        <span class="ident">executor</span>.<span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
+            <span class="ident">executor</span>
+                .<span class="ident">state</span>
+                .<span class="ident">take</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">param</span>(<span class="ident">new_param</span>)
+                .<span class="ident">cost</span>(<span class="ident">new_cost</span>),
+        );
+        <span class="ident">executor</span>.<span class="ident">state</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">update</span>();
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">executor</span>
+                .<span class="ident">state</span>
+                .<span class="ident">as_ref</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">get_best_param_ref</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">clone</span>(),
+            <span class="ident">old_param</span>
+        );
+        <span class="macro">assert!</span>(<span class="ident">executor</span>
+            .<span class="ident">state</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">get_best_cost</span>()
+            .<span class="ident">is_infinite</span>());
+        <span class="macro">assert!</span>(<span class="ident">executor</span>
+            .<span class="ident">state</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">get_best_cost</span>()
+            .<span class="ident">is_sign_negative</span>());
+    }
+
+    <span class="doccomment">/// The solver&#39;s `init` should not be called when started from a checkpoint.</span>
+    <span class="doccomment">/// See https://github.com/argmin-rs/argmin/issues/199.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">test_checkpointing_solver_initialization</span>() {
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::checkpointing</span>::{<span class="ident">CheckpointingFrequency</span>, <span class="ident">FileCheckpoint</span>};
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::test_utils::TestProblem</span>;
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>};
+        <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+
+        <span class="comment">// Fake optimization algorithm which holds internal state which changes over time</span>
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
+        <span class="kw">struct</span> <span class="ident">OptimizationAlgorithm</span> {
+            <span class="kw">pub</span> <span class="ident">internal_state</span>: <span class="ident">u64</span>,
+        }
+
+        <span class="comment">// Implement Solver for OptimizationAlgorithm</span>
+        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OptimizationAlgorithm</span>
+        <span class="kw">where</span>
+            <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
+            <span class="ident">P</span>: <span class="ident">Clone</span>,
+            <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+        {
+            <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;OptimizationAlgorithm&quot;</span>;
+
+            <span class="comment">// Only resets internal_state to 1</span>
+            <span class="kw">fn</span> <span class="ident">init</span>(
+                <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+                <span class="ident">_problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+                <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>,
+            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
+                <span class="self">self</span>.<span class="ident">internal_state</span> <span class="op">=</span> <span class="number">1</span>;
+                <span class="prelude-val">Ok</span>((<span class="ident">state</span>, <span class="prelude-val">None</span>))
+            }
+
+            <span class="comment">// Increment internal_state</span>
+            <span class="kw">fn</span> <span class="ident">next_iter</span>(
+                <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+                <span class="ident">_problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+                <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>,
+            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
+                <span class="self">self</span>.<span class="ident">internal_state</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="prelude-val">Ok</span>((<span class="ident">state</span>, <span class="prelude-val">None</span>))
+            }
+
+            <span class="comment">// Avoid terminating early because param does not change</span>
+            <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
+                <span class="ident">TerminationReason::NotTerminated</span>
+            }
+
+            <span class="comment">// Avoid terminating early because param does not change</span>
+            <span class="kw">fn</span> <span class="ident">terminate_internal</span>(
+                <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+                <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>,
+            ) -&gt; <span class="ident">TerminationReason</span> {
+                <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_max_iters</span>() {
+                    <span class="ident">TerminationReason::MaxItersReached</span>
+                } <span class="kw">else</span> {
+                    <span class="ident">TerminationReason::NotTerminated</span>
+                }
+            }
+        }
+
+        <span class="comment">// Create random test problem</span>
+        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
+
+        <span class="comment">// solver instance</span>
+        <span class="kw">let</span> <span class="ident">solver</span> <span class="op">=</span> <span class="ident">OptimizationAlgorithm</span> { <span class="ident">internal_state</span>: <span class="number">0</span> };
+
+        <span class="comment">// Delete old checkpointing file</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">std::fs::remove_file</span>(<span class="string">&quot;.checkpoints/init_test.arg&quot;</span>);
+
+        <span class="comment">// Create a checkpoint</span>
+        <span class="kw">let</span> <span class="ident">checkpoint</span> <span class="op">=</span>
+            <span class="ident">FileCheckpoint::new</span>(<span class="string">&quot;.checkpoints&quot;</span>, <span class="string">&quot;init_test&quot;</span>, <span class="ident">CheckpointingFrequency::Always</span>);
+
+        <span class="comment">// Create and run executor</span>
+        <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
+            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">state</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">param</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>]).<span class="ident">max_iters</span>(<span class="number">10</span>))
+            .<span class="ident">checkpointing</span>(<span class="ident">checkpoint</span>.<span class="ident">clone</span>());
+
+        <span class="kw">let</span> <span class="ident">OptimizationResult</span> { <span class="ident">solver</span>, .. } <span class="op">=</span> <span class="ident">executor</span>.<span class="ident">run</span>().<span class="ident">unwrap</span>();
+
+        <span class="comment">// internal_state should be 11</span>
+        <span class="comment">// (1 from init plus 10 iterations where it is incremented by 1)</span>
+        <span class="macro">assert_eq!</span>(<span class="ident">solver</span>.<span class="ident">internal_state</span>, <span class="number">11</span>);
+
+        <span class="comment">// Create and run solver again</span>
+        <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
+            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">state</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">param</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>]).<span class="ident">max_iters</span>(<span class="number">10</span>))
+            .<span class="ident">checkpointing</span>(<span class="ident">checkpoint</span>);
+
+        <span class="kw">let</span> <span class="ident">OptimizationResult</span> { <span class="ident">solver</span>, .. } <span class="op">=</span> <span class="ident">executor</span>.<span class="ident">run</span>().<span class="ident">unwrap</span>();
+
+        <span class="comment">// internal_state should still be 11</span>
+        <span class="comment">// (1 from init plus 10 iterations where it is incremented by 1)</span>
+        <span class="macro">assert_eq!</span>(<span class="ident">solver</span>.<span class="ident">internal_state</span>, <span class="number">11</span>);
+
+        <span class="comment">// Delete old checkpointing file</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">std::fs::remove_file</span>(<span class="string">&quot;.checkpoints/init_test.arg&quot;</span>);
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["SATempFunc","Temperature functions for Simulated Annealing."]],"struct":[["SimulatedAnnealing","Simulated Annealing"]]});
+initSidebarItems({"enum":[["SATempFunc","Temperature functions for Simulated Annealing."]],"struct":[["SimulatedAnnealing","Simulated Annealing"]],"trait":[["Anneal","This trait handles the annealing of a parameter vector."]]});
