@@ -6,6 +6,11 @@
 // copied, modified, or distributed except according to those terms.
 
 //! # Loggers based on the `slog` crate
+//!
+//! These loggers write general information about the optimization and information about the
+//! progress of the optimization for each iteration of the algorithm to screen or into a file as
+//! JSON.
+//! See [`SlogLogger`] for details regarding usage.
 
 use crate::core::observers::Observe;
 use crate::core::{Error, State, KV};
@@ -21,7 +26,7 @@ use std::fs::OpenOptions;
 #[cfg(feature = "serde1")]
 use std::sync::Mutex;
 
-/// A logger based on `slog`
+/// A logger using the [`slog`](https://crates.io/crates/slog) crate as backend.
 #[derive(Clone)]
 pub struct SlogLogger {
     /// the logger
@@ -29,17 +34,37 @@ pub struct SlogLogger {
 }
 
 impl SlogLogger {
-    /// Log to the terminal in a blocking way
+    /// Log to the terminal.
+    ///
+    /// Will block execution when buffer is full.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::SlogLogger;
+    ///
+    /// let terminal_logger = SlogLogger::term();
+    /// ```
     pub fn term() -> Self {
         SlogLogger::term_internal(OverflowStrategy::Block)
     }
 
-    /// Log to the terminal in a non-blocking way (in case of overflow, messages are dropped)
+    /// Log to the terminal without blocking execution.
+    ///
+    /// Messages may be lost in case of buffer overflow.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::SlogLogger;
+    ///
+    /// let terminal_logger = SlogLogger::term_noblock();
+    /// ```
     pub fn term_noblock() -> Self {
         SlogLogger::term_internal(OverflowStrategy::Drop)
     }
 
-    /// Actual implementation of the logging to the terminal
+    /// Create terminal logger with a given `OverflowStragegy`.
     fn term_internal(overflow_strategy: OverflowStrategy) -> Self {
         let decorator = slog_term::TermDecorator::new().build();
         let drain = slog_term::FullFormat::new(decorator)
@@ -55,34 +80,50 @@ impl SlogLogger {
         }
     }
 
-    /// Log JSON to a file in a blocking way
+    /// Log JSON to a file while blocking execution in case of full buffers.
     ///
-    /// If `truncate` is set to `true`, the content of existing log files at `file` will be
-    /// cleared.
+    /// If `truncate` is set to `true`, the content of existing log files will be cleared.
     ///
-    /// Only available when the `serde1` feature is set.
+    /// Only available if the `serde1` feature is set.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::SlogLogger;
+    ///
+    /// let file_logger = SlogLogger::file("logfile.log", true);
+    /// ```
     #[cfg(feature = "serde1")]
-    pub fn file(file: &str, truncate: bool) -> Result<Self, Error> {
+    pub fn file<N: AsRef<str>>(file: N, truncate: bool) -> Result<Self, Error> {
         SlogLogger::file_internal(file, OverflowStrategy::Block, truncate)
     }
 
-    /// Log JSON to a file in a non-blocking way (in case of overflow, messages are dropped)
+    /// Log JSON to a file without blocking execution.
     ///
-    /// If `truncate` is set to `true`, the content of existing log files at `file` will be
-    /// cleared.
+    /// Messages may be lost in case of buffer overflow.
     ///
-    /// Only available when the `serde1` feature is set.
+    /// If `truncate` is set to `true`, the content of existing log files will be cleared.
+    ///
+    /// Only available if the `serde1` feature is set.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::SlogLogger;
+    ///
+    /// let file_logger = SlogLogger::file_noblock("logfile.log", true);
+    /// ```
     #[cfg(feature = "serde1")]
-    pub fn file_noblock(file: &str, truncate: bool) -> Result<Self, Error> {
+    pub fn file_noblock<N: AsRef<str>>(file: N, truncate: bool) -> Result<Self, Error> {
         SlogLogger::file_internal(file, OverflowStrategy::Drop, truncate)
     }
 
-    /// Actual implementaiton of logging JSON to file
+    /// Create file logger with a given `OverflowStrategy`.
     ///
-    /// Only available when the `serde1` feature is set.
+    /// Only available if the `serde1` feature is set.
     #[cfg(feature = "serde1")]
-    fn file_internal(
-        file: &str,
+    fn file_internal<N: AsRef<str>>(
+        file: N,
         overflow_strategy: OverflowStrategy,
         truncate: bool,
     ) -> Result<Self, Error> {
@@ -91,7 +132,7 @@ impl SlogLogger {
             .create(true)
             .write(true)
             .truncate(truncate)
-            .open(file)?;
+            .open(file.as_ref())?;
         let drain = Mutex::new(slog_json::Json::new(file).build()).map(slog::Fuse);
         let drain = slog_async::Async::new(drain)
             .overflow_strategy(overflow_strategy)
@@ -133,14 +174,13 @@ impl<I> Observe<I> for SlogLogger
 where
     I: State,
 {
-    /// Log general info
+    /// Log basic information about the optimization after initialization.
     fn observe_init(&mut self, msg: &str, kv: &KV) -> Result<(), Error> {
         info!(self.logger, "{}", msg; kv);
         Ok(())
     }
 
-    /// This should be used to log iteration data only (because this is what may be saved in a CSV
-    /// file or a database)
+    /// Logs information about the progress of the optimization after every iteration.
     fn observe_iter(&mut self, state: &I, kv: &KV) -> Result<(), Error> {
         info!(self.logger, ""; LogState(state), kv);
         Ok(())
