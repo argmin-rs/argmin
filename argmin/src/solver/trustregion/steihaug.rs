@@ -164,7 +164,7 @@ where
         _problem: &mut Problem<O>,
         state: IterState<P, P, (), H, F>,
     ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
-        let r = state.get_grad_ref().unwrap().clone();
+        let r = state.get_grad().unwrap().clone();
 
         self.r_0_norm = r.norm();
         self.rtr = r.dot(&r);

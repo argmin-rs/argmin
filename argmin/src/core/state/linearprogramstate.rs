@@ -8,7 +8,7 @@
 //! TODO: Documentation
 
 use crate::core::{ArgminFloat, Problem, State, TerminationReason};
-use crate::{getter, getter_option_ref, setter};
+use crate::{getter, getter_option_ref};
 use instant;
 use paste::item;
 #[cfg(feature = "serde1")]
@@ -160,13 +160,17 @@ where
 
     getter_option_ref!(best_param, P, "Returns reference to best parameter vector");
 
-    #[must_use]
     fn termination_reason(mut self, reason: TerminationReason) -> Self {
         self.termination_reason = reason;
         self
     }
 
-    setter!(time, Option<instant::Duration>, "Set time required so far");
+    /// Set time required so far
+    fn time(&mut self, time: Option<instant::Duration>) -> &mut Self {
+        self.time = time;
+        self
+    }
+
     getter!(cost, Self::Float, "Returns current cost function value");
     getter!(
         best_cost,
@@ -198,7 +202,7 @@ where
     }
 
     /// Set all function evaluation counts to the evaluation counts of another `Problem`.
-    fn set_func_counts<O>(&mut self, problem: &Problem<O>) {
+    fn func_counts<O>(&mut self, problem: &Problem<O>) {
         for (k, &v) in problem.counts.iter() {
             let count = self.counts.entry(k.to_string()).or_insert(0);
             *count = v

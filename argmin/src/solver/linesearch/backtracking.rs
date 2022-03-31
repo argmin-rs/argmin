@@ -187,7 +187,7 @@ where
     fn terminate(&mut self, state: &IterState<P, G, (), (), F>) -> TerminationReason {
         if self.condition.eval(
             state.cost,
-            state.get_grad_ref(),
+            state.get_grad(),
             self.init_cost,
             self.init_grad.as_ref().unwrap(),
             self.search_direction.as_ref().unwrap(),
@@ -335,13 +335,13 @@ mod tests {
         let data = ls.backtracking_step(&mut Problem::new(prob), IterState::new());
         assert!(data.is_ok());
 
-        let param = data.as_ref().unwrap().get_param_ref().unwrap();
+        let param = data.as_ref().unwrap().get_param().unwrap();
         let cost = data.as_ref().unwrap().get_cost();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
 
-        assert!(data.as_ref().unwrap().get_grad_ref().is_none());
+        assert!(data.as_ref().unwrap().get_grad().is_none());
     }
 
     #[test]
@@ -367,9 +367,9 @@ mod tests {
         let data = ls.backtracking_step(&mut Problem::new(prob), IterState::new());
         assert!(data.is_ok());
 
-        let param = data.as_ref().unwrap().get_param_ref().unwrap();
+        let param = data.as_ref().unwrap().get_param().unwrap();
         let cost = data.as_ref().unwrap().get_cost();
-        let gradient = data.as_ref().unwrap().get_grad_ref().unwrap();
+        let gradient = data.as_ref().unwrap().get_grad().unwrap();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
@@ -414,13 +414,13 @@ mod tests {
 
         let data = data.unwrap().0;
 
-        let param = data.get_param_ref().unwrap();
+        let param = data.get_param().unwrap();
         let cost = data.get_cost();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
 
-        assert!(data.get_grad_ref().is_none());
+        assert!(data.get_grad().is_none());
     }
 
     #[test]
@@ -461,9 +461,9 @@ mod tests {
 
         let data = data.unwrap().0;
 
-        let param = data.get_param_ref().unwrap();
+        let param = data.get_param().unwrap();
         let cost = data.get_cost();
-        let gradient = data.get_grad_ref().unwrap();
+        let gradient = data.get_grad().unwrap();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(cost, 0.6f64.powi(2), epsilon = f64::EPSILON);
@@ -496,14 +496,14 @@ mod tests {
         );
         assert!(data.is_ok());
 
-        let param = data.as_ref().unwrap().0.get_param_ref().unwrap();
+        let param = data.as_ref().unwrap().0.get_param().unwrap();
         let cost = data.as_ref().unwrap().0.get_cost();
         // step is smaller than compared to step test, because of the reduced alpha.
         assert_relative_eq!(param[0], 0.44, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(cost, 0.44f64.powi(2), epsilon = f64::EPSILON);
 
-        assert!(data.as_ref().unwrap().0.get_grad_ref().is_none());
+        assert!(data.as_ref().unwrap().0.get_grad().is_none());
         assert_relative_eq!(ls.alpha, ls.rho * 0.8, epsilon = f64::EPSILON);
     }
 
@@ -580,7 +580,7 @@ mod tests {
 
         let data = data.unwrap().state;
 
-        let param = data.get_param_ref().unwrap();
+        let param = data.get_param().unwrap();
         assert_relative_eq!(param[0], 0.6, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(data.get_cost(), 0.6.powi(2), epsilon = f64::EPSILON);
@@ -593,7 +593,7 @@ mod tests {
             TerminationReason::LineSearchConditionMet
         );
 
-        assert!(data.get_grad_ref().is_none());
+        assert!(data.get_grad().is_none());
     }
 
     #[test]
@@ -629,7 +629,7 @@ mod tests {
 
         let data = data.unwrap().state;
 
-        let param = data.get_param_ref().unwrap();
+        let param = data.get_param().unwrap();
         assert_relative_eq!(param[0], 0.44, epsilon = f64::EPSILON);
         assert_relative_eq!(param[1], 0.0, epsilon = f64::EPSILON);
         assert_relative_eq!(data.get_cost(), 0.44f64.powi(2), epsilon = f64::EPSILON);
@@ -641,6 +641,6 @@ mod tests {
             data.termination_reason,
             TerminationReason::LineSearchConditionMet
         );
-        assert!(data.get_grad_ref().is_none());
+        assert!(data.get_grad().is_none());
     }
 }

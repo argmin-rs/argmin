@@ -177,7 +177,7 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .get_best_param_ref()
+            .get_best_param()
             .unwrap()
             .clone();
         assert_relative_eq!(param[0], -1.0, epsilon = f64::EPSILON);
@@ -193,7 +193,7 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .get_best_param_ref()
+            .get_best_param()
             .unwrap()
             .clone();
         assert_relative_eq!(param[0], -2.0, epsilon = f64::EPSILON);
@@ -209,7 +209,7 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .get_best_param_ref()
+            .get_best_param()
             .unwrap()
             .clone();
         assert_relative_eq!(param[0], -0.5, epsilon = f64::EPSILON);
@@ -225,7 +225,7 @@ mod tests {
             .run()
             .unwrap()
             .state
-            .get_best_param_ref()
+            .get_best_param()
             .unwrap()
             .clone();
         assert_relative_eq!(param[0], -1.0, epsilon = f64::EPSILON);
