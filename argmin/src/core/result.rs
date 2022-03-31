@@ -128,7 +128,7 @@ where
         writeln!(
             f,
             "    param (best):  {}",
-            if let Some(best_param) = self.state.get_best_param_ref() {
+            if let Some(best_param) = self.state.get_best_param() {
                 format!("{:?}", best_param)
             } else {
                 String::from("None")

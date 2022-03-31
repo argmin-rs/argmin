@@ -150,7 +150,7 @@ macro_rules! getter_option_ref {
     ($name:ident, $type:ty, $doc:tt) => {
         item! {
             #[doc=$doc]
-            fn [<get_ $name _ref>](&self) -> Option<&$type> {
+            fn [<get_ $name>](&self) -> Option<&$type> {
                 self.$name.as_ref()
             }
         }
@@ -164,7 +164,7 @@ macro_rules! pub_getter_option_ref {
     ($name:ident, $type:ty, $doc:tt) => {
         item! {
             #[doc=$doc]
-            pub fn [<get_ $name _ref>](&self) -> Option<&$type> {
+            pub fn [<get_ $name>](&self) -> Option<&$type> {
                 self.$name.as_ref()
             }
         }

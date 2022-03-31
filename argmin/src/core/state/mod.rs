@@ -5,8 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! TODO: Documentation
-
 pub mod iterstate;
 pub mod linearprogramstate;
 
@@ -16,28 +14,56 @@ pub use linearprogramstate::LinearProgramState;
 use crate::core::{ArgminFloat, Problem, TerminationReason};
 use std::collections::HashMap;
 
-/// Types implemeting this trait can be used to keep track of a solver's state
+/// Minimal interface which struct used for managing state in solvers have to implement.
+///
+/// These methods expose basic information about the state which is needed in
+/// [`Executor`](`crate::core::Executor`) and
+/// [`OptimizationResult`](`crate::core::OptimizationResult`) but can also be useful in
+/// [`observers`](`crate::core::observers`).
+///
+/// The struct implementing this trait should keep track of
+/// * the current parameter vector
+/// * the cost associated with the current parameter vector
+/// * the current best parameter vector
+/// * the cost associated with the current best parameter vector
+/// * the iteration number where the last best parameter vector was found
+/// * the target cost function value (If this value is reached, the optimization will be stopped).
+///   Set this to `Self::Float::NEG_INFINITY` if not relevant.
+/// * the current number of iterations
+/// * how often each function of the problem has been called
+/// * the time required since the beginning of the optimization until the current point in time
+/// * the reason why it terminated ([`TerminationReason`])
+///
+/// Since the state in general changes for each iteration, "current" refers to the current
+/// iteration.
+///
+/// [`State::Param`] indicates the type of the parameter vector while [`State::Float`] indicates
+/// the precision of floating point operations. Any type implementing [`ArgminFloat`] can be used
+/// for this (so far f32 and f64).
 pub trait State {
-    /// Type of Parameter vector
+    /// Type of parameter vector
     type Param;
-    /// Floating Point Precision
+    /// Floating point precision (f32 or f64)
     type Float: ArgminFloat;
 
-    /// Constructor
+    /// Construct a new state
     fn new() -> Self;
 
     /// This method is called after each iteration and checks if the new parameter vector is better
     /// than the previous one. If so, it will update the current best parameter vector and current
     /// best cost function value.
+    ///
+    /// For methods where the cost function value is unknown, it is advised to assume that every
+    /// new parameter vector is better than the previous one.
     fn update(&mut self);
 
-    /// Returns a reference to parameter vector
-    fn get_param_ref(&self) -> Option<&Self::Param>;
+    /// Returns a reference to the current parameter vector
+    fn get_param(&self) -> Option<&Self::Param>;
 
-    /// Returns a reference to the best parameter vector
-    fn get_best_param_ref(&self) -> Option<&Self::Param>;
+    /// Returns a reference to the current best parameter vector
+    fn get_best_param(&self) -> Option<&Self::Param>;
 
-    /// Returns maximum number of iterations
+    /// Returns maximum number of iterations that are to be performed
     fn get_max_iters(&self) -> u64;
 
     /// Increment the number of iterations by one
@@ -57,22 +83,15 @@ pub trait State {
 
     /// Set all function evaluation counts to the evaluation counts of another operator
     /// wrapped in `Problem`.
-    fn set_func_counts<O>(&mut self, problem: &Problem<O>);
+    fn func_counts<O>(&mut self, problem: &Problem<O>);
 
-    /// Return whether the algorithm has terminated or not
-    fn terminated(&self) -> bool;
+    /// Returns currecnt cost function evaluation count
+    fn get_func_counts(&self) -> &HashMap<String, u64>;
 
-    /// Set termination reason
-    #[must_use]
-    fn termination_reason(self, termination_reason: TerminationReason) -> Self;
-
-    /// Returns termination reason
-    fn get_termination_reason(&self) -> TerminationReason;
-
-    /// Set time required so far
+    /// Set time required since the beginning of the optimization until the current iteration
     fn time(&mut self, time: Option<instant::Duration>) -> &mut Self;
 
-    /// Get time required so far
+    /// Get time passed since the beginning of the optimization until the current iteration
     fn get_time(&self) -> Option<instant::Duration>;
 
     /// Returns iteration number where the last best parameter vector was found
@@ -82,6 +101,15 @@ pub trait State {
     /// far.
     fn is_best(&self) -> bool;
 
-    /// Returns currecnt cost function evaluation count
-    fn get_func_counts(&self) -> &HashMap<String, u64>;
+    /// Set termination reason
+    #[must_use]
+    fn termination_reason(self, termination_reason: TerminationReason) -> Self;
+
+    /// Returns termination reason. Returns [`TerminationReason::NotTerminated`] if not terminated.
+    fn get_termination_reason(&self) -> TerminationReason;
+
+    /// Return whether the algorithm has terminated or not
+    fn terminated(&self) -> bool {
+        self.get_termination_reason().terminated()
+    }
 }

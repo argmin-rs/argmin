@@ -80,7 +80,7 @@ where
     <I as State>::Param: Serialize,
 {
     fn observe_iter(&mut self, state: &I, _kv: &KV) -> Result<(), Error> {
-        if let Some(param) = state.get_param_ref() {
+        if let Some(param) = state.get_param() {
             let iter = state.get_iter();
             if !self.dir.exists() {
                 std::fs::create_dir_all(&self.dir)?

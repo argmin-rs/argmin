@@ -244,7 +244,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<P, G, (), B, F>) -> TerminationReason {
-        if state.get_grad_ref().unwrap().norm() < self.tol_grad {
+        if state.get_grad().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         // if (state.get_prev_cost() - state.get_cost()).abs() < std::f64::EPSILON {

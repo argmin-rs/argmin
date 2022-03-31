@@ -159,7 +159,7 @@ impl Observe<IterState<Vec<f64>, (), (), (), f64>> for Visualizer3d {
         // TODO: get particles from `state` or `kv`
 
         self.iteration(
-            state.get_param_ref().unwrap(),
+            state.get_param().unwrap(),
             state.best_cost,
             state.get_population(),
         );

@@ -8,7 +8,7 @@
 //! TODO: Documentation
 
 use crate::core::{ArgminFloat, Problem, State, TerminationReason};
-use crate::{getter, getter_option_ref, pub_getter, pub_getter_option_ref, pub_take, setter};
+use crate::{getter, getter_option_ref, pub_getter, pub_getter_option_ref, pub_take};
 use instant;
 use paste::item;
 #[cfg(feature = "serde1")]
@@ -337,13 +337,17 @@ where
 
     getter_option_ref!(best_param, P, "Returns reference to best parameter vector");
 
-    #[must_use]
     fn termination_reason(mut self, reason: TerminationReason) -> Self {
         self.termination_reason = reason;
         self
     }
 
-    setter!(time, Option<instant::Duration>, "Set time required so far");
+    /// Set time required so far
+    fn time(&mut self, time: Option<instant::Duration>) -> &mut Self {
+        self.time = time;
+        self
+    }
+
     getter!(cost, Self::Float, "Returns current cost function value");
     getter!(
         best_cost,
@@ -375,7 +379,7 @@ where
     }
 
     /// Set all function evaluation counts to the evaluation counts of another `Problem`.
-    fn set_func_counts<O>(&mut self, problem: &Problem<O>) {
+    fn func_counts<O>(&mut self, problem: &Problem<O>) {
         for (k, &v) in problem.counts.iter() {
             let count = self.counts.entry(k.to_string()).or_insert(0);
             *count = v
@@ -384,11 +388,6 @@ where
 
     fn get_func_counts(&self) -> &HashMap<String, u64> {
         &self.counts
-    }
-
-    /// Return whether the algorithm has terminated or not
-    fn terminated(&self) -> bool {
-        self.termination_reason.terminated()
     }
 
     /// Returns whether the current parameter vector is also the best parameter vector found so
@@ -411,17 +410,17 @@ mod tests {
         let mut state: IterState<Vec<f64>, Vec<f64>, Vec<f64>, Vec<Vec<f64>>, f64> =
             IterState::new();
 
-        assert!(state.get_param_ref().is_none());
-        assert!(state.get_prev_param_ref().is_none());
-        assert!(state.get_best_param_ref().is_none());
-        assert!(state.get_prev_best_param_ref().is_none());
+        assert!(state.get_param().is_none());
+        assert!(state.get_prev_param().is_none());
+        assert!(state.get_best_param().is_none());
+        assert!(state.get_prev_best_param().is_none());
 
         state = state.param(param.clone());
 
-        assert_eq!(*state.get_param_ref().unwrap(), param);
-        assert!(state.get_prev_param_ref().is_none());
-        assert!(state.get_best_param_ref().is_none());
-        assert!(state.get_prev_best_param_ref().is_none());
+        assert_eq!(*state.get_param().unwrap(), param);
+        assert!(state.get_prev_param().is_none());
+        assert!(state.get_best_param().is_none());
+        assert!(state.get_prev_best_param().is_none());
 
         assert!(state.get_cost().is_infinite());
         assert!(state.get_cost().is_sign_positive());
@@ -438,14 +437,14 @@ mod tests {
         assert!(state.get_target_cost().is_infinite());
         assert!(state.get_target_cost().is_sign_negative());
 
-        assert!(state.get_grad_ref().is_none());
-        assert!(state.get_prev_grad_ref().is_none());
-        assert!(state.get_hessian_ref().is_none());
-        assert!(state.get_prev_hessian_ref().is_none());
-        assert!(state.get_inv_hessian_ref().is_none());
-        assert!(state.get_prev_inv_hessian_ref().is_none());
-        assert!(state.get_jacobian_ref().is_none());
-        assert!(state.get_prev_jacobian_ref().is_none());
+        assert!(state.get_grad().is_none());
+        assert!(state.get_prev_grad().is_none());
+        assert!(state.get_hessian().is_none());
+        assert!(state.get_prev_hessian().is_none());
+        assert!(state.get_inv_hessian().is_none());
+        assert!(state.get_prev_inv_hessian().is_none());
+        assert!(state.get_jacobian().is_none());
+        assert!(state.get_prev_jacobian().is_none());
         assert_eq!(state.get_iter(), 0);
 
         assert!(state.is_best());
@@ -479,13 +478,13 @@ mod tests {
 
         state = state.param(new_param.clone());
 
-        assert_eq!(*state.get_param_ref().unwrap(), new_param);
-        assert_eq!(*state.get_prev_param_ref().unwrap(), param);
+        assert_eq!(*state.get_param().unwrap(), new_param);
+        assert_eq!(*state.get_prev_param().unwrap(), param);
 
         state.best_param(new_param.clone());
 
-        assert_eq!(*state.get_best_param_ref().unwrap(), new_param);
-        assert!(state.get_prev_best_param_ref().is_none());
+        assert_eq!(*state.get_best_param().unwrap(), new_param);
+        assert!(state.get_prev_best_param().is_none());
 
         let new_cost: f64 = 21.0;
 
@@ -512,53 +511,53 @@ mod tests {
         let grad = vec![1.0, 2.0];
 
         let state = state.grad(grad.clone());
-        assert_eq!(*state.get_grad_ref().unwrap(), grad);
-        assert!(state.get_prev_grad_ref().is_none());
+        assert_eq!(*state.get_grad().unwrap(), grad);
+        assert!(state.get_prev_grad().is_none());
 
         let new_grad = vec![2.0, 1.0];
 
         let state = state.grad(new_grad.clone());
 
-        assert_eq!(*state.get_grad_ref().unwrap(), new_grad);
-        assert_eq!(*state.get_prev_grad_ref().unwrap(), grad);
+        assert_eq!(*state.get_grad().unwrap(), new_grad);
+        assert_eq!(*state.get_prev_grad().unwrap(), grad);
 
         let hessian = vec![vec![1.0, 2.0], vec![2.0, 1.0]];
 
         let state = state.hessian(hessian.clone());
-        assert_eq!(*state.get_hessian_ref().unwrap(), hessian);
-        assert!(state.get_prev_hessian_ref().is_none());
+        assert_eq!(*state.get_hessian().unwrap(), hessian);
+        assert!(state.get_prev_hessian().is_none());
 
         let new_hessian = vec![vec![2.0, 1.0], vec![1.0, 2.0]];
 
         let state = state.hessian(new_hessian.clone());
 
-        assert_eq!(*state.get_hessian_ref().unwrap(), new_hessian);
-        assert_eq!(*state.get_prev_hessian_ref().unwrap(), hessian);
+        assert_eq!(*state.get_hessian().unwrap(), new_hessian);
+        assert_eq!(*state.get_prev_hessian().unwrap(), hessian);
 
         let inv_hessian = vec![vec![2.0, 1.0], vec![1.0, 2.0]];
 
         let state = state.inv_hessian(inv_hessian.clone());
-        assert_eq!(*state.get_inv_hessian_ref().unwrap(), inv_hessian);
-        assert!(state.get_prev_inv_hessian_ref().is_none());
+        assert_eq!(*state.get_inv_hessian().unwrap(), inv_hessian);
+        assert!(state.get_prev_inv_hessian().is_none());
 
         let new_inv_hessian = vec![vec![3.0, 4.0], vec![4.0, 3.0]];
 
         let state = state.inv_hessian(new_inv_hessian.clone());
 
-        assert_eq!(*state.get_inv_hessian_ref().unwrap(), new_inv_hessian);
-        assert_eq!(*state.get_prev_inv_hessian_ref().unwrap(), inv_hessian);
+        assert_eq!(*state.get_inv_hessian().unwrap(), new_inv_hessian);
+        assert_eq!(*state.get_prev_inv_hessian().unwrap(), inv_hessian);
 
         let jacobian = vec![1.0f64, 2.0];
 
         let state = state.jacobian(jacobian.clone());
-        assert!(state.get_prev_jacobian_ref().is_none());
+        assert!(state.get_prev_jacobian().is_none());
 
         let new_jacobian = vec![2.0f64, 1.0];
 
         let mut state = state.jacobian(new_jacobian.clone());
 
-        assert_eq!(*state.get_jacobian_ref().unwrap(), new_jacobian);
-        assert_eq!(*state.get_prev_jacobian_ref().unwrap(), jacobian);
+        assert_eq!(*state.get_jacobian().unwrap(), new_jacobian);
+        assert_eq!(*state.get_prev_jacobian().unwrap(), jacobian);
 
         state.increment_iter();
 
@@ -577,26 +576,26 @@ mod tests {
         assert_eq!(state.get_prev_cost().to_ne_bytes(), cost.to_ne_bytes());
         assert_eq!(state.get_prev_cost().to_ne_bytes(), cost.to_ne_bytes());
 
-        assert_eq!(*state.get_param_ref().unwrap(), new_param);
-        assert_eq!(*state.get_prev_param_ref().unwrap(), param);
+        assert_eq!(*state.get_param().unwrap(), new_param);
+        assert_eq!(*state.get_prev_param().unwrap(), param);
 
         assert_eq!(state.get_best_cost().to_ne_bytes(), new_cost.to_ne_bytes());
         assert_eq!(state.get_prev_best_cost().to_ne_bytes(), cost.to_ne_bytes());
 
-        assert_eq!(*state.get_best_param_ref().unwrap(), new_param);
-        assert!(state.get_prev_best_param_ref().is_none());
+        assert_eq!(*state.get_best_param().unwrap(), new_param);
+        assert!(state.get_prev_best_param().is_none());
 
         assert_eq!(state.get_best_cost().to_ne_bytes(), new_cost.to_ne_bytes());
         assert_eq!(state.get_prev_best_cost().to_ne_bytes(), cost.to_ne_bytes());
 
-        assert_eq!(*state.get_grad_ref().unwrap(), new_grad);
-        assert_eq!(*state.get_prev_grad_ref().unwrap(), grad);
-        assert_eq!(*state.get_hessian_ref().unwrap(), new_hessian);
-        assert_eq!(*state.get_prev_hessian_ref().unwrap(), hessian);
-        assert_eq!(*state.get_inv_hessian_ref().unwrap(), new_inv_hessian);
-        assert_eq!(*state.get_prev_inv_hessian_ref().unwrap(), inv_hessian);
-        assert_eq!(*state.get_jacobian_ref().unwrap(), new_jacobian);
-        assert_eq!(*state.get_prev_jacobian_ref().unwrap(), jacobian);
+        assert_eq!(*state.get_grad().unwrap(), new_grad);
+        assert_eq!(*state.get_prev_grad().unwrap(), grad);
+        assert_eq!(*state.get_hessian().unwrap(), new_hessian);
+        assert_eq!(*state.get_prev_hessian().unwrap(), hessian);
+        assert_eq!(*state.get_inv_hessian().unwrap(), new_inv_hessian);
+        assert_eq!(*state.get_prev_inv_hessian().unwrap(), inv_hessian);
+        assert_eq!(*state.get_jacobian().unwrap(), new_jacobian);
+        assert_eq!(*state.get_prev_jacobian().unwrap(), jacobian);
         assert_eq!(state.take_grad().unwrap(), new_grad);
         assert_eq!(state.take_prev_grad().unwrap(), grad);
         assert_eq!(state.take_hessian().unwrap(), new_hessian);

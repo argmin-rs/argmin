@@ -183,7 +183,7 @@ where
                 self.observers.observe_init(S::NAME, &logs)?;
             }
 
-            state.set_func_counts(&self.problem);
+            state.func_counts(&self.problem);
             state
         } else {
             state
@@ -217,7 +217,7 @@ where
             let (state_t, kv) = self.solver.next_iter(&mut self.problem, state)?;
             state = state_t;
 
-            state.set_func_counts(&self.problem);
+            state.func_counts(&self.problem);
 
             // End time measurement
             let duration = if self.timer {
@@ -412,12 +412,7 @@ mod tests {
         executor.state = Some(executor.state.take().unwrap().param(new_param.clone()));
         executor.state.as_mut().unwrap().update();
         assert_eq!(
-            *executor
-                .state
-                .as_ref()
-                .unwrap()
-                .get_best_param_ref()
-                .unwrap(),
+            *executor.state.as_ref().unwrap().get_best_param().unwrap(),
             new_param
         );
         assert!(executor
@@ -446,12 +441,7 @@ mod tests {
         );
         executor.state.as_mut().unwrap().update();
         assert_eq!(
-            *executor
-                .state
-                .as_ref()
-                .unwrap()
-                .get_best_param_ref()
-                .unwrap(),
+            *executor.state.as_ref().unwrap().get_best_param().unwrap(),
             new_param
         );
         assert_relative_eq!(
@@ -465,7 +455,7 @@ mod tests {
             .state
             .as_ref()
             .unwrap()
-            .get_best_param_ref()
+            .get_best_param()
             .unwrap()
             .clone();
         let new_param = vec![3.0, 3.0];
@@ -485,7 +475,7 @@ mod tests {
                 .state
                 .as_ref()
                 .unwrap()
-                .get_best_param_ref()
+                .get_best_param()
                 .unwrap()
                 .clone(),
             old_param
@@ -513,12 +503,7 @@ mod tests {
         );
         executor.state.as_mut().unwrap().update();
         assert_eq!(
-            *executor
-                .state
-                .as_ref()
-                .unwrap()
-                .get_best_param_ref()
-                .unwrap(),
+            *executor.state.as_ref().unwrap().get_best_param().unwrap(),
             new_param
         );
         assert!(executor
@@ -539,7 +524,7 @@ mod tests {
             .state
             .as_ref()
             .unwrap()
-            .get_best_param_ref()
+            .get_best_param()
             .unwrap()
             .clone();
         let new_param = vec![6.0, 6.0];
@@ -558,7 +543,7 @@ mod tests {
                 .state
                 .as_ref()
                 .unwrap()
-                .get_best_param_ref()
+                .get_best_param()
                 .unwrap()
                 .clone(),
             old_param

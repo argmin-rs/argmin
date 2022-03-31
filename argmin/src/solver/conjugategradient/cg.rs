@@ -95,7 +95,7 @@ where
         problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
-        let init_param = state.get_param_ref().unwrap();
+        let init_param = state.get_param().unwrap();
         let ap = problem.apply(init_param)?;
         let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
         self.r = Some(r0.clone());
@@ -116,7 +116,7 @@ where
         self.p_prev = Some(p.clone());
         let apk = problem.apply(p)?;
         let alpha = self.rtr.div(p.dot(&apk.conj()));
-        let new_param = state.get_param_ref().unwrap().scaled_add(&alpha, p);
+        let new_param = state.get_param().unwrap().scaled_add(&alpha, p);
         let r = r.scaled_add(&alpha, &apk);
         let rtr_n = r.dot(&r.conj());
         let beta = rtr_n.div(self.rtr);
