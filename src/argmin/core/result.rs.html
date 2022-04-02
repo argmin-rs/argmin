@@ -336,7 +336,7 @@
         <span class="macro">writeln!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;    param (best):  {}&quot;</span>,
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">best_param</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_best_param_ref</span>() {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">best_param</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_best_param</span>() {
                 <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">best_param</span>)
             } <span class="kw">else</span> {
                 <span class="ident">String::from</span>(<span class="string">&quot;None&quot;</span>)
