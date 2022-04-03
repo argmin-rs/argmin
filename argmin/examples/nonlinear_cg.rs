@@ -43,7 +43,7 @@ fn run() -> Result<(), Error> {
     let beta_method = PolakRibiere::new();
 
     // Set up nonlinear conjugate gradient method
-    let solver = NonlinearConjugateGradient::new(linesearch, beta_method)?
+    let solver = NonlinearConjugateGradient::new(linesearch, beta_method)
         // Set the number of iterations when a restart should be performed
         // This allows the algorithm to "forget" previous information which may not be helpful anymore.
         .restart_iters(10)
