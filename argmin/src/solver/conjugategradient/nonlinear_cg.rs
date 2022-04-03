@@ -5,11 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # References:
-//!
-//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
-//! Springer. ISBN 0-387-30303-0.
-
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
     LineSearch, NLCGBetaUpdate, OptimizationResult, Problem, SerializeAlias, Solver, State, KV,
@@ -18,10 +13,9 @@ use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
-/// The nonlinear conjugate gradient is a generalization of the conjugate gradient method for
-/// nonlinear optimization problems.
+/// A generalization of the conjugate gradient method for nonlinear optimization problems.
 ///
-/// # References:
+/// # Reference
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
@@ -46,7 +40,7 @@ impl<P, L, B, F> NonlinearConjugateGradient<P, L, B, F>
 where
     F: ArgminFloat,
 {
-    /// Constructor (Polak Ribiere Conjugate Gradient (PR-CG))
+    /// Constructor
     pub fn new(linesearch: L, beta_method: B) -> Result<Self, Error> {
         Ok(NonlinearConjugateGradient {
             p: None,

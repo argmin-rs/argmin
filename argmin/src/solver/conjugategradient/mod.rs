@@ -5,36 +5,20 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Conjugate Gradient methods
+//! # Conjugate Gradient methods
 //!
-//! * [Conjugate Gradients](cg/struct.ConjugateGradient.html)
-//! * [Nonlinear Conjugate Gradients](nonlinear_cg/struct.NonlinearConjugateGradient.html)
+//! * [Conjugate Gradient](`ConjugateGradient`)
+//! * [Nonlinear Conjugate Gradient](`NonlinearConjugateGradient`)
 //!
-//! # References:
+//! # Reference
 //!
-//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-/// Conjugate gradient method
-pub mod cg;
+mod cg;
+mod nonlinear_cg;
 
-/// Nonlinear conjugate gradient method
-pub mod nonlinear_cg;
-
-/// Beta update methods for nonlinear CG
 pub mod beta;
 
-pub use self::beta::*;
-pub use self::cg::*;
-pub use self::nonlinear_cg::*;
-
-use crate::core::SerializeAlias;
-
-/// Common interface for beta update methods (Nonlinear-CG)
-pub trait NLCGBetaUpdate<G, P, F>: SerializeAlias {
-    /// Update beta
-    /// Parameter 1: \nabla f_k
-    /// Parameter 2: \nabla f_{k+1}
-    /// Parameter 3: p_k
-    fn update(&self, nabla_f_k: &G, nabla_f_k_p_1: &G, p_k: &P) -> F;
-}
+pub use self::cg::ConjugateGradient;
+pub use self::nonlinear_cg::NonlinearConjugateGradient;

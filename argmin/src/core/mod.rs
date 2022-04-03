@@ -40,7 +40,7 @@ mod termination;
 /// Convenience utilities for testing
 pub mod test_utils;
 
-pub use crate::solver::conjugategradient::NLCGBetaUpdate;
+pub use crate::solver::conjugategradient::beta::NLCGBetaUpdate;
 pub use crate::solver::linesearch::LineSearch;
 pub use crate::solver::trustregion::TrustRegionRadius;
 pub use anyhow::Error;

@@ -47,6 +47,13 @@ pub enum ArgminError {
         text: String,
     },
 
+    /// For errors which are likely bugs.
+    #[error("Potential bug: {text:?}. This is potentially a bug. Please file a report on https://github.com/argmin-rs/argmin/issues")]
+    PotentialBug {
+        /// Text
+        text: String,
+    },
+
     /// Indicates an impossible error
     #[error("Impossible Error: {text:?}")]
     ImpossibleError {

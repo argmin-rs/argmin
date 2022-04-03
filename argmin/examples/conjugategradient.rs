@@ -31,7 +31,7 @@ fn run() -> Result<(), Error> {
     let operator = MyProblem {};
 
     // Set up the solver
-    let solver: ConjugateGradient<_, f64> = ConjugateGradient::new(b)?;
+    let solver: ConjugateGradient<_, f64> = ConjugateGradient::new(b);
 
     // Run solver
     let res = Executor::new(operator, solver)

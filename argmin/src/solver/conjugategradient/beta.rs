@@ -5,21 +5,31 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Beta update methods
+//! # Beta update methods for [`NonlinearConjugateGradient`](`crate::solver::conjugategradient::NonlinearConjugateGradient`)
 //!
 //! TODO: Proper documentation.
 //!
-//! # References:
+//! # Reference
 //!
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::core::{ArgminFloat, NLCGBetaUpdate};
+use crate::core::{ArgminFloat, SerializeAlias};
 use argmin_math::{ArgminDot, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
+/// Common interface for beta update methods (Nonlinear-CG)
+pub trait NLCGBetaUpdate<G, P, F>: SerializeAlias {
+    /// Update beta
+    /// Parameter 1: \nabla f_k
+    /// Parameter 2: \nabla f_{k+1}
+    /// Parameter 3: p_k
+    fn update(&self, nabla_f_k: &G, nabla_f_k_p_1: &G, p_k: &P) -> F;
+}
+
 /// Fletcher and Reeves (FR) method
+///
 /// TODO: Reference
 #[derive(Default, Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -43,6 +53,7 @@ where
 }
 
 /// Polak and Ribiere (PR) method
+///
 /// TODO: Reference
 #[derive(Default, Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -67,6 +78,7 @@ where
 }
 
 /// Polak and Ribiere Plus (PR+) method
+///
 /// TODO: Reference
 #[derive(Default, Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -92,6 +104,7 @@ where
 }
 
 /// Hestenes and Stiefel (HS) method
+///
 /// TODO: Reference
 #[derive(Default, Copy, Clone, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
