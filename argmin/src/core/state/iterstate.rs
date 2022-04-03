@@ -34,7 +34,7 @@ use std::collections::HashMap;
 ///   annealing,...)
 /// * elapsed time
 /// * termination reason (set to [`TerminationReason::NotTerminated`] if not terminated yet)
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct IterState<P, G, J, H, F> {
     /// Current parameter vector

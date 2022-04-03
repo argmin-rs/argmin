@@ -109,7 +109,7 @@ where
 
         let mut x_p = param.zero_like();
         let mut x: P = param.zero_like();
-        let mut cg = ConjugateGradient::new(grad.mul(&(F::from_f64(-1.0).unwrap())))?;
+        let mut cg = ConjugateGradient::new(grad.mul(&(F::from_f64(-1.0).unwrap())));
 
         let cg_state = IterState::new().param(x_p.clone());
         let (mut cg_state, _) = cg.init(&mut cg_problem, cg_state)?;
@@ -119,7 +119,7 @@ where
             cg_state = state_tmp;
             let cost = cg_state.get_cost();
             x = cg_state.take_param().unwrap();
-            let p = cg.p_prev();
+            let p = cg.get_prev_p()?;
             let curvature = p.dot(&hessian.dot(p));
             if curvature <= self.curvature_threshold {
                 if iter == 0 {
