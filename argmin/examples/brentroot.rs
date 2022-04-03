@@ -7,7 +7,7 @@
 
 use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{Error, Executor, Operator};
-use argmin::solver::brent::Brent;
+use argmin::solver::brent::BrentRoot;
 
 /// Test function generalise from Wikipedia example
 struct TestFunc {
@@ -31,7 +31,7 @@ fn main() {
         zero2: -1.,
     };
     let init_param = 0.5;
-    let solver = Brent::new(-4., 0.5, 1e-11);
+    let solver = BrentRoot::new(-4., 0.5, 1e-11);
 
     let res = Executor::new(cost, solver)
         .configure(|state| state.param(init_param).max_iters(100))
