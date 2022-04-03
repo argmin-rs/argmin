@@ -28,7 +28,7 @@ impl CostFunction for TestFunc {
 
 fn main() {
     let cost = TestFunc {};
-    let solver = Brent::new(-10., 10.);
+    let solver = BrentOpt::new(-10., 10.);
 
     let res = Executor::new(cost, solver)
         .configure(|state| state.max_iters(100))

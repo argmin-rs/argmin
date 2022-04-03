@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 
 pub mod brent;
-pub mod brentopt;
 pub mod conjugategradient;
 pub mod gaussnewton;
 pub mod goldensectionsearch;

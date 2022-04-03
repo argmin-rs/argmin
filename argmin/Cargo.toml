@@ -69,7 +69,7 @@ name = "bfgs"
 required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
-name = "brent"
+name = "brentroot"
 required-features = ["slog-logger"]
 
 [[example]]

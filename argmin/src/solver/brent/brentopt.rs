@@ -37,7 +37,7 @@ use serde::{Deserialize, Serialize};
 /// derivatives_, Richard P. Brent, 1973, Prentice-Hall.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct Brent<F> {
+pub struct BrentOpt<F> {
     /// relative tolerance
     eps: F,
     /// absolute tolerance
@@ -68,12 +68,12 @@ pub struct Brent<F> {
     c: F,
 }
 
-impl<F: ArgminFloat> Brent<F> {
+impl<F: ArgminFloat> BrentOpt<F> {
     /// Constructor
     ///
     /// The values `min` and `max` must bracket the minimum of the function.
-    pub fn new(min: F, max: F) -> Brent<F> {
-        Brent {
+    pub fn new(min: F, max: F) -> Self {
+        BrentOpt {
             eps: F::epsilon().sqrt(),
             t: F::from_f64(1e-5).unwrap(),
             a: min,
@@ -106,17 +106,17 @@ impl<F: ArgminFloat> Brent<F> {
     }
 }
 
-impl<O, F> Solver<O, IterState<F, (), (), (), F>> for Brent<F>
+impl<O, F> Solver<O, IterState<F, (), (), (), F>> for BrentOpt<F>
 where
     O: CostFunction<Param = F, Output = F>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Brent";
+    const NAME: &'static str = "BrentOpt";
 
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        // Brent maintains its own state
+        // BrentOpt maintains its own state
         state: IterState<F, (), (), (), F>,
     ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
         let u = self.a + self.c * (self.b - self.a);
@@ -133,7 +133,7 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        // Brent maintains its own state
+        // BrentOpt maintains its own state
         state: IterState<F, (), (), (), F>,
     ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
         let two = F::from_f64(2f64).unwrap();
@@ -222,7 +222,7 @@ mod tests {
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
 
-    test_trait_impl!(brent, Brent<f64>);
+    test_trait_impl!(brent, BrentOpt<f64>);
 
     struct TestFunc {}
     impl CostFunction for TestFunc {
@@ -237,7 +237,7 @@ mod tests {
     #[test]
     fn test_brent() {
         let cost = TestFunc {};
-        let solver = Brent::new(-10., 10.);
+        let solver = BrentOpt::new(-10., 10.);
         let res = Executor::new(cost, solver)
             .configure(|state| state.max_iters(13))
             .run()
