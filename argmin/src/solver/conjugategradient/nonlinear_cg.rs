@@ -40,21 +40,44 @@ impl<P, L, B, F> NonlinearConjugateGradient<P, L, B, F>
 where
     F: ArgminFloat,
 {
-    /// Constructor
-    pub fn new(linesearch: L, beta_method: B) -> Result<Self, Error> {
-        Ok(NonlinearConjugateGradient {
+    /// Construct a new instance of `NonlinearConjugateGradient`.
+    ///
+    /// Takes a [`LineSearch`] and a [`NLCGBetaUpdate`] as input.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::conjugategradient::NonlinearConjugateGradient;
+    /// # let linesearch = ();
+    /// # let beta_method = ();
+    /// let nlcg: NonlinearConjugateGradient<Vec<f64>, _, _, f64> =
+    ///     NonlinearConjugateGradient::new(linesearch, beta_method);
+    /// ```
+    pub fn new(linesearch: L, beta_method: B) -> Self {
+        NonlinearConjugateGradient {
             p: None,
             beta: F::nan(),
             linesearch,
             beta_method,
             restart_iter: std::u64::MAX,
             restart_orthogonality: None,
-        })
+        }
     }
 
-    /// Specifiy the number of iterations after which a restart should be performed
+    /// Specifiy the number of iterations after which a restart should be performed.
+    ///
     /// This allows the algorithm to "forget" previous information which may not be helpful
     /// anymore.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::conjugategradient::NonlinearConjugateGradient;
+    /// # let linesearch = ();
+    /// # let beta_method = ();
+    /// # let nlcg: NonlinearConjugateGradient<Vec<f64>, _, _, f64> = NonlinearConjugateGradient::new(linesearch, beta_method);
+    /// let nlcg = nlcg.restart_iters(100);
+    /// ```
     #[must_use]
     pub fn restart_iters(mut self, iters: u64) -> Self {
         self.restart_iter = iters;
@@ -62,13 +85,24 @@ where
     }
 
     /// Set the value for the orthogonality measure.
-    /// Setting this parameter leads to a restart of the algorithm (setting beta = 0) after two
-    /// consecutive search directions are not orthogonal anymore. In other words, if this condition
+    ///
+    /// Setting this parameter leads to a restart of the algorithm (setting beta = 0) after
+    /// consecutive search directions stop being orthogonal. In other words, if this condition
     /// is met:
     ///
-    /// `|\nabla f_k^T * \nabla f_{k-1}| / | \nabla f_k ||^2 >= v`
+    /// `|\nabla f_k^T * \nabla f_{k-1}| / | \nabla f_k |^2 >= v`
     ///
     /// A typical value for `v` is 0.1.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::conjugategradient::NonlinearConjugateGradient;
+    /// # let linesearch = ();
+    /// # let beta_method = ();
+    /// # let nlcg: NonlinearConjugateGradient<Vec<f64>, _, _, f64> = NonlinearConjugateGradient::new(linesearch, beta_method);
+    /// let nlcg = nlcg.restart_orthogonality(0.1);
+    /// ```
     #[must_use]
     pub fn restart_orthogonality(mut self, v: F) -> Self {
         self.restart_orthogonality = Some(v);
