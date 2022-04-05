@@ -19,7 +19,7 @@
 /// Implementation of Brent's optimization method,
 /// see <https://en.wikipedia.org/wiki/Brent%27s_method>
 use crate::core::{
-    ArgminFloat, Error, IterState, Operator, Problem, Solver, State, TerminationReason, KV,
+    ArgminFloat, CostFunction, Error, IterState, Problem, Solver, State, TerminationReason, KV,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -85,7 +85,7 @@ impl<F: ArgminFloat> BrentRoot<F> {
 
 impl<O, F> Solver<O, IterState<F, (), (), (), F>> for BrentRoot<F>
 where
-    O: Operator<Param = F, Output = F>,
+    O: CostFunction<Param = F, Output = F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "BrentRoot";
@@ -96,8 +96,8 @@ where
         // BrentRoot maintains its own state
         state: IterState<F, (), (), (), F>,
     ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
-        self.fa = problem.apply(&self.a)?;
-        self.fb = problem.apply(&self.b)?;
+        self.fa = problem.cost(&self.a)?;
+        self.fb = problem.cost(&self.b)?;
         if self.fa * self.fb > F::from_f64(0.0).unwrap() {
             return Err(BrentRootError::WrongSign.into());
         }
@@ -188,7 +188,7 @@ where
                 };
         }
 
-        self.fb = problem.apply(&self.b)?;
+        self.fb = problem.cost(&self.b)?;
         Ok((state.param(self.b).cost(self.fb.abs()), None))
     }
 }
