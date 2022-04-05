@@ -32,6 +32,7 @@ where
     ShapeConstraint: DimEq<R1, R2> + DimEq<C1, C2>,
 {
     #[inline]
+    #[allow(clippy::only_used_in_recursion)]
     fn dot(&self, other: &Matrix<N, R2, C2, SB>) -> N {
         self.dot(other)
     }
