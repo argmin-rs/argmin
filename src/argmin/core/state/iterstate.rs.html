@@ -1565,7 +1565,7 @@
 <span class="doccomment">///   annealing,...)</span>
 <span class="doccomment">/// * elapsed time</span>
 <span class="doccomment">/// * termination reason (set to [`TerminationReason::NotTerminated`] if not terminated yet)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">J</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Current parameter vector</span>

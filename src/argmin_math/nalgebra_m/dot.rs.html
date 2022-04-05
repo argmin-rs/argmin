@@ -257,6 +257,7 @@
 <span id="255">255</span>
 <span id="256">256</span>
 <span id="257">257</span>
+<span id="258">258</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -291,6 +292,7 @@
     <span class="ident">ShapeConstraint</span>: <span class="ident">DimEq</span><span class="op">&lt;</span><span class="ident">R1</span>, <span class="ident">R2</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">DimEq</span><span class="op">&lt;</span><span class="ident">C1</span>, <span class="ident">C2</span><span class="op">&gt;</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::only_used_in_recursion</span>)]</span>
     <span class="kw">fn</span> <span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Matrix</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R2</span>, <span class="ident">C2</span>, <span class="ident">SB</span><span class="op">&gt;</span>) -&gt; <span class="ident">N</span> {
         <span class="self">self</span>.<span class="ident">dot</span>(<span class="ident">other</span>)
     }
