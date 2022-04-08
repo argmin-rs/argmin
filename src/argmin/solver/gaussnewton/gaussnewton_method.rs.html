@@ -1,6 +1,9 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin&#x2F;src&#x2F;solver&#x2F;gaussnewton&#x2F;gaussnewton_method.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gaussnewton_method.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.png" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/gaussnewton/gaussnewton_method.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gaussnewton_method.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -298,6 +301,90 @@
 <span id="296">296</span>
 <span id="297">297</span>
 <span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -305,24 +392,25 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! # References:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
-
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Jacobian</span>, <span class="ident">Operator</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>,
+    <span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Jacobian</span>, <span class="ident">Operator</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">State</span>,
     <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
 };
 <span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminInv</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminSub</span>, <span class="ident">ArgminTranspose</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
-<span class="doccomment">/// Gauss-Newton method</span>
+<span class="doccomment">/// # Gauss-Newton method</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # References:</span>
+<span class="doccomment">/// The Gauss-Newton method is used to solve non-linear least squares problems.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">/// Requires that the provided optimization problem implements [`Operator`] and [`Jacobian`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Requires an initial parameter vector.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Reference</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
@@ -334,7 +422,14 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">GaussNewton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructor</span>
+    <span class="doccomment">/// Construct a new instance of [`GaussNewton`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::solver::gaussnewton::GaussNewton;</span>
+    <span class="doccomment">/// let gauss_newton: GaussNewton&lt;f64&gt; = GaussNewton::new();</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">GaussNewton</span> {
             <span class="ident">gamma</span>: <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>(),
@@ -342,7 +437,20 @@
         }
     }
 
-    <span class="doccomment">/// set gamma</span>
+    <span class="doccomment">/// Set step width gamma.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Gamma must be within `(0, 1]`. Defaults to `1.0`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::solver::gaussnewton::GaussNewton;</span>
+    <span class="doccomment">/// # use argmin::core::Error;</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
+    <span class="doccomment">/// let gauss_newton = GaussNewton::new().with_gamma(0.5f64)?;</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">gamma</span> <span class="op">&gt;</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
@@ -354,7 +462,20 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set tolerance for the stopping criterion based on cost difference</span>
+    <span class="doccomment">/// Set tolerance for the stopping criterion based on cost difference.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Tolerance must be larger than zero and defaults to `sqrt(EPSILON)`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::solver::gaussnewton::GaussNewton;</span>
+    <span class="doccomment">/// # use argmin::core::Error;</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
+    <span class="doccomment">/// let gauss_newton = GaussNewton::new().with_tol(1e-4f64)?;</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tol</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">tol</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
@@ -391,11 +512,20 @@
     <span class="kw">fn</span> <span class="ident">next_iter</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), <span class="ident">J</span>, (), <span class="ident">F</span><span class="op">&gt;</span>,
+        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), <span class="ident">J</span>, (), <span class="ident">F</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), <span class="ident">J</span>, (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">residuals</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">jacobian</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">jacobian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> -&gt; <span class="ident">Error</span> {
+            <span class="ident">ArgminError::NotInitialized</span> {
+                <span class="ident">text</span>: <span class="macro">concat!</span>(
+                    <span class="string">&quot;`GaussNewton` requires an initial parameter vector. &quot;</span>,
+                    <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
+                )
+                .<span class="ident">to_string</span>(),
+            }
+            .<span class="ident">into</span>()
+        })<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">residuals</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">apply</span>(<span class="ident">param</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">jacobian</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">jacobian</span>(<span class="ident">param</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">jacobian</span>
             .<span class="ident">clone</span>()
@@ -429,7 +559,7 @@
     <span class="macro">test_trait_impl!</span>(<span class="ident">gauss_newton_method</span>, <span class="ident">GaussNewton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_default</span>() {
+    <span class="kw">fn</span> <span class="ident">test_new</span>() {
         <span class="kw">let</span> <span class="ident">GaussNewton</span> { <span class="ident">tol</span>: <span class="ident">t</span>, <span class="ident">gamma</span>: <span class="ident">g</span> } <span class="op">=</span> <span class="ident">GaussNewton</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="ident">::new</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">to_ne_bytes</span>(), (<span class="number">1.0f64</span>).<span class="ident">to_ne_bytes</span>());
@@ -448,9 +578,10 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_tolerance_error</span>() {
         <span class="kw">let</span> <span class="ident">tol</span> <span class="op">=</span> <span class="op">-</span><span class="number">2.0</span>;
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewton::new</span>().<span class="ident">with_tol</span>(<span class="ident">tol</span>).<span class="ident">err</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">error</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">ArgminError</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
+        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewton::new</span>().<span class="ident">with_tol</span>(<span class="ident">tol</span>);
+        <span class="macro">assert_error!</span>(
+            <span class="ident">error</span>,
+            <span class="ident">ArgminError</span>,
             <span class="string">&quot;Invalid parameter: \&quot;Gauss-Newton: tol must be positive.\&quot;&quot;</span>
         );
     }
@@ -467,24 +598,64 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_gamma_errors</span>() {
         <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="op">-</span><span class="number">0.5</span>;
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewton::new</span>().<span class="ident">with_gamma</span>(<span class="ident">gamma</span>).<span class="ident">err</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">error</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">ArgminError</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
+        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewton::new</span>().<span class="ident">with_gamma</span>(<span class="ident">gamma</span>);
+        <span class="macro">assert_error!</span>(
+            <span class="ident">error</span>,
+            <span class="ident">ArgminError</span>,
             <span class="string">&quot;Invalid parameter: \&quot;Gauss-Newton: gamma must be in  (0, 1].\&quot;&quot;</span>
         );
 
         <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="number">0.0</span>;
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewton::new</span>().<span class="ident">with_gamma</span>(<span class="ident">gamma</span>).<span class="ident">err</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">error</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">ArgminError</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
+        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewton::new</span>().<span class="ident">with_gamma</span>(<span class="ident">gamma</span>);
+        <span class="macro">assert_error!</span>(
+            <span class="ident">error</span>,
+            <span class="ident">ArgminError</span>,
             <span class="string">&quot;Invalid parameter: \&quot;Gauss-Newton: gamma must be in  (0, 1].\&quot;&quot;</span>
         );
 
         <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="number">2.0</span>;
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewton::new</span>().<span class="ident">with_gamma</span>(<span class="ident">gamma</span>).<span class="ident">err</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">error</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">ArgminError</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
+        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewton::new</span>().<span class="ident">with_gamma</span>(<span class="ident">gamma</span>);
+        <span class="macro">assert_error!</span>(
+            <span class="ident">error</span>,
+            <span class="ident">ArgminError</span>,
             <span class="string">&quot;Invalid parameter: \&quot;Gauss-Newton: gamma must be in  (0, 1].\&quot;&quot;</span>
+        );
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_next_iter_param_not_initialized</span>() {
+        <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">Array</span>, <span class="ident">Array1</span>, <span class="ident">Array2</span>};
+
+        <span class="kw">struct</span> <span class="ident">TestProblem</span> {}
+
+        <span class="kw">impl</span> <span class="ident">Operator</span> <span class="kw">for</span> <span class="ident">TestProblem</span> {
+            <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+
+            <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">Array1::from_vec</span>(<span class="macro">vec!</span>[<span class="number">0.5</span>, <span class="number">2.0</span>]))
+            }
+        }
+
+        <span class="kw">impl</span> <span class="ident">Jacobian</span> <span class="kw">for</span> <span class="ident">TestProblem</span> {
+            <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+            <span class="kw">type</span> <span class="ident">Jacobian</span> <span class="op">=</span> <span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+
+            <span class="kw">fn</span> <span class="ident">jacobian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Jacobian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">Array::from_shape_vec</span>((<span class="number">2</span>, <span class="number">2</span>), <span class="macro">vec!</span>[<span class="number">1f64</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>])<span class="question-mark">?</span>)
+            }
+        }
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gn</span> <span class="op">=</span> <span class="ident">GaussNewton</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="ident">::new</span>();
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">gn</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem</span> {}), <span class="ident">IterState::new</span>());
+        <span class="macro">assert_error!</span>(
+            <span class="ident">res</span>,
+            <span class="ident">ArgminError</span>,
+            <span class="macro">concat!</span>(
+                <span class="string">&quot;Not initialized: \&quot;`GaussNewton` requires an initial parameter vector. &quot;</span>,
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
+            )
         );
     }
 
@@ -597,5 +768,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
 </body></html>

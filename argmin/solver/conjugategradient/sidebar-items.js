@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["beta","Beta update methods for `NonlinearConjugateGradient`"]],"struct":[["ConjugateGradient","A solver for systems of linear equations with a symmetric and positive-definite matrix."],["NonlinearConjugateGradient","A generalization of the conjugate gradient method for nonlinear optimization problems."]]});
+initSidebarItems({"mod":[["beta","Beta update methods for `NonlinearConjugateGradient`"]],"struct":[["ConjugateGradient","Conjugate Gradient method"],["NonlinearConjugateGradient","Non-linear Conjugate Gradient method"]]});

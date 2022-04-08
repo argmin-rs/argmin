@@ -1,9 +1,13 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="argmin is a numerical optimization library written entirely in Rust."><meta name="keywords" content="rust, rustlang, rust-lang, argmin"><title>argmin - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
-    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.png" alt="logo"></div>
-        </a><h2 class="location">Crate argmin</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.5.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all argmin's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div><div id="sidebar-vars" data-name="argmin" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../argmin/index.html"><img class="rust-logo" src="../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/argmin/lib.rs.html#8-637" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"><a href="#">Crate argmin</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.5.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div></section><div id="sidebar-vars" data-name="argmin" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../argmin/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin/lib.rs.html#8-637">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
 <p><a href="https://docs.rs/argmin/latest/argmin/">Documentation of most recent release</a></p>
 <p><a href="https://argmin-rs.github.io/argmin/argmin/">Documentation of main branch</a></p>
-<h2 id="design-goals" class="section-header"><a href="#design-goals">Design goals</a></h2>
+<h2 id="design-goals"><a href="#design-goals">Design goals</a></h2>
 <p>argmin aims at offering a wide range of optimization algorithms with a consistent interface,
 written purely in Rust. It comes with additional features such as checkpointing and observers
 which for instance make it possible to log the progress of an optimization to screen or file.</p>
@@ -15,7 +19,7 @@ taken care of by the library.</p>
 functions enable the use of common backends such as <code>ndarray</code> and <code>nalgebra</code> via the
 <code>argmin-math</code> crate. All operations can be performed with 32 and 64 bit floats. Custom types are
 of course also supported.</p>
-<h2 id="contributing" class="section-header"><a href="#contributing">Contributing</a></h2>
+<h2 id="contributing"><a href="#contributing">Contributing</a></h2>
 <p>This crate is looking for contributors!
 Potential projects can be found in the
 <a href="https://github.com/argmin-rs/argmin/issues">Github issues</a>, but feel free to suggest your own
@@ -24,7 +28,7 @@ also highly welcome, for instance improving performance, documentation, writing 
 real world problems), developing tests, adding observers, implementing a C interface or
 <a href="https://github.com/argmin-rs/pyargmin">Python wrappers</a>.
 Bug reports (and fixes) are of course also highly appreciated.</p>
-<h2 id="algorithms" class="section-header"><a href="#algorithms">Algorithms</a></h2>
+<h2 id="algorithms"><a href="#algorithms">Algorithms</a></h2>
 <ul>
 <li>
 <p><a href="solver/linesearch/index.html">Line searches</a></p>
@@ -93,11 +97,11 @@ Bug reports (and fixes) are of course also highly appreciated.</p>
 <p><a href="solver/particleswarm/struct.ParticleSwarm.html">Particle Swarm Optimization</a></p>
 </li>
 </ul>
-<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
+<h2 id="examples"><a href="#examples">Examples</a></h2>
 <p>Examples for each solver can be found
 <a href="https://github.com/argmin-rs/argmin/tree/v0.5.0/examples">here (current released version)</a> and
 <a href="https://github.com/argmin-rs/argmin/tree/main/argmin/examples">here (main branch)</a>.</p>
-<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
+<h2 id="usage"><a href="#usage">Usage</a></h2>
 <p>Add this to your <code>Cargo.toml</code>:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
  argmin = &quot;0.5.0&quot;
@@ -108,29 +112,29 @@ argmin = { git = &quot;https://github.com/argmin-rs/argmin&quot; }
 argmin-math = { git = &quot;https://github.com/argmin-rs/argmin&quot;, features = [&quot;ndarray_latest-serde,nalgebra_latest-serde&quot;] }</code></pre></div>
 <p>(For which features to select for <code>argmin-math</code> please see the
 <a href="https://docs.rs/argmin/latest/argmin-math">documentation</a>.)</p>
-<h3 id="features" class="section-header"><a href="#features">Features</a></h3><h4 id="default-features" class="section-header"><a href="#default-features">Default features</a></h4>
+<h3 id="features"><a href="#features">Features</a></h3><h4 id="default-features"><a href="#default-features">Default features</a></h4>
 <ul>
 <li><code>slog-logger</code>: Support for logging using <code>slog</code></li>
 <li><code>serde1</code>: Support for <code>serde</code>. Needed for checkpointing and writing parameters to disk as
 well as logging to disk.</li>
 </ul>
-<h4 id="optional-features" class="section-header"><a href="#optional-features">Optional features</a></h4>
+<h4 id="optional-features"><a href="#optional-features">Optional features</a></h4>
 <p>The <code>ctrlc</code> feature uses the <code>ctrlc</code> crate to properly stop the optimization (and return the
 current best result) after pressing Ctrl+C during an optimization run.</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
- argmin = { version = &quot;0.5.0&quot;, features = [&quot;ctrlc&quot;] }</code></pre></div><h4 id="experimental-support-for-compiling-to-webassembly" class="section-header"><a href="#experimental-support-for-compiling-to-webassembly">Experimental support for compiling to WebAssembly</a></h4>
+ argmin = { version = &quot;0.5.0&quot;, features = [&quot;ctrlc&quot;] }</code></pre></div><h4 id="experimental-support-for-compiling-to-webassembly"><a href="#experimental-support-for-compiling-to-webassembly">Experimental support for compiling to WebAssembly</a></h4>
 <p>When compiling to WASM, the feature <code>wasm-bindgen</code> must be used.</p>
 <p>WASM support is still experimental. Please report any issues you encounter when using argmin
 in a WASM context.</p>
-<h4 id="compiling-without-serde-dependency" class="section-header"><a href="#compiling-without-serde-dependency">Compiling without <code>serde</code> dependency</a></h4>
+<h4 id="compiling-without-serde-dependency"><a href="#compiling-without-serde-dependency">Compiling without <code>serde</code> dependency</a></h4>
 <p>The <code>serde</code> dependency can be removed by turning off the <code>serde1</code> feature, for instance like so:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
  argmin = { version = &quot;0.5.0&quot;, default-features = false, features = [&quot;slog-logger&quot;] }</code></pre></div>
 <p>Note that this will remove the ability to write parameters and logs to disk as well as
 checkpointing.</p>
-<h3 id="running-the-tests-and-building-the-examples" class="section-header"><a href="#running-the-tests-and-building-the-examples">Running the tests and building the examples</a></h3>
+<h3 id="running-the-tests-and-building-the-examples"><a href="#running-the-tests-and-building-the-examples">Running the tests and building the examples</a></h3>
 <p>The tests and examples require a set of features to be enabled:</p>
-<div class="example-wrap"><pre class="language-bash"><code>cargo test --features &quot;argmin/ctrlc,argmin-math/ndarray_latest-serde,argmin-math/nalgebra_latest-serde,argmin/ndarrayl&quot;</code></pre></div><h2 id="defining-a-problem" class="section-header"><a href="#defining-a-problem">Defining a problem</a></h2>
+<div class="example-wrap"><pre class="language-bash"><code>cargo test --features &quot;argmin/ctrlc,argmin-math/ndarray_latest-serde,argmin-math/nalgebra_latest-serde,argmin/ndarrayl&quot;</code></pre></div><h2 id="defining-a-problem"><a href="#defining-a-problem">Defining a problem</a></h2>
 <p>TODO TODO TODO TODO Rewrite!
 A problem can be defined by implementing the <code>ArgminOp</code> trait which comes with the
 associated types <code>Param</code>, <code>Output</code> and <code>Hessian</code>. <code>Param</code> is the type of your
@@ -202,7 +206,7 @@ at <code>p</code>.</li>
 <p>It is optional to implement any of these methods, as there are default implementations which
 will return an <code>Err</code> when called. What needs to be implemented is defined by the requirements
 of the solver that is to be used.</p>
-<h2 id="running-a-solver" class="section-header"><a href="#running-a-solver">Running a solver</a></h2>
+<h2 id="running-a-solver"><a href="#running-a-solver">Running a solver</a></h2>
 <p>The following example shows how to use the previously shown definition of a problem in a
 Steepest Descent (Gradient Descent) solver.</p>
 
@@ -238,7 +242,7 @@ Steepest Descent (Gradient Descent) solver.</p>
     .<span class="ident">run</span>()<span class="question-mark">?</span>;
 <span class="comment">// print result</span>
 <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">res</span>);</code></pre></div>
-<h2 id="observing-iterations" class="section-header"><a href="#observing-iterations">Observing iterations</a></h2>
+<h2 id="observing-iterations"><a href="#observing-iterations">Observing iterations</a></h2>
 <p>Argmin offers an interface to observe the state of the solver at initialization as well as
 after every iteration. This includes the parameter vector, gradient, Hessian, iteration number,
 cost values and many more as well as solver-specific metrics. This interface can be used to
@@ -266,7 +270,7 @@ is indicated via the enum <code>ObserverMode</code> which can be either <code>Al
     )
     <span class="comment">// run the solver on the defined problem</span>
     .<span class="ident">run</span>()<span class="question-mark">?</span>;</code></pre></div>
-<h2 id="checkpoints" class="section-header"><a href="#checkpoints">Checkpoints</a></h2>
+<h2 id="checkpoints"><a href="#checkpoints">Checkpoints</a></h2>
 <p>The probability of crashes increases with runtime, therefore one may want to save checkpoints
 in order to be able to resume the optimization after a crash.
 The <code>CheckpointingFrequency</code> defines how often checkpoints are saved and is either <code>Never</code> (default),
@@ -289,7 +293,7 @@ new <code>Executor</code>, thus starting from scratch.</p>
     .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">init_param</span>).<span class="ident">max_iters</span>(<span class="ident">iters</span>))
     .<span class="ident">checkpointing</span>(<span class="ident">checkpoint</span>)
     .<span class="ident">run</span>()<span class="question-mark">?</span>;</code></pre></div>
-<h2 id="implementing-an-optimization-algorithm" class="section-header"><a href="#implementing-an-optimization-algorithm">Implementing an optimization algorithm</a></h2>
+<h2 id="implementing-an-optimization-algorithm"><a href="#implementing-an-optimization-algorithm">Implementing an optimization algorithm</a></h2>
 <p>In this section we are going to implement the Landweber solver, which essentially is a special
 form of gradient descent. In iteration <code>k</code>, the new parameter vector <code>x_{k+1}</code> is calculated
 from the previous parameter vector <code>x_k</code> and the gradient at <code>x_k</code> according to the following
@@ -359,7 +363,7 @@ cost function values, iteration number, …), respectively.</p>
         <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">xkp1</span>), <span class="prelude-val">None</span>))
     }
 }</code></pre></div>
-<h2 id="license" class="section-header"><a href="#license">License</a></h2>
+<h2 id="license"><a href="#license">License</a></h2>
 <p>Licensed under either of</p>
 <ul>
 <li>Apache License, Version 2.0,
@@ -369,7 +373,7 @@ cost function values, iteration number, …), respectively.</p>
 <a href="http://opensource.org/licenses/MIT">http://opensource.org/licenses/MIT</a>)</li>
 </ul>
 <p>at your option.</p>
-<h3 id="contribution" class="section-header"><a href="#contribution">Contribution</a></h3>
+<h3 id="contribution"><a href="#contribution">Contribution</a></h3>
 <p>Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
 in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
 without any additional terms or conditions.</p>
@@ -382,5 +386,5 @@ without any additional terms or conditions.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.make_kv.html" title="argmin::make_kv macro">make_kv</a></div><div class="item-right docblock-short"><p>Creates an <code>KV</code> at compile time</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.trait_bound.html" title="argmin::trait_bound macro">trait_bound</a></div><div class="item-right docblock-short"><p>Reuse a list of trait bounds by giving it a name,
 e.g. trait_bound!(CopyAndDefault; Copy, Default);</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
 </body></html>

@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["gaussnewton_linesearch","Gauss-Newton method with linesearch"],["gaussnewton_method","Gauss-Newton method"]]});
+initSidebarItems({"struct":[["GaussNewton","Gauss-Newton method"],["GaussNewtonLS","Gauss-Newton method with line search"]]});
