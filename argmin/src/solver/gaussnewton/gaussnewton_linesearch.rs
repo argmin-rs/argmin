@@ -5,25 +5,26 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # References:
-//!
-//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
-//! Springer. ISBN 0-387-30303-0.
-
 use crate::core::{
     ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    Hessian, IterState, Jacobian, LineSearch, Operator, OptimizationResult, Problem,
-    SerializeAlias, Solver, TerminationReason, KV,
+    IterState, Jacobian, LineSearch, Operator, OptimizationResult, Problem, SerializeAlias, Solver,
+    TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminTranspose};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
-/// Gauss-Newton method with linesearch
+/// # Gauss-Newton method with line search
 ///
-/// # References:
+/// Gauss-Newton method where an appropriate step length is obtained by a line search.
 ///
-/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Requires that the provided optimization problem implements [`Operator`] and [`Jacobian`].
+///
+/// Requires an initial parameter vector.
+///
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -35,7 +36,15 @@ pub struct GaussNewtonLS<L, F> {
 }
 
 impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
-    /// Constructor
+    /// Construct a new instance of [`GaussNewtonLS`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::gaussnewton::GaussNewtonLS;
+    /// # let linesearch = ();
+    /// let gauss_newton_ls: GaussNewtonLS<_, f64> = GaussNewtonLS::new(linesearch);
+    /// ```
     pub fn new(linesearch: L) -> Self {
         GaussNewtonLS {
             linesearch,
@@ -43,7 +52,21 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
         }
     }
 
-    /// Set tolerance for the stopping criterion based on cost difference
+    /// Set tolerance for the stopping criterion based on cost difference.
+    ///
+    /// Tolerance must be larger than zero and defaults to `sqrt(EPSILON)`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::gaussnewton::GaussNewtonLS;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// # let linesearch = ();
+    /// let gauss_newton_ls = GaussNewtonLS::new(linesearch).with_tol(1e-4f64)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn with_tol(mut self, tol: F) -> Result<Self, Error> {
         if tol <= F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
@@ -73,14 +96,23 @@ where
     L: Clone + LineSearch<P, F> + Solver<LineSearchProblem<O, F>, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Gauss-Newton method with Linesearch";
+    const NAME: &'static str = "Gauss-Newton method with line search";
 
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
         mut state: IterState<P, G, J, (), F>,
     ) -> Result<(IterState<P, G, J, (), F>, Option<KV>), Error> {
-        let param = state.take_param().unwrap();
+        let param = state.take_param().ok_or_else(|| -> Error {
+            ArgminError::NotInitialized {
+                text: concat!(
+                    "`GaussNewtonLS` requires an initial parameter vector. ",
+                    "Please provide an initial guess via `Executor`s `configure` method."
+                )
+                .to_string(),
+            }
+            .into()
+        })?;
         let residuals = problem.apply(&param)?;
         let jacobian = problem.jacobian(&param)?;
         let jacobian_t = jacobian.clone().t();
@@ -97,7 +129,12 @@ where
             state: mut linesearch_state,
             ..
         } = Executor::new(
-            LineSearchProblem::new(problem.take_problem().unwrap()),
+            LineSearchProblem::new(problem.take_problem().ok_or_else(|| -> Error {
+                ArgminError::PotentialBug {
+                    text: "`GaussNewtonLS`: Failed to take `problem` for line search".to_string(),
+                }
+                .into()
+            })?),
             self.linesearch.clone(),
         )
         .configure(|config| config.param(param).grad(grad).cost(residuals.norm()))
@@ -107,12 +144,29 @@ where
         // Here we cannot use `consume_problem` because the problem we need is hidden inside a
         // `LineSearchProblem` hidden inside a `Problem`. Therefore we have to split this in two
         // separate tasks: first getting the problem, then dealing with the function counts.
-        problem.problem = Some(line_problem.take_problem().unwrap().problem);
+        problem.problem = Some(
+            line_problem
+                .take_problem()
+                .ok_or_else(|| -> Error {
+                    ArgminError::PotentialBug {
+                        text: "`GaussNewtonLS`: Failed to take `problem` from line search"
+                            .to_string(),
+                    }
+                    .into()
+                })?
+                .problem,
+        );
         problem.consume_func_counts(line_problem);
 
         Ok((
             state
-                .param(linesearch_state.take_param().unwrap())
+                .param(linesearch_state.take_param().ok_or_else(|| -> Error {
+                    ArgminError::PotentialBug {
+                        text: "`GaussNewtonLS`: Failed to take `param` from line search state"
+                            .to_string(),
+                    }
+                    .into()
+                })?)
                 .cost(linesearch_state.get_cost()),
             None,
         ))
@@ -129,14 +183,14 @@ where
 #[doc(hidden)]
 #[derive(Clone, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct LineSearchProblem<O, F> {
-    pub problem: O,
+struct LineSearchProblem<O, F> {
+    problem: O,
     _phantom: std::marker::PhantomData<F>,
 }
 
 impl<O, F> LineSearchProblem<O, F> {
-    /// constructor
-    pub fn new(operator: O) -> Self {
+    /// Construct a new [`LineSearchProblem`]
+    fn new(operator: O) -> Self {
         LineSearchProblem {
             problem: operator,
             _phantom: std::marker::PhantomData,
@@ -172,53 +226,247 @@ where
     }
 }
 
-impl<O, P, H, F> Hessian for LineSearchProblem<O, F>
-where
-    P: Clone + SerializeAlias + DeserializeOwnedAlias,
-    H: Clone + SerializeAlias + DeserializeOwnedAlias,
-    O: Hessian<Param = P, Hessian = H>,
-{
-    type Param = P;
-    type Hessian = H;
-
-    fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-        self.problem.hessian(p)
-    }
-}
-
-impl<O, P, J, F> Jacobian for LineSearchProblem<O, F>
-where
-    O: Jacobian<Param = P, Jacobian = J>,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias,
-    J: Clone + SerializeAlias + DeserializeOwnedAlias,
-{
-    type Param = P;
-    type Jacobian = J;
-
-    fn jacobian(&self, p: &Self::Param) -> Result<Self::Jacobian, Error> {
-        self.problem.jacobian(p)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::solver::linesearch::MoreThuenteLineSearch;
-    use crate::test_trait_impl;
+    #[cfg(feature = "ndarrayl")]
+    use crate::core::{IterState, State};
+    use crate::solver::linesearch::{ArmijoCondition, BacktrackingLineSearch};
+    use crate::{assert_error, test_trait_impl};
+    #[cfg(feature = "ndarrayl")]
+    use approx::assert_relative_eq;
 
     test_trait_impl!(
         gauss_newton_linesearch_method,
-        GaussNewtonLS<MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>, f64>
+        GaussNewtonLS<BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64>, f64>
     );
+
+    #[test]
+    fn test_new() {
+        #[derive(Eq, PartialEq, Debug)]
+        struct MyLinesearch {}
+
+        let GaussNewtonLS {
+            linesearch: ls,
+            tol: t,
+        } = GaussNewtonLS::<_, f64>::new(MyLinesearch {});
+
+        assert_eq!(ls, MyLinesearch {});
+        assert_eq!(t.to_ne_bytes(), f64::EPSILON.sqrt().to_ne_bytes());
+    }
 
     #[test]
     fn test_tolerance() {
         let tol1: f64 = 1e-4;
 
-        let linesearch: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
-            MoreThuenteLineSearch::new();
+        let linesearch = ();
         let GaussNewtonLS { tol: t1, .. } = GaussNewtonLS::new(linesearch).with_tol(tol1).unwrap();
 
-        assert!((t1 - tol1).abs() < std::f64::EPSILON);
+        assert_eq!(t1.to_ne_bytes(), tol1.to_ne_bytes());
+    }
+
+    #[test]
+    fn test_tolerance_error_when_negative() {
+        let tol = -2.0;
+        let error = GaussNewtonLS::new(()).with_tol(tol);
+        assert_error!(
+            error,
+            ArgminError,
+            "Invalid parameter: \"Gauss-Newton-Linesearch: tol must be positive.\""
+        );
+    }
+
+    #[test]
+    fn test_tolerance_error_when_zero() {
+        let tol = 0.0;
+        let error = GaussNewtonLS::new(()).with_tol(tol);
+        assert_error!(
+            error,
+            ArgminError,
+            "Invalid parameter: \"Gauss-Newton-Linesearch: tol must be positive.\""
+        );
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_line_search_sub_problem() {
+        use ndarray::{Array, Array1, Array2};
+
+        struct TestProblem {}
+
+        impl Operator for TestProblem {
+            type Param = Array1<f64>;
+            type Output = Array1<f64>;
+
+            fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
+                Ok(Array1::from_vec(vec![0.5, 2.0]))
+            }
+        }
+
+        impl Gradient for TestProblem {
+            type Param = Array1<f64>;
+            type Gradient = Array1<f64>;
+
+            fn gradient(&self, _p: &Self::Param) -> Result<Self::Gradient, Error> {
+                Ok(Array1::from_vec(vec![1.5, 3.0]))
+            }
+        }
+
+        impl Jacobian for TestProblem {
+            type Param = Array1<f64>;
+            type Jacobian = Array2<f64>;
+
+            fn jacobian(&self, _p: &Self::Param) -> Result<Self::Jacobian, Error> {
+                Ok(Array::from_shape_vec((2, 2), vec![1f64, 2.0, 3.0, 4.0])?)
+            }
+        }
+
+        let lsp: LineSearchProblem<_, f64> = LineSearchProblem::new(TestProblem {});
+
+        let res = lsp.cost(&Array1::from_vec(vec![])).unwrap();
+        assert_relative_eq!(
+            res,
+            (0.5f64.powi(2) + 2.0f64.powi(2)).sqrt(),
+            epsilon = f64::EPSILON
+        );
+
+        let res = lsp.gradient(&Array1::from_vec(vec![])).unwrap();
+        assert_relative_eq!(res[0], 1.0 * 0.5 + 3.0 * 2.0, epsilon = f64::EPSILON);
+        assert_relative_eq!(res[1], 2.0 * 0.5 + 4.0 * 2.0, epsilon = f64::EPSILON);
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_next_iter_param_not_initialized() {
+        use ndarray::{Array, Array1, Array2};
+
+        struct TestProblem {}
+
+        impl Operator for TestProblem {
+            type Param = Array1<f64>;
+            type Output = Array1<f64>;
+
+            fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
+                Ok(Array1::from_vec(vec![0.5, 2.0]))
+            }
+        }
+
+        impl Jacobian for TestProblem {
+            type Param = Array1<f64>;
+            type Jacobian = Array2<f64>;
+
+            fn jacobian(&self, _p: &Self::Param) -> Result<Self::Jacobian, Error> {
+                Ok(Array::from_shape_vec((2, 2), vec![1f64, 2.0, 3.0, 4.0])?)
+            }
+        }
+
+        let linesearch: BacktrackingLineSearch<
+            Array1<f64>,
+            Array1<f64>,
+            ArmijoCondition<f64>,
+            f64,
+        > = BacktrackingLineSearch::new(ArmijoCondition::new(0.2).unwrap());
+        let mut gnls = GaussNewtonLS::<_, f64>::new(linesearch);
+        let res = gnls.next_iter(&mut Problem::new(TestProblem {}), IterState::new());
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`GaussNewtonLS` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method.\""
+            )
+        );
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_next_iter_regression() {
+        use ndarray::{Array, Array1, Array2};
+        use std::cell::RefCell;
+
+        struct MyProblem {
+            counter: RefCell<usize>,
+        }
+
+        impl Operator for MyProblem {
+            type Param = Array1<f64>;
+            type Output = Array1<f64>;
+
+            fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
+                if *self.counter.borrow() == 0 {
+                    let mut c = self.counter.borrow_mut();
+                    *c += 1;
+                    Ok(Array1::from_vec(vec![0.5, 2.0]))
+                } else {
+                    Ok(Array1::from_vec(vec![0.3, 1.0]))
+                }
+            }
+        }
+
+        impl Gradient for MyProblem {
+            type Param = Array1<f64>;
+            type Gradient = Array1<f64>;
+
+            fn gradient(&self, _p: &Self::Param) -> Result<Self::Gradient, Error> {
+                Ok(Array1::from_vec(vec![3.2, 1.1]))
+            }
+        }
+
+        impl Jacobian for MyProblem {
+            type Param = Array1<f64>;
+            type Jacobian = Array2<f64>;
+
+            fn jacobian(&self, _p: &Self::Param) -> Result<Self::Jacobian, Error> {
+                Ok(Array::from_shape_vec((2, 2), vec![1f64, 2.0, 3.0, 4.0])?)
+            }
+        }
+
+        let problem = MyProblem {
+            counter: RefCell::new(0),
+        };
+
+        let linesearch: BacktrackingLineSearch<
+            Array1<f64>,
+            Array1<f64>,
+            ArmijoCondition<f64>,
+            f64,
+        > = BacktrackingLineSearch::new(ArmijoCondition::new(0.2).unwrap());
+        let mut gnls = GaussNewtonLS::<_, f64>::new(linesearch);
+        let state = IterState::new()
+            .param(Array1::from_vec(vec![1.0, 2.0]))
+            .jacobian(Array::from_shape_vec((2, 2), vec![1f64, 2.0, 3.0, 4.0]).unwrap());
+        let mut problem = Problem::new(problem);
+        let (mut state, kv) = gnls.next_iter(&mut problem, state).unwrap();
+        state.update();
+
+        assert!(kv.is_none());
+
+        assert_relative_eq!(
+            state.param.as_ref().unwrap()[0],
+            7.105427357601002e-15,
+            epsilon = f64::EPSILON
+        );
+        assert_relative_eq!(
+            state.param.as_ref().unwrap()[1],
+            2.25f64,
+            epsilon = f64::EPSILON
+        );
+        assert_relative_eq!(
+            state.best_param.as_ref().unwrap()[0],
+            7.105427357601002e-15,
+            epsilon = f64::EPSILON
+        );
+        assert_relative_eq!(
+            state.best_param.as_ref().unwrap()[1],
+            2.25f64,
+            epsilon = f64::EPSILON
+        );
+        assert_relative_eq!(state.cost, 1.044030650891055f64, epsilon = f64::EPSILON);
+        assert!(!state.prev_cost.is_finite());
+        assert_relative_eq!(
+            state.best_cost,
+            1.044030650891055f64,
+            epsilon = f64::EPSILON
+        );
     }
 }

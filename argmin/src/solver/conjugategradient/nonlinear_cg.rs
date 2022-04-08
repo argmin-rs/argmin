@@ -20,6 +20,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// Requires that the provided optimization problem implements [`CostFunction`] and [`Gradient`].
 ///
+/// Requires an initial parameter vector.
+///
 /// # Reference
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
