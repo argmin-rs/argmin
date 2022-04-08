@@ -22,6 +22,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// Requires that the provided optimization problem implements [`Operator`].
 ///
+/// Requires an initial parameter vector.
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
