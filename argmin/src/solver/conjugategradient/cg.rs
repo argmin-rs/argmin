@@ -13,6 +13,8 @@ use argmin_math::{ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd,
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
+/// # Conjugate Gradient method
+///
 /// A solver for systems of linear equations with a symmetric and positive-definite matrix.
 ///
 /// Solves systems of the form `A * x = b` where `x` and `b` are vectors and `A` is a symmetric and
@@ -20,9 +22,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// Requires that the provided optimization problem implements [`Operator`].
 ///
-/// # Reference
+/// ## Reference
 ///
-/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]

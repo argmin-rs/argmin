@@ -5,24 +5,23 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # References:
-//!
-//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
-//! Springer. ISBN 0-387-30303-0.
-
 use crate::core::{
-    ArgminError, ArgminFloat, Error, IterState, Jacobian, Operator, Problem, Solver,
+    ArgminError, ArgminFloat, Error, IterState, Jacobian, Operator, Problem, Solver, State,
     TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
-/// Gauss-Newton method
+/// # Gauss-Newton method
 ///
-/// # References:
+/// The Gauss-Newton method is used to solve non-linear least squares problems.
 ///
-/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Requires that the provided optimization problem implements [`Operator`] and [`Jacobian`].
+///
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -34,7 +33,14 @@ pub struct GaussNewton<F> {
 }
 
 impl<F: ArgminFloat> GaussNewton<F> {
-    /// Constructor
+    /// Construct a new instance of [`GaussNewton`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::gaussnewton::GaussNewton;
+    /// let gauss_newton: GaussNewton<f64> = GaussNewton::new();
+    /// ```
     pub fn new() -> Self {
         GaussNewton {
             gamma: F::from_f64(1.0).unwrap(),
@@ -42,7 +48,20 @@ impl<F: ArgminFloat> GaussNewton<F> {
         }
     }
 
-    /// set gamma
+    /// Set step width gamma.
+    ///
+    /// Gamma must be within `(0, 1]`. Defaults to `1.0`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::gaussnewton::GaussNewton;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let gauss_newton = GaussNewton::new().with_gamma(0.5f64)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn with_gamma(mut self, gamma: F) -> Result<Self, Error> {
         if gamma <= F::from_f64(0.0).unwrap() || gamma > F::from_f64(1.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
@@ -54,7 +73,20 @@ impl<F: ArgminFloat> GaussNewton<F> {
         Ok(self)
     }
 
-    /// Set tolerance for the stopping criterion based on cost difference
+    /// Set tolerance for the stopping criterion based on cost difference.
+    ///
+    /// Tolerance must be larger than zero and defaults to `sqrt(EPSILON)`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::gaussnewton::GaussNewton;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let gauss_newton = GaussNewton::new().with_tol(1e-4f64)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn with_tol(mut self, tol: F) -> Result<Self, Error> {
         if tol <= F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
@@ -91,11 +123,20 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, (), J, (), F>,
+        state: IterState<P, (), J, (), F>,
     ) -> Result<(IterState<P, (), J, (), F>, Option<KV>), Error> {
-        let param = state.take_param().unwrap();
-        let residuals = problem.apply(&param)?;
-        let jacobian = problem.jacobian(&param)?;
+        let param = state.get_param().ok_or_else(|| -> Error {
+            ArgminError::NotInitialized {
+                text: concat!(
+                    "`GaussNewton` requires an initial parameter vector. ",
+                    "Please provide an initial guess via `Executor`s `configure` method."
+                )
+                .to_string(),
+            }
+            .into()
+        })?;
+        let residuals = problem.apply(param)?;
+        let jacobian = problem.jacobian(param)?;
 
         let p = jacobian
             .clone()
@@ -129,7 +170,7 @@ mod tests {
     test_trait_impl!(gauss_newton_method, GaussNewton<f64>);
 
     #[test]
-    fn test_default() {
+    fn test_new() {
         let GaussNewton { tol: t, gamma: g } = GaussNewton::<f64>::new();
 
         assert_eq!(g.to_ne_bytes(), (1.0f64).to_ne_bytes());
@@ -148,9 +189,10 @@ mod tests {
     #[test]
     fn test_tolerance_error() {
         let tol = -2.0;
-        let error = GaussNewton::new().with_tol(tol).err().unwrap();
-        assert_eq!(
-            error.downcast_ref::<ArgminError>().unwrap().to_string(),
+        let error = GaussNewton::new().with_tol(tol);
+        assert_error!(
+            error,
+            ArgminError,
             "Invalid parameter: \"Gauss-Newton: tol must be positive.\""
         );
     }
@@ -167,24 +209,64 @@ mod tests {
     #[test]
     fn test_gamma_errors() {
         let gamma = -0.5;
-        let error = GaussNewton::new().with_gamma(gamma).err().unwrap();
-        assert_eq!(
-            error.downcast_ref::<ArgminError>().unwrap().to_string(),
+        let error = GaussNewton::new().with_gamma(gamma);
+        assert_error!(
+            error,
+            ArgminError,
             "Invalid parameter: \"Gauss-Newton: gamma must be in  (0, 1].\""
         );
 
         let gamma = 0.0;
-        let error = GaussNewton::new().with_gamma(gamma).err().unwrap();
-        assert_eq!(
-            error.downcast_ref::<ArgminError>().unwrap().to_string(),
+        let error = GaussNewton::new().with_gamma(gamma);
+        assert_error!(
+            error,
+            ArgminError,
             "Invalid parameter: \"Gauss-Newton: gamma must be in  (0, 1].\""
         );
 
         let gamma = 2.0;
-        let error = GaussNewton::new().with_gamma(gamma).err().unwrap();
-        assert_eq!(
-            error.downcast_ref::<ArgminError>().unwrap().to_string(),
+        let error = GaussNewton::new().with_gamma(gamma);
+        assert_error!(
+            error,
+            ArgminError,
             "Invalid parameter: \"Gauss-Newton: gamma must be in  (0, 1].\""
+        );
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_next_iter_param_not_initialized() {
+        use ndarray::{Array, Array1, Array2};
+
+        struct TestProblem {}
+
+        impl Operator for TestProblem {
+            type Param = Array1<f64>;
+            type Output = Array1<f64>;
+
+            fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
+                Ok(Array1::from_vec(vec![0.5, 2.0]))
+            }
+        }
+
+        impl Jacobian for TestProblem {
+            type Param = Array1<f64>;
+            type Jacobian = Array2<f64>;
+
+            fn jacobian(&self, _p: &Self::Param) -> Result<Self::Jacobian, Error> {
+                Ok(Array::from_shape_vec((2, 2), vec![1f64, 2.0, 3.0, 4.0])?)
+            }
+        }
+
+        let mut gn = GaussNewton::<f64>::new();
+        let res = gn.next_iter(&mut Problem::new(TestProblem {}), IterState::new());
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`GaussNewton` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method.\""
+            )
         );
     }
 
