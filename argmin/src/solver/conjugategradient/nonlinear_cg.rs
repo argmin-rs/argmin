@@ -14,6 +14,8 @@ use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
+/// # Non-linear Conjugate Gradient method
+///
 /// A generalization of the conjugate gradient method for nonlinear optimization problems.
 ///
 /// Requires that the provided optimization problem implements [`CostFunction`] and [`Gradient`].

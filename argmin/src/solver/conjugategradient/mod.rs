@@ -10,7 +10,7 @@
 //! * [Conjugate Gradient](`ConjugateGradient`)
 //! * [Nonlinear Conjugate Gradient](`NonlinearConjugateGradient`)
 //!
-//! # Reference
+//! ## Reference
 //!
 //! Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.

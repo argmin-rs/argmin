@@ -5,17 +5,18 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Newton Methods
+//! # Newton Methods
 //!
-//! # References:
+//! * [Gauss-Newton method](`GaussNewton`)
+//! * [Gauss-Newton method with line search](`GaussNewtonLS`)
 //!
-//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! ## Reference
+//!
+//! Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-/// Gauss-Newton method with linesearch
-pub mod gaussnewton_linesearch;
-/// Gauss-Newton method
-pub mod gaussnewton_method;
+mod gaussnewton_linesearch;
+mod gaussnewton_method;
 
-pub use self::gaussnewton_linesearch::*;
-pub use self::gaussnewton_method::*;
+pub use gaussnewton_linesearch::GaussNewtonLS;
+pub use gaussnewton_method::GaussNewton;
