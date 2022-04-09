@@ -63,7 +63,7 @@ where
     }
 
     /// Set tolerance for the stopping criterion based on cost difference
-    pub fn with_tol(mut self, tol: F) -> Result<Self, Error> {
+    pub fn with_tolerance(mut self, tol: F) -> Result<Self, Error> {
         if tol <= F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "Newton-CG: tol must be positive.".to_string(),
@@ -221,7 +221,7 @@ mod tests {
             MoreThuenteLineSearch::new();
 
         let NewtonCG { tol: t, .. }: NewtonCG<MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>, f64> =
-            NewtonCG::new(linesearch).with_tol(tol1).unwrap();
+            NewtonCG::new(linesearch).with_tolerance(tol1).unwrap();
 
         assert!((t - tol1).abs() < std::f64::EPSILON);
     }
