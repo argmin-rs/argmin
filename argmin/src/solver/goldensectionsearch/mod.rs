@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Golden Section Search
+//! # Golden-section search
 //!
 //! The golden-section search is a technique for finding an extremum (minimum or maximum) of a
 //! function inside a specified interval.
@@ -41,6 +41,11 @@ const G2: f64 = 1.0 - G1;
 ///
 /// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.
 ///
+/// Requires that the provided optimization problem implements [`CostFunction`].
+///
+/// Requires an initial guess which is to be provided via [`Executor`](`crate::core::Executor`)s
+/// `configure` method.
+///
 /// ## Reference
 ///
 /// <https://en.wikipedia.org/wiki/Golden-section_search>
@@ -65,9 +70,29 @@ impl<F> GoldenSectionSearch<F>
 where
     F: ArgminFloat,
 {
-    /// Constructor
-    pub fn new(min_bound: F, max_bound: F) -> Self {
-        GoldenSectionSearch {
+    /// Construct a new instance of [`GoldenSectionSearch`].
+    ///
+    /// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::goldensectionsearch::GoldenSectionSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let gss = GoldenSectionSearch::new(-2.5f64, 3.0f64)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn new(min_bound: F, max_bound: F) -> Result<Self, Error> {
+        if max_bound <= min_bound {
+            return Err(ArgminError::InvalidParameter {
+                text: "`GoldenSectionSearch`: `min_bound` must be smaller than `max_bound`."
+                    .to_string(),
+            }
+            .into());
+        }
+        Ok(GoldenSectionSearch {
             g1: F::from(G1).unwrap(),
             g2: F::from(G2).unwrap(),
             min_bound,
@@ -79,14 +104,32 @@ where
             x3: max_bound,
             f1: F::zero(),
             f2: F::zero(),
-        }
+        })
     }
 
-    /// Set tolerance
-    #[must_use]
-    pub fn with_tolerance(mut self, tol: F) -> Self {
-        self.tolerance = tol;
-        self
+    /// Set tolerance.
+    ///
+    /// Must be larger than `0` and defaults to `0.01`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::goldensectionsearch::GoldenSectionSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let gss = GoldenSectionSearch::new(-2.5f64, 3.0f64)?.with_tolerance(0.0001)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_tolerance(mut self, tolerance: F) -> Result<Self, Error> {
+        if tolerance <= F::from_f64(0.0).unwrap() {
+            return Err(ArgminError::InvalidParameter {
+                text: "`GoldenSectionSearch`: Tolerance must be larger than 0.".to_string(),
+            }
+            .into());
+        }
+        self.tolerance = tolerance;
+        Ok(self)
     }
 }
 
@@ -102,10 +145,20 @@ where
         problem: &mut Problem<O>,
         mut state: IterState<F, (), (), (), F>,
     ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
-        let init_estimate = state.take_param().unwrap();
+        let init_estimate = state.take_param().ok_or_else(|| -> Error {
+            ArgminError::NotInitialized {
+                text: concat!(
+                    "`GoldenSectionSearch` requires an initial estimate. ",
+                    "Please provide an initial guess via `Executor`s `configure` method."
+                )
+                .to_string(),
+            }
+            .into()
+        })?;
         if init_estimate < self.min_bound || init_estimate > self.max_bound {
             Err(ArgminError::InvalidParameter {
-                text: "Initial estimate must be ∈ [min_bound, max_bound].".to_string(),
+                text: "`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound]."
+                    .to_string(),
             }
             .into())
         } else {
@@ -164,7 +217,287 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::State;
     use crate::test_trait_impl;
+    use approx::assert_relative_eq;
+
+    #[derive(Clone)]
+    struct GssTestProblem {}
+
+    impl CostFunction for GssTestProblem {
+        type Param = f64;
+        type Output = f64;
+
+        fn cost(&self, x: &Self::Param) -> Result<Self::Output, Error> {
+            Ok((x + 3.0) * (x - 1.0).powi(2))
+        }
+    }
 
     test_trait_impl!(golden_section_search, GoldenSectionSearch<f64>);
+
+    #[test]
+    fn test_new() {
+        let GoldenSectionSearch {
+            g1,
+            g2,
+            min_bound,
+            max_bound,
+            tolerance,
+            x0,
+            x1,
+            x2,
+            x3,
+            f1,
+            f2,
+        } = GoldenSectionSearch::new(-2.5f64, 3.0f64).unwrap();
+
+        assert_eq!(g1.to_ne_bytes(), G1.to_ne_bytes());
+        assert_eq!(g2.to_ne_bytes(), G2.to_ne_bytes());
+        assert_eq!(min_bound.to_ne_bytes(), (-2.5f64).to_ne_bytes());
+        assert_eq!(max_bound.to_ne_bytes(), 3.0f64.to_ne_bytes());
+        assert_eq!(tolerance.to_ne_bytes(), 0.01f64.to_ne_bytes());
+        assert_eq!(x0.to_ne_bytes(), min_bound.to_ne_bytes());
+        assert_eq!(x1.to_ne_bytes(), 0f64.to_ne_bytes());
+        assert_eq!(x2.to_ne_bytes(), 0f64.to_ne_bytes());
+        assert_eq!(x3.to_ne_bytes(), max_bound.to_ne_bytes());
+        assert_eq!(f1.to_ne_bytes(), 0f64.to_ne_bytes());
+        assert_eq!(f2.to_ne_bytes(), 0f64.to_ne_bytes());
+    }
+
+    #[test]
+    fn test_new_errors() {
+        let res = GoldenSectionSearch::new(2.5f64, -3.0f64);
+
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Invalid parameter: \"`GoldenSectionSearch`: ",
+                "`min_bound` must be smaller than `max_bound`.\""
+            )
+        );
+
+        let res = GoldenSectionSearch::new(2.5f64, 2.5f64);
+
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Invalid parameter: \"`GoldenSectionSearch`: ",
+                "`min_bound` must be smaller than `max_bound`.\""
+            )
+        );
+    }
+
+    #[test]
+    fn test_tolerance() {
+        let GoldenSectionSearch { tolerance, .. } = GoldenSectionSearch::new(-2.5f64, 3.0f64)
+            .unwrap()
+            .with_tolerance(0.001)
+            .unwrap();
+
+        assert_eq!(tolerance.to_ne_bytes(), 0.001f64.to_ne_bytes());
+    }
+
+    #[test]
+    fn test_tolerance_errors() {
+        let res = GoldenSectionSearch::new(-2.5f64, 3.0f64)
+            .unwrap()
+            .with_tolerance(0.0);
+        assert_error!(
+            res,
+            ArgminError,
+            "Invalid parameter: \"`GoldenSectionSearch`: Tolerance must be larger than 0.\""
+        );
+
+        let res = GoldenSectionSearch::new(-2.5f64, 3.0f64)
+            .unwrap()
+            .with_tolerance(-1.0);
+        assert_error!(
+            res,
+            ArgminError,
+            "Invalid parameter: \"`GoldenSectionSearch`: Tolerance must be larger than 0.\""
+        );
+    }
+
+    #[test]
+    fn test_init_param_not_initialized() {
+        let mut gss = GoldenSectionSearch::new(-2.5f64, 3.0f64).unwrap();
+        let res = gss.init(&mut Problem::new(GssTestProblem {}), IterState::new());
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`GoldenSectionSearch` requires an initial estimate. ",
+                "Please provide an initial guess via `Executor`s `configure` method.\""
+            )
+        );
+    }
+
+    #[test]
+    fn test_init_param_outside_bounds() {
+        let mut gss = GoldenSectionSearch::new(-2.5f64, 3.0f64).unwrap();
+        let res = gss.init(
+            &mut Problem::new(GssTestProblem {}),
+            IterState::new().param(5.0f64),
+        );
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Invalid parameter: \"`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound].\"",
+            )
+        );
+    }
+
+    #[test]
+    fn test_init() {
+        let mut gss = GoldenSectionSearch::new(-2.5f64, 3.0f64).unwrap();
+        let problem = GssTestProblem {};
+        let (state, kv) = gss
+            .init(
+                &mut Problem::new(problem.clone()),
+                IterState::new().param(-0.5f64),
+            )
+            .unwrap();
+
+        assert!(kv.is_none());
+
+        let GoldenSectionSearch {
+            g1,
+            g2,
+            min_bound,
+            max_bound,
+            tolerance,
+            x0,
+            x1,
+            x2,
+            x3,
+            f1,
+            f2,
+        } = gss.clone();
+
+        assert_relative_eq!(x1, -0.5f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(x2, -0.5f64 + g2 * 3.5f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(f1, problem.cost(&x1).unwrap(), epsilon = f64::EPSILON);
+        assert_relative_eq!(f2, problem.cost(&x2).unwrap(), epsilon = f64::EPSILON);
+        if f1 < f2 {
+            assert_relative_eq!(*state.param.as_ref().unwrap(), x1, epsilon = f64::EPSILON);
+            assert_relative_eq!(state.cost, f1, epsilon = f64::EPSILON);
+        } else {
+            assert_relative_eq!(*state.param.as_ref().unwrap(), x2, epsilon = f64::EPSILON);
+            assert_relative_eq!(state.cost, f2, epsilon = f64::EPSILON);
+        }
+
+        assert_eq!(g1.to_ne_bytes(), G1.to_ne_bytes());
+        assert_eq!(g2.to_ne_bytes(), G2.to_ne_bytes());
+        assert_eq!(min_bound.to_ne_bytes(), (-2.5f64).to_ne_bytes());
+        assert_eq!(max_bound.to_ne_bytes(), 3.0f64.to_ne_bytes());
+        assert_eq!(tolerance.to_ne_bytes(), 0.01f64.to_ne_bytes());
+        assert_eq!(x0.to_ne_bytes(), min_bound.to_ne_bytes());
+        assert_eq!(x3.to_ne_bytes(), max_bound.to_ne_bytes());
+    }
+
+    #[test]
+    fn test_next_iter_1() {
+        let mut gss = GoldenSectionSearch::new(-2.5f64, 3.0f64).unwrap();
+        let mut problem = Problem::new(GssTestProblem {});
+
+        gss.f1 = 10.0f64;
+        gss.f2 = 5.0f64;
+        gss.x0 = 0.0f64;
+        gss.x1 = 1.0f64;
+        gss.x2 = 2.0f64;
+        gss.x3 = 3.0f64;
+
+        let (state, kv) = gss
+            .next_iter(&mut problem, IterState::new().param(-0.5f64))
+            .unwrap();
+
+        assert!(kv.is_none());
+
+        let GoldenSectionSearch {
+            g1,
+            g2,
+            min_bound,
+            max_bound,
+            tolerance,
+            x0,
+            x1,
+            x2,
+            x3,
+            f1,
+            f2,
+        } = gss.clone();
+
+        assert_relative_eq!(x0, 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(x1, 2.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(x2, g1 * 2.0f64 + g2 * x3, epsilon = f64::EPSILON);
+        assert_relative_eq!(f1, 5.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(f2, problem.cost(&x2).unwrap(), epsilon = f64::EPSILON);
+        assert_eq!(g1.to_ne_bytes(), G1.to_ne_bytes());
+        assert_eq!(g2.to_ne_bytes(), G2.to_ne_bytes());
+        assert_eq!(min_bound.to_ne_bytes(), (-2.5f64).to_ne_bytes());
+        assert_eq!(max_bound.to_ne_bytes(), 3.0f64.to_ne_bytes());
+        assert_eq!(tolerance.to_ne_bytes(), 0.01f64.to_ne_bytes());
+        if f1 < f2 {
+            assert_relative_eq!(*state.param.as_ref().unwrap(), x1, epsilon = f64::EPSILON);
+            assert_relative_eq!(state.cost, f1, epsilon = f64::EPSILON);
+        } else {
+            assert_relative_eq!(*state.param.as_ref().unwrap(), x2, epsilon = f64::EPSILON);
+            assert_relative_eq!(state.cost, f2, epsilon = f64::EPSILON);
+        }
+    }
+
+    #[test]
+    fn test_next_iter_2() {
+        let mut gss = GoldenSectionSearch::new(-2.5f64, 3.0f64).unwrap();
+        let mut problem = Problem::new(GssTestProblem {});
+
+        gss.f1 = 5.0f64;
+        gss.f2 = 10.0f64;
+        gss.x0 = 0.0f64;
+        gss.x1 = 1.0f64;
+        gss.x2 = 2.0f64;
+        gss.x3 = 3.0f64;
+
+        let (state, kv) = gss
+            .next_iter(&mut problem, IterState::new().param(-0.5f64))
+            .unwrap();
+
+        assert!(kv.is_none());
+
+        let GoldenSectionSearch {
+            g1,
+            g2,
+            min_bound,
+            max_bound,
+            tolerance,
+            x0,
+            x1,
+            x2,
+            x3,
+            f1,
+            f2,
+        } = gss.clone();
+
+        assert_relative_eq!(x0, 0.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(x1, g1 * x2 + g2 * x0, epsilon = f64::EPSILON);
+        assert_relative_eq!(x2, 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(x3, 2.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(f1, problem.cost(&x1).unwrap(), epsilon = f64::EPSILON);
+        assert_relative_eq!(f2, 5.0f64, epsilon = f64::EPSILON);
+        assert_eq!(g1.to_ne_bytes(), G1.to_ne_bytes());
+        assert_eq!(g2.to_ne_bytes(), G2.to_ne_bytes());
+        assert_eq!(min_bound.to_ne_bytes(), (-2.5f64).to_ne_bytes());
+        assert_eq!(max_bound.to_ne_bytes(), 3.0f64.to_ne_bytes());
+        assert_eq!(tolerance.to_ne_bytes(), 0.01f64.to_ne_bytes());
+        if f1 < f2 {
+            assert_relative_eq!(*state.param.as_ref().unwrap(), x1, epsilon = f64::EPSILON);
+            assert_relative_eq!(state.cost, f1, epsilon = f64::EPSILON);
+        } else {
+            assert_relative_eq!(*state.param.as_ref().unwrap(), x2, epsilon = f64::EPSILON);
+            assert_relative_eq!(state.cost, f2, epsilon = f64::EPSILON);
+        }
+    }
 }

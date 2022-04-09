@@ -25,10 +25,10 @@ impl CostFunction for TestFunc {
     }
 }
 
-fn main() {
+fn main() -> Result<(), Error> {
     let cost = TestFunc {};
     let init_param = -0.5;
-    let solver = GoldenSectionSearch::new(-2.5, 3.0).with_tolerance(0.0001);
+    let solver = GoldenSectionSearch::new(-2.5, 3.0)?.with_tolerance(0.0001)?;
 
     let res = Executor::new(cost, solver)
         .configure(|state| state.param(init_param).max_iters(100))
@@ -36,4 +36,5 @@ fn main() {
         .run()
         .unwrap();
     println!("Result of golden section search:\n{}", res);
+    Ok(())
 }
