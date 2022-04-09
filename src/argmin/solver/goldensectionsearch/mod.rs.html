@@ -168,6 +168,11 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -175,11 +180,16 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! Golden Section Search</span>
+<span class="doccomment">//! # Golden Section Search</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! # References:</span>
+<span class="doccomment">//! The golden-section search is a technique for finding an extremum (minimum or maximum) of a</span>
+<span class="doccomment">//! function inside a specified interval.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)</span>
+<span class="doccomment">//! See [`GoldenSectionSearch`] for details.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Reference</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! &lt;https://en.wikipedia.org/wiki/Golden-section_search&gt;</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
     <span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
@@ -193,7 +203,7 @@
 <span class="kw">const</span> <span class="ident">G1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="op">-</span><span class="number">1.0</span> <span class="op">+</span> <span class="ident">GOLDEN_RATIO</span>;
 <span class="kw">const</span> <span class="ident">G2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.0</span> <span class="op">-</span> <span class="ident">G1</span>;
 
-<span class="doccomment">/// Golden-section search</span>
+<span class="doccomment">/// # Golden-section search</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The golden-section search is a technique for finding an extremum (minimum or maximum) of a</span>
 <span class="doccomment">/// function inside a specified interval.</span>
@@ -206,9 +216,9 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # References:</span>
+<span class="doccomment">/// ## Reference</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)</span>
+<span class="doccomment">/// &lt;https://en.wikipedia.org/wiki/Golden-section_search&gt;</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GoldenSectionSearch</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
@@ -249,7 +259,7 @@
 
     <span class="doccomment">/// Set tolerance</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tolerance</span> <span class="op">=</span> <span class="ident">tol</span>;
         <span class="self">self</span>
     }

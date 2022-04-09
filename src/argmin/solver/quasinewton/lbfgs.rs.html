@@ -297,14 +297,14 @@
 
     <span class="doccomment">/// Sets tolerance for the stopping criterion based on the change of the norm on the gradient</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tol_grad</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol_grad</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance_grad</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol_grad</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tol_grad</span> <span class="op">=</span> <span class="ident">tol_grad</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets tolerance for the stopping criterion based on the change of the cost stopping criterion</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tol_cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol_cost</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance_cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol_cost</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tol_cost</span> <span class="op">=</span> <span class="ident">tol_cost</span>;
         <span class="self">self</span>
     }
@@ -456,8 +456,8 @@
             <span class="ident">tol_cost</span>: <span class="ident">t2</span>,
             ..
         }: <span class="ident">LBFGS</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">LBFGS::new</span>(<span class="ident">linesearch</span>, <span class="number">7</span>)
-            .<span class="ident">with_tol_grad</span>(<span class="ident">tol1</span>)
-            .<span class="ident">with_tol_cost</span>(<span class="ident">tol2</span>);
+            .<span class="ident">with_tolerance_grad</span>(<span class="ident">tol1</span>)
+            .<span class="ident">with_tolerance_cost</span>(<span class="ident">tol2</span>);
 
         <span class="macro">assert!</span>((<span class="ident">t1</span> <span class="op">-</span> <span class="ident">tol1</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">std::f64::EPSILON</span>);
         <span class="macro">assert!</span>((<span class="ident">t2</span> <span class="op">-</span> <span class="ident">tol2</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">std::f64::EPSILON</span>);

@@ -475,6 +475,7 @@
 <span id="470">470</span>
 <span id="471">471</span>
 <span id="472">472</span>
+<span id="473">473</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -540,11 +541,11 @@
     <span class="doccomment">/// # use argmin::core::Error;</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
     <span class="doccomment">/// # let linesearch = ();</span>
-    <span class="doccomment">/// let gauss_newton_ls = GaussNewtonLS::new(linesearch).with_tol(1e-4f64)?;</span>
+    <span class="doccomment">/// let gauss_newton_ls = GaussNewtonLS::new(linesearch).with_tolerance(1e-4f64)?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tol</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">tol</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
                 <span class="ident">text</span>: <span class="string">&quot;Gauss-Newton-Linesearch: tol must be positive.&quot;</span>.<span class="ident">to_string</span>(),
@@ -737,7 +738,8 @@
         <span class="kw">let</span> <span class="ident">tol1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1e-4</span>;
 
         <span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> ();
-        <span class="kw">let</span> <span class="ident">GaussNewtonLS</span> { <span class="ident">tol</span>: <span class="ident">t1</span>, .. } <span class="op">=</span> <span class="ident">GaussNewtonLS::new</span>(<span class="ident">linesearch</span>).<span class="ident">with_tol</span>(<span class="ident">tol1</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">GaussNewtonLS</span> { <span class="ident">tol</span>: <span class="ident">t1</span>, .. } <span class="op">=</span>
+            <span class="ident">GaussNewtonLS::new</span>(<span class="ident">linesearch</span>).<span class="ident">with_tolerance</span>(<span class="ident">tol1</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">t1</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">tol1</span>.<span class="ident">to_ne_bytes</span>());
     }
@@ -745,7 +747,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_tolerance_error_when_negative</span>() {
         <span class="kw">let</span> <span class="ident">tol</span> <span class="op">=</span> <span class="op">-</span><span class="number">2.0</span>;
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewtonLS::new</span>(()).<span class="ident">with_tol</span>(<span class="ident">tol</span>);
+        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewtonLS::new</span>(()).<span class="ident">with_tolerance</span>(<span class="ident">tol</span>);
         <span class="macro">assert_error!</span>(
             <span class="ident">error</span>,
             <span class="ident">ArgminError</span>,
@@ -756,7 +758,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_tolerance_error_when_zero</span>() {
         <span class="kw">let</span> <span class="ident">tol</span> <span class="op">=</span> <span class="number">0.0</span>;
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewtonLS::new</span>(()).<span class="ident">with_tol</span>(<span class="ident">tol</span>);
+        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">GaussNewtonLS::new</span>(()).<span class="ident">with_tolerance</span>(<span class="ident">tol</span>);
         <span class="macro">assert_error!</span>(
             <span class="ident">error</span>,
             <span class="ident">ArgminError</span>,
