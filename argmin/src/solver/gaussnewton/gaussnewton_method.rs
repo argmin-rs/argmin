@@ -85,11 +85,11 @@ impl<F: ArgminFloat> GaussNewton<F> {
     /// # use argmin::solver::gaussnewton::GaussNewton;
     /// # use argmin::core::Error;
     /// # fn main() -> Result<(), Error> {
-    /// let gauss_newton = GaussNewton::new().with_tol(1e-4f64)?;
+    /// let gauss_newton = GaussNewton::new().with_tolerance(1e-4f64)?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn with_tol(mut self, tol: F) -> Result<Self, Error> {
+    pub fn with_tolerance(mut self, tol: F) -> Result<Self, Error> {
         if tol <= F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "Gauss-Newton: tol must be positive.".to_string(),
@@ -183,7 +183,7 @@ mod tests {
     fn test_tolerance() {
         let tol1: f64 = 1e-4;
 
-        let GaussNewton { tol: t, .. } = GaussNewton::new().with_tol(tol1).unwrap();
+        let GaussNewton { tol: t, .. } = GaussNewton::new().with_tolerance(tol1).unwrap();
 
         assert_eq!(t.to_ne_bytes(), tol1.to_ne_bytes());
     }
@@ -191,7 +191,7 @@ mod tests {
     #[test]
     fn test_tolerance_error() {
         let tol = -2.0;
-        let error = GaussNewton::new().with_tol(tol);
+        let error = GaussNewton::new().with_tolerance(tol);
         assert_error!(
             error,
             ArgminError,

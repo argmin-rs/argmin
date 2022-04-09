@@ -50,7 +50,7 @@ where
 
     /// Sets tolerance for the stopping criterion based on the change of the norm on the gradient
     #[must_use]
-    pub fn with_tol_grad(mut self, tol_grad: F) -> Self {
+    pub fn with_tolerance_grad(mut self, tol_grad: F) -> Self {
         self.tol_grad = tol_grad;
         self
     }
@@ -193,7 +193,7 @@ mod tests {
 
         let tol: f64 = 1e-4;
 
-        let DFP { tol_grad: t, .. } = DFP::new(init_hessian, linesearch).with_tol_grad(tol);
+        let DFP { tol_grad: t, .. } = DFP::new(init_hessian, linesearch).with_tolerance_grad(tol);
 
         assert!((t - tol).abs() < std::f64::EPSILON);
     }

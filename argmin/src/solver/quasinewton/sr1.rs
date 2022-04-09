@@ -70,14 +70,14 @@ where
 
     /// Sets tolerance for the stopping criterion based on the change of the norm on the gradient
     #[must_use]
-    pub fn with_tol_grad(mut self, tol_grad: F) -> Self {
+    pub fn with_tolerance_grad(mut self, tol_grad: F) -> Self {
         self.tol_grad = tol_grad;
         self
     }
 
     /// Sets tolerance for the stopping criterion based on the change of the cost stopping criterion
     #[must_use]
-    pub fn with_tol_cost(mut self, tol_cost: F) -> Self {
+    pub fn with_tolerance_cost(mut self, tol_cost: F) -> Self {
         self.tol_cost = tol_cost;
         self
     }
@@ -226,8 +226,8 @@ mod tests {
             tol_cost: t2,
             ..
         } = SR1::new(init_hessian, linesearch)
-            .with_tol_grad(tol1)
-            .with_tol_cost(tol2);
+            .with_tolerance_grad(tol1)
+            .with_tolerance_cost(tol2);
 
         assert!((t1 - tol1).abs() < std::f64::EPSILON);
         assert!((t2 - tol2).abs() < std::f64::EPSILON);

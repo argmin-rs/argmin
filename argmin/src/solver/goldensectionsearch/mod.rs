@@ -5,11 +5,16 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Golden Section Search
+//! # Golden Section Search
 //!
-//! # References:
+//! The golden-section search is a technique for finding an extremum (minimum or maximum) of a
+//! function inside a specified interval.
 //!
-//! [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
+//! See [`GoldenSectionSearch`] for details.
+//!
+//! ## Reference
+//!
+//! <https://en.wikipedia.org/wiki/Golden-section_search>
 
 use crate::core::{
     ArgminError, ArgminFloat, CostFunction, Error, IterState, Problem, Solver, TerminationReason,
@@ -23,7 +28,7 @@ const GOLDEN_RATIO: f64 = 1.618_033_988_749_895;
 const G1: f64 = -1.0 + GOLDEN_RATIO;
 const G2: f64 = 1.0 - G1;
 
-/// Golden-section search
+/// # Golden-section search
 ///
 /// The golden-section search is a technique for finding an extremum (minimum or maximum) of a
 /// function inside a specified interval.
@@ -36,9 +41,9 @@ const G2: f64 = 1.0 - G1;
 ///
 /// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.
 ///
-/// # References:
+/// ## Reference
 ///
-/// [Wikipedia](https://en.wikipedia.org/wiki/Golden-section_search)
+/// <https://en.wikipedia.org/wiki/Golden-section_search>
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct GoldenSectionSearch<F> {
@@ -79,7 +84,7 @@ where
 
     /// Set tolerance
     #[must_use]
-    pub fn tolerance(mut self, tol: F) -> Self {
+    pub fn with_tolerance(mut self, tol: F) -> Self {
         self.tolerance = tol;
         self
     }

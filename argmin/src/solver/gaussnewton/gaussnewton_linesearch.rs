@@ -63,11 +63,11 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
     /// # use argmin::core::Error;
     /// # fn main() -> Result<(), Error> {
     /// # let linesearch = ();
-    /// let gauss_newton_ls = GaussNewtonLS::new(linesearch).with_tol(1e-4f64)?;
+    /// let gauss_newton_ls = GaussNewtonLS::new(linesearch).with_tolerance(1e-4f64)?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn with_tol(mut self, tol: F) -> Result<Self, Error> {
+    pub fn with_tolerance(mut self, tol: F) -> Result<Self, Error> {
         if tol <= F::from_f64(0.0).unwrap() {
             return Err(ArgminError::InvalidParameter {
                 text: "Gauss-Newton-Linesearch: tol must be positive.".to_string(),
@@ -260,7 +260,8 @@ mod tests {
         let tol1: f64 = 1e-4;
 
         let linesearch = ();
-        let GaussNewtonLS { tol: t1, .. } = GaussNewtonLS::new(linesearch).with_tol(tol1).unwrap();
+        let GaussNewtonLS { tol: t1, .. } =
+            GaussNewtonLS::new(linesearch).with_tolerance(tol1).unwrap();
 
         assert_eq!(t1.to_ne_bytes(), tol1.to_ne_bytes());
     }
@@ -268,7 +269,7 @@ mod tests {
     #[test]
     fn test_tolerance_error_when_negative() {
         let tol = -2.0;
-        let error = GaussNewtonLS::new(()).with_tol(tol);
+        let error = GaussNewtonLS::new(()).with_tolerance(tol);
         assert_error!(
             error,
             ArgminError,
@@ -279,7 +280,7 @@ mod tests {
     #[test]
     fn test_tolerance_error_when_zero() {
         let tol = 0.0;
-        let error = GaussNewtonLS::new(()).with_tol(tol);
+        let error = GaussNewtonLS::new(()).with_tolerance(tol);
         assert_error!(
             error,
             ArgminError,
