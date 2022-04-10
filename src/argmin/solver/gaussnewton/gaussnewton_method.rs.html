@@ -383,8 +383,6 @@
 <span id="378">378</span>
 <span id="379">379</span>
 <span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -393,8 +391,8 @@
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Jacobian</span>, <span class="ident">Operator</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">State</span>,
-    <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
+    <span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Jacobian</span>, <span class="ident">Operator</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">State</span>, <span class="ident">TerminationReason</span>,
+    <span class="ident">KV</span>,
 };
 <span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminInv</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminSub</span>, <span class="ident">ArgminTranspose</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
@@ -453,10 +451,10 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">gamma</span> <span class="op">&gt;</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;Gauss-Newton: gamma must be in  (0, 1].&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;Gauss-Newton: gamma must be in  (0, 1].&quot;</span>
+            ));
         }
         <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
@@ -478,10 +476,10 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">tol</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;Gauss-Newton: tol must be positive.&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;Gauss-Newton: tol must be positive.&quot;</span>
+            ));
         }
         <span class="self">self</span>.<span class="ident">tol</span> <span class="op">=</span> <span class="ident">tol</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
@@ -514,16 +512,13 @@
         <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), <span class="ident">J</span>, (), <span class="ident">F</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), <span class="ident">J</span>, (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> -&gt; <span class="ident">Error</span> {
-            <span class="ident">ArgminError::NotInitialized</span> {
-                <span class="ident">text</span>: <span class="macro">concat!</span>(
-                    <span class="string">&quot;`GaussNewton` requires an initial parameter vector. &quot;</span>,
-                    <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-                )
-                .<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>()
-        })<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
+            <span class="ident">NotInitialized</span>,
+            <span class="macro">concat!</span>(
+                <span class="string">&quot;`GaussNewton` requires an initial parameter vector. &quot;</span>,
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
+            )
+        ))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">residuals</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">apply</span>(<span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">jacobian</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">jacobian</span>(<span class="ident">param</span>)<span class="question-mark">?</span>;
 
@@ -550,6 +545,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::ArgminError</span>;
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::Executor</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;

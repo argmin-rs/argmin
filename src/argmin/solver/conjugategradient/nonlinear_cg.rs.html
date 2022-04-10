@@ -497,19 +497,6 @@
 <span id="492">492</span>
 <span id="493">493</span>
 <span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -518,9 +505,8 @@
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>,
-    <span class="ident">IterState</span>, <span class="ident">LineSearch</span>, <span class="ident">NLCGBetaUpdate</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>,
-    <span class="ident">State</span>, <span class="ident">KV</span>,
+    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>, <span class="ident">IterState</span>,
+    <span class="ident">LineSearch</span>, <span class="ident">NLCGBetaUpdate</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">State</span>, <span class="ident">KV</span>,
 };
 <span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
@@ -651,16 +637,13 @@
         <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> -&gt; <span class="ident">Error</span> {
-            <span class="ident">ArgminError::NotInitialized</span> {
-                <span class="ident">text</span>: <span class="macro">concat!</span>(
-                    <span class="string">&quot;`NonlinearConjugateGradient` requires an initial parameter vector. &quot;</span>,
-                    <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-                )
-                .<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>()
-        })<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
+            <span class="ident">NotInitialized</span>,
+            <span class="macro">concat!</span>(
+                <span class="string">&quot;`NonlinearConjugateGradient` requires an initial parameter vector. &quot;</span>,
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
+            )
+        ))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>())));
@@ -672,18 +655,14 @@
         <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> -&gt; <span class="ident">Error</span> {
-            <span class="ident">ArgminError::PotentialBug</span> {
-                <span class="ident">text</span>: <span class="string">&quot;`NonlinearConjugateGradient`: Field `p` not set&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>()
-        })<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> -&gt; <span class="ident">Error</span> {
-            <span class="ident">ArgminError::PotentialBug</span> {
-                <span class="ident">text</span>: <span class="string">&quot;`NonlinearConjugateGradient`: No `param` in `state`&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>()
-        })<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
+            <span class="ident">PotentialBug</span>,
+            <span class="string">&quot;`NonlinearConjugateGradient`: Field `p` not set&quot;</span>
+        ))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
+            <span class="ident">PotentialBug</span>,
+            <span class="string">&quot;`NonlinearConjugateGradient`: No `param` in `state`&quot;</span>
+        ))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">state</span>
             .<span class="ident">take_grad</span>()
             .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
@@ -699,13 +678,10 @@
             <span class="ident">state</span>: <span class="kw-2">mut</span> <span class="ident">line_state</span>,
             ..
         } <span class="op">=</span> <span class="ident">Executor::new</span>(
-            <span class="ident">problem</span>.<span class="ident">take_problem</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> -&gt; <span class="ident">Error</span> {
-                <span class="ident">ArgminError::PotentialBug</span> {
-                    <span class="ident">text</span>: <span class="string">&quot;`NonlinearConjugateGradient`: Failed to take `problem` for line search&quot;</span>
-                        .<span class="ident">to_string</span>(),
-                }
-                .<span class="ident">into</span>()
-            })<span class="question-mark">?</span>,
+            <span class="ident">problem</span>.<span class="ident">take_problem</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
+                <span class="ident">PotentialBug</span>,
+                <span class="string">&quot;`NonlinearConjugateGradient`: Failed to take `problem` for line search&quot;</span>
+            ))<span class="question-mark">?</span>,
             <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">clone</span>(),
         )
         .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">state</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">xk</span>).<span class="ident">grad</span>(<span class="ident">grad</span>.<span class="ident">clone</span>()).<span class="ident">cost</span>(<span class="ident">cur_cost</span>))
@@ -715,13 +691,10 @@
         <span class="comment">// takes care of the counts of function evaluations</span>
         <span class="ident">problem</span>.<span class="ident">consume_problem</span>(<span class="ident">line_problem</span>);
 
-        <span class="kw">let</span> <span class="ident">xk1</span> <span class="op">=</span> <span class="ident">line_state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> -&gt; <span class="ident">Error</span> {
-            <span class="ident">ArgminError::PotentialBug</span> {
-                <span class="ident">text</span>: <span class="string">&quot;`NonlinearConjugateGradient`: No `param` returned by line search&quot;</span>
-                    .<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>()
-        })<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">xk1</span> <span class="op">=</span> <span class="ident">line_state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
+            <span class="ident">PotentialBug</span>,
+            <span class="string">&quot;`NonlinearConjugateGradient`: No `param` returned by line search&quot;</span>
+        ))<span class="question-mark">?</span>;
 
         <span class="comment">// Update of beta</span>
         <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk1</span>)<span class="question-mark">?</span>;
@@ -764,6 +737,7 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::test_utils::TestProblem</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::ArgminError</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::conjugategradient::beta::PolakRibiere</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::linesearch</span>::{
         <span class="ident">ArmijoCondition</span>, <span class="ident">BacktrackingLineSearch</span>, <span class="ident">MoreThuenteLineSearch</span>,

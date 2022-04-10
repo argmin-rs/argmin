@@ -248,8 +248,8 @@
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>,
-    <span class="ident">Hessian</span>, <span class="ident">IterState</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
+    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>, <span class="ident">Hessian</span>,
+    <span class="ident">IterState</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
     <span class="ident">TrustRegionRadius</span>, <span class="ident">KV</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::trustregion::reduction_ratio</span>;
@@ -325,10 +325,10 @@
     <span class="doccomment">/// Set eta</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eta</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eta</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">eta</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.25</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">eta</span> <span class="op">&lt;</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;TrustRegion: eta must be in [0, 1/4).&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;TrustRegion: eta must be in [0, 1/4).&quot;</span>
+            ));
         }
         <span class="self">self</span>.<span class="ident">eta</span> <span class="op">=</span> <span class="ident">eta</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)

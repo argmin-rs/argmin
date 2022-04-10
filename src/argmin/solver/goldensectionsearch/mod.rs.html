@@ -500,12 +500,6 @@
 <span id="495">495</span>
 <span id="496">496</span>
 <span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -525,8 +519,7 @@
 <span class="doccomment">//! &lt;https://en.wikipedia.org/wiki/Golden-section_search&gt;</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
-    <span class="ident">KV</span>,
+    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -594,11 +587,10 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">min_bound</span>: <span class="ident">F</span>, <span class="ident">max_bound</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">max_bound</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">min_bound</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;`GoldenSectionSearch`: `min_bound` must be smaller than `max_bound`.&quot;</span>
-                    .<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;`GoldenSectionSearch`: `min_bound` must be smaller than `max_bound`.&quot;</span>
+            ));
         }
         <span class="prelude-val">Ok</span>(<span class="ident">GoldenSectionSearch</span> {
             <span class="ident">g1</span>: <span class="ident">F::from</span>(<span class="ident">G1</span>).<span class="ident">unwrap</span>(),
@@ -631,10 +623,10 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tolerance</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">tolerance</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;`GoldenSectionSearch`: Tolerance must be larger than 0.&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;`GoldenSectionSearch`: Tolerance must be larger than 0.&quot;</span>
+            ));
         }
         <span class="self">self</span>.<span class="ident">tolerance</span> <span class="op">=</span> <span class="ident">tolerance</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
@@ -653,22 +645,18 @@
         <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">F</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">F</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">init_estimate</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> -&gt; <span class="ident">Error</span> {
-            <span class="ident">ArgminError::NotInitialized</span> {
-                <span class="ident">text</span>: <span class="macro">concat!</span>(
-                    <span class="string">&quot;`GoldenSectionSearch` requires an initial estimate. &quot;</span>,
-                    <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-                )
-                .<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>()
-        })<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">init_estimate</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
+            <span class="ident">NotInitialized</span>,
+            <span class="macro">concat!</span>(
+                <span class="string">&quot;`GoldenSectionSearch` requires an initial estimate. &quot;</span>,
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
+            )
+        ))<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">init_estimate</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">min_bound</span> <span class="op">|</span><span class="op">|</span> <span class="ident">init_estimate</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">max_bound</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound].&quot;</span>
-                    .<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>())
+            <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound].&quot;</span>
+            ))
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">ie_min</span> <span class="op">=</span> <span class="ident">init_estimate</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">min_bound</span>;
             <span class="kw">let</span> <span class="ident">max_ie</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_bound</span> <span class="op">-</span> <span class="ident">init_estimate</span>;
@@ -725,7 +713,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::State</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminError</span>, <span class="ident">State</span>};
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
     <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
 

@@ -237,7 +237,6 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-<span id="235">235</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2019-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -251,9 +250,8 @@
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>,
-    <span class="ident">IterState</span>, <span class="ident">LineSearch</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
-    <span class="ident">KV</span>,
+    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>, <span class="ident">IterState</span>,
+    <span class="ident">LineSearch</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
 };
 <span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminSub</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
@@ -298,10 +296,10 @@
     <span class="doccomment">/// Set r</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">r</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">r</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">r</span> <span class="op">&lt;</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">r</span> <span class="op">&gt;</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;SR1: r must be between 0 and 1.&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>())
+            <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;SR1: r must be between 0 and 1.&quot;</span>
+            ))
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">r</span> <span class="op">=</span> <span class="ident">r</span>;
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)

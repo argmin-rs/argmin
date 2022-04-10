@@ -343,7 +343,7 @@
 <span class="doccomment">//! [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>,
+    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>,
     <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
 };
 <span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminSub</span>};
@@ -423,10 +423,10 @@
     <span class="doccomment">/// set alpha</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alpha</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;Nelder-Mead:  must be &gt; 0.&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;Nelder-Mead:  must be &gt; 0.&quot;</span>
+            ));
         }
         <span class="self">self</span>.<span class="ident">alpha</span> <span class="op">=</span> <span class="ident">alpha</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
@@ -435,10 +435,10 @@
     <span class="doccomment">/// set gamma</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;Nelder-Mead: gamma must be &gt; 1.&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;Nelder-Mead: gamma must be &gt; 1.&quot;</span>
+            ));
         }
         <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
@@ -447,10 +447,10 @@
     <span class="doccomment">/// set rho</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rho</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rho</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">rho</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">rho</span> <span class="op">&gt;</span> <span class="ident">F::from_f64</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;Nelder-Mead: rho must be in  (0.0, 0.5].&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;Nelder-Mead: rho must be in  (0.0, 0.5].&quot;</span>
+            ));
         }
         <span class="self">self</span>.<span class="ident">rho</span> <span class="op">=</span> <span class="ident">rho</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
@@ -459,10 +459,10 @@
     <span class="doccomment">/// set sigma</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sigma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sigma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">sigma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">sigma</span> <span class="op">&gt;</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;Nelder-Mead: sigma must be in  (0.0, 1.0].&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;Nelder-Mead: sigma must be in  (0.0, 1.0].&quot;</span>
+            ));
         }
         <span class="self">self</span>.<span class="ident">sigma</span> <span class="op">=</span> <span class="ident">sigma</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)

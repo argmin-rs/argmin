@@ -638,6 +638,7 @@
 <span id="633">633</span>
 <span id="634">634</span>
 <span id="635">635</span>
+<span id="636">636</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -650,7 +651,7 @@
 <span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminError</span>, <span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">SerializeAlias</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">SerializeAlias</span>};
 <span class="kw">use</span> <span class="ident">argmin_math::ArgminDot</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -686,10 +687,10 @@
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;ArmijoCondition: Parameter c must be in (0, 1)&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;ArmijoCondition: Parameter c must be in (0, 1)&quot;</span>
+            ));
         }
         <span class="prelude-val">Ok</span>(<span class="ident">ArmijoCondition</span> { <span class="ident">c</span> })
     }
@@ -732,16 +733,16 @@
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c1</span>: <span class="ident">F</span>, <span class="ident">c2</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;WolfeCondition: Parameter c1 must be in (0, 1)&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;WolfeCondition: Parameter c1 must be in (0, 1)&quot;</span>
+            ));
         }
         <span class="kw">if</span> <span class="ident">c2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">c1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;WolfeCondition: Parameter c2 must be in (c1, 1)&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;WolfeCondition: Parameter c2 must be in (c1, 1)&quot;</span>
+            ));
         }
         <span class="prelude-val">Ok</span>(<span class="ident">WolfeCondition</span> { <span class="ident">c1</span>, <span class="ident">c2</span> })
     }
@@ -786,16 +787,16 @@
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c1</span>: <span class="ident">F</span>, <span class="ident">c2</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)&quot;</span>
+            ));
         }
         <span class="kw">if</span> <span class="ident">c2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">c1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)&quot;</span>
+            ));
         }
         <span class="prelude-val">Ok</span>(<span class="ident">StrongWolfeCondition</span> { <span class="ident">c1</span>, <span class="ident">c2</span> })
     }
@@ -839,10 +840,10 @@
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError::InvalidParameter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)&quot;</span>.<span class="ident">to_string</span>(),
-            }
-            .<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                <span class="ident">InvalidParameter</span>,
+                <span class="string">&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)&quot;</span>
+            ));
         }
         <span class="prelude-val">Ok</span>(<span class="ident">GoldsteinCondition</span> { <span class="ident">c</span> })
     }
@@ -876,6 +877,7 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::assert_error</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::ArgminError</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
 
     <span class="macro">test_trait_impl!</span>(<span class="ident">goldstein</span>, <span class="ident">GoldsteinCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);

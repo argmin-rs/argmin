@@ -139,6 +139,26 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -182,7 +202,7 @@
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span>:<span class="ident">ident</span>) =&gt; {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span> {
             <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::core::ArgminError</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span> {
                     <span class="ident">text</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>.<span class="ident">to_string</span>(),
                 }
                 .<span class="ident">into</span>());
@@ -192,6 +212,26 @@
     };
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) =&gt; {
         <span class="macro">check_param!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>, <span class="ident">NotInitialized</span>)
+    };
+}
+
+<span class="doccomment">/// Create an `ArgminError` with a provided message.</span>
+<span class="attribute">#[<span class="ident">macro_export</span>]</span>
+<span class="macro">macro_rules!</span> <span class="ident">argmin_error</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error_type</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::core::ArgminError</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error_type</span> {
+            <span class="ident">text</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>.<span class="ident">to_string</span>(),
+        }
+        .<span class="ident">into</span>()
+    };
+}
+
+<span class="doccomment">/// Create an `ArgminError` with a provided message wrapped in a closure for use in</span>
+<span class="doccomment">/// `.ok_or_else(...)` methods on `Option`s.</span>
+<span class="attribute">#[<span class="ident">macro_export</span>]</span>
+<span class="macro">macro_rules!</span> <span class="ident">argmin_error_closure</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error_type</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) =&gt; {
+        <span class="op">|</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::core::Error</span> { <span class="macro">argmin_error!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error_type</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>) }
     };
 }
 
