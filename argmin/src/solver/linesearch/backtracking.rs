@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize};
 /// Springer. ISBN 0-387-30303-0.
 ///
 /// \[1\] Wikipedia: <https://en.wikipedia.org/wiki/Backtracking_line_search>
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct BacktrackingLineSearch<P, G, L, F> {
     /// initial parameter vector

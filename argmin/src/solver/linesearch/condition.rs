@@ -33,7 +33,7 @@ pub trait LineSearchCondition<T, G, F>: SerializeAlias {
 }
 
 /// Armijo Condition
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct ArmijoCondition<F> {
     c: F,
@@ -78,7 +78,7 @@ where
 }
 
 /// Wolfe Condition
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct WolfeCondition<F> {
     c1: F,
@@ -132,7 +132,7 @@ where
 }
 
 /// Strong Wolfe conditions
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct StrongWolfeCondition<F> {
     c1: F,
@@ -186,7 +186,7 @@ where
 }
 
 /// Goldstein conditions
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct GoldsteinCondition<F> {
     c: F,
