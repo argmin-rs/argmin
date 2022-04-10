@@ -16,7 +16,7 @@
 //! DOI: 10.1126/science.220.4598.671
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
+    ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
     TerminationReason, KV,
 };
 use rand::prelude::*;
@@ -159,10 +159,10 @@ where
     /// * `rng`: an RNG (must implement Serialize when `serde1` feature is activated)
     pub fn new(init_temp: F, rng: R) -> Result<Self, Error> {
         if init_temp <= F::from_f64(0.0).unwrap() {
-            Err(ArgminError::InvalidParameter {
-                text: "Initial temperature must be > 0.".to_string(),
-            }
-            .into())
+            Err(argmin_error!(
+                InvalidParameter,
+                "Initial temperature must be > 0."
+            ))
         } else {
             Ok(SimulatedAnnealing {
                 init_temp,

@@ -10,9 +10,7 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::core::{
-    ArgminError, ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, KV,
-};
+use crate::core::{ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, KV};
 use argmin_math::{ArgminDot, ArgminInv, ArgminScaledSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -46,10 +44,10 @@ where
     /// set gamma
     pub fn set_gamma(mut self, gamma: F) -> Result<Self, Error> {
         if gamma <= F::from_f64(0.0).unwrap() || gamma > F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "Newton: gamma must be in  (0, 1].".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "Newton: gamma must be in  (0, 1]."
+            ));
         }
         self.gamma = gamma;
         Ok(self)
@@ -90,6 +88,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::ArgminError;
     #[cfg(feature = "ndarrayl")]
     use crate::core::Executor;
     use crate::test_trait_impl;

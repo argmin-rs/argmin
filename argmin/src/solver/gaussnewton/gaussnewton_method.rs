@@ -6,8 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminError, ArgminFloat, Error, IterState, Jacobian, Operator, Problem, Solver, State,
-    TerminationReason, KV,
+    ArgminFloat, Error, IterState, Jacobian, Operator, Problem, Solver, State, TerminationReason,
+    KV,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose};
 #[cfg(feature = "serde1")]
@@ -66,10 +66,10 @@ impl<F: ArgminFloat> GaussNewton<F> {
     /// ```
     pub fn with_gamma(mut self, gamma: F) -> Result<Self, Error> {
         if gamma <= F::from_f64(0.0).unwrap() || gamma > F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "Gauss-Newton: gamma must be in  (0, 1].".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "Gauss-Newton: gamma must be in  (0, 1]."
+            ));
         }
         self.gamma = gamma;
         Ok(self)
@@ -91,10 +91,10 @@ impl<F: ArgminFloat> GaussNewton<F> {
     /// ```
     pub fn with_tolerance(mut self, tol: F) -> Result<Self, Error> {
         if tol <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "Gauss-Newton: tol must be positive.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "Gauss-Newton: tol must be positive."
+            ));
         }
         self.tol = tol;
         Ok(self)
@@ -127,16 +127,13 @@ where
         problem: &mut Problem<O>,
         state: IterState<P, (), J, (), F>,
     ) -> Result<(IterState<P, (), J, (), F>, Option<KV>), Error> {
-        let param = state.get_param().ok_or_else(|| -> Error {
-            ArgminError::NotInitialized {
-                text: concat!(
-                    "`GaussNewton` requires an initial parameter vector. ",
-                    "Please provide an initial guess via `Executor`s `configure` method."
-                )
-                .to_string(),
-            }
-            .into()
-        })?;
+        let param = state.get_param().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            concat!(
+                "`GaussNewton` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method."
+            )
+        ))?;
         let residuals = problem.apply(param)?;
         let jacobian = problem.jacobian(param)?;
 
@@ -163,6 +160,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::ArgminError;
     #[cfg(feature = "ndarrayl")]
     use crate::core::Executor;
     use crate::test_trait_impl;

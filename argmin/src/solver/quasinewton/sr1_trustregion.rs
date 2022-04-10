@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    Hessian, IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
+    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
     TrustRegionRadius, KV,
 };
 use argmin_math::{
@@ -70,10 +70,10 @@ where
     /// Set r
     pub fn r(mut self, r: F) -> Result<Self, Error> {
         if r <= F::from_f64(0.0).unwrap() || r >= F::from_f64(1.0).unwrap() {
-            Err(ArgminError::InvalidParameter {
-                text: "SR1: r must be in (0, 1).".to_string(),
-            }
-            .into())
+            Err(argmin_error!(
+                InvalidParameter,
+                "SR1TrustRegion: r must be in (0, 1)."
+            ))
         } else {
             self.r = r;
             Ok(self)
@@ -90,10 +90,10 @@ where
     /// Set eta
     pub fn eta(mut self, eta: F) -> Result<Self, Error> {
         if eta >= F::from_f64(10e-3).unwrap() || eta <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "SR1TrustRegion: eta must be in (0, 10^-3).".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "SR1TrustRegion: eta must be in (0, 10^-3)."
+            ));
         }
         self.eta = eta;
         Ok(self)

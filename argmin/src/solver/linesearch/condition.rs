@@ -10,7 +10,7 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::core::{ArgminError, ArgminFloat, Error, SerializeAlias};
+use crate::core::{ArgminFloat, Error, SerializeAlias};
 use argmin_math::ArgminDot;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -46,10 +46,10 @@ where
     /// Constructor
     pub fn new(c: F) -> Result<Self, Error> {
         if c <= F::from_f64(0.0).unwrap() || c >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "ArmijoCondition: Parameter c must be in (0, 1)".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "ArmijoCondition: Parameter c must be in (0, 1)"
+            ));
         }
         Ok(ArmijoCondition { c })
     }
@@ -92,16 +92,16 @@ where
     /// Constructor
     pub fn new(c1: F, c2: F) -> Result<Self, Error> {
         if c1 <= F::from_f64(0.0).unwrap() || c1 >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "WolfeCondition: Parameter c1 must be in (0, 1)".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "WolfeCondition: Parameter c1 must be in (0, 1)"
+            ));
         }
         if c2 <= c1 || c2 >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "WolfeCondition: Parameter c2 must be in (c1, 1)".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "WolfeCondition: Parameter c2 must be in (c1, 1)"
+            ));
         }
         Ok(WolfeCondition { c1, c2 })
     }
@@ -146,16 +146,16 @@ where
     /// Constructor
     pub fn new(c1: F, c2: F) -> Result<Self, Error> {
         if c1 <= F::from_f64(0.0).unwrap() || c1 >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "StrongWolfeCondition: Parameter c1 must be in (0, 1)".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "StrongWolfeCondition: Parameter c1 must be in (0, 1)"
+            ));
         }
         if c2 <= c1 || c2 >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "StrongWolfeCondition: Parameter c2 must be in (c1, 1)".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "StrongWolfeCondition: Parameter c2 must be in (c1, 1)"
+            ));
         }
         Ok(StrongWolfeCondition { c1, c2 })
     }
@@ -199,10 +199,10 @@ where
     /// Constructor
     pub fn new(c: F) -> Result<Self, Error> {
         if c <= F::from_f64(0.0).unwrap() || c >= F::from_f64(0.5).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "GoldsteinCondition: Parameter c must be in (0, 0.5)".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "GoldsteinCondition: Parameter c must be in (0, 0.5)"
+            ));
         }
         Ok(GoldsteinCondition { c })
     }
@@ -236,6 +236,7 @@ where
 mod tests {
     use super::*;
     use crate::assert_error;
+    use crate::core::ArgminError;
     use crate::test_trait_impl;
 
     test_trait_impl!(goldstein, GoldsteinCondition<f64>);

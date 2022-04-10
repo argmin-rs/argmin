@@ -6,9 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    IterState, LineSearch, NLCGBetaUpdate, OptimizationResult, Problem, SerializeAlias, Solver,
-    State, KV,
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
+    LineSearch, NLCGBetaUpdate, OptimizationResult, Problem, SerializeAlias, Solver, State, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm};
 #[cfg(feature = "serde1")]
@@ -139,16 +138,13 @@ where
         problem: &mut Problem<O>,
         state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
-        let param = state.get_param().ok_or_else(|| -> Error {
-            ArgminError::NotInitialized {
-                text: concat!(
-                    "`NonlinearConjugateGradient` requires an initial parameter vector. ",
-                    "Please provide an initial guess via `Executor`s `configure` method."
-                )
-                .to_string(),
-            }
-            .into()
-        })?;
+        let param = state.get_param().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            concat!(
+                "`NonlinearConjugateGradient` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method."
+            )
+        ))?;
         let cost = problem.cost(param)?;
         let grad = problem.gradient(param)?;
         self.p = Some(grad.mul(&(F::from_f64(-1.0).unwrap())));
@@ -160,18 +156,14 @@ where
         problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
-        let p = self.p.as_ref().ok_or_else(|| -> Error {
-            ArgminError::PotentialBug {
-                text: "`NonlinearConjugateGradient`: Field `p` not set".to_string(),
-            }
-            .into()
-        })?;
-        let xk = state.take_param().ok_or_else(|| -> Error {
-            ArgminError::PotentialBug {
-                text: "`NonlinearConjugateGradient`: No `param` in `state`".to_string(),
-            }
-            .into()
-        })?;
+        let p = self.p.as_ref().ok_or_else(argmin_error_closure!(
+            PotentialBug,
+            "`NonlinearConjugateGradient`: Field `p` not set"
+        ))?;
+        let xk = state.take_param().ok_or_else(argmin_error_closure!(
+            PotentialBug,
+            "`NonlinearConjugateGradient`: No `param` in `state`"
+        ))?;
         let grad = state
             .take_grad()
             .map(Result::Ok)
@@ -187,13 +179,10 @@ where
             state: mut line_state,
             ..
         } = Executor::new(
-            problem.take_problem().ok_or_else(|| -> Error {
-                ArgminError::PotentialBug {
-                    text: "`NonlinearConjugateGradient`: Failed to take `problem` for line search"
-                        .to_string(),
-                }
-                .into()
-            })?,
+            problem.take_problem().ok_or_else(argmin_error_closure!(
+                PotentialBug,
+                "`NonlinearConjugateGradient`: Failed to take `problem` for line search"
+            ))?,
             self.linesearch.clone(),
         )
         .configure(|state| state.param(xk).grad(grad.clone()).cost(cur_cost))
@@ -203,13 +192,10 @@ where
         // takes care of the counts of function evaluations
         problem.consume_problem(line_problem);
 
-        let xk1 = line_state.take_param().ok_or_else(|| -> Error {
-            ArgminError::PotentialBug {
-                text: "`NonlinearConjugateGradient`: No `param` returned by line search"
-                    .to_string(),
-            }
-            .into()
-        })?;
+        let xk1 = line_state.take_param().ok_or_else(argmin_error_closure!(
+            PotentialBug,
+            "`NonlinearConjugateGradient`: No `param` returned by line search"
+        ))?;
 
         // Update of beta
         let new_grad = problem.gradient(&xk1)?;
@@ -252,6 +238,7 @@ where
 mod tests {
     use super::*;
     use crate::core::test_utils::TestProblem;
+    use crate::core::ArgminError;
     use crate::solver::conjugategradient::beta::PolakRibiere;
     use crate::solver::linesearch::{
         ArmijoCondition, BacktrackingLineSearch, MoreThuenteLineSearch,

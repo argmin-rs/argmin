@@ -11,9 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    IterState, LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
-    KV,
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
+    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -58,10 +57,10 @@ where
     /// Set r
     pub fn r(mut self, r: F) -> Result<Self, Error> {
         if r < F::from_f64(0.0).unwrap() || r > F::from_f64(1.0).unwrap() {
-            Err(ArgminError::InvalidParameter {
-                text: "SR1: r must be between 0 and 1.".to_string(),
-            }
-            .into())
+            Err(argmin_error!(
+                InvalidParameter,
+                "SR1: r must be between 0 and 1."
+            ))
         } else {
             self.r = r;
             Ok(self)

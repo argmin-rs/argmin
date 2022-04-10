@@ -17,8 +17,7 @@
 //! <https://en.wikipedia.org/wiki/Golden-section_search>
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, IterState, Problem, Solver, TerminationReason,
-    KV,
+    ArgminFloat, CostFunction, Error, IterState, Problem, Solver, TerminationReason, KV,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -86,11 +85,10 @@ where
     /// ```
     pub fn new(min_bound: F, max_bound: F) -> Result<Self, Error> {
         if max_bound <= min_bound {
-            return Err(ArgminError::InvalidParameter {
-                text: "`GoldenSectionSearch`: `min_bound` must be smaller than `max_bound`."
-                    .to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "`GoldenSectionSearch`: `min_bound` must be smaller than `max_bound`."
+            ));
         }
         Ok(GoldenSectionSearch {
             g1: F::from(G1).unwrap(),
@@ -123,10 +121,10 @@ where
     /// ```
     pub fn with_tolerance(mut self, tolerance: F) -> Result<Self, Error> {
         if tolerance <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "`GoldenSectionSearch`: Tolerance must be larger than 0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "`GoldenSectionSearch`: Tolerance must be larger than 0."
+            ));
         }
         self.tolerance = tolerance;
         Ok(self)
@@ -145,22 +143,18 @@ where
         problem: &mut Problem<O>,
         mut state: IterState<F, (), (), (), F>,
     ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
-        let init_estimate = state.take_param().ok_or_else(|| -> Error {
-            ArgminError::NotInitialized {
-                text: concat!(
-                    "`GoldenSectionSearch` requires an initial estimate. ",
-                    "Please provide an initial guess via `Executor`s `configure` method."
-                )
-                .to_string(),
-            }
-            .into()
-        })?;
+        let init_estimate = state.take_param().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            concat!(
+                "`GoldenSectionSearch` requires an initial estimate. ",
+                "Please provide an initial guess via `Executor`s `configure` method."
+            )
+        ))?;
         if init_estimate < self.min_bound || init_estimate > self.max_bound {
-            Err(ArgminError::InvalidParameter {
-                text: "`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound]."
-                    .to_string(),
-            }
-            .into())
+            Err(argmin_error!(
+                InvalidParameter,
+                "`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound]."
+            ))
         } else {
             let ie_min = init_estimate - self.min_bound;
             let max_ie = self.max_bound - init_estimate;
@@ -217,7 +211,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::State;
+    use crate::core::{ArgminError, State};
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
 

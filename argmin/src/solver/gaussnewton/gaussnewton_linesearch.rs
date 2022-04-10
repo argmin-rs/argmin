@@ -6,8 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    IterState, Jacobian, LineSearch, Operator, OptimizationResult, Problem, SerializeAlias, Solver,
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
+    Jacobian, LineSearch, Operator, OptimizationResult, Problem, SerializeAlias, Solver,
     TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminTranspose};
@@ -69,10 +69,10 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
     /// ```
     pub fn with_tolerance(mut self, tol: F) -> Result<Self, Error> {
         if tol <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "Gauss-Newton-Linesearch: tol must be positive.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "Gauss-Newton-Linesearch: tol must be positive."
+            ));
         }
         self.tol = tol;
         Ok(self)
@@ -103,16 +103,13 @@ where
         problem: &mut Problem<O>,
         mut state: IterState<P, G, J, (), F>,
     ) -> Result<(IterState<P, G, J, (), F>, Option<KV>), Error> {
-        let param = state.take_param().ok_or_else(|| -> Error {
-            ArgminError::NotInitialized {
-                text: concat!(
-                    "`GaussNewtonLS` requires an initial parameter vector. ",
-                    "Please provide an initial guess via `Executor`s `configure` method."
-                )
-                .to_string(),
-            }
-            .into()
-        })?;
+        let param = state.take_param().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            concat!(
+                "`GaussNewtonLS` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method."
+            )
+        ))?;
         let residuals = problem.apply(&param)?;
         let jacobian = problem.jacobian(&param)?;
         let jacobian_t = jacobian.clone().t();
@@ -129,12 +126,10 @@ where
             state: mut linesearch_state,
             ..
         } = Executor::new(
-            LineSearchProblem::new(problem.take_problem().ok_or_else(|| -> Error {
-                ArgminError::PotentialBug {
-                    text: "`GaussNewtonLS`: Failed to take `problem` for line search".to_string(),
-                }
-                .into()
-            })?),
+            LineSearchProblem::new(problem.take_problem().ok_or_else(argmin_error_closure!(
+                PotentialBug,
+                "`GaussNewtonLS`: Failed to take `problem` for line search"
+            ))?),
             self.linesearch.clone(),
         )
         .configure(|config| config.param(param).grad(grad).cost(residuals.norm()))
@@ -147,26 +142,24 @@ where
         problem.problem = Some(
             line_problem
                 .take_problem()
-                .ok_or_else(|| -> Error {
-                    ArgminError::PotentialBug {
-                        text: "`GaussNewtonLS`: Failed to take `problem` from line search"
-                            .to_string(),
-                    }
-                    .into()
-                })?
+                .ok_or_else(argmin_error_closure!(
+                    PotentialBug,
+                    "`GaussNewtonLS`: Failed to take `problem` from line search"
+                ))?
                 .problem,
         );
         problem.consume_func_counts(line_problem);
 
         Ok((
             state
-                .param(linesearch_state.take_param().ok_or_else(|| -> Error {
-                    ArgminError::PotentialBug {
-                        text: "`GaussNewtonLS`: Failed to take `param` from line search state"
-                            .to_string(),
-                    }
-                    .into()
-                })?)
+                .param(
+                    linesearch_state
+                        .take_param()
+                        .ok_or_else(argmin_error_closure!(
+                            PotentialBug,
+                            "`GaussNewtonLS`: Failed to take `param` from line search state"
+                        ))?,
+                )
                 .cost(linesearch_state.get_cost()),
             None,
         ))
@@ -229,6 +222,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::ArgminError;
     #[cfg(feature = "ndarrayl")]
     use crate::core::{IterState, State};
     use crate::solver::linesearch::{ArmijoCondition, BacktrackingLineSearch};

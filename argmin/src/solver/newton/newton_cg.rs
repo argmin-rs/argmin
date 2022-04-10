@@ -13,9 +13,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState,
-    LineSearch, Operator, OptimizationResult, Problem, SerializeAlias, Solver, State,
-    TerminationReason, KV,
+    ArgminFloat, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState, LineSearch,
+    Operator, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason, KV,
 };
 use crate::solver::conjugategradient::ConjugateGradient;
 use argmin_math::{
@@ -65,10 +64,10 @@ where
     /// Set tolerance for the stopping criterion based on cost difference
     pub fn with_tolerance(mut self, tol: F) -> Result<Self, Error> {
         if tol <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "Newton-CG: tol must be positive.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "Newton-CG: tol must be positive."
+            ));
         }
         self.tol = tol;
         Ok(self)

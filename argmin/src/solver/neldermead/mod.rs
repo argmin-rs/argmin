@@ -12,7 +12,7 @@
 //! [Wikipedia](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
+    ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
     TerminationReason, KV,
 };
 use argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
@@ -92,10 +92,10 @@ where
     /// set alpha
     pub fn alpha(mut self, alpha: F) -> Result<Self, Error> {
         if alpha <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "Nelder-Mead:  must be > 0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "Nelder-Mead:  must be > 0."
+            ));
         }
         self.alpha = alpha;
         Ok(self)
@@ -104,10 +104,10 @@ where
     /// set gamma
     pub fn gamma(mut self, gamma: F) -> Result<Self, Error> {
         if gamma <= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "Nelder-Mead: gamma must be > 1.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "Nelder-Mead: gamma must be > 1."
+            ));
         }
         self.gamma = gamma;
         Ok(self)
@@ -116,10 +116,10 @@ where
     /// set rho
     pub fn rho(mut self, rho: F) -> Result<Self, Error> {
         if rho <= F::from_f64(0.0).unwrap() || rho > F::from_f64(0.5).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "Nelder-Mead: rho must be in  (0.0, 0.5].".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "Nelder-Mead: rho must be in  (0.0, 0.5]."
+            ));
         }
         self.rho = rho;
         Ok(self)
@@ -128,10 +128,10 @@ where
     /// set sigma
     pub fn sigma(mut self, sigma: F) -> Result<Self, Error> {
         if sigma <= F::from_f64(0.0).unwrap() || sigma > F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "Nelder-Mead: sigma must be in  (0.0, 1.0].".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "Nelder-Mead: sigma must be in  (0.0, 1.0]."
+            ));
         }
         self.sigma = sigma;
         Ok(self)

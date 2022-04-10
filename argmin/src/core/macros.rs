@@ -41,7 +41,7 @@ macro_rules! check_param {
     ($param:expr, $msg:expr, $error:ident) => {
         match $param {
             None => {
-                return Err(ArgminError::$error {
+                return Err($crate::core::ArgminError::$error {
                     text: $msg.to_string(),
                 }
                 .into());
@@ -51,6 +51,26 @@ macro_rules! check_param {
     };
     ($param:expr, $msg:expr) => {
         check_param!($param, $msg, NotInitialized)
+    };
+}
+
+/// Create an `ArgminError` with a provided message.
+#[macro_export]
+macro_rules! argmin_error {
+    ($error_type:ident, $msg:expr) => {
+        $crate::core::ArgminError::$error_type {
+            text: $msg.to_string(),
+        }
+        .into()
+    };
+}
+
+/// Create an `ArgminError` with a provided message wrapped in a closure for use in
+/// `.ok_or_else(...)` methods on `Option`s.
+#[macro_export]
+macro_rules! argmin_error_closure {
+    ($error_type:ident, $msg:expr) => {
+        || -> $crate::core::Error { argmin_error!($error_type, $msg) }
     };
 }
 
