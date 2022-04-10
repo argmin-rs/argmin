@@ -22,8 +22,8 @@
 #![allow(clippy::nonminimal_bool)]
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem,
-    SerializeAlias, Solver, State, TerminationReason, KV,
+    ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
+    Solver, State, TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -152,16 +152,16 @@ where
     /// Set c1 and c2 where 0 < c1 < c2 < 1.
     pub fn c(mut self, c1: F, c2: F) -> Result<Self, Error> {
         if c1 <= F::from_f64(0.0).unwrap() || c1 >= c2 {
-            return Err(ArgminError::InvalidParameter {
-                text: "MoreThuenteLineSearch: Parameter c1 must be in (0, c2).".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "MoreThuenteLineSearch: Parameter c1 must be in (0, c2)."
+            ));
         }
         if c2 <= c1 || c2 >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "MoreThuenteLineSearch: Parameter c2 must be in (c1, 1).".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "MoreThuenteLineSearch: Parameter c2 must be in (c1, 1)."
+            ));
         }
         self.ftol = c1;
         self.gtol = c2;
@@ -171,17 +171,16 @@ where
     /// set alpha limits
     pub fn alpha(mut self, alpha_min: F, alpha_max: F) -> Result<Self, Error> {
         if alpha_min < F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "MoreThuenteLineSearch: alpha_min must be >= 0.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "MoreThuenteLineSearch: alpha_min must be >= 0.0."
+            ));
         }
         if alpha_max <= alpha_min {
-            return Err(ArgminError::InvalidParameter {
-                text: "MoreThuenteLineSearch: alpha_min must be smaller than alpha_max."
-                    .to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "MoreThuenteLineSearch: alpha_min must be smaller than alpha_max."
+            ));
         }
         self.stpmin = alpha_min;
         self.stpmax = alpha_max;
@@ -210,10 +209,10 @@ where
     /// Set initial alpha value
     fn set_init_alpha(&mut self, alpha: F) -> Result<(), Error> {
         if alpha <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "MoreThuenteLineSearch: Initial alpha must be > 0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "MoreThuenteLineSearch: Initial alpha must be > 0."
+            ));
         }
         self.alpha = alpha;
         Ok(())
@@ -263,11 +262,10 @@ where
 
         // compute search direction in 1D
         if self.dginit >= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::ConditionViolated {
-                text: "MoreThuenteLineSearch: Search direction must be a descent direction."
-                    .to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                ConditionViolated,
+                "MoreThuenteLineSearch: Search direction must be a descent direction."
+            ));
         }
 
         self.stage1 = true;
@@ -464,10 +462,10 @@ fn cstep<F: ArgminFloat>(
         let tmp = vec![theta, stx.gx, stp.gx];
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
-            return Err(ArgminError::ConditionViolated {
-                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                ConditionViolated,
+                "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
+            ));
         }
         let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
         let mut gamma = *s * ((theta / *s).powi(2) - (stx.gx / *s) * (stp.gx / *s)).sqrt();
@@ -500,10 +498,10 @@ fn cstep<F: ArgminFloat>(
         let tmp = vec![theta, stx.gx, stp.gx];
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
-            return Err(ArgminError::ConditionViolated {
-                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                ConditionViolated,
+                "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
+            ));
         }
         let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
         let mut gamma = *s * ((theta / *s).powi(2) - (stx.gx / *s) * (stp.gx / *s)).sqrt();
@@ -535,10 +533,10 @@ fn cstep<F: ArgminFloat>(
         let tmp = vec![theta, stx.gx, stp.gx];
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
-            return Err(ArgminError::ConditionViolated {
-                text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                ConditionViolated,
+                "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
+            ));
         }
         let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
         // the case gamma == 0 only arises if the cubic does not tend to infinity in the direction
@@ -587,11 +585,10 @@ fn cstep<F: ArgminFloat>(
             let tmp = vec![theta, sty.gx, stp.gx];
             // Check for a NaN or Inf in tmp before sorting
             if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
-                return Err(ArgminError::ConditionViolated {
-                    text: "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
-                        .to_string(),
-                }
-                .into());
+                return Err(argmin_error!(
+                    ConditionViolated,
+                    "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
+                ));
             }
             let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
             let mut gamma = *s * ((theta / *s).powi(2) - (sty.gx / *s) * (stp.gx / *s)).sqrt();

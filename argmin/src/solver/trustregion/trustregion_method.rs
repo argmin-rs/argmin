@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    Hessian, IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
+    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
     TrustRegionRadius, KV,
 };
 use crate::solver::trustregion::reduction_ratio;
@@ -88,10 +88,10 @@ where
     /// Set eta
     pub fn eta(mut self, eta: F) -> Result<Self, Error> {
         if eta >= F::from_f64(0.25).unwrap() || eta < F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "TrustRegion: eta must be in [0, 1/4).".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "TrustRegion: eta must be in [0, 1/4)."
+            ));
         }
         self.eta = eta;
         Ok(self)

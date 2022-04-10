@@ -6,8 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminError, ArgminFloat, Error, IterState, Operator, Problem, SerializeAlias, Solver, State,
-    KV,
+    ArgminFloat, Error, IterState, Operator, Problem, SerializeAlias, Solver, State, KV,
 };
 use argmin_math::{ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -81,12 +80,10 @@ where
     /// let p_prev: Result<_, _> = cg.get_prev_p();
     /// ```
     pub fn get_prev_p(&self) -> Result<&P, Error> {
-        self.p_prev.as_ref().ok_or_else(|| {
-            ArgminError::NotInitialized {
-                text: "Field `p_prev` of `ConjugateGradient` not initialized.".to_string(),
-            }
-            .into()
-        })
+        self.p_prev.as_ref().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            "Field `p_prev` of `ConjugateGradient` not initialized."
+        ))
     }
 }
 
@@ -109,16 +106,13 @@ where
         problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
-        let init_param = state.get_param().ok_or_else(|| -> Error {
-            ArgminError::NotInitialized {
-                text: concat!(
-                    "`ConjugateGradient` requires an initial parameter vector. ",
-                    "Please provide an initial guess via `Executor`s `configure` method."
-                )
-                .to_string(),
-            }
-            .into()
-        })?;
+        let init_param = state.get_param().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            concat!(
+                "`ConjugateGradient` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method."
+            )
+        ))?;
         let ap = problem.apply(init_param)?;
         let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
         self.p = Some(r0.mul(&(F::from_f64(-1.0).unwrap())));
@@ -133,27 +127,21 @@ where
         problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
-        let p = self.p.take().ok_or_else(|| -> Error {
-            ArgminError::PotentialBug {
-                text: "`ConjugateGradient`: Field `p` not set".to_string(),
-            }
-            .into()
-        })?;
-        let r = self.r.as_ref().ok_or_else(|| -> Error {
-            ArgminError::PotentialBug {
-                text: "`ConjugateGradient`: Field `r` not set".to_string(),
-            }
-            .into()
-        })?;
+        let p = self.p.take().ok_or_else(argmin_error_closure!(
+            PotentialBug,
+            "`ConjugateGradient`: Field `p` not set"
+        ))?;
+        let r = self.r.as_ref().ok_or_else(argmin_error_closure!(
+            PotentialBug,
+            "`ConjugateGradient`: Field `r` not set"
+        ))?;
 
         let apk = problem.apply(&p)?;
         let alpha = self.rtr.div(p.dot(&apk.conj()));
-        let state_param = state.get_param().ok_or_else(|| -> Error {
-            ArgminError::PotentialBug {
-                text: "`ConjugateGradient`: Parameter vector in `state` not set".to_string(),
-            }
-            .into()
-        })?;
+        let state_param = state.get_param().ok_or_else(argmin_error_closure!(
+            PotentialBug,
+            "`ConjugateGradient`: Parameter vector in `state` not set"
+        ))?;
         let new_param = state_param.scaled_add(&alpha, &p);
         let r = r.scaled_add(&alpha, &apk);
         let rtr_n = r.dot(&r.conj());
@@ -176,7 +164,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{test_utils::TestProblem, IterState, Problem};
+    use crate::core::{test_utils::TestProblem, ArgminError, IterState, Problem};
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
 

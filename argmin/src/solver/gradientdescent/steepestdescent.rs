@@ -6,8 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient,
-    IterState, LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, KV,
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
+    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, KV,
 };
 use argmin_math::ArgminMul;
 #[cfg(feature = "serde1")]
@@ -61,16 +61,13 @@ where
         problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
-        let param_new = state.take_param().ok_or_else(|| -> Error {
-            ArgminError::NotInitialized {
-                text: concat!(
-                    "`SteepestDescent` requires an initial parameter vector. ",
-                    "Please provide an initial guess via `Executor`s `configure` method."
-                )
-                .to_string(),
-            }
-            .into()
-        })?;
+        let param_new = state.take_param().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            concat!(
+                "`SteepestDescent` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method."
+            )
+        ))?;
         let new_cost = problem.cost(&param_new)?;
         let new_grad = problem.gradient(&param_new)?;
 
@@ -83,12 +80,10 @@ where
             state: mut linesearch_state,
             ..
         } = Executor::new(
-            problem.take_problem().ok_or_else(|| -> Error {
-                ArgminError::PotentialBug {
-                    text: "`SteepestDescent`: Failed to take `problem` for line search".to_string(),
-                }
-                .into()
-            })?,
+            problem.take_problem().ok_or_else(argmin_error_closure!(
+                PotentialBug,
+                "`SteepestDescent`: Failed to take `problem` for line search"
+            ))?,
             self.linesearch.clone(),
         )
         .configure(|config| config.param(param_new).grad(new_grad).cost(new_cost))
@@ -100,12 +95,14 @@ where
 
         Ok((
             state
-                .param(linesearch_state.take_param().ok_or_else(|| -> Error {
-                    ArgminError::PotentialBug {
-                        text: "`GradientDescent`: No `param` returned by line search".to_string(),
-                    }
-                    .into()
-                })?)
+                .param(
+                    linesearch_state
+                        .take_param()
+                        .ok_or_else(argmin_error_closure!(
+                            PotentialBug,
+                            "`GradientDescent`: No `param` returned by line search"
+                        ))?,
+                )
                 .cost(linesearch_state.get_cost()),
             None,
         ))
@@ -116,7 +113,7 @@ where
 mod tests {
     use super::*;
     use crate::core::test_utils::TestProblem;
-    use crate::core::State;
+    use crate::core::{ArgminError, State};
     use crate::solver::linesearch::{
         ArmijoCondition, BacktrackingLineSearch, MoreThuenteLineSearch,
     };

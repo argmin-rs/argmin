@@ -8,8 +8,8 @@
 //! * [Backtracking line search](struct.BacktrackingLineSearch.html)
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem,
-    SerializeAlias, Solver, State, TerminationReason, KV,
+    ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
+    Solver, State, TerminationReason, KV,
 };
 use crate::solver::linesearch::condition::*;
 use argmin_math::ArgminScaledAdd;
@@ -64,11 +64,10 @@ where
     /// Set rho
     pub fn rho(mut self, rho: F) -> Result<Self, Error> {
         if rho <= F::from_f64(0.0).unwrap() || rho >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "BacktrackingLineSearch: Contraction factor rho must be in (0, 1)."
-                    .to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "BacktrackingLineSearch: Contraction factor rho must be in (0, 1)."
+            ));
         }
         self.rho = rho;
         Ok(self)
@@ -87,10 +86,10 @@ where
     /// Set initial alpha value
     fn set_init_alpha(&mut self, alpha: F) -> Result<(), Error> {
         if alpha <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "LineSearch: Inital alpha must be > 0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "LineSearch: Inital alpha must be > 0."
+            ));
         }
         self.alpha = alpha;
         Ok(())
@@ -162,10 +161,10 @@ where
             .unwrap_or_else(|| problem.gradient(&init_param))?;
 
         if self.search_direction.is_none() {
-            return Err(ArgminError::NotInitialized {
-                text: "BacktrackingLineSearch: search_direction must be set.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                NotInitialized,
+                "BacktrackingLineSearch: search_direction must be set."
+            ));
         }
 
         self.init_param = Some(init_param);
@@ -204,7 +203,7 @@ where
 mod tests {
     use super::*;
     use crate::assert_error;
-    use crate::core::{test_utils::TestProblem, Executor, State};
+    use crate::core::{test_utils::TestProblem, ArgminError, Executor, State};
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
     use num_traits::Float;

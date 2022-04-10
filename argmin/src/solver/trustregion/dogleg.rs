@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, State,
-    TerminationReason, TrustRegionRadius, KV,
+    ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, State, TerminationReason,
+    TrustRegionRadius, KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot,
@@ -113,10 +113,10 @@ where
             } else if tau >= F::from_f64(1.0).unwrap() && tau <= F::from_f64(2.0).unwrap() {
                 pstar = pu.add(&pb.sub(&pu).mul(&(tau - F::from_f64(1.0).unwrap())));
             } else {
-                return Err(ArgminError::ImpossibleError {
-                    text: "tau is bigger than 2, this is not supposed to happen.".to_string(),
-                }
-                .into());
+                return Err(argmin_error!(
+                    PotentialBug,
+                    "tau is bigger than 2, this is not supposed to happen."
+                ));
             }
         }
         Ok((state.param(pstar).grad(g).hessian(h), None))

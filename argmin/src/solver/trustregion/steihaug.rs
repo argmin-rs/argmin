@@ -11,8 +11,8 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{
-    ArgminError, ArgminFloat, Error, IterState, Problem, SerializeAlias, Solver, State,
-    TerminationReason, TrustRegionRadius, KV,
+    ArgminFloat, Error, IterState, Problem, SerializeAlias, Solver, State, TerminationReason,
+    TrustRegionRadius, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot, ArgminZeroLike};
 #[cfg(feature = "serde1")]
@@ -68,10 +68,10 @@ where
     /// Set epsilon
     pub fn epsilon(mut self, epsilon: F) -> Result<Self, Error> {
         if epsilon <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "Steihaug: epsilon must be > 0.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "Steihaug: epsilon must be > 0.0."
+            ));
         }
         self.epsilon = epsilon;
         Ok(self)

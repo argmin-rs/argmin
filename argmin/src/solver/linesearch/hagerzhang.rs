@@ -14,8 +14,8 @@
 //! DOI: <https://doi.org/10.1137/030601880>
 
 use crate::core::{
-    ArgminError, ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem,
-    SerializeAlias, Solver, TerminationReason, KV,
+    ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
+    Solver, TerminationReason, KV,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -137,16 +137,16 @@ where
     /// set delta
     pub fn delta(mut self, delta: F) -> Result<Self, Error> {
         if delta <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: delta must be > 0.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: delta must be > 0.0."
+            ));
         }
         if delta >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: delta must be < 1.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: delta must be < 1.0."
+            ));
         }
         self.delta = delta;
         Ok(self)
@@ -155,16 +155,16 @@ where
     /// set sigma
     pub fn sigma(mut self, sigma: F) -> Result<Self, Error> {
         if sigma < self.delta {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: sigma must be >= delta."
+            ));
         }
         if sigma >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: sigma must be < 1.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: sigma must be < 1.0."
+            ));
         }
         self.sigma = sigma;
         Ok(self)
@@ -173,10 +173,10 @@ where
     /// set epsilon
     pub fn epsilon(mut self, epsilon: F) -> Result<Self, Error> {
         if epsilon < F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: epsilon must be >= 0.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: epsilon must be >= 0.0."
+            ));
         }
         self.epsilon = epsilon;
         Ok(self)
@@ -185,16 +185,16 @@ where
     /// set theta
     pub fn theta(mut self, theta: F) -> Result<Self, Error> {
         if theta <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: theta must be > 0.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: theta must be > 0.0."
+            ));
         }
         if theta >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: theta must be < 1.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: theta must be < 1.0."
+            ));
         }
         self.theta = theta;
         Ok(self)
@@ -203,16 +203,16 @@ where
     /// set gamma
     pub fn gamma(mut self, gamma: F) -> Result<Self, Error> {
         if gamma <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: gamma must be > 0.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: gamma must be > 0.0."
+            ));
         }
         if gamma >= F::from_f64(1.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: gamma must be < 1.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: gamma must be < 1.0."
+            ));
         }
         self.gamma = gamma;
         Ok(self)
@@ -221,10 +221,10 @@ where
     /// set eta
     pub fn eta(mut self, eta: F) -> Result<Self, Error> {
         if eta <= F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: eta must be > 0.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: eta must be > 0.0."
+            ));
         }
         self.eta = eta;
         Ok(self)
@@ -233,16 +233,16 @@ where
     /// set alpha limits
     pub fn alpha(mut self, alpha_min: F, alpha_max: F) -> Result<Self, Error> {
         if alpha_min < F::from_f64(0.0).unwrap() {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: alpha_min must be >= 0.0.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: alpha_min must be >= 0.0."
+            ));
         }
         if alpha_max <= alpha_min {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: alpha_min must be smaller than alpha_max.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: alpha_min must be smaller than alpha_max."
+            ));
         }
         self.a_x_init = alpha_min;
         self.b_x_init = alpha_max;
@@ -300,10 +300,10 @@ where
         }
 
         // return Ok(((a_x, a_f, a_g), (b_x, b_f, b_g)));
-        Err(ArgminError::InvalidParameter {
-            text: "HagerZhangLineSearch: Reached unreachable point in `update` method.".to_string(),
-        }
-        .into())
+        Err(argmin_error!(
+            PotentialBug,
+            "HagerZhangLineSearch: Reached unreachable point in `update` method."
+        ))
     }
 
     /// secant step
@@ -440,10 +440,10 @@ where
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         if self.sigma < self.delta {
-            return Err(ArgminError::InvalidParameter {
-                text: "HagerZhangLineSearch: sigma must be >= delta.".to_string(),
-            }
-            .into());
+            return Err(argmin_error!(
+                InvalidParameter,
+                "HagerZhangLineSearch: sigma must be >= delta."
+            ));
         }
 
         check_param!(

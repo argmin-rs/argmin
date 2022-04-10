@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminError, ArgminFloat, Error};
+use crate::core::{ArgminFloat, Error};
 use std::collections::HashMap;
 
 /// Wrapper around problems defined by users.
@@ -484,27 +484,27 @@ pub trait LinearProgram {
     /// TODO c for linear programs
     /// Those three could maybe be merged into a single function; name unclear
     fn c(&self) -> Result<Vec<Self::Float>, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `c` of LinearProgram trait not implemented!".to_string(),
-        }
-        .into())
+        Err(argmin_error!(
+            NotImplemented,
+            "Method `c` of LinearProgram trait not implemented!"
+        ))
     }
 
     /// TODO b for linear programs
     fn b(&self) -> Result<Vec<Self::Float>, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `b` of LinearProgram trait not implemented!".to_string(),
-        }
-        .into())
+        Err(argmin_error!(
+            NotImplemented,
+            "Method `b` of LinearProgram trait not implemented!"
+        ))
     }
 
     /// TODO A for linear programs
     #[allow(non_snake_case)]
     fn A(&self) -> Result<Vec<Vec<Self::Float>>, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `A` of LinearProgram trait not implemented!".to_string(),
-        }
-        .into())
+        Err(argmin_error!(
+            NotImplemented,
+            "Method `A` of LinearProgram trait not implemented!"
+        ))
     }
 }
 
