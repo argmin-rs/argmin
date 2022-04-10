@@ -676,7 +676,7 @@
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// \[1\] Wikipedia: &lt;https://en.wikipedia.org/wiki/Backtracking_line_search&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// initial parameter vector</span>

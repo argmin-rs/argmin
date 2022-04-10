@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["steepestdescent","Steepest Descent method"]]});
+initSidebarItems({"struct":[["SteepestDescent","Steepest descent"]]});

@@ -673,7 +673,7 @@
 }
 
 <span class="doccomment">/// Armijo Condition</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="ident">c</span>: <span class="ident">F</span>,
@@ -718,7 +718,7 @@
 }
 
 <span class="doccomment">/// Wolfe Condition</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="ident">c1</span>: <span class="ident">F</span>,
@@ -772,7 +772,7 @@
 }
 
 <span class="doccomment">/// Strong Wolfe conditions</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StrongWolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="ident">c1</span>: <span class="ident">F</span>,
@@ -826,7 +826,7 @@
 }
 
 <span class="doccomment">/// Goldstein conditions</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GoldsteinCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="ident">c</span>: <span class="ident">F</span>,
