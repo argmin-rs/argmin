@@ -119,7 +119,7 @@ where
 
         let cur_cost = problem.cost(&new_param)?;
 
-        let out = if self.condition.requires_cur_grad() {
+        let out = if self.condition.requires_current_gradient() {
             state
                 .grad(problem.gradient(&new_param)?)
                 .param(new_param)
@@ -137,10 +137,10 @@ where
     P: Clone + SerializeAlias + ArgminScaledAdd<P, F, P>,
     G: SerializeAlias + ArgminScaledAdd<P, F, P>,
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    L: LineSearchCondition<P, G, F>,
+    L: LineSearchCondition<P, G, F> + SerializeAlias,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Backtracking Line search";
+    const NAME: &'static str = "Backtracking line search";
 
     fn init(
         &mut self,
@@ -184,7 +184,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<P, G, (), (), F>) -> TerminationReason {
-        if self.condition.eval(
+        if self.condition.evaluate_condition(
             state.cost,
             state.get_grad(),
             self.init_cost,
