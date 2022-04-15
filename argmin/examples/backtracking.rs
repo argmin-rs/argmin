@@ -7,7 +7,7 @@
 
 use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{CostFunction, Error, Executor, Gradient, LineSearch};
-use argmin::solver::linesearch::{ArmijoCondition, BacktrackingLineSearch};
+use argmin::solver::linesearch::{condition::ArmijoCondition, BacktrackingLineSearch};
 use argmin_testfunctions::{sphere, sphere_derivative};
 
 struct Sphere {}
@@ -47,10 +47,10 @@ fn run() -> Result<(), Error> {
     // ArgminLineSearch trait which needs to be object safe.
 
     // Set search direction
-    solver.set_search_direction(vec![-1.0, 0.0]);
+    solver.search_direction(vec![-1.0, 0.0]);
 
     // Set initial position
-    solver.set_init_alpha(1.0)?;
+    solver.initial_step_length(1.0)?;
 
     let init_cost = operator.cost(&init_param)?;
     let init_grad = operator.gradient(&init_param)?;

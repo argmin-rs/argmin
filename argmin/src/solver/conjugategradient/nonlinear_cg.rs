@@ -171,7 +171,7 @@ where
         let cur_cost = state.cost;
 
         // Linesearch
-        self.linesearch.set_search_direction(p.clone());
+        self.linesearch.search_direction(p.clone());
 
         // Run solver
         let OptimizationResult {
@@ -241,7 +241,7 @@ mod tests {
     use crate::core::ArgminError;
     use crate::solver::conjugategradient::beta::PolakRibiere;
     use crate::solver::linesearch::{
-        ArmijoCondition, BacktrackingLineSearch, MoreThuenteLineSearch,
+        condition::ArmijoCondition, BacktrackingLineSearch, MoreThuenteLineSearch,
     };
     use crate::test_trait_impl;
     use approx::assert_relative_eq;

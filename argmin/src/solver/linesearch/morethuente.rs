@@ -202,12 +202,12 @@ where
     F: ArgminFloat,
 {
     /// Set search direction
-    fn set_search_direction(&mut self, search_direction: P) {
+    fn search_direction(&mut self, search_direction: P) {
         self.search_direction = Some(search_direction);
     }
 
     /// Set initial alpha value
-    fn set_init_alpha(&mut self, alpha: F) -> Result<(), Error> {
+    fn initial_step_length(&mut self, alpha: F) -> Result<(), Error> {
         if alpha <= F::from_f64(0.0).unwrap() {
             return Err(argmin_error!(
                 InvalidParameter,
@@ -235,7 +235,7 @@ where
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         check_param!(
             self.search_direction,
-            "MoreThuenteLineSearch: Search direction not initialized. Call `set_search_direction`."
+            "MoreThuenteLineSearch: Search direction not initialized. Call `search_direction`."
         );
 
         self.init_param = state.param.clone();

@@ -72,7 +72,7 @@ where
         let new_grad = problem.gradient(&param_new)?;
 
         self.linesearch
-            .set_search_direction(new_grad.mul(&(F::from_f64(-1.0).unwrap())));
+            .search_direction(new_grad.mul(&(F::from_f64(-1.0).unwrap())));
 
         // Run line search
         let OptimizationResult {
@@ -115,7 +115,7 @@ mod tests {
     use crate::core::test_utils::TestProblem;
     use crate::core::{ArgminError, State};
     use crate::solver::linesearch::{
-        ArmijoCondition, BacktrackingLineSearch, MoreThuenteLineSearch,
+        condition::ArmijoCondition, BacktrackingLineSearch, MoreThuenteLineSearch,
     };
     use crate::test_trait_impl;
     use approx::assert_relative_eq;

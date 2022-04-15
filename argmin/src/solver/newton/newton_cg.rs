@@ -136,7 +136,7 @@ where
         }
 
         // perform line search
-        self.linesearch.set_search_direction(x);
+        self.linesearch.search_direction(x);
 
         let line_cost = state.get_cost();
 

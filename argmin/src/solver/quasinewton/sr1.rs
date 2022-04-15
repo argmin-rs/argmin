@@ -133,7 +133,7 @@ where
 
         let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
 
-        self.linesearch.set_search_direction(p);
+        self.linesearch.search_direction(p);
 
         // Run solver
         let OptimizationResult {

@@ -116,7 +116,7 @@ where
         let inv_hessian = state.take_inv_hessian().unwrap();
         let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
 
-        self.linesearch.set_search_direction(p);
+        self.linesearch.search_direction(p);
 
         let OptimizationResult {
             problem: line_problem,
