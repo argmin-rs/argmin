@@ -147,7 +147,7 @@ where
         }
 
         self.linesearch
-            .set_search_direction(r.mul(&F::from_f64(-1.0).unwrap()));
+            .search_direction(r.mul(&F::from_f64(-1.0).unwrap()));
 
         // Run solver
         let OptimizationResult {

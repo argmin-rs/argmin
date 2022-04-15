@@ -414,12 +414,12 @@ where
 
 impl<P, G, F> LineSearch<P, F> for HagerZhangLineSearch<P, G, F> {
     /// Set search direction
-    fn set_search_direction(&mut self, search_direction: P) {
+    fn search_direction(&mut self, search_direction: P) {
         self.search_direction = Some(search_direction);
     }
 
     /// Set initial alpha value
-    fn set_init_alpha(&mut self, alpha: F) -> Result<(), Error> {
+    fn initial_step_length(&mut self, alpha: F) -> Result<(), Error> {
         self.c_x_init = alpha;
         Ok(())
     }
@@ -448,7 +448,7 @@ where
 
         check_param!(
             self.search_direction,
-            "HagerZhangLineSearch: Search direction not initialized. Call `set_search_direction`."
+            "HagerZhangLineSearch: Search direction not initialized. Call `search_direction`."
         );
 
         self.init_param = state.param.clone();

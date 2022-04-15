@@ -79,12 +79,12 @@ where
     F: ArgminFloat,
 {
     /// Set search direction
-    fn set_search_direction(&mut self, search_direction: P) {
+    fn search_direction(&mut self, search_direction: P) {
         self.search_direction = Some(search_direction);
     }
 
     /// Set initial alpha value
-    fn set_init_alpha(&mut self, alpha: F) -> Result<(), Error> {
+    fn initial_step_length(&mut self, alpha: F) -> Result<(), Error> {
         if alpha <= F::from_f64(0.0).unwrap() {
             return Err(argmin_error!(
                 InvalidParameter,
@@ -288,27 +288,27 @@ mod tests {
     }
 
     #[test]
-    fn test_set_search_direction() {
+    fn test_search_direction() {
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
         let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
-        ls.set_search_direction(vec![1.0f64, 1.0]);
+        ls.search_direction(vec![1.0f64, 1.0]);
 
         assert_eq!(ls.search_direction, Some(vec![1.0f64, 1.0]));
     }
 
     #[test]
-    fn test_set_init_alpha() {
+    fn test_initial_step_length() {
         let c: f64 = 0.01;
         let armijo = ArmijoCondition::new(c).unwrap();
         let mut ls: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
             BacktrackingLineSearch::new(armijo);
 
-        assert!(ls.set_init_alpha(f64::EPSILON).is_ok());
+        assert!(ls.initial_step_length(f64::EPSILON).is_ok());
 
         assert_error!(
-            ls.set_init_alpha(0.0f64),
+            ls.initial_step_length(0.0f64),
             ArgminError,
             "Invalid parameter: \"LineSearch: Inital alpha must be > 0.\""
         );
@@ -328,8 +328,8 @@ mod tests {
         ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
         ls.init_grad = Some(vec![-2.0, 0.0]);
-        ls.set_search_direction(vec![2.0f64, 0.0]);
-        ls.set_init_alpha(0.8).unwrap();
+        ls.search_direction(vec![2.0f64, 0.0]);
+        ls.initial_step_length(0.8).unwrap();
 
         let data = ls.backtracking_step(&mut Problem::new(prob), IterState::new());
         assert!(data.is_ok());
@@ -360,8 +360,8 @@ mod tests {
         ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
         ls.init_grad = Some(vec![-2.0, 0.0]);
-        ls.set_search_direction(vec![2.0f64, 0.0]);
-        ls.set_init_alpha(0.8).unwrap();
+        ls.search_direction(vec![2.0f64, 0.0]);
+        ls.initial_step_length(0.8).unwrap();
 
         let data = ls.backtracking_step(&mut Problem::new(prob), IterState::new());
         assert!(data.is_ok());
@@ -392,7 +392,7 @@ mod tests {
         ls.init_cost = f64::infinity();
         // in contrast to the step tests above, it is not necessary to set the init_grad here
         // because it will be computed in init if not present.
-        ls.set_init_alpha(0.8).unwrap();
+        ls.initial_step_length(0.8).unwrap();
 
         assert_error!(
             ls.init(
@@ -403,7 +403,7 @@ mod tests {
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
         );
 
-        ls.set_search_direction(vec![2.0f64, 0.0]);
+        ls.search_direction(vec![2.0f64, 0.0]);
 
         let data = ls.init(
             &mut Problem::new(prob),
@@ -439,7 +439,7 @@ mod tests {
         ls.init_cost = f64::infinity();
         // in contrast to the step tests above, it is not necessary to set the init_grad here
         // because it will be computed in init if not present.
-        ls.set_init_alpha(0.8).unwrap();
+        ls.initial_step_length(0.8).unwrap();
 
         assert_error!(
             ls.init(
@@ -450,7 +450,7 @@ mod tests {
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
         );
 
-        ls.set_search_direction(vec![2.0f64, 0.0]);
+        ls.search_direction(vec![2.0f64, 0.0]);
 
         let data = ls.init(
             &mut Problem::new(prob),
@@ -486,8 +486,8 @@ mod tests {
         ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
         ls.init_grad = Some(vec![-2.0, 0.0]);
-        ls.set_search_direction(vec![2.0f64, 0.0]);
-        ls.set_init_alpha(init_alpha).unwrap();
+        ls.search_direction(vec![2.0f64, 0.0]);
+        ls.initial_step_length(init_alpha).unwrap();
 
         let data = ls.next_iter(
             &mut Problem::new(prob),
@@ -517,8 +517,8 @@ mod tests {
         ls.init_param = Some(vec![-1.0, 0.0]);
         ls.init_cost = f64::infinity();
         ls.init_grad = Some(vec![-2.0, 0.0]);
-        ls.set_search_direction(vec![2.0f64, 0.0]);
-        ls.set_init_alpha(init_alpha).unwrap();
+        ls.search_direction(vec![2.0f64, 0.0]);
+        ls.initial_step_length(init_alpha).unwrap();
 
         let init_param = ls.init_param.clone().unwrap();
         assert_eq!(
@@ -560,7 +560,7 @@ mod tests {
         ls.init_cost = f64::infinity();
         // in contrast to the step tests above, it is not necessary to set the init_grad here
         // because it will be computed in init if not present.
-        ls.set_init_alpha(0.8).unwrap();
+        ls.initial_step_length(0.8).unwrap();
 
         assert_error!(
             Executor::new(prob.clone(), ls.clone())
@@ -570,7 +570,7 @@ mod tests {
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
         );
 
-        ls.set_search_direction(vec![2.0f64, 0.0]);
+        ls.search_direction(vec![2.0f64, 0.0]);
 
         let data = Executor::new(prob, ls.clone())
             .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(10))
@@ -609,7 +609,7 @@ mod tests {
         ls.init_cost = f64::infinity();
         // in contrast to the step tests above, it is not necessary to set the init_grad here
         // because it will be computed in init if not present.
-        ls.set_init_alpha(0.8).unwrap();
+        ls.initial_step_length(0.8).unwrap();
 
         assert_error!(
             Executor::new(prob.clone(), ls.clone())
@@ -619,7 +619,7 @@ mod tests {
             "Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
         );
 
-        ls.set_search_direction(vec![2.0f64, 0.0]);
+        ls.search_direction(vec![2.0f64, 0.0]);
 
         let data = Executor::new(prob, ls.clone())
             .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(10))

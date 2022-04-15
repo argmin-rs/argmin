@@ -44,10 +44,10 @@ fn run() -> Result<(), Error> {
     // LineSearch trait which needs to be object safe.
 
     // Set search direction
-    solver.set_search_direction(vec![-1.5, 0.0]);
+    solver.search_direction(vec![-1.5, 0.0]);
 
     // Set initial step length
-    solver.set_init_alpha(1.0)?;
+    solver.initial_step_length(1.0)?;
 
     let init_cost = operator.cost(&init_param)?;
     let init_grad = operator.gradient(&init_param)?;

@@ -118,7 +118,7 @@ where
         let p: P = jacobian_t.dot(&jacobian).inv()?.dot(&grad);
 
         self.linesearch
-            .set_search_direction(p.mul(&(F::from_f64(-1.0).unwrap())));
+            .search_direction(p.mul(&(F::from_f64(-1.0).unwrap())));
 
         // perform linesearch
         let OptimizationResult {
@@ -225,7 +225,7 @@ mod tests {
     use crate::core::ArgminError;
     #[cfg(feature = "ndarrayl")]
     use crate::core::{IterState, State};
-    use crate::solver::linesearch::{ArmijoCondition, BacktrackingLineSearch};
+    use crate::solver::linesearch::{condition::ArmijoCondition, BacktrackingLineSearch};
     use crate::{assert_error, test_trait_impl};
     #[cfg(feature = "ndarrayl")]
     use approx::assert_relative_eq;
