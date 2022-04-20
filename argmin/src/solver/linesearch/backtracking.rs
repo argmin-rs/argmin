@@ -5,8 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! * [Backtracking line search](struct.BacktrackingLineSearch.html)
-
 use crate::core::{
     ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
     Solver, State, TerminationReason, KV,
@@ -16,10 +14,12 @@ use argmin_math::ArgminScaledAdd;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
-/// The Backtracking line search is a simple method to find a step length which obeys the Armijo
-/// (sufficient decrease) condition.
+/// # Backtracking line search
 ///
-/// # References:
+/// The Backtracking line search is a method which finds a step length from a given point along a
+/// given direction, such that this step length obeys the Armijo (sufficient decrease) condition.
+///
+/// ## References
 ///
 /// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
@@ -48,7 +48,17 @@ impl<P, G, L, F> BacktrackingLineSearch<P, G, L, F>
 where
     F: ArgminFloat,
 {
-    /// Constructor
+    /// Construct a new instance of `BacktrackingLineSearch`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::BacktrackingLineSearch;
+    /// # use argmin::solver::linesearch::condition::ArmijoCondition;
+    ///
+    /// let backtracking: BacktrackingLineSearch<Vec<f64>, Vec<f64>, _, f64> =
+    ///     BacktrackingLineSearch::new(ArmijoCondition::new(0.0001f64));
+    /// ```
     pub fn new(condition: L) -> Self {
         BacktrackingLineSearch {
             init_param: None,
@@ -61,7 +71,23 @@ where
         }
     }
 
-    /// Set rho
+    /// Set contraction factor rho
+    ///
+    /// This factor must be in (0, 1).
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::Error;
+    /// # use argmin::solver::linesearch::BacktrackingLineSearch;
+    /// # use argmin::solver::linesearch::condition::ArmijoCondition;
+    /// # fn main() -> Result<(), Error> {
+    /// # let backtracking: BacktrackingLineSearch<Vec<f64>, Vec<f64>, _, f64> =
+    /// #     BacktrackingLineSearch::new(ArmijoCondition::new(0.0001f64));
+    /// let backtracking = backtracking.rho(0.5)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn rho(mut self, rho: F) -> Result<Self, Error> {
         if rho <= F::from_f64(0.0).unwrap() || rho >= F::from_f64(1.0).unwrap() {
             return Err(argmin_error!(
@@ -83,12 +109,12 @@ where
         self.search_direction = Some(search_direction);
     }
 
-    /// Set initial alpha value
+    /// Set initial step length
     fn initial_step_length(&mut self, alpha: F) -> Result<(), Error> {
         if alpha <= F::from_f64(0.0).unwrap() {
             return Err(argmin_error!(
                 InvalidParameter,
-                "LineSearch: Inital alpha must be > 0."
+                "LineSearch: Initial alpha must be > 0."
             ));
         }
         self.alpha = alpha;
@@ -103,6 +129,7 @@ where
     IterState<P, G, (), (), F>: State<Float = F>,
     F: ArgminFloat,
 {
+    /// Perform a single backtracking step
     fn backtracking_step<O>(
         &self,
         problem: &mut Problem<O>,
@@ -114,8 +141,19 @@ where
         let new_param = self
             .init_param
             .as_ref()
-            .unwrap()
-            .scaled_add(&self.alpha, self.search_direction.as_ref().unwrap());
+            .ok_or_else(argmin_error_closure!(
+                PotentialBug,
+                "`BacktrackingLineSearch`: Initial parameter vector not set."
+            ))?
+            .scaled_add(
+                &self.alpha,
+                self.search_direction
+                    .as_ref()
+                    .ok_or_else(argmin_error_closure!(
+                        PotentialBug,
+                        "`BacktrackingLineSearch`: Search direction not set."
+                    ))?,
+            );
 
         let cur_cost = problem.cost(&new_param)?;
 
@@ -147,9 +185,24 @@ where
         problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
-        let init_param = state.param.clone().unwrap();
-        let cost = state.cost;
-        self.init_cost = if cost == F::infinity() {
+        if self.search_direction.is_none() {
+            return Err(argmin_error!(
+                NotInitialized,
+                "BacktrackingLineSearch: search_direction must be set."
+            ));
+        }
+
+        let init_param = state.take_param().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            concat!(
+                "`BacktrackingLineSearch` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method."
+            )
+        ))?;
+
+        let cost = state.get_cost();
+
+        self.init_cost = if cost.is_infinite() {
             problem.cost(&init_param)?
         } else {
             cost
@@ -159,13 +212,6 @@ where
             .take_grad()
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&init_param))?;
-
-        if self.search_direction.is_none() {
-            return Err(argmin_error!(
-                NotInitialized,
-                "BacktrackingLineSearch: search_direction must be set."
-            ));
-        }
 
         self.init_param = Some(init_param);
         self.init_grad = Some(init_grad);
@@ -310,7 +356,23 @@ mod tests {
         assert_error!(
             ls.initial_step_length(0.0f64),
             ArgminError,
-            "Invalid parameter: \"LineSearch: Inital alpha must be > 0.\""
+            "Invalid parameter: \"LineSearch: Initial alpha must be > 0.\""
+        );
+    }
+
+    #[test]
+    fn test_init_param_not_initialized() {
+        let mut linesearch: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
+            BacktrackingLineSearch::new(ArmijoCondition::new(0.2).unwrap());
+        linesearch.search_direction(vec![1.0f64, 1.0]);
+        let res = linesearch.init(&mut Problem::new(TestProblem::new()), IterState::new());
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`BacktrackingLineSearch` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method.\""
+            )
         );
     }
 
