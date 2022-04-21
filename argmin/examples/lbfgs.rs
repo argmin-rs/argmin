@@ -44,7 +44,7 @@ fn run() -> Result<(), Error> {
     // let init_param: Array1<f64> = array![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
 
     // set up a line search
-    let linesearch = MoreThuenteLineSearch::new().c(1e-4, 0.9)?;
+    let linesearch = MoreThuenteLineSearch::new().with_c(1e-4, 0.9)?;
 
     // Set up solver
     let solver = LBFGS::new(linesearch, 7);

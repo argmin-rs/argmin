@@ -5,18 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! TODO: Apparently it is missing stopping criteria!
-//!
-//! This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
-//! <http://www.cs.umd.edu/users/oleary/software/>
-//!
-//! # Reference
-//!
-//! Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
-//! decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
-//! DOI: <https://doi.org/10.1145/192115.192132>
-//!
-
 // Deactivating this lint here because it would make the boolean expressions more difficult to
 // read.
 #![allow(clippy::nonminimal_bool)]
@@ -30,15 +18,32 @@ use argmin_math::{ArgminDot, ArgminScaledAdd};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
-/// The More-Thuente line search is a method to find a step length which obeys the strong Wolfe
-/// conditions.
+/// # More-Thuente line search
 ///
-/// # References
+/// The More-Thuente line search is a method which finds an appropriate step length from a starting
+/// point and a search direction. This point obeys the strong Wolfe conditions.
+///
+/// With the method [`with_c`](`MoreThuenteLineSearch::with_c`) the scaling factors for the
+/// sufficient decrease condition and the curvature condition can be supplied. By default they are
+/// set to `c1 = 1e-4` and `c2 = 0.9`.
+///
+/// Bounds on the range where step lengths are being searched for can be set with
+/// [`with_bounds`](`MoreThuenteLineSearch::with_bounds`) which accepts a lower and an upper bound.
+/// Both values need to be non-negative and `lower < upper`.
+///
+/// One of the reasons for the algorithm to terminate is when the the relative width of the
+/// uncertainty interval is smaller than a given tolerance (default: `1e-10`). This tolerance can
+/// be set via [`with_width_tolerance`](`MoreThuenteLineSearch::with_width_tolerance`) and must be
+/// non-negative.
+///
+/// TODO: Add missing stopping criteria!
+///
+/// ## References
 ///
 /// This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
 /// <http://www.cs.umd.edu/users/oleary/software/>
 ///
-/// \[0\] Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
+/// Jorge J. More and David J. Thuente. "Line search algorithms with guaranteed sufficient
 /// decrease." ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
 /// DOI: <https://doi.org/10.1145/192115.192132>
 #[derive(Clone)]
@@ -60,7 +65,7 @@ pub struct MoreThuenteLineSearch<P, G, F> {
     ftol: F,
     /// c2
     gtol: F,
-    /// xtrapf?
+    /// xtrapf
     xtrapf: F,
     /// width of interval
     width: F,
@@ -76,9 +81,9 @@ pub struct MoreThuenteLineSearch<P, G, F> {
     stpmax: F,
     /// current step
     stp: Step<F>,
-    /// stx
+    /// stx (one endpoint of uncertainty interval)
     stx: Step<F>,
-    /// sty
+    /// sty (another endpoint of uncertainty interval)
     sty: Step<F>,
     /// f
     f: F,
@@ -90,7 +95,7 @@ pub struct MoreThuenteLineSearch<P, G, F> {
     infoc: usize,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 struct Step<F> {
     pub x: F,
@@ -99,6 +104,7 @@ struct Step<F> {
 }
 
 impl<F> Step<F> {
+    /// Create a new instance of `Step`
     pub fn new(x: F, fx: F, gx: F) -> Self {
         Step { x, fx, gx }
     }
@@ -121,7 +127,14 @@ impl<P, G, F> MoreThuenteLineSearch<P, G, F>
 where
     F: ArgminFloat,
 {
-    /// Constructor
+    /// Construct a new instance of `MoreThuenteLineSearch`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+    /// ```
     pub fn new() -> Self {
         MoreThuenteLineSearch {
             search_direction: None,
@@ -149,18 +162,33 @@ where
         }
     }
 
-    /// Set c1 and c2 where 0 < c1 < c2 < 1.
-    pub fn c(mut self, c1: F, c2: F) -> Result<Self, Error> {
+    /// Set the constants c1 and c2 for the sufficient decrease and curvature conditions,
+    /// respectively. `0 < c1 < c2 < 1` must hold.
+    ///
+    /// The default values are `c1 = 1e-4` and `c2 = 0.9`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
+    ///     MoreThuenteLineSearch::new().with_c(1e-3, 0.8)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_c(mut self, c1: F, c2: F) -> Result<Self, Error> {
         if c1 <= F::from_f64(0.0).unwrap() || c1 >= c2 {
             return Err(argmin_error!(
                 InvalidParameter,
-                "MoreThuenteLineSearch: Parameter c1 must be in (0, c2)."
+                "`MoreThuenteLineSearch`: Parameter c1 must be in (0, c2)."
             ));
         }
         if c2 <= c1 || c2 >= F::from_f64(1.0).unwrap() {
             return Err(argmin_error!(
                 InvalidParameter,
-                "MoreThuenteLineSearch: Parameter c2 must be in (c1, 1)."
+                "`MoreThuenteLineSearch`: Parameter c2 must be in (c1, 1)."
             ));
         }
         self.ftol = c1;
@@ -168,22 +196,67 @@ where
         Ok(self)
     }
 
-    /// set alpha limits
-    pub fn alpha(mut self, alpha_min: F, alpha_max: F) -> Result<Self, Error> {
-        if alpha_min < F::from_f64(0.0).unwrap() {
+    /// Set lower and upper bound of step
+    ///
+    /// Defaults are `step_min = sqrt(EPS)` and `step_max = INF`.
+    ///
+    /// `step_min` must be smaller than `step_max`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
+    ///     MoreThuenteLineSearch::new().with_bounds(1e-6, 10.0)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_bounds(mut self, step_min: F, step_max: F) -> Result<Self, Error> {
+        if step_min < F::from_f64(0.0).unwrap() {
             return Err(argmin_error!(
                 InvalidParameter,
-                "MoreThuenteLineSearch: alpha_min must be >= 0.0."
+                "`MoreThuenteLineSearch`: step_min must be >= 0.0."
             ));
         }
-        if alpha_max <= alpha_min {
+        if step_max <= step_min {
             return Err(argmin_error!(
                 InvalidParameter,
-                "MoreThuenteLineSearch: alpha_min must be smaller than alpha_max."
+                "`MoreThuenteLineSearch`: step_min must be smaller than step_max."
             ));
         }
-        self.stpmin = alpha_min;
-        self.stpmax = alpha_max;
+        self.stpmin = step_min;
+        self.stpmax = step_max;
+        Ok(self)
+    }
+
+    /// Set relative tolerance on width of uncertainty interval
+    ///
+    /// The algorithm terminates when the relative width of the uncertainty interval is below the
+    /// supplied tolerance.
+    ///
+    /// Must be non-negative and defaults to `1e-10`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
+    ///     MoreThuenteLineSearch::new().with_width_tolerance(1e-9)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_width_tolerance(mut self, xtol: F) -> Result<Self, Error> {
+        if xtol < F::from_f64(0.0).unwrap() {
+            return Err(argmin_error!(
+                InvalidParameter,
+                "`MoreThuenteLineSearch`: relative width tolerance must be >= 0.0."
+            ));
+        }
+        self.xtol = xtol;
         Ok(self)
     }
 }
@@ -235,12 +308,21 @@ where
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
         check_param!(
             self.search_direction,
-            "MoreThuenteLineSearch: Search direction not initialized. Call `search_direction`."
+            concat!(
+                "`MoreThuenteLineSearch`: Search direction not initialized. ",
+                "Call `search_direction` before executing the solver."
+            )
         );
 
-        self.init_param = state.param.clone();
+        self.init_param = Some(state.take_param().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            concat!(
+                "`MoreThuenteLineSearch` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method."
+            )
+        ))?);
 
-        let cost = state.cost;
+        let cost = state.get_cost();
         self.finit = if cost.is_infinite() {
             problem.cost(self.init_param.as_ref().unwrap())?
         } else {
@@ -264,7 +346,7 @@ where
         if self.dginit >= F::from_f64(0.0).unwrap() {
             return Err(argmin_error!(
                 ConditionViolated,
-                "MoreThuenteLineSearch: Search direction must be a descent direction."
+                "`MoreThuenteLineSearch`: Search direction must be a descent direction."
             ));
         }
 
@@ -535,7 +617,7 @@ fn cstep<F: ArgminFloat>(
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
             return Err(argmin_error!(
                 ConditionViolated,
-                "MoreThuenteLineSearch: NaN or Inf encountered during iteration"
+                "`MoreThuenteLineSearch`: NaN or Inf encountered during iteration"
             ));
         }
         let s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
@@ -645,7 +727,207 @@ fn cstep<F: ArgminFloat>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::{test_utils::TestProblem, ArgminError, IterState, Problem};
     use crate::test_trait_impl;
 
     test_trait_impl!(morethuente, MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>);
+
+    #[test]
+    fn test_new() {
+        let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let MoreThuenteLineSearch {
+            search_direction,
+            init_param,
+            finit,
+            init_grad,
+            dginit,
+            dgtest,
+            ftol,
+            gtol,
+            xtrapf,
+            width,
+            width1,
+            xtol,
+            alpha,
+            stpmin,
+            stpmax,
+            stp,
+            stx,
+            sty,
+            f,
+            brackt,
+            stage1,
+            infoc,
+        } = mtls;
+
+        assert!(search_direction.is_none());
+        assert!(init_param.is_none());
+        assert!(finit.is_infinite());
+        assert!(finit.is_sign_positive());
+        assert!(init_grad.is_none());
+        assert_eq!(dginit.to_ne_bytes(), 0.0f64.to_ne_bytes());
+        assert_eq!(dgtest.to_ne_bytes(), 0.0f64.to_ne_bytes());
+        assert_eq!(ftol.to_ne_bytes(), 1e-4f64.to_ne_bytes());
+        assert_eq!(gtol.to_ne_bytes(), 0.9f64.to_ne_bytes());
+        assert_eq!(xtrapf.to_ne_bytes(), 4.0f64.to_ne_bytes());
+        assert!(width.is_nan());
+        assert!(width1.is_nan());
+        assert_eq!(xtol.to_ne_bytes(), 1e-10f64.to_ne_bytes());
+        assert_eq!(alpha.to_ne_bytes(), 1.0f64.to_ne_bytes());
+        assert_eq!(stpmin.to_ne_bytes(), f64::EPSILON.sqrt().to_ne_bytes());
+        assert!(stpmax.is_infinite());
+        assert!(stpmax.is_sign_positive());
+        assert_eq!(stp, Step::default());
+        assert_eq!(stx, Step::default());
+        assert_eq!(sty, Step::default());
+        assert!(f.is_nan());
+        assert!(!brackt);
+        assert!(stage1);
+        assert_eq!(infoc, 1);
+    }
+
+    #[test]
+    fn test_with_c_correct() {
+        let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let res = mtls.with_c(0.1, 0.9);
+        assert!(res.is_ok());
+
+        let mtls = res.unwrap();
+        assert_eq!(mtls.ftol.to_ne_bytes(), 0.1f64.to_ne_bytes());
+        assert_eq!(mtls.gtol.to_ne_bytes(), 0.9f64.to_ne_bytes());
+    }
+
+    #[test]
+    fn test_with_c_c1_larger_than_c2() {
+        let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let res = mtls.with_c(0.9, 0.1);
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Invalid parameter: \"`MoreThuenteLineSearch`: ",
+                "Parameter c1 must be in (0, c2).\""
+            )
+        );
+    }
+
+    #[test]
+    fn test_with_c_c1_smaller_than_0() {
+        let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let res = mtls.with_c(-0.9, 0.99);
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Invalid parameter: \"`MoreThuenteLineSearch`: ",
+                "Parameter c1 must be in (0, c2).\""
+            )
+        );
+    }
+
+    #[test]
+    fn test_with_c_c2_larger_than_1() {
+        let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let res = mtls.with_c(0.1, 1.01);
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Invalid parameter: \"`MoreThuenteLineSearch`: ",
+                "Parameter c2 must be in (c1, 1).\""
+            )
+        );
+    }
+
+    #[test]
+    fn test_with_bounds_correct() {
+        let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let res = mtls.with_bounds(0.1, 0.9);
+        assert!(res.is_ok());
+
+        let mtls = res.unwrap();
+        assert_eq!(mtls.stpmin.to_ne_bytes(), 0.1f64.to_ne_bytes());
+        assert_eq!(mtls.stpmax.to_ne_bytes(), 0.9f64.to_ne_bytes());
+    }
+
+    #[test]
+    fn test_with_bounds_step_min_smaller_than_0() {
+        let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let res = mtls.with_bounds(-0.1, 0.99);
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Invalid parameter: \"`MoreThuenteLineSearch`: ",
+                "step_min must be >= 0.0.\""
+            )
+        );
+    }
+
+    #[test]
+    fn test_with_bounds_step_min_larger_than_step_max() {
+        let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let res = mtls.with_bounds(10.0, 0.99);
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Invalid parameter: \"`MoreThuenteLineSearch`: ",
+                "step_min must be smaller than step_max.\""
+            )
+        );
+    }
+
+    #[test]
+    fn test_with_width_tolerance_correct() {
+        let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let res = mtls.with_width_tolerance(1e-9);
+        assert!(res.is_ok());
+
+        let mtls = res.unwrap();
+        assert_eq!(mtls.xtol.to_ne_bytes(), 1e-9f64.to_ne_bytes());
+    }
+
+    #[test]
+    fn test_with_width_tolerance_negative_xtol() {
+        let mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let res = mtls.with_width_tolerance(-1e-10);
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Invalid parameter: \"`MoreThuenteLineSearch`: ",
+                "relative width tolerance must be >= 0.0.\""
+            )
+        );
+    }
+
+    #[test]
+    fn test_init_search_direction_not_set() {
+        let mut mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        let res = mtls.init(&mut Problem::new(TestProblem::new()), IterState::new());
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`MoreThuenteLineSearch`: Search direction not initialized. ",
+                "Call `search_direction` before executing the solver.\""
+            )
+        );
+    }
+
+    #[test]
+    fn test_init_param_not_set() {
+        let mut mtls: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> = MoreThuenteLineSearch::new();
+        mtls.search_direction(vec![1.0f64]);
+        let res = mtls.init(&mut Problem::new(TestProblem::new()), IterState::new());
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`MoreThuenteLineSearch` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method.\""
+            )
+        );
+    }
 }

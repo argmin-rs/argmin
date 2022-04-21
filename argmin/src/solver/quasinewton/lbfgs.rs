@@ -211,7 +211,7 @@ mod tests {
     #[test]
     fn test_tolerances() {
         let linesearch: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
-            MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
+            MoreThuenteLineSearch::new().with_c(1e-4, 0.9).unwrap();
 
         let tol1 = 1e-4f64;
         let tol2 = 1e-2;

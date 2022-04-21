@@ -66,7 +66,7 @@ fn run() -> Result<(), Error> {
         ],
     };
 
-    let linesearch = MoreThuenteLineSearch::new().alpha(0.0, 1.0)?;
+    let linesearch = MoreThuenteLineSearch::new().with_bounds(0.0, 1.0)?;
 
     // Define initial parameter vector
     let init_param: Array1<f64> = Array1::from(vec![0.9, 0.2]);
