@@ -46,7 +46,7 @@ fn run() -> Result<(), Error> {
     // let init_hessian: Array2<f64> = Array2::eye(8);
 
     // set up a line search
-    let linesearch = MoreThuenteLineSearch::new().c(1e-4, 0.9)?;
+    let linesearch = MoreThuenteLineSearch::new().with_c(1e-4, 0.9)?;
 
     // Set up solver
     let solver = DFP::new(init_hessian, linesearch);

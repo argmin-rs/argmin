@@ -215,7 +215,7 @@ mod tests {
     #[test]
     fn test_tolerances() {
         let linesearch: MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64> =
-            MoreThuenteLineSearch::new().c(1e-4, 0.9).unwrap();
+            MoreThuenteLineSearch::new().with_c(1e-4, 0.9).unwrap();
         let init_hessian: Vec<Vec<f64>> = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
 
         let tol1: f64 = 1e-4;
