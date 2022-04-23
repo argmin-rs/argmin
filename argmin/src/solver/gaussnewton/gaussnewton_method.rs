@@ -45,7 +45,7 @@ impl<F: ArgminFloat> GaussNewton<F> {
     /// ```
     pub fn new() -> Self {
         GaussNewton {
-            gamma: F::from_f64(1.0).unwrap(),
+            gamma: float!(1.0),
             tol: F::epsilon().sqrt(),
         }
     }
@@ -65,7 +65,7 @@ impl<F: ArgminFloat> GaussNewton<F> {
     /// # }
     /// ```
     pub fn with_gamma(mut self, gamma: F) -> Result<Self, Error> {
-        if gamma <= F::from_f64(0.0).unwrap() || gamma > F::from_f64(1.0).unwrap() {
+        if gamma <= float!(0.0) || gamma > float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "Gauss-Newton: gamma must be in  (0, 1]."
@@ -90,7 +90,7 @@ impl<F: ArgminFloat> GaussNewton<F> {
     /// # }
     /// ```
     pub fn with_tolerance(mut self, tol: F) -> Result<Self, Error> {
-        if tol <= F::from_f64(0.0).unwrap() {
+        if tol <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "Gauss-Newton: tol must be positive."

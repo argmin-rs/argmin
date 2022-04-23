@@ -100,26 +100,26 @@ where
     /// ```
     pub fn new() -> Self {
         HagerZhangLineSearch {
-            delta: F::from_f64(0.1).unwrap(),
-            sigma: F::from_f64(0.9).unwrap(),
-            epsilon: F::from_f64(1e-6).unwrap(),
+            delta: float!(0.1),
+            sigma: float!(0.9),
+            epsilon: float!(1e-6),
             epsilon_k: F::nan(),
-            theta: F::from_f64(0.5).unwrap(),
-            gamma: F::from_f64(0.66).unwrap(),
-            eta: F::from_f64(0.01).unwrap(),
+            theta: float!(0.5),
+            gamma: float!(0.66),
+            eta: float!(0.01),
             a_x_init: F::epsilon(),
             a_x: F::nan(),
             a_f: F::nan(),
             a_g: F::nan(),
-            b_x_init: F::from_f64(1e5).unwrap(),
+            b_x_init: float!(1e5),
             b_x: F::nan(),
             b_f: F::nan(),
             b_g: F::nan(),
-            c_x_init: F::from_f64(1.0).unwrap(),
+            c_x_init: float!(1.0),
             c_x: F::nan(),
             c_f: F::nan(),
             c_g: F::nan(),
-            best_x: F::from_f64(0.0).unwrap(),
+            best_x: float!(0.0),
             best_f: F::infinity(),
             best_g: F::nan(),
             init_param: None,
@@ -150,11 +150,7 @@ where
     /// # }
     /// ```
     pub fn with_delta_sigma(mut self, delta: F, sigma: F) -> Result<Self, Error> {
-        if delta <= F::from_f64(0.0).unwrap()
-            || delta >= F::from_f64(1.0).unwrap()
-            || sigma < delta
-            || sigma >= F::from_f64(1.0).unwrap()
-        {
+        if delta <= float!(0.0) || delta >= float!(1.0) || sigma < delta || sigma >= float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "`HagerZhangLineSearch`: delta must be in (0, 1) and sigma must be in [delta, 1)."
@@ -183,7 +179,7 @@ where
     /// # }
     /// ```
     pub fn with_epsilon(mut self, epsilon: F) -> Result<Self, Error> {
-        if epsilon < F::from_f64(0.0).unwrap() {
+        if epsilon < float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "`HagerZhangLineSearch`: epsilon must be >= 0."
@@ -212,7 +208,7 @@ where
     /// # }
     /// ```
     pub fn with_theta(mut self, theta: F) -> Result<Self, Error> {
-        if theta <= F::from_f64(0.0).unwrap() || theta >= F::from_f64(1.0).unwrap() {
+        if theta <= float!(0.0) || theta >= float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "`HagerZhangLineSearch`: theta must be in (0, 1)."
@@ -240,7 +236,7 @@ where
     /// # }
     /// ```
     pub fn with_gamma(mut self, gamma: F) -> Result<Self, Error> {
-        if gamma <= F::from_f64(0.0).unwrap() || gamma >= F::from_f64(1.0).unwrap() {
+        if gamma <= float!(0.0) || gamma >= float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "`HagerZhangLineSearch`: gamma must be in (0, 1)."
@@ -268,7 +264,7 @@ where
     /// # }
     /// ```
     pub fn with_eta(mut self, eta: F) -> Result<Self, Error> {
-        if eta <= F::from_f64(0.0).unwrap() {
+        if eta <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "`HagerZhangLineSearch`: eta must be > 0."
@@ -296,7 +292,7 @@ where
     /// # }
     /// ```
     pub fn with_bounds(mut self, step_min: F, step_max: F) -> Result<Self, Error> {
-        if step_min < F::from_f64(0.0).unwrap() || step_max <= step_min {
+        if step_min < float!(0.0) || step_max <= step_min {
             return Err(argmin_error!(
                 InvalidParameter,
                 concat!(
@@ -327,34 +323,34 @@ where
         }
 
         // U1
-        if c_g >= F::from_f64(0.0).unwrap() {
+        if c_g >= float!(0.0) {
             return Ok(((a_x, a_f, a_g), (c_x, c_f, c_g)));
         }
 
         // U2
-        if c_g < F::from_f64(0.0).unwrap() && c_f <= self.finit + self.epsilon_k {
+        if c_g < float!(0.0) && c_f <= self.finit + self.epsilon_k {
             return Ok(((c_x, c_f, c_g), (b_x, b_f, b_g)));
         }
 
         // U3
-        if c_g < F::from_f64(0.0).unwrap() && c_f > self.finit + self.epsilon_k {
+        if c_g < float!(0.0) && c_f > self.finit + self.epsilon_k {
             let mut ah_x = a_x;
             let mut ah_f = a_f;
             let mut ah_g = a_g;
             let mut bh_x = c_x;
             loop {
-                let d_x = (F::from_f64(1.0).unwrap() - self.theta) * ah_x + self.theta * bh_x;
+                let d_x = (float!(1.0) - self.theta) * ah_x + self.theta * bh_x;
                 let d_f = self.calc(problem, d_x)?;
                 let d_g = self.calc_grad(problem, d_x)?;
-                if d_g >= F::from_f64(0.0).unwrap() {
+                if d_g >= float!(0.0) {
                     return Ok(((ah_x, ah_f, ah_g), (d_x, d_f, d_g)));
                 }
-                if d_g < F::from_f64(0.0).unwrap() && d_f <= self.finit + self.epsilon_k {
+                if d_g < float!(0.0) && d_f <= self.finit + self.epsilon_k {
                     ah_x = d_x;
                     ah_f = d_f;
                     ah_g = d_g;
                 }
-                if d_g < F::from_f64(0.0).unwrap() && d_f > self.finit + self.epsilon_k {
+                if d_g < float!(0.0) && d_f > self.finit + self.epsilon_k {
                     bh_x = d_x;
                 }
             }
@@ -386,7 +382,7 @@ where
         let c_x = self.secant(a_x, a_g, b_x, b_g);
         let c_f = self.calc(problem, c_x)?;
         let c_g = self.calc_grad(problem, c_x)?;
-        let mut c_bar_x: F = F::from_f64(0.0).unwrap();
+        let mut c_bar_x: F = float!(0.0);
 
         let ((aa_x, aa_f, aa_g), (bb_x, bb_f, bb_g)) =
             self.update(problem, (a_x, a_f, a_g), (b_x, b_f, b_g), (c_x, c_f, c_g))?;
@@ -580,7 +576,7 @@ where
 
         // L2
         if bt_x - at_x > self.gamma * (self.b_x - self.a_x) {
-            let c_x = (at_x + bt_x) / F::from_f64(2.0).unwrap();
+            let c_x = (at_x + bt_x) / float!(2.0);
             let tmp = self
                 .init_param
                 .as_ref()
@@ -626,8 +622,7 @@ where
         {
             return TerminationReason::LineSearchConditionMet;
         }
-        if (F::from_f64(2.0).unwrap() * self.delta - F::from_f64(1.0).unwrap()) * self.dginit
-            >= self.best_g
+        if (float!(2.0) * self.delta - float!(1.0)) * self.dginit >= self.best_g
             && self.best_g >= self.sigma * self.dginit
             && self.best_f <= self.finit + self.epsilon_k
         {

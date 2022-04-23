@@ -116,9 +116,9 @@ where
 {
     fn default() -> Self {
         Step {
-            x: F::from_f64(0.0).unwrap(),
-            fx: F::from_f64(0.0).unwrap(),
-            gx: F::from_f64(0.0).unwrap(),
+            x: float!(0.0),
+            fx: float!(0.0),
+            gx: float!(0.0),
         }
     }
 }
@@ -141,15 +141,15 @@ where
             init_param: None,
             finit: F::infinity(),
             init_grad: None,
-            dginit: F::from_f64(0.0).unwrap(),
-            dgtest: F::from_f64(0.0).unwrap(),
-            ftol: F::from_f64(1e-4).unwrap(),
-            gtol: F::from_f64(0.9).unwrap(),
-            xtrapf: F::from_f64(4.0).unwrap(),
+            dginit: float!(0.0),
+            dgtest: float!(0.0),
+            ftol: float!(1e-4),
+            gtol: float!(0.9),
+            xtrapf: float!(4.0),
             width: F::nan(),
             width1: F::nan(),
-            xtol: F::from_f64(1e-10).unwrap(),
-            alpha: F::from_f64(1.0).unwrap(),
+            xtol: float!(1e-10),
+            alpha: float!(1.0),
             stpmin: F::epsilon().sqrt(),
             stpmax: F::infinity(),
             stp: Step::default(),
@@ -179,13 +179,13 @@ where
     /// # }
     /// ```
     pub fn with_c(mut self, c1: F, c2: F) -> Result<Self, Error> {
-        if c1 <= F::from_f64(0.0).unwrap() || c1 >= c2 {
+        if c1 <= float!(0.0) || c1 >= c2 {
             return Err(argmin_error!(
                 InvalidParameter,
                 "`MoreThuenteLineSearch`: Parameter c1 must be in (0, c2)."
             ));
         }
-        if c2 <= c1 || c2 >= F::from_f64(1.0).unwrap() {
+        if c2 <= c1 || c2 >= float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "`MoreThuenteLineSearch`: Parameter c2 must be in (c1, 1)."
@@ -214,7 +214,7 @@ where
     /// # }
     /// ```
     pub fn with_bounds(mut self, step_min: F, step_max: F) -> Result<Self, Error> {
-        if step_min < F::from_f64(0.0).unwrap() {
+        if step_min < float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "`MoreThuenteLineSearch`: step_min must be >= 0.0."
@@ -250,7 +250,7 @@ where
     /// # }
     /// ```
     pub fn with_width_tolerance(mut self, xtol: F) -> Result<Self, Error> {
-        if xtol < F::from_f64(0.0).unwrap() {
+        if xtol < float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "`MoreThuenteLineSearch`: relative width tolerance must be >= 0.0."
@@ -281,7 +281,7 @@ where
 
     /// Set initial alpha value
     fn initial_step_length(&mut self, alpha: F) -> Result<(), Error> {
-        if alpha <= F::from_f64(0.0).unwrap() {
+        if alpha <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "MoreThuenteLineSearch: Initial alpha must be > 0."
@@ -343,7 +343,7 @@ where
             .dot(self.search_direction.as_ref().unwrap());
 
         // compute search direction in 1D
-        if self.dginit >= F::from_f64(0.0).unwrap() {
+        if self.dginit >= float!(0.0) {
             return Err(argmin_error!(
                 ConditionViolated,
                 "`MoreThuenteLineSearch`: Search direction must be a descent direction."
@@ -355,12 +355,12 @@ where
 
         self.dgtest = self.ftol * self.dginit;
         self.width = self.stpmax - self.stpmin;
-        self.width1 = F::from_f64(2.0).unwrap() * self.width;
+        self.width1 = float!(2.0) * self.width;
         self.f = self.finit;
 
         self.stp = Step::new(self.alpha, F::nan(), F::nan());
-        self.stx = Step::new(F::from_f64(0.0).unwrap(), self.finit, self.dginit);
-        self.sty = Step::new(F::from_f64(0.0).unwrap(), self.finit, self.dginit);
+        self.stx = Step::new(float!(0.0), self.finit, self.dginit);
+        self.sty = Step::new(float!(0.0), self.finit, self.dginit);
 
         Ok((state, None))
     }
@@ -494,8 +494,8 @@ where
         }
 
         if self.brackt {
-            if (self.sty.x - self.stx.x).abs() >= F::from_f64(0.66).unwrap() * self.width1 {
-                self.stp.x = self.stx.x + F::from_f64(0.5).unwrap() * (self.sty.x - self.stx.x);
+            if (self.sty.x - self.stx.x).abs() >= float!(0.66) * self.width1 {
+                self.stp.x = self.stx.x + float!(0.5) * (self.sty.x - self.stx.x);
             }
             self.width1 = self.width;
             self.width = (self.sty.x - self.stx.x).abs();
@@ -524,7 +524,7 @@ fn cstep<F: ArgminFloat>(
 
     // check inputs
     if (brackt && (stp.x <= stx.x.min(sty.x) || stp.x >= stx.x.max(sty.x)))
-        || stx.gx * (stp.x - stx.x) >= F::from_f64(0.0).unwrap()
+        || stx.gx * (stp.x - stx.x) >= float!(0.0)
         || stpmax < stpmin
     {
         return Ok((stx, sty, stp, brackt, stpmin, stpmax, info));
@@ -539,8 +539,7 @@ fn cstep<F: ArgminFloat>(
         // the quadratic steps is taken.
         info = 1;
         bound = true;
-        let theta =
-            F::from_f64(3.0).unwrap() * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        let theta = float!(3.0) * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
@@ -560,23 +559,21 @@ fn cstep<F: ArgminFloat>(
         let r = p / q;
         stpc = stx.x + r * (stp.x - stx.x);
         stpq = stx.x
-            + ((stx.gx / ((stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx))
-                / F::from_f64(2.0).unwrap())
+            + ((stx.gx / ((stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx)) / float!(2.0))
                 * (stp.x - stx.x);
         if (stpc - stx.x).abs() < (stpq - stx.x).abs() {
             stpf = stpc;
         } else {
-            stpf = stpc + (stpq - stpc) / F::from_f64(2.0).unwrap();
+            stpf = stpc + (stpq - stpc) / float!(2.0);
         }
         brackt = true;
-    } else if sgnd < F::from_f64(0.0).unwrap() {
+    } else if sgnd < float!(0.0) {
         // Second case. A lower function value and derivatives of opposite sign. The minimum is
         // bracketed. If the cubic step is closer to stx.x than the quadtratic (secant) step, the
         // cubic step is taken, else the quadratic step is taken.
         info = 2;
         bound = false;
-        let theta =
-            F::from_f64(3.0).unwrap() * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        let theta = float!(3.0) * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
@@ -610,8 +607,7 @@ fn cstep<F: ArgminFloat>(
         // else the step farthest away is taken.
         info = 3;
         bound = true;
-        let theta =
-            F::from_f64(3.0).unwrap() * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        let theta = float!(3.0) * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
         let tmp = vec![theta, stx.gx, stp.gx];
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
@@ -625,8 +621,7 @@ fn cstep<F: ArgminFloat>(
         // of the step.
 
         let mut gamma = *s
-            * F::from_f64(0.0)
-                .unwrap()
+            * float!(0.0)
                 .max((theta / *s).powi(2) - (stx.gx / *s) * (stp.gx / *s))
                 .sqrt();
         if stp.x > stx.x {
@@ -636,7 +631,7 @@ fn cstep<F: ArgminFloat>(
         let p = (gamma - stp.gx) + theta;
         let q = (gamma + (stx.gx - stp.gx)) + gamma;
         let r = p / q;
-        if r < F::from_f64(0.0).unwrap() && gamma != F::from_f64(0.0).unwrap() {
+        if r < float!(0.0) && gamma != float!(0.0) {
             stpc = stp.x + r * (stx.x - stp.x);
         } else if stp.x > stx.x {
             stpc = stpmax;
@@ -662,8 +657,7 @@ fn cstep<F: ArgminFloat>(
         info = 4;
         bound = false;
         if brackt {
-            let theta =
-                F::from_f64(3.0).unwrap() * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
+            let theta = float!(3.0) * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
             let tmp = vec![theta, sty.gx, stp.gx];
             // Check for a NaN or Inf in tmp before sorting
             if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
@@ -697,7 +691,7 @@ fn cstep<F: ArgminFloat>(
     if stp_o.fx > stx_o.fx {
         sty_o = Step::new(stp_o.x, stp_o.fx, stp_o.gx);
     } else {
-        if sgnd < F::from_f64(0.0).unwrap() {
+        if sgnd < float!(0.0) {
             sty_o = Step::new(stx_o.x, stx_o.fx, stx_o.gx);
         }
         stx_o = Step::new(stp_o.x, stp_o.fx, stp_o.gx);
@@ -711,13 +705,9 @@ fn cstep<F: ArgminFloat>(
     stp_o.x = stpf;
     if brackt && bound {
         if sty_o.x > stx_o.x {
-            stp_o.x = stp_o
-                .x
-                .min(stx_o.x + F::from_f64(0.66).unwrap() * (sty_o.x - stx_o.x));
+            stp_o.x = stp_o.x.min(stx_o.x + float!(0.66) * (sty_o.x - stx_o.x));
         } else {
-            stp_o.x = stp_o
-                .x
-                .max(stx_o.x + F::from_f64(0.66).unwrap() * (sty_o.x - stx_o.x));
+            stp_o.x = stp_o.x.max(stx_o.x + float!(0.66) * (sty_o.x - stx_o.x));
         }
     }
 

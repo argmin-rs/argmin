@@ -126,7 +126,7 @@ where
         let prev_grad = state.take_grad().unwrap();
         let inv_hessian = state.take_inv_hessian().unwrap();
 
-        let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
+        let p = inv_hessian.dot(&prev_grad).mul(&float!(-1.0));
 
         self.linesearch.search_direction(p);
 
@@ -158,7 +158,7 @@ where
         let sk = xk1.sub(&param);
 
         let yksk: F = yk.dot(&sk);
-        let rhok = F::from_f64(1.0).unwrap() / yksk;
+        let rhok = float!(1.0) / yksk;
 
         let e = inv_hessian.eye_like();
         let mat1: H = sk.dot(&yk);

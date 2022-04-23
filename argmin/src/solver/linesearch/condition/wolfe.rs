@@ -37,13 +37,13 @@ where
     /// let wolfe = WolfeCondition::new(0.0001f64, 0.1f64);
     /// ```
     pub fn new(c1: F, c2: F) -> Result<Self, Error> {
-        if c1 <= F::from_f64(0.0).unwrap() || c1 >= F::from_f64(1.0).unwrap() {
+        if c1 <= float!(0.0) || c1 >= float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "WolfeCondition: Parameter c1 must be in (0, 1)"
             ));
         }
-        if c2 <= c1 || c2 >= F::from_f64(1.0).unwrap() {
+        if c2 <= c1 || c2 >= float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "WolfeCondition: Parameter c2 must be in (c1, 1)"

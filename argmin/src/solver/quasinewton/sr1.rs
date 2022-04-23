@@ -46,7 +46,7 @@ where
     /// Constructor
     pub fn new(init_inverse_hessian: H, linesearch: L) -> Self {
         SR1 {
-            r: F::from_f64(1e-8).unwrap(),
+            r: float!(1e-8),
             init_inv_hessian: Some(init_inverse_hessian),
             linesearch,
             tol_grad: F::epsilon().sqrt(),
@@ -56,7 +56,7 @@ where
 
     /// Set r
     pub fn r(mut self, r: F) -> Result<Self, Error> {
-        if r < F::from_f64(0.0).unwrap() || r > F::from_f64(1.0).unwrap() {
+        if r < float!(0.0) || r > float!(1.0) {
             Err(argmin_error!(
                 InvalidParameter,
                 "SR1: r must be between 0 and 1."
@@ -131,7 +131,7 @@ where
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&param))?;
 
-        let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
+        let p = inv_hessian.dot(&prev_grad).mul(&float!(-1.0));
 
         self.linesearch.search_direction(p);
 
@@ -176,7 +176,7 @@ where
         // let hessian_update = tmp.abs() >= self.r * sksk.sqrt() * blah.sqrt();
 
         if hessian_update {
-            inv_hessian = inv_hessian.add(&a.mul(&(F::from_f64(1.0).unwrap() / b)));
+            inv_hessian = inv_hessian.add(&a.mul(&(float!(1.0) / b)));
         }
 
         Ok((

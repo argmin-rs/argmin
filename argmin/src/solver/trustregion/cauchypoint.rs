@@ -69,12 +69,10 @@ where
             .unwrap_or_else(|| problem.hessian(&param))?;
 
         let wdp = grad.weighted_dot(&hessian, &grad);
-        let tau: F = if wdp <= F::from_f64(0.0).unwrap() {
-            F::from_f64(1.0).unwrap()
+        let tau: F = if wdp <= float!(0.0) {
+            float!(1.0)
         } else {
-            F::from_f64(1.0)
-                .unwrap()
-                .min(grad_norm.powi(3) / (self.radius * wdp))
+            float!(1.0).min(grad_norm.powi(3) / (self.radius * wdp))
         };
 
         let new_param = grad.mul(&(-tau * self.radius / grad_norm));

@@ -34,7 +34,7 @@ where
     /// let goldstein = GoldsteinCondition::new(0.1f64);
     /// ```
     pub fn new(c: F) -> Result<Self, Error> {
-        if c <= F::from_f64(0.0).unwrap() || c >= F::from_f64(0.5).unwrap() {
+        if c <= float!(0.0) || c >= float!(0.5) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "GoldsteinCondition: Parameter c must be in (0, 0.5)"
@@ -59,7 +59,7 @@ where
         step_length: F,
     ) -> bool {
         let tmp = step_length * initial_gradient.dot(search_direction);
-        initial_cost + (F::from_f64(1.0).unwrap() - self.c) * tmp <= current_cost
+        initial_cost + (float!(1.0) - self.c) * tmp <= current_cost
             && current_cost <= initial_cost + self.c * tmp
     }
 

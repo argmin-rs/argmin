@@ -147,7 +147,7 @@ where
         ))?;
         let cost = problem.cost(param)?;
         let grad = problem.gradient(param)?;
-        self.p = Some(grad.mul(&(F::from_f64(-1.0).unwrap())));
+        self.p = Some(grad.mul(&(float!(-1.0))));
         Ok((state.cost(cost).grad(grad), None))
     }
 
@@ -209,17 +209,13 @@ where
             (state.get_iter() % self.restart_iter == 0) && state.get_iter() != 0;
 
         if restart_iter || restart_orthogonality {
-            self.beta = F::from_f64(0.0).unwrap();
+            self.beta = float!(0.0);
         } else {
             self.beta = self.beta_method.update(&grad, &new_grad, p);
         }
 
         // Update of p
-        self.p = Some(
-            new_grad
-                .mul(&(F::from_f64(-1.0).unwrap()))
-                .add(&p.mul(&self.beta)),
-        );
+        self.p = Some(new_grad.mul(&(float!(-1.0))).add(&p.mul(&self.beta)));
 
         // Housekeeping
         let cost = problem.cost(&xk1)?;

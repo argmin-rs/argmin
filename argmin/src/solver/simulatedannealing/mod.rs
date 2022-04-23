@@ -158,7 +158,7 @@ where
     /// * `init_temp`: initial temperature
     /// * `rng`: an RNG (must implement Serialize when `serde1` feature is activated)
     pub fn new(init_temp: F, rng: R) -> Result<Self, Error> {
-        if init_temp <= F::from_f64(0.0).unwrap() {
+        if init_temp <= float!(0.0) {
             Err(argmin_error!(
                 InvalidParameter,
                 "Initial temperature must be > 0."
@@ -345,10 +345,9 @@ where
         //
         // which will always be between 0 and 0.5.
         let prob: f64 = self.rng.gen();
-        let prob = F::from_f64(prob).unwrap();
+        let prob = float!(prob);
         let accepted = (new_cost < prev_cost)
-            || (F::from_f64(1.0).unwrap()
-                / (F::from_f64(1.0).unwrap() + ((new_cost - prev_cost) / self.cur_temp).exp())
+            || (float!(1.0) / (float!(1.0) + ((new_cost - prev_cost) / self.cur_temp).exp())
                 > prob);
 
         let new_best_found = new_cost < state.best_cost;

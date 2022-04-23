@@ -114,7 +114,7 @@ where
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&param))?;
         let inv_hessian = state.take_inv_hessian().unwrap();
-        let p = inv_hessian.dot(&prev_grad).mul(&F::from_f64(-1.0).unwrap());
+        let p = inv_hessian.dot(&prev_grad).mul(&float!(-1.0));
 
         self.linesearch.search_direction(p);
 
@@ -150,11 +150,9 @@ where
         let tmp3: P = inv_hessian.dot(&yk);
         let tmp4: F = tmp3.dot(&yk);
         let tmp3: H = tmp3.dot(&tmp3);
-        let tmp3: H = tmp3.mul(&(F::from_f64(1.0).unwrap() / tmp4));
+        let tmp3: H = tmp3.mul(&(float!(1.0) / tmp4));
 
-        let inv_hessian = inv_hessian
-            .sub(&tmp3)
-            .add(&sksk.mul(&(F::from_f64(1.0).unwrap() / yksk)));
+        let inv_hessian = inv_hessian.sub(&tmp3).add(&sksk.mul(&(float!(1.0) / yksk)));
 
         Ok((
             state

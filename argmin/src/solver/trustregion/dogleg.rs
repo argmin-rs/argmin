@@ -76,7 +76,7 @@ where
         let pstar;
 
         // pb = -H^-1g
-        let pb = (h.inv()?).dot(&g).mul(&F::from_f64(-1.0).unwrap());
+        let pb = (h.inv()?).dot(&g).mul(&float!(-1.0));
 
         if pb.norm() <= self.radius {
             pstar = pb;
@@ -91,12 +91,11 @@ where
 
             // compute tau
             let delta = self.radius.powi(2);
-            let t1 = F::from_f64(3.0).unwrap() * utb - btb - F::from_f64(2.0).unwrap() * utu;
-            let t2 = (utb.powi(2) - F::from_f64(2.0).unwrap() * utb * delta + delta * btb
-                - btb * utu
+            let t1 = float!(3.0) * utb - btb - float!(2.0) * utu;
+            let t2 = (utb.powi(2) - float!(2.0) * utb * delta + delta * btb - btb * utu
                 + delta * utu)
                 .sqrt();
-            let t3 = F::from_f64(-2.0).unwrap() * utb + btb + utu;
+            let t3 = float!(-2.0) * utb + btb + utu;
             let tau1: F = -(t1 + t2) / t3;
             let tau2: F = -(t1 - t2) / t3;
 
@@ -105,13 +104,13 @@ where
 
             // if calculation failed because t3 is too small, use the third option
             if tau.is_nan() || tau.is_infinite() {
-                tau = (delta + btb - F::from_f64(2.0).unwrap() * utu) / (btb - utu);
+                tau = (delta + btb - float!(2.0) * utu) / (btb - utu);
             }
 
-            if tau >= F::from_f64(0.0).unwrap() && tau < F::from_f64(1.0).unwrap() {
+            if tau >= float!(0.0) && tau < float!(1.0) {
                 pstar = pu.mul(&tau);
-            } else if tau >= F::from_f64(1.0).unwrap() && tau <= F::from_f64(2.0).unwrap() {
-                pstar = pu.add(&pb.sub(&pu).mul(&(tau - F::from_f64(1.0).unwrap())));
+            } else if tau >= float!(1.0) && tau <= float!(2.0) {
+                pstar = pu.add(&pb.sub(&pu).mul(&(tau - float!(1.0))));
             } else {
                 return Err(argmin_error!(
                     PotentialBug,

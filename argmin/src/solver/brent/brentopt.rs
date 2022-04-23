@@ -75,7 +75,7 @@ impl<F: ArgminFloat> BrentOpt<F> {
     pub fn new(min: F, max: F) -> Self {
         BrentOpt {
             eps: F::epsilon().sqrt(),
-            t: F::from_f64(1e-5).unwrap(),
+            t: float!(1e-5),
             a: min,
             b: max,
             u: F::nan(),
@@ -87,7 +87,7 @@ impl<F: ArgminFloat> BrentOpt<F> {
             fx: F::nan(),
             e: F::zero(),
             d: F::zero(),
-            c: F::from_f64((3f64 - 5f64.sqrt()) / 2f64).unwrap(),
+            c: float!((3f64 - 5f64.sqrt()) / 2f64),
         }
     }
 
@@ -136,7 +136,7 @@ where
         // BrentOpt maintains its own state
         state: IterState<F, (), (), (), F>,
     ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
-        let two = F::from_f64(2f64).unwrap();
+        let two = float!(2f64);
         let tol = self.eps * self.x.abs() + self.t;
         let m = (self.a + self.b) / two;
         if (self.x - m).abs() <= two * tol - (self.b - self.a) / two {

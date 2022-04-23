@@ -97,7 +97,7 @@ where
     ) -> Particle<P, F> {
         let (min, max) = &self.search_region;
         let delta = max.sub(min);
-        let delta_neg = delta.mul(&F::from_f64(-1.0).unwrap());
+        let delta_neg = delta.mul(&float!(-1.0));
 
         let initial_position = O::Param::rand_from_range(min, max);
         let initial_cost = problem.cost(&initial_position).unwrap(); // FIXME do not unwrap

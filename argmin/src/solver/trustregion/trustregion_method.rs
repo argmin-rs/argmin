@@ -62,9 +62,9 @@ where
     /// Constructor
     pub fn new(subproblem: R) -> Self {
         TrustRegion {
-            radius: F::from_f64(1.0).unwrap(),
-            max_radius: F::from_f64(100.0).unwrap(),
-            eta: F::from_f64(0.125).unwrap(),
+            radius: float!(1.0),
+            max_radius: float!(100.0),
+            eta: float!(0.125),
             subproblem,
             fxk: F::nan(),
             mk0: F::nan(),
@@ -87,7 +87,7 @@ where
 
     /// Set eta
     pub fn eta(mut self, eta: F) -> Result<Self, Error> {
-        if eta >= F::from_f64(0.25).unwrap() || eta < F::from_f64(0.0).unwrap() {
+        if eta >= float!(0.25) || eta < float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "TrustRegion: eta must be in [0, 1/4)."
@@ -175,20 +175,18 @@ where
 
         let new_param = pk.add(&param);
         let fxkpk = problem.cost(&new_param)?;
-        let mkpk =
-            self.fxk + pk.dot(&grad) + F::from_f64(0.5).unwrap() * pk.weighted_dot(&hessian, &pk);
+        let mkpk = self.fxk + pk.dot(&grad) + float!(0.5) * pk.weighted_dot(&hessian, &pk);
 
         let rho = reduction_ratio(self.fxk, fxkpk, self.mk0, mkpk);
 
         let pk_norm = pk.norm();
 
         let cur_radius = self.radius;
-        self.radius = if rho < F::from_f64(0.25).unwrap() {
-            F::from_f64(0.25).unwrap() * pk_norm
-        } else if rho > F::from_f64(0.75).unwrap()
-            && (pk_norm - self.radius).abs() <= F::from_f64(10.0).unwrap() * F::epsilon()
+        self.radius = if rho < float!(0.25) {
+            float!(0.25) * pk_norm
+        } else if rho > float!(0.75) && (pk_norm - self.radius).abs() <= float!(10.0) * F::epsilon()
         {
-            self.max_radius.min(F::from_f64(2.0).unwrap() * self.radius)
+            self.max_radius.min(float!(2.0) * self.radius)
         } else {
             self.radius
         };

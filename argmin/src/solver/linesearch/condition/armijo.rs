@@ -33,7 +33,7 @@ where
     /// let armijo = ArmijoCondition::new(0.0001f64);
     /// ```
     pub fn new(c: F) -> Result<Self, Error> {
-        if c <= F::from_f64(0.0).unwrap() || c >= F::from_f64(1.0).unwrap() {
+        if c <= float!(0.0) || c >= float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "ArmijoCondition: Parameter c must be in (0, 1)"

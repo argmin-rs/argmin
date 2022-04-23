@@ -66,10 +66,10 @@ where
     /// Constructor
     pub fn new() -> Self {
         NelderMead {
-            alpha: F::from_f64(1.0).unwrap(),
-            gamma: F::from_f64(2.0).unwrap(),
-            rho: F::from_f64(0.5).unwrap(),
-            sigma: F::from_f64(0.5).unwrap(),
+            alpha: float!(1.0),
+            gamma: float!(2.0),
+            rho: float!(0.5),
+            sigma: float!(0.5),
             params: vec![],
             sd_tolerance: F::epsilon(),
         }
@@ -91,7 +91,7 @@ where
 
     /// set alpha
     pub fn alpha(mut self, alpha: F) -> Result<Self, Error> {
-        if alpha <= F::from_f64(0.0).unwrap() {
+        if alpha <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "Nelder-Mead:  must be > 0."
@@ -103,7 +103,7 @@ where
 
     /// set gamma
     pub fn gamma(mut self, gamma: F) -> Result<Self, Error> {
-        if gamma <= F::from_f64(1.0).unwrap() {
+        if gamma <= float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "Nelder-Mead: gamma must be > 1."
@@ -115,7 +115,7 @@ where
 
     /// set rho
     pub fn rho(mut self, rho: F) -> Result<Self, Error> {
-        if rho <= F::from_f64(0.0).unwrap() || rho > F::from_f64(0.5).unwrap() {
+        if rho <= float!(0.0) || rho > float!(0.5) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "Nelder-Mead: rho must be in  (0.0, 0.5]."
@@ -127,7 +127,7 @@ where
 
     /// set sigma
     pub fn sigma(mut self, sigma: F) -> Result<Self, Error> {
-        if sigma <= F::from_f64(0.0).unwrap() || sigma > F::from_f64(1.0).unwrap() {
+        if sigma <= float!(0.0) || sigma > float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "Nelder-Mead: sigma must be in  (0.0, 1.0]."
@@ -150,7 +150,7 @@ where
         for idx in 1..num_param {
             x0 = x0.add(&self.params[idx].0)
         }
-        x0.mul(&(F::from_f64(1.0).unwrap() / (F::from_usize(num_param).unwrap())))
+        x0.mul(&(float!(1.0) / (F::from_usize(num_param).unwrap())))
     }
 
     /// Reflect
@@ -302,7 +302,7 @@ where
     fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationReason {
         let n = F::from_usize(self.params.len()).unwrap();
         let c0: F = self.params.iter().map(|(_, c)| *c).sum::<F>() / n;
-        let s: F = (F::from_f64(1.0).unwrap() / (n - F::from_f64(1.0).unwrap())
+        let s: F = (float!(1.0) / (n - float!(1.0))
             * self
                 .params
                 .iter()

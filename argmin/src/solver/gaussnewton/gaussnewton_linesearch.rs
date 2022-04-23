@@ -68,7 +68,7 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
     /// # }
     /// ```
     pub fn with_tolerance(mut self, tol: F) -> Result<Self, Error> {
-        if tol <= F::from_f64(0.0).unwrap() {
+        if tol <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "Gauss-Newton-Linesearch: tol must be positive."
@@ -117,8 +117,7 @@ where
 
         let p: P = jacobian_t.dot(&jacobian).inv()?.dot(&grad);
 
-        self.linesearch
-            .search_direction(p.mul(&(F::from_f64(-1.0).unwrap())));
+        self.linesearch.search_direction(p.mul(&(float!(-1.0))));
 
         // perform linesearch
         let OptimizationResult {

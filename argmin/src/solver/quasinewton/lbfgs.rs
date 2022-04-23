@@ -122,17 +122,17 @@ where
         let gamma: F = if let (Some(sk), Some(yk)) = (self.s.back(), self.y.back()) {
             sk.dot(yk) / yk.dot(yk)
         } else {
-            F::from_f64(1.0).unwrap()
+            float!(1.0)
         };
 
         // L-BFGS two-loop recursion
         let mut q = prev_grad.clone();
         let cur_m = self.s.len();
-        let mut alpha: Vec<F> = vec![F::from_f64(0.0).unwrap(); cur_m];
-        let mut rho: Vec<F> = vec![F::from_f64(0.0).unwrap(); cur_m];
+        let mut alpha: Vec<F> = vec![float!(0.0); cur_m];
+        let mut rho: Vec<F> = vec![float!(0.0); cur_m];
         for (i, (sk, yk)) in self.s.iter().rev().zip(self.y.iter().rev()).enumerate() {
             let yksk: F = yk.dot(sk);
-            let rho_t = F::from_f64(1.0).unwrap() / yksk;
+            let rho_t = float!(1.0) / yksk;
             let skq: F = sk.dot(&q);
             let alpha_t = skq.mul(rho_t);
             q = q.sub(&yk.mul(&alpha_t));
@@ -146,8 +146,7 @@ where
             r = r.add(&sk.mul(&(alpha[i] - beta)));
         }
 
-        self.linesearch
-            .search_direction(r.mul(&F::from_f64(-1.0).unwrap()));
+        self.linesearch.search_direction(r.mul(&float!(-1.0)));
 
         // Run solver
         let OptimizationResult {

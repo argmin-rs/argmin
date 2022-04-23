@@ -55,7 +55,7 @@ where
     pub fn new() -> Self {
         Steihaug {
             radius: F::nan(),
-            epsilon: F::from_f64(10e-10).unwrap(),
+            epsilon: float!(10e-10),
             p: None,
             r: None,
             rtr: F::nan(),
@@ -67,7 +67,7 @@ where
 
     /// Set epsilon
     pub fn epsilon(mut self, epsilon: F) -> Result<Self, Error> {
-        if epsilon <= F::from_f64(0.0).unwrap() {
+        if epsilon <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "Steihaug: epsilon must be > 0.0."
@@ -89,7 +89,7 @@ where
     where
         P: ArgminWeightedDot<P, F, H>,
     {
-        g.dot(p) + F::from_f64(0.5).unwrap() * p.weighted_dot(h, p)
+        g.dot(p) + float!(0.5) * p.weighted_dot(h, p)
     }
 
     /// calculate all possible step lengths
@@ -111,7 +111,7 @@ where
         let mut t = vec![tau1, tau2];
         // Maybe calculating tau3 should only be done if b is close to zero?
         if tau1.is_nan() || tau2.is_nan() || tau1.is_infinite() || tau2.is_infinite() {
-            let tau3 = (delta - a) / (F::from_f64(2.0).unwrap() * c);
+            let tau3 = (delta - a) / (float!(2.0) * c);
             t.push(tau3);
         }
         let v = if eval {
@@ -168,7 +168,7 @@ where
 
         self.r_0_norm = r.norm();
         self.rtr = r.dot(&r);
-        self.d = Some(r.mul(&F::from_f64(-1.0).unwrap()));
+        self.d = Some(r.mul(&float!(-1.0)));
         let p = r.zero_like();
         self.p = Some(p.clone());
 
@@ -189,7 +189,7 @@ where
 
         // Current search direction d is a direction of zero curvature or negative curvature
         let p = self.p.as_ref().unwrap();
-        if dhd <= F::from_f64(0.0).unwrap() {
+        if dhd <= float!(0.0) {
             let tau = self.tau(|_| true, true, &grad, &h);
             return Ok((
                 state
@@ -204,7 +204,7 @@ where
 
         // new p violates trust region bound
         if p_n.norm() >= self.radius {
-            let tau = self.tau(|x| x >= F::from_f64(0.0).unwrap(), false, &grad, &h);
+            let tau = self.tau(|x| x >= float!(0.0), false, &grad, &h);
             return Ok((
                 state
                     .param(p.add(&d.mul(&tau)))
@@ -227,7 +227,7 @@ where
 
         let rjtrj = r_n.dot(&r_n);
         let beta = rjtrj / self.rtr;
-        self.d = Some(r_n.mul(&F::from_f64(-1.0).unwrap()).add(&d.mul(&beta)));
+        self.d = Some(r_n.mul(&float!(-1.0)).add(&d.mul(&beta)));
         self.r = Some(r_n);
         self.p = Some(p_n.clone());
         self.rtr = rjtrj;

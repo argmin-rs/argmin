@@ -120,7 +120,7 @@ where
     /// # }
     /// ```
     pub fn with_tolerance(mut self, tolerance: F) -> Result<Self, Error> {
-        if tolerance <= F::from_f64(0.0).unwrap() {
+        if tolerance <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "`GoldenSectionSearch`: Tolerance must be larger than 0."

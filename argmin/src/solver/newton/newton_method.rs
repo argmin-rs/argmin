@@ -36,14 +36,12 @@ where
 {
     /// Constructor
     pub fn new() -> Self {
-        Newton {
-            gamma: F::from_f64(1.0).unwrap(),
-        }
+        Newton { gamma: float!(1.0) }
     }
 
     /// set gamma
     pub fn set_gamma(mut self, gamma: F) -> Result<Self, Error> {
-        if gamma <= F::from_f64(0.0).unwrap() || gamma > F::from_f64(1.0).unwrap() {
+        if gamma <= float!(0.0) || gamma > float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "Newton: gamma must be in  (0, 1]."
