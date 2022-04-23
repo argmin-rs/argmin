@@ -5,14 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! * [Hager-Zhang line search](struct.HagerZhangLineSearch.html)
-//!
-//! # Reference
-//!
-//! William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed descent
-//! and an efficient line search." SIAM J. Optim. 16(1), 2006, 170-192.
-//! DOI: <https://doi.org/10.1137/030601880>
-
 use crate::core::{
     ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
     Solver, TerminationReason, KV,
@@ -23,12 +15,14 @@ use serde::{Deserialize, Serialize};
 
 type Triplet<F> = (F, F, F);
 
+/// # Hager-Zhang line search
+///
 /// The Hager-Zhang line search is a method to find a step length which obeys the strong Wolfe
 /// conditions.
 ///
-/// # References
+/// ## Reference
 ///
-/// \[0\] William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed
+/// William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed
 /// descent and an efficient line search." SIAM J. Optim. 16(1), 2006, 170-192.
 /// DOI: <https://doi.org/10.1137/030601880>
 #[derive(Clone)]
@@ -93,9 +87,17 @@ pub struct HagerZhangLineSearch<P, G, F> {
 
 impl<P, G, F> HagerZhangLineSearch<P, G, F>
 where
+    P: ArgminScaledAdd<P, F, P> + ArgminDot<G, F>,
     F: ArgminFloat,
 {
-    /// Constructor
+    /// Construct a new instance of [`HagerZhangLineSearch`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+    /// ```
     pub fn new() -> Self {
         HagerZhangLineSearch {
             delta: F::from_f64(0.1).unwrap(),
@@ -109,7 +111,7 @@ where
             a_x: F::nan(),
             a_f: F::nan(),
             a_g: F::nan(),
-            b_x_init: F::from_f64(100.0).unwrap(),
+            b_x_init: F::from_f64(1e5).unwrap(),
             b_x: F::nan(),
             b_f: F::nan(),
             b_g: F::nan(),
@@ -127,125 +129,184 @@ where
             finit: F::infinity(),
         }
     }
-}
 
-impl<P, G, F> HagerZhangLineSearch<P, G, F>
-where
-    P: ArgminScaledAdd<P, F, P> + ArgminDot<G, F>,
-    F: ArgminFloat,
-{
-    /// set delta
-    pub fn delta(mut self, delta: F) -> Result<Self, Error> {
-        if delta <= F::from_f64(0.0).unwrap() {
+    /// Set delta and sigma.
+    ///
+    /// Delta defaults to `0.1` and must be in `(0, 1)`.
+    /// Sigma defaults to `0.9` and must be in `[delta, 1)`.
+    ///
+    /// Delta and Sigma correspond to the constants `c1` and `c2` of the strong Wolfe conditions,
+    /// respectively.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> =
+    ///     HagerZhangLineSearch::new().with_delta_sigma(0.2, 0.8)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_delta_sigma(mut self, delta: F, sigma: F) -> Result<Self, Error> {
+        if delta <= F::from_f64(0.0).unwrap()
+            || delta >= F::from_f64(1.0).unwrap()
+            || sigma < delta
+            || sigma >= F::from_f64(1.0).unwrap()
+        {
             return Err(argmin_error!(
                 InvalidParameter,
-                "HagerZhangLineSearch: delta must be > 0.0."
-            ));
-        }
-        if delta >= F::from_f64(1.0).unwrap() {
-            return Err(argmin_error!(
-                InvalidParameter,
-                "HagerZhangLineSearch: delta must be < 1.0."
+                "`HagerZhangLineSearch`: delta must be in (0, 1) and sigma must be in [delta, 1)."
             ));
         }
         self.delta = delta;
-        Ok(self)
-    }
-
-    /// set sigma
-    pub fn sigma(mut self, sigma: F) -> Result<Self, Error> {
-        if sigma < self.delta {
-            return Err(argmin_error!(
-                InvalidParameter,
-                "HagerZhangLineSearch: sigma must be >= delta."
-            ));
-        }
-        if sigma >= F::from_f64(1.0).unwrap() {
-            return Err(argmin_error!(
-                InvalidParameter,
-                "HagerZhangLineSearch: sigma must be < 1.0."
-            ));
-        }
         self.sigma = sigma;
         Ok(self)
     }
 
-    /// set epsilon
-    pub fn epsilon(mut self, epsilon: F) -> Result<Self, Error> {
+    /// Set epsilon
+    ///
+    /// Used in the approximate strong Wolfe condition.
+    ///
+    /// Must be non-negative and defaults to `1e-6`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> =
+    ///     HagerZhangLineSearch::new().with_epsilon(1e-8)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_epsilon(mut self, epsilon: F) -> Result<Self, Error> {
         if epsilon < F::from_f64(0.0).unwrap() {
             return Err(argmin_error!(
                 InvalidParameter,
-                "HagerZhangLineSearch: epsilon must be >= 0.0."
+                "`HagerZhangLineSearch`: epsilon must be >= 0."
             ));
         }
         self.epsilon = epsilon;
         Ok(self)
     }
 
-    /// set theta
-    pub fn theta(mut self, theta: F) -> Result<Self, Error> {
-        if theta <= F::from_f64(0.0).unwrap() {
+    /// Set theta
+    ///
+    /// Used in the update rules when the potential intervals [a, c] or [c, b] violate the opposite
+    /// slope condition.
+    ///
+    /// Must be in `(0, 1)` and defaults to `0.5`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> =
+    ///     HagerZhangLineSearch::new().with_theta(0.4)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_theta(mut self, theta: F) -> Result<Self, Error> {
+        if theta <= F::from_f64(0.0).unwrap() || theta >= F::from_f64(1.0).unwrap() {
             return Err(argmin_error!(
                 InvalidParameter,
-                "HagerZhangLineSearch: theta must be > 0.0."
-            ));
-        }
-        if theta >= F::from_f64(1.0).unwrap() {
-            return Err(argmin_error!(
-                InvalidParameter,
-                "HagerZhangLineSearch: theta must be < 1.0."
+                "`HagerZhangLineSearch`: theta must be in (0, 1)."
             ));
         }
         self.theta = theta;
         Ok(self)
     }
 
-    /// set gamma
-    pub fn gamma(mut self, gamma: F) -> Result<Self, Error> {
-        if gamma <= F::from_f64(0.0).unwrap() {
+    /// Set gamma
+    ///
+    /// Determines when a bisection step is performed.
+    ///
+    /// Must be in `(0, 1)` and defaults to `0.66`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> =
+    ///     HagerZhangLineSearch::new().with_gamma(0.7)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_gamma(mut self, gamma: F) -> Result<Self, Error> {
+        if gamma <= F::from_f64(0.0).unwrap() || gamma >= F::from_f64(1.0).unwrap() {
             return Err(argmin_error!(
                 InvalidParameter,
-                "HagerZhangLineSearch: gamma must be > 0.0."
-            ));
-        }
-        if gamma >= F::from_f64(1.0).unwrap() {
-            return Err(argmin_error!(
-                InvalidParameter,
-                "HagerZhangLineSearch: gamma must be < 1.0."
+                "`HagerZhangLineSearch`: gamma must be in (0, 1)."
             ));
         }
         self.gamma = gamma;
         Ok(self)
     }
 
-    /// set eta
-    pub fn eta(mut self, eta: F) -> Result<Self, Error> {
+    /// Set eta
+    ///
+    /// Used in the lower bound for `beta_k^N`.
+    ///
+    /// Must be larger than zero and defaults to `0.01`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> =
+    ///     HagerZhangLineSearch::new().with_eta(0.02)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_eta(mut self, eta: F) -> Result<Self, Error> {
         if eta <= F::from_f64(0.0).unwrap() {
             return Err(argmin_error!(
                 InvalidParameter,
-                "HagerZhangLineSearch: eta must be > 0.0."
+                "`HagerZhangLineSearch`: eta must be > 0."
             ));
         }
         self.eta = eta;
         Ok(self)
     }
 
-    /// set alpha limits
-    pub fn alpha(mut self, alpha_min: F, alpha_max: F) -> Result<Self, Error> {
-        if alpha_min < F::from_f64(0.0).unwrap() {
+    /// Set lower and upper bound of step
+    ///
+    /// Defaults to a minimum step length of `EPSILON` and a maximum step length of `1e5`.
+    ///
+    /// The chosen values must satisfy `0 <= step_min < step_max`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> =
+    ///     HagerZhangLineSearch::new().with_bounds(1e-3, 1.0)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_bounds(mut self, step_min: F, step_max: F) -> Result<Self, Error> {
+        if step_min < F::from_f64(0.0).unwrap() || step_max <= step_min {
             return Err(argmin_error!(
                 InvalidParameter,
-                "HagerZhangLineSearch: alpha_min must be >= 0.0."
+                concat!(
+                    "`HagerZhangLineSearch`: minimum and maximum step length must be chosen ",
+                    "such that 0 <= step_min < step_max."
+                )
             ));
         }
-        if alpha_max <= alpha_min {
-            return Err(argmin_error!(
-                InvalidParameter,
-                "HagerZhangLineSearch: alpha_min must be smaller than alpha_max."
-            ));
-        }
-        self.a_x_init = alpha_min;
-        self.b_x_init = alpha_max;
+        self.a_x_init = step_min;
+        self.b_x_init = step_max;
         Ok(self)
     }
 
@@ -302,7 +363,7 @@ where
         // return Ok(((a_x, a_f, a_g), (b_x, b_f, b_g)));
         Err(argmin_error!(
             PotentialBug,
-            "HagerZhangLineSearch: Reached unreachable point in `update` method."
+            "`HagerZhangLineSearch`: Reached unreachable point in `update` method."
         ))
     }
 
@@ -359,24 +420,30 @@ where
 
     fn calc<O>(&mut self, problem: &mut Problem<O>, alpha: F) -> Result<F, Error>
     where
-        O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
+        O: CostFunction<Param = P, Output = F>,
     {
         let tmp = self
             .init_param
             .as_ref()
-            .unwrap()
+            .ok_or_else(argmin_error_closure!(
+                PotentialBug,
+                "`HagerZhangLineSearch`: `init_param` is `None` in `calc`."
+            ))?
             .scaled_add(&alpha, self.search_direction.as_ref().unwrap());
         problem.cost(&tmp)
     }
 
     fn calc_grad<O>(&mut self, problem: &mut Problem<O>, alpha: F) -> Result<F, Error>
     where
-        O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
+        O: Gradient<Param = P, Gradient = G>,
     {
         let tmp = self
             .init_param
             .as_ref()
-            .unwrap()
+            .ok_or_else(argmin_error_closure!(
+                PotentialBug,
+                "`HagerZhangLineSearch`: `init_param` is `None` in `calc_grad`."
+            ))?
             .scaled_add(&alpha, self.search_direction.as_ref().unwrap());
         let grad = problem.gradient(&tmp)?;
         Ok(self.search_direction.as_ref().unwrap().dot(&grad))
@@ -405,6 +472,7 @@ where
 
 impl<P, G, F> Default for HagerZhangLineSearch<P, G, F>
 where
+    P: ArgminScaledAdd<P, F, P> + ArgminDot<G, F>,
     F: ArgminFloat,
 {
     fn default() -> Self {
@@ -432,28 +500,30 @@ where
     G: Clone + SerializeAlias + ArgminDot<P, F>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Hager-Zhang Line search";
+    const NAME: &'static str = "Hager-Zhang line search";
 
     fn init(
         &mut self,
         problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
-        if self.sigma < self.delta {
-            return Err(argmin_error!(
-                InvalidParameter,
-                "HagerZhangLineSearch: sigma must be >= delta."
-            ));
-        }
-
         check_param!(
             self.search_direction,
-            "HagerZhangLineSearch: Search direction not initialized. Call `search_direction`."
+            concat!(
+                "`HagerZhangLineSearch`: Search direction not initialized. ",
+                "Call `search_direction` before executing the solver."
+            )
         );
 
-        self.init_param = state.param.clone();
+        self.init_param = Some(state.take_param().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            concat!(
+                "`HagerZhangLineSearch` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method."
+            )
+        ))?);
 
-        let cost = state.cost;
+        let cost = state.get_cost();
         self.finit = if cost.is_infinite() {
             problem.cost(self.init_param.as_ref().unwrap())?
         } else {
@@ -471,15 +541,12 @@ where
         self.b_x = self.b_x_init;
         self.c_x = self.c_x_init;
 
-        let at = self.a_x;
-        self.a_f = self.calc(problem, at)?;
-        self.a_g = self.calc_grad(problem, at)?;
-        let bt = self.b_x;
-        self.b_f = self.calc(problem, bt)?;
-        self.b_g = self.calc_grad(problem, bt)?;
-        let ct = self.c_x;
-        self.c_f = self.calc(problem, ct)?;
-        self.c_g = self.calc_grad(problem, ct)?;
+        self.a_f = self.calc(problem, self.a_x)?;
+        self.a_g = self.calc_grad(problem, self.a_x)?;
+        self.b_f = self.calc(problem, self.b_x)?;
+        self.b_g = self.calc_grad(problem, self.b_x)?;
+        self.c_f = self.calc(problem, self.c_x)?;
+        self.c_g = self.calc_grad(problem, self.c_x)?;
 
         self.epsilon_k = self.epsilon * self.finit.abs();
 
@@ -573,7 +640,294 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::{test_utils::TestProblem, ArgminError, IterState, Problem, State};
     use crate::test_trait_impl;
 
     test_trait_impl!(hagerzhang, HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64>);
+
+    #[test]
+    fn test_new() {
+        let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+        let HagerZhangLineSearch {
+            delta,
+            sigma,
+            epsilon,
+            epsilon_k,
+            theta,
+            gamma,
+            eta,
+            a_x_init,
+            a_x,
+            a_f,
+            a_g,
+            b_x_init,
+            b_x,
+            b_f,
+            b_g,
+            c_x_init,
+            c_x,
+            c_f,
+            c_g,
+            best_x,
+            best_f,
+            best_g,
+            init_param,
+            init_grad,
+            search_direction,
+            dginit,
+            finit,
+        } = hzls;
+
+        assert_eq!(delta.to_ne_bytes(), 0.1f64.to_ne_bytes());
+        assert_eq!(sigma.to_ne_bytes(), 0.9f64.to_ne_bytes());
+        assert_eq!(epsilon.to_ne_bytes(), 1e-6f64.to_ne_bytes());
+        assert!(epsilon_k.is_nan());
+        assert_eq!(theta.to_ne_bytes(), 0.5f64.to_ne_bytes());
+        assert_eq!(gamma.to_ne_bytes(), 0.66f64.to_ne_bytes());
+        assert_eq!(eta.to_ne_bytes(), 0.01f64.to_ne_bytes());
+        assert_eq!(a_x_init.to_ne_bytes(), f64::EPSILON.to_ne_bytes());
+        assert!(a_x.is_nan());
+        assert!(a_f.is_nan());
+        assert!(a_g.is_nan());
+        assert_eq!(b_x_init.to_ne_bytes(), 1e5f64.to_ne_bytes());
+        assert!(b_x.is_nan());
+        assert!(b_f.is_nan());
+        assert!(b_g.is_nan());
+        assert_eq!(c_x_init.to_ne_bytes(), 1.0f64.to_ne_bytes());
+        assert!(c_x.is_nan());
+        assert!(c_f.is_nan());
+        assert!(c_g.is_nan());
+        assert_eq!(best_x.to_ne_bytes(), 0.0f64.to_ne_bytes());
+        assert!(best_f.is_infinite());
+        assert!(best_f.is_sign_positive());
+        assert!(best_g.is_nan());
+        assert!(init_param.is_none());
+        assert!(init_grad.is_none());
+        assert!(search_direction.is_none());
+        assert!(dginit.is_nan());
+        assert!(finit.is_infinite());
+        assert!(finit.is_sign_positive());
+    }
+
+    #[test]
+    fn test_with_delta_sigma() {
+        // correct parameters
+        for (delta, sigma) in [
+            (0.2, 0.8),
+            (0.5, 0.5),
+            (0.0 + f64::EPSILON, 0.5),
+            (0.2, 1.0 - f64::EPSILON),
+            (0.5, 0.5),
+        ] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_delta_sigma(delta, sigma);
+            assert!(res.is_ok());
+
+            let hzls = res.unwrap();
+            assert_eq!(hzls.delta.to_ne_bytes(), delta.to_ne_bytes());
+            assert_eq!(hzls.sigma.to_ne_bytes(), sigma.to_ne_bytes());
+        }
+
+        // incorrect parameters
+        for (delta, sigma) in [
+            (-1.0, 0.5),
+            (0.0, 0.5),
+            (1.0, 0.5),
+            (2.0, 0.5),
+            (0.5, 0.5 - f64::EPSILON),
+            (0.5, 0.0),
+            (0.5, 1.0),
+            (0.5, 2.0),
+            (0.6, 0.2),
+        ] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_delta_sigma(delta, sigma);
+            assert_error!(
+                res,
+                ArgminError,
+                concat!(
+                    "Invalid parameter: \"`HagerZhangLineSearch`: ",
+                    "delta must be in (0, 1) and sigma must be in [delta, 1).\""
+                )
+            );
+        }
+    }
+
+    #[test]
+    fn test_with_epsilon() {
+        // correct parameters
+        for epsilon in [1e-6, 0.0, 1e-2, 1.0, 2.0] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_epsilon(epsilon);
+            assert!(res.is_ok());
+
+            let hzls = res.unwrap();
+            assert_eq!(hzls.epsilon.to_ne_bytes(), epsilon.to_ne_bytes());
+        }
+
+        // incorrect parameters
+        for epsilon in [-f64::EPSILON, -1.0, -100.0, -42.0] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_epsilon(epsilon);
+            assert_error!(
+                res,
+                ArgminError,
+                concat!(
+                    "Invalid parameter: \"`HagerZhangLineSearch`: ",
+                    "epsilon must be >= 0.\""
+                )
+            );
+        }
+    }
+
+    #[test]
+    fn test_with_theta() {
+        // correct parameters
+        for theta in [0.0 + f64::EPSILON, 1e-2, 0.5, 0.6, 1.0 - f64::EPSILON] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_theta(theta);
+            assert!(res.is_ok());
+
+            let hzls = res.unwrap();
+            assert_eq!(hzls.theta.to_ne_bytes(), theta.to_ne_bytes());
+        }
+
+        // incorrect parameters
+        for theta in [0.0, 1.0, -100.0, 42.0] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_theta(theta);
+            assert_error!(
+                res,
+                ArgminError,
+                concat!(
+                    "Invalid parameter: \"`HagerZhangLineSearch`: ",
+                    "theta must be in (0, 1).\""
+                )
+            );
+        }
+    }
+
+    #[test]
+    fn test_with_gamma() {
+        // correct parameters
+        for gamma in [0.0 + f64::EPSILON, 1e-2, 0.5, 0.6, 1.0 - f64::EPSILON] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_gamma(gamma);
+            assert!(res.is_ok());
+
+            let hzls = res.unwrap();
+            assert_eq!(hzls.gamma.to_ne_bytes(), gamma.to_ne_bytes());
+        }
+
+        // incorrect parameters
+        for gamma in [0.0, 1.0, -100.0, 42.0] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_gamma(gamma);
+            assert_error!(
+                res,
+                ArgminError,
+                concat!(
+                    "Invalid parameter: \"`HagerZhangLineSearch`: ",
+                    "gamma must be in (0, 1).\""
+                )
+            );
+        }
+    }
+
+    #[test]
+    fn test_with_eta() {
+        // correct parameters
+        for eta in [0.0 + f64::EPSILON, 1e-2, 0.5, 1.0, 10.0] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_eta(eta);
+            assert!(res.is_ok());
+
+            let hzls = res.unwrap();
+            assert_eq!(hzls.eta.to_ne_bytes(), eta.to_ne_bytes());
+        }
+
+        // incorrect parameters
+        for eta in [0.0, -f64::EPSILON, -100.0, -42.0] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_eta(eta);
+            assert_error!(
+                res,
+                ArgminError,
+                concat!(
+                    "Invalid parameter: \"`HagerZhangLineSearch`: ",
+                    "eta must be > 0.\""
+                )
+            );
+        }
+    }
+
+    #[test]
+    fn test_with_bounds() {
+        // correct parameters
+        for (min, max) in [
+            (0.2, 0.8),
+            (0.5 - f64::EPSILON, 0.5),
+            (0.5, 0.5 + f64::EPSILON),
+            (0.0, 0.5),
+            (0.0 + f64::EPSILON, 0.5),
+            (50.0, 100.0),
+        ] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_bounds(min, max);
+            assert!(res.is_ok());
+
+            let hzls = res.unwrap();
+            assert_eq!(hzls.a_x_init.to_ne_bytes(), min.to_ne_bytes());
+            assert_eq!(hzls.b_x_init.to_ne_bytes(), max.to_ne_bytes());
+        }
+
+        // incorrect parameters
+        for (min, max) in [
+            (-1.0, 0.5),
+            (0.5, 0.5),
+            (0.5 + f64::EPSILON, 0.5),
+            (0.5, 0.0),
+            (-1000.0, -100.0),
+        ] {
+            let hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+            let res = hzls.with_bounds(min, max);
+            assert_error!(
+                res,
+                ArgminError,
+                concat!(
+                    "Invalid parameter: \"`HagerZhangLineSearch`: minimum and maximum step length ",
+                    "must be chosen such that 0 <= step_min < step_max.\""
+                )
+            );
+        }
+    }
+
+    #[test]
+    fn test_init_search_direction_not_set() {
+        let mut hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+        let res = hzls.init(&mut Problem::new(TestProblem::new()), IterState::new());
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`HagerZhangLineSearch`: Search direction not initialized. ",
+                "Call `search_direction` before executing the solver.\""
+            )
+        );
+    }
+
+    #[test]
+    fn test_init_param_not_set() {
+        let mut hzls: HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64> = HagerZhangLineSearch::new();
+        hzls.search_direction(vec![1.0f64]);
+        let res = hzls.init(&mut Problem::new(TestProblem::new()), IterState::new());
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`HagerZhangLineSearch` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method.\""
+            )
+        );
+    }
 }
