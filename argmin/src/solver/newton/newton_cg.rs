@@ -49,7 +49,7 @@ where
     pub fn new(linesearch: L) -> Self {
         NewtonCG {
             linesearch,
-            curvature_threshold: F::from_f64(0.0).unwrap(),
+            curvature_threshold: float!(0.0),
             tol: F::epsilon(),
         }
     }
@@ -63,7 +63,7 @@ where
 
     /// Set tolerance for the stopping criterion based on cost difference
     pub fn with_tolerance(mut self, tol: F) -> Result<Self, Error> {
-        if tol <= F::from_f64(0.0).unwrap() {
+        if tol <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "Newton-CG: tol must be positive."
@@ -108,7 +108,7 @@ where
 
         let mut x_p = param.zero_like();
         let mut x: P = param.zero_like();
-        let mut cg = ConjugateGradient::new(grad.mul(&(F::from_f64(-1.0).unwrap())));
+        let mut cg = ConjugateGradient::new(grad.mul(&(float!(-1.0))));
 
         let cg_state = IterState::new().param(x_p.clone());
         let (mut cg_state, _) = cg.init(&mut cg_problem, cg_state)?;
@@ -122,13 +122,13 @@ where
             let curvature = p.dot(&hessian.dot(p));
             if curvature <= self.curvature_threshold {
                 if iter == 0 {
-                    x = grad.mul(&(F::from_f64(-1.0).unwrap()));
+                    x = grad.mul(&(float!(-1.0)));
                 } else {
                     x = x_p;
                 }
                 break;
             }
-            if cost <= F::from_f64(0.5).unwrap().min(grad_norm.sqrt()) * grad_norm {
+            if cost <= float!(0.5).min(grad_norm.sqrt()) * grad_norm {
                 break;
             }
             cg_state = cg_state.param(x.clone()).cost(cost);

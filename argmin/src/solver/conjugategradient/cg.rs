@@ -114,8 +114,8 @@ where
             )
         ))?;
         let ap = problem.apply(init_param)?;
-        let r0 = self.b.sub(&ap).mul(&(F::from_f64(-1.0).unwrap()));
-        self.p = Some(r0.mul(&(F::from_f64(-1.0).unwrap())));
+        let r0 = self.b.sub(&ap).mul(&(float!(-1.0)));
+        self.p = Some(r0.mul(&(float!(-1.0))));
         self.rtr = r0.dot(&r0.conj());
         self.r = Some(r0);
         Ok((state, None))
@@ -147,7 +147,7 @@ where
         let rtr_n = r.dot(&r.conj());
         let beta = rtr_n.div(self.rtr);
         self.rtr = rtr_n;
-        let p_n = r.mul(&(F::from_f64(-1.0).unwrap())).scaled_add(&beta, &p);
+        let p_n = r.mul(&(float!(-1.0))).scaled_add(&beta, &p);
         let norm = r.dot(&r.conj()).norm();
 
         self.p = Some(p_n);

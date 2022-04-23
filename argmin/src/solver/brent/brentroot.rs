@@ -98,7 +98,7 @@ where
     ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
         self.fa = problem.cost(&self.a)?;
         self.fb = problem.cost(&self.b)?;
-        if self.fa * self.fb > F::from_f64(0.0).unwrap() {
+        if self.fa * self.fb > float!(0.0) {
             return Err(BrentRootError::WrongSign.into());
         }
         self.fc = self.fb;
@@ -111,8 +111,8 @@ where
         // BrentRoot maintains its own state
         state: IterState<F, (), (), (), F>,
     ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
-        if (self.fb > F::from_f64(0.0).unwrap() && self.fc > F::from_f64(0.0).unwrap())
-            || self.fb < F::from_f64(0.0).unwrap() && self.fc < F::from_f64(0.0).unwrap()
+        if (self.fb > float!(0.0) && self.fc > float!(0.0))
+            || self.fb < float!(0.0) && self.fc < float!(0.0)
         {
             self.c = self.a;
             self.fc = self.fa;
@@ -128,10 +128,9 @@ where
             self.fc = self.fa;
         }
         // effective tolerance is double machine precision plus half tolerance as given.
-        let eff_tol = F::from_f64(2.0).unwrap() * F::epsilon() * self.b.abs()
-            + F::from_f64(0.5).unwrap() * self.tol;
-        let mid = F::from_f64(0.5).unwrap() * (self.c - self.b);
-        if mid.abs() <= eff_tol || self.fb == F::from_f64(0.0).unwrap() {
+        let eff_tol = float!(2.0) * F::epsilon() * self.b.abs() + float!(0.5) * self.tol;
+        let mid = float!(0.5) * (self.c - self.b);
+        if mid.abs() <= eff_tol || self.fb == float!(0.0) {
             return Ok((
                 state
                     .termination_reason(TerminationReason::TargetPrecisionReached)
@@ -143,28 +142,22 @@ where
         if self.e.abs() >= eff_tol && self.fa.abs() > self.fb.abs() {
             let s = self.fb / self.fa;
             let (mut p, mut q) = if self.a == self.c {
-                (
-                    F::from_f64(2.0).unwrap() * mid * s,
-                    F::from_f64(1.0).unwrap() - s,
-                )
+                (float!(2.0) * mid * s, float!(1.0) - s)
             } else {
                 let q = self.fa / self.fc;
                 let r = self.fb / self.fc;
                 (
-                    s * (F::from_f64(2.0).unwrap() * mid * q * (q - r)
-                        - (self.b - self.a) * (r - F::from_f64(1.0).unwrap())),
-                    (q - F::from_f64(1.0).unwrap())
-                        * (r - F::from_f64(1.0).unwrap())
-                        * (s - F::from_f64(1.0).unwrap()),
+                    s * (float!(2.0) * mid * q * (q - r) - (self.b - self.a) * (r - float!(1.0))),
+                    (q - float!(1.0)) * (r - float!(1.0)) * (s - float!(1.0)),
                 )
             };
-            if p > F::from_f64(0.0).unwrap() {
+            if p > float!(0.0) {
                 q = -q;
             }
             p = p.abs();
-            let min1 = F::from_f64(3.0).unwrap() * mid * q - (eff_tol * q).abs();
+            let min1 = float!(3.0) * mid * q - (eff_tol * q).abs();
             let min2 = (self.e * q).abs();
-            if F::from_f64(2.0).unwrap() * p < if min1 < min2 { min1 } else { min2 } {
+            if float!(2.0) * p < if min1 < min2 { min1 } else { min2 } {
                 self.e = self.d;
                 self.d = p / q;
             } else {
@@ -181,7 +174,7 @@ where
             self.b = self.b + self.d;
         } else {
             self.b = self.b
-                + if mid >= F::from_f64(0.0).unwrap() {
+                + if mid >= float!(0.0) {
                     eff_tol.abs()
                 } else {
                     -eff_tol.abs()

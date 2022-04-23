@@ -199,7 +199,7 @@ where
     fn update(&self, dfk: &G, dfk1: &G, _pk: &P) -> F {
         let dfk_norm_sq = dfk.norm().powi(2);
         let beta = dfk1.dot(&dfk1.sub(dfk)) / dfk_norm_sq;
-        F::from_f64(0.0).unwrap().max(beta)
+        float!(0.0).max(beta)
     }
 }
 

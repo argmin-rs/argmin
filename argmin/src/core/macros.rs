@@ -74,6 +74,17 @@ macro_rules! argmin_error_closure {
     };
 }
 
+/// Convert a constant to a float of given precision
+#[macro_export]
+macro_rules! float {
+    ($t:ident, $val:expr) => {
+        $t::from_f64($val).unwrap()
+    };
+    ($val:expr) => {
+        F::from_f64($val).unwrap()
+    };
+}
+
 /// Implements a simple send and a simple sync test for a given type.
 #[cfg(test)]
 macro_rules! send_sync_test {

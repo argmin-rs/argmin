@@ -72,7 +72,7 @@ where
         let new_grad = problem.gradient(&param_new)?;
 
         self.linesearch
-            .search_direction(new_grad.mul(&(F::from_f64(-1.0).unwrap())));
+            .search_direction(new_grad.mul(&(float!(-1.0))));
 
         // Run line search
         let OptimizationResult {

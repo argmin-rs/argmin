@@ -65,9 +65,9 @@ where
             init_cost: F::infinity(),
             init_grad: None,
             search_direction: None,
-            rho: F::from_f64(0.9).unwrap(),
+            rho: float!(0.9),
             condition,
-            alpha: F::from_f64(1.0).unwrap(),
+            alpha: float!(1.0),
         }
     }
 
@@ -89,7 +89,7 @@ where
     /// # }
     /// ```
     pub fn rho(mut self, rho: F) -> Result<Self, Error> {
-        if rho <= F::from_f64(0.0).unwrap() || rho >= F::from_f64(1.0).unwrap() {
+        if rho <= float!(0.0) || rho >= float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "BacktrackingLineSearch: Contraction factor rho must be in (0, 1)."
@@ -111,7 +111,7 @@ where
 
     /// Set initial step length
     fn initial_step_length(&mut self, alpha: F) -> Result<(), Error> {
-        if alpha <= F::from_f64(0.0).unwrap() {
+        if alpha <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "LineSearch: Initial alpha must be > 0."

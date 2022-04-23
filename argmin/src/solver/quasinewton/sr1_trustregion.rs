@@ -51,12 +51,12 @@ where
     /// Constructor
     pub fn new(subproblem: R) -> Self {
         SR1TrustRegion {
-            r: F::from_f64(1e-8).unwrap(),
+            r: float!(1e-8),
             init_hessian: None,
             subproblem,
-            radius: F::from_f64(1.0).unwrap(),
-            eta: F::from_f64(0.5 * 1e-3).unwrap(),
-            tol_grad: F::from_f64(1e-3).unwrap(),
+            radius: float!(1.0),
+            eta: float!(0.5 * 1e-3),
+            tol_grad: float!(1e-3),
         }
     }
 
@@ -69,7 +69,7 @@ where
 
     /// Set r
     pub fn r(mut self, r: F) -> Result<Self, Error> {
-        if r <= F::from_f64(0.0).unwrap() || r >= F::from_f64(1.0).unwrap() {
+        if r <= float!(0.0) || r >= float!(1.0) {
             Err(argmin_error!(
                 InvalidParameter,
                 "SR1TrustRegion: r must be in (0, 1)."
@@ -89,7 +89,7 @@ where
 
     /// Set eta
     pub fn eta(mut self, eta: F) -> Result<Self, Error> {
-        if eta >= F::from_f64(10e-3).unwrap() || eta <= F::from_f64(0.0).unwrap() {
+        if eta >= float!(10e-3) || eta <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
                 "SR1TrustRegion: eta must be in (0, 10^-3)."
@@ -198,7 +198,7 @@ where
         let ared = cost - fk1;
         let tmp1: F = prev_grad.dot(&sk);
         let tmp2: F = sk.weighted_dot(&hessian, &sk);
-        let tmp2: F = tmp2.mul(F::from_f64(0.5).unwrap());
+        let tmp2: F = tmp2.mul(float!(0.5));
         let pred = -tmp1 - tmp2;
         let ap = ared / pred;
 
@@ -208,16 +208,16 @@ where
             (xk, cost, prev_grad)
         };
 
-        self.radius = if ap > F::from_f64(0.75).unwrap() {
-            if sk.norm() <= F::from_f64(0.8).unwrap() * self.radius {
+        self.radius = if ap > float!(0.75) {
+            if sk.norm() <= float!(0.8) * self.radius {
                 self.radius
             } else {
-                F::from_f64(2.0).unwrap() * self.radius
+                float!(2.0) * self.radius
             }
-        } else if ap <= F::from_f64(0.75).unwrap() && ap >= F::from_f64(0.1).unwrap() {
+        } else if ap <= float!(0.75) && ap >= float!(0.1) {
             self.radius
         } else {
-            F::from_f64(0.5).unwrap() * self.radius
+            float!(0.5) * self.radius
         };
 
         let bksk = hessian.dot(&sk);
@@ -228,7 +228,7 @@ where
         let hessian = if hessian_update {
             let a: B = ykbksk.dot(&ykbksk);
             let b: F = sk.dot(&ykbksk);
-            hessian.add(&a.mul(&(F::from_f64(1.0).unwrap() / b)))
+            hessian.add(&a.mul(&(float!(1.0) / b)))
         } else {
             hessian
         };
