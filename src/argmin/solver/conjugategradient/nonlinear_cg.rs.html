@@ -670,7 +670,7 @@
         <span class="kw">let</span> <span class="ident">cur_cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">cost</span>;
 
         <span class="comment">// Linesearch</span>
-        <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">set_search_direction</span>(<span class="ident">p</span>.<span class="ident">clone</span>());
+        <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">search_direction</span>(<span class="ident">p</span>.<span class="ident">clone</span>());
 
         <span class="comment">// Run solver</span>
         <span class="kw">let</span> <span class="ident">OptimizationResult</span> {
@@ -740,7 +740,7 @@
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::ArgminError</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::conjugategradient::beta::PolakRibiere</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::linesearch</span>::{
-        <span class="ident">ArmijoCondition</span>, <span class="ident">BacktrackingLineSearch</span>, <span class="ident">MoreThuenteLineSearch</span>,
+        <span class="ident">condition::ArmijoCondition</span>, <span class="ident">BacktrackingLineSearch</span>, <span class="ident">MoreThuenteLineSearch</span>,
     };
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
     <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;

@@ -321,7 +321,7 @@
         <span class="kw">let</span> <span class="ident">inv_hessian</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_inv_hessian</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>());
 
-        <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">set_search_direction</span>(<span class="ident">p</span>);
+        <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">search_direction</span>(<span class="ident">p</span>);
 
         <span class="kw">let</span> <span class="ident">OptimizationResult</span> {
             <span class="ident">problem</span>: <span class="ident">line_problem</span>,
@@ -393,7 +393,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_tolerances</span>() {
         <span class="kw">let</span> <span class="ident">linesearch</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">MoreThuenteLineSearch::new</span>().<span class="ident">c</span>(<span class="number">1e-4</span>, <span class="number">0.9</span>).<span class="ident">unwrap</span>();
+            <span class="ident">MoreThuenteLineSearch::new</span>().<span class="ident">with_c</span>(<span class="number">1e-4</span>, <span class="number">0.9</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">init_hessian</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>]];
 
         <span class="kw">let</span> <span class="ident">tol</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1e-4</span>;

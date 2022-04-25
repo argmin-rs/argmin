@@ -275,7 +275,7 @@
         <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param_new</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">linesearch</span>
-            .<span class="ident">set_search_direction</span>(<span class="ident">new_grad</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>())));
+            .<span class="ident">search_direction</span>(<span class="ident">new_grad</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>())));
 
         <span class="comment">// Run line search</span>
         <span class="kw">let</span> <span class="ident">OptimizationResult</span> {
@@ -318,7 +318,7 @@
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::test_utils::TestProblem</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminError</span>, <span class="ident">State</span>};
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::linesearch</span>::{
-        <span class="ident">ArmijoCondition</span>, <span class="ident">BacktrackingLineSearch</span>, <span class="ident">MoreThuenteLineSearch</span>,
+        <span class="ident">condition::ArmijoCondition</span>, <span class="ident">BacktrackingLineSearch</span>, <span class="ident">MoreThuenteLineSearch</span>,
     };
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
     <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;

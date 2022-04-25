@@ -53,6 +53,43 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -60,13 +97,22 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! Line search methods</span>
+<span class="doccomment">//! # Line search methods</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! * [Backtracking line search](backtracking/struct.BacktrackingLineSearch.html)</span>
-<span class="doccomment">//! * [More-Thuente line search](morethuente/struct.MoreThuenteLineSearch.html)</span>
-<span class="doccomment">//! * [Hager-Zhang line search](hagerzhang/struct.HagerZhangLineSearch.html)</span>
+<span class="doccomment">//! Line searches are given a position in parameter space and a direction. They obtain a step</span>
+<span class="doccomment">//! length in this direction which fulfils a given set of [acceptance conditions](`condition`).</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! # References:</span>
+<span class="doccomment">//! These methods are often an integral part of other methods, such as gradient descent.</span>
+<span class="doccomment">//! Each algorithm which implements the [`LineSearch`] trait can be used in these optimization</span>
+<span class="doccomment">//! methods.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Available line searches</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * [Backtracking line search](`BacktrackingLineSearch`)</span>
+<span class="doccomment">//! * [More-Thuente line search](`MoreThuenteLineSearch`)</span>
+<span class="doccomment">//! * [Hager-Zhang line search](`HagerZhangLineSearch`)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## References</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
@@ -79,29 +125,57 @@
 <span class="doccomment">//! descent and an efficient line search.&quot; SIAM J. Optim. 16(1), 2006, 170-192.</span>
 <span class="doccomment">//! DOI: &lt;https://doi.org/10.1137/030601880&gt;</span>
 
-<span class="doccomment">/// Backtracking line search algorithm</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">backtracking</span>;
+<span class="kw">mod</span> <span class="ident">backtracking</span>;
 <span class="doccomment">/// Acceptance conditions</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">condition</span>;
-<span class="doccomment">/// Hager-Zhang line search algorithm</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">hagerzhang</span>;
-<span class="doccomment">/// More-Thuente line search algorithm</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">morethuente</span>;
+<span class="kw">mod</span> <span class="ident">hagerzhang</span>;
+<span class="kw">mod</span> <span class="ident">morethuente</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::backtracking</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::condition</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::hagerzhang</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::morethuente</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::backtracking::BacktrackingLineSearch</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::hagerzhang::HagerZhangLineSearch</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::morethuente::MoreThuenteLineSearch</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::Error</span>;
-
-<span class="doccomment">/// Defines a common interface for line search methods.</span>
+<span class="doccomment">/// # Line search trait</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// For a method to be used as a line search, it has to implement this trait.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// It enables the optimization method to set the search direction and the initial step length of</span>
+<span class="doccomment">/// the line search.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Example</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use argmin::solver::linesearch::LineSearch;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// struct MyLineSearch&lt;P, F&gt; {</span>
+<span class="doccomment">///     // `P` is the type of the search direction, typically the same as the parameter vector</span>
+<span class="doccomment">///     search_direction: P,</span>
+<span class="doccomment">///     // `F` is a floating point value (f32 or f64)</span>
+<span class="doccomment">///     init_step_length: F,</span>
+<span class="doccomment">///     // ...</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// impl&lt;P, F&gt; LineSearch&lt;P, F&gt; for MyLineSearch&lt;P, F&gt; {</span>
+<span class="doccomment">///     fn search_direction(&amp;mut self, direction: P) {</span>
+<span class="doccomment">///         self.search_direction = direction;</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///     fn initial_step_length(&amp;mut self, step_length: F) -&gt; Result&lt;(), argmin::core::Error&gt; {</span>
+<span class="doccomment">///         self.init_step_length = step_length;</span>
+<span class="doccomment">///         Ok(())</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Set the search direction</span>
-    <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">P</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is the direction in which the line search will be performed.</span>
+    <span class="kw">fn</span> <span class="ident">search_direction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">P</span>);
 
     <span class="doccomment">/// Set the initial step length</span>
-    <span class="kw">fn</span> <span class="ident">set_init_alpha</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">step_length</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This indicates the first step length which will be tried.</span>
+    <span class="kw">fn</span> <span class="ident">initial_step_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">step_length</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">crate</span>::core::Error</span><span class="op">&gt;</span>;
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
