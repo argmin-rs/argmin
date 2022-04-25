@@ -243,13 +243,13 @@
     <span class="doccomment">/// let wolfe = WolfeCondition::new(0.0001f64, 0.1f64);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c1</span>: <span class="ident">F</span>, <span class="ident">c2</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
+        <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">c1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 <span class="ident">InvalidParameter</span>,
                 <span class="string">&quot;WolfeCondition: Parameter c1 must be in (0, 1)&quot;</span>
             ));
         }
-        <span class="kw">if</span> <span class="ident">c2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">c1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
+        <span class="kw">if</span> <span class="ident">c2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">c1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 <span class="ident">InvalidParameter</span>,
                 <span class="string">&quot;WolfeCondition: Parameter c2 must be in (c1, 1)&quot;</span>

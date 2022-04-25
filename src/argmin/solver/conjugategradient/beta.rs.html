@@ -468,7 +468,7 @@
     <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dfk</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">dfk1</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">_pk</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">F</span> {
         <span class="kw">let</span> <span class="ident">dfk_norm_sq</span> <span class="op">=</span> <span class="ident">dfk</span>.<span class="ident">norm</span>().<span class="ident">powi</span>(<span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="ident">dfk1</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">dfk1</span>.<span class="ident">sub</span>(<span class="ident">dfk</span>)) <span class="op">/</span> <span class="ident">dfk_norm_sq</span>;
-        <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>().<span class="ident">max</span>(<span class="ident">beta</span>)
+        <span class="macro">float!</span>(<span class="number">0.0</span>).<span class="ident">max</span>(<span class="ident">beta</span>)
     }
 }
 

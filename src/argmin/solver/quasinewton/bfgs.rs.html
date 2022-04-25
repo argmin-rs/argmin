@@ -366,7 +366,7 @@
         <span class="kw">let</span> <span class="ident">prev_grad</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_grad</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">inv_hessian</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_inv_hessian</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>());
+        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>));
 
         <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">search_direction</span>(<span class="ident">p</span>);
 
@@ -398,7 +398,7 @@
         <span class="kw">let</span> <span class="ident">sk</span> <span class="op">=</span> <span class="ident">xk1</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>);
 
         <span class="kw">let</span> <span class="ident">yksk</span>: <span class="ident">F</span> <span class="op">=</span> <span class="ident">yk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
-        <span class="kw">let</span> <span class="ident">rhok</span> <span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() <span class="op">/</span> <span class="ident">yksk</span>;
+        <span class="kw">let</span> <span class="ident">rhok</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">/</span> <span class="ident">yksk</span>;
 
         <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">inv_hessian</span>.<span class="ident">eye_like</span>();
         <span class="kw">let</span> <span class="ident">mat1</span>: <span class="ident">H</span> <span class="op">=</span> <span class="ident">sk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">yk</span>);

@@ -777,9 +777,9 @@
             <span class="ident">init_cost</span>: <span class="ident">F::infinity</span>(),
             <span class="ident">init_grad</span>: <span class="prelude-val">None</span>,
             <span class="ident">search_direction</span>: <span class="prelude-val">None</span>,
-            <span class="ident">rho</span>: <span class="ident">F::from_f64</span>(<span class="number">0.9</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">rho</span>: <span class="macro">float!</span>(<span class="number">0.9</span>),
             <span class="ident">condition</span>,
-            <span class="ident">alpha</span>: <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">alpha</span>: <span class="macro">float!</span>(<span class="number">1.0</span>),
         }
     }
 
@@ -801,7 +801,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rho</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rho</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">rho</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">rho</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
+        <span class="kw">if</span> <span class="ident">rho</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">rho</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 <span class="ident">InvalidParameter</span>,
                 <span class="string">&quot;BacktrackingLineSearch: Contraction factor rho must be in (0, 1).&quot;</span>
@@ -823,7 +823,7 @@
 
     <span class="doccomment">/// Set initial step length</span>
     <span class="kw">fn</span> <span class="ident">initial_step_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
+        <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 <span class="ident">InvalidParameter</span>,
                 <span class="string">&quot;LineSearch: Initial alpha must be &gt; 0.&quot;</span>

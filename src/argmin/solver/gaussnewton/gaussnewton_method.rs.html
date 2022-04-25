@@ -430,7 +430,7 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">GaussNewton</span> {
-            <span class="ident">gamma</span>: <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">gamma</span>: <span class="macro">float!</span>(<span class="number">1.0</span>),
             <span class="ident">tol</span>: <span class="ident">F::epsilon</span>().<span class="ident">sqrt</span>(),
         }
     }
@@ -450,7 +450,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">gamma</span> <span class="op">&gt;</span> <span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() {
+        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">gamma</span> <span class="op">&gt;</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 <span class="ident">InvalidParameter</span>,
                 <span class="string">&quot;Gauss-Newton: gamma must be in  (0, 1].&quot;</span>
@@ -475,7 +475,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">tol</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
+        <span class="kw">if</span> <span class="ident">tol</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 <span class="ident">InvalidParameter</span>,
                 <span class="string">&quot;Gauss-Newton: tol must be positive.&quot;</span>

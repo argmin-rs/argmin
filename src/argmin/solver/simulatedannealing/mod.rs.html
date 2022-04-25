@@ -409,7 +409,6 @@
 <span id="404">404</span>
 <span id="405">405</span>
 <span id="406">406</span>
-<span id="407">407</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -570,7 +569,7 @@
     <span class="doccomment">/// * `init_temp`: initial temperature</span>
     <span class="doccomment">/// * `rng`: an RNG (must implement Serialize when `serde1` feature is activated)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">init_temp</span>: <span class="ident">F</span>, <span class="ident">rng</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">init_temp</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
+        <span class="kw">if</span> <span class="ident">init_temp</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 <span class="ident">InvalidParameter</span>,
                 <span class="string">&quot;Initial temperature must be &gt; 0.&quot;</span>
@@ -757,10 +756,9 @@
         <span class="comment">//</span>
         <span class="comment">// which will always be between 0 and 0.5.</span>
         <span class="kw">let</span> <span class="ident">prob</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">gen</span>();
-        <span class="kw">let</span> <span class="ident">prob</span> <span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="ident">prob</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">prob</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="ident">prob</span>);
         <span class="kw">let</span> <span class="ident">accepted</span> <span class="op">=</span> (<span class="ident">new_cost</span> <span class="op">&lt;</span> <span class="ident">prev_cost</span>)
-            <span class="op">|</span><span class="op">|</span> (<span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>()
-                <span class="op">/</span> (<span class="ident">F::from_f64</span>(<span class="number">1.0</span>).<span class="ident">unwrap</span>() <span class="op">+</span> ((<span class="ident">new_cost</span> <span class="op">-</span> <span class="ident">prev_cost</span>) <span class="op">/</span> <span class="self">self</span>.<span class="ident">cur_temp</span>).<span class="ident">exp</span>())
+            <span class="op">|</span><span class="op">|</span> (<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">/</span> (<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">+</span> ((<span class="ident">new_cost</span> <span class="op">-</span> <span class="ident">prev_cost</span>) <span class="op">/</span> <span class="self">self</span>.<span class="ident">cur_temp</span>).<span class="ident">exp</span>())
                 <span class="op">&gt;</span> <span class="ident">prob</span>);
 
         <span class="kw">let</span> <span class="ident">new_best_found</span> <span class="op">=</span> <span class="ident">new_cost</span> <span class="op">&lt;</span> <span class="ident">state</span>.<span class="ident">best_cost</span>;

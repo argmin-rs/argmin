@@ -322,7 +322,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Steihaug</span> {
             <span class="ident">radius</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">epsilon</span>: <span class="ident">F::from_f64</span>(<span class="number">10e-10</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">epsilon</span>: <span class="macro">float!</span>(<span class="number">10e-10</span>),
             <span class="ident">p</span>: <span class="prelude-val">None</span>,
             <span class="ident">r</span>: <span class="prelude-val">None</span>,
             <span class="ident">rtr</span>: <span class="ident">F::nan</span>(),
@@ -334,7 +334,7 @@
 
     <span class="doccomment">/// Set epsilon</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">epsilon</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">epsilon</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">epsilon</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
+        <span class="kw">if</span> <span class="ident">epsilon</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 <span class="ident">InvalidParameter</span>,
                 <span class="string">&quot;Steihaug: epsilon must be &gt; 0.0.&quot;</span>
@@ -356,7 +356,7 @@
     <span class="kw">where</span>
         <span class="ident">P</span>: <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">H</span><span class="op">&gt;</span>,
     {
-        <span class="ident">g</span>.<span class="ident">dot</span>(<span class="ident">p</span>) <span class="op">+</span> <span class="ident">F::from_f64</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">p</span>.<span class="ident">weighted_dot</span>(<span class="ident">h</span>, <span class="ident">p</span>)
+        <span class="ident">g</span>.<span class="ident">dot</span>(<span class="ident">p</span>) <span class="op">+</span> <span class="macro">float!</span>(<span class="number">0.5</span>) <span class="op">*</span> <span class="ident">p</span>.<span class="ident">weighted_dot</span>(<span class="ident">h</span>, <span class="ident">p</span>)
     }
 
     <span class="doccomment">/// calculate all possible step lengths</span>
@@ -378,7 +378,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">tau1</span>, <span class="ident">tau2</span>];
         <span class="comment">// Maybe calculating tau3 should only be done if b is close to zero?</span>
         <span class="kw">if</span> <span class="ident">tau1</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tau2</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tau1</span>.<span class="ident">is_infinite</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tau2</span>.<span class="ident">is_infinite</span>() {
-            <span class="kw">let</span> <span class="ident">tau3</span> <span class="op">=</span> (<span class="ident">delta</span> <span class="op">-</span> <span class="ident">a</span>) <span class="op">/</span> (<span class="ident">F::from_f64</span>(<span class="number">2.0</span>).<span class="ident">unwrap</span>() <span class="op">*</span> <span class="ident">c</span>);
+            <span class="kw">let</span> <span class="ident">tau3</span> <span class="op">=</span> (<span class="ident">delta</span> <span class="op">-</span> <span class="ident">a</span>) <span class="op">/</span> (<span class="macro">float!</span>(<span class="number">2.0</span>) <span class="op">*</span> <span class="ident">c</span>);
             <span class="ident">t</span>.<span class="ident">push</span>(<span class="ident">tau3</span>);
         }
         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">eval</span> {
@@ -435,7 +435,7 @@
 
         <span class="self">self</span>.<span class="ident">r_0_norm</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">norm</span>();
         <span class="self">self</span>.<span class="ident">rtr</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>);
-        <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>()));
+        <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>)));
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">zero_like</span>();
         <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>.<span class="ident">clone</span>());
 
@@ -456,7 +456,7 @@
 
         <span class="comment">// Current search direction d is a direction of zero curvature or negative curvature</span>
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-        <span class="kw">if</span> <span class="ident">dhd</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
+        <span class="kw">if</span> <span class="ident">dhd</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">let</span> <span class="ident">tau</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tau</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
             <span class="kw">return</span> <span class="prelude-val">Ok</span>((
                 <span class="ident">state</span>
@@ -471,7 +471,7 @@
 
         <span class="comment">// new p violates trust region bound</span>
         <span class="kw">if</span> <span class="ident">p_n</span>.<span class="ident">norm</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">radius</span> {
-            <span class="kw">let</span> <span class="ident">tau</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tau</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>(), <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
+            <span class="kw">let</span> <span class="ident">tau</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tau</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>), <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
             <span class="kw">return</span> <span class="prelude-val">Ok</span>((
                 <span class="ident">state</span>
                     .<span class="ident">param</span>(<span class="ident">p</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">tau</span>)))
@@ -494,7 +494,7 @@
 
         <span class="kw">let</span> <span class="ident">rjtrj</span> <span class="op">=</span> <span class="ident">r_n</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">r_n</span>);
         <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="ident">rjtrj</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">rtr</span>;
-        <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r_n</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">F::from_f64</span>(<span class="op">-</span><span class="number">1.0</span>).<span class="ident">unwrap</span>()).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">beta</span>)));
+        <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r_n</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>)).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">beta</span>)));
         <span class="self">self</span>.<span class="ident">r</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r_n</span>);
         <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">p_n</span>.<span class="ident">clone</span>());
         <span class="self">self</span>.<span class="ident">rtr</span> <span class="op">=</span> <span class="ident">rjtrj</span>;
