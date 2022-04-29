@@ -229,14 +229,20 @@ where
             .sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
     }
 
-    /// Calculate centroid of all but the worst vectors
+    /// Calculate centroid of all vectors but the worst
     fn calculate_centroid(&self) -> P {
+        // Number of parameters is number of parameter vectors minus 1
         let num_param = self.params.len() - 1;
-        let mut x0: P = self.params[0].0.clone();
-        for idx in 1..num_param {
-            x0 = x0.add(&self.params[idx].0)
-        }
-        x0.mul(&(float!(1.0) / (F::from_usize(num_param).unwrap())))
+        self.params
+            .iter()
+            // Avoid the worst vector
+            .take(num_param)
+            // First one is used as the accumulator, therefore exclude it from the iterator
+            .skip(1)
+            // Add all vectors to the first
+            .fold(self.params[0].0.clone(), |acc, p| acc.add(&p.0))
+            // Scale
+            .mul(&(float!(1.0) / (float!(num_param as f64))))
     }
 
     /// Reflect
@@ -259,17 +265,17 @@ where
     where
         S: FnMut(&P) -> Result<F, Error>,
     {
-        let mut out = Vec::with_capacity(self.params.len());
-        out.push(self.params[0].clone());
-
-        for idx in 1..self.params.len() {
-            let xi = out[0]
-                .0
-                .add(&self.params[idx].0.sub(&out[0].0).mul(&self.sigma));
-            let ci = (cost)(&xi)?;
-            out.push((xi, ci));
-        }
-        self.params = out;
+        // The best parameter vector unfortunately has to be cloned once.
+        let x0 = self.params[0].0.clone();
+        self.params
+            .iter_mut()
+            // Best one is not modified
+            .skip(1)
+            .try_for_each(|(p, c)| -> Result<(), Error> {
+                *p = x0.add(&p.sub(&x0).mul(&self.sigma));
+                *c = (cost)(p)?;
+                Ok(())
+            })?;
         Ok(())
     }
 }
@@ -306,15 +312,10 @@ where
         problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
-        self.params = self
-            .params
-            .iter()
-            .cloned()
-            .map(|(p, _)| {
-                let c = problem.cost(&p).unwrap();
-                (p, c)
-            })
-            .collect();
+        self.params
+            .iter_mut()
+            .for_each(|(p, c)| *c = problem.cost(p).unwrap());
+
         self.sort_param_vecs();
 
         Ok((
@@ -376,7 +377,7 @@ where
     }
 
     fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationReason {
-        let n = F::from_usize(self.params.len()).unwrap();
+        let n = float!(self.params.len() as f64);
         let c0: F = self.params.iter().map(|(_, c)| *c).sum::<F>() / n;
         let s: F = (float!(1.0) / (n - float!(1.0))
             * self
@@ -397,6 +398,7 @@ mod tests {
     use super::*;
     use crate::core::{test_utils::TestProblem, ArgminError};
     use crate::test_trait_impl;
+    use approx::assert_relative_eq;
 
     test_trait_impl!(nelder_mead, NelderMead<TestProblem, f64>);
 
@@ -538,6 +540,96 @@ mod tests {
                     "sigma must be in (0, 1].\""
                 )
             );
+        }
+    }
+
+    #[test]
+    fn test_sort_param_vecs() {
+        let params: Vec<Vec<f64>> = vec![vec![2.0], vec![1.0], vec![3.0]];
+        let params_sorted: Vec<Vec<f64>> = vec![vec![1.0], vec![2.0], vec![3.0]];
+        let mut nm: NelderMead<_, f64> = NelderMead::new(params);
+        nm.params.iter_mut().for_each(|(p, c)| *c = p[0]);
+        nm.sort_param_vecs();
+        for ((p, c), ps) in nm.params.iter().zip(params_sorted.iter()) {
+            assert_eq!(p[0].to_ne_bytes(), ps[0].to_ne_bytes());
+            assert_eq!(c.to_ne_bytes(), ps[0].to_ne_bytes());
+        }
+    }
+
+    #[test]
+    fn test_calculate_centroid() {
+        let params: Vec<Vec<f64>> = vec![vec![0.2, 0.0], vec![0.4, 1.0], vec![1.0, 0.0]];
+        let mut nm: NelderMead<_, f64> = NelderMead::new(params);
+        nm.params
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, (_, c))| *c = i as f64);
+        nm.sort_param_vecs();
+        let centroid = nm.calculate_centroid();
+        assert_relative_eq!(centroid[0], 0.3f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(centroid[1], 0.5f64, epsilon = f64::EPSILON);
+    }
+
+    #[test]
+    fn test_reflect() {
+        let params: Vec<Vec<f64>> = vec![vec![0.0, 1.0], vec![1.0, 0.0], vec![0.0, 0.0]];
+        let mut nm: NelderMead<_, f64> = NelderMead::new(params);
+        nm.params
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, (_, c))| *c = i as f64);
+        nm.sort_param_vecs();
+        let centroid = nm.calculate_centroid();
+        let reflected = nm.reflect(&centroid, &vec![0.0, 0.0]);
+        assert_relative_eq!(reflected[0], 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(reflected[1], 1.0f64, epsilon = f64::EPSILON);
+    }
+
+    #[test]
+    fn test_expand() {
+        let params: Vec<Vec<f64>> = vec![vec![0.0, 1.0], vec![1.0, 0.0], vec![0.0, 0.0]];
+        let mut nm: NelderMead<_, f64> = NelderMead::new(params);
+        nm.params
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, (_, c))| *c = i as f64);
+        nm.sort_param_vecs();
+        let centroid = nm.calculate_centroid();
+        let expanded = nm.expand(&centroid, &vec![1.0, 1.0]);
+        assert_relative_eq!(expanded[0], 1.5f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(expanded[1], 1.5f64, epsilon = f64::EPSILON);
+    }
+
+    #[test]
+    fn test_contract() {
+        let params: Vec<Vec<f64>> = vec![vec![0.0, 1.0], vec![1.0, 0.0], vec![0.0, 0.0]];
+        let mut nm: NelderMead<_, f64> = NelderMead::new(params);
+        nm.params
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, (_, c))| *c = i as f64);
+        nm.sort_param_vecs();
+        let centroid = nm.calculate_centroid();
+        let contracted = nm.contract(&centroid, &vec![1.0, 1.0]);
+        assert_relative_eq!(contracted[0], 0.75f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(contracted[1], 0.75f64, epsilon = f64::EPSILON);
+    }
+
+    #[test]
+    fn test_shrink() {
+        let params: Vec<Vec<f64>> = vec![vec![0.0, 0.0], vec![0.0, 1.0], vec![1.0, 0.0]];
+        let params_shrunk: Vec<Vec<f64>> = vec![vec![0.0, 0.0], vec![0.0, 0.5], vec![0.5, 0.0]];
+        let mut nm: NelderMead<_, f64> = NelderMead::new(params);
+        nm.params
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, (_, c))| *c = i as f64);
+        nm.sort_param_vecs();
+        nm.shrink(|_| Ok(1.0f64)).unwrap();
+
+        for ((p, _), ps) in nm.params.iter().zip(params_shrunk.iter()) {
+            assert_eq!(p[0].to_ne_bytes(), ps[0].to_ne_bytes());
+            assert_eq!(p[1].to_ne_bytes(), ps[1].to_ne_bytes());
         }
     }
 }
