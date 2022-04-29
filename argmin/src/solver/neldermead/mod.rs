@@ -12,9 +12,11 @@
 //!
 //! See [`NelderMead`] for details.
 //!
-//! ## Reference
+//! ## References
 //!
 //! <https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method>
+//!
+//! <http://www.scholarpedia.org/article/Nelder-Mead_algorithm#Simplex_transformation_algorithm>
 
 use crate::core::{
     ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
@@ -329,19 +331,23 @@ where
         problem: &mut Problem<O>,
         state: IterState<P, (), (), (), F>,
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
-        let num_param = self.params.len();
+        let num_param_vecs = self.params.len();
 
         let x0 = self.calculate_centroid();
 
-        let xr = self.reflect(&x0, &self.params[num_param - 1].0);
+        let p_best = &self.params[0];
+        let p_worst = &self.params[num_param_vecs - 1];
+        let p_second_worst = &self.params[num_param_vecs - 2];
+
+        let xr = self.reflect(&x0, &p_worst.0);
         let xr_cost = problem.cost(&xr)?;
 
-        let action = if xr_cost < self.params[num_param - 2].1 && xr_cost >= self.params[0].1 {
+        let action = if xr_cost < p_second_worst.1 && xr_cost >= p_best.1 {
             // reflection
             self.params.last_mut().unwrap().0 = xr;
             self.params.last_mut().unwrap().1 = xr_cost;
             Action::Reflection
-        } else if xr_cost < self.params[0].1 {
+        } else if xr_cost < p_best.1 {
             // expansion
             let xe = self.expand(&x0, &xr);
             let xe_cost = problem.cost(&xe)?;
@@ -353,19 +359,40 @@ where
                 self.params.last_mut().unwrap().1 = xr_cost;
             }
             Action::Expansion
-        } else if xr_cost >= self.params[num_param - 2].1 {
+        } else if xr_cost >= p_second_worst.1 {
             // contraction
-            let xc = self.contract(&x0, &self.params[num_param - 1].0);
-            let xc_cost = problem.cost(&xc)?;
-            if xc_cost < self.params[num_param - 1].1 {
-                self.params.last_mut().unwrap().0 = xc;
-                self.params.last_mut().unwrap().1 = xc_cost;
+            if xr_cost < p_worst.1 {
+                // Outside
+                let xc = self.contract(&x0, &xr);
+                let xc_cost = problem.cost(&xc)?;
+                if xc_cost <= xr_cost {
+                    self.params.last_mut().unwrap().0 = xc;
+                    self.params.last_mut().unwrap().1 = xc_cost;
+                    Action::Contraction
+                } else {
+                    // shrink
+                    self.shrink(|x| problem.cost(x))?;
+                    Action::Shrink
+                }
+            } else {
+                // Inside
+                let xc = self.contract(&x0, &p_worst.0);
+                let xc_cost = problem.cost(&xc)?;
+                if xc_cost < p_worst.1 {
+                    self.params.last_mut().unwrap().0 = xc;
+                    self.params.last_mut().unwrap().1 = xc_cost;
+                    Action::Contraction
+                } else {
+                    // shrink
+                    self.shrink(|x| problem.cost(x))?;
+                    Action::Shrink
+                }
             }
-            Action::Contraction
         } else {
-            // shrink
-            self.shrink(|x| problem.cost(x))?;
-            Action::Shrink
+            return Err(argmin_error!(
+                PotentialBug,
+                "`NelderMead`: Reached unreachable point."
+            ));
         };
 
         self.sort_param_vecs();
