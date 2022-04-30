@@ -5,13 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! TODO: Stop when search direction is close to 0
-//!
-//! # References:
-//!
-//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
-//! Springer. ISBN 0-387-30303-0.
-
 use crate::core::{
     ArgminFloat, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState, LineSearch,
     Operator, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason, KV,
@@ -23,12 +16,16 @@ use argmin_math::{
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
+/// # Newton-Conjugate-Gradient (Newton-CG) method
+///
 /// The Newton-CG method (also called truncated Newton method) uses a modified CG to solve the
 /// Newton equations approximately. After a search direction is found, a line search is performed.
 ///
-/// # References:
+/// TODO: Stop when search direction is close to 0
 ///
-/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
