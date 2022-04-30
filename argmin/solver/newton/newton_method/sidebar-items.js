@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Newton","Newton’s method iteratively finds the stationary points of a function f by using a second order approximation of f at the current point."]]});

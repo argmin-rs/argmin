@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["newton_cg","Newton-CG method TODO: Stop when search direction is close to 0"],["newton_method","Newton’s method"]]});
+initSidebarItems({"struct":[["Newton","Newton’s method"],["NewtonCG","Newton-Conjugate-Gradient (Newton-CG) method"]]});

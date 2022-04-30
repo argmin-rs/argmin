@@ -230,19 +230,123 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
 <span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
-
-<span class="doccomment">//! TODO: Stop when search direction is close to 0</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # References:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
     <span class="ident">ArgminFloat</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>, <span class="ident">Hessian</span>, <span class="ident">IterState</span>, <span class="ident">LineSearch</span>,
@@ -255,12 +359,14 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
-<span class="doccomment">/// The Newton-CG method (also called truncated Newton method) uses a modified CG to solve the</span>
-<span class="doccomment">/// Newton equations approximately. After a search direction is found, a line search is performed.</span>
+<span class="doccomment">/// # Newton-Conjugate-Gradient (Newton-CG) method</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # References:</span>
+<span class="doccomment">/// The Newton-CG method (also called truncated Newton method) uses a modified CG to approximately</span>
+<span class="doccomment">/// solve the Newton equations. After a search direction is found, a line search is performed.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">/// ## Reference</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
@@ -277,7 +383,15 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
-    <span class="doccomment">/// Constructor</span>
+    <span class="doccomment">/// Construct a new instance of [`NewtonCG`]</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::solver::newton::NewtonCG;</span>
+    <span class="doccomment">/// # let linesearch = ();</span>
+    <span class="doccomment">/// let ncg: NewtonCG&lt;_, f64&gt; = NewtonCG::new(linesearch);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">linesearch</span>: <span class="ident">L</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">NewtonCG</span> {
             <span class="ident">linesearch</span>,
@@ -287,18 +401,42 @@
     }
 
     <span class="doccomment">/// Set curvature threshold</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Defaults to 0.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::solver::newton::NewtonCG;</span>
+    <span class="doccomment">/// # let linesearch = ();</span>
+    <span class="doccomment">/// let ncg: NewtonCG&lt;_, f64&gt; = NewtonCG::new(linesearch).with_curvature_threshold(1e-6);</span>
+    <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">curvature_threshold</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">threshold</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_curvature_threshold</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">threshold</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">curvature_threshold</span> <span class="op">=</span> <span class="ident">threshold</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set tolerance for the stopping criterion based on cost difference</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Must be larger than 0 and defaults to EPSILON.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::solver::newton::NewtonCG;</span>
+    <span class="doccomment">/// # use argmin::core::Error;</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
+    <span class="doccomment">/// # let linesearch = ();</span>
+    <span class="doccomment">/// let ncg: NewtonCG&lt;_, f64&gt; = NewtonCG::new(linesearch).with_tolerance(1e-6)?;</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">tol</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;Newton-CG: tol must be positive.&quot;</span>
+                <span class="string">&quot;`NewtonCG`: tol must be &gt; 0.&quot;</span>
             ));
         }
         <span class="self">self</span>.<span class="ident">tol</span> <span class="op">=</span> <span class="ident">tol</span>;
@@ -330,27 +468,41 @@
         <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
+            <span class="ident">NotInitialized</span>,
+            <span class="macro">concat!</span>(
+                <span class="string">&quot;`NewtonCG` requires an initial parameter vector. &quot;</span>,
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
+            )
+        ))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">state</span>
+            .<span class="ident">take_grad</span>()
+            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="ident">state</span>
+            .<span class="ident">take_hessian</span>()
+            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>))<span class="question-mark">?</span>;
 
         <span class="comment">// Solve CG subproblem</span>
-        <span class="kw">let</span> <span class="ident">cg_problem</span>: <span class="ident">CGSubProblem</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CGSubProblem::new</span>(<span class="ident">hessian</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cg_problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">cg_problem</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cg_problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">CGSubProblem::new</span>(<span class="kw-2">&amp;</span><span class="ident">hessian</span>));
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x_p</span> <span class="op">=</span> <span class="ident">param</span>.<span class="ident">zero_like</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span>: <span class="ident">P</span> <span class="op">=</span> <span class="ident">param</span>.<span class="ident">zero_like</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">param</span>.<span class="ident">zero_like</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cg</span> <span class="op">=</span> <span class="ident">ConjugateGradient::new</span>(<span class="ident">grad</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>))));
 
-        <span class="kw">let</span> <span class="ident">cg_state</span> <span class="op">=</span> <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">x_p</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">cg_state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">cg</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cg_problem</span>, <span class="ident">cg_state</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">grad_norm</span> <span class="op">=</span> <span class="ident">grad</span>.<span class="ident">norm</span>();
+        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">cg_state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">cg</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cg_problem</span>, <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">x_p</span>.<span class="ident">clone</span>()))<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">grad_norm_factor</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.5</span>).<span class="ident">min</span>(<span class="ident">grad</span>.<span class="ident">norm</span>().<span class="ident">sqrt</span>()) <span class="op">*</span> <span class="ident">grad</span>.<span class="ident">norm</span>();
+
         <span class="kw">for</span> <span class="ident">iter</span> <span class="kw">in</span> <span class="number">0</span>.. {
-            <span class="kw">let</span> (<span class="ident">state_tmp</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">cg</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cg_problem</span>, <span class="ident">cg_state</span>)<span class="question-mark">?</span>;
-            <span class="ident">cg_state</span> <span class="op">=</span> <span class="ident">state_tmp</span>;
+            (<span class="ident">cg_state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">cg</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cg_problem</span>, <span class="ident">cg_state</span>)<span class="question-mark">?</span>;
+
             <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">cg_state</span>.<span class="ident">get_cost</span>();
+
             <span class="ident">x</span> <span class="op">=</span> <span class="ident">cg_state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">cg</span>.<span class="ident">get_prev_p</span>()<span class="question-mark">?</span>;
+
             <span class="kw">let</span> <span class="ident">curvature</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">hessian</span>.<span class="ident">dot</span>(<span class="ident">p</span>));
             <span class="kw">if</span> <span class="ident">curvature</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">curvature_threshold</span> {
                 <span class="kw">if</span> <span class="ident">iter</span> <span class="op">==</span> <span class="number">0</span> {
@@ -360,14 +512,17 @@
                 }
                 <span class="kw">break</span>;
             }
-            <span class="kw">if</span> <span class="ident">cost</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.5</span>).<span class="ident">min</span>(<span class="ident">grad_norm</span>.<span class="ident">sqrt</span>()) <span class="op">*</span> <span class="ident">grad_norm</span> {
+
+            <span class="kw">if</span> <span class="ident">cost</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">grad_norm_factor</span> {
                 <span class="kw">break</span>;
             }
+
             <span class="ident">cg_state</span> <span class="op">=</span> <span class="ident">cg_state</span>.<span class="ident">param</span>(<span class="ident">x</span>.<span class="ident">clone</span>()).<span class="ident">cost</span>(<span class="ident">cost</span>);
             <span class="ident">x_p</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">clone</span>();
         }
 
         <span class="comment">// perform line search</span>
+        <span class="comment">// TODO: Should the algorithm stop when search direction is close to 0?</span>
         <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">search_direction</span>(<span class="ident">x</span>);
 
         <span class="kw">let</span> <span class="ident">line_cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
@@ -378,7 +533,7 @@
             <span class="ident">state</span>: <span class="kw-2">mut</span> <span class="ident">linesearch_state</span>,
             ..
         } <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>.<span class="ident">take_problem</span>().<span class="ident">unwrap</span>(), <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">clone</span>())
-            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">grad</span>(<span class="ident">grad</span>).<span class="ident">cost</span>(<span class="ident">line_cost</span>))
+            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">state</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">grad</span>(<span class="ident">grad</span>).<span class="ident">cost</span>(<span class="ident">line_cost</span>))
             .<span class="ident">ctrlc</span>(<span class="bool-val">false</span>)
             .<span class="ident">run</span>()<span class="question-mark">?</span>;
 
@@ -394,7 +549,7 @@
 
     <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
         <span class="kw">if</span> (<span class="ident">state</span>.<span class="ident">get_cost</span>() <span class="op">-</span> <span class="ident">state</span>.<span class="ident">get_prev_cost</span>()).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tol</span> {
-            <span class="ident">TerminationReason::NoChangeInCost</span>
+            <span class="ident">TerminationReason::TargetToleranceReached</span>
         } <span class="kw">else</span> {
             <span class="ident">TerminationReason::NotTerminated</span>
         }
@@ -402,15 +557,14 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">struct</span> <span class="ident">CGSubProblem</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">H</span><span class="op">&gt;</span> {
-    <span class="ident">hessian</span>: <span class="ident">H</span>,
+<span class="kw">struct</span> <span class="ident">CGSubProblem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>, <span class="ident">H</span><span class="op">&gt;</span> {
+    <span class="ident">hessian</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">H</span>,
     <span class="ident">phantom</span>: <span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">CGSubProblem</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// constructor</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">hessian</span>: <span class="ident">H</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">CGSubProblem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>, <span class="ident">H</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Constructor</span>
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">hessian</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">H</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">CGSubProblem</span> {
             <span class="ident">hessian</span>,
             <span class="ident">phantom</span>: <span class="ident">std::marker::PhantomData</span>,
@@ -418,10 +572,9 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">Operator</span> <span class="kw">for</span> <span class="ident">CGSubProblem</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">H</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">Operator</span> <span class="kw">for</span> <span class="ident">CGSubProblem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">H</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>,
 {
     <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>;
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">P</span>;
@@ -434,6 +587,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">test_utils::TestProblem</span>, <span class="ident">ArgminError</span>};
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::linesearch::MoreThuenteLineSearch</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
 
@@ -456,6 +610,74 @@
 
         <span class="macro">assert!</span>((<span class="ident">t</span> <span class="op">-</span> <span class="ident">tol1</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">std::f64::EPSILON</span>);
     }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_new</span>() {
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">LineSearch</span> {}
+        <span class="kw">let</span> <span class="ident">ls</span> <span class="op">=</span> <span class="ident">LineSearch</span> {};
+        <span class="kw">let</span> <span class="ident">ncg</span>: <span class="ident">NewtonCG</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NewtonCG::new</span>(<span class="ident">ls</span>);
+        <span class="kw">let</span> <span class="ident">NewtonCG</span> {
+            <span class="ident">linesearch</span>,
+            <span class="ident">curvature_threshold</span>,
+            <span class="ident">tol</span>,
+        } <span class="op">=</span> <span class="ident">ncg</span>;
+        <span class="macro">assert_eq!</span>(<span class="ident">linesearch</span>, <span class="ident">ls</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">curvature_threshold</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.0f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">tol</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::EPSILON</span>.<span class="ident">to_ne_bytes</span>());
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_with_curvature_threshold</span>() {
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">LineSearch</span> {}
+        <span class="kw">let</span> <span class="ident">ls</span> <span class="op">=</span> <span class="ident">LineSearch</span> {};
+        <span class="kw">let</span> <span class="ident">ncg</span>: <span class="ident">NewtonCG</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NewtonCG::new</span>(<span class="ident">ls</span>).<span class="ident">with_curvature_threshold</span>(<span class="number">1e-6</span>);
+        <span class="kw">let</span> <span class="ident">NewtonCG</span> {
+            <span class="ident">linesearch</span>,
+            <span class="ident">curvature_threshold</span>,
+            <span class="ident">tol</span>,
+        } <span class="op">=</span> <span class="ident">ncg</span>;
+        <span class="macro">assert_eq!</span>(<span class="ident">linesearch</span>, <span class="ident">ls</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">curvature_threshold</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1e-6f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">tol</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::EPSILON</span>.<span class="ident">to_ne_bytes</span>());
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_with_tolerance</span>() {
+        <span class="kw">let</span> <span class="ident">ls</span> <span class="op">=</span> ();
+        <span class="kw">for</span> <span class="ident">tolerance</span> <span class="kw">in</span> [<span class="ident">f64::EPSILON</span>, <span class="number">1.0</span>, <span class="number">10.0</span>, <span class="number">100.0</span>] {
+            <span class="kw">let</span> <span class="ident">ncg</span>: <span class="ident">NewtonCG</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NewtonCG::new</span>(<span class="ident">ls</span>).<span class="ident">with_tolerance</span>(<span class="ident">tolerance</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">ncg</span>.<span class="ident">tol</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">tolerance</span>.<span class="ident">to_ne_bytes</span>());
+        }
+
+        <span class="kw">for</span> <span class="ident">tolerance</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="number">0.0</span>, <span class="op">-</span><span class="number">1.0</span>] {
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">NewtonCG::new</span>(<span class="ident">ls</span>).<span class="ident">with_tolerance</span>(<span class="ident">tolerance</span>);
+            <span class="macro">assert_error!</span>(
+                <span class="ident">res</span>,
+                <span class="ident">ArgminError</span>,
+                <span class="string">&quot;Invalid parameter: \&quot;`NewtonCG`: tol must be &gt; 0.\&quot;&quot;</span>
+            );
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_next_iter_param_not_initialized</span>() {
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::linesearch</span>::{<span class="ident">condition::ArmijoCondition</span>, <span class="ident">BacktrackingLineSearch</span>};
+        <span class="kw">let</span> <span class="ident">ls</span> <span class="op">=</span> <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">ArmijoCondition::new</span>(<span class="number">0.9f64</span>).<span class="ident">unwrap</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ncg</span>: <span class="ident">NewtonCG</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NewtonCG::new</span>(<span class="ident">ls</span>);
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ncg</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">IterState::new</span>());
+        <span class="macro">assert_error!</span>(
+            <span class="ident">res</span>,
+            <span class="ident">ArgminError</span>,
+            <span class="macro">concat!</span>(
+                <span class="string">&quot;Not initialized: \&quot;`NewtonCG` requires an initial parameter vector. &quot;</span>,
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
+            )
+        );
+    }
+
+    <span class="comment">// TODO: Test next_iter.</span>
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>

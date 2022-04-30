@@ -24,6 +24,9 @@
 <span id="19">19</span>
 <span id="20">20</span>
 <span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -31,20 +34,23 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! Newton Methods</span>
+<span class="doccomment">//! # Newton Methods</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! # References:</span>
+<span class="doccomment">//! * [`Newton`]</span>
+<span class="doccomment">//! * [`NewtonCG`]</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">//! # Reference</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="doccomment">/// Newton-CG method</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">newton_cg</span>;
+<span class="kw">mod</span> <span class="ident">newton_cg</span>;
 <span class="doccomment">/// Newton&#39;s method</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">newton_method</span>;
+<span class="kw">mod</span> <span class="ident">newton_method</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::newton_cg</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::newton_method</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::newton_cg::NewtonCG</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::newton_method::Newton</span>;
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
 </body></html>

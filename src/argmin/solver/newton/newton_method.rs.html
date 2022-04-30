@@ -234,6 +234,59 @@
 <span id="229">229</span>
 <span id="230">230</span>
 <span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -241,23 +294,23 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! # References:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
-
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">Gradient</span>, <span class="ident">Hessian</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">KV</span>};
 <span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminInv</span>, <span class="ident">ArgminScaledSub</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std::default::Default</span>;
 
+<span class="doccomment">/// # Newton&#39;s method</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// Newton&#39;s method iteratively finds the stationary points of a function f by using a second order</span>
 <span class="doccomment">/// approximation of f at the current point.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # References:</span>
+<span class="doccomment">/// The stepsize `gamma` can be adjusted with the [`with_gamma`](`Newton::with_gamma`) method. It</span>
+<span class="doccomment">/// must be in `(0, 1])` and defaults to `1`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">/// ## Reference</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
@@ -270,13 +323,33 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
-    <span class="doccomment">/// Constructor</span>
+    <span class="doccomment">/// Construct a new instance of [`Newton`]</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::solver::newton::Newton;</span>
+    <span class="doccomment">/// let newton: Newton&lt;f64&gt; = Newton::new();</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Newton</span> { <span class="ident">gamma</span>: <span class="macro">float!</span>(<span class="number">1.0</span>) }
     }
 
-    <span class="doccomment">/// set gamma</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Set step size gamma</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Gamma must be in `(0, 1]` and defaults to `1`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use argmin::solver::newton::Newton;</span>
+    <span class="doccomment">/// # use argmin::core::Error;</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
+    <span class="doccomment">/// let newton: Newton&lt;f64&gt; = Newton::new().with_gamma(0.4)?;</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">gamma</span> <span class="op">&gt;</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 <span class="ident">InvalidParameter</span>,
@@ -311,7 +384,13 @@
         <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
+            <span class="ident">NotInitialized</span>,
+            <span class="macro">concat!</span>(
+                <span class="string">&quot;`Newton` requires an initial parameter vector. &quot;</span>,
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
+            )
+        ))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="ident">param</span>.<span class="ident">scaled_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">gamma</span>, <span class="kw-2">&amp;</span><span class="ident">hessian</span>.<span class="ident">inv</span>()<span class="question-mark">?</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>));
@@ -348,30 +427,57 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_set_gamma</span>() {
-        <span class="kw">let</span> <span class="ident">new_gamma</span> <span class="op">=</span> <span class="number">0.5</span>;
-        <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">set_gamma</span>(<span class="ident">new_gamma</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">solver</span>.<span class="ident">gamma</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">new_gamma</span>.<span class="ident">to_ne_bytes</span>());
+    <span class="kw">fn</span> <span class="ident">test_with_gamma</span>() {
+        <span class="kw">for</span> <span class="ident">new_gamma</span> <span class="kw">in</span> [<span class="ident">f64::EPSILON</span>, <span class="number">0.1</span>, <span class="number">0.5</span>, <span class="number">0.9</span>, <span class="number">1.0</span>] {
+            <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">with_gamma</span>(<span class="ident">new_gamma</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">solver</span>.<span class="ident">gamma</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">new_gamma</span>.<span class="ident">to_ne_bytes</span>());
+        }
 
-        <span class="kw">let</span> <span class="ident">new_gamma</span> <span class="op">=</span> <span class="number">2.0</span>;
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">set_gamma</span>(<span class="ident">new_gamma</span>).<span class="ident">err</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">error</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">ArgminError</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
-            <span class="string">&quot;Invalid parameter: \&quot;Newton: gamma must be in  (0, 1].\&quot;&quot;</span>
-        );
+        <span class="kw">for</span> <span class="ident">new_gamma</span> <span class="kw">in</span> [<span class="number">1.0</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="number">2.0</span>, <span class="number">0.0</span>, <span class="op">-</span><span class="number">1.0</span>] {
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">with_gamma</span>(<span class="ident">new_gamma</span>);
+            <span class="macro">assert_error!</span>(
+                <span class="ident">res</span>,
+                <span class="ident">ArgminError</span>,
+                <span class="string">&quot;Invalid parameter: \&quot;Newton: gamma must be in  (0, 1].\&quot;&quot;</span>
+            );
+        }
+    }
 
-        <span class="kw">let</span> <span class="ident">new_gamma</span> <span class="op">=</span> <span class="number">0.0</span>;
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">set_gamma</span>(<span class="ident">new_gamma</span>).<span class="ident">err</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">error</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">ArgminError</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
-            <span class="string">&quot;Invalid parameter: \&quot;Newton: gamma must be in  (0, 1].\&quot;&quot;</span>
-        );
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_next_iter_param_not_initialized</span>() {
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::State</span>;
+        <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">Array</span>, <span class="ident">Array1</span>, <span class="ident">Array2</span>};
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">newton</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>();
 
-        <span class="kw">let</span> <span class="ident">new_gamma</span> <span class="op">=</span> <span class="op">-</span><span class="number">1.0</span>;
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">set_gamma</span>(<span class="ident">new_gamma</span>).<span class="ident">err</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">error</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">ArgminError</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
-            <span class="string">&quot;Invalid parameter: \&quot;Newton: gamma must be in  (0, 1].\&quot;&quot;</span>
+        <span class="kw">struct</span> <span class="ident">NewtonProblem</span> {}
+
+        <span class="kw">impl</span> <span class="ident">Gradient</span> <span class="kw">for</span> <span class="ident">NewtonProblem</span> {
+            <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+            <span class="kw">type</span> <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+
+            <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Gradient</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">Array1::from_vec</span>(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>]))
+            }
+        }
+
+        <span class="kw">impl</span> <span class="ident">Hessian</span> <span class="kw">for</span> <span class="ident">NewtonProblem</span> {
+            <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+            <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+
+            <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">Array::from_shape_vec</span>((<span class="number">2</span>, <span class="number">2</span>), <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>])<span class="question-mark">?</span>)
+            }
+        }
+
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">newton</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">NewtonProblem</span> {}), <span class="ident">IterState::new</span>());
+        <span class="macro">assert_error!</span>(
+            <span class="ident">res</span>,
+            <span class="ident">ArgminError</span>,
+            <span class="macro">concat!</span>(
+                <span class="string">&quot;Not initialized: \&quot;`Newton` requires an initial parameter vector. &quot;</span>,
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
+            )
         );
     }
 
@@ -434,7 +540,7 @@
 
         <span class="comment">// Single iteration, starting from [0, 0], gamma = 0.5</span>
         <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem</span> {};
-        <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">set_gamma</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">with_gamma</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">init_param</span> <span class="op">=</span> <span class="ident">Array1::from_vec</span>(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
 
         <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
@@ -450,7 +556,7 @@
 
         <span class="comment">// Two iterations, starting from [0, 0], gamma = 0.5</span>
         <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem</span> {};
-        <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">set_gamma</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">with_gamma</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">init_param</span> <span class="op">=</span> <span class="ident">Array1::from_vec</span>(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
 
         <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
