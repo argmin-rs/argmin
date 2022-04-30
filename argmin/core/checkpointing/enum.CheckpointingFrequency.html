@@ -18,8 +18,8 @@
 <span class="comment">// A checkpoint in each iteration</span>
 <span class="kw">let</span> <span class="ident">always</span> <span class="op">=</span> <span class="ident">CheckpointingFrequency::Always</span>;
 
-<span class="comment">// The default is `CheckpointingFrequency::Never`</span>
-<span class="macro">assert_eq!</span>(<span class="ident">CheckpointingFrequency::default</span>(), <span class="ident">CheckpointingFrequency::Never</span>);</code></pre></div>
+<span class="comment">// The default is `CheckpointingFrequency::Always`</span>
+<span class="macro">assert_eq!</span>(<span class="ident">CheckpointingFrequency::default</span>(), <span class="ident">CheckpointingFrequency::Always</span>);</code></pre></div>
 </div></details><h2 id="variants" class="variants small-section-header">Variants<a href="#variants" class="anchor"></a></h2><h3 id="variant.Never" class="variant small-section-header"><a href="#variant.Never" class="anchor field"></a><code>Never</code></h3><div class="docblock"><p>Never create checkpoint</p>
 </div><h3 id="variant.Every" class="variant small-section-header"><a href="#variant.Every" class="anchor field"></a><code>Every(<a class="primitive" href="https://doc.rust-lang.org/1.60.0/std/primitive.u64.html">u64</a>)</code></h3><div class="docblock"><p>Create checkpoint every N iterations</p>
 </div><h3 id="variant.Always" class="variant small-section-header"><a href="#variant.Always" class="anchor field"></a><code>Always</code></h3><div class="docblock"><p>Create checkpoint in every iteration</p>

@@ -4,7 +4,7 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"><a href="#">Crate argmin</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.5.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div></section><div id="sidebar-vars" data-name="argmin" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../argmin/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin/lib.rs.html#8-637">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin/lib.rs.html#8-638">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
 <p><a href="https://docs.rs/argmin/latest/argmin/">Documentation of most recent release</a></p>
 <p><a href="https://argmin-rs.github.io/argmin/argmin/">Documentation of main branch</a></p>
 <h2 id="design-goals"><a href="#design-goals">Design goals</a></h2>
@@ -271,17 +271,16 @@ is indicated via the enum <code>ObserverMode</code> which can be either <code>Al
     <span class="comment">// run the solver on the defined problem</span>
     .<span class="ident">run</span>()<span class="question-mark">?</span>;</code></pre></div>
 <h2 id="checkpoints"><a href="#checkpoints">Checkpoints</a></h2>
-<p>The probability of crashes increases with runtime, therefore one may want to save checkpoints
-in order to be able to resume the optimization after a crash.
-The <code>CheckpointingFrequency</code> defines how often checkpoints are saved and is either <code>Never</code> (default),
-<code>Always</code> (every iteration) or <code>Every(u64)</code> (every Nth iteration). It is set via the setter
-method <code>checkpoint_mode</code> of <code>Executor</code>.
-In addition, the directory where the checkpoints and a prefix for every file can be set via
-<code>checkpoint_dir</code> and <code>checkpoint_name</code>, respectively.</p>
-<p>The following example shows how the <code>from_checkpoint</code> method can be used to resume from a
-checkpoint. In case this fails (for instance because the file does not exist, which could mean
-that this is the first run and there is nothing to resume from), it will resort to creating a
-new <code>Executor</code>, thus starting from scratch.</p>
+<p>Checkpointing is a useful mechanism for mitigating the effects of crashes when software is run
+in unstable environment, particularly for long run times. Checkpoints are saved regularly with
+a definable frequency. Optimizations can then be resumed from a given checkpoint after a crash.</p>
+<p>A <code>FileCheckpoint</code> is provided, which saves checkpoints to disk. Via the <code>Checkpoint</code> trait
+other checkpointing mechanisms can be implemented.</p>
+<p>The <code>CheckpointingFrequency</code> defines how often checkpoints are saved and is either <code>Always</code>
+(every iteration), <code>Every(u64)</code> (every Nth iteration) or <code>Never</code>.</p>
+<p>The following example shows how the <code>checkpointing</code> method is used to activate checkpointing.
+If no checkpoint is available on disk, an optimization will be started from scratch. If the run
+crashes and a checkpoint is found on disk, then it will resume from the checkpoint.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">checkpoint</span> <span class="op">=</span> <span class="ident">FileCheckpoint::new</span>(
     <span class="string">&quot;.checkpoints&quot;</span>,
