@@ -287,9 +287,16 @@ let res = res
 
 ## Checkpoints
 
-The probability of crashes increases with runtime, therefore one may want to save checkpoints in order to be able to resume the optimization after a crash. The `CheckpointMode` defines how often checkpoints are saved and is either `Never` (default), `Always` (every iteration) or `Every(u64)` (every Nth iteration). It is set via the setter method `checkpoint_mode` of `Executor`. In addition, the directory where the checkpoints and a prefix for every file can be set via `checkpoint_dir` and `checkpoint_name`, respectively.
+Checkpointing is a useful mechanism for mitigating the effects of crashes when software is run in unstable environment, particularly for long run times.
+Checkpoints are saved regularly with a definable frequency. Optimizations can then be resumed from a given checkpoint after a crash.
 
-The following example shows how the `from_checkpoint` method can be used to resume from a checkpoint. In case this fails (for instance because the file does not exist, which could mean that this is the first run and there is nothing to resume from), it will resort to creating a new `Executor`, thus starting from scratch.
+A `FileCheckpoint` is provided, which saves checkpoints to disk. Via the `Checkpoint` trait other checkpointing mechanisms can be implemented.
+
+The `CheckpointingFrequency` defines how often checkpoints are saved and is either `Always` (every iteration), `Every(u64)` (every Nth iteration) or `Never`.
+
+The following example shows how the `checkpointing` method is used to activate checkpointing.
+If no checkpoint is available on disk, an optimization will be started from scratch.
+If the run crashes and a checkpoint is found on disk, then it will resume from the checkpoint.
 
 
 ```rust

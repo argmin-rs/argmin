@@ -110,8 +110,8 @@ pub trait Checkpoint<S, I> {
 /// // A checkpoint in each iteration
 /// let always = CheckpointingFrequency::Always;
 ///
-/// // The default is `CheckpointingFrequency::Never`
-/// assert_eq!(CheckpointingFrequency::default(), CheckpointingFrequency::Never);
+/// // The default is `CheckpointingFrequency::Always`
+/// assert_eq!(CheckpointingFrequency::default(), CheckpointingFrequency::Always);
 /// ```
 #[derive(Clone, Eq, PartialEq, Debug, Hash, Copy)]
 pub enum CheckpointingFrequency {
@@ -125,7 +125,7 @@ pub enum CheckpointingFrequency {
 
 impl Default for CheckpointingFrequency {
     fn default() -> CheckpointingFrequency {
-        CheckpointingFrequency::Never
+        CheckpointingFrequency::Always
     }
 }
 
