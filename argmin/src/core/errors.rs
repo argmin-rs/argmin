@@ -11,6 +11,7 @@ use thiserror::Error;
 
 /// Argmin error type
 #[derive(Debug, Error)]
+#[non_exhaustive]
 pub enum ArgminError {
     /// Indicates and invalid parameter
     #[error("Invalid parameter: {text:?}")]
