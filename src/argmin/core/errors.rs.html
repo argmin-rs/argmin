@@ -73,6 +73,7 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -86,6 +87,7 @@
 
 <span class="doccomment">/// Argmin error type</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ArgminError</span> {
     <span class="doccomment">/// Indicates and invalid parameter</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid parameter: {text:?}&quot;</span>)]</span>
