@@ -5,23 +5,23 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # References:
-//!
-//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
-//! Springer. ISBN 0-387-30303-0.
-
 use crate::core::{ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, KV};
 use argmin_math::{ArgminDot, ArgminInv, ArgminScaledSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
+/// # Newton's method
+///
 /// Newton's method iteratively finds the stationary points of a function f by using a second order
 /// approximation of f at the current point.
 ///
-/// # References:
+/// The stepsize `gamma` can be adjusted with the [`with_gamma`](`Newton::with_gamma`) method. It
+/// must be in `(0, 1])` and defaults to `1`.
 ///
-/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Copy)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -34,13 +34,33 @@ impl<F> Newton<F>
 where
     F: ArgminFloat,
 {
-    /// Constructor
+    /// Construct a new instance of [`Newton`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::newton::Newton;
+    /// let newton: Newton<f64> = Newton::new();
+    /// ```
     pub fn new() -> Self {
         Newton { gamma: float!(1.0) }
     }
 
-    /// set gamma
-    pub fn set_gamma(mut self, gamma: F) -> Result<Self, Error> {
+    /// Set step size gamma
+    ///
+    /// Gamma must be in `(0, 1]` and defaults to `1`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::newton::Newton;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let newton: Newton<f64> = Newton::new().with_gamma(0.4)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_gamma(mut self, gamma: F) -> Result<Self, Error> {
         if gamma <= float!(0.0) || gamma > float!(1.0) {
             return Err(argmin_error!(
                 InvalidParameter,
@@ -75,7 +95,13 @@ where
         problem: &mut Problem<O>,
         mut state: IterState<P, G, (), H, F>,
     ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
-        let param = state.take_param().unwrap();
+        let param = state.take_param().ok_or_else(argmin_error_closure!(
+            NotInitialized,
+            concat!(
+                "`Newton` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method."
+            )
+        ))?;
         let grad = problem.gradient(&param)?;
         let hessian = problem.hessian(&param)?;
         let new_param = param.scaled_sub(&self.gamma, &hessian.inv()?.dot(&grad));
@@ -112,30 +138,68 @@ mod tests {
     }
 
     #[test]
-    fn test_set_gamma() {
+    fn test_with_gamma() {
         let new_gamma = 0.5;
-        let solver: Newton<f64> = Newton::new().set_gamma(new_gamma).unwrap();
+        let solver: Newton<f64> = Newton::new().with_gamma(new_gamma).unwrap();
         assert_eq!(solver.gamma.to_ne_bytes(), new_gamma.to_ne_bytes());
 
         let new_gamma = 2.0;
-        let error = Newton::new().set_gamma(new_gamma).err().unwrap();
+        let error = Newton::new().with_gamma(new_gamma).err().unwrap();
         assert_eq!(
             error.downcast_ref::<ArgminError>().unwrap().to_string(),
             "Invalid parameter: \"Newton: gamma must be in  (0, 1].\""
         );
 
         let new_gamma = 0.0;
-        let error = Newton::new().set_gamma(new_gamma).err().unwrap();
+        let error = Newton::new().with_gamma(new_gamma).err().unwrap();
         assert_eq!(
             error.downcast_ref::<ArgminError>().unwrap().to_string(),
             "Invalid parameter: \"Newton: gamma must be in  (0, 1].\""
         );
 
         let new_gamma = -1.0;
-        let error = Newton::new().set_gamma(new_gamma).err().unwrap();
+        let error = Newton::new().with_gamma(new_gamma).err().unwrap();
         assert_eq!(
             error.downcast_ref::<ArgminError>().unwrap().to_string(),
             "Invalid parameter: \"Newton: gamma must be in  (0, 1].\""
+        );
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_next_iter_param_not_initialized() {
+        use crate::core::State;
+        use ndarray::{Array, Array1, Array2};
+        let mut newton: Newton<f64> = Newton::new();
+
+        struct NewtonProblem {}
+
+        impl Gradient for NewtonProblem {
+            type Param = Array1<f64>;
+            type Gradient = Array1<f64>;
+
+            fn gradient(&self, _p: &Self::Param) -> Result<Self::Gradient, Error> {
+                Ok(Array1::from_vec(vec![1.0, 2.0]))
+            }
+        }
+
+        impl Hessian for NewtonProblem {
+            type Param = Array1<f64>;
+            type Hessian = Array2<f64>;
+
+            fn hessian(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
+                Ok(Array::from_shape_vec((2, 2), vec![1.0f64, 0.0, 0.0, 1.0])?)
+            }
+        }
+
+        let res = newton.next_iter(&mut Problem::new(NewtonProblem {}), IterState::new());
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`Newton` requires an initial parameter vector. ",
+                "Please provide an initial guess via `Executor`s `configure` method.\""
+            )
         );
     }
 
@@ -198,7 +262,7 @@ mod tests {
 
         // Single iteration, starting from [0, 0], gamma = 0.5
         let problem = Problem {};
-        let solver: Newton<f64> = Newton::new().set_gamma(0.5).unwrap();
+        let solver: Newton<f64> = Newton::new().with_gamma(0.5).unwrap();
         let init_param = Array1::from_vec(vec![0.0, 0.0]);
 
         let param = Executor::new(problem, solver)
@@ -214,7 +278,7 @@ mod tests {
 
         // Two iterations, starting from [0, 0], gamma = 0.5
         let problem = Problem {};
-        let solver: Newton<f64> = Newton::new().set_gamma(0.5).unwrap();
+        let solver: Newton<f64> = Newton::new().with_gamma(0.5).unwrap();
         let init_param = Array1::from_vec(vec![0.0, 0.0]);
 
         let param = Executor::new(problem, solver)

@@ -5,17 +5,20 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Newton Methods
+//! # Newton Methods
 //!
-//! # References:
+//! * [`Newton`]
+//! * [`NewtonCG`]
 //!
-//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! # Reference
+//!
+//! Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
 /// Newton-CG method
-pub mod newton_cg;
+mod newton_cg;
 /// Newton's method
-pub mod newton_method;
+mod newton_method;
 
-pub use self::newton_cg::*;
-pub use self::newton_method::*;
+pub use self::newton_cg::NewtonCG;
+pub use self::newton_method::Newton;
