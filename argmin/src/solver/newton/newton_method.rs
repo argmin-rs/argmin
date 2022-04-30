@@ -139,30 +139,19 @@ mod tests {
 
     #[test]
     fn test_with_gamma() {
-        let new_gamma = 0.5;
-        let solver: Newton<f64> = Newton::new().with_gamma(new_gamma).unwrap();
-        assert_eq!(solver.gamma.to_ne_bytes(), new_gamma.to_ne_bytes());
+        for new_gamma in [f64::EPSILON, 0.1, 0.5, 0.9, 1.0] {
+            let solver: Newton<f64> = Newton::new().with_gamma(new_gamma).unwrap();
+            assert_eq!(solver.gamma.to_ne_bytes(), new_gamma.to_ne_bytes());
+        }
 
-        let new_gamma = 2.0;
-        let error = Newton::new().with_gamma(new_gamma).err().unwrap();
-        assert_eq!(
-            error.downcast_ref::<ArgminError>().unwrap().to_string(),
-            "Invalid parameter: \"Newton: gamma must be in  (0, 1].\""
-        );
-
-        let new_gamma = 0.0;
-        let error = Newton::new().with_gamma(new_gamma).err().unwrap();
-        assert_eq!(
-            error.downcast_ref::<ArgminError>().unwrap().to_string(),
-            "Invalid parameter: \"Newton: gamma must be in  (0, 1].\""
-        );
-
-        let new_gamma = -1.0;
-        let error = Newton::new().with_gamma(new_gamma).err().unwrap();
-        assert_eq!(
-            error.downcast_ref::<ArgminError>().unwrap().to_string(),
-            "Invalid parameter: \"Newton: gamma must be in  (0, 1].\""
-        );
+        for new_gamma in [1.0 + f64::EPSILON, 2.0, 0.0, -1.0] {
+            let res = Newton::new().with_gamma(new_gamma);
+            assert_error!(
+                res,
+                ArgminError,
+                "Invalid parameter: \"Newton: gamma must be in  (0, 1].\""
+            );
+        }
     }
 
     #[cfg(feature = "ndarrayl")]
