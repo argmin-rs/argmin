@@ -7,9 +7,11 @@
 
 pub mod iterstate;
 pub mod linearprogramstate;
+pub mod populationstate;
 
 pub use iterstate::IterState;
 pub use linearprogramstate::LinearProgramState;
+pub use populationstate::PopulationState;
 
 use crate::core::{ArgminFloat, Problem, TerminationReason};
 use std::collections::HashMap;
