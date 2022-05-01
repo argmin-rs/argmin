@@ -26,7 +26,6 @@ use std::collections::HashMap;
 /// * cost function value of current and previous iteration
 /// * current and previous best cost function value
 /// * target cost function value
-/// * population (for population based algorithms)
 /// * current iteration number
 /// * iteration number where the last best parameter vector was found
 /// * maximum number of iterations that will be executed
@@ -71,8 +70,6 @@ pub struct IterState<P, G, J, H, F> {
     pub jacobian: Option<J>,
     /// Previous Jacobian
     pub prev_jacobian: Option<J>,
-    /// All members for population-based algorithms as (param, cost) tuples
-    pub population: Option<Vec<(P, F)>>,
     /// Current iteration
     pub iter: u64,
     /// Iteration number of last best cost
@@ -264,33 +261,6 @@ where
     #[must_use]
     pub fn target_cost(mut self, target_cost: F) -> Self {
         self.target_cost = target_cost;
-        self
-    }
-
-    /// Set population.
-    ///
-    /// A population is a `Vec` of tuples of type `(Self::Param, Self::Float)` where the latter
-    /// indicates the associated cost function value.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::{IterState, State};
-    /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
-    /// # assert!(state.population.is_none());
-    /// # let param1 = vec![0.0f64, 1.0f64];
-    /// # let param2 = vec![2.0f64, 3.0f64];
-    /// let state = state.population(vec![(param1, 1.2), (param2, 2.1)]);
-    /// # assert_eq!(state.population.as_ref().unwrap()[0].0[0].to_ne_bytes(), 0.0f64.to_ne_bytes());
-    /// # assert_eq!(state.population.as_ref().unwrap()[0].0[1].to_ne_bytes(), 1.0f64.to_ne_bytes());
-    /// # assert_eq!(state.population.as_ref().unwrap()[0].1.to_ne_bytes(), 1.2f64.to_ne_bytes());
-    /// # assert_eq!(state.population.as_ref().unwrap()[1].0[0].to_ne_bytes(), 2.0f64.to_ne_bytes());
-    /// # assert_eq!(state.population.as_ref().unwrap()[1].0[1].to_ne_bytes(), 3.0f64.to_ne_bytes());
-    /// # assert_eq!(state.population.as_ref().unwrap()[1].1.to_ne_bytes(), 2.1f64.to_ne_bytes());
-    /// ```
-    #[must_use]
-    pub fn population(mut self, population: Vec<(P, F)>) -> Self {
-        self.population = Some(population);
         self
     }
 
@@ -890,36 +860,6 @@ where
     pub fn take_prev_jacobian(&mut self) -> Option<J> {
         self.prev_jacobian.take()
     }
-
-    /// Returns a reference to the population
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
-    /// # assert!(state.population.is_none());
-    /// # assert!(state.get_population().is_none());
-    /// # let param1 = vec![0.0f64, 1.0f64];
-    /// # let param2 = vec![2.0f64, 3.0f64];
-    /// # let state = state.population(vec![(param1, 1.2), (param2, 2.1)]);
-    /// # assert_eq!(state.population.as_ref().unwrap()[0].0[0].to_ne_bytes(), 0.0f64.to_ne_bytes());
-    /// # assert_eq!(state.population.as_ref().unwrap()[0].0[1].to_ne_bytes(), 1.0f64.to_ne_bytes());
-    /// # assert_eq!(state.population.as_ref().unwrap()[0].1.to_ne_bytes(), 1.2f64.to_ne_bytes());
-    /// # assert_eq!(state.population.as_ref().unwrap()[1].0[0].to_ne_bytes(), 2.0f64.to_ne_bytes());
-    /// # assert_eq!(state.population.as_ref().unwrap()[1].0[1].to_ne_bytes(), 3.0f64.to_ne_bytes());
-    /// # assert_eq!(state.population.as_ref().unwrap()[1].1.to_ne_bytes(), 2.1f64.to_ne_bytes());
-    /// let population = state.get_population();
-    /// # assert_eq!(population.unwrap()[0].0[0].to_ne_bytes(), 0.0f64.to_ne_bytes());
-    /// # assert_eq!(population.unwrap()[0].0[1].to_ne_bytes(), 1.0f64.to_ne_bytes());
-    /// # assert_eq!(population.unwrap()[0].1.to_ne_bytes(), 1.2f64.to_ne_bytes());
-    /// # assert_eq!(population.unwrap()[1].0[0].to_ne_bytes(), 2.0f64.to_ne_bytes());
-    /// # assert_eq!(population.unwrap()[1].0[1].to_ne_bytes(), 3.0f64.to_ne_bytes());
-    /// # assert_eq!(population.unwrap()[1].1.to_ne_bytes(), 2.1f64.to_ne_bytes());
-    /// ```
-    pub fn get_population(&self) -> Option<&Vec<(P, F)>> {
-        self.population.as_ref()
-    }
 }
 
 impl<P, G, J, H, F> State for IterState<P, G, J, H, F>
@@ -958,7 +898,6 @@ where
     /// # assert!(state.prev_inv_hessian.is_none());
     /// # assert!(state.jacobian.is_none());
     /// # assert!(state.prev_jacobian.is_none());
-    /// # assert!(state.population.is_none());
     /// # assert_eq!(state.iter, 0);
     /// # assert_eq!(state.last_best_iter, 0);
     /// # assert_eq!(state.max_iters, std::u64::MAX);
@@ -985,7 +924,6 @@ where
             prev_inv_hessian: None,
             jacobian: None,
             prev_jacobian: None,
-            population: None,
             iter: 0,
             last_best_iter: 0,
             max_iters: std::u64::MAX,

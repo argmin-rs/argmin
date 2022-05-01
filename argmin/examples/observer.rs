@@ -6,8 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use argmin::core::observers::{Observe, ObserverMode};
-use argmin::core::{ArgminFloat, CostFunction, Error, Executor, IterState, State, KV};
-use argmin::solver::particleswarm::ParticleSwarm;
+use argmin::core::{ArgminFloat, CostFunction, Error, Executor, PopulationState, State, KV};
+use argmin::solver::particleswarm::{Particle, ParticleSwarm};
 use argmin_testfunctions::himmelblau;
 use gnuplot::{Color, PointSize};
 use std::sync::Mutex;
@@ -119,7 +119,7 @@ impl Visualizer3d {
         &mut self,
         xy: &[F],
         cost: F,
-        population: Option<&Vec<(Vec<F>, F)>>,
+        population: Option<&Vec<Particle<Vec<F>, F>>>,
     ) {
         self.optima_x.clear();
         self.optima_y.clear();
@@ -133,10 +133,12 @@ impl Visualizer3d {
         self.particles_z.clear();
 
         if let Some(population) = population {
-            for (param, cost) in population {
-                self.particles_x.push(F::to_f64(&param[0]).unwrap());
-                self.particles_y.push(F::to_f64(&param[1]).unwrap());
-                self.particles_z.push(F::to_f64(cost).unwrap());
+            for particle in population {
+                self.particles_x
+                    .push(F::to_f64(&particle.position[0]).unwrap());
+                self.particles_y
+                    .push(F::to_f64(&particle.position[1]).unwrap());
+                self.particles_z.push(F::to_f64(&particle.cost).unwrap());
             }
         }
 
@@ -150,16 +152,16 @@ impl std::default::Default for Visualizer3d {
     }
 }
 
-impl Observe<IterState<Vec<f64>, (), (), (), f64>> for Visualizer3d {
+impl Observe<PopulationState<Particle<Vec<f64>, f64>, f64>> for Visualizer3d {
     fn observe_iter(
         &mut self,
-        state: &IterState<Vec<f64>, (), (), (), f64>,
+        state: &PopulationState<Particle<Vec<f64>, f64>, f64>,
         _kv: &KV,
     ) -> Result<(), Error> {
         // TODO: get particles from `state` or `kv`
 
         self.iteration(
-            state.get_param().unwrap(),
+            &state.get_param().unwrap().position,
             state.best_cost,
             state.get_population(),
         );
@@ -224,9 +226,6 @@ impl CostFunction for Himmelblau {
 }
 
 fn run() -> Result<(), Error> {
-    // Define inital parameter vector
-    let init_param: Vec<f64> = vec![0.1, 0.1];
-
     let cost_function = Himmelblau {};
 
     let visualizer = Visualizer3d::new()
@@ -234,10 +233,9 @@ fn run() -> Result<(), Error> {
         .surface(Surface::new(Himmelblau {}, (-4.0, -4.0, 4.0, 4.0), 0.1));
 
     {
-        let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
+        let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 40);
 
-        let executor = Executor::new(cost_function, solver)
-            .configure(|state| state.param(init_param).max_iters(15));
+        let executor = Executor::new(cost_function, solver).configure(|state| state.max_iters(15));
 
         let executor = executor.add_observer(visualizer, ObserverMode::Always);
 

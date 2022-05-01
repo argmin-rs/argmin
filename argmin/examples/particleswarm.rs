@@ -21,15 +21,13 @@ impl CostFunction for Himmelblau {
 }
 
 fn run() -> Result<(), Error> {
-    // Define inital parameter vector
-    let init_param: Vec<f64> = vec![0.1, 0.1];
-
     let cost_function = Himmelblau {};
 
-    let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.0, 0.5)?;
+    // let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.9, 0.5)?;
+    let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 40);
 
     let res = Executor::new(cost_function, solver)
-        .configure(|state| state.param(init_param).max_iters(15))
+        .configure(|state| state.max_iters(100))
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
