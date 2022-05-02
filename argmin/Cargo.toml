@@ -39,7 +39,7 @@ approx = "0.5.0"
 finitediff = { version = "0.1.4", features = ["ndarray"] }
 argmin_testfunctions = "0.1.1"
 rand_xoshiro = { version = "0.6.0", features = ["serde1"] }
-nalgebra = { version = "0.30", features = ["serde-serialize"] }
+nalgebra = { version = "0.31", features = ["serde-serialize"] }
 ndarray = { version = "0.15", features = ["serde-1"] }
 ndarray-linalg = { version = "0.14", features = ["netlib"] }
 argmin-math = { path = "../argmin-math" }
