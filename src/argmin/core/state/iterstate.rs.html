@@ -1470,68 +1470,6 @@
 <span id="1465">1465</span>
 <span id="1466">1466</span>
 <span id="1467">1467</span>
-<span id="1468">1468</span>
-<span id="1469">1469</span>
-<span id="1470">1470</span>
-<span id="1471">1471</span>
-<span id="1472">1472</span>
-<span id="1473">1473</span>
-<span id="1474">1474</span>
-<span id="1475">1475</span>
-<span id="1476">1476</span>
-<span id="1477">1477</span>
-<span id="1478">1478</span>
-<span id="1479">1479</span>
-<span id="1480">1480</span>
-<span id="1481">1481</span>
-<span id="1482">1482</span>
-<span id="1483">1483</span>
-<span id="1484">1484</span>
-<span id="1485">1485</span>
-<span id="1486">1486</span>
-<span id="1487">1487</span>
-<span id="1488">1488</span>
-<span id="1489">1489</span>
-<span id="1490">1490</span>
-<span id="1491">1491</span>
-<span id="1492">1492</span>
-<span id="1493">1493</span>
-<span id="1494">1494</span>
-<span id="1495">1495</span>
-<span id="1496">1496</span>
-<span id="1497">1497</span>
-<span id="1498">1498</span>
-<span id="1499">1499</span>
-<span id="1500">1500</span>
-<span id="1501">1501</span>
-<span id="1502">1502</span>
-<span id="1503">1503</span>
-<span id="1504">1504</span>
-<span id="1505">1505</span>
-<span id="1506">1506</span>
-<span id="1507">1507</span>
-<span id="1508">1508</span>
-<span id="1509">1509</span>
-<span id="1510">1510</span>
-<span id="1511">1511</span>
-<span id="1512">1512</span>
-<span id="1513">1513</span>
-<span id="1514">1514</span>
-<span id="1515">1515</span>
-<span id="1516">1516</span>
-<span id="1517">1517</span>
-<span id="1518">1518</span>
-<span id="1519">1519</span>
-<span id="1520">1520</span>
-<span id="1521">1521</span>
-<span id="1522">1522</span>
-<span id="1523">1523</span>
-<span id="1524">1524</span>
-<span id="1525">1525</span>
-<span id="1526">1526</span>
-<span id="1527">1527</span>
-<span id="1528">1528</span>
-<span id="1529">1529</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -1560,7 +1498,6 @@
 <span class="doccomment">/// * cost function value of current and previous iteration</span>
 <span class="doccomment">/// * current and previous best cost function value</span>
 <span class="doccomment">/// * target cost function value</span>
-<span class="doccomment">/// * population (for population based algorithms)</span>
 <span class="doccomment">/// * current iteration number</span>
 <span class="doccomment">/// * iteration number where the last best parameter vector was found</span>
 <span class="doccomment">/// * maximum number of iterations that will be executed</span>
@@ -1605,8 +1542,6 @@
     <span class="kw">pub</span> <span class="ident">jacobian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">J</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Previous Jacobian</span>
     <span class="kw">pub</span> <span class="ident">prev_jacobian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">J</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// All members for population-based algorithms as (param, cost) tuples</span>
-    <span class="kw">pub</span> <span class="ident">population</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">P</span>, <span class="ident">F</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Current iteration</span>
     <span class="kw">pub</span> <span class="ident">iter</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// Iteration number of last best cost</span>
@@ -1798,33 +1733,6 @@
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target_cost</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">target_cost</span> <span class="op">=</span> <span class="ident">target_cost</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set population.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A population is a `Vec` of tuples of type `(Self::Param, Self::Float)` where the latter</span>
-    <span class="doccomment">/// indicates the associated cost function value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{IterState, State};</span>
-    <span class="doccomment">/// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();</span>
-    <span class="doccomment">/// # assert!(state.population.is_none());</span>
-    <span class="doccomment">/// # let param1 = vec![0.0f64, 1.0f64];</span>
-    <span class="doccomment">/// # let param2 = vec![2.0f64, 3.0f64];</span>
-    <span class="doccomment">/// let state = state.population(vec![(param1, 1.2), (param2, 2.1)]);</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[0].0[0].to_ne_bytes(), 0.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[0].0[1].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[0].1.to_ne_bytes(), 1.2f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[1].0[0].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[1].0[1].to_ne_bytes(), 3.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[1].1.to_ne_bytes(), 2.1f64.to_ne_bytes());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">population</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">population</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">P</span>, <span class="ident">F</span>)<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">population</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">population</span>);
         <span class="self">self</span>
     }
 
@@ -2424,36 +2332,6 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_prev_jacobian</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">J</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">prev_jacobian</span>.<span class="ident">take</span>()
     }
-
-    <span class="doccomment">/// Returns a reference to the population</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{IterState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();</span>
-    <span class="doccomment">/// # assert!(state.population.is_none());</span>
-    <span class="doccomment">/// # assert!(state.get_population().is_none());</span>
-    <span class="doccomment">/// # let param1 = vec![0.0f64, 1.0f64];</span>
-    <span class="doccomment">/// # let param2 = vec![2.0f64, 3.0f64];</span>
-    <span class="doccomment">/// # let state = state.population(vec![(param1, 1.2), (param2, 2.1)]);</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[0].0[0].to_ne_bytes(), 0.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[0].0[1].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[0].1.to_ne_bytes(), 1.2f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[1].0[0].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[1].0[1].to_ne_bytes(), 3.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.population.as_ref().unwrap()[1].1.to_ne_bytes(), 2.1f64.to_ne_bytes());</span>
-    <span class="doccomment">/// let population = state.get_population();</span>
-    <span class="doccomment">/// # assert_eq!(population.unwrap()[0].0[0].to_ne_bytes(), 0.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(population.unwrap()[0].0[1].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(population.unwrap()[0].1.to_ne_bytes(), 1.2f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(population.unwrap()[1].0[0].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(population.unwrap()[1].0[1].to_ne_bytes(), 3.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(population.unwrap()[1].1.to_ne_bytes(), 2.1f64.to_ne_bytes());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_population</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">P</span>, <span class="ident">F</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">population</span>.<span class="ident">as_ref</span>()
-    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">J</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">State</span> <span class="kw">for</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">J</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>
@@ -2492,7 +2370,6 @@
     <span class="doccomment">/// # assert!(state.prev_inv_hessian.is_none());</span>
     <span class="doccomment">/// # assert!(state.jacobian.is_none());</span>
     <span class="doccomment">/// # assert!(state.prev_jacobian.is_none());</span>
-    <span class="doccomment">/// # assert!(state.population.is_none());</span>
     <span class="doccomment">/// # assert_eq!(state.iter, 0);</span>
     <span class="doccomment">/// # assert_eq!(state.last_best_iter, 0);</span>
     <span class="doccomment">/// # assert_eq!(state.max_iters, std::u64::MAX);</span>
@@ -2519,7 +2396,6 @@
             <span class="ident">prev_inv_hessian</span>: <span class="prelude-val">None</span>,
             <span class="ident">jacobian</span>: <span class="prelude-val">None</span>,
             <span class="ident">prev_jacobian</span>: <span class="prelude-val">None</span>,
-            <span class="ident">population</span>: <span class="prelude-val">None</span>,
             <span class="ident">iter</span>: <span class="number">0</span>,
             <span class="ident">last_best_iter</span>: <span class="number">0</span>,
             <span class="ident">max_iters</span>: <span class="ident">std::u64::MAX</span>,

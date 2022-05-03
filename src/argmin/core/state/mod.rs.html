@@ -118,6 +118,8 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -127,9 +129,11 @@
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iterstate</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">linearprogramstate</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">populationstate</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">iterstate::IterState</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">linearprogramstate::LinearProgramState</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">populationstate::PopulationState</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">Problem</span>, <span class="ident">TerminationReason</span>};
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
