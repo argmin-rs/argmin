@@ -15,6 +15,7 @@ exclude = []
 
 [dependencies]
 # nalgebra
+nalgebra_0_31 = { package = "nalgebra", version = "0.31", optional = true }
 nalgebra_0_30 = { package = "nalgebra", version = "0.30", optional = true }
 nalgebra_0_29 = { package = "nalgebra", version = "0.29", optional = true }
 
@@ -59,8 +60,10 @@ vec = ["primitives", "num-complex_0_4"]
 
 # nalgebra
 nalgebra_all = ["primitives"]
-nalgebra_latest = ["nalgebra_v0_30"]
-nalgebra_latest-serde = ["nalgebra_v0_30-serde"]
+nalgebra_latest = ["nalgebra_v0_31"]
+nalgebra_latest-serde = ["nalgebra_v0_31-serde"]
+nalgebra_v0_31 = ["nalgebra_0_31", "num-complex_0_4", "nalgebra_all"]
+nalgebra_v0_31-serde = ["nalgebra_v0_31", "nalgebra_0_31/serde-serialize"]
 nalgebra_v0_30 = ["nalgebra_0_30", "num-complex_0_4", "nalgebra_all"]
 nalgebra_v0_30-serde = ["nalgebra_v0_30", "nalgebra_0_30/serde-serialize"]
 nalgebra_v0_29 = ["nalgebra_0_29", "num-complex_0_4", "nalgebra_all"]

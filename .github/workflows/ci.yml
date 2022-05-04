@@ -48,6 +48,7 @@ jobs:
           - ndarray_v0_14-serde
           - ndarray_v0_13-serde
           - nalgebra_latest-serde
+          - nalgebra_v0_31-serde
           - nalgebra_v0_30-serde
           - nalgebra_v0_29-serde
     steps:
