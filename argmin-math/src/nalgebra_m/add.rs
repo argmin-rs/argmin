@@ -68,10 +68,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[cfg(feature = "nalgebra_v0_29")]
-    use nalgebra_0_29::{DMatrix, DVector, Matrix2x3, Vector3};
-    #[cfg(feature = "nalgebra_v0_30")]
-    use nalgebra_0_30::{DMatrix, DVector, Matrix2x3, Vector3};
+    use nalgebra::{DMatrix, DVector, Matrix2x3, Vector3};
     use paste::item;
 
     macro_rules! make_test {
