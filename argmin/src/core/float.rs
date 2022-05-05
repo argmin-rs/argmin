@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{DeserializeOwnedAlias, SerializeAlias};
+use crate::core::{DeserializeOwnedAlias, SendAlias, SerializeAlias};
 use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 use std::fmt::{Debug, Display};
 
@@ -23,6 +23,7 @@ pub trait ArgminFloat:
     + Display
     + SerializeAlias
     + DeserializeOwnedAlias
+    + SendAlias
 {
 }
 
@@ -37,5 +38,6 @@ impl<I> ArgminFloat for I where
         + Display
         + SerializeAlias
         + DeserializeOwnedAlias
+        + SendAlias
 {
 }

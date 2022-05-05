@@ -21,7 +21,8 @@
 //! \[1\] <https://en.wikipedia.org/wiki/Particle_swarm_optimization>
 
 use crate::core::{
-    ArgminFloat, CostFunction, Error, PopulationState, Problem, SerializeAlias, Solver, KV,
+    ArgminFloat, CostFunction, Error, PopulationState, Problem, SerializeAlias, Solver, SyncAlias,
+    KV,
 };
 use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
 #[cfg(feature = "serde1")]
@@ -31,6 +32,10 @@ use serde::{Deserialize, Serialize};
 ///
 /// Canonical implementation of the particle swarm optimization method as outlined in \[0\] in
 /// chapter II, section A.
+///
+/// The `rayon` feature enables parallel computation of the cost function. This can be beneficial
+/// for expensive cost functions, but may cause a drop in performance for cheap cost functions. Be
+/// sure to benchmark both parallel and sequential computation.
 ///
 /// ## References
 ///
@@ -56,7 +61,7 @@ pub struct ParticleSwarm<P, F> {
 
 impl<P, F> ParticleSwarm<P, F>
 where
-    P: Clone + ArgminSub<P, P> + ArgminMul<F, P> + ArgminRandom,
+    P: Clone + SyncAlias + ArgminSub<P, P> + ArgminMul<F, P> + ArgminRandom + ArgminZeroLike,
     F: ArgminFloat,
 {
     /// Construct a new instance of `ParticleSwarm`
@@ -179,21 +184,20 @@ where
     }
 
     /// Initializes all particles randomly and sorts them by their cost function values
-    fn initialize_particles<O: CostFunction<Param = P, Output = F>>(
+    fn initialize_particles<O: CostFunction<Param = P, Output = F> + SyncAlias>(
         &mut self,
         problem: &mut Problem<O>,
     ) -> Result<Vec<Particle<P, F>>, Error> {
         let (positions, velocities) = self.initialize_positions_and_velocities();
 
-        // this could be done in parallel!
+        let costs = problem.bulk_cost(&positions)?;
+
         let mut particles = positions
             .into_iter()
             .zip(velocities.into_iter())
-            .map(|(p, v)| -> Result<Particle<P, F>, Error> {
-                let cost = problem.cost(&p)?;
-                Ok(Particle::new(p, cost, v))
-            })
-            .collect::<Result<Vec<_>, _>>()?;
+            .zip(costs.into_iter())
+            .map(|((p, v), c)| Particle::new(p, c, v))
+            .collect::<Vec<_>>();
 
         // sort them, such that the first one is the best one
         particles.sort_by(|a, b| {
@@ -226,9 +230,10 @@ where
 
 impl<O, P, F> Solver<O, PopulationState<Particle<P, F>, F>> for ParticleSwarm<P, F>
 where
-    O: CostFunction<Param = P, Output = F>,
+    O: CostFunction<Param = P, Output = F> + SyncAlias,
     P: SerializeAlias
         + Clone
+        + SyncAlias
         + ArgminAdd<P, P>
         + ArgminSub<P, P>
         + ArgminMul<F, P>
@@ -295,33 +300,41 @@ where
 
         let zero = P::zero_like(&best_particle.position);
 
-        for p in particles.iter_mut() {
-            // New velocity is composed of
-            // 1) previous velocity (momentum),
-            // 2) motion toward particle optimum and
-            // 3) motion toward global optimum.
+        // for p in particles.iter_mut() {
+        let positions: Vec<_> = particles
+            .iter_mut()
+            .map(|p| {
+                // New velocity is composed of
+                // 1) previous velocity (momentum),
+                // 2) motion toward particle optimum and
+                // 3) motion toward global optimum.
 
-            // ad 1)
-            let momentum = p.velocity.mul(&self.weight_inertia);
+                // ad 1)
+                let momentum = p.velocity.mul(&self.weight_inertia);
 
-            // ad 2)
-            let to_optimum = p.best_position.sub(&p.position);
-            let pull_to_optimum = P::rand_from_range(&zero, &to_optimum);
-            let pull_to_optimum = pull_to_optimum.mul(&self.weight_cognitive);
+                // ad 2)
+                let to_optimum = p.best_position.sub(&p.position);
+                let pull_to_optimum = P::rand_from_range(&zero, &to_optimum);
+                let pull_to_optimum = pull_to_optimum.mul(&self.weight_cognitive);
 
-            // ad 3)
-            let to_global_optimum = best_particle.position.sub(&p.position);
-            let pull_to_global_optimum =
-                P::rand_from_range(&zero, &to_global_optimum).mul(&self.weight_social);
+                // ad 3)
+                let to_global_optimum = best_particle.position.sub(&p.position);
+                let pull_to_global_optimum =
+                    P::rand_from_range(&zero, &to_global_optimum).mul(&self.weight_social);
 
-            p.velocity = momentum.add(&pull_to_optimum).add(&pull_to_global_optimum);
-            let new_position = p.position.add(&p.velocity);
+                p.velocity = momentum.add(&pull_to_optimum).add(&pull_to_global_optimum);
+                let new_position = p.position.add(&p.velocity);
 
-            // Limit to search window
-            p.position = P::min(&P::max(&new_position, &self.bounds.0), &self.bounds.1);
+                // Limit to search window
+                p.position = P::min(&P::max(&new_position, &self.bounds.0), &self.bounds.1);
+                &p.position
+            })
+            .collect();
 
-            // Evaluate cost at new position
-            p.cost = problem.cost(&p.position)?;
+        let costs = problem.bulk_cost(&positions)?;
+
+        for (p, c) in particles.iter_mut().zip(costs.into_iter()) {
+            p.cost = c;
 
             if p.cost < p.best_cost {
                 p.best_position = p.position.clone();
@@ -555,7 +568,7 @@ mod tests {
             ParticleSwarm::new((lower_bound, upper_bound), num_particles);
 
         struct PsoProblem {
-            counter: std::cell::RefCell<usize>,
+            counter: std::sync::Mutex<usize>,
             values: [f64; 10],
         }
 
@@ -564,8 +577,8 @@ mod tests {
             type Output = f64;
 
             fn cost(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
-                let cost = self.values[*self.counter.borrow()];
-                *self.counter.borrow_mut() += 1;
+                let cost = self.values[*self.counter.lock().unwrap()];
+                *self.counter.lock().unwrap() += 1;
                 Ok(cost)
             }
         }
@@ -573,7 +586,7 @@ mod tests {
         let mut values = [1.0, 4.0, 10.0, 2.0, -3.0, 8.0, 4.4, 8.1, 6.4, 4.4];
 
         let mut problem = Problem::new(PsoProblem {
-            counter: std::cell::RefCell::new(0),
+            counter: std::sync::Mutex::new(0),
             values,
         });
 
@@ -667,7 +680,7 @@ mod tests {
     #[test]
     fn test_next_iter() {
         struct PsoProblem {
-            counter: std::cell::RefCell<usize>,
+            counter: std::sync::Mutex<usize>,
             values: [f64; 10],
         }
 
@@ -676,8 +689,8 @@ mod tests {
             type Output = f64;
 
             fn cost(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
-                let cost = self.values[*self.counter.borrow() % 10];
-                *self.counter.borrow_mut() += 1;
+                let cost = self.values[*self.counter.lock().unwrap() % 10];
+                *self.counter.lock().unwrap() += 1;
                 Ok(cost)
             }
         }
@@ -685,7 +698,7 @@ mod tests {
         let values = [1.0, 4.0, 10.0, 2.0, -3.0, 8.0, 4.4, 8.1, 6.4, 4.4];
 
         let mut problem = Problem::new(PsoProblem {
-            counter: std::cell::RefCell::new(0),
+            counter: std::sync::Mutex::new(0),
             values,
         });
 

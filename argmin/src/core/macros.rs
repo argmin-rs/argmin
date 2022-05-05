@@ -85,6 +85,65 @@ macro_rules! float {
     };
 }
 
+/// Creates the `bulk_X` methods.
+#[macro_export]
+macro_rules! bulk {
+    ($method_name:tt, $input:ty, $output:ty) => {
+        paste::item! {
+            #[doc = concat!(
+                "Compute `",
+                stringify!($method_name),
+                "` in bulk. ",
+                "If the `rayon` feature is enabled, multiple calls to `",
+                stringify!($method_name),
+                "` will be run in parallel using `rayon`, otherwise they will execute ",
+                "sequentially. If the `rayon` feature is enabled, parallelization can still be ",
+                "turned off by overwriting `parallelize` to return `false`. This can be useful ",
+                "in cases where it is preferable to parallelize only certain parts. ",
+                "Note that even if `parallelize` is set to false, the parameter vectors and the ",
+                "problem are still required to be `Send` and `Sync`. Those bounds are linked to ",
+                "the `rayon` feature. This method can be overwritten.",
+            )]
+            fn [<bulk_ $method_name>]<'a, P>(&self, params: &'a [P]) -> Result<Vec<$output>, Error>
+            where
+                P: std::borrow::Borrow<$input> + SyncAlias,
+                $output: SendAlias,
+                Self: SyncAlias,
+            {
+                #[cfg(feature = "rayon")]
+                {
+                    if self.parallelize() {
+                        params.par_iter().map(|p| self.$method_name(p.borrow())).collect()
+                    } else {
+                        params.iter().map(|p| self.$method_name(p.borrow())).collect()
+                    }
+                }
+                #[cfg(not(feature = "rayon"))]
+                {
+                    params.iter().map(|p| self.$method_name(p.borrow())).collect()
+                }
+            }
+        }
+
+        #[doc = concat!(
+                    "Indicates whether to parallelize calls to `",
+                    stringify!($method_name),
+                    "` when using `bulk_",
+                    stringify!($method_name),
+                    "`. By default returns true, but can be set manually to `false` if needed. ",
+                    "This allows users to turn off parallelization for certain traits ",
+                    "implemented on their problem. ",
+                    "Note that parallelization requires the `rayon` feature to be enabled, ",
+                    "otherwise calls to `",
+                    stringify!($method_name),
+                    "` will be executed sequentially independent of how `parallelize` is set."
+                )]
+        fn parallelize(&self) -> bool {
+            true
+        }
+    };
+}
+
 /// Implements a simple send and a simple sync test for a given type.
 #[cfg(test)]
 macro_rules! send_sync_test {
@@ -106,17 +165,6 @@ macro_rules! send_sync_test {
                 assert_sync::<$t>();
             }
         }
-    };
-}
-
-/// Reuse a list of trait bounds by giving it a name,
-/// e.g. trait_bound!(CopyAndDefault; Copy, Default);
-#[macro_export]
-macro_rules! trait_bound {
-    ($name:ident ; $head:path $(, $tail:path)*) => {
-        #[allow(missing_docs)]
-        pub trait $name : $head $(+ $tail)* {}
-        impl<T> $name for T where T: $head $(+ $tail)* {}
     };
 }
 
