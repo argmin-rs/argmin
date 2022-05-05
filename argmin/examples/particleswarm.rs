@@ -23,15 +23,11 @@ impl CostFunction for Himmelblau {
 fn run() -> Result<(), Error> {
     let cost_function = Himmelblau {};
 
-    // let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 100, 0.5, 0.9, 0.5)?;
     let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 40);
 
     let res = Executor::new(cost_function, solver)
         .configure(|state| state.max_iters(100))
         .run()?;
-
-    // Wait a second (lets the logger flush everything before printing again)
-    std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print Result
     println!("{}", res);

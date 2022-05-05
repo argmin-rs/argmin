@@ -5,7 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminFloat, Error};
+use crate::core::{ArgminFloat, Error, SendAlias, SyncAlias};
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
 use std::collections::HashMap;
 
 /// Wrapper around problems defined by users.
@@ -129,6 +131,23 @@ impl<O> Problem<O> {
     ) -> Result<T, Error> {
         let count = self.counts.entry(counts_string).or_insert(0);
         *count += 1;
+        func(self.problem.as_ref().unwrap())
+    }
+
+    /// Gives access to the stored `problem` via the closure `func` and keeps track of how many
+    /// times the function has been called. In contrast to the `problem` method, this also allows
+    /// to pass the number of parameter vectors which will be processed by the underlying problem.
+    /// This is used by the `bulk_*` methods, which process multiple parameters at once.
+    /// The function counts will be passed to observers labelled with `counts_string`.
+    /// Per convention, `counts_string` is chosen as `<something>_count`.
+    pub fn bulk_problem<T, F: FnOnce(&O) -> Result<T, Error>>(
+        &mut self,
+        counts_string: &'static str,
+        num_param_vecs: usize,
+        func: F,
+    ) -> Result<T, Error> {
+        let count = self.counts.entry(counts_string).or_insert(0);
+        *count += num_param_vecs as u64;
         func(self.problem.as_ref().unwrap())
     }
 
@@ -326,6 +345,8 @@ pub trait Operator {
 
     /// Applies the operator to parameters
     fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error>;
+
+    bulk!(apply, Self::Param, Self::Output);
 }
 
 /// Defines computation of a cost function value
@@ -356,6 +377,8 @@ pub trait CostFunction {
 
     /// Compute cost function
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error>;
+
+    bulk!(cost, Self::Param, Self::Output);
 }
 
 /// Defines the computation of the gradient.
@@ -386,6 +409,8 @@ pub trait Gradient {
 
     /// Compute gradient
     fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error>;
+
+    bulk!(gradient, Self::Param, Self::Gradient);
 }
 
 /// Defines the computation of the Hessian.
@@ -415,6 +440,8 @@ pub trait Hessian {
 
     /// Compute Hessian
     fn hessian(&self, param: &Self::Param) -> Result<Self::Hessian, Error>;
+
+    bulk!(hessian, Self::Param, Self::Hessian);
 }
 
 /// Defines the computation of the Jacobian.
@@ -447,6 +474,8 @@ pub trait Jacobian {
 
     /// Compute Jacobian
     fn jacobian(&self, param: &Self::Param) -> Result<Self::Jacobian, Error>;
+
+    bulk!(jacobian, Self::Param, Self::Jacobian);
 }
 
 /// Defines a linear Program
@@ -542,6 +571,50 @@ impl<O: Operator> Problem<O> {
     pub fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
         self.problem("operator_count", |problem| problem.apply(param))
     }
+
+    /// Calls `bulk_apply` defined in the `Operator` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Operator, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Operator for UserDefinedProblem {
+    /// #     type Param = Vec<f64>;
+    /// #     type Output = Vec<f64>;
+    /// #
+    /// #     fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+    /// #         Ok(vec![1.0f64, 1.0f64])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Operator`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param1 = vec![2.0f64, 1.0f64];
+    /// let param2 = vec![3.0f64, 5.0f64];
+    /// let params = vec![&param1, &param2];
+    ///
+    /// let res = problem1.bulk_apply(&params);
+    ///
+    /// assert_eq!(problem1.counts["operator_count"], 2);
+    /// # let res = res.unwrap();
+    /// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);
+    /// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);
+    /// ```
+    pub fn bulk_apply<P>(&mut self, params: &Vec<P>) -> Result<Vec<O::Output>, Error>
+    where
+        P: std::borrow::Borrow<O::Param> + SyncAlias,
+        O::Output: SendAlias,
+        O: SyncAlias,
+    {
+        self.bulk_problem("operator_count", params.len(), |problem| {
+            problem.bulk_apply(params)
+        })
+    }
 }
 
 /// Wraps a call to `cost` defined in the `CostFunction` trait and as such allows to call `cost` on
@@ -578,6 +651,50 @@ impl<O: CostFunction> Problem<O> {
     /// ```
     pub fn cost(&mut self, param: &O::Param) -> Result<O::Output, Error> {
         self.problem("cost_count", |problem| problem.cost(param))
+    }
+
+    /// Calls `bulk_cost` defined in the `CostFunction` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, CostFunction, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl CostFunction for UserDefinedProblem {
+    /// #     type Param = Vec<f64>;
+    /// #     type Output = f64;
+    /// #
+    /// #     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+    /// #         Ok(4.0f64)
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `CostFunction`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param1 = vec![2.0f64, 1.0f64];
+    /// let param2 = vec![3.0f64, 5.0f64];
+    /// let params = vec![&param1, &param2];
+    ///
+    /// let res = problem1.bulk_cost(&params);
+    ///
+    /// assert_eq!(problem1.counts["cost_count"], 2);
+    /// # let res = res.unwrap();
+    /// # assert_eq!(res[0], 4.0f64);
+    /// # assert_eq!(res[1], 4.0f64);
+    /// ```
+    pub fn bulk_cost<P>(&mut self, params: &Vec<P>) -> Result<Vec<O::Output>, Error>
+    where
+        P: std::borrow::Borrow<O::Param> + SyncAlias,
+        O::Output: SendAlias,
+        O: SyncAlias,
+    {
+        self.bulk_problem("cost_count", params.len(), |problem| {
+            problem.bulk_cost(params)
+        })
     }
 }
 
@@ -616,6 +733,50 @@ impl<O: Gradient> Problem<O> {
     pub fn gradient(&mut self, param: &O::Param) -> Result<O::Gradient, Error> {
         self.problem("gradient_count", |problem| problem.gradient(param))
     }
+
+    /// Calls `bulk_gradient` defined in the `Gradient` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Gradient, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Gradient for UserDefinedProblem {
+    /// #     type Param = Vec<f64>;
+    /// #     type Gradient = Vec<f64>;
+    /// #
+    /// #     fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error> {
+    /// #         Ok(vec![1.0f64, 1.0f64])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Gradient`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param1 = vec![2.0f64, 1.0f64];
+    /// let param2 = vec![3.0f64, 5.0f64];
+    /// let params = vec![&param1, &param2];
+    ///
+    /// let res = problem1.bulk_gradient(&params);
+    ///
+    /// assert_eq!(problem1.counts["gradient_count"], 2);
+    /// # let res = res.unwrap();
+    /// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);
+    /// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);
+    /// ```
+    pub fn bulk_gradient<P>(&mut self, params: &Vec<P>) -> Result<Vec<O::Gradient>, Error>
+    where
+        P: std::borrow::Borrow<O::Param> + SyncAlias,
+        O::Gradient: SendAlias,
+        O: SyncAlias,
+    {
+        self.bulk_problem("gradient_count", params.len(), |problem| {
+            problem.bulk_gradient(params)
+        })
+    }
 }
 
 /// Wraps a call to `hessian` defined in the `Hessian` trait and as such allows to call `hessian` on
@@ -651,6 +812,50 @@ impl<O: Hessian> Problem<O> {
     /// ```
     pub fn hessian(&mut self, param: &O::Param) -> Result<O::Hessian, Error> {
         self.problem("hessian_count", |problem| problem.hessian(param))
+    }
+
+    /// Calls `bulk_hessian` defined in the `Hessian` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Hessian, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Hessian for UserDefinedProblem {
+    /// #     type Param = Vec<f64>;
+    /// #     type Hessian = Vec<Vec<f64>>;
+    /// #
+    /// #     fn hessian(&self, param: &Self::Param) -> Result<Self::Hessian, Error> {
+    /// #         Ok(vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Hessian`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param1 = vec![2.0f64, 1.0f64];
+    /// let param2 = vec![3.0f64, 5.0f64];
+    /// let params = vec![&param1, &param2];
+    ///
+    /// let res = problem1.bulk_hessian(&params);
+    ///
+    /// assert_eq!(problem1.counts["hessian_count"], 2);
+    /// # let res = res.unwrap();
+    /// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
+    /// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
+    /// ```
+    pub fn bulk_hessian<P>(&mut self, params: &Vec<P>) -> Result<Vec<O::Hessian>, Error>
+    where
+        P: std::borrow::Borrow<O::Param> + SyncAlias,
+        O::Hessian: SendAlias,
+        O: SyncAlias,
+    {
+        self.bulk_problem("hessian_count", params.len(), |problem| {
+            problem.bulk_hessian(params)
+        })
     }
 }
 
@@ -688,6 +893,48 @@ impl<O: Jacobian> Problem<O> {
     /// ```
     pub fn jacobian(&mut self, param: &O::Param) -> Result<O::Jacobian, Error> {
         self.problem("jacobian_count", |problem| problem.jacobian(param))
+    }
+
+    /// Calls `bulk_jacobian` defined in the `Jacobian` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Jacobian, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Jacobian for UserDefinedProblem {
+    /// #     type Param = Vec<f64>;
+    /// #     type Jacobian = Vec<Vec<f64>>;
+    /// #
+    /// #     fn jacobian(&self, param: &Self::Param) -> Result<Self::Jacobian, Error> {
+    /// #         Ok(vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Jacobian`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let params = vec![vec![2.0f64, 1.0f64], vec![3.0f64, 5.0f64]];
+    ///
+    /// let res = problem1.bulk_jacobian(&params);
+    ///
+    /// assert_eq!(problem1.counts["jacobian_count"], 2);
+    /// # let res = res.unwrap();
+    /// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
+    /// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
+    /// ```
+    pub fn bulk_jacobian<P>(&mut self, params: &Vec<P>) -> Result<Vec<O::Jacobian>, Error>
+    where
+        P: std::borrow::Borrow<O::Param> + SyncAlias,
+        O::Jacobian: SendAlias,
+        O: SyncAlias,
+    {
+        self.bulk_problem("jacobian_count", params.len(), |problem| {
+            problem.bulk_jacobian(params)
+        })
     }
 }
 

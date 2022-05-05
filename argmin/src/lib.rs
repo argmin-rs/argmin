@@ -132,6 +132,16 @@
 #![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ctrlc\"] }")]
 //! ```
 //!
+//! The `rayon` feature adds `rayon` as a depenceny and allows for parallel computation of cost
+//! functions, operators, gradients, Jacobians and Hessians. Note that only solvers that operate on
+//! multiple parameter vectors per iteration benefit from this feature (e.g. Particle Swarm
+//! Optimization).
+//!
+//! ```toml
+//! [dependencies]
+#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"rayon\"] }")]
+//! ```
+//!
 //! ### Experimental support for compiling to WebAssembly
 //!
 //! When compiling to WASM, the feature `wasm-bindgen` must be used.
@@ -161,7 +171,7 @@
 //!
 //! # Defining a problem
 //!
-//! TODO TODO TODO TODO Rewrite!
+//! TODO TODO TODO TODO Rewrite! Also mention bulk methods.
 //! A problem can be defined by implementing the `ArgminOp` trait which comes with the
 //! associated types `Param`, `Output` and `Hessian`. `Param` is the type of your
 //! parameter vector (i.e. the input to your cost function), `Output` is the type returned
