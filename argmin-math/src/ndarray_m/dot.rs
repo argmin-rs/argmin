@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminDot;
+use crate::{ArgminDot, ArgminTDot};
 use ndarray::{Array1, Array2};
 use num_complex::Complex;
 
@@ -70,6 +70,13 @@ macro_rules! make_dot_ndarray {
             #[inline]
             fn dot(&self, other: &Array2<$t>) -> Array2<$t> {
                 other * *self
+            }
+        }
+
+        impl ArgminTDot<Array2<$t>, Array1<$t>> for Array1<$t> {
+            #[inline]
+            fn tdot(&self, other: &Array2<$t>) -> Array1<$t> {
+                self.dot(other)
             }
         }
     };
@@ -309,6 +316,17 @@ mod tests {
                             assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
                         }
                     }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_vec_vec_ $t>]() {
+                    let a = array![
+                        [1 as $t, 2 as $t, 3 as $t],
+                        [4 as $t, 5 as $t, 6 as $t],
+                    ];
+                    assert_eq!(ArgminTDot::<Array2<$t>, Array1<$t>>::tdot(&array![1 as $t, 2 as $t], &a), array![9 as $t, 12 as $t, 15 as $t]);
                 }
             }
         };

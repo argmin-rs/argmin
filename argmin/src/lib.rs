@@ -78,6 +78,8 @@
 //!
 //! - [Particle Swarm Optimization](`crate::solver::particleswarm::ParticleSwarm`)
 //!
+//! - [CMA-ES](`crate::solver::cma_es::CMAES`)
+//!
 //! # License
 //!
 //! Licensed under either of

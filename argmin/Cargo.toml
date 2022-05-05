@@ -168,3 +168,7 @@ required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 [[example]]
 name = "writers"
 required-features = ["argmin-math/ndarray_latest-serde", "slog-logger", "serde1"]
+
+[[example]]
+name = "cmaes"
+required-features = ["slog-logger"]

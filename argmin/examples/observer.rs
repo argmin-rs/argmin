@@ -152,10 +152,12 @@ impl std::default::Default for Visualizer3d {
     }
 }
 
-impl Observe<PopulationState<Particle<Vec<f64>, f64>, f64>> for Visualizer3d {
+impl Observe<PopulationState<Particle<Vec<f64>, f64>, f64, Vec<Particle<Vec<f64>, f64>>>>
+    for Visualizer3d
+{
     fn observe_iter(
         &mut self,
-        state: &PopulationState<Particle<Vec<f64>, f64>, f64>,
+        state: &PopulationState<Particle<Vec<f64>, f64>, f64, Vec<Particle<Vec<f64>, f64>>>,
         _kv: &KV,
     ) -> Result<(), Error> {
         // TODO: get particles from `state` or `kv`

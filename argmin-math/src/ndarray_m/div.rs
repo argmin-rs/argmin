@@ -38,6 +38,13 @@ macro_rules! make_div {
                 self / other
             }
         }
+
+        impl ArgminDiv<$t, Array2<$t>> for Array2<$t> {
+            #[inline]
+            fn div(&self, other: &$t) -> Array2<$t> {
+                self / *other
+            }
+        }
     };
 }
 
@@ -180,6 +187,27 @@ mod tests {
                     ];
                     let b = array![[]];
                     <Array2<$t> as ArgminDiv<Array2<$t>, Array2<$t>>>::div(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_div_scalar_mat_1_ $t>]() {
+                    let a = array![
+                        [16 as $t, 12 as $t, 10 as $t],
+                        [8 as $t, 4 as $t, 2 as $t]
+                    ];
+                    let b = 2 as $t;
+                    let target = array![
+                        [8 as $t, 6 as $t, 5 as $t],
+                        [4 as $t, 2 as $t, 1 as $t]
+                    ];
+                    let res = <Array2<$t> as ArgminDiv<$t, Array2<$t>>>::div(&a, &b);
+                    for i in 0..3 {
+                        for j in 0..2 {
+                        assert!(((target[[j, i]] - res[[j, i]]) as f64).abs() < std::f64::EPSILON);
+                        }
+                    }
                 }
             }
         };

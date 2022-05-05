@@ -4,3 +4,6 @@ target/
 target/*
 *.log
 justfile
+.vscode
+.DS_Store
+checkpoints/

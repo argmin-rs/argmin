@@ -5,8 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminDot;
-use crate::ArgminTranspose;
+use crate::{ArgminDot, ArgminTDot};
 use num_complex::Complex;
 
 macro_rules! make_dot_vec {
@@ -41,6 +40,18 @@ macro_rules! make_dot_vec {
             }
         }
 
+        impl ArgminDot<Vec<Vec<$t>>, Vec<$t>> for Vec<$t> {
+            #[inline]
+            fn dot(&self, other: &Vec<Vec<$t>>) -> Vec<$t> {
+                assert!(self.len() == other.len());
+                assert!(self.len() > 0);
+                let (n, m) = (self.len(), other[0].len());
+                (0..m)
+                    .map(|i| (0..n).map(|j| self[j] * other[j][i]).sum())
+                    .collect()
+            }
+        }
+
         impl ArgminDot<Vec<$t>, Vec<$t>> for Vec<Vec<$t>> {
             #[inline]
             fn dot(&self, other: &Vec<$t>) -> Vec<$t> {
@@ -51,8 +62,6 @@ macro_rules! make_dot_vec {
         impl ArgminDot<Vec<Vec<$t>>, Vec<Vec<$t>>> for Vec<Vec<$t>> {
             #[inline]
             fn dot(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {
-                // Would be more efficient if this wasn't necessary!
-                let other = other.clone().t();
                 let sr = self.len();
                 assert!(sr > 0);
                 let sc = self[0].len();
@@ -61,16 +70,13 @@ macro_rules! make_dot_vec {
                 assert!(or > 0);
                 let oc = other[0].len();
                 assert_eq!(sc, or);
-                assert!(oc > 0);
-                let v = vec![<$t>::default(); oc];
-                let mut out = vec![v; sr];
-                for i in 0..sr {
-                    assert_eq!(self[i].len(), sc);
-                    for j in 0..oc {
-                        out[i][j] = self[i].dot(&other[j]);
-                    }
-                }
-                out
+                (0..sr)
+                    .map(|i| {
+                        (0..oc)
+                            .map(|j| (0..sc).map(|k| self[i][k] * other[k][j]).sum())
+                            .collect()
+                    })
+                    .collect()
             }
         }
 
@@ -88,6 +94,18 @@ macro_rules! make_dot_vec {
             fn dot(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {
                 (0..other.len())
                     .map(|i| other[i].iter().map(|a| a * self).collect())
+                    .collect()
+            }
+        }
+
+        impl ArgminTDot<Vec<Vec<$t>>, Vec<$t>> for Vec<$t> {
+            #[inline]
+            fn tdot(&self, other: &Vec<Vec<$t>>) -> Vec<$t> {
+                assert!(self.len() == other.len());
+                assert!(self.len() > 0);
+                let (n, m) = (self.len(), other[0].len());
+                (0..m)
+                    .map(|i| (0..n).map(|j| self[j] * other[j][i]).sum())
                     .collect()
             }
         }
@@ -200,7 +218,7 @@ mod tests {
 
             item! {
                 #[test]
-                fn [<test_mat_mat_ $t>]() {
+                fn [<test_mat_mat_1_ $t>]() {
                     let a = vec![
                         vec![1 as $t, 2 as $t, 3 as $t],
                         vec![4 as $t, 5 as $t, 6 as $t],
@@ -227,9 +245,35 @@ mod tests {
 
             item! {
                 #[test]
+                fn [<test_mat_mat_2_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t, 3 as $t],
+                        vec![4 as $t, 5 as $t, 6 as $t]
+                    ];
+                    let b = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![3 as $t, 4 as $t],
+                        vec![5 as $t, 6 as $t]
+                    ];
+                    let expected = vec![
+                        vec![22 as $t, 28 as $t],
+                        vec![49 as $t, 64 as $t],
+                    ];
+
+                    let product = a.dot(&b);
+
+                    assert_eq!(product.len(), 2);
+                    assert_eq!(product[0].len(), 2);
+
+                    product.iter().flatten().zip(expected.iter().flatten()).for_each(|(&a, &b)| assert!((a as f64 - b as f64).abs() < std::f64::EPSILON));
+                }
+            }
+
+            item! {
+                #[test]
                 #[should_panic]
                 fn [<test_mat_mat_panic_1_ $t>]() {
-                    let a = vec![];
+                    let a: Vec<$t> = vec![];
                     let b = vec![
                         vec![3 as $t, 2 as $t, 1 as $t],
                         vec![6 as $t, 5 as $t, 4 as $t],
@@ -273,8 +317,7 @@ mod tests {
 
             item! {
                 #[test]
-                #[should_panic]
-                fn [<test_mat_mat_panic_4_ $t>]() {
+                fn [<test_mat_mat_4_ $t>]() {
                     let a = vec![
                         vec![1 as $t, 2 as $t, 3 as $t],
                         vec![4 as $t, 5 as $t, 6 as $t],
@@ -285,7 +328,10 @@ mod tests {
                         vec![6 as $t, 5 as $t],
                         vec![3 as $t, 2 as $t]
                     ];
-                    a.dot(&b);
+                    let res = a.dot(&b);
+                    let expected = vec![24 as $t, 18 as $t, 60 as $t, 45 as $t, 24 as $t, 18 as $t];
+
+                    res.iter().flatten().zip(expected.iter()).for_each(|(&a, &b)| assert!(((a-b) as f64).abs() <= f64::EPSILON));
                 }
             }
 
@@ -366,6 +412,28 @@ mod tests {
                             assert!((((res[i][j] - product[i][j]) as f64).abs()) < std::f64::EPSILON);
                         }
                     }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_vec_vec_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t, 3 as $t],
+                        vec![4 as $t, 5 as $t, 6 as $t],
+                    ];
+                    assert_eq!(vec![1 as $t, 2 as $t].dot(&a), vec![9 as $t, 12 as $t, 15 as $t]);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_tdot_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t, 3 as $t],
+                        vec![4 as $t, 5 as $t, 6 as $t],
+                    ];
+                    assert_eq!(vec![1 as $t, 2 as $t].tdot(&a), vec![9 as $t, 12 as $t, 15 as $t]);
                 }
             }
         };

@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminDot;
+use crate::{ArgminDot, ArgminTDot};
 
 use num_traits::{One, Zero};
 
@@ -85,10 +85,34 @@ where
     }
 }
 
+impl<N, R1, R2, C1, C2, SA, SB> ArgminTDot<Matrix<N, R2, C2, SB>, OMatrix<N, C2, C1>>
+    for Matrix<N, R1, C1, SA>
+where
+    N: Scalar + Zero + One + ClosedAdd + ClosedMul,
+    R1: Dim,
+    R2: Dim,
+    C1: Dim,
+    C2: Dim,
+    SA: Storage<N, R1, C1>,
+    SB: Storage<N, R2, C2>,
+    DefaultAllocator: Allocator<N, R1, C2>,
+    DefaultAllocator: Allocator<N, C1, R1>,
+    DefaultAllocator: Allocator<N, C1, C2>,
+    DefaultAllocator: Allocator<N, C2, C1>,
+    ShapeConstraint: AreMultipliable<C1, R1, R2, C2>,
+{
+    #[inline]
+    fn tdot(&self, other: &Matrix<N, R2, C2, SB>) -> OMatrix<N, C2, C1> {
+        (self.transpose() * other).transpose()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use nalgebra::{Matrix3, RowVector3, Vector3};
+    use nalgebra::{
+        DMatrix, Matrix2x3, Matrix3, RowDVector, RowVector2, RowVector3, Vector2, Vector3,
+    };
     use paste::item;
 
     macro_rules! make_test {
@@ -239,6 +263,63 @@ mod tests {
                         for j in 0..3 {
                             assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
                         }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_vec_vec_ $t>]() {
+                    let a = Matrix2x3::new(
+                        1 as $t, 2 as $t, 3 as $t,
+                        4 as $t, 5 as $t, 6 as $t,
+                    );
+                    let b = RowVector2::new(1 as $t, 2 as $t);
+                    let res = RowVector3::new(9 as $t, 12 as $t, 15 as $t);
+                    let product = ArgminDot::<Matrix2x3<$t>, RowVector3<$t>>::dot(&b, &a);
+                    for i in 0..3 {
+                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_vec_vec_dyn_ $t>]() {
+                    let a = DMatrix::from_row_slice(2, 3,
+                        &[1 as $t, 2 as $t, 3 as $t, 4 as $t, 5 as $t, 6 as $t]
+                    );
+                    let b = RowVector2::new(1 as $t, 2 as $t);
+                    let res = RowVector3::new(9 as $t, 12 as $t, 15 as $t);
+                    let product = ArgminDot::<DMatrix<$t>, RowDVector<$t>>::dot(&b, &a);
+                    for i in 0..3 {
+                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_row_vec_vec_ $t>]() {
+                    let a = RowVector3::new(1 as $t, 2 as $t, 3 as $t);
+                    let b = RowVector3::new(4 as $t, 5 as $t, 6 as $t);
+                    let res: $t = <RowVector3<$t> as ArgminDot<RowVector3<$t>, $t>>::dot(&a, &b);
+                    assert!((((res - 32 as $t) as f64).abs()) < std::f64::EPSILON);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_tdot_ $t>]() {
+                    let a = Matrix2x3::new(
+                        1 as $t, 2 as $t, 3 as $t,
+                        4 as $t, 5 as $t, 6 as $t,
+                    );
+                    let b = Vector2::new(1 as $t, 2 as $t);
+                    let res = Vector3::new(9 as $t, 12 as $t, 15 as $t);
+                    let product = ArgminTDot::<Matrix2x3<$t>, Vector3<$t>>::tdot(&b, &a);
+                    for i in 0..3 {
+                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
                     }
                 }
             }

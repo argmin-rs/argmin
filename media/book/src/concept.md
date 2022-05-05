@@ -9,8 +9,12 @@ There are three components needed for solving an optimization problem in argmin:
 The [Executor](https://docs.rs/argmin/latest/argmin/core/struct.Executor.html) applies the solver to the optimization problem.
 It also accepts observers and checkpointing mechanisms, as well as an initial guess of the parameter vector, the cost function value at that initial guess, gradient, and so on.
 
+<<<<<<< HEAD:media/book/src/concept.md
 A solver is anything that implements the [Solver](https://docs.rs/argmin/latest/argmin/core/trait.Solver.html) trait.
 This trait defines how the optimization algorithm is initialized, how a single iteration is performed and when and how to terminate the iterations.
+=======
+A solver is anything that implements the [Solver](https://docs.rs/argmin/latest/argmin/core/trait.Solver.html) trait. This trait defines how the optimization algorithm is initialized, how a single iteration is performed and when and how to terminate the iterations.
+>>>>>>> 90a03788 (Adds CMA-ES algorithm):docs/book/src/concept.md
 
 The optimization problem needs to implement a subset of the traits
 [`CostFunction`](https://docs.rs/argmin/latest/argmin/core/trait.CostFunction.html),
