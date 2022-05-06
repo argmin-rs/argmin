@@ -4,7 +4,7 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"><a href="#">Crate argmin</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.5.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div></section><div id="sidebar-vars" data-name="argmin" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../argmin/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin/lib.rs.html#8-638">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin/lib.rs.html#8-648">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
 <p><a href="https://docs.rs/argmin/latest/argmin/">Documentation of most recent release</a></p>
 <p><a href="https://argmin-rs.github.io/argmin/argmin/">Documentation of main branch</a></p>
 <h2 id="design-goals"><a href="#design-goals">Design goals</a></h2>
@@ -122,7 +122,13 @@ well as logging to disk.</li>
 <p>The <code>ctrlc</code> feature uses the <code>ctrlc</code> crate to properly stop the optimization (and return the
 current best result) after pressing Ctrl+C during an optimization run.</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
- argmin = { version = &quot;0.5.0&quot;, features = [&quot;ctrlc&quot;] }</code></pre></div><h4 id="experimental-support-for-compiling-to-webassembly"><a href="#experimental-support-for-compiling-to-webassembly">Experimental support for compiling to WebAssembly</a></h4>
+ argmin = { version = &quot;0.5.0&quot;, features = [&quot;ctrlc&quot;] }</code></pre></div>
+<p>The <code>rayon</code> feature adds <code>rayon</code> as a depenceny and allows for parallel computation of cost
+functions, operators, gradients, Jacobians and Hessians. Note that only solvers that operate on
+multiple parameter vectors per iteration benefit from this feature (e.g. Particle Swarm
+Optimization).</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+ argmin = { version = &quot;0.5.0&quot;, features = [&quot;rayon&quot;] }</code></pre></div><h4 id="experimental-support-for-compiling-to-webassembly"><a href="#experimental-support-for-compiling-to-webassembly">Experimental support for compiling to WebAssembly</a></h4>
 <p>When compiling to WASM, the feature <code>wasm-bindgen</code> must be used.</p>
 <p>WASM support is still experimental. Please report any issues you encounter when using argmin
 in a WASM context.</p>
@@ -135,7 +141,7 @@ checkpointing.</p>
 <h3 id="running-the-tests-and-building-the-examples"><a href="#running-the-tests-and-building-the-examples">Running the tests and building the examples</a></h3>
 <p>The tests and examples require a set of features to be enabled:</p>
 <div class="example-wrap"><pre class="language-bash"><code>cargo test --features &quot;argmin/ctrlc,argmin-math/ndarray_latest-serde,argmin-math/nalgebra_latest-serde,argmin/ndarrayl&quot;</code></pre></div><h2 id="defining-a-problem"><a href="#defining-a-problem">Defining a problem</a></h2>
-<p>TODO TODO TODO TODO Rewrite!
+<p>TODO TODO TODO TODO Rewrite! Also mention bulk methods.
 A problem can be defined by implementing the <code>ArgminOp</code> trait which comes with the
 associated types <code>Param</code>, <code>Output</code> and <code>Hessian</code>. <code>Param</code> is the type of your
 parameter vector (i.e. the input to your cost function), <code>Output</code> is the type returned
@@ -383,11 +389,10 @@ without any additional terms or conditions.</p>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.argmin_error.html" title="argmin::argmin_error macro">argmin_error</a></div><div class="item-right docblock-short"><p>Create an <code>ArgminError</code> with a provided message.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.argmin_error_closure.html" title="argmin::argmin_error_closure macro">argmin_error_closure</a></div><div class="item-right docblock-short"><p>Create an <code>ArgminError</code> with a provided message wrapped in a closure for use in
 <code>.ok_or_else(...)</code> methods on <code>Option</code>s.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bulk.html" title="argmin::bulk macro">bulk</a></div><div class="item-right docblock-short"><p>Creates the <code>bulk_X</code> methods.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.check_param.html" title="argmin::check_param macro">check_param</a></div><div class="item-right docblock-short"><p>Release an <code>T</code> from an <code>Option&lt;T&gt;</code> if it is not <code>None</code>. If it is <code>None</code>, return an
 <code>ArgminError</code> with a provided message.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.float.html" title="argmin::float macro">float</a></div><div class="item-right docblock-short"><p>Convert a constant to a float of given precision</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.make_kv.html" title="argmin::make_kv macro">make_kv</a></div><div class="item-right docblock-short"><p>Creates an <code>KV</code> at compile time</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.trait_bound.html" title="argmin::trait_bound macro">trait_bound</a></div><div class="item-right docblock-short"><p>Reuse a list of trait bounds by giving it a name,
-e.g. trait_bound!(CopyAndDefault; Copy, Default);</p>
 </div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
 </body></html>

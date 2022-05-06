@@ -641,6 +641,16 @@
 <span id="636">636</span>
 <span id="637">637</span>
 <span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -775,6 +785,16 @@
 <span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot; argmin = { version = \&quot;&quot;</span>, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>), <span class="string">&quot;\&quot;, features = [\&quot;ctrlc\&quot;] }&quot;</span>)]</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! The `rayon` feature adds `rayon` as a depenceny and allows for parallel computation of cost</span>
+<span class="doccomment">//! functions, operators, gradients, Jacobians and Hessians. Note that only solvers that operate on</span>
+<span class="doccomment">//! multiple parameter vectors per iteration benefit from this feature (e.g. Particle Swarm</span>
+<span class="doccomment">//! Optimization).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies]</span>
+<span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot; argmin = { version = \&quot;&quot;</span>, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>), <span class="string">&quot;\&quot;, features = [\&quot;rayon\&quot;] }&quot;</span>)]</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! ### Experimental support for compiling to WebAssembly</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! When compiling to WASM, the feature `wasm-bindgen` must be used.</span>
@@ -804,7 +824,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Defining a problem</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! TODO TODO TODO TODO Rewrite!</span>
+<span class="doccomment">//! TODO TODO TODO TODO Rewrite! Also mention bulk methods.</span>
 <span class="doccomment">//! A problem can be defined by implementing the `ArgminOp` trait which comes with the</span>
 <span class="doccomment">//! associated types `Param`, `Output` and `Hessian`. `Param` is the type of your</span>
 <span class="doccomment">//! parameter vector (i.e. the input to your cost function), `Output` is the type returned</span>

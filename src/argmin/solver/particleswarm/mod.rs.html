@@ -718,6 +718,19 @@
 <span id="713">713</span>
 <span id="714">714</span>
 <span id="715">715</span>
+<span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -741,7 +754,8 @@
 <span class="doccomment">//! \[1\] &lt;https://en.wikipedia.org/wiki/Particle_swarm_optimization&gt;</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">PopulationState</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">KV</span>,
+    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">PopulationState</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">SyncAlias</span>,
+    <span class="ident">KV</span>,
 };
 <span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminMinMax</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminRandom</span>, <span class="ident">ArgminSub</span>, <span class="ident">ArgminZeroLike</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
@@ -751,6 +765,10 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Canonical implementation of the particle swarm optimization method as outlined in \[0\] in</span>
 <span class="doccomment">/// chapter II, section A.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The `rayon` feature enables parallel computation of the cost function. This can be beneficial</span>
+<span class="doccomment">/// for expensive cost functions, but may cause a drop in performance for cheap cost functions. Be</span>
+<span class="doccomment">/// sure to benchmark both parallel and sequential computation.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## References</span>
 <span class="doccomment">///</span>
@@ -776,7 +794,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminRandom</span>,
+    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SyncAlias</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminRandom</span> <span class="op">+</span> <span class="ident">ArgminZeroLike</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="doccomment">/// Construct a new instance of `ParticleSwarm`</span>
@@ -899,21 +917,20 @@
     }
 
     <span class="doccomment">/// Initializes all particles randomly and sorts them by their cost function values</span>
-    <span class="kw">fn</span> <span class="ident">initialize_particles</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="kw">fn</span> <span class="ident">initialize_particles</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SyncAlias</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">positions</span>, <span class="ident">velocities</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">initialize_positions_and_velocities</span>();
 
-        <span class="comment">// this could be done in parallel!</span>
+        <span class="kw">let</span> <span class="ident">costs</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">bulk_cost</span>(<span class="kw-2">&amp;</span><span class="ident">positions</span>)<span class="question-mark">?</span>;
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">positions</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">zip</span>(<span class="ident">velocities</span>.<span class="ident">into_iter</span>())
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">p</span>, <span class="ident">v</span>)<span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">Particle::new</span>(<span class="ident">p</span>, <span class="ident">cost</span>, <span class="ident">v</span>))
-            })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            .<span class="ident">zip</span>(<span class="ident">costs</span>.<span class="ident">into_iter</span>())
+            .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">p</span>, <span class="ident">v</span>), <span class="ident">c</span>)<span class="op">|</span> <span class="ident">Particle::new</span>(<span class="ident">p</span>, <span class="ident">c</span>, <span class="ident">v</span>))
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="comment">// sort them, such that the first one is the best one</span>
         <span class="ident">particles</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
@@ -946,9 +963,10 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">PopulationState</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SyncAlias</span>,
     <span class="ident">P</span>: <span class="ident">SerializeAlias</span>
         <span class="op">+</span> <span class="ident">Clone</span>
+        <span class="op">+</span> <span class="ident">SyncAlias</span>
         <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>
@@ -1015,33 +1033,41 @@
 
         <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="ident">P::zero_like</span>(<span class="kw-2">&amp;</span><span class="ident">best_particle</span>.<span class="ident">position</span>);
 
-        <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="ident">particles</span>.<span class="ident">iter_mut</span>() {
-            <span class="comment">// New velocity is composed of</span>
-            <span class="comment">// 1) previous velocity (momentum),</span>
-            <span class="comment">// 2) motion toward particle optimum and</span>
-            <span class="comment">// 3) motion toward global optimum.</span>
+        <span class="comment">// for p in particles.iter_mut() {</span>
+        <span class="kw">let</span> <span class="ident">positions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">particles</span>
+            .<span class="ident">iter_mut</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
+                <span class="comment">// New velocity is composed of</span>
+                <span class="comment">// 1) previous velocity (momentum),</span>
+                <span class="comment">// 2) motion toward particle optimum and</span>
+                <span class="comment">// 3) motion toward global optimum.</span>
 
-            <span class="comment">// ad 1)</span>
-            <span class="kw">let</span> <span class="ident">momentum</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">velocity</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">weight_inertia</span>);
+                <span class="comment">// ad 1)</span>
+                <span class="kw">let</span> <span class="ident">momentum</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">velocity</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">weight_inertia</span>);
 
-            <span class="comment">// ad 2)</span>
-            <span class="kw">let</span> <span class="ident">to_optimum</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">best_position</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">position</span>);
-            <span class="kw">let</span> <span class="ident">pull_to_optimum</span> <span class="op">=</span> <span class="ident">P::rand_from_range</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">to_optimum</span>);
-            <span class="kw">let</span> <span class="ident">pull_to_optimum</span> <span class="op">=</span> <span class="ident">pull_to_optimum</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">weight_cognitive</span>);
+                <span class="comment">// ad 2)</span>
+                <span class="kw">let</span> <span class="ident">to_optimum</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">best_position</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">position</span>);
+                <span class="kw">let</span> <span class="ident">pull_to_optimum</span> <span class="op">=</span> <span class="ident">P::rand_from_range</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">to_optimum</span>);
+                <span class="kw">let</span> <span class="ident">pull_to_optimum</span> <span class="op">=</span> <span class="ident">pull_to_optimum</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">weight_cognitive</span>);
 
-            <span class="comment">// ad 3)</span>
-            <span class="kw">let</span> <span class="ident">to_global_optimum</span> <span class="op">=</span> <span class="ident">best_particle</span>.<span class="ident">position</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">position</span>);
-            <span class="kw">let</span> <span class="ident">pull_to_global_optimum</span> <span class="op">=</span>
-                <span class="ident">P::rand_from_range</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">to_global_optimum</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">weight_social</span>);
+                <span class="comment">// ad 3)</span>
+                <span class="kw">let</span> <span class="ident">to_global_optimum</span> <span class="op">=</span> <span class="ident">best_particle</span>.<span class="ident">position</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">position</span>);
+                <span class="kw">let</span> <span class="ident">pull_to_global_optimum</span> <span class="op">=</span>
+                    <span class="ident">P::rand_from_range</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">to_global_optimum</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">weight_social</span>);
 
-            <span class="ident">p</span>.<span class="ident">velocity</span> <span class="op">=</span> <span class="ident">momentum</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">pull_to_optimum</span>).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">pull_to_global_optimum</span>);
-            <span class="kw">let</span> <span class="ident">new_position</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">position</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">velocity</span>);
+                <span class="ident">p</span>.<span class="ident">velocity</span> <span class="op">=</span> <span class="ident">momentum</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">pull_to_optimum</span>).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">pull_to_global_optimum</span>);
+                <span class="kw">let</span> <span class="ident">new_position</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">position</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">velocity</span>);
 
-            <span class="comment">// Limit to search window</span>
-            <span class="ident">p</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">P::min</span>(<span class="kw-2">&amp;</span><span class="ident">P::max</span>(<span class="kw-2">&amp;</span><span class="ident">new_position</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bounds</span>.<span class="number">0</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bounds</span>.<span class="number">1</span>);
+                <span class="comment">// Limit to search window</span>
+                <span class="ident">p</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">P::min</span>(<span class="kw-2">&amp;</span><span class="ident">P::max</span>(<span class="kw-2">&amp;</span><span class="ident">new_position</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bounds</span>.<span class="number">0</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bounds</span>.<span class="number">1</span>);
+                <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">position</span>
+            })
+            .<span class="ident">collect</span>();
 
-            <span class="comment">// Evaluate cost at new position</span>
-            <span class="ident">p</span>.<span class="ident">cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">position</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">costs</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">bulk_cost</span>(<span class="kw-2">&amp;</span><span class="ident">positions</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">for</span> (<span class="ident">p</span>, <span class="ident">c</span>) <span class="kw">in</span> <span class="ident">particles</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">costs</span>.<span class="ident">into_iter</span>()) {
+            <span class="ident">p</span>.<span class="ident">cost</span> <span class="op">=</span> <span class="ident">c</span>;
 
             <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">cost</span> <span class="op">&lt;</span> <span class="ident">p</span>.<span class="ident">best_cost</span> {
                 <span class="ident">p</span>.<span class="ident">best_position</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">position</span>.<span class="ident">clone</span>();
@@ -1275,7 +1301,7 @@
             <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>, <span class="ident">upper_bound</span>), <span class="ident">num_particles</span>);
 
         <span class="kw">struct</span> <span class="ident">PsoProblem</span> {
-            <span class="ident">counter</span>: <span class="ident">std::cell::RefCell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+            <span class="ident">counter</span>: <span class="ident">std::sync::Mutex</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
             <span class="ident">values</span>: [<span class="ident">f64</span>; <span class="number">10</span>],
         }
 
@@ -1284,8 +1310,8 @@
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
 
             <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">values</span>[<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">borrow</span>()];
-                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">borrow_mut</span>() <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">values</span>[<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>()];
+                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">cost</span>)
             }
         }
@@ -1293,7 +1319,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> [<span class="number">1.0</span>, <span class="number">4.0</span>, <span class="number">10.0</span>, <span class="number">2.0</span>, <span class="op">-</span><span class="number">3.0</span>, <span class="number">8.0</span>, <span class="number">4.4</span>, <span class="number">8.1</span>, <span class="number">6.4</span>, <span class="number">4.4</span>];
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">PsoProblem</span> {
-            <span class="ident">counter</span>: <span class="ident">std::cell::RefCell::new</span>(<span class="number">0</span>),
+            <span class="ident">counter</span>: <span class="ident">std::sync::Mutex::new</span>(<span class="number">0</span>),
             <span class="ident">values</span>,
         });
 
@@ -1387,7 +1413,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_next_iter</span>() {
         <span class="kw">struct</span> <span class="ident">PsoProblem</span> {
-            <span class="ident">counter</span>: <span class="ident">std::cell::RefCell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+            <span class="ident">counter</span>: <span class="ident">std::sync::Mutex</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
             <span class="ident">values</span>: [<span class="ident">f64</span>; <span class="number">10</span>],
         }
 
@@ -1396,8 +1422,8 @@
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
 
             <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">values</span>[<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">borrow</span>() <span class="op">%</span> <span class="number">10</span>];
-                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">borrow_mut</span>() <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">values</span>[<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() <span class="op">%</span> <span class="number">10</span>];
+                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">cost</span>)
             }
         }
@@ -1405,7 +1431,7 @@
         <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> [<span class="number">1.0</span>, <span class="number">4.0</span>, <span class="number">10.0</span>, <span class="number">2.0</span>, <span class="op">-</span><span class="number">3.0</span>, <span class="number">8.0</span>, <span class="number">4.4</span>, <span class="number">8.1</span>, <span class="number">6.4</span>, <span class="number">4.4</span>];
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">PsoProblem</span> {
-            <span class="ident">counter</span>: <span class="ident">std::cell::RefCell::new</span>(<span class="number">0</span>),
+            <span class="ident">counter</span>: <span class="ident">std::sync::Mutex::new</span>(<span class="number">0</span>),
             <span class="ident">values</span>,
         });
 
