@@ -95,6 +95,7 @@ impl Hessian for MaxEntropy {
     }
 }
 
+// TODO fix this, there should be only one macro.
 macro_rules! entropy_max_tests {
     ($($name:ident: $solver:expr,)*) => {
     $(
@@ -102,7 +103,37 @@ macro_rules! entropy_max_tests {
         fn $name() {
             let cost_func = MaxEntropy::new();
             let res = Executor::new(cost_func.clone(), $solver)
-                .configure(|config| config.param(cost_func.param_init.clone()).max_iters(100))
+                .configure(|state| {
+                    state
+                        .param(cost_func.param_init.clone())
+                        .max_iters(100)
+                })
+                .run()
+                .unwrap();
+
+            assert_relative_eq!(
+                cost_func.cost(res.state.get_param().unwrap()).unwrap(),
+                cost_func.cost(&cost_func.param_opt).unwrap(),
+                epsilon = 1e-6
+            );
+        }
+    )*
+    }
+}
+
+macro_rules! entropy_max_tests_with_inv_hessian {
+    ($($name:ident: $solver:expr,)*) => {
+    $(
+        #[test]
+        fn $name() {
+            let cost_func = MaxEntropy::new();
+            let res = Executor::new(cost_func.clone(), $solver)
+                .configure(|state| {
+                    state
+                        .param(cost_func.param_init.clone())
+                        .inv_hessian(Array2::eye(3))
+                        .max_iters(100)
+                })
                 .run()
                 .unwrap();
 
@@ -119,10 +150,13 @@ macro_rules! entropy_max_tests {
 entropy_max_tests! {
      test_max_entropy_lbfgs_morethuente: LBFGS::new(MoreThuenteLineSearch::new(), 10),
      test_max_entropy_lbfgs_hagerzhang: LBFGS::new(HagerZhangLineSearch::new(), 10),
-     test_max_entropy_bfgs: BFGS::new(Array2::eye(3), MoreThuenteLineSearch::new()),
      test_max_entropy_dfp: DFP::new(Array2::eye(3), MoreThuenteLineSearch::new()),
      test_max_entropy_newton_cg: NewtonCG::new(MoreThuenteLineSearch::new()),
      test_max_entropy_steepest_descent: SteepestDescent::new(MoreThuenteLineSearch::new()),
+}
+
+entropy_max_tests_with_inv_hessian! {
+     test_max_entropy_bfgs: BFGS::new(MoreThuenteLineSearch::new()),
 }
 
 #[test]

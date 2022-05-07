@@ -5,23 +5,26 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Quasi-Newton methods
+//! # Quasi-Newton methods
 //!
-//! [BFGS](BFGS/struct.BFGS.html)
+//! * [`BFGS`]
+//! * [`DFP`]
+//! * [`LBFGS`]
+//! * [`SR1TrustRegion`]
 //!
-//! # References:
+//! ## Reference
 //!
-//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-pub mod bfgs;
-pub mod dfp;
-pub mod lbfgs;
-pub mod sr1;
-pub mod sr1_trustregion;
+mod bfgs;
+mod dfp;
+mod lbfgs;
+mod sr1;
+mod sr1_trustregion;
 
-pub use self::bfgs::*;
-pub use self::dfp::*;
-pub use self::lbfgs::*;
-pub use self::sr1::*;
-pub use self::sr1_trustregion::*;
+pub use self::bfgs::BFGS;
+pub use self::dfp::DFP;
+pub use self::lbfgs::LBFGS;
+pub use self::sr1::SR1;
+pub use self::sr1_trustregion::SR1TrustRegion;
