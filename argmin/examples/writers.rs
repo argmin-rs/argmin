@@ -49,7 +49,7 @@ fn run() -> Result<(), Error> {
     let linesearch = MoreThuenteLineSearch::new();
 
     // Set up solver
-    let solver = BFGS::new(init_hessian, linesearch);
+    let solver = BFGS::new(linesearch);
 
     // Create writer
     // Set serializer to Bincode
@@ -60,7 +60,12 @@ fn run() -> Result<(), Error> {
     let writer2 = WriteToFile::new("params", "best", WriteToFileSerializer::JSON);
 
     let res = Executor::new(cost, solver)
-        .configure(|state| state.param(init_param).max_iters(10))
+        .configure(|state| {
+            state
+                .param(init_param)
+                .inv_hessian(init_hessian)
+                .max_iters(10)
+        })
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .add_observer(writer, ObserverMode::Every(3))
         .add_observer(writer2, ObserverMode::NewBest)

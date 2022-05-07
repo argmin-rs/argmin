@@ -568,7 +568,7 @@ mod tests {
             ParticleSwarm::new((lower_bound, upper_bound), num_particles);
 
         struct PsoProblem {
-            counter: std::sync::Mutex<usize>,
+            counter: std::sync::Arc<std::sync::Mutex<usize>>,
             values: [f64; 10],
         }
 
@@ -577,16 +577,17 @@ mod tests {
             type Output = f64;
 
             fn cost(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
-                let cost = self.values[*self.counter.lock().unwrap()];
-                *self.counter.lock().unwrap() += 1;
+                let mut counter = self.counter.lock().unwrap();
+                let cost = self.values[*counter];
+                *counter += 1;
                 Ok(cost)
             }
         }
 
-        let mut values = [1.0, 4.0, 10.0, 2.0, -3.0, 8.0, 4.4, 8.1, 6.4, 4.4];
+        let mut values = [1.0, 4.0, 10.0, 2.0, -3.0, 8.0, 4.4, 8.1, 6.4, 4.5];
 
         let mut problem = Problem::new(PsoProblem {
-            counter: std::sync::Mutex::new(0),
+            counter: std::sync::Arc::new(std::sync::Mutex::new(0)),
             values,
         });
 
