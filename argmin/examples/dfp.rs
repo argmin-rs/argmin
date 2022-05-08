@@ -49,11 +49,16 @@ fn run() -> Result<(), Error> {
     let linesearch = MoreThuenteLineSearch::new().with_c(1e-4, 0.9)?;
 
     // Set up solver
-    let solver = DFP::new(init_hessian, linesearch);
+    let solver = DFP::new(linesearch);
 
     // Run solver
     let res = Executor::new(cost, solver)
-        .configure(|state| state.param(init_param).max_iters(1000))
+        .configure(|state| {
+            state
+                .param(init_param)
+                .inv_hessian(init_hessian)
+                .max_iters(1000)
+        })
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 

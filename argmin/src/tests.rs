@@ -150,13 +150,13 @@ macro_rules! entropy_max_tests_with_inv_hessian {
 entropy_max_tests! {
      test_max_entropy_lbfgs_morethuente: LBFGS::new(MoreThuenteLineSearch::new(), 10),
      test_max_entropy_lbfgs_hagerzhang: LBFGS::new(HagerZhangLineSearch::new(), 10),
-     test_max_entropy_dfp: DFP::new(Array2::eye(3), MoreThuenteLineSearch::new()),
      test_max_entropy_newton_cg: NewtonCG::new(MoreThuenteLineSearch::new()),
      test_max_entropy_steepest_descent: SteepestDescent::new(MoreThuenteLineSearch::new()),
 }
 
 entropy_max_tests_with_inv_hessian! {
      test_max_entropy_bfgs: BFGS::new(MoreThuenteLineSearch::new()),
+     test_max_entropy_dfp: DFP::new(MoreThuenteLineSearch::new()),
 }
 
 #[test]
