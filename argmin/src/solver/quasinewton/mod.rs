@@ -10,6 +10,7 @@
 //! * [`BFGS`]
 //! * [`DFP`]
 //! * [`LBFGS`]
+//! * [`SR1`]
 //! * [`SR1TrustRegion`]
 //!
 //! ## Reference
