@@ -10,7 +10,7 @@ use num_complex::Complex;
 
 macro_rules! make_dot_vec {
     ($t:ty) => {
-        impl<'a> ArgminDot<$t, $t> for $t {
+        impl ArgminDot<$t, $t> for $t {
             #[inline]
             fn dot(&self, other: &$t) -> $t {
                 self * other

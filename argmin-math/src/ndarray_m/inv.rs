@@ -13,7 +13,7 @@ use num_complex::Complex;
 
 macro_rules! make_inv {
     ($t:ty) => {
-        impl<'a> ArgminInv<Array2<$t>> for Array2<$t>
+        impl ArgminInv<Array2<$t>> for Array2<$t>
         where
             Array2<$t>: Inverse,
         {

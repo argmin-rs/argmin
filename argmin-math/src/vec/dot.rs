@@ -11,21 +11,21 @@ use num_complex::Complex;
 
 macro_rules! make_dot_vec {
     ($t:ty) => {
-        impl<'a> ArgminDot<Vec<$t>, $t> for Vec<$t> {
+        impl ArgminDot<Vec<$t>, $t> for Vec<$t> {
             #[inline]
             fn dot(&self, other: &Vec<$t>) -> $t {
                 self.iter().zip(other.iter()).map(|(a, b)| a * b).sum()
             }
         }
 
-        impl<'a> ArgminDot<$t, Vec<$t>> for Vec<$t> {
+        impl ArgminDot<$t, Vec<$t>> for Vec<$t> {
             #[inline]
             fn dot(&self, other: &$t) -> Vec<$t> {
                 self.iter().map(|a| a * other).collect()
             }
         }
 
-        impl<'a> ArgminDot<Vec<$t>, Vec<$t>> for $t {
+        impl ArgminDot<Vec<$t>, Vec<$t>> for $t {
             #[inline]
             fn dot(&self, other: &Vec<$t>) -> Vec<$t> {
                 other.iter().map(|a| a * self).collect()
@@ -74,7 +74,7 @@ macro_rules! make_dot_vec {
             }
         }
 
-        impl<'a> ArgminDot<$t, Vec<Vec<$t>>> for Vec<Vec<$t>> {
+        impl ArgminDot<$t, Vec<Vec<$t>>> for Vec<Vec<$t>> {
             #[inline]
             fn dot(&self, other: &$t) -> Vec<Vec<$t>> {
                 (0..self.len())
@@ -83,7 +83,7 @@ macro_rules! make_dot_vec {
             }
         }
 
-        impl<'a> ArgminDot<Vec<Vec<$t>>, Vec<Vec<$t>>> for $t {
+        impl ArgminDot<Vec<Vec<$t>>, Vec<Vec<$t>>> for $t {
             #[inline]
             fn dot(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {
                 (0..other.len())
