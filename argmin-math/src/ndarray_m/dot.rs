@@ -25,7 +25,7 @@ macro_rules! make_dot_ndarray {
             }
         }
 
-        impl<'a> ArgminDot<Array1<$t>, Array1<$t>> for $t {
+        impl ArgminDot<Array1<$t>, Array1<$t>> for $t {
             #[inline]
             fn dot(&self, other: &Array1<$t>) -> Array1<$t> {
                 other * *self
@@ -66,7 +66,7 @@ macro_rules! make_dot_ndarray {
             }
         }
 
-        impl<'a> ArgminDot<Array2<$t>, Array2<$t>> for $t {
+        impl ArgminDot<Array2<$t>, Array2<$t>> for $t {
             #[inline]
             fn dot(&self, other: &Array2<$t>) -> Array2<$t> {
                 other * *self
@@ -91,7 +91,7 @@ macro_rules! make_dot_complex_ndarray {
             }
         }
 
-        impl<'a> ArgminDot<Array1<Complex<$t>>, Array1<Complex<$t>>> for Complex<$t> {
+        impl ArgminDot<Array1<Complex<$t>>, Array1<Complex<$t>>> for Complex<$t> {
             #[inline]
             fn dot(&self, other: &Array1<Complex<$t>>) -> Array1<Complex<$t>> {
                 other * *self
@@ -132,7 +132,7 @@ macro_rules! make_dot_complex_ndarray {
             }
         }
 
-        impl<'a> ArgminDot<Array2<Complex<$t>>, Array2<Complex<$t>>> for Complex<$t> {
+        impl ArgminDot<Array2<Complex<$t>>, Array2<Complex<$t>>> for Complex<$t> {
             #[inline]
             fn dot(&self, other: &Array2<Complex<$t>>) -> Array2<Complex<$t>> {
                 other * *self
