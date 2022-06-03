@@ -533,7 +533,7 @@ mod tests {
 
         let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new()
             .param(param)
-            .grad(gradient.clone())
+            .grad(gradient)
             .hessian(hessian.clone());
 
         let problem = TestProblem::new();
