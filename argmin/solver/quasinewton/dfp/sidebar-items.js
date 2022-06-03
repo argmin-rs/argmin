@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["DFP","DFP method"]]});

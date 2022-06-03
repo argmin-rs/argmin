@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["bfgs","References:"],["dfp","References:"],["lbfgs","References:"],["sr1","References:"],["sr1_trustregion","References:"]]});
+initSidebarItems({"struct":[["BFGS","BFGS method"],["DFP","Davidon-Fletcher-Powell (DFP) method"],["LBFGS","Limited-memory BFGS (L-BFGS) method"],["SR1","Symmetric rank-one (SR1) method"],["SR1TrustRegion","SR1 Trust region method"]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["SR1TrustRegion","SR1 Trust Region method"]]});
