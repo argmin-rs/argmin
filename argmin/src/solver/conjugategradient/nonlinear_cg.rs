@@ -232,6 +232,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::let_unit_value)]
+
     use super::*;
     use crate::core::test_utils::TestProblem;
     use crate::core::ArgminError;

@@ -220,6 +220,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::let_unit_value)]
+
     use super::*;
     use crate::core::ArgminError;
     #[cfg(feature = "ndarrayl")]
