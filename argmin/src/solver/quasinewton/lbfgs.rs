@@ -193,9 +193,15 @@ where
         problem: &mut Problem<O>,
         mut state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
-        let param = state.take_param().unwrap();
+        let param = state.take_param().ok_or_else(argmin_error_closure!(
+            PotentialBug,
+            "`L-BFGS`: Parameter vector in state not set."
+        ))?;
         let cur_cost = state.get_cost();
-        let prev_grad = state.take_grad().unwrap();
+        let prev_grad = state.take_grad().ok_or_else(argmin_error_closure!(
+            PotentialBug,
+            "`L-BFGS`: Gradient in state not set."
+        ))?;
 
         let gamma: F = if let (Some(sk), Some(yk)) = (self.s.back(), self.y.back()) {
             sk.dot(yk) / yk.dot(yk)
