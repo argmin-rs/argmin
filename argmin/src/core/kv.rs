@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use std::fmt;
-use std::fmt::Display;
+use std::fmt::{Debug, Display};
 use std::rc::Rc;
 
 /// A simple key-value storage
@@ -39,6 +39,12 @@ pub struct KV {
     pub kv: Vec<(&'static str, Rc<dyn Display>)>,
 }
 
+impl Debug for KV {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "{}", self)?;
+        Ok(())
+    }
+}
 impl Display for KV {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "KV")?;

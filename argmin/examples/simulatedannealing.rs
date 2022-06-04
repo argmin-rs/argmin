@@ -94,29 +94,28 @@ fn run() -> Result<(), Error> {
     // Define initial temperature
     let temp = 15.0;
 
-    // Seed RNG
-    let rng = Xoshiro256PlusPlus::from_entropy();
-
     // Set up simulated annealing solver
-    let solver = SimulatedAnnealing::new(temp, rng)?
+    // An alternative random number generator (RNG) can be provided to `new_with_rng`:
+    // SimulatedAnnealing::new_with_rng(temp, Xoshiro256PlusPlus::from_entropy())?
+    let solver = SimulatedAnnealing::new(temp)?
         // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
-        .temp_func(SATempFunc::Boltzmann)
+        .with_temp_func(SATempFunc::Boltzmann)
         /////////////////////////
         // Stopping criteria   //
         /////////////////////////
         // Optional: stop if there was no new best solution after 1000 iterations
-        .stall_best(1000)
+        .with_stall_best(1000)
         // Optional: stop if there was no accepted solution after 1000 iterations
-        .stall_accepted(1000)
+        .with_stall_accepted(1000)
         /////////////////////////
         // Reannealing         //
         /////////////////////////
         // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
-        .reannealing_fixed(1000)
+        .with_reannealing_fixed(1000)
         // Optional: Reanneal after no accepted solution has been found for `iter` iterations
-        .reannealing_accepted(500)
+        .with_reannealing_accepted(500)
         // Optional: Start reannealing after no new best solution has been found for 800 iterations
-        .reannealing_best(800);
+        .with_reannealing_best(800);
 
     /////////////////////////
     // Run solver          //
