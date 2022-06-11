@@ -142,6 +142,12 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -150,7 +156,7 @@
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>};
 <span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
 
 <span class="doccomment">/// A simple key-value storage</span>
@@ -183,6 +189,12 @@
     <span class="kw">pub</span> <span class="ident">kv</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Rc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Display</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
 }
 
+<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">KV</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
+}
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">KV</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;KV&quot;</span>)<span class="question-mark">?</span>;
