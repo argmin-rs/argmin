@@ -57,7 +57,7 @@ fn run() -> Result<(), Error> {
     // let init_hessian: Array2<f64> = Array2::eye(8);
 
     // Set up the subproblem
-    let subproblem = Steihaug::new().max_iters(20);
+    let subproblem = Steihaug::new().with_max_iters(20);
     // let subproblem = CauchyPoint::new();
     // let subproblem = Dogleg::new();
 
