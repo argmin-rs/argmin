@@ -53,7 +53,7 @@ where
     /// ```
     /// # use argmin::solver::quasinewton::SR1TrustRegion;
     /// # let subproblem = ();
-    /// let subproblem = argmin::solver::trustregion::Steihaug::new().max_iters(20);
+    /// let subproblem = argmin::solver::trustregion::Steihaug::new().with_max_iters(20);
     /// # // The next line defines the type of `subproblem`. This is done here hidden in order to
     /// # // not litter the docs. When all of this is fed into an Executor, the compiler will
     /// # // figure out the types.

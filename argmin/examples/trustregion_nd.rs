@@ -25,6 +25,7 @@ impl CostFunction for Rosenbrock {
         Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
     }
 }
+
 impl Gradient for Rosenbrock {
     type Param = Array1<f64>;
     type Gradient = Array1<f64>;
@@ -59,9 +60,9 @@ fn run() -> Result<(), Error> {
     let init_param: Array1<f64> = Array1::from(vec![-1.2, 1.0]);
 
     // Set up the subproblem
-    // let subproblem = Steihaug::new().max_iters(2);
-    // let subproblem = CauchyPoint::new();
-    let subproblem = Dogleg::new();
+    // let subproblem = Steihaug::new().with_max_iters(2);
+    let subproblem = CauchyPoint::new();
+    // let subproblem = Dogleg::new();
 
     // Set up solver
     let solver = TrustRegion::new(subproblem);

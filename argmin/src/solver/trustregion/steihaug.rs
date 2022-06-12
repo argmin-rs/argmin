@@ -5,11 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # References:
-//!
-//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
-//! Springer. ISBN 0-387-30303-0.
-
 use crate::core::{
     ArgminFloat, Error, IterState, Problem, SerializeAlias, Solver, State, TerminationReason,
     TrustRegionRadius, KV,
@@ -18,12 +13,14 @@ use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
+/// # Steihaug method
+///
 /// The Steihaug method is a conjugate gradients based approach for finding an approximate solution
 /// to the second order approximation of the cost function within the trust region.
 ///
-/// # References:
+/// ## Reference
 ///
-/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -51,7 +48,14 @@ where
     P: ArgminMul<F, P> + ArgminDot<P, F> + ArgminAdd<P, P>,
     F: ArgminFloat,
 {
-    /// Constructor
+    /// Construct a new instance of [`Steihaug`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::trustregion::Steihaug;
+    /// let sh: Steihaug<Vec<f64>, f64> = Steihaug::new();
+    /// ```
     pub fn new() -> Self {
         Steihaug {
             radius: F::nan(),
@@ -66,20 +70,47 @@ where
     }
 
     /// Set epsilon
-    pub fn epsilon(mut self, epsilon: F) -> Result<Self, Error> {
+    ///
+    /// The algorithm stops when the residual is smaller than `epsilon`.
+    ///
+    /// Must be larger than 0 and defaults to 10^-10.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::trustregion::Steihaug;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// let sh: Steihaug<Vec<f64>, f64> = Steihaug::new().with_epsilon(10e-9)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_epsilon(mut self, epsilon: F) -> Result<Self, Error> {
         if epsilon <= float!(0.0) {
             return Err(argmin_error!(
                 InvalidParameter,
-                "Steihaug: epsilon must be > 0.0."
+                "`Steihaug`: epsilon must be > 0.0."
             ));
         }
         self.epsilon = epsilon;
         Ok(self)
     }
 
-    /// set maximum number of iterations
+    /// Set maximum number of iterations
+    ///
+    /// The algorithm stops after `iter` iterations.
+    ///
+    /// Defaults to `u64::MAX`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::trustregion::Steihaug;
+    /// # use argmin::core::Error;
+    /// let sh: Steihaug<Vec<f64>, f64> = Steihaug::new().with_max_iters(100);
+    /// ```
     #[must_use]
-    pub fn max_iters(mut self, iters: u64) -> Self {
+    pub fn with_max_iters(mut self, iters: u64) -> Self {
         self.max_iters = iters;
         self
     }
@@ -164,7 +195,26 @@ where
         _problem: &mut Problem<O>,
         state: IterState<P, P, (), H, F>,
     ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
-        let r = state.get_grad().unwrap().clone();
+        let r = state
+            .get_grad()
+            .ok_or_else(argmin_error_closure!(
+                NotInitialized,
+                concat!(
+                    "`Steihaug` requires an initial gradient. ",
+                    "Please provide an initial gradient via `Executor`s `configure` method."
+                )
+            ))?
+            .clone();
+
+        if state.get_hessian().is_none() {
+            return Err(argmin_error!(
+                NotInitialized,
+                concat!(
+                    "`Steihaug` requires an initial Hessian. ",
+                    "Please provide an initial Hessian via `Executor`s `configure` method."
+                )
+            ));
+        }
 
         self.r_0_norm = r.norm();
         self.rtr = r.dot(&r);
@@ -182,8 +232,16 @@ where
         _problem: &mut Problem<O>,
         mut state: IterState<P, P, (), H, F>,
     ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
-        let grad = state.take_grad().unwrap();
-        let h = state.take_hessian().unwrap();
+        let grad = state.take_grad().ok_or_else(argmin_error_closure!(
+            PotentialBug,
+            "`Steihaug`: Gradient in state not set."
+        ))?;
+
+        let h = state.take_hessian().ok_or_else(argmin_error_closure!(
+            PotentialBug,
+            "`Steihaug`: Hessian in state not set."
+        ))?;
+
         let d = self.d.as_ref().unwrap();
         let dhd = d.weighted_dot(&h, d);
 
@@ -246,7 +304,18 @@ where
     }
 }
 
-impl<P: Clone + SerializeAlias, F: ArgminFloat> TrustRegionRadius<F> for Steihaug<P, F> {
+impl<P, F: ArgminFloat> TrustRegionRadius<F> for Steihaug<P, F> {
+    /// Set current radius.
+    ///
+    /// Needed by [`TrustRegion`](`crate::solver::trustregion::TrustRegion`).
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::solver::trustregion::{Steihaug, TrustRegionRadius};
+    /// let mut sh: Steihaug<Vec<f64>, f64> = Steihaug::new();
+    /// sh.set_radius(0.8);
+    /// ```
     fn set_radius(&mut self, radius: F) {
         self.radius = radius;
     }
@@ -256,7 +325,140 @@ impl<P: Clone + SerializeAlias, F: ArgminFloat> TrustRegionRadius<F> for Steihau
 mod tests {
     use super::*;
     use crate::core::test_utils::TestProblem;
+    use crate::core::ArgminError;
     use crate::test_trait_impl;
+    use approx::assert_relative_eq;
 
     test_trait_impl!(steihaug, Steihaug<TestProblem, f64>);
+
+    #[test]
+    fn test_new() {
+        let sh: Steihaug<Vec<f64>, f64> = Steihaug::new();
+
+        let Steihaug {
+            radius,
+            epsilon,
+            p,
+            r,
+            rtr,
+            r_0_norm,
+            d,
+            max_iters,
+        } = sh;
+
+        assert_eq!(radius.to_ne_bytes(), f64::NAN.to_ne_bytes());
+        assert_eq!(epsilon.to_ne_bytes(), 10e-10f64.to_ne_bytes());
+        assert!(p.is_none());
+        assert!(r.is_none());
+        assert_eq!(rtr.to_ne_bytes(), f64::NAN.to_ne_bytes());
+        assert_eq!(r_0_norm.to_ne_bytes(), f64::NAN.to_ne_bytes());
+        assert!(d.is_none());
+        assert_eq!(max_iters, u64::MAX);
+    }
+
+    #[test]
+    fn test_with_tolerance() {
+        for tolerance in [f64::EPSILON, 1e-10, 1e-12, 1e-6, 1.0, 10.0, 100.0] {
+            let sh: Steihaug<Vec<f64>, f64> = Steihaug::new().with_epsilon(tolerance).unwrap();
+            assert_eq!(sh.epsilon.to_ne_bytes(), tolerance.to_ne_bytes());
+        }
+
+        for tolerance in [-f64::EPSILON, 0.0, -1.0] {
+            let res: Result<Steihaug<Vec<f64>, f64>, _> = Steihaug::new().with_epsilon(tolerance);
+            assert_error!(
+                res,
+                ArgminError,
+                "Invalid parameter: \"`Steihaug`: epsilon must be > 0.0.\""
+            );
+        }
+    }
+
+    #[test]
+    fn test_max_iters() {
+        let sh: Steihaug<Vec<f64>, f64> = Steihaug::new();
+
+        let Steihaug { max_iters, .. } = sh;
+
+        assert_eq!(max_iters, u64::MAX);
+
+        for iters in [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144] {
+            let sh: Steihaug<Vec<f64>, f64> = Steihaug::new().with_max_iters(iters);
+
+            let Steihaug { max_iters, .. } = sh;
+
+            assert_eq!(max_iters, iters);
+        }
+    }
+
+    #[test]
+    fn test_init() {
+        let grad: Vec<f64> = vec![1.0, 2.0];
+        let hessian: Vec<Vec<f64>> = vec![vec![4.0, 3.0], vec![2.0, 1.0]];
+
+        let mut sh: Steihaug<Vec<f64>, f64> = Steihaug::new();
+        sh.set_radius(1.0);
+
+        // Forgot to initialize gradient
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new();
+        let problem = TestProblem::new();
+        let res = sh.init(&mut Problem::new(problem), state);
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`Steihaug` requires an initial gradient. Please ",
+                "provide an initial gradient via `Executor`s `configure` method.\""
+            )
+        );
+
+        // Forgot to initialize Hessian
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+            IterState::new().grad(grad.clone());
+        let problem = TestProblem::new();
+        let res = sh.init(&mut Problem::new(problem), state);
+        assert_error!(
+            res,
+            ArgminError,
+            concat!(
+                "Not initialized: \"`Steihaug` requires an initial Hessian. Please ",
+                "provide an initial Hessian via `Executor`s `configure` method.\""
+            )
+        );
+
+        // All good.
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+            IterState::new().grad(grad.clone()).hessian(hessian);
+        let problem = TestProblem::new();
+        let (mut state_out, kv) = sh.init(&mut Problem::new(problem), state).unwrap();
+
+        assert!(kv.is_none());
+
+        let s_param = state_out.take_param().unwrap();
+
+        assert_relative_eq!(s_param[0], 0.0f64.sqrt(), epsilon = f64::EPSILON);
+        assert_relative_eq!(s_param[1], 0.0f64.sqrt(), epsilon = f64::EPSILON);
+
+        let Steihaug {
+            radius,
+            epsilon,
+            p,
+            r,
+            rtr,
+            r_0_norm,
+            d,
+            max_iters,
+        } = sh;
+
+        assert_eq!(radius.to_ne_bytes(), 1.0f64.to_ne_bytes());
+        assert_eq!(epsilon.to_ne_bytes(), 10e-10f64.to_ne_bytes());
+        assert_relative_eq!(p.as_ref().unwrap()[0], 0.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(p.as_ref().unwrap()[1], 0.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(r.as_ref().unwrap()[0], grad[0], epsilon = f64::EPSILON);
+        assert_relative_eq!(r.as_ref().unwrap()[1], grad[1], epsilon = f64::EPSILON);
+        assert_eq!(rtr.to_ne_bytes(), 5.0f64.to_ne_bytes());
+        assert_eq!(r_0_norm.to_ne_bytes(), (5.0f64).sqrt().to_ne_bytes());
+        assert_relative_eq!(d.as_ref().unwrap()[0], -grad[0], epsilon = f64::EPSILON);
+        assert_relative_eq!(d.as_ref().unwrap()[1], -grad[1], epsilon = f64::EPSILON);
+        assert_eq!(max_iters, u64::MAX);
+    }
 }
