@@ -224,11 +224,11 @@ mod tests {
 
     use super::*;
     use crate::core::ArgminError;
-    #[cfg(feature = "ndarrayl")]
+    #[cfg(feature = "_ndarrayl")]
     use crate::core::{IterState, State};
     use crate::solver::linesearch::{condition::ArmijoCondition, BacktrackingLineSearch};
     use crate::{assert_error, test_trait_impl};
-    #[cfg(feature = "ndarrayl")]
+    #[cfg(feature = "_ndarrayl")]
     use approx::assert_relative_eq;
 
     test_trait_impl!(
@@ -283,7 +283,7 @@ mod tests {
         );
     }
 
-    #[cfg(feature = "ndarrayl")]
+    #[cfg(feature = "_ndarrayl")]
     #[test]
     fn test_line_search_sub_problem() {
         use ndarray::{Array, Array1, Array2};
@@ -331,7 +331,7 @@ mod tests {
         assert_relative_eq!(res[1], 2.0 * 0.5 + 4.0 * 2.0, epsilon = f64::EPSILON);
     }
 
-    #[cfg(feature = "ndarrayl")]
+    #[cfg(feature = "_ndarrayl")]
     #[test]
     fn test_next_iter_param_not_initialized() {
         use ndarray::{Array, Array1, Array2};
@@ -374,7 +374,7 @@ mod tests {
         );
     }
 
-    #[cfg(feature = "ndarrayl")]
+    #[cfg(feature = "_ndarrayl")]
     #[test]
     fn test_next_iter_regression() {
         use ndarray::{Array, Array1, Array2};
