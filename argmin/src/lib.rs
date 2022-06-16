@@ -163,10 +163,10 @@
 //!
 //! ## Running the tests and building the examples
 //!
-//! The tests and examples require a set of features to be enabled:
+//! For running all tests and examples, it is recommended to enable all features:
 //!
 //! ```bash
-//! cargo test --features "argmin/ctrlc,argmin-math/ndarray_latest-serde,argmin-math/nalgebra_latest-serde,argmin/ndarrayl"
+//! cargo test --all-features
 //! ```
 //!
 //! # Defining a problem
@@ -644,5 +644,5 @@ pub mod core;
 pub mod solver;
 
 #[cfg(test)]
-#[cfg(feature = "ndarrayl")]
+#[cfg(feature = "_ndarrayl")]
 mod tests;

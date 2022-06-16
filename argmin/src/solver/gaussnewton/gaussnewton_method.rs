@@ -161,10 +161,10 @@ where
 mod tests {
     use super::*;
     use crate::core::ArgminError;
-    #[cfg(feature = "ndarrayl")]
+    #[cfg(feature = "_ndarrayl")]
     use crate::core::Executor;
     use crate::test_trait_impl;
-    #[cfg(feature = "ndarrayl")]
+    #[cfg(feature = "_ndarrayl")]
     use approx::assert_relative_eq;
 
     test_trait_impl!(gauss_newton_method, GaussNewton<f64>);
@@ -233,7 +233,7 @@ mod tests {
         );
     }
 
-    #[cfg(feature = "ndarrayl")]
+    #[cfg(feature = "_ndarrayl")]
     #[test]
     fn test_next_iter_param_not_initialized() {
         use ndarray::{Array, Array1, Array2};
@@ -270,7 +270,7 @@ mod tests {
         );
     }
 
-    #[cfg(feature = "ndarrayl")]
+    #[cfg(feature = "_ndarrayl")]
     #[test]
     fn test_solver() {
         use crate::core::State;
