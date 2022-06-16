@@ -816,10 +816,10 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Running the tests and building the examples</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The tests and examples require a set of features to be enabled:</span>
+<span class="doccomment">//! For running all tests and examples, it is recommended to enable all features:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```bash</span>
-<span class="doccomment">//! cargo test --features &quot;argmin/ctrlc,argmin-math/ndarray_latest-serde,argmin-math/nalgebra_latest-serde,argmin/ndarrayl&quot;</span>
+<span class="doccomment">//! cargo test --all-features</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Defining a problem</span>
@@ -1297,7 +1297,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">solver</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>

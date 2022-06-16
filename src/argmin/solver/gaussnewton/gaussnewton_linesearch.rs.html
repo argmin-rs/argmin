@@ -697,11 +697,11 @@
 
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::ArgminError</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">IterState</span>, <span class="ident">State</span>};
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::linesearch</span>::{<span class="ident">condition::ArmijoCondition</span>, <span class="ident">BacktrackingLineSearch</span>};
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">assert_error</span>, <span class="ident">test_trait_impl</span>};
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
     <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
 
     <span class="macro">test_trait_impl!</span>(
@@ -756,7 +756,7 @@
         );
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_line_search_sub_problem</span>() {
         <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">Array</span>, <span class="ident">Array1</span>, <span class="ident">Array2</span>};
@@ -804,7 +804,7 @@
         <span class="macro">assert_relative_eq!</span>(<span class="ident">res</span>[<span class="number">1</span>], <span class="number">2.0</span> <span class="op">*</span> <span class="number">0.5</span> <span class="op">+</span> <span class="number">4.0</span> <span class="op">*</span> <span class="number">2.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_next_iter_param_not_initialized</span>() {
         <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">Array</span>, <span class="ident">Array1</span>, <span class="ident">Array2</span>};
@@ -847,7 +847,7 @@
         );
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarrayl&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_next_iter_regression</span>() {
         <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">Array</span>, <span class="ident">Array1</span>, <span class="ident">Array2</span>};
