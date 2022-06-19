@@ -27,7 +27,7 @@
 //! `argmin-math` crate. All operations can be performed with 32 and 64 bit floats. Custom types are
 //! of course also supported.
 //!
-//! # Features
+//! # Highlights
 //!
 //! * [Checkpointing](`crate::core::checkpointing`)
 //! * [Observers](`crate::core::observers`)
@@ -117,7 +117,7 @@
 //! (For which features to select for `argmin-math` please see the
 //! [documentation](https://docs.rs/argmin/latest/argmin-math).)
 //!
-//! ## Features
+//! ## Crate features
 //!
 //! ### Default features
 //!
@@ -176,7 +176,7 @@
 //!
 //! # Defining a problem
 //!
-//! TODO TODO TODO TODO Rewrite! Also mention bulk methods.
+//! TODO TODO TODO TODO Remove after argmin book is online.
 //! A problem can be defined by implementing the `ArgminOp` trait which comes with the
 //! associated types `Param`, `Output` and `Hessian`. `Param` is the type of your
 //! parameter vector (i.e. the input to your cost function), `Output` is the type returned
