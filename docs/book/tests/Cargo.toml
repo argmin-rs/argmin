@@ -1,0 +1,11 @@
+[package]
+name = "tests"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+doc-comment = "0.3.3"
+argmin = { path = "../../../argmin", features = ["serde1", "slog-logger", "ctrlc", "wasm-bindgen", "rayon"] }
+argmin-math = { path = "../../../argmin-math", features = ["latest_all"] }
+argmin_testfunctions = "*"

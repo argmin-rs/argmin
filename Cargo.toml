@@ -4,3 +4,7 @@ members = [
     "argmin",
     "argmin-math",
 ]
+
+exclude = [
+    "docs/book/tests",
+]

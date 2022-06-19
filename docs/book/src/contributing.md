@@ -1,0 +1,4 @@
+# Contributing
+
+## Running the tests
+
