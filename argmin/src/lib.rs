@@ -40,52 +40,50 @@
 //!
 //! # Algorithms
 //!
-//! - [Line searches](solver/linesearch/index.html)
+//! - [Line searches](`crate::solver::linesearch`)
+//!   - [Backtracking line search](`crate::solver::linesearch::BacktrackingLineSearch`)
+//!   - [More-Thuente line search](`crate::solver::linesearch::MoreThuenteLineSearch`)
+//!   - [Hager-Zhang line search](`crate::solver::linesearch::HagerZhangLineSearch`)
 //!
-//!   - [Backtracking line search](solver/linesearch/backtracking/struct.BacktrackingLineSearch.html)
-//!   - [More-Thuente line search](solver/linesearch/morethuente/struct.MoreThuenteLineSearch.html)
-//!   - [Hager-Zhang line search](solver/linesearch/hagerzhang/struct.HagerZhangLineSearch.html)
-//!
-//! - [Trust region method](solver/trustregion/trustregion_method/struct.TrustRegion.html)
-//!
-//!   - [Cauchy point method](solver/trustregion/cauchypoint/struct.CauchyPoint.html)
-//!   - [Dogleg method](solver/trustregion/dogleg/struct.Dogleg.html)
-//!   - [Steihaug method](solver/trustregion/steihaug/struct.Steihaug.html)
+//! - [Trust region method](`crate::solver::trustregion::TrustRegion`)
+//!   - [Cauchy point method](`crate::solver::trustregion::CauchyPoint`)
+//!   - [Dogleg method](`crate::solver::trustregion::Dogleg`)
+//!   - [Steihaug method](`crate::solver::trustregion::Steihaug`)
 //!   
-//! - [Steepest descent](solver/gradientdescent/steepestdescent/struct.SteepestDescent.html)
+//! - [Steepest descent](`crate::solver::gradientdescent::SteepestDescent`)
 //!
-//! - [Conjugate gradient method](solver/conjugategradient/cg/struct.ConjugateGradient.html)
+//! - [Conjugate gradient methods](`crate::solver::conjugategradient`)
+//!   - [Conjugate gradient method](`crate::solver::conjugategradient::ConjugateGradient`)
+//!   - [Nonlinear conjugate gradient method](`crate::solver::conjugategradient::NonlinearConjugateGradient`)
 //!
-//! - [Nonlinear conjugate gradient method](solver/conjugategradient/nonlinear_cg/struct.NonlinearConjugateGradient.html)
-//!
-//! - [Newton methods](solver/newton/index.html)
-//!
-//!   - [Newton's method](solver/newton/newton_method/struct.Newton.html)
+//! - [Newton methods](`crate::solver::newton`)
+//!   - [Newton's method](`crate::solver::newton::Newton`)
 //!   - [Newton-CG](solver/newton/newton_cg/struct.NewtonCG.html)
 //!
-//! - [Quasi-Newton methods](solver/quasinewton/index.html)
+//! - [Quasi-Newton methods](`crate::solver::quasinewton`)
+//!   - [BFGS](`crate::solver::quasinewton::BFGS`)
+//!   - [L-BFGS](`crate::solver::quasinewton::LBFGS`)
+//!   - [DFP](`crate::solver::quasinewton::DFP`)
+//!   - [SR1](`crate::solver::quasinewton::SR1`)
+//!   - [SR1-TrustRegion](`crate::solver::quasinewton::SR1TrustRegion`)
 //!
-//!   - [BFGS](solver/quasinewton/bfgs/struct.BFGS.html)
-//!   - [L-BFGS](solver/quasinewton/lbfgs/struct.LBFGS.html)
-//!   - [DFP](solver/quasinewton/dfp/struct.DFP.html)
-//!   - [SR1](solver/quasinewton/sr1/struct.SR1.html)
-//!   - [SR1-TrustRegion](solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html)
+//! - [Gauss-Newton methods](`crate::solver::gaussnewton`)
+//!   - [Gauss-Newton method](`crate::solver::gaussnewton::GaussNewton`)
+//!   - [Gauss-Newton method with linesearch](`crate::solver::gaussnewton::GaussNewtonLS`)
 //!
-//! - [Gauss-Newton method](solver/gaussnewton/gaussnewton_method/struct.GaussNewton.html)
+//! - [Golden-section search](`crate::solver::goldensectionsearch::GoldenSectionSearch`)
 //!
-//! - [Gauss-Newton method with linesearch](solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLS.html)
+//! - [Landweber iteration](`crate::solver::landweber::Landweber`)
 //!
-//! - [Golden-section search](solver/goldensectionsearch/struct.GoldenSectionSearch.html)
+//! - [Brent's methods](`crate::solver::brent`)
+//!   - [Brent's minimization method](`crate::solver::brent::BrentOpt`)
+//!   - [Brent's root finding method](`crate::solver::brent::BrentRoot`)
 //!
-//! - [Landweber iteration](solver/landweber/struct.Landweber.html)
+//! - [Nelder-Mead method](`crate::solver::neldermead::NelderMead`)
 //!
-//! - [Brent's method](solver/brent/struct.Brent.html)
+//! - [Simulated Annealing](`crate::solver::simulatedannealing::SimulatedAnnealing`)
 //!
-//! - [Nelder-Mead method](solver/neldermead/struct.NelderMead.html)
-//!
-//! - [Simulated Annealing](solver/simulatedannealing/struct.SimulatedAnnealing.html)
-//!
-//! - [Particle Swarm Optimization](solver/particleswarm/struct.ParticleSwarm.html)
+//! - [Particle Swarm Optimization](`crate::solver::particleswarm::ParticleSwarm`)
 //!
 //! # Examples
 //!
@@ -99,7 +97,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!(" argmin = \"", env!("CARGO_PKG_VERSION"), "\"")]
+#![doc = concat!("argmin = \"", env!("CARGO_PKG_VERSION"), "\"")]
 //! argmin-math = { version = "0.1.0", features = ["ndarray_latest-serde,nalgebra_latest-serde"] }
 //! ```
 //!
@@ -129,7 +127,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ctrlc\"] }")]
+#![doc = concat!("argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ctrlc\"] }")]
 //! ```
 //!
 //! The `rayon` feature adds `rayon` as a depenceny and allows for parallel computation of cost
@@ -139,7 +137,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"rayon\"] }")]
+#![doc = concat!("argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"rayon\"] }")]
 //! ```
 //!
 //! ### Experimental support for compiling to WebAssembly
@@ -155,7 +153,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!(" argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", default-features = false, features = [\"slog-logger\"] }")]
+#![doc = concat!("argmin = { version = \"", env!("CARGO_PKG_VERSION"), "\", default-features = false, features = [\"slog-logger\"] }")]
 //! ```
 //!
 //! Note that this will remove the ability to write parameters and logs to disk as well as
@@ -634,8 +632,6 @@
 // Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,
 // this is just to make sure that it will always stay this way.)
 #![deny(clippy::float_cmp)]
-
-// extern crate rand;
 
 #[macro_use]
 pub mod core;
