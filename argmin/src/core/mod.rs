@@ -22,7 +22,6 @@ mod executor;
 mod float;
 /// Key value datastructure
 mod kv;
-/// Observers
 pub mod observers;
 /// Trait alias for `Send` and `Sync`
 mod parallelization;

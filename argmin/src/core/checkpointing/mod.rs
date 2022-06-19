@@ -22,6 +22,8 @@
 //! If no checkpoint is available on disk, an optimization will be started from scratch. If the run
 //! crashes and a checkpoint is found on disk, then it will resume from the checkpoint.
 //!
+//! ## Example
+//!
 //! ```rust
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
