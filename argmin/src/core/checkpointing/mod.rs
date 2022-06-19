@@ -5,6 +5,98 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+//! # Checkpointing
+//!
+//! Checkpointing is a useful mechanism for mitigating the effects of crashes when software is run
+//! in unstable environment, particularly for long run times. Checkpoints are saved regularly with
+//! a user-chosen frequency. Optimizations can then be resumed from a given checkpoint after a
+//! crash.
+//!
+//! For saving checkpoints to disk, `FileCheckpoint` is provided.
+//! Via the `Checkpoint` trait other checkpointing approaches can be implemented.
+//!
+//! The `CheckpointingFrequency` defines how often checkpoints are saved and can be chosen to be
+//! either `Always` (every iteration), `Every(u64)` (every Nth iteration) or `Never`.
+//!
+//! The following example shows how the `checkpointing` method is used to activate checkpointing.
+//! If no checkpoint is available on disk, an optimization will be started from scratch. If the run
+//! crashes and a checkpoint is found on disk, then it will resume from the checkpoint.
+//!
+//! ```rust
+//! # extern crate argmin;
+//! # extern crate argmin_testfunctions;
+//! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
+//! # #[cfg(feature = "serde1")]
+//! # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
+//! # #[cfg(feature = "slog-logger")]
+//! # use argmin::core::observers::SlogLogger;
+//! # use argmin::solver::landweber::Landweber;
+//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! #
+//! # #[derive(Default)]
+//! # struct Rosenbrock {}
+//! #
+//! # /// Implement `CostFunction` for `Rosenbrock`
+//! # impl CostFunction for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Output = f64;
+//! #
+//! #     /// Apply the cost function to a parameter `p`
+//! #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
+//! #     }
+//! # }
+//! #
+//! # /// Implement `Gradient` for `Rosenbrock`
+//! # impl Gradient for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Gradient = Vec<f64>;
+//! #
+//! #     /// Compute the gradient at parameter `p`.
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #     // define inital parameter vector
+//! #     let init_param: Vec<f64> = vec![1.2, 1.2];
+//! #     let my_optimization_problem = Rosenbrock {};
+//! #
+//! #     let iters = 35;
+//! #     let solver = Landweber::new(0.001);
+//! // [...]
+//!
+//! # #[cfg(feature = "serde1")]
+//! let checkpoint = FileCheckpoint::new(
+//!     ".checkpoints",
+//!     "optim",
+//!     CheckpointingFrequency::Every(20)
+//! );
+//!
+//! #
+//! # #[cfg(feature = "serde1")]
+//! let res = Executor::new(my_optimization_problem, solver)
+//!     .configure(|config| config.param(init_param).max_iters(iters))
+//!     .checkpointing(checkpoint)
+//!     .run()?;
+//!
+//! // [...]
+//! #
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{}", e);
+//! #     }
+//! # }
+//! ```
+
 #[cfg(feature = "serde1")]
 mod file;
 

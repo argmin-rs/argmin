@@ -13,7 +13,6 @@
 /// Macros
 #[macro_use]
 pub mod macros;
-/// Checkpointing
 pub mod checkpointing;
 /// Error handling
 mod errors;
