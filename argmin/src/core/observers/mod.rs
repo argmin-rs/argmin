@@ -7,9 +7,10 @@
 
 //! # Observers
 //!
-//! Observers are called after an iteration of a solver was performed and enable the user to observe
-//! the current state of the optimization. This can for instance be used for logging the state of
-//! the optimizor or for writing the current parameter vector to disk.
+//! Argmin offers an interface to observe the state of the solver at initialization as well as
+//! after every iteration. This includes the parameter vector, gradient, Jacobian, Hessian,
+//! iteration number, cost values and many more as well as solver-specific metrics. This interface
+//! can be used to implement loggers, send the information to a storage or to plot metrics.
 //!
 //! The observer [`WriteToFile`](`crate::core::observers::WriteToFile`) saves the parameter vector
 //! to disk and as such requires the parameter vector to be serializable. Hence this feature is
@@ -17,7 +18,111 @@
 //!
 //! The observer [`SlogLogger`](`crate::core::observers::SlogLogger`) logs the progress of the
 //! optimization to screen or to disk. This requires the `slog-logger` feature. Writing to disk
-//! requires the `serde1` feature in addition.
+//! in addtion requires the `serde1` feature.
+//!
+//! For each observer it can be defined how often it will observe the progress of the solver. This
+//! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`
+//! (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.
+//!
+//! Custom observers can be used as well by implementing the [`crate::core::observers::Observe`]
+//! trait.
+//!
+//! ## Example
+//!
+//! ```rust
+//! # #![allow(unused_imports)]
+//! # extern crate argmin;
+//! # extern crate argmin_testfunctions;
+//! # use argmin::core::{Error, Executor, CostFunction, Gradient, observers::ObserverMode};
+//! # #[cfg(feature = "slog-logger")]
+//! # use argmin::core::observers::SlogLogger;
+//! # #[cfg(feature = "serde1")]
+//! # use argmin::core::observers::{WriteToFile, WriteToFileSerializer};
+//! # use argmin::solver::gradientdescent::SteepestDescent;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! #
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # /// Implement `CostFunction` for `Rosenbrock`
+//! # impl CostFunction for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Output = f64;
+//! #
+//! #     /// Apply the cost function to a parameter `p`
+//! #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
+//! #     }
+//! # }
+//! #
+//! # /// Implement `Gradient` for `Rosenbrock`
+//! # impl Gradient for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec<f64>;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Gradient = Vec<f64>;
+//! #
+//! #     /// Compute the gradient at parameter `p`.
+//! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
+//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+//! #     }
+//! # }
+//! #
+//! # fn run() -> Result<(), Error> {
+//! #
+//! # // Define cost function (must implement `CostFunction` and `Gradient`)
+//! # let problem = Rosenbrock { a: 1.0, b: 100.0 };
+//! #
+//! # // Define initial parameter vector
+//! # let init_param: Vec<f64> = vec![-1.2, 1.0];
+//! #
+//! # // Set up line search
+//! # let linesearch = MoreThuenteLineSearch::new();
+//! #
+//! # // Set up solver
+//! # let solver = SteepestDescent::new(linesearch);
+//! #
+//! // [...]
+//!
+//! let res = Executor::new(problem, solver)
+//!     .configure(|config| config.param(init_param).max_iters(2))
+//! # ;
+//! # #[cfg(feature = "slog-logger")]
+//! # let res = res
+//!     // Add an observer which will log all iterations to the terminal (without blocking)
+//!     .add_observer(SlogLogger::term_noblock(), ObserverMode::Always)
+//! # ;
+//! # #[cfg(feature = "serde1")]
+//! # #[cfg(feature = "slog-logger")]
+//! # let res = res
+//!     // Log to file whenever a new best solution is found
+//!     .add_observer(SlogLogger::file("solver.log", false)?, ObserverMode::NewBest)
+//!     // Write parameter vector to `params/param.arg` every 20th iteration
+//!     .add_observer(
+//!         WriteToFile::new("params", "param", WriteToFileSerializer::JSON),
+//!         ObserverMode::Every(20)
+//!     )
+//! # ;
+//! # let res = res
+//!     // run the solver on the defined problem
+//!     .run()?;
+//!
+//! // [...]
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!("{}", e);
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//! ```
 
 #[cfg(feature = "serde1")]
 pub mod file;
