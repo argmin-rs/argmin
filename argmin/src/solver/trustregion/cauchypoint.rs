@@ -23,7 +23,7 @@ use std::fmt::Debug;
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
-#[derive(Clone, Debug, Copy, PartialEq, PartialOrd, Default)]
+#[derive(Clone, Debug, Copy, PartialEq, Eq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct CauchyPoint<F> {
     /// Radius
