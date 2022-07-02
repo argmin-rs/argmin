@@ -18,9 +18,11 @@ use serde::{Deserialize, Serialize};
 ///
 /// Gauss-Newton method where an appropriate step length is obtained by a line search.
 ///
-/// Requires that the provided optimization problem implements [`Operator`] and [`Jacobian`].
-///
 /// Requires an initial parameter vector.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`Operator`] and [`Jacobian`].
 ///
 /// ## Reference
 ///

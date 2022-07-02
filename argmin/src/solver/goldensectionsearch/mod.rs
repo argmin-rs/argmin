@@ -40,10 +40,12 @@ const G2: f64 = 1.0 - G1;
 ///
 /// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.
 ///
-/// Requires that the provided optimization problem implements [`CostFunction`].
-///
 /// Requires an initial guess which is to be provided via [`Executor`](`crate::core::Executor`)s
 /// `configure` method.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`].
 ///
 /// ## Reference
 ///

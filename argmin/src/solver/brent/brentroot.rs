@@ -5,19 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Brent's method
-//!
-//! A root-finding algorithm combining the bisection method, the secant method
-//! and inverse quadratic interpolation. It has the reliability of bisection
-//! but it can be as quick as some of the less-reliable methods.
-//!
-//! # References:
-//!
-//! <https://en.wikipedia.org/wiki/Brent%27s_method>
-//!
-
-/// Implementation of Brent's optimization method,
-/// see <https://en.wikipedia.org/wiki/Brent%27s_method>
 use crate::core::{
     ArgminFloat, CostFunction, Error, IterState, Problem, Solver, State, TerminationReason, KV,
 };
@@ -33,13 +20,18 @@ pub enum BrentRootError {
     WrongSign,
 }
 
-/// Brent's method
+/// # Brent's method
 ///
 /// A root-finding algorithm combining the bisection method, the secant method
 /// and inverse quadratic interpolation. It has the reliability of bisection
 /// but it can be as quick as some of the less-reliable methods.
 ///
-/// # References:
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`].
+///
+/// ##  Reference
+///
 /// <https://en.wikipedia.org/wiki/Brent%27s_method>
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]

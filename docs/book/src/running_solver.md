@@ -1,26 +1,34 @@
 # Running a solver
 
-The following example shows how to use the previously shown definition of a problem in a
-Steepest Descent (Gradient Descent) solver.
+The [`Executor`](https://docs.rs/argmin/latest/argmin/core/struct.Executor.html)s constructor takes a solver and an optimization problem as input and applies the solver to the problem.
+It also allows to manipulate the initial state of the optimization run via the [`configure`](https://docs.rs/argmin/latest/argmin/core/struct.Executor.html#method.configure) method.
+This method takes a closure which has access to the state which allows one to provide initial parameter vectors, cost function values, Hessians, and so on.
+The particular kind of state exposed depends on the solver.
+Most solvers internally use [`IterState`](https://docs.rs/argmin/latest/argmin/core/struct.IterState.html), but some, for instance Particle Swarm Optimization or CMA-ES use [`PopulationState`](https://docs.rs/argmin/latest/argmin/core/struct.PopulationState.html).
+Please refer to the respective documentation for details on how to modify the state.
+
+Once the `Executor` is configured, the optimization is run via the [`run`](https://docs.rs/argmin/latest/argmin/core/struct.Executor.html#method.run) method.
+This method returns an [`OptimizationResult`](https://docs.rs/argmin/latest/argmin/core/struct.OptimizationResult.html) which holds the provided problem, the solver and the final state. 
+Given that the variable is called `res`, the final parameter vector can be accessed via `res.state().get_best_param()` and the corresponding cost function value via `res.state().get_best_cost()`.
+
+For an overview, `OptimizationResult`s `Display` implementation can be used to print the result to screen: `println!("{}", res)`.
+
+The following example shows how to use the `SteepestDescent` solver to solve a problem which implements `CostFunction` and `Gradient` (which are both required by the solver).
 
 ```rust
 # #![allow(unused_imports)]
 # extern crate argmin;
 # extern crate argmin_testfunctions;
-use argmin::core::{Error, Executor, CostFunction, Gradient};
-# #[cfg(feature = "slog-logger")]
-use argmin::core::observers::{SlogLogger, ObserverMode};
+use argmin::core::{State, Error, Executor, CostFunction, Gradient};
 use argmin::solver::gradientdescent::SteepestDescent;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
-#
-# struct Rosenbrock {
-#     a: f64,
-#     b: f64,
-# }
-#
-# /// Implement `CostFunction` for `Rosenbrock`
-# impl CostFunction for Rosenbrock {
+
+struct MyProblem {}
+
+// Implement `CostFunction` for `MyProblem`
+impl CostFunction for MyProblem {
+      // [...]
 #     /// Type of the parameter vector
 #     type Param = Vec<f64>;
 #     /// Type of the return value computed by the cost function
@@ -30,10 +38,11 @@ use argmin::solver::linesearch::MoreThuenteLineSearch;
 #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 #         Ok(rosenbrock_2d(p, 1.0, 100.0))
 #     }
-# }
-#
-# /// Implement `Gradient` for `Rosenbrock`
-# impl Gradient for Rosenbrock {
+}
+
+// Implement `Gradient` for `MyProblem`
+impl Gradient for MyProblem {
+      // [...]
 #     /// Type of the parameter vector
 #     type Param = Vec<f64>;
 #     /// Type of the return value computed by the cost function
@@ -43,43 +52,50 @@ use argmin::solver::linesearch::MoreThuenteLineSearch;
 #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
 #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
 #     }
-# }
+}
 #
 # fn run() -> Result<(), Error> {
 
-// Define cost function (must implement `CostFunction` and `Gradient`)
-let cost = Rosenbrock { a: 1.0, b: 100.0 };
+// Create new instance of cost function
+let cost = MyProblem {};
  
 // Define initial parameter vector
 let init_param: Vec<f64> = vec![-1.2, 1.0];
  
-// Set up line search
+// Set up line search needed by `SteepestDescent`
 let linesearch = MoreThuenteLineSearch::new();
  
-// Set up solver
+// Set up solver -- `SteepestDescent` requires a linesearch
 let solver = SteepestDescent::new(linesearch);
  
-// Run solver
+// Create an `Executor` object 
 let res = Executor::new(cost, solver)
-    .configure(|config|
-        config
+    // Via `configure`, one has access to the internally used state.
+    // This state can be initialized, for instance by providing an
+    // initial parameter vector.
+    // The maximum number of iterations is also set via this method.
+    // In this particular case, the state exposed is of type `IterState`.
+    // The documentation of `IterState` shows how this struct can be
+    // manipulated.
+    .configure(|state|
+        state
             // Set initial parameters
             .param(init_param)
             // Set maximum iterations to 10
             .max_iters(10)
     )
-# ;
-# #[cfg(feature = "slog-logger")]
-# let res = res
-    // Add an observer which will log all iterations to the terminal
-    .add_observer(SlogLogger::term(), ObserverMode::Always)
-# ;
-# let res = res
     // run the solver on the defined problem
     .run()?;
-#
+
 // print result
 println!("{}", res);
+
+// Extract results from state
+let best = res.state().get_best_param();
+let best_cost = res.state().get_best_cost();
+let termination_reason = res.state().get_termination_reason();
+let time_needed = res.state().get_time();
+let num_iterations = res.state().get_iter();
 #     Ok(())
 # }
 #
@@ -90,3 +106,4 @@ println!("{}", res);
 #     }
 # }
 ```
+

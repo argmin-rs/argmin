@@ -8,8 +8,8 @@
 //! # Checkpointing
 //!
 //! Checkpointing is a useful mechanism for mitigating the effects of crashes when software is run
-//! in unstable environment, particularly for long run times. Checkpoints are saved regularly with
-//! a user-chosen frequency. Optimizations can then be resumed from a given checkpoint after a
+//! in an unstable environment, particularly for long run times. Checkpoints are saved regularly
+//! with a user-chosen frequency. Optimizations can then be resumed from a given checkpoint after a
 //! crash.
 //!
 //! For saving checkpoints to disk, `FileCheckpoint` is provided.

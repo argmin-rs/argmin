@@ -23,6 +23,11 @@ use serde::{Deserialize, Serialize};
 /// Hessian are optional and will be computed if not provided.
 /// Requires a [trust region sub problem](`crate::solver::trustregion`).
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`], [`Gradient`] and
+/// [`Hessian`].
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

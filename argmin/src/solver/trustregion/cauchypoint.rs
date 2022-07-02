@@ -19,6 +19,10 @@ use std::fmt::Debug;
 /// The Cauchy point is the minimum of the quadratic approximation of the cost function within the
 /// trust region along the direction given by the first derivative.
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`Gradient`] and [`Hessian`].
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

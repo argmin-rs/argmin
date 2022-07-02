@@ -75,7 +75,8 @@ where
     /// This method gives mutable access to the internal state of the solver. This allows for
     /// initializing the state before running the `Executor`. The options for initialization depend
     /// on the type of state used by the chosen solver. Common types of state are
-    /// [`IterState`](`crate::core::IterState`) and
+    /// [`IterState`](`crate::core::IterState`),
+    /// [`PopulationState`](`crate::core::PopulationState`), and
     /// [`LinearProgramState`](`crate::core::LinearProgramState`). Please see the documentation of
     /// the desired solver for information about which state is used.
     ///

@@ -21,6 +21,10 @@ use serde::{Deserialize, Serialize};
 /// the unconstraind minimum along the steepest descent direction and the optimum of the quadratic
 /// approximation of the cost function at the current point.
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`Gradient`] and [`Hessian`].
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

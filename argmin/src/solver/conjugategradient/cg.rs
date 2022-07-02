@@ -19,9 +19,11 @@ use serde::{Deserialize, Serialize};
 /// Solves systems of the form `A * x = b` where `x` and `b` are vectors and `A` is a symmetric and
 /// positive-definite matrix.
 ///
-/// Requires that the provided optimization problem implements [`Operator`].
-///
 /// Requires an initial parameter vector.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`Operator`].
 ///
 /// ## Reference
 ///

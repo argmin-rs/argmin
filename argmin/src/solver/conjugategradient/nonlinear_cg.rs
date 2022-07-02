@@ -17,13 +17,15 @@ use serde::{Deserialize, Serialize};
 ///
 /// A generalization of the conjugate gradient method for nonlinear optimization problems.
 ///
-/// Requires that the provided optimization problem implements [`CostFunction`] and [`Gradient`].
-///
 /// Requires an initial parameter vector.
 ///
-/// # Reference
+/// ## Requirements on the optimization problem
 ///
-/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]

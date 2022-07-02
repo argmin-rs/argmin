@@ -3,6 +3,8 @@
 [Introduction](README.md)
 
 - [Getting started](./getting_started.md)
+  - [Using argmin](./using_argmin.md)
+  - [Basic concept](./concept.md)
   - [Defining an optimization problem](./defining_optimization_problem.md)
   - [Running a solver](./running_solver.md)
   - [Observing progress](./observing.md)
