@@ -1,31 +1,53 @@
 # Introduction
 
-* What it is
-* What to expect
-* How to use it
-* Which features
+
+argmin is a numerical optimization library written entirely in Rust.
+
+Its goal is to offer a wide range of optimization algorithms with a consistent interface. 
+It is type-agnostic by the design, meaning that any type and/or math backends, such as `nalgebra` or `ndarray` can be used -- even your own.
+
+Observers allow one to track the progress of iterations, either by using one of the provided ones for logging to screen or disk or by implementing your own.
+
+An optional checkpointing mechanism helps to mitigate the negative effects of crashes in unstable computing environments.
+
+Due to Rusts powerful generics and traits, most features can be exchanged by your own tailored implementations.
+
+argmin is designed to simplify the implementation of optimization algorithms and as such can also be used as a toolbox for the development of new algorithms. One can focus on the algorithm itself, while the handling of termination, parameter vectors, populations, gradients, Jacobians and Hessians is taken care of by the library.
+
+> **IMPORTANT NOTE**
+>
+> This book covers the yet unreleased version 0.6.0! A large portion of the content does not apply to versions below 0.6.
+
+
+## The argmin ecosystem
+
+The ecosystem constist of a number of crates:
+
+* [argmin](https://crates.io/crates/argmin): Optimization algorithms and framework
+* [argmin-math](https://crates.io/crates/argmin-math): Interface for math backend abstraction and implementations for various versions of [ndarray](https://crates.io/crates/ndarray), [nalgebra](https://crates.io/crates/nalgebra) and `Vec`s.
+* [argmin-testfunctions](https://crates.io/crates/argmin-testfunctions): A collection of test functions
+* [finitediff](https://crates.io/crates/finitediff): Finite differentiation
+* [modcholesky](https://crates.io/crates/modcholesky): Modified cholesky decompositions
+
 
 ## Algorithms
 
-* Link to docs
+argmin comes with a number of line searches (Backtracking, More-Thuente, Hager-Zhang, trust region methods (Cauchy point, Dogleg, Steihaug), Steepest descent, (Nonlinear) conjugate gradient, Newton method, Newton-CG, Quasi-Newton methods (BFGS, L-BFGS, DFP, SR1-TrustRegion), Gauss-Newton methods (with and without line search), Golden-section search, Landweber, Brents optimization and root finding methods, Nelder-Mead, Simulated Annealing, Particle Swarm Optimization and CMA-ES.
 
-## Examples
+For a complete and up-to-date list of all algorithms please visit the [API documentation](https://docs.rs/argmin/latest/argmin/).
 
-* Link to examples
+> Examples for each algorithm can be found on [Github](https://github.com/argmin-rs/argmin/tree/main/argmin/examples). Make sure to choose the tag matching the argmin version you are using.
 
-## Crate features
+## Documentation
 
-### Default
-* todo
+This book is a guide on how to use argmins algorithms as well as on how to implement algorithms using argmins framework. 
+For detailed information on specific algorithms or traits, please refer to [argmins API documentation](https://docs.rs/argmin/latest/argmin/). 
 
-### Optional 
-* todo
+The [argmin-math documentation](https://docs.rs/argmin/latest/argmin-math/) outlines the abstractions over the math backends and the [argmin-testfunctions API documentation](https://docs.rs/argmin/latest/argmin-testfunctions/) lists all available test functions.
 
-### Experimental support for compiling to WebAssembly
-* todo
+For details on how to use `finitediff` for finite differentiation, please refer to the corresponding [API documentation](https://docs.rs/argmin/latest/finitediff/).
 
-### Compiling without the `serde1` feature
-* todo
+The documentation of `modcholesky` can be found [here](https://docs.rs/argmin/latest/modcholesky).
 
 ## License
 

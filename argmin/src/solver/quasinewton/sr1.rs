@@ -17,6 +17,10 @@ use serde::{Deserialize, Serialize};
 ///
 /// This method currently has problems: <https://github.com/argmin-rs/argmin/issues/221>.
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

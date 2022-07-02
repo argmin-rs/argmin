@@ -28,6 +28,11 @@ use serde::{Deserialize, Serialize};
 /// * [Dogleg method](`crate::solver::trustregion::Dogleg`)
 /// * [Steihaug method](`crate::solver::trustregion::Steihaug`)
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`], [`Gradient`] and
+/// [`Hessian`].
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

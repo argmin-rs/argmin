@@ -18,6 +18,10 @@ use serde::{Deserialize, Serialize};
 /// Iteratively takes steps in the direction of the strongest negative gradient. In each iteration,
 /// a line search is used to obtain an appropriate step length.
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

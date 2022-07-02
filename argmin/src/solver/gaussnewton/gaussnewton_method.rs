@@ -17,9 +17,11 @@ use serde::{Deserialize, Serialize};
 ///
 /// The Gauss-Newton method is used to solve non-linear least squares problems.
 ///
-/// Requires that the provided optimization problem implements [`Operator`] and [`Jacobian`].
-///
 /// Requires an initial parameter vector.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`Operator`] and [`Jacobian`].
 ///
 /// ## Reference
 ///

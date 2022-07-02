@@ -31,6 +31,10 @@ use serde::{Deserialize, Serialize};
 /// [`with_tolerance_grad`](`DFP::with_tolerance_grad`): If the norm of the gradient is below
 /// said tolerance, the algorithm stops. It defaults to `sqrt(EPSILON)`.
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

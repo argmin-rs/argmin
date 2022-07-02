@@ -19,6 +19,10 @@ use std::default::Default;
 /// The stepsize `gamma` can be adjusted with the [`with_gamma`](`Newton::with_gamma`) method. It
 /// must be in `(0, 1])` and defaults to `1`.
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`Gradient`] and [`Hessian`].
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

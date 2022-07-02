@@ -37,6 +37,10 @@ use serde::{Deserialize, Serialize};
 /// for expensive cost functions, but may cause a drop in performance for cheap cost functions. Be
 /// sure to benchmark both parallel and sequential computation.
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`].
+///
 /// ## References
 ///
 /// \[0\] Zambrano-Bigiarini, M. et.al. (2013): Standard Particle Swarm Optimisation 2011 at
@@ -300,7 +304,6 @@ where
 
         let zero = P::zero_like(&best_particle.position);
 
-        // for p in particles.iter_mut() {
         let positions: Vec<_> = particles
             .iter_mut()
             .map(|p| {

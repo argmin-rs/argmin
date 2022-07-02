@@ -12,10 +12,10 @@
 //!
 //! ## References
 //!
-//! \[0\] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
+//! Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
 //! kind. Amer. J. Math. 73, 615–624
 //!
-//! \[1\] <https://en.wikipedia.org/wiki/Landweber_iteration>
+//! <https://en.wikipedia.org/wiki/Landweber_iteration>
 
 use crate::core::{ArgminFloat, Error, Gradient, IterState, Problem, Solver, KV};
 use argmin_math::ArgminScaledSub;
@@ -31,12 +31,16 @@ use serde::{Deserialize, Serialize};
 ///
 /// `x_{k+1} = x_k - omega * \nabla f(x_k)`
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`Gradient`].
+///
 /// ## References
 ///
-/// \[0\] Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
+/// Landweber, L. (1951): An iteration formula for Fredholm integral equations of the first
 /// kind. Amer. J. Math. 73, 615–624
 ///
-/// \[1\] <https://en.wikipedia.org/wiki/Landweber_iteration>
+/// <https://en.wikipedia.org/wiki/Landweber_iteration>
 #[derive(Clone, Copy)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct Landweber<F> {

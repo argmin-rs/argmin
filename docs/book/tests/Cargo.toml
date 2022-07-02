@@ -9,3 +9,4 @@ doc-comment = "0.3.3"
 argmin = { path = "../../../argmin", features = ["serde1", "slog-logger", "ctrlc", "wasm-bindgen", "rayon"] }
 argmin-math = { path = "../../../argmin-math", features = ["latest_all"] }
 argmin_testfunctions = "*"
+serde = "1"

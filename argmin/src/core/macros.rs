@@ -70,7 +70,7 @@ macro_rules! argmin_error {
 #[macro_export]
 macro_rules! argmin_error_closure {
     ($error_type:ident, $msg:expr) => {
-        || -> $crate::core::Error { argmin_error!($error_type, $msg) }
+        || -> $crate::core::Error { $crate::argmin_error!($error_type, $msg) }
     };
 }
 

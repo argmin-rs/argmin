@@ -136,6 +136,10 @@ impl<F> Default for SATempFunc<F> {
 /// modified. Please see the Simulated Annealing example for one approach to do so for floating
 /// point parameters.
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`].
+///
 /// ## References
 ///
 /// [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)

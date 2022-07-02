@@ -38,6 +38,10 @@ use std::collections::VecDeque;
 ///
 /// TODO: Implement compact representation of BFGS updating (Nocedal/Wright p.230)
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

@@ -37,6 +37,10 @@ use serde::{Deserialize, Serialize};
 /// other. If the change is below this tolerance (default: `EPSILON`), the algorithm stops. This
 /// parameter can be set via [`with_tolerance_cost`](`BFGS::with_tolerance_cost`).
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
 /// ## Reference
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.

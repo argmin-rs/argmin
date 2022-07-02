@@ -5,32 +5,23 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Brent's method
-//!
-//! A minimization algorithm combining parabolic interpolation and the
-//! golden-section method.  It has the reliability of the golden-section
-//! method, but can be faster thanks to the parabolic interpolation steps.
-//!
-//! # References:
-//!
-//! "An algorithm with guaranteed convergence for finding a minimum of
-//! a function of one variable", _Algorithms for minimization without
-//! derivatives_, Richard P. Brent, 1973, Prentice-Hall.
-
-/// Implementation of Brent's optimization method,
 use crate::core::{
     ArgminFloat, CostFunction, Error, IterState, Problem, Solver, State, TerminationReason, KV,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
-/// Brent's method
+/// # Brent's method
 ///
 /// A minimization algorithm combining parabolic interpolation and the
 /// golden-section method.  It has the reliability of the golden-section
 /// method, but can be faster thanks to the parabolic interpolation steps.
 ///
-/// # References:
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`].
+///
+/// ## Reference
 ///
 /// "An algorithm with guaranteed convergence for finding a minimum of
 /// a function of one variable", _Algorithms for minimization without

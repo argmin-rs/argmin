@@ -49,6 +49,10 @@ use std::fmt;
 /// 4) Shrink (Parameter `sigma`, defaults to `0.5`, configurable via
 ///    [`with_sigma`](`NelderMead::with_sigma`))
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`].
+///
 /// ## References
 ///
 /// <https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method>

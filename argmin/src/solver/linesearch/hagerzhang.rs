@@ -20,6 +20,10 @@ type Triplet<F> = (F, F, F);
 /// The Hager-Zhang line search is a method to find a step length which obeys the strong Wolfe
 /// conditions.
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
 /// ## Reference
 ///
 /// William W. Hager and Hongchao Zhang. "A new conjugate gradient method with guaranteed

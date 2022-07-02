@@ -19,12 +19,16 @@ use serde::{Deserialize, Serialize};
 /// The Backtracking line search is a method which finds a step length from a given point along a
 /// given direction, such that this step length obeys the Armijo (sufficient decrease) condition.
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
 /// ## References
 ///
-/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 ///
-/// \[1\] Wikipedia: <https://en.wikipedia.org/wiki/Backtracking_line_search>
+/// Wikipedia: <https://en.wikipedia.org/wiki/Backtracking_line_search>
 #[derive(Clone, Eq, PartialEq, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct BacktrackingLineSearch<P, G, L, F> {

@@ -38,6 +38,10 @@ use std::default::Default;
 ///
 /// TODO: Add missing stopping criteria!
 ///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
 /// ## References
 ///
 /// This implementation follows the excellent MATLAB implementation of Dianne P. O'Leary at
