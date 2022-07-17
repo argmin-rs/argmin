@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Argmin Optimization toolbox core
+//! argmin optimization toolbox core
 //!
 //! This module contains the traits and types necessary for implementing optimization algorithms
 //! and tools for observing the state of optimization runs and checkpointing.
