@@ -7,25 +7,23 @@
 
 //! argmin is a numerical optimization library written entirely in Rust.
 //!
-//! [Documentation of most recent release](https://docs.rs/argmin/latest/argmin/)
+//! Its goal is to offer a wide range of optimization algorithms with a consistent interface.
+//! It is type-agnostic by the design, meaning that any type and/or math backends, such as
+//! `nalgebra` or `ndarray` can be used -- even your own.
 //!
-//! [Documentation of main branch](https://argmin-rs.github.io/argmin/argmin/)
+//! Observers allow one to track the progress of iterations, either by using one of the provided
+//! ones for logging to screen or disk or by implementing your own.
 //!
-//! # Design goals
+//! An optional checkpointing mechanism helps to mitigate the negative effects of crashes in
+//! unstable computing environments.
 //!
-//! argmin aims at offering a wide range of optimization algorithms with a consistent interface,
-//! written purely in Rust. It comes with additional features such as checkpointing and observers
-//! which for instance make it possible to log the progress of an optimization to screen or file.
+//! Due to Rusts powerful generics and traits, most features can be exchanged by your own tailored
+//! implementations.
 //!
-//! It further provides a framework for implementing iterative optimization algorithms in a
-//! convenient manner. Essentially, a single iteration of the algorithm needs to be implemented and
-//! everything else, such as handling termination, parameter vectors, gradients and Hessians, is
-//! taken care of by the library.
-//!
-//! This library uses generics to be as type-agnostic as possible. Abstractions over common math
-//! functions enable the use of common backends such as `ndarray` and `nalgebra` via the
-//! `argmin-math` crate. All operations can be performed with 32 and 64 bit floats. Custom types are
-//! of course also supported.
+//! argmin is designed to simplify the implementation of optimization algorithms and as such can
+//! also be used as a toolbox for the development of new algorithms. One can focus on the algorithm
+//! itself, while the handling of termination, parameter vectors, populations, gradients, Jacobians
+//! and Hessians is taken care of by the library.
 //!
 //! # Highlights
 //!
