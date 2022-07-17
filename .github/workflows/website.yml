@@ -16,7 +16,7 @@ jobs:
       - name: Build website 
         uses: shalzz/zola-deploy-action@master
         env:
-          BUILD_DIR: docs/website/
+          BUILD_DIR: media/website/
           BUILD_ONLY: true
           BUILD_FLAGS: --drafts
           CHECK_LINKS: true
