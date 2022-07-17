@@ -23,9 +23,9 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Generate harness
-        working-directory: ./docs/book/tests
+        working-directory: ./media/book/tests
         run: ./generate_book_tests.sh
 
       - name: Test code samples
-        working-directory: ./docs/book/tests
+        working-directory: ./media/book/tests
         run: cargo test

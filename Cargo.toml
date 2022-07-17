@@ -6,5 +6,5 @@ members = [
 ]
 
 exclude = [
-    "docs/book/tests",
+    "media/book/tests",
 ]
