@@ -1,17 +1,18 @@
 # Running a solver
 
 The [`Executor`](https://docs.rs/argmin/latest/argmin/core/struct.Executor.html)s constructor takes a solver and an optimization problem as input and applies the solver to the problem.
-It also allows to manipulate the initial state of the optimization run via the [`configure`](https://docs.rs/argmin/latest/argmin/core/struct.Executor.html#method.configure) method.
-This method takes a closure which has access to the state which allows one to provide initial parameter vectors, cost function values, Hessians, and so on.
-The particular kind of state exposed depends on the solver.
-Most solvers internally use [`IterState`](https://docs.rs/argmin/latest/argmin/core/struct.IterState.html), but some, for instance Particle Swarm Optimization or CMA-ES use [`PopulationState`](https://docs.rs/argmin/latest/argmin/core/struct.PopulationState.html).
+The initial state of the optimization run can be modified via the [`configure`](https://docs.rs/argmin/latest/argmin/core/struct.Executor.html#method.configure) method.
+This method accepts a closure with the state as only parameter.
+This allows one to provide initial parameter vectors, cost function values, Hessians, and so on via the closure.
+There are diffent kinds/types of state and the particular kind of state used depends on the solver.
+Most solvers internally use [`IterState`](https://docs.rs/argmin/latest/argmin/core/struct.IterState.html), but some (for instance Particle Swarm Optimization or CMA-ES) use [`PopulationState`](https://docs.rs/argmin/latest/argmin/core/struct.PopulationState.html).
 Please refer to the respective documentation for details on how to modify the state.
 
 Once the `Executor` is configured, the optimization is run via the [`run`](https://docs.rs/argmin/latest/argmin/core/struct.Executor.html#method.run) method.
-This method returns an [`OptimizationResult`](https://docs.rs/argmin/latest/argmin/core/struct.OptimizationResult.html) which holds the provided problem, the solver and the final state. 
-Given that the variable is called `res`, the final parameter vector can be accessed via `res.state().get_best_param()` and the corresponding cost function value via `res.state().get_best_cost()`.
+This method returns an [`OptimizationResult`](https://docs.rs/argmin/latest/argmin/core/struct.OptimizationResult.html) which contains the provided problem, the solver and the final state. 
+Assuming the variable is called `res`, the final parameter vector can be accessed via `res.state().get_best_param()` and the corresponding cost function value via `res.state().get_best_cost()`.
 
-For an overview, `OptimizationResult`s `Display` implementation can be used to print the result to screen: `println!("{}", res)`.
+For an overview, `OptimizationResult`s `Display` implementation can be used to print the result: `println!("{}", res)`.
 
 The following example shows how to use the `SteepestDescent` solver to solve a problem which implements `CostFunction` and `Gradient` (which are both required by the solver).
 
@@ -91,11 +92,27 @@ let res = Executor::new(cost, solver)
 println!("{}", res);
 
 // Extract results from state
-let best = res.state().get_best_param();
+
+// Best parameter vector
+let best = res.state().get_best_param().unwrap();
+
+// Cost function value associated with best parameter vector
 let best_cost = res.state().get_best_cost();
+
+// Reason why the optimizer terminated
 let termination_reason = res.state().get_termination_reason();
-let time_needed = res.state().get_time();
+
+// Time needed for optimization
+let time_needed = res.state().get_time().unwrap();
+
+// Total number of iterations needed
 let num_iterations = res.state().get_iter();
+
+// Iteration number where the last best parameter vector was found
+let num_iterations_best = res.state().get_last_best_iter();
+
+// Number of evaluation counts per method (Cost, Gradient)
+let function_evaluation_counts = res.state().get_func_counts();
 #     Ok(())
 # }
 #

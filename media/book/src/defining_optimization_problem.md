@@ -7,6 +7,7 @@ Depending on the requirements of the solver that is to be used, the optimization
 - [`Jacobian`](https://docs.rs/argmin/latest/argmin/core/trait.Jacobian.html): Computes the Jacobian for a parameter vector `p`
 - [`Hessian`](https://docs.rs/argmin/latest/argmin/core/trait.Hessian.html): Computes the Hessian for a parameter vector `p`
 - [`Operator`](https://docs.rs/argmin/latest/argmin/core/trait.Operator.html): Applies an operator to the parameter vector `p`
+- [`Anneal`](https://docs.rs/argmin/latest/argmin/solver/simulatedannealing/trait.Anneal.html): Create a new parameter vector by "annealing" of the curent parameter vector `p` (needed for SimulatedAnnealing).
 
 Which subset is needed is given in the documentation of each solver.
 
@@ -130,8 +131,9 @@ Trait        | Single input      | Multiple inputs |
 `Jacobian`     | `jacobian`          | `bulk_jacobian`   |
 `Hessian`      | `hessian`           | `bulk_hessian`    |
 `Operator`     | `apply`             | `bulk_apply`      |
+`Anneal`       | `anneal`            | `bulk_anneal`     |
 
-These `bulk_*` methods come with a default implementation, which looks essentially like this:
+These `bulk_*` methods come with a default implementation, which essentially looks like this:
 
 ```rust
 # extern crate argmin;
