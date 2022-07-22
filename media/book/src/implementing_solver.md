@@ -7,10 +7,10 @@ In iteration \\( k \\), the new parameter vector \\( x_{k+1} \\) is calculated f
 x_{k+1} = x_k - \omega * \nabla f(x_k)
 \\]
 
-In order to implement this using argmin, one first needs to define the struct `Landweber` which holds data specific to the solver (\\( \omega \\)).
+In order to implement this using argmin, one first needs to define the struct `Landweber` which holds data specific to the solver (the step length \\( \omega \\)).
 Then, the [`Solver`](https://docs.rs/argmin/latest/argmin/core/trait.Solver.html) trait needs to be implemented for this struct.
 
-The `Solver` trait consists of several methods; however, not all of them need to be implemented as they come with default implementations.
+The `Solver` trait consists of several methods; however, not all of them need to be implemented since most come with default implementations.
 
 * `NAME`: a `&'static str` which holds the solvers name (mainly needed for the observers).
 * `init(...)`: Run before the the actual iterations and initializes the solver. Does nothing by default.

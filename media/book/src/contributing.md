@@ -20,7 +20,7 @@ cargo test -p argmin --all-features
 ```
 
 This will work for `--all-features` and any other combination of features.
-Note that not all test will run if only a subset of the features is enabled.
+Note that not all tests will run if only a subset of the features is enabled.
 
 In terms of `argmin-math`, one can just test the default features:
 
@@ -34,4 +34,4 @@ Or the default features plus the latest `ndarray`/`nalgebra` backends:
 cargo test -p argmin-math --features "latest_all"
 ```
 
-Individual backends can be tested as well; however, care has to be taken to not add two backends of the same kind but with different versions, as that may not work.
+Individual backends can be tested as well; however, care has to be taken to not add two different versions of the same backend, as that may not work.
