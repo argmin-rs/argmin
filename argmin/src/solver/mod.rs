@@ -15,6 +15,7 @@ pub mod linesearch;
 pub mod neldermead;
 pub mod newton;
 pub mod particleswarm;
+pub mod powell;
 pub mod quasinewton;
 pub mod simulatedannealing;
 pub mod trustregion;
