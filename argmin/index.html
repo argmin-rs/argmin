@@ -4,79 +4,76 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"><a href="#">Crate argmin</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.5.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div></section><div id="sidebar-vars" data-name="argmin" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../argmin/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin/lib.rs.html#8-648">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
-<p><a href="https://docs.rs/argmin/latest/argmin/">Documentation of most recent release</a></p>
-<p><a href="https://argmin-rs.github.io/argmin/argmin/">Documentation of main branch</a></p>
-<h2 id="design-goals"><a href="#design-goals">Design goals</a></h2>
-<p>argmin aims at offering a wide range of optimization algorithms with a consistent interface,
-written purely in Rust. It comes with additional features such as checkpointing and observers
-which for instance make it possible to log the progress of an optimization to screen or file.</p>
-<p>It further provides a framework for implementing iterative optimization algorithms in a
-convenient manner. Essentially, a single iteration of the algorithm needs to be implemented and
-everything else, such as handling termination, parameter vectors, gradients and Hessians, is
-taken care of by the library.</p>
-<p>This library uses generics to be as type-agnostic as possible. Abstractions over common math
-functions enable the use of common backends such as <code>ndarray</code> and <code>nalgebra</code> via the
-<code>argmin-math</code> crate. All operations can be performed with 32 and 64 bit floats. Custom types are
-of course also supported.</p>
-<h2 id="contributing"><a href="#contributing">Contributing</a></h2>
-<p>This crate is looking for contributors!
-Potential projects can be found in the
-<a href="https://github.com/argmin-rs/argmin/issues">Github issues</a>, but feel free to suggest your own
-ideas as well. Besides adding optimization methods and new features, other contributions are
-also highly welcome, for instance improving performance, documentation, writing examples (with
-real world problems), developing tests, adding observers, implementing a C interface or
-<a href="https://github.com/argmin-rs/pyargmin">Python wrappers</a>.
-Bug reports (and fixes) are of course also highly appreciated.</p>
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin/lib.rs.html#8-113">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
+<p>Its goal is to offer a wide range of optimization algorithms with a consistent interface.
+It is type-agnostic by the design, meaning that any type and/or math backend, such as
+<code>nalgebra</code> or <code>ndarray</code> can be used – even your own.</p>
+<p>Observers allow one to track the progress of iterations, either by using one of the provided
+ones for logging to screen or disk or by implementing your own.</p>
+<p>An optional checkpointing mechanism helps to mitigate the negative effects of crashes in
+unstable computing environments.</p>
+<p>Due to Rusts powerful generics and traits, most features can be exchanged by your own tailored
+implementations.</p>
+<p>argmin is designed to simplify the implementation of optimization algorithms and as such can
+also be used as a toolbox for the development of new algorithms. One can focus on the algorithm
+itself, while the handling of termination, parameter vectors, populations, gradients, Jacobians
+and Hessians is taken care of by the library.</p>
+<h2 id="highlights"><a href="#highlights">Highlights</a></h2>
+<ul>
+<li><a href="core/checkpointing/index.html">Checkpointing</a></li>
+<li><a href="core/observers/index.html">Observers</a></li>
+</ul>
 <h2 id="algorithms"><a href="#algorithms">Algorithms</a></h2>
 <ul>
 <li>
 <p><a href="solver/linesearch/index.html">Line searches</a></p>
 <ul>
-<li><a href="solver/linesearch/backtracking/struct.BacktrackingLineSearch.html">Backtracking line search</a></li>
-<li><a href="solver/linesearch/morethuente/struct.MoreThuenteLineSearch.html">More-Thuente line search</a></li>
-<li><a href="solver/linesearch/hagerzhang/struct.HagerZhangLineSearch.html">Hager-Zhang line search</a></li>
+<li><a href="solver/linesearch/struct.BacktrackingLineSearch.html">Backtracking line search</a></li>
+<li><a href="solver/linesearch/struct.MoreThuenteLineSearch.html">More-Thuente line search</a></li>
+<li><a href="solver/linesearch/struct.HagerZhangLineSearch.html">Hager-Zhang line search</a></li>
 </ul>
 </li>
 <li>
-<p><a href="solver/trustregion/trustregion_method/struct.TrustRegion.html">Trust region method</a></p>
+<p><a href="solver/trustregion/struct.TrustRegion.html">Trust region method</a></p>
 <ul>
-<li><a href="solver/trustregion/cauchypoint/struct.CauchyPoint.html">Cauchy point method</a></li>
-<li><a href="solver/trustregion/dogleg/struct.Dogleg.html">Dogleg method</a></li>
-<li><a href="solver/trustregion/steihaug/struct.Steihaug.html">Steihaug method</a></li>
+<li><a href="solver/trustregion/struct.CauchyPoint.html">Cauchy point method</a></li>
+<li><a href="solver/trustregion/struct.Dogleg.html">Dogleg method</a></li>
+<li><a href="solver/trustregion/struct.Steihaug.html">Steihaug method</a></li>
 </ul>
 </li>
 <li>
-<p><a href="solver/gradientdescent/steepestdescent/struct.SteepestDescent.html">Steepest descent</a></p>
+<p><a href="solver/gradientdescent/struct.SteepestDescent.html">Steepest descent</a></p>
 </li>
 <li>
-<p><a href="solver/conjugategradient/cg/struct.ConjugateGradient.html">Conjugate gradient method</a></p>
-</li>
-<li>
-<p><a href="solver/conjugategradient/nonlinear_cg/struct.NonlinearConjugateGradient.html">Nonlinear conjugate gradient method</a></p>
+<p><a href="solver/conjugategradient/index.html">Conjugate gradient methods</a></p>
+<ul>
+<li><a href="solver/conjugategradient/struct.ConjugateGradient.html">Conjugate gradient method</a></li>
+<li><a href="solver/conjugategradient/struct.NonlinearConjugateGradient.html">Nonlinear conjugate gradient method</a></li>
+</ul>
 </li>
 <li>
 <p><a href="solver/newton/index.html">Newton methods</a></p>
 <ul>
-<li><a href="solver/newton/newton_method/struct.Newton.html">Newton’s method</a></li>
+<li><a href="solver/newton/struct.Newton.html">Newton’s method</a></li>
 <li><a href="solver/newton/newton_cg/struct.NewtonCG.html">Newton-CG</a></li>
 </ul>
 </li>
 <li>
 <p><a href="solver/quasinewton/index.html">Quasi-Newton methods</a></p>
 <ul>
-<li><a href="solver/quasinewton/bfgs/struct.BFGS.html">BFGS</a></li>
-<li><a href="solver/quasinewton/lbfgs/struct.LBFGS.html">L-BFGS</a></li>
-<li><a href="solver/quasinewton/dfp/struct.DFP.html">DFP</a></li>
-<li><a href="solver/quasinewton/sr1/struct.SR1.html">SR1</a></li>
-<li><a href="solver/quasinewton/sr1_trustregion/struct.SR1TrustRegion.html">SR1-TrustRegion</a></li>
+<li><a href="solver/quasinewton/struct.BFGS.html">BFGS</a></li>
+<li><a href="solver/quasinewton/struct.LBFGS.html">L-BFGS</a></li>
+<li><a href="solver/quasinewton/struct.DFP.html">DFP</a></li>
+<li><a href="solver/quasinewton/struct.SR1.html">SR1</a></li>
+<li><a href="solver/quasinewton/struct.SR1TrustRegion.html">SR1-TrustRegion</a></li>
 </ul>
 </li>
 <li>
-<p><a href="solver/gaussnewton/gaussnewton_method/struct.GaussNewton.html">Gauss-Newton method</a></p>
-</li>
-<li>
-<p><a href="solver/gaussnewton/gaussnewton_linesearch/struct.GaussNewtonLS.html">Gauss-Newton method with linesearch</a></p>
+<p><a href="solver/gaussnewton/index.html">Gauss-Newton methods</a></p>
+<ul>
+<li><a href="solver/gaussnewton/struct.GaussNewton.html">Gauss-Newton method</a></li>
+<li><a href="solver/gaussnewton/struct.GaussNewtonLS.html">Gauss-Newton method with linesearch</a></li>
+</ul>
 </li>
 <li>
 <p><a href="solver/goldensectionsearch/struct.GoldenSectionSearch.html">Golden-section search</a></p>
@@ -85,7 +82,11 @@ Bug reports (and fixes) are of course also highly appreciated.</p>
 <p><a href="solver/landweber/struct.Landweber.html">Landweber iteration</a></p>
 </li>
 <li>
-<p><a href="solver/brent/struct.Brent.html">Brent’s method</a></p>
+<p><a href="solver/brent/index.html">Brent’s methods</a></p>
+<ul>
+<li><a href="solver/brent/struct.BrentOpt.html">Brent’s minimization method</a></li>
+<li><a href="solver/brent/struct.BrentRoot.html">Brent’s root finding method</a></li>
+</ul>
 </li>
 <li>
 <p><a href="solver/neldermead/struct.NelderMead.html">Nelder-Mead method</a></p>
@@ -97,277 +98,6 @@ Bug reports (and fixes) are of course also highly appreciated.</p>
 <p><a href="solver/particleswarm/struct.ParticleSwarm.html">Particle Swarm Optimization</a></p>
 </li>
 </ul>
-<h2 id="examples"><a href="#examples">Examples</a></h2>
-<p>Examples for each solver can be found
-<a href="https://github.com/argmin-rs/argmin/tree/v0.5.0/examples">here (current released version)</a> and
-<a href="https://github.com/argmin-rs/argmin/tree/main/argmin/examples">here (main branch)</a>.</p>
-<h2 id="usage"><a href="#usage">Usage</a></h2>
-<p>Add this to your <code>Cargo.toml</code>:</p>
-<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
- argmin = &quot;0.5.0&quot;
-argmin-math = { version = &quot;0.1.0&quot;, features = [&quot;ndarray_latest-serde,nalgebra_latest-serde&quot;] }</code></pre></div>
-<p>or, for the current development version:</p>
-<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
-argmin = { git = &quot;https://github.com/argmin-rs/argmin&quot; }
-argmin-math = { git = &quot;https://github.com/argmin-rs/argmin&quot;, features = [&quot;ndarray_latest-serde,nalgebra_latest-serde&quot;] }</code></pre></div>
-<p>(For which features to select for <code>argmin-math</code> please see the
-<a href="https://docs.rs/argmin/latest/argmin-math">documentation</a>.)</p>
-<h3 id="features"><a href="#features">Features</a></h3><h4 id="default-features"><a href="#default-features">Default features</a></h4>
-<ul>
-<li><code>slog-logger</code>: Support for logging using <code>slog</code></li>
-<li><code>serde1</code>: Support for <code>serde</code>. Needed for checkpointing and writing parameters to disk as
-well as logging to disk.</li>
-</ul>
-<h4 id="optional-features"><a href="#optional-features">Optional features</a></h4>
-<p>The <code>ctrlc</code> feature uses the <code>ctrlc</code> crate to properly stop the optimization (and return the
-current best result) after pressing Ctrl+C during an optimization run.</p>
-<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
- argmin = { version = &quot;0.5.0&quot;, features = [&quot;ctrlc&quot;] }</code></pre></div>
-<p>The <code>rayon</code> feature adds <code>rayon</code> as a depenceny and allows for parallel computation of cost
-functions, operators, gradients, Jacobians and Hessians. Note that only solvers that operate on
-multiple parameter vectors per iteration benefit from this feature (e.g. Particle Swarm
-Optimization).</p>
-<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
- argmin = { version = &quot;0.5.0&quot;, features = [&quot;rayon&quot;] }</code></pre></div><h4 id="experimental-support-for-compiling-to-webassembly"><a href="#experimental-support-for-compiling-to-webassembly">Experimental support for compiling to WebAssembly</a></h4>
-<p>When compiling to WASM, the feature <code>wasm-bindgen</code> must be used.</p>
-<p>WASM support is still experimental. Please report any issues you encounter when using argmin
-in a WASM context.</p>
-<h4 id="compiling-without-serde-dependency"><a href="#compiling-without-serde-dependency">Compiling without <code>serde</code> dependency</a></h4>
-<p>The <code>serde</code> dependency can be removed by turning off the <code>serde1</code> feature, for instance like so:</p>
-<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
- argmin = { version = &quot;0.5.0&quot;, default-features = false, features = [&quot;slog-logger&quot;] }</code></pre></div>
-<p>Note that this will remove the ability to write parameters and logs to disk as well as
-checkpointing.</p>
-<h3 id="running-the-tests-and-building-the-examples"><a href="#running-the-tests-and-building-the-examples">Running the tests and building the examples</a></h3>
-<p>For running all tests and examples, it is recommended to enable all features:</p>
-<div class="example-wrap"><pre class="language-bash"><code>cargo test --all-features</code></pre></div><h2 id="defining-a-problem"><a href="#defining-a-problem">Defining a problem</a></h2>
-<p>TODO TODO TODO TODO Rewrite! Also mention bulk methods.
-A problem can be defined by implementing the <code>ArgminOp</code> trait which comes with the
-associated types <code>Param</code>, <code>Output</code> and <code>Hessian</code>. <code>Param</code> is the type of your
-parameter vector (i.e. the input to your cost function), <code>Output</code> is the type returned
-by the cost function, <code>Hessian</code> is the type of the Hessian and <code>Jacobian</code> is the type of the
-Jacobian.
-The trait provides the following methods:</p>
-<ul>
-<li><code>apply(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt;</code>: Applys the cost
-function to parameters <code>p</code> of type <code>Self::Param</code> and returns the cost function value.</li>
-<li><code>gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Param, Error&gt;</code>: Computes the
-gradient at <code>p</code>.</li>
-<li><code>hessian(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt;</code>: Computes the Hessian
-at <code>p</code>.</li>
-<li><code>jacobian(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Jacobian, Error&gt;</code>: Computes the Jacobian
-at <code>p</code>.</li>
-</ul>
-<p>The following code snippet shows an example of how to use the Rosenbrock test functions from
-<code>argmin-testfunctions</code> in argmin:</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">argmin_testfunctions</span>::{<span class="ident">rosenbrock_2d</span>, <span class="ident">rosenbrock_2d_derivative</span>, <span class="ident">rosenbrock_2d_hessian</span>};
-<span class="kw">use</span> <span class="ident">argmin::core</span>::{<span class="ident">Error</span>, <span class="ident">CostFunction</span>, <span class="ident">Gradient</span>, <span class="ident">Hessian</span>};
-
-<span class="doccomment">/// First, create a struct for your problem</span>
-<span class="kw">struct</span> <span class="ident">Rosenbrock</span> {
-    <span class="ident">a</span>: <span class="ident">f64</span>,
-    <span class="ident">b</span>: <span class="ident">f64</span>,
-}
-
-<span class="doccomment">/// Implement `CostFunction` for `Rosenbrock`</span>
-<span class="kw">impl</span> <span class="ident">CostFunction</span> <span class="kw">for</span> <span class="ident">Rosenbrock</span> {
-    <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="doccomment">/// Type of the return value computed by the cost function</span>
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
-
-    <span class="doccomment">/// Apply the cost function to a parameter `p`</span>
-    <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">rosenbrock_2d</span>(<span class="ident">p</span>, <span class="number">1.0</span>, <span class="number">100.0</span>))
-    }
-}
-
-<span class="doccomment">/// Implement `Gradient` for `Rosenbrock`</span>
-<span class="kw">impl</span> <span class="ident">Gradient</span> <span class="kw">for</span> <span class="ident">Rosenbrock</span> {
-    <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="doccomment">/// Type of the return value computed by the cost function</span>
-    <span class="kw">type</span> <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Compute the gradient at parameter `p`.</span>
-    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Gradient</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">rosenbrock_2d_derivative</span>(<span class="ident">p</span>, <span class="number">1.0</span>, <span class="number">100.0</span>))
-    }
-}
-
-<span class="doccomment">/// Implement `Hessian` for `Rosenbrock`</span>
-<span class="kw">impl</span> <span class="ident">Hessian</span> <span class="kw">for</span> <span class="ident">Rosenbrock</span> {
-    <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="doccomment">/// Type of the Hessian. Can be `()` if not needed.</span>
-    <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Compute the Hessian at parameter `p`.</span>
-    <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">rosenbrock_2d_hessian</span>(<span class="ident">p</span>, <span class="number">1.0</span>, <span class="number">100.0</span>);
-        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="ident">t</span>[<span class="number">0</span>], <span class="ident">t</span>[<span class="number">1</span>]], <span class="macro">vec!</span>[<span class="ident">t</span>[<span class="number">2</span>], <span class="ident">t</span>[<span class="number">3</span>]]])
-    }
-}</code></pre></div>
-<p>It is optional to implement any of these methods, as there are default implementations which
-will return an <code>Err</code> when called. What needs to be implemented is defined by the requirements
-of the solver that is to be used.</p>
-<h2 id="running-a-solver"><a href="#running-a-solver">Running a solver</a></h2>
-<p>The following example shows how to use the previously shown definition of a problem in a
-Steepest Descent (Gradient Descent) solver.</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">argmin::core</span>::{<span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">CostFunction</span>, <span class="ident">Gradient</span>};
-<span class="kw">use</span> <span class="ident">argmin::core::observers</span>::{<span class="ident">SlogLogger</span>, <span class="ident">ObserverMode</span>};
-<span class="kw">use</span> <span class="ident">argmin::solver::gradientdescent::SteepestDescent</span>;
-<span class="kw">use</span> <span class="ident">argmin::solver::linesearch::MoreThuenteLineSearch</span>;
-
-<span class="comment">// Define cost function (must implement `CostFunction` and `Gradient`)</span>
-<span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">Rosenbrock</span> { <span class="ident">a</span>: <span class="number">1.0</span>, <span class="ident">b</span>: <span class="number">100.0</span> };
-  
-<span class="comment">// Define initial parameter vector</span>
-<span class="kw">let</span> <span class="ident">init_param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.2</span>, <span class="number">1.0</span>];
-  
-<span class="comment">// Set up line search</span>
-<span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-  
-<span class="comment">// Set up solver</span>
-<span class="kw">let</span> <span class="ident">solver</span> <span class="op">=</span> <span class="ident">SteepestDescent::new</span>(<span class="ident">linesearch</span>);
-  
-<span class="comment">// Run solver</span>
-<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">cost</span>, <span class="ident">solver</span>)
-    .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span>
-        <span class="ident">config</span>
-            <span class="comment">// Set initial parameters</span>
-            .<span class="ident">param</span>(<span class="ident">init_param</span>)
-            <span class="comment">// Set maximum iterations to 10</span>
-            .<span class="ident">max_iters</span>(<span class="number">10</span>)
-    )
-    <span class="comment">// Add an observer which will log all iterations to the terminal</span>
-    .<span class="ident">add_observer</span>(<span class="ident">SlogLogger::term</span>(), <span class="ident">ObserverMode::Always</span>)
-    <span class="comment">// run the solver on the defined problem</span>
-    .<span class="ident">run</span>()<span class="question-mark">?</span>;
-<span class="comment">// print result</span>
-<span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">res</span>);</code></pre></div>
-<h2 id="observing-iterations"><a href="#observing-iterations">Observing iterations</a></h2>
-<p>Argmin offers an interface to observe the state of the solver at initialization as well as
-after every iteration. This includes the parameter vector, gradient, Hessian, iteration number,
-cost values and many more as well as solver-specific metrics. This interface can be used to
-implement loggers, send the information to a storage or to plot metrics.
-Observers need to implement the <code>Observe</code> trait.
-Argmin ships with a logger based on the <code>slog</code> crate. <code>SlogLogger::term</code> logs to the
-terminal and <code>SlogLogger::file</code> logs to a file in JSON format. Both loggers also come
-with a <code>*_noblock</code> version which does not block the execution of logging, but may drop some
-messages in case of a full buffer.
-Parameter vectors can be written to disk using <code>WriteToFile</code>.
-For each observer it can be defined how often it will observe the progress of the solver. This
-is indicated via the enum <code>ObserverMode</code> which can be either <code>Always</code>, <code>Never</code>, <code>NewBest</code>
-(whenever a new best solution is found) or <code>Every(i)</code> which means every <code>i</code>th iteration.</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
-    .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">init_param</span>).<span class="ident">max_iters</span>(<span class="number">2</span>))
-    <span class="comment">// Add an observer which will log all iterations to the terminal (without blocking)</span>
-    .<span class="ident">add_observer</span>(<span class="ident">SlogLogger::term_noblock</span>(), <span class="ident">ObserverMode::Always</span>)
-    <span class="comment">// Log to file whenever a new best solution is found</span>
-    .<span class="ident">add_observer</span>(<span class="ident">SlogLogger::file</span>(<span class="string">&quot;solver.log&quot;</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">ObserverMode::NewBest</span>)
-    <span class="comment">// Write parameter vector to `params/param.arg` every 20th iteration</span>
-    .<span class="ident">add_observer</span>(
-        <span class="ident">WriteToFile::new</span>(<span class="string">&quot;params&quot;</span>, <span class="string">&quot;param&quot;</span>, <span class="ident">WriteToFileSerializer::JSON</span>),
-        <span class="ident">ObserverMode::Every</span>(<span class="number">20</span>)
-    )
-    <span class="comment">// run the solver on the defined problem</span>
-    .<span class="ident">run</span>()<span class="question-mark">?</span>;</code></pre></div>
-<h2 id="checkpoints"><a href="#checkpoints">Checkpoints</a></h2>
-<p>Checkpointing is a useful mechanism for mitigating the effects of crashes when software is run
-in unstable environment, particularly for long run times. Checkpoints are saved regularly with
-a definable frequency. Optimizations can then be resumed from a given checkpoint after a crash.</p>
-<p>A <code>FileCheckpoint</code> is provided, which saves checkpoints to disk. Via the <code>Checkpoint</code> trait
-other checkpointing mechanisms can be implemented.</p>
-<p>The <code>CheckpointingFrequency</code> defines how often checkpoints are saved and is either <code>Always</code>
-(every iteration), <code>Every(u64)</code> (every Nth iteration) or <code>Never</code>.</p>
-<p>The following example shows how the <code>checkpointing</code> method is used to activate checkpointing.
-If no checkpoint is available on disk, an optimization will be started from scratch. If the run
-crashes and a checkpoint is found on disk, then it will resume from the checkpoint.</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">checkpoint</span> <span class="op">=</span> <span class="ident">FileCheckpoint::new</span>(
-    <span class="string">&quot;.checkpoints&quot;</span>,
-    <span class="string">&quot;optim&quot;</span>,
-    <span class="ident">CheckpointingFrequency::Every</span>(<span class="number">20</span>)
-);
-
-<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">Rosenbrock</span> {}, <span class="ident">solver</span>)
-    .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">init_param</span>).<span class="ident">max_iters</span>(<span class="ident">iters</span>))
-    .<span class="ident">checkpointing</span>(<span class="ident">checkpoint</span>)
-    .<span class="ident">run</span>()<span class="question-mark">?</span>;</code></pre></div>
-<h2 id="implementing-an-optimization-algorithm"><a href="#implementing-an-optimization-algorithm">Implementing an optimization algorithm</a></h2>
-<p>In this section we are going to implement the Landweber solver, which essentially is a special
-form of gradient descent. In iteration <code>k</code>, the new parameter vector <code>x_{k+1}</code> is calculated
-from the previous parameter vector <code>x_k</code> and the gradient at <code>x_k</code> according to the following
-update rule:</p>
-<p><code>x_{k+1} = x_k - omega * \nabla f(x_k)</code></p>
-<p>In order to implement this using the argmin framework, one first needs to define a struct which
-holds data specific to the solver. Then, the <code>Solver</code> trait needs to be implemented for the
-struct. This requires setting the associated constant <code>NAME</code> which gives your solver a name.
-The <code>next_iter</code> method defines the computations performed in a single iteration of the solver.
-Via the parameters <code>problem</code> and <code>state</code> one has access to the problem (cost function, gradient
-computation, Hessian, …) and to the current state of the optimization (parameter vectors,
-cost function values, iteration number, …), respectively.</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">argmin::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">KV</span>, <span class="ident">Error</span>, <span class="ident">Gradient</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">State</span>
-};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">argmin_math::ArgminScaledSub</span>;
-
-<span class="comment">// Define a struct which holds any parameters/data which are needed during the execution of the</span>
-<span class="comment">// solver. Note that this does not include parameter vectors, gradients, Hessians, cost</span>
-<span class="comment">// function values and so on, as those will be handled by the `Executor`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Landweber</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// omega</span>
-    <span class="ident">omega</span>: <span class="ident">F</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Landweber</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructor</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">omega</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Landweber</span> { <span class="ident">omega</span> }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span>, <span class="ident">P</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Landweber</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="comment">// `O` needs to implement `Gradient` for the Landweber solver</span>
-    <span class="ident">O</span>: <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="comment">// `P` needs to implement `ArgminScaledSub` because of the update formula</span>
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
-{
-    <span class="comment">// This gives the solver a name which will be used for logging</span>
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Landweber&quot;</span>;
-
-    <span class="comment">// Defines the computations performed in a single iteration.</span>
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="comment">// This gives access to the problem supplied to the `Executor`. `O` implements</span>
-        <span class="comment">// `Gradient` and `Problem` takes care of counting the calls to the respective</span>
-        <span class="comment">// functions.</span>
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="comment">// Current state of the optimization. This gives access to the parameter vector,</span>
-        <span class="comment">// gradient, Hessian and cost function value of the current, previous and best</span>
-        <span class="comment">// iteration as well as current iteration number, and many more.</span>
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// First we obtain the current parameter vector from the `state` struct (`x_k`).</span>
-        <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
-        <span class="comment">// Then we compute the gradient at `x_k` (`\nabla f(x_k)`)</span>
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk</span>)<span class="question-mark">?</span>;
-        <span class="comment">// Now subtract `\nabla f(x_k)` scaled by `omega` from `x_k` to compute `x_{k+1}`</span>
-        <span class="kw">let</span> <span class="ident">xkp1</span> <span class="op">=</span> <span class="ident">xk</span>.<span class="ident">scaled_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">omega</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>);
-        <span class="comment">// Return new the updated `state`</span>
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">xkp1</span>), <span class="prelude-val">None</span>))
-    }
-}</code></pre></div>
 <h2 id="license"><a href="#license">License</a></h2>
 <p>Licensed under either of</p>
 <ul>
@@ -383,7 +113,7 @@ cost function values, iteration number, …), respectively.</p>
 in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
 without any additional terms or conditions.</p>
 </div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="core/index.html" title="argmin::core mod">core</a></div><div class="item-right docblock-short"><p>Argmin Optimization toolbox core</p>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="core/index.html" title="argmin::core mod">core</a></div><div class="item-right docblock-short"><p>argmin optimization toolbox core</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="solver/index.html" title="argmin::solver mod">solver</a></div><div class="item-right docblock-short"><p>Solvers</p>
 </div></div></div><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.argmin_error.html" title="argmin::argmin_error macro">argmin_error</a></div><div class="item-right docblock-short"><p>Create an <code>ArgminError</code> with a provided message.</p>
@@ -394,5 +124,5 @@ without any additional terms or conditions.</p>
 <code>ArgminError</code> with a provided message.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.float.html" title="argmin::float macro">float</a></div><div class="item-right docblock-short"><p>Convert a constant to a float of given precision</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.make_kv.html" title="argmin::make_kv macro">make_kv</a></div><div class="item-right docblock-short"><p>Creates an <code>KV</code> at compile time</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

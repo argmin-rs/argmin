@@ -350,6 +350,111 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -359,9 +464,10 @@
 
 <span class="doccomment">//! # Observers</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Observers are called after an iteration of a solver was performed and enable the user to observe</span>
-<span class="doccomment">//! the current state of the optimization. This can for instance be used for logging the state of</span>
-<span class="doccomment">//! the optimizor or for writing the current parameter vector to disk.</span>
+<span class="doccomment">//! Argmin offers an interface to observe the state of the solver at initialization as well as</span>
+<span class="doccomment">//! after every iteration. This includes the parameter vector, gradient, Jacobian, Hessian,</span>
+<span class="doccomment">//! iteration number, cost values and many more as well as solver-specific metrics. This interface</span>
+<span class="doccomment">//! can be used to implement loggers, send the information to a storage or to plot metrics.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The observer [`WriteToFile`](`crate::core::observers::WriteToFile`) saves the parameter vector</span>
 <span class="doccomment">//! to disk and as such requires the parameter vector to be serializable. Hence this feature is</span>
@@ -369,7 +475,111 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The observer [`SlogLogger`](`crate::core::observers::SlogLogger`) logs the progress of the</span>
 <span class="doccomment">//! optimization to screen or to disk. This requires the `slog-logger` feature. Writing to disk</span>
-<span class="doccomment">//! requires the `serde1` feature in addition.</span>
+<span class="doccomment">//! in addtion requires the `serde1` feature.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For each observer it can be defined how often it will observe the progress of the solver. This</span>
+<span class="doccomment">//! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`</span>
+<span class="doccomment">//! (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Custom observers can be used as well by implementing the [`crate::core::observers::Observe`]</span>
+<span class="doccomment">//! trait.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Example</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! # #![allow(unused_imports)]</span>
+<span class="doccomment">//! # extern crate argmin;</span>
+<span class="doccomment">//! # extern crate argmin_testfunctions;</span>
+<span class="doccomment">//! # use argmin::core::{Error, Executor, CostFunction, Gradient, observers::ObserverMode};</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
+<span class="doccomment">//! # use argmin::core::observers::SlogLogger;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
+<span class="doccomment">//! # use argmin::core::observers::{WriteToFile, WriteToFileSerializer};</span>
+<span class="doccomment">//! # use argmin::solver::gradientdescent::SteepestDescent;</span>
+<span class="doccomment">//! # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
+<span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # struct Rosenbrock {</span>
+<span class="doccomment">//! #     a: f64,</span>
+<span class="doccomment">//! #     b: f64,</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # /// Implement `CostFunction` for `Rosenbrock`</span>
+<span class="doccomment">//! # impl CostFunction for Rosenbrock {</span>
+<span class="doccomment">//! #     /// Type of the parameter vector</span>
+<span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
+<span class="doccomment">//! #     type Output = f64;</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! #     /// Apply the cost function to a parameter `p`</span>
+<span class="doccomment">//! #     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
+<span class="doccomment">//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))</span>
+<span class="doccomment">//! #     }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # /// Implement `Gradient` for `Rosenbrock`</span>
+<span class="doccomment">//! # impl Gradient for Rosenbrock {</span>
+<span class="doccomment">//! #     /// Type of the parameter vector</span>
+<span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
+<span class="doccomment">//! #     type Gradient = Vec&lt;f64&gt;;</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! #     /// Compute the gradient at parameter `p`.</span>
+<span class="doccomment">//! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {</span>
+<span class="doccomment">//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))</span>
+<span class="doccomment">//! #     }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # fn run() -&gt; Result&lt;(), Error&gt; {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # // Define cost function (must implement `CostFunction` and `Gradient`)</span>
+<span class="doccomment">//! # let problem = Rosenbrock { a: 1.0, b: 100.0 };</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # // Define initial parameter vector</span>
+<span class="doccomment">//! # let init_param: Vec&lt;f64&gt; = vec![-1.2, 1.0];</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # // Set up line search</span>
+<span class="doccomment">//! # let linesearch = MoreThuenteLineSearch::new();</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # // Set up solver</span>
+<span class="doccomment">//! # let solver = SteepestDescent::new(linesearch);</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! // [...]</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let res = Executor::new(problem, solver)</span>
+<span class="doccomment">//!     .configure(|config| config.param(init_param).max_iters(2))</span>
+<span class="doccomment">//! # ;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
+<span class="doccomment">//! # let res = res</span>
+<span class="doccomment">//!     // Add an observer which will log all iterations to the terminal (without blocking)</span>
+<span class="doccomment">//!     .add_observer(SlogLogger::term_noblock(), ObserverMode::Always)</span>
+<span class="doccomment">//! # ;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
+<span class="doccomment">//! # let res = res</span>
+<span class="doccomment">//!     // Log to file whenever a new best solution is found</span>
+<span class="doccomment">//!     .add_observer(SlogLogger::file(&quot;solver.log&quot;, false)?, ObserverMode::NewBest)</span>
+<span class="doccomment">//!     // Write parameter vector to `params/param.arg` every 20th iteration</span>
+<span class="doccomment">//!     .add_observer(</span>
+<span class="doccomment">//!         WriteToFile::new(&quot;params&quot;, &quot;param&quot;, WriteToFileSerializer::JSON),</span>
+<span class="doccomment">//!         ObserverMode::Every(20)</span>
+<span class="doccomment">//!     )</span>
+<span class="doccomment">//! # ;</span>
+<span class="doccomment">//! # let res = res</span>
+<span class="doccomment">//!     // run the solver on the defined problem</span>
+<span class="doccomment">//!     .run()?;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // [...]</span>
+<span class="doccomment">//! #     Ok(())</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # fn main() {</span>
+<span class="doccomment">//! #     if let Err(ref e) = run() {</span>
+<span class="doccomment">//! #         println!(&quot;{}&quot;, e);</span>
+<span class="doccomment">//! #         std::process::exit(1);</span>
+<span class="doccomment">//! #     }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">file</span>;
@@ -698,5 +908,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

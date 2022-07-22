@@ -426,6 +426,10 @@
 <span id="421">421</span>
 <span id="422">422</span>
 <span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -458,6 +462,10 @@
 <span class="doccomment">/// A tolerance on the gradient can be configured with</span>
 <span class="doccomment">/// [`with_tolerance_grad`](`DFP::with_tolerance_grad`): If the norm of the gradient is below</span>
 <span class="doccomment">/// said tolerance, the algorithm stops. It defaults to `sqrt(EPSILON)`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Requirements on the optimization problem</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## Reference</span>
 <span class="doccomment">///</span>
@@ -850,5 +858,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

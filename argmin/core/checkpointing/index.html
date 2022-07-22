@@ -4,12 +4,38 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"><a href="#">Module checkpointing</a></h2><div class="sidebar-elems"><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div></section><div id="sidebar-vars" data-name="checkpointing" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../argmin/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Module <a href="../../index.html">argmin</a>::<wbr><a href="../index.html">core</a>::<wbr><a class="mod" href="#">checkpointing</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../../src/argmin/core/checkpointing/mod.rs.html#8-140">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Checkpointing</p>
+    <h1 class="fqn"><span class="in-band">Module <a href="../../index.html">argmin</a>::<wbr><a href="../index.html">core</a>::<wbr><a class="mod" href="#">checkpointing</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../../src/argmin/core/checkpointing/mod.rs.html#8-234">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="checkpointing"><a href="#checkpointing">Checkpointing</a></h2>
+<p>Checkpointing is a useful mechanism for mitigating the effects of crashes when software is run
+in an unstable environment, particularly for long run times. Checkpoints are saved regularly
+with a user-chosen frequency. Optimizations can then be resumed from a given checkpoint after a
+crash.</p>
+<p>For saving checkpoints to disk, <code>FileCheckpoint</code> is provided.
+Via the <code>Checkpoint</code> trait other checkpointing approaches can be implemented.</p>
+<p>The <code>CheckpointingFrequency</code> defines how often checkpoints are saved and can be chosen to be
+either <code>Always</code> (every iteration), <code>Every(u64)</code> (every Nth iteration) or <code>Never</code>.</p>
+<p>The following example shows how the <code>checkpointing</code> method is used to activate checkpointing.
+If no checkpoint is available on disk, an optimization will be started from scratch. If the run
+crashes and a checkpoint is found on disk, then it will resume from the checkpoint.</p>
+<h3 id="example"><a href="#example">Example</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// [...]</span>
+
+<span class="kw">let</span> <span class="ident">checkpoint</span> <span class="op">=</span> <span class="ident">FileCheckpoint::new</span>(
+    <span class="string">&quot;.checkpoints&quot;</span>,
+    <span class="string">&quot;optim&quot;</span>,
+    <span class="ident">CheckpointingFrequency::Every</span>(<span class="number">20</span>)
+);
+
+<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">my_optimization_problem</span>, <span class="ident">solver</span>)
+    .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">init_param</span>).<span class="ident">max_iters</span>(<span class="ident">iters</span>))
+    .<span class="ident">checkpointing</span>(<span class="ident">checkpoint</span>)
+    .<span class="ident">run</span>()<span class="question-mark">?</span>;
+
+<span class="comment">// [...]</span></code></pre></div>
 </div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.FileCheckpoint.html" title="argmin::core::checkpointing::FileCheckpoint struct">FileCheckpoint</a></div><div class="item-right docblock-short"><p>Handles saving a checkpoint to disk as a binary file.</p>
 </div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.CheckpointingFrequency.html" title="argmin::core::checkpointing::CheckpointingFrequency enum">CheckpointingFrequency</a></div><div class="item-right docblock-short"><p>Defines at which intervals a checkpoint is saved.</p>
 </div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Checkpoint.html" title="argmin::core::checkpointing::Checkpoint trait">Checkpoint</a></div><div class="item-right docblock-short"><p>An interface for checkpointing methods</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

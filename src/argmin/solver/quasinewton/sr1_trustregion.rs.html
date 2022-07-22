@@ -555,6 +555,11 @@
 <span id="550">550</span>
 <span id="551">551</span>
 <span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2019-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -579,6 +584,11 @@
 <span class="doccomment">/// region framework. An initial parameter vector must be provided, initial cost, gradient and</span>
 <span class="doccomment">/// Hessian are optional and will be computed if not provided.</span>
 <span class="doccomment">/// Requires a [trust region sub problem](`crate::solver::trustregion`).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Requirements on the optimization problem</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`], [`Gradient`] and</span>
+<span class="doccomment">/// [`Hessian`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## Reference</span>
 <span class="doccomment">///</span>
@@ -1108,5 +1118,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

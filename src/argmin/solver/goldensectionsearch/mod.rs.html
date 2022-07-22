@@ -500,6 +500,8 @@
 <span id="495">495</span>
 <span id="496">496</span>
 <span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -542,10 +544,12 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Requires that the provided optimization problem implements [`CostFunction`].</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// Requires an initial guess which is to be provided via [`Executor`](`crate::core::Executor`)s</span>
 <span class="doccomment">/// `configure` method.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Requirements on the optimization problem</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## Reference</span>
 <span class="doccomment">///</span>
@@ -998,5 +1002,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

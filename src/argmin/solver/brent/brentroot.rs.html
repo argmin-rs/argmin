@@ -190,14 +190,6 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -205,19 +197,6 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! Brent&#39;s method</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A root-finding algorithm combining the bisection method, the secant method</span>
-<span class="doccomment">//! and inverse quadratic interpolation. It has the reliability of bisection</span>
-<span class="doccomment">//! but it can be as quick as some of the less-reliable methods.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # References:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;https://en.wikipedia.org/wiki/Brent%27s_method&gt;</span>
-<span class="doccomment">//!</span>
-
-<span class="doccomment">/// Implementation of Brent&#39;s optimization method,</span>
-<span class="doccomment">/// see &lt;https://en.wikipedia.org/wiki/Brent%27s_method&gt;</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
     <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">State</span>, <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
 };
@@ -233,13 +212,18 @@
     <span class="ident">WrongSign</span>,
 }
 
-<span class="doccomment">/// Brent&#39;s method</span>
+<span class="doccomment">/// # Brent&#39;s method</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A root-finding algorithm combining the bisection method, the secant method</span>
 <span class="doccomment">/// and inverse quadratic interpolation. It has the reliability of bisection</span>
 <span class="doccomment">/// but it can be as quick as some of the less-reliable methods.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # References:</span>
+<span class="doccomment">/// ## Requirements on the optimization problem</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ##  Reference</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// &lt;https://en.wikipedia.org/wiki/Brent%27s_method&gt;</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
@@ -394,5 +378,5 @@
     <span class="macro">test_trait_impl!</span>(<span class="ident">brent</span>, <span class="ident">BrentRoot</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

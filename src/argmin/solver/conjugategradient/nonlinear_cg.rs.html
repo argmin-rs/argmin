@@ -495,6 +495,8 @@
 <span id="490">490</span>
 <span id="491">491</span>
 <span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -514,13 +516,15 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// A generalization of the conjugate gradient method for nonlinear optimization problems.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Requires that the provided optimization problem implements [`CostFunction`] and [`Gradient`].</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// Requires an initial parameter vector.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # Reference</span>
+<span class="doccomment">/// ## Requirements on the optimization problem</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
+<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Reference</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
 <span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
@@ -988,5 +992,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

@@ -286,15 +286,6 @@
 <span id="281">281</span>
 <span id="282">282</span>
 <span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -302,32 +293,23 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="doccomment">//! Brent&#39;s method</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A minimization algorithm combining parabolic interpolation and the</span>
-<span class="doccomment">//! golden-section method.  It has the reliability of the golden-section</span>
-<span class="doccomment">//! method, but can be faster thanks to the parabolic interpolation steps.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # References:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &quot;An algorithm with guaranteed convergence for finding a minimum of</span>
-<span class="doccomment">//! a function of one variable&quot;, _Algorithms for minimization without</span>
-<span class="doccomment">//! derivatives_, Richard P. Brent, 1973, Prentice-Hall.</span>
-
-<span class="doccomment">/// Implementation of Brent&#39;s optimization method,</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
     <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">State</span>, <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
-<span class="doccomment">/// Brent&#39;s method</span>
+<span class="doccomment">/// # Brent&#39;s method</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A minimization algorithm combining parabolic interpolation and the</span>
 <span class="doccomment">/// golden-section method.  It has the reliability of the golden-section</span>
 <span class="doccomment">/// method, but can be faster thanks to the parabolic interpolation steps.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # References:</span>
+<span class="doccomment">/// ## Requirements on the optimization problem</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Reference</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// &quot;An algorithm with guaranteed convergence for finding a minimum of</span>
 <span class="doccomment">/// a function of one variable&quot;, _Algorithms for minimization without</span>
@@ -588,5 +570,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

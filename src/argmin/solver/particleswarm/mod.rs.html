@@ -732,6 +732,9 @@
 <span id="727">727</span>
 <span id="728">728</span>
 <span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -770,6 +773,10 @@
 <span class="doccomment">/// The `rayon` feature enables parallel computation of the cost function. This can be beneficial</span>
 <span class="doccomment">/// for expensive cost functions, but may cause a drop in performance for cheap cost functions. Be</span>
 <span class="doccomment">/// sure to benchmark both parallel and sequential computation.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Requirements on the optimization problem</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## References</span>
 <span class="doccomment">///</span>
@@ -1034,7 +1041,6 @@
 
         <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="ident">P::zero_like</span>(<span class="kw-2">&amp;</span><span class="ident">best_particle</span>.<span class="ident">position</span>);
 
-        <span class="comment">// for p in particles.iter_mut() {</span>
         <span class="kw">let</span> <span class="ident">positions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">particles</span>
             .<span class="ident">iter_mut</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
@@ -1462,5 +1468,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>
