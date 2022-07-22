@@ -1,7 +1,7 @@
 <p align="center">
   <img
     width="400"
-    src="https://raw.githubusercontent.com/argmin-rs/argmin/media/logo.png"
+    src="https://raw.githubusercontent.com/argmin-rs/argmin/main/media/logo.png"
   />
 </p>
 <p align="center">
