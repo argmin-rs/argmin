@@ -10,7 +10,8 @@
 //! For details see [`CMAES`].
 
 use crate::core::{
-    ArgminFloat, CostFunction, Error, PopulationState, Problem, SerializeAlias, Solver, KV,
+    ArgminFloat, CostFunction, Error, PopulationState, Problem, SerializeAlias, Solver, SyncAlias,
+    KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminArgsort, ArgminAxisIter, ArgminBroadcast, ArgminDiv, ArgminDot,
@@ -45,10 +46,10 @@ use std::ops::{AddAssign, MulAssign};
 /// }
 ///
 /// impl CostFunction for Rosenbrock {
-/// type Param = Vec<f32>;
-/// type Output = f32;
+///     type Param = Vec<f32>;
+///     type Output = f32;
 ///
-/// fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+///     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
 ///         Ok(rosenbrock_2d(p, self.a, self.b))
 ///     }
 /// }
@@ -203,11 +204,12 @@ where
 
 impl<O, P, F> Solver<O, PopulationState<P, F, P::Array2D>> for CMAES<P, F>
 where
-    O: CostFunction<Param = P, Output = F>,
+    O: CostFunction<Param = P, Output = F> + SyncAlias,
     Vec<F>: ArgminArgsort,
     F: ArgminFloat + MulAssign + AddAssign + NumCast + ArgminDiv<P, P>,
     P: SerializeAlias
         + Clone
+        + SyncAlias
         + ArgminTransition
         + ArgminSize<usize>
         + ArgminZeroLike
@@ -251,12 +253,9 @@ where
 
         state.population = Some(self.generate());
 
-        let fitness: Vec<F> = state
-            .get_population()
-            .unwrap()
-            .row_iterator()
-            .map(|p| problem.cost(&p).unwrap())
-            .collect();
+        let fitness: Vec<F> = problem
+            .bulk_cost(&state.get_population().unwrap().row_iterator().collect())
+            .unwrap();
 
         let fitness_indices = fitness.argsort();
 
@@ -411,7 +410,6 @@ mod tests {
         assert!(state.best_individual.is_some());
 
         let solution = state.best_individual.unwrap();
-        println!("{:?}", solution);
         assert!((solution[0] - 1.0).abs() <= precision);
         assert!((solution[1] - 1.0).abs() <= precision);
     }
