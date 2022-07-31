@@ -15,7 +15,7 @@
   |
   <a href="https://docs.rs/argmin">Docs (latest release)</a>
   |
-  <a href="https://docs.rs/argmin">Docs (main branch)</a>
+  <a href="https://argmin-rs.github.io/argmin/argmin/">Docs (main branch)</a>
   |
   <a href="https://github.com/argmin-rs/argmin/tree/v0.5.0/examples">Examples (latest release)</a>
   |
@@ -86,8 +86,6 @@ An optional checkpointing mechanism helps to mitigate the negative effects of cr
 Due to Rusts powerful generics and traits, most features can be exchanged by your own tailored implementations.
 
 argmin is designed to simplify the implementation of optimization algorithms and as such can also be used as a toolbox for the development of new algorithms. One can focus on the algorithm itself, while the handling of termination, parameter vectors, populations, gradients, Jacobians and Hessians is taken care of by the library.
-
-**This is the README for the current development version. For the README of the most recent release please visit [crates.io](https://crates.io/crates/argmin)!**
 
 
 ## Algorithms
