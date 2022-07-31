@@ -1,90 +1,57 @@
-# argmin-math
-[![argmin CI](https://github.com/argmin-rs/argmin/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/argmin-rs/argmin/actions/workflows/ci.yml)
-[![argmin-math on crates.io](https://img.shields.io/crates/v/argmin-math)](https://crates.io/crates/argmin-math)
-[![argmin-math on docs.rs](https://docs.rs/argmin-math/badge.svg)](https://docs.rs/argmin-math)
-[![Source Code Repository](https://img.shields.io/badge/Code-On%20github.com-blue)](https://github.com/argmin-rs/argmin)
-[![argmin-math on deps.rs](https://deps.rs/repo/github/argmin-rs/argmin/status.svg)](https://deps.rs/repo/github/argmin-rs/argmin)
-![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
-![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
-[![Gitter chat](https://badges.gitter.im/argmin-rs/community.png)](https://gitter.im/argmin-rs/community)
+<p align="center">
+  <img
+    width="400"
+    src="https://raw.githubusercontent.com/argmin-rs/argmin/main/media/logo.png"
+  />
+</p>
+<p align="center">
+    Mathematical optimization in pure Rust
+</p>
 
-argmin-math provides mathematics related abstractions needed in argmin. It supports implementations of these abstractions for basic `Vec`s and for `ndarray` and `nalgebra`. The traits can of course also be implemented for your own types to make them compatible with argmin.
+<p align="center">
+  <a href="http://argmin-rs.org">Website</a>
+  |
+  <a href="http://argmin-rs.org/book/">Book</a>
+  |
+  <a href="https://docs.rs/argmin-math">Docs (latest release)</a>
+  |
+  <a href="https://argmin-rs.github.io/argmin/argmin_math/">Docs (main branch)</a>
+</p>
 
-
-## Usage
-
-Add the following line to your dependencies list:
-
-
-```toml
-[dependencies]
-argmin-math = "0.1.0"
-```
-
-This will activate the `primitives` and `vec` features. For other backends see the section below.
-
-
-### Features
-
-Support for the various backends can be switched on via features:
-
-| Feature | Default | Backend |
-| --- | --- | --- |
-| `primitives` | yes | basic integer and floating point types |
-| `vec` | yes | `Vec`s (basic functionality) |
-| `ndarray_latest` | no | `ndarray` (latest supported version) |
-| `ndarray_latest-serde` | no | `ndarray` (latest supported version) + serde support |
-| `ndarray_v0_15` | no | `ndarray` (version 0.15) |
-| `ndarray_v0_15-serde` | no | `ndarray` (version 0.15) + serde support |
-| `ndarray_v0_14` | no | `ndarray` (version 0.14) |
-| `ndarray_v0_14-serde` | no | `ndarray` (version 0.14) + serde support |
-| `ndarray_v0_13` | no | `ndarray` (version 0.13) |
-| `ndarray_v0_13-serde` | no | `ndarray` (version 0.13) + serde support |
-| `nalgebra_latest` | no | `nalgebra` (latest supported version) |
-| `nalgebra_latest-serde` | no | `nalgebra` (latest supported version) + serde support |
-| `nalgebra_v0_30` | no | `nalgebra` (version 0.30) |
-| `nalgebra_v0_30-serde` | no | `nalgebra` (version 0.30) + serde support |
-| `nalgebra_v0_29` | no | `nalgebra` (version 0.29) |
-| `nalgebra_v0_29-serde` | no | `nalgebra` (version 0.29) + serde support |
-
-It is not possible to activate two versions of the same backend.
-
-The features labelled `*_latest*` are an alias for the most recent supported version of the respective backend.
-
-Note that `argmin` by default compiles with `serde` support. Therefore, unless `serde` is deliberately turned off in `argmin`, it is necessary to activiate the `serde` support in `argmin-math` as well.
-
-The default features `primitives` and `vec` can be turned off in order to only compile the trait definitions. If another backend is chosen, they will automatically be turned on again.
-
-Using the `ndarray_*` features on Windows might require to explicitly choose the `ndarray-linalg` BLAS backend in the `Cargo.toml` (see the [`ndarray-linalg` documentation for details][__link0]):
+<p align="center">
+  <a href="https://crates.io/crates/argmin-math"
+    ><img
+      src="https://img.shields.io/crates/v/argmin-math?style=flat-square"
+      alt="Crates.io version"
+  /></a>
+  <a href="https://github.com/argmin-rs/argmin/actions"
+    ><img
+      src="https://img.shields.io/github/workflow/status/argmin-rs/argmin/argmin CI/main?label=argmin CI&style=flat-square"
+      alt="GitHub Actions workflow status"
+  /></a>
+  <img
+    src="https://img.shields.io/crates/l/argmin-math?style=flat-square"
+    alt="License"
+  />
+  <a href="https://gitter.im/argmin-rs/community"
+    ><img
+      src="https://img.shields.io/gitter/room/argmin-rs/argmin?style=flat-square"
+      alt="Gitter chat"
+  /></a>
+</p>
 
 
-```toml
-ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
-```
-
-
-#### Example
-
-Activate support for the latest supported `ndarray` version:
-
-
-```toml
-[dependencies]
-argmin-math = { version = "0.1.0", features = ["ndarray_latest-serde"] }
-```
-
-
-## Contributing
-
-You found a bug? Your favourite backend is not supported? Feel free to open an issue or ideally submit a PR.
+This create provides a abstractions for mathematical operations needed in [argmin](http://argmin-rs.org).
+The supported math backends so far are basic `Vec`s, `ndarray` and `nalgebra`.
+Please consult the documentation for details.
 
 
 ## License
 
 Licensed under either of
 
- - Apache License, Version 2.0, ([LICENSE-APACHE][__link1] or <http://www.apache.org/licenses/LICENSE-2.0>)
- - MIT License ([LICENSE-MIT][__link3] or <http://opensource.org/licenses/MIT>)
+ - Apache License, Version 2.0, ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+ - MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
 
@@ -92,8 +59,3 @@ at your option.
 ### Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
-
-
- [__link0]: https://github.com/rust-ndarray/ndarray-linalg
- [__link1]: https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE
- [__link3]: https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT

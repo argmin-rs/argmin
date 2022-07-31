@@ -16,7 +16,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!(" argmin-math = \"", env!("CARGO_PKG_VERSION"), "\"")]
+#![doc = concat!("argmin-math = \"", env!("CARGO_PKG_VERSION"), "\"")]
 //! ```
 //!
 //! This will activate the `primitives` and `vec` features. For other backends see the section
@@ -73,7 +73,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!(" argmin-math = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ndarray_latest-serde\"] }")]
+#![doc = concat!("argmin-math = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ndarray_latest-serde\"] }")]
 //! ```
 //!
 //! # Contributing
