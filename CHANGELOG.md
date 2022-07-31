@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) (since argmin version 0.6.0),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (since argmin version 0.5.0).
 
-## [argmin unreleased]
+## argmin [Unreleased]
 
-## [argmin-math unreleased]
+## argmin-math [Unreleased]
 
-## [argmin v0.6.0-rc.1] and [argmin-math v0.1.0-rc.1] 2022-XX-XX
+## [argmin v0.6.0-rc.2] and [argmin-math v0.1.0-rc.1] 2022-07-31
 
 This is a rather large release with many (breaking) changes.
 
@@ -166,5 +166,5 @@ This is a rather large release with many (breaking) changes.
 For older versions please see the Git history.
 
 [Unreleased]: https://github.com/argmin-rs/argmin/compare/v0.5.1...HEAD
-[argmin v0.6.0-rc.1]: https://github.com/olivierlacan/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0-rc.1
+[argmin v0.6.0-rc.1]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0-rc.2
 [argmin-math v0.1.0-rc.1]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0-rc.1
