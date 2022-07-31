@@ -1,6 +1,53 @@
 # Changelog
 
-## argmin unreleased (xx xxxxxx xxxx)
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) (since argmin version 0.6.0),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (since argmin version 0.5.0).
+
+## [argmin unreleased]
+
+## [argmin-math unreleased]
+
+## [argmin v0.6.0-rc.1] and [argmin-math v0.1.0-rc.1] 2022-XX-XX
+
+This is a rather large release with many (breaking) changes.
+
+- Code related to the abstraction of math backends was split of into the `argmin-math` crate. This crate offers now the traits related to math operations as well as their implementations for various backends (vec, ndarray, nalgebra). The backends can be turned on and off as needed. It also supports different versions of the backends.
+- The `serde` depenency is now optional and feature-gated via `serde1`. Disabling the `serde1` feature disables checkpointing and some logging.
+- The `ArgminOp` trait was removed and replaced with more specialized traits such as `Operator`, `CostFunction`, `Gradient`, `Jacobian`, `Hessian`, `Anneal`. 
+  All of the above mentioned traits come with `bulk_*` methods wich allow one to compute cost function, gradients,... in parallel as long as the `rayon` feature is enabled. This is so far used in Particle Swarm Optimization.
+- The handling of solver-internal state was redesigned completely to allow for various kinds of state, depending on the solver. There is a `State` trait now which defines the basic functionality that a state must offer. 
+- Many aspects were redesigned to avoid unnecessary cloning
+- `ArgminResult` was renamed to `OptimizationResult` and also has a more useful API now. It returns the solver, the problem and the final internal state.
+- The `Solver` trait was redesigned 
+- The solver is now configured/initialized via the `configure` method on `Executor`
+- KV does not store Strings anymore but rather `dyn Display`. This avoids unnecessarily stringifying variables when no observer is used.
+- Checkpointing is now a trait (so everyone can implement their own checkpointing mechanisms). Also the handling of checkpoints was completely redesigned.
+- Made the API surface a bit more consistent. 
+- The prelude was removed
+- `OpWrapper` was renamed to `Problem` and has now a more consistent interface. It still keeps track of the function evaluations, but to be flexible enough to support future or user-defined traits, these are stored in a `HashMap` now.
+- PSO was redesigned and a `PopulationState` was introduced which replaces `IterState` in PSO
+- Unnecessary trait bounds on solvers were removed
+- Removed many `unwrap`s and instead return errors with meaningful error messages (for instance when something isn't initialized properly)
+- The optional `stdweb` dependency was removed
+- Documentation was improved. The README is now rather short and not created from the `lib.rs` file anymore. 
+- The website was updated and the "argmin book" was published, which is so far mainly a collection of short tutorials but will be extended in the future.
+- A lot more tests and doc tests were added
+- `ArgminError` is now `non_exhaustive`.
+- Added support for nalgebra 0.31
+- Many now useless macros were removed
+- Improved the CI to better test all aspects of the code
+- Code of conduct was added
+- Brent's optimization method was added (#77, thanks to @Armavica)
+- Fixed a bug in Nelder-Mead which was reported by @bivhitscar (thanks!)
+- Remove the Default trait bound on TrustRegion and Steihaug impls (#192, thanks to @cfunky)
+
+## argmin v0.5.1 (16 February 2022)
+
+- Fixed Bug in HagerZhang line search (#2, #184, @wfsteiner)
+- Removed Default trait bounds on TrustRegion and Steihaug implementations (#187, #192, @cfunky)
+- Inverse Hessians are now part of IterState, therefore the final inverse Hessian can be retrieved after an optimization run (#185, #186, @stefan-k)
 
 ## argmin v0.5.0 (10 January 2022)
 
@@ -117,3 +164,7 @@
 ## older versions
 
 For older versions please see the Git history.
+
+[Unreleased]: https://github.com/argmin-rs/argmin/compare/v0.5.1...HEAD
+[argmin v0.6.0-rc.1]: https://github.com/olivierlacan/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0-rc.1
+[argmin-math v0.1.0-rc.1]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0-rc.1

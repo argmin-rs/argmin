@@ -5,7 +5,7 @@ The initial state of the optimization run can be modified via the [`configure`](
 This method accepts a closure with the state as only parameter.
 This allows one to provide initial parameter vectors, cost function values, Hessians, and so on via the closure.
 There are diffent kinds/types of state and the particular kind of state used depends on the solver.
-Most solvers internally use [`IterState`](https://docs.rs/argmin/latest/argmin/core/struct.IterState.html), but some (for instance Particle Swarm Optimization or CMA-ES) use [`PopulationState`](https://docs.rs/argmin/latest/argmin/core/struct.PopulationState.html).
+Most solvers internally use [`IterState`](https://docs.rs/argmin/latest/argmin/core/struct.IterState.html), but some (for instance Particle Swarm Optimization) use [`PopulationState`](https://docs.rs/argmin/latest/argmin/core/struct.PopulationState.html).
 Please refer to the respective documentation for details on how to modify the state.
 
 Once the `Executor` is configured, the optimization is run via the [`run`](https://docs.rs/argmin/latest/argmin/core/struct.Executor.html#method.run) method.

@@ -1,6 +1,6 @@
 [package]
 name = "argmin"
-version = "0.5.0"
+version = "0.6.0-rc.2"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -8,7 +8,7 @@ description = "Mathematical optimization in pure Rust"
 documentation = "https://docs.rs/argmin/"
 homepage = "http://argmin-rs.org"
 repository = "https://github.com/argmin-rs/argmin"
-readme = "README.md"
+readme = "../README.md"
 keywords = ["optimization", "math", "science"]
 categories = ["science"]
 exclude = []
@@ -20,9 +20,9 @@ instant = {version = "0.1" }
 paste = "1"
 num-traits = { version = "0.2" }
 rand = { version = "0.8.3" }
-rand_xoshiro = { version = "0.6.0", features = ["serde1"] }
+rand_xoshiro = { version = "0.6.0" }
 thiserror = "1.0"
-argmin-math = { path = "../argmin-math", default-features = false, features = ["primitives"] }
+argmin-math = { path = "../argmin-math", version = "0.1.0-rc.1", default-features = false, features = ["primitives"] }
 # optional
 bincode = { version = "1.3.3", optional = true }
 ctrlc = { version = "3.1.2", optional = true }
@@ -50,7 +50,7 @@ serde = { version = "1.0", features = ["derive", "rc"] }
 default = ["slog-logger", "serde1"]
 wasm-bindgen = ["instant/wasm-bindgen", "getrandom/js"]
 slog-logger = ["slog", "slog-term", "slog-async"]
-serde1 = ["serde", "serde_json", "rand/serde1", "bincode", "slog-json"]
+serde1 = ["serde", "serde_json", "rand/serde1", "bincode", "slog-json", "rand_xoshiro/serde1"]
 _ndarrayl = ["argmin-math/ndarray_latest-serde"]
 _nalgebral = ["argmin-math/nalgebra_latest-serde"]
 
@@ -59,7 +59,7 @@ maintenance = { status = "actively-developed" }
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
-features = ["slog-logger", "serde1", "visualizer"]
+features = ["slog-logger", "serde1"]
 
 [[example]]
 name = "backtracking"
