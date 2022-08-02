@@ -73,7 +73,7 @@ repo_branch = "main"
 ## Math settings
 # options: true, false. Enable math support globally,
 # default: false. You can always enable math on a per page.
-math = false
+math = true
 library = "katex"  # options: "katex", "mathjax". default is "katex".
 
 ## Open Graph + Twitter Cards
