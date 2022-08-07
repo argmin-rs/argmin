@@ -4,7 +4,7 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../argmin_math/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"><a href="#">Crate argmin_math</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.1.0-rc.1</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#traits">Traits</a></li></ul></div></section><div id="sidebar-vars" data-name="argmin_math" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../argmin_math/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin_math</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin_math/lib.rs.html#8-277">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin-math provides mathematics related abstractions needed in argmin. It supports
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin_math</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin_math/lib.rs.html#8-285">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin-math provides mathematics related abstractions needed in argmin. It supports
 implementations of these abstractions for basic <code>Vec</code>s and for <code>ndarray</code> and <code>nalgebra</code>.
 The traits can of course also be implemented for your own types to make them compatible with
 argmin.</p>
@@ -38,8 +38,9 @@ below.</p>
 </tbody></table>
 </div>
 <p>It is not possible to activate two versions of the same backend.</p>
-<p>The features labelled <code>*_latest*</code> are an alias for the most recent supported version of the
-respective backend.</p>
+<p>The features labelled <code>*latest*</code> are an alias for the most recent supported version of the
+respective backend. It is however recommended to explicitly specify the desired version instead
+of using any of the <code>*latest*</code> features (see section about semantic versioning below).</p>
 <p>Note that <code>argmin</code> by default compiles with <code>serde</code> support. Therefore, unless <code>serde</code> is
 deliberately turned off in <code>argmin</code>, it is necessary to activiate the <code>serde</code> support in
 <code>argmin-math</code> as well.</p>
@@ -51,7 +52,12 @@ details</a>):</p>
 <div class="example-wrap"><pre class="language-toml"><code>ndarray-linalg = { version = &quot;*&quot;, features = [&quot;intel-mkl-static&quot;] }</code></pre></div><h4 id="example"><a href="#example">Example</a></h4>
 <p>Activate support for the latest supported <code>ndarray</code> version:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
-argmin-math = { version = &quot;0.1.0-rc.1&quot;, features = [&quot;ndarray_latest-serde&quot;] }</code></pre></div><h2 id="contributing"><a href="#contributing">Contributing</a></h2>
+argmin-math = { version = &quot;0.1.0-rc.1&quot;, features = [&quot;ndarray_latest-serde&quot;] }</code></pre></div><h2 id="semantic-versioning"><a href="#semantic-versioning">Semantic versioning</a></h2>
+<p>This crate follows semantic versioning. Adding a new backend or a new version of a backend is
+not considered a breaking change. However, your code may still break if you use any of the
+features containing <code>*latest*</code>. It is therefore recommended to specify the actual version of the
+backend you are using.</p>
+<h2 id="contributing"><a href="#contributing">Contributing</a></h2>
 <p>You found a bug? Your favourite backend is not supported? Feel free to open an issue or ideally
 submit a PR.</p>
 <h2 id="license"><a href="#license">License</a></h2>

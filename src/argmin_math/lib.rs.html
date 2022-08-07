@@ -280,6 +280,14 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -331,8 +339,9 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! It is not possible to activate two versions of the same backend.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The features labelled `*_latest*` are an alias for the most recent supported version of the</span>
-<span class="doccomment">//! respective backend.</span>
+<span class="doccomment">//! The features labelled `*latest*` are an alias for the most recent supported version of the</span>
+<span class="doccomment">//! respective backend. It is however recommended to explicitly specify the desired version instead</span>
+<span class="doccomment">//! of using any of the `*latest*` features (see section about semantic versioning below).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Note that `argmin` by default compiles with `serde` support. Therefore, unless `serde` is</span>
 <span class="doccomment">//! deliberately turned off in `argmin`, it is necessary to activiate the `serde` support in</span>
@@ -357,6 +366,13 @@
 <span class="doccomment">//! [dependencies]</span>
 <span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot;argmin-math = { version = \&quot;&quot;</span>, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>), <span class="string">&quot;\&quot;, features = [\&quot;ndarray_latest-serde\&quot;] }&quot;</span>)]</span>
 <span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Semantic versioning</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This crate follows semantic versioning. Adding a new backend or a new version of a backend is</span>
+<span class="doccomment">//! not considered a breaking change. However, your code may still break if you use any of the</span>
+<span class="doccomment">//! features containing `*latest*`. It is therefore recommended to specify the actual version of the</span>
+<span class="doccomment">//! backend you are using.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Contributing</span>
 <span class="doccomment">//!</span>
