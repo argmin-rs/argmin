@@ -49,8 +49,9 @@
 //!
 //! It is not possible to activate two versions of the same backend.
 //!
-//! The features labelled `*_latest*` are an alias for the most recent supported version of the
-//! respective backend.
+//! The features labelled `*latest*` are an alias for the most recent supported version of the
+//! respective backend. It is however recommended to explicitly specify the desired version instead
+//! of using any of the `*latest*` features (see section about semantic versioning below).
 //!
 //! Note that `argmin` by default compiles with `serde` support. Therefore, unless `serde` is
 //! deliberately turned off in `argmin`, it is necessary to activiate the `serde` support in
@@ -75,6 +76,13 @@
 //! [dependencies]
 #![doc = concat!("argmin-math = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ndarray_latest-serde\"] }")]
 //! ```
+//!
+//! # Semantic versioning
+//!
+//! This crate follows semantic versioning. Adding a new backend or a new version of a backend is
+//! not considered a breaking change. However, your code may still break if you use any of the
+//! features containing `*latest*`. It is therefore recommended to specify the actual version of the
+//! backend you are using.
 //!
 //! # Contributing
 //!
