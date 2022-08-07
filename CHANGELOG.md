@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## argmin-math [Unreleased]
 
-## [argmin v0.6.0-rc.2] and [argmin-math v0.1.0-rc.1] 2022-07-31
+## [argmin v0.6.0] and [argmin-math v0.1.0] 2022-08-09
 
 This is a rather large release with many (breaking) changes.
 
@@ -168,5 +168,5 @@ This is a rather large release with many (breaking) changes.
 For older versions please see the Git history.
 
 [Unreleased]: https://github.com/argmin-rs/argmin/compare/v0.5.1...HEAD
-[argmin v0.6.0-rc.1]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0-rc.2
-[argmin-math v0.1.0-rc.1]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0-rc.1
+[argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0
+[argmin-math v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0
