@@ -196,7 +196,7 @@ where
         state: IterState<P, P, (), H, F>,
     ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
         let r = state
-            .get_grad()
+            .get_gradient()
             .ok_or_else(argmin_error_closure!(
                 NotInitialized,
                 concat!(
@@ -232,7 +232,7 @@ where
         _problem: &mut Problem<O>,
         mut state: IterState<P, P, (), H, F>,
     ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
-        let grad = state.take_grad().ok_or_else(argmin_error_closure!(
+        let grad = state.take_gradient().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`Steihaug`: Gradient in state not set."
         ))?;
@@ -290,7 +290,10 @@ where
         self.p = Some(p_n.clone());
         self.rtr = rjtrj;
 
-        Ok((state.param(p_n).cost(self.rtr).grad(grad).hessian(h), None))
+        Ok((
+            state.param(p_n).cost(self.rtr).gradient(grad).hessian(h),
+            None,
+        ))
     }
 
     fn terminate(&mut self, state: &IterState<P, P, (), H, F>) -> TerminationReason {
@@ -413,7 +416,7 @@ mod tests {
 
         // Forgot to initialize Hessian
         let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
-            IterState::new().grad(grad.clone());
+            IterState::new().gradient(grad.clone());
         let problem = TestProblem::new();
         let res = sh.init(&mut Problem::new(problem), state);
         assert_error!(
@@ -427,7 +430,7 @@ mod tests {
 
         // All good.
         let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
-            IterState::new().grad(grad.clone()).hessian(hessian);
+            IterState::new().gradient(grad.clone()).hessian(hessian);
         let problem = TestProblem::new();
         let (mut state_out, kv) = sh.init(&mut Problem::new(problem), state).unwrap();
 

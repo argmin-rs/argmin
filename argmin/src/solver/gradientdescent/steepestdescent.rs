@@ -90,7 +90,7 @@ where
             ))?,
             self.linesearch.clone(),
         )
-        .configure(|config| config.param(param_new).grad(new_grad).cost(new_cost))
+        .configure(|config| config.param(param_new).gradient(new_grad).cost(new_cost))
         .ctrlc(false)
         .run()?;
 

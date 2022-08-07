@@ -137,7 +137,7 @@ where
             )
         ))?;
         let grad = state
-            .take_grad()
+            .take_gradient()
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&param))?;
         let hessian = state
@@ -194,7 +194,7 @@ where
             state: mut linesearch_state,
             ..
         } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
-            .configure(|state| state.param(param).grad(grad).cost(line_cost))
+            .configure(|state| state.param(param).gradient(grad).cost(line_cost))
             .ctrlc(false)
             .run()?;
 

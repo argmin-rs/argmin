@@ -81,7 +81,7 @@ where
         ))?;
 
         let g = state
-            .take_grad()
+            .take_gradient()
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&param))?;
 
@@ -135,7 +135,7 @@ where
                 ));
             }
         }
-        Ok((state.param(pstar).grad(g).hessian(h), None))
+        Ok((state.param(pstar).gradient(g).hessian(h), None))
     }
 
     fn terminate(&mut self, state: &IterState<P, P, (), H, F>) -> TerminationReason {

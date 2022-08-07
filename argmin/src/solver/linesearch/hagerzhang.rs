@@ -532,7 +532,7 @@ where
 
         self.init_grad = Some(
             state
-                .take_grad()
+                .take_gradient()
                 .map(Result::Ok)
                 .unwrap_or_else(|| problem.gradient(self.init_param.as_ref().unwrap()))?,
         );

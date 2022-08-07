@@ -190,7 +190,7 @@ where
         ))?;
 
         let grad = state
-            .take_grad()
+            .take_gradient()
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&param))?;
 
@@ -211,7 +211,7 @@ where
             state
                 .param(param)
                 .cost(self.fxk)
-                .grad(grad)
+                .gradient(grad)
                 .hessian(hessian),
             None,
         ))
@@ -227,7 +227,7 @@ where
             "`TrustRegion`: Parameter vector in state not set."
         ))?;
 
-        let grad = state.take_grad().ok_or_else(argmin_error_closure!(
+        let grad = state.take_gradient().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`TrustRegion`: Gradient in state not set."
         ))?;
@@ -247,7 +247,7 @@ where
             .configure(|config| {
                 config
                     .param(param.clone())
-                    .grad(grad.clone())
+                    .gradient(grad.clone())
                     .hessian(hessian.clone())
             })
             .ctrlc(false)
@@ -286,13 +286,13 @@ where
                 state
                     .param(new_param)
                     .cost(fxkpk)
-                    .grad(grad)
+                    .gradient(grad)
                     .hessian(hessian)
             } else {
                 state
                     .param(param)
                     .cost(self.fxk)
-                    .grad(grad)
+                    .gradient(grad)
                     .hessian(hessian)
             },
             Some(make_kv!("radius" => cur_radius;)),

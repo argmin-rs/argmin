@@ -59,7 +59,7 @@ fn run() -> Result<(), Error> {
         .configure(|state| {
             state
                 .param(init_param)
-                .grad(init_grad)
+                .gradient(init_grad)
                 .cost(init_cost)
                 .max_iters(100)
         })

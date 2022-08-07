@@ -150,7 +150,7 @@ where
         let cost = problem.cost(param)?;
         let grad = problem.gradient(param)?;
         self.p = Some(grad.mul(&(float!(-1.0))));
-        Ok((state.cost(cost).grad(grad), None))
+        Ok((state.cost(cost).gradient(grad), None))
     }
 
     fn next_iter(
@@ -167,7 +167,7 @@ where
             "`NonlinearConjugateGradient`: No `param` in `state`"
         ))?;
         let grad = state
-            .take_grad()
+            .take_gradient()
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&xk))?;
         let cur_cost = state.cost;
@@ -187,7 +187,7 @@ where
             ))?,
             self.linesearch.clone(),
         )
-        .configure(|state| state.param(xk).grad(grad.clone()).cost(cur_cost))
+        .configure(|state| state.param(xk).gradient(grad.clone()).cost(cur_cost))
         .ctrlc(false)
         .run()?;
 
@@ -223,7 +223,7 @@ where
         let cost = problem.cost(&xk1)?;
 
         Ok((
-            state.param(xk1).cost(cost).grad(new_grad),
+            state.param(xk1).cost(cost).gradient(new_grad),
             Some(make_kv!("beta" => self.beta;
              "restart_iter" => restart_iter;
              "restart_orthogonality" => restart_orthogonality;
@@ -420,7 +420,7 @@ mod tests {
             NonlinearConjugateGradient::new(linesearch, beta_method);
         let state = IterState::new()
             .param(vec![1.0f64, 2.0])
-            .grad(vec![1.0f64, 2.0]);
+            .gradient(vec![1.0f64, 2.0]);
         nlcg.p = Some(vec![]);
         assert!(nlcg.p.is_some());
         let mut problem = Problem::new(TestProblem::new());
@@ -446,7 +446,7 @@ mod tests {
             NonlinearConjugateGradient::new(linesearch, beta_method);
         let state = IterState::new()
             .param(vec![1.0f64, 2.0])
-            .grad(vec![1.0f64, 2.0]);
+            .gradient(vec![1.0f64, 2.0]);
         let mut problem = Problem::new(TestProblem::new());
         let (state, kv) = nlcg.init(&mut problem, state).unwrap();
         assert!(kv.is_none());

@@ -38,6 +38,8 @@ This is a rather large release with many (breaking) changes.
 - Added support for nalgebra 0.31
 - Many now useless macros were removed
 - Improved the CI to better test all aspects of the code
+- Renamed `termination_reaosn` method of `State` to `terminate_with`
+- Renamed all `*grad*` methods of `IterState` to `*gradient*`
 - Code of conduct was added
 - Brent's optimization method was added (#77, thanks to @Armavica)
 - Fixed a bug in Nelder-Mead which was reported by @bivhitscar (thanks!)

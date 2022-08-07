@@ -74,7 +74,7 @@ where
         ))?;
 
         let grad = state
-            .take_grad()
+            .take_gradient()
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&param))?;
 

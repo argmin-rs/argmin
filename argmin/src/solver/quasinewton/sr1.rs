@@ -202,14 +202,14 @@ where
         };
 
         let grad = state
-            .take_grad()
+            .take_gradient()
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&param))?;
         Ok((
             state
                 .param(param)
                 .cost(cost)
-                .grad(grad)
+                .gradient(grad)
                 .inv_hessian(inv_hessian),
             None,
         ))
@@ -226,7 +226,7 @@ where
         ))?;
         let cost = state.get_cost();
 
-        let prev_grad = state.take_grad().ok_or_else(argmin_error_closure!(
+        let prev_grad = state.take_gradient().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`SR1`: Gradient in state not set."
         ))?;
@@ -249,7 +249,7 @@ where
             .configure(|config| {
                 config
                     .param(param.clone())
-                    .grad(prev_grad.clone())
+                    .gradient(prev_grad.clone())
                     .cost(cost)
             })
             .ctrlc(false)
@@ -284,14 +284,14 @@ where
             state
                 .param(xk1)
                 .cost(next_cost)
-                .grad(grad)
+                .gradient(grad)
                 .inv_hessian(inv_hessian),
             Some(make_kv!["denominator" => b; "hessian_update" => hessian_update;]),
         ))
     }
 
     fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationReason {
-        if state.get_grad().unwrap().norm() < self.tol_grad {
+        if state.get_gradient().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         if (state.get_prev_cost() - state.cost).abs() < self.tol_cost {
@@ -465,7 +465,7 @@ mod tests {
             assert_eq!(s.to_ne_bytes(), p.to_ne_bytes());
         }
 
-        let s_grad = state_out.take_grad().unwrap();
+        let s_grad = state_out.take_gradient().unwrap();
 
         for (s, p) in s_grad.iter().zip(param.iter()) {
             assert_eq!(s.to_ne_bytes(), p.to_ne_bytes());
@@ -519,14 +519,14 @@ mod tests {
         let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new()
             .param(param)
             .inv_hessian(inv_hessian)
-            .grad(gradient.clone());
+            .gradient(gradient.clone());
 
         let problem = TestProblem::new();
         let (mut state_out, kv) = sr1.init(&mut Problem::new(problem), state).unwrap();
 
         assert!(kv.is_none());
 
-        let s_grad = state_out.take_grad().unwrap();
+        let s_grad = state_out.take_gradient().unwrap();
 
         for (s, g) in s_grad.iter().zip(gradient.iter()) {
             assert_eq!(s.to_ne_bytes(), g.to_ne_bytes());
