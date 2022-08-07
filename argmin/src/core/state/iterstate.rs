@@ -124,21 +124,21 @@ where
     /// # use argmin::core::{IterState, State};
     /// # let state: IterState<(), Vec<f64>, (), (), f64> = IterState::new();
     /// # let grad_old = vec![1.0f64, 2.0f64];
-    /// # let state = state.grad(grad_old);
+    /// # let state = state.gradient(grad_old);
     /// # assert!(state.prev_grad.is_none());
     /// # assert_eq!(state.grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(state.grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// # let grad = vec![0.0f64, 3.0f64];
-    /// let state = state.grad(grad);
+    /// let state = state.gradient(grad);
     /// # assert_eq!(state.prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(state.prev_grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// # assert_eq!(state.grad.as_ref().unwrap()[0].to_ne_bytes(), 0.0f64.to_ne_bytes());
     /// # assert_eq!(state.grad.as_ref().unwrap()[1].to_ne_bytes(), 3.0f64.to_ne_bytes());
     /// ```
     #[must_use]
-    pub fn grad(mut self, grad: G) -> Self {
+    pub fn gradient(mut self, gradient: G) -> Self {
         std::mem::swap(&mut self.prev_grad, &mut self.grad);
-        self.grad = Some(grad);
+        self.grad = Some(gradient);
         self
     }
 
@@ -487,15 +487,15 @@ where
     /// # use argmin::core::{IterState, State, ArgminFloat};
     /// # let mut state: IterState<(), Vec<f64>, (), (), f64> = IterState::new();
     /// # assert!(state.grad.is_none());
-    /// # assert!(state.get_grad().is_none());
+    /// # assert!(state.get_gradient().is_none());
     /// # state.grad = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(state.grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
-    /// let grad = state.get_grad();  // Option<&G>
+    /// let grad = state.get_gradient();  // Option<&G>
     /// # assert_eq!(grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    pub fn get_grad(&self) -> Option<&G> {
+    pub fn get_gradient(&self) -> Option<&G> {
         self.grad.as_ref()
     }
 
@@ -506,17 +506,17 @@ where
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
     /// # let mut state: IterState<(), Vec<f64>, (), (), f64> = IterState::new();
-    /// # assert!(state.take_grad().is_none());
+    /// # assert!(state.take_gradient().is_none());
     /// # state.grad = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(state.grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
-    /// let grad = state.take_grad();  // Option<G>
-    /// # assert!(state.take_grad().is_none());
+    /// let grad = state.take_gradient();  // Option<G>
+    /// # assert!(state.take_gradient().is_none());
     /// # assert!(state.grad.is_none());
     /// # assert_eq!(grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    pub fn take_grad(&mut self) -> Option<G> {
+    pub fn take_gradient(&mut self) -> Option<G> {
         self.grad.take()
     }
 
@@ -528,15 +528,15 @@ where
     /// # use argmin::core::{IterState, State, ArgminFloat};
     /// # let mut state: IterState<(), Vec<f64>, (), (), f64> = IterState::new();
     /// # assert!(state.prev_grad.is_none());
-    /// # assert!(state.get_prev_grad().is_none());
+    /// # assert!(state.get_prev_gradient().is_none());
     /// # state.prev_grad = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(state.prev_grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
-    /// let prev_grad = state.get_prev_grad();  // Option<&G>
+    /// let prev_grad = state.get_prev_gradient();  // Option<&G>
     /// # assert_eq!(prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(prev_grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    pub fn get_prev_grad(&self) -> Option<&G> {
+    pub fn get_prev_gradient(&self) -> Option<&G> {
         self.prev_grad.as_ref()
     }
 
@@ -547,17 +547,17 @@ where
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
     /// # let mut state: IterState<(), Vec<f64>, (), (), f64> = IterState::new();
-    /// # assert!(state.take_prev_grad().is_none());
+    /// # assert!(state.take_prev_gradient().is_none());
     /// # state.prev_grad = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(state.prev_grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
-    /// let prev_grad = state.take_prev_grad();  // Option<G>
-    /// # assert!(state.take_prev_grad().is_none());
+    /// let prev_grad = state.take_prev_gradient();  // Option<G>
+    /// # assert!(state.take_prev_gradient().is_none());
     /// # assert!(state.prev_grad.is_none());
     /// # assert_eq!(prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(prev_grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    pub fn take_prev_grad(&mut self) -> Option<G> {
+    pub fn take_prev_gradient(&mut self) -> Option<G> {
         self.prev_grad.take()
     }
 
@@ -1314,8 +1314,8 @@ mod tests {
         assert!(state.get_target_cost().is_infinite());
         assert!(state.get_target_cost().is_sign_negative());
 
-        assert!(state.get_grad().is_none());
-        assert!(state.get_prev_grad().is_none());
+        assert!(state.get_gradient().is_none());
+        assert!(state.get_prev_gradient().is_none());
         assert!(state.get_hessian().is_none());
         assert!(state.get_prev_hessian().is_none());
         assert!(state.get_inv_hessian().is_none());
@@ -1371,16 +1371,16 @@ mod tests {
 
         let grad = vec![1.0, 2.0];
 
-        let state = state.grad(grad.clone());
-        assert_eq!(*state.get_grad().unwrap(), grad);
-        assert!(state.get_prev_grad().is_none());
+        let state = state.gradient(grad.clone());
+        assert_eq!(*state.get_gradient().unwrap(), grad);
+        assert!(state.get_prev_gradient().is_none());
 
         let new_grad = vec![2.0, 1.0];
 
-        let state = state.grad(new_grad.clone());
+        let state = state.gradient(new_grad.clone());
 
-        assert_eq!(*state.get_grad().unwrap(), new_grad);
-        assert_eq!(*state.get_prev_grad().unwrap(), grad);
+        assert_eq!(*state.get_gradient().unwrap(), new_grad);
+        assert_eq!(*state.get_prev_gradient().unwrap(), grad);
 
         let hessian = vec![vec![1.0, 2.0], vec![2.0, 1.0]];
 
@@ -1440,16 +1440,16 @@ mod tests {
         assert_eq!(*state.get_param().unwrap(), new_param);
         assert_eq!(*state.get_prev_param().unwrap(), param);
 
-        assert_eq!(*state.get_grad().unwrap(), new_grad);
-        assert_eq!(*state.get_prev_grad().unwrap(), grad);
+        assert_eq!(*state.get_gradient().unwrap(), new_grad);
+        assert_eq!(*state.get_prev_gradient().unwrap(), grad);
         assert_eq!(*state.get_hessian().unwrap(), new_hessian);
         assert_eq!(*state.get_prev_hessian().unwrap(), hessian);
         assert_eq!(*state.get_inv_hessian().unwrap(), new_inv_hessian);
         assert_eq!(*state.get_prev_inv_hessian().unwrap(), inv_hessian);
         assert_eq!(*state.get_jacobian().unwrap(), new_jacobian);
         assert_eq!(*state.get_prev_jacobian().unwrap(), jacobian);
-        assert_eq!(state.take_grad().unwrap(), new_grad);
-        assert_eq!(state.take_prev_grad().unwrap(), grad);
+        assert_eq!(state.take_gradient().unwrap(), new_grad);
+        assert_eq!(state.take_prev_gradient().unwrap(), grad);
         assert_eq!(state.take_hessian().unwrap(), new_hessian);
         assert_eq!(state.take_prev_hessian().unwrap(), hessian);
         assert_eq!(state.take_inv_hessian().unwrap(), new_inv_hessian);

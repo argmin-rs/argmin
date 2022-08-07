@@ -133,7 +133,7 @@ where
             ))?),
             self.linesearch.clone(),
         )
-        .configure(|config| config.param(param).grad(grad).cost(residuals.norm()))
+        .configure(|config| config.param(param).gradient(grad).cost(residuals.norm()))
         .ctrlc(false)
         .run()?;
 

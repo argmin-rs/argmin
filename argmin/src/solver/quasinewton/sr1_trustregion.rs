@@ -232,7 +232,7 @@ where
         };
 
         let grad = state
-            .take_grad()
+            .take_gradient()
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&param))?;
 
@@ -242,7 +242,11 @@ where
             .unwrap_or_else(|| problem.hessian(&param))?;
 
         Ok((
-            state.param(param).cost(cost).grad(grad).hessian(hessian),
+            state
+                .param(param)
+                .cost(cost)
+                .gradient(grad)
+                .hessian(hessian),
             None,
         ))
     }
@@ -259,7 +263,7 @@ where
 
         let cost = state.get_cost();
 
-        let prev_grad = state.take_grad().ok_or_else(argmin_error_closure!(
+        let prev_grad = state.take_gradient().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`SR1TrustRegion`: Gradient in state not set."
         ))?;
@@ -280,7 +284,7 @@ where
                 config
                     .param(xk.zero_like())
                     .hessian(hessian.clone())
-                    .grad(prev_grad.clone())
+                    .gradient(prev_grad.clone())
                     .cost(cost)
             })
             .ctrlc(false)
@@ -338,7 +342,7 @@ where
         };
 
         Ok((
-            state.param(xk1).cost(fk1).grad(dfk1).hessian(hessian),
+            state.param(xk1).cost(fk1).gradient(dfk1).hessian(hessian),
             Some(make_kv!["ared" => ared;
                          "pred" => pred;
                          "ap" => ap;
@@ -348,7 +352,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<P, G, (), B, F>) -> TerminationReason {
-        if state.get_grad().unwrap().norm() < self.tol_grad {
+        if state.get_gradient().unwrap().norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         TerminationReason::NotTerminated
@@ -474,7 +478,7 @@ mod tests {
             assert_eq!(s.to_ne_bytes(), p.to_ne_bytes());
         }
 
-        let s_grad = state_out.take_grad().unwrap();
+        let s_grad = state_out.take_gradient().unwrap();
 
         for (s, p) in s_grad.iter().zip(param.iter()) {
             assert_eq!(s.to_ne_bytes(), p.to_ne_bytes());
@@ -512,14 +516,14 @@ mod tests {
         let mut sr1: SR1TrustRegion<_, f64> = SR1TrustRegion::new(subproblem);
 
         let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
-            IterState::new().param(param).grad(gradient.clone());
+            IterState::new().param(param).gradient(gradient.clone());
 
         let problem = TestProblem::new();
         let (mut state_out, kv) = sr1.init(&mut Problem::new(problem), state).unwrap();
 
         assert!(kv.is_none());
 
-        let s_grad = state_out.take_grad().unwrap();
+        let s_grad = state_out.take_gradient().unwrap();
 
         for (s, g) in s_grad.iter().zip(gradient.iter()) {
             assert_eq!(s.to_ne_bytes(), g.to_ne_bytes());
@@ -538,7 +542,7 @@ mod tests {
 
         let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new()
             .param(param)
-            .grad(gradient)
+            .gradient(gradient)
             .hessian(hessian.clone());
 
         let problem = TestProblem::new();
