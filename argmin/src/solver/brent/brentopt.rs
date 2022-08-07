@@ -133,7 +133,7 @@ where
         if (self.x - m).abs() <= two * tol - (self.b - self.a) / two {
             return Ok((
                 state
-                    .termination_reason(TerminationReason::TargetPrecisionReached)
+                    .terminate_with(TerminationReason::TargetPrecisionReached)
                     .param(self.x)
                     .cost(self.fx),
                 None,

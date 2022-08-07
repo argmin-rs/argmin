@@ -252,7 +252,7 @@ where
             return Ok((
                 state
                     .param(p.add(&d.mul(&tau)))
-                    .termination_reason(TerminationReason::TargetPrecisionReached),
+                    .terminate_with(TerminationReason::TargetPrecisionReached),
                 None,
             ));
         }
@@ -266,7 +266,7 @@ where
             return Ok((
                 state
                     .param(p.add(&d.mul(&tau)))
-                    .termination_reason(TerminationReason::TargetPrecisionReached),
+                    .terminate_with(TerminationReason::TargetPrecisionReached),
                 None,
             ));
         }
@@ -278,7 +278,7 @@ where
             return Ok((
                 state
                     .param(p_n)
-                    .termination_reason(TerminationReason::TargetPrecisionReached),
+                    .terminate_with(TerminationReason::TargetPrecisionReached),
                 None,
             ));
         }

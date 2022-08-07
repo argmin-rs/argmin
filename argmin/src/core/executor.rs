@@ -199,7 +199,7 @@ where
             // within `next_iter()`!
             state = if !state.terminated() {
                 let term = self.solver.terminate_internal(&state);
-                state.termination_reason(term)
+                state.terminate_with(term)
             } else {
                 state
             };
@@ -262,7 +262,7 @@ where
         // in case it stopped prematurely and `termination_reason` is still `NotTerminated`,
         // someone must have pulled the handbrake
         if state.get_iter() < state.get_max_iters() && !state.terminated() {
-            state = state.termination_reason(TerminationReason::Aborted);
+            state = state.terminate_with(TerminationReason::Aborted);
         }
         Ok(OptimizationResult::new(self.problem, self.solver, state))
     }

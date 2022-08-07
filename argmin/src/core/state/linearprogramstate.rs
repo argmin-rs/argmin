@@ -322,10 +322,10 @@ where
     /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};
     /// # let mut state: LinearProgramState<Vec<f64>, f64> = LinearProgramState::new();
     /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
-    /// let state = state.termination_reason(TerminationReason::MaxItersReached);
+    /// let state = state.terminate_with(TerminationReason::MaxItersReached);
     /// # assert_eq!(state.termination_reason, TerminationReason::MaxItersReached);
     /// ```
-    fn termination_reason(mut self, reason: TerminationReason) -> Self {
+    fn terminate_with(mut self, reason: TerminationReason) -> Self {
         self.termination_reason = reason;
         self
     }
