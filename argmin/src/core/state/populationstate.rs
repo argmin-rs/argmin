@@ -601,10 +601,10 @@ where
     /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationReason};
     /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
     /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
-    /// let state = state.termination_reason(TerminationReason::MaxItersReached);
+    /// let state = state.terminate_with(TerminationReason::MaxItersReached);
     /// # assert_eq!(state.termination_reason, TerminationReason::MaxItersReached);
     /// ```
-    fn termination_reason(mut self, reason: TerminationReason) -> Self {
+    fn terminate_with(mut self, reason: TerminationReason) -> Self {
         self.termination_reason = reason;
         self
     }

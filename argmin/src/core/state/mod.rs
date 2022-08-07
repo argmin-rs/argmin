@@ -105,7 +105,7 @@ pub trait State {
 
     /// Set termination reason
     #[must_use]
-    fn termination_reason(self, termination_reason: TerminationReason) -> Self;
+    fn terminate_with(self, termination_reason: TerminationReason) -> Self;
 
     /// Returns termination reason. Returns [`TerminationReason::NotTerminated`] if not terminated.
     fn get_termination_reason(&self) -> TerminationReason;
