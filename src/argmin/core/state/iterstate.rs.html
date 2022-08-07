@@ -1596,21 +1596,21 @@
     <span class="doccomment">/// # use argmin::core::{IterState, State};</span>
     <span class="doccomment">/// # let state: IterState&lt;(), Vec&lt;f64&gt;, (), (), f64&gt; = IterState::new();</span>
     <span class="doccomment">/// # let grad_old = vec![1.0f64, 2.0f64];</span>
-    <span class="doccomment">/// # let state = state.grad(grad_old);</span>
+    <span class="doccomment">/// # let state = state.gradient(grad_old);</span>
     <span class="doccomment">/// # assert!(state.prev_grad.is_none());</span>
     <span class="doccomment">/// # assert_eq!(state.grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(state.grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # let grad = vec![0.0f64, 3.0f64];</span>
-    <span class="doccomment">/// let state = state.grad(grad);</span>
+    <span class="doccomment">/// let state = state.gradient(grad);</span>
     <span class="doccomment">/// # assert_eq!(state.prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(state.prev_grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(state.grad.as_ref().unwrap()[0].to_ne_bytes(), 0.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(state.grad.as_ref().unwrap()[1].to_ne_bytes(), 3.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grad</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="ident">G</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gradient</span>: <span class="ident">G</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">prev_grad</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">grad</span>);
-        <span class="self">self</span>.<span class="ident">grad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>);
+        <span class="self">self</span>.<span class="ident">grad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">gradient</span>);
         <span class="self">self</span>
     }
 
@@ -1959,15 +1959,15 @@
     <span class="doccomment">/// # use argmin::core::{IterState, State, ArgminFloat};</span>
     <span class="doccomment">/// # let mut state: IterState&lt;(), Vec&lt;f64&gt;, (), (), f64&gt; = IterState::new();</span>
     <span class="doccomment">/// # assert!(state.grad.is_none());</span>
-    <span class="doccomment">/// # assert!(state.get_grad().is_none());</span>
+    <span class="doccomment">/// # assert!(state.get_gradient().is_none());</span>
     <span class="doccomment">/// # state.grad = Some(vec![1.0, 2.0]);</span>
     <span class="doccomment">/// # assert_eq!(state.grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(state.grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// let grad = state.get_grad();  // Option&lt;&amp;G&gt;</span>
+    <span class="doccomment">/// let grad = state.get_gradient();  // Option&lt;&amp;G&gt;</span>
     <span class="doccomment">/// # assert_eq!(grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_grad</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">G</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">G</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">grad</span>.<span class="ident">as_ref</span>()
     }
 
@@ -1978,17 +1978,17 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use argmin::core::{IterState, State, ArgminFloat};</span>
     <span class="doccomment">/// # let mut state: IterState&lt;(), Vec&lt;f64&gt;, (), (), f64&gt; = IterState::new();</span>
-    <span class="doccomment">/// # assert!(state.take_grad().is_none());</span>
+    <span class="doccomment">/// # assert!(state.take_gradient().is_none());</span>
     <span class="doccomment">/// # state.grad = Some(vec![1.0, 2.0]);</span>
     <span class="doccomment">/// # assert_eq!(state.grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(state.grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// let grad = state.take_grad();  // Option&lt;G&gt;</span>
-    <span class="doccomment">/// # assert!(state.take_grad().is_none());</span>
+    <span class="doccomment">/// let grad = state.take_gradient();  // Option&lt;G&gt;</span>
+    <span class="doccomment">/// # assert!(state.take_gradient().is_none());</span>
     <span class="doccomment">/// # assert!(state.grad.is_none());</span>
     <span class="doccomment">/// # assert_eq!(grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_grad</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_gradient</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">grad</span>.<span class="ident">take</span>()
     }
 
@@ -2000,15 +2000,15 @@
     <span class="doccomment">/// # use argmin::core::{IterState, State, ArgminFloat};</span>
     <span class="doccomment">/// # let mut state: IterState&lt;(), Vec&lt;f64&gt;, (), (), f64&gt; = IterState::new();</span>
     <span class="doccomment">/// # assert!(state.prev_grad.is_none());</span>
-    <span class="doccomment">/// # assert!(state.get_prev_grad().is_none());</span>
+    <span class="doccomment">/// # assert!(state.get_prev_gradient().is_none());</span>
     <span class="doccomment">/// # state.prev_grad = Some(vec![1.0, 2.0]);</span>
     <span class="doccomment">/// # assert_eq!(state.prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(state.prev_grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// let prev_grad = state.get_prev_grad();  // Option&lt;&amp;G&gt;</span>
+    <span class="doccomment">/// let prev_grad = state.get_prev_gradient();  // Option&lt;&amp;G&gt;</span>
     <span class="doccomment">/// # assert_eq!(prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(prev_grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_prev_grad</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">G</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_prev_gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">G</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">prev_grad</span>.<span class="ident">as_ref</span>()
     }
 
@@ -2019,17 +2019,17 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use argmin::core::{IterState, State, ArgminFloat};</span>
     <span class="doccomment">/// # let mut state: IterState&lt;(), Vec&lt;f64&gt;, (), (), f64&gt; = IterState::new();</span>
-    <span class="doccomment">/// # assert!(state.take_prev_grad().is_none());</span>
+    <span class="doccomment">/// # assert!(state.take_prev_gradient().is_none());</span>
     <span class="doccomment">/// # state.prev_grad = Some(vec![1.0, 2.0]);</span>
     <span class="doccomment">/// # assert_eq!(state.prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(state.prev_grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// let prev_grad = state.take_prev_grad();  // Option&lt;G&gt;</span>
-    <span class="doccomment">/// # assert!(state.take_prev_grad().is_none());</span>
+    <span class="doccomment">/// let prev_grad = state.take_prev_gradient();  // Option&lt;G&gt;</span>
+    <span class="doccomment">/// # assert!(state.take_prev_gradient().is_none());</span>
     <span class="doccomment">/// # assert!(state.prev_grad.is_none());</span>
     <span class="doccomment">/// # assert_eq!(prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// # assert_eq!(prev_grad.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_prev_grad</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_prev_gradient</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">prev_grad</span>.<span class="ident">take</span>()
     }
 
@@ -2517,10 +2517,10 @@
     <span class="doccomment">/// # use argmin::core::{IterState, State, ArgminFloat, TerminationReason};</span>
     <span class="doccomment">/// # let mut state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();</span>
     <span class="doccomment">/// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);</span>
-    <span class="doccomment">/// let state = state.termination_reason(TerminationReason::MaxItersReached);</span>
+    <span class="doccomment">/// let state = state.terminate_with(TerminationReason::MaxItersReached);</span>
     <span class="doccomment">/// # assert_eq!(state.termination_reason, TerminationReason::MaxItersReached);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">termination_reason</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">TerminationReason</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">terminate_with</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">TerminationReason</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">termination_reason</span> <span class="op">=</span> <span class="ident">reason</span>;
         <span class="self">self</span>
     }
@@ -2786,8 +2786,8 @@
         <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_target_cost</span>().<span class="ident">is_infinite</span>());
         <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_target_cost</span>().<span class="ident">is_sign_negative</span>());
 
-        <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_prev_grad</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_gradient</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_prev_gradient</span>().<span class="ident">is_none</span>());
         <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_hessian</span>().<span class="ident">is_none</span>());
         <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_prev_hessian</span>().<span class="ident">is_none</span>());
         <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_inv_hessian</span>().<span class="ident">is_none</span>());
@@ -2843,16 +2843,16 @@
 
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>];
 
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">grad</span>(<span class="ident">grad</span>.<span class="ident">clone</span>());
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap</span>(), <span class="ident">grad</span>);
-        <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_prev_grad</span>().<span class="ident">is_none</span>());
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">gradient</span>(<span class="ident">grad</span>.<span class="ident">clone</span>());
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_gradient</span>().<span class="ident">unwrap</span>(), <span class="ident">grad</span>);
+        <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_prev_gradient</span>().<span class="ident">is_none</span>());
 
         <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">1.0</span>];
 
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">grad</span>(<span class="ident">new_grad</span>.<span class="ident">clone</span>());
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">gradient</span>(<span class="ident">new_grad</span>.<span class="ident">clone</span>());
 
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap</span>(), <span class="ident">new_grad</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_prev_grad</span>().<span class="ident">unwrap</span>(), <span class="ident">grad</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_gradient</span>().<span class="ident">unwrap</span>(), <span class="ident">new_grad</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_prev_gradient</span>().<span class="ident">unwrap</span>(), <span class="ident">grad</span>);
 
         <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">1.0</span>]];
 
@@ -2912,16 +2912,16 @@
         <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>(), <span class="ident">new_param</span>);
         <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_prev_param</span>().<span class="ident">unwrap</span>(), <span class="ident">param</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap</span>(), <span class="ident">new_grad</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_prev_grad</span>().<span class="ident">unwrap</span>(), <span class="ident">grad</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_gradient</span>().<span class="ident">unwrap</span>(), <span class="ident">new_grad</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_prev_gradient</span>().<span class="ident">unwrap</span>(), <span class="ident">grad</span>);
         <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_hessian</span>().<span class="ident">unwrap</span>(), <span class="ident">new_hessian</span>);
         <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_prev_hessian</span>().<span class="ident">unwrap</span>(), <span class="ident">hessian</span>);
         <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_inv_hessian</span>().<span class="ident">unwrap</span>(), <span class="ident">new_inv_hessian</span>);
         <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_prev_inv_hessian</span>().<span class="ident">unwrap</span>(), <span class="ident">inv_hessian</span>);
         <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_jacobian</span>().<span class="ident">unwrap</span>(), <span class="ident">new_jacobian</span>);
         <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_prev_jacobian</span>().<span class="ident">unwrap</span>(), <span class="ident">jacobian</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">take_grad</span>().<span class="ident">unwrap</span>(), <span class="ident">new_grad</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">take_prev_grad</span>().<span class="ident">unwrap</span>(), <span class="ident">grad</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">take_gradient</span>().<span class="ident">unwrap</span>(), <span class="ident">new_grad</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">take_prev_gradient</span>().<span class="ident">unwrap</span>(), <span class="ident">grad</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">take_hessian</span>().<span class="ident">unwrap</span>(), <span class="ident">new_hessian</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">take_prev_hessian</span>().<span class="ident">unwrap</span>(), <span class="ident">hessian</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">take_inv_hessian</span>().<span class="ident">unwrap</span>(), <span class="ident">new_inv_hessian</span>);

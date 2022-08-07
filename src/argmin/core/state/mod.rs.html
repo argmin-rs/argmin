@@ -227,7 +227,7 @@
 
     <span class="doccomment">/// Set termination reason</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">fn</span> <span class="ident">termination_reason</span>(<span class="self">self</span>, <span class="ident">termination_reason</span>: <span class="ident">TerminationReason</span>) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">terminate_with</span>(<span class="self">self</span>, <span class="ident">termination_reason</span>: <span class="ident">TerminationReason</span>) -&gt; <span class="self">Self</span>;
 
     <span class="doccomment">/// Returns termination reason. Returns [`TerminationReason::NotTerminated`] if not terminated.</span>
     <span class="kw">fn</span> <span class="ident">get_termination_reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TerminationReason</span>;

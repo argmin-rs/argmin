@@ -652,11 +652,11 @@
         };
 
         <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">state</span>
-            .<span class="ident">take_grad</span>()
+            .<span class="ident">take_gradient</span>()
             .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>))<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">cost</span>(<span class="ident">cost</span>).<span class="ident">grad</span>(<span class="ident">grad</span>), <span class="prelude-val">None</span>))
+        <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">cost</span>(<span class="ident">cost</span>).<span class="ident">gradient</span>(<span class="ident">grad</span>), <span class="prelude-val">None</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">next_iter</span>(
@@ -669,7 +669,7 @@
             <span class="string">&quot;`L-BFGS`: Parameter vector in state not set.&quot;</span>
         ))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">cur_cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="kw">let</span> <span class="ident">prev_grad</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_grad</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
+        <span class="kw">let</span> <span class="ident">prev_grad</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_gradient</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
             <span class="ident">PotentialBug</span>,
             <span class="string">&quot;`L-BFGS`: Gradient in state not set.&quot;</span>
         ))<span class="question-mark">?</span>;
@@ -712,7 +712,7 @@
             .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
                 <span class="ident">config</span>
                     .<span class="ident">param</span>(<span class="ident">param</span>.<span class="ident">clone</span>())
-                    .<span class="ident">grad</span>(<span class="ident">prev_grad</span>.<span class="ident">clone</span>())
+                    .<span class="ident">gradient</span>(<span class="ident">prev_grad</span>.<span class="ident">clone</span>())
                     .<span class="ident">cost</span>(<span class="ident">cur_cost</span>)
             })
             .<span class="ident">ctrlc</span>(<span class="bool-val">false</span>)
@@ -735,13 +735,13 @@
         <span class="self">self</span>.<span class="ident">y</span>.<span class="ident">push_back</span>(<span class="ident">grad</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>));
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">xk1</span>).<span class="ident">cost</span>(<span class="ident">next_cost</span>).<span class="ident">grad</span>(<span class="ident">grad</span>),
+            <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">xk1</span>).<span class="ident">cost</span>(<span class="ident">next_cost</span>).<span class="ident">gradient</span>(<span class="ident">grad</span>),
             <span class="prelude-val">Some</span>(<span class="macro">make_kv!</span>(<span class="string">&quot;gamma&quot;</span> =&gt; <span class="ident">gamma</span>;)),
         ))
     }
 
     <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_grad</span>().<span class="ident">unwrap</span>().<span class="ident">norm</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tol_grad</span> {
+        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_gradient</span>().<span class="ident">unwrap</span>().<span class="ident">norm</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tol_grad</span> {
             <span class="kw">return</span> <span class="ident">TerminationReason::TargetPrecisionReached</span>;
         }
         <span class="kw">if</span> (<span class="ident">state</span>.<span class="ident">get_prev_cost</span>() <span class="op">-</span> <span class="ident">state</span>.<span class="ident">get_cost</span>()).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tol_cost</span> {
@@ -875,7 +875,7 @@
             <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">p</span>.<span class="ident">to_ne_bytes</span>());
         }
 
-        <span class="kw">let</span> <span class="ident">s_grad</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_grad</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">s_grad</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_gradient</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">p</span>) <span class="kw">in</span> <span class="ident">s_grad</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">param</span>.<span class="ident">iter</span>()) {
             <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">p</span>.<span class="ident">to_ne_bytes</span>());
@@ -913,14 +913,14 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lbfgs</span>: <span class="ident">LBFGS</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">LBFGS::new</span>(<span class="ident">linesearch</span>, <span class="number">3</span>);
 
         <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">grad</span>(<span class="ident">gradient</span>.<span class="ident">clone</span>());
+            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">gradient</span>(<span class="ident">gradient</span>.<span class="ident">clone</span>());
 
         <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">lbfgs</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
 
-        <span class="kw">let</span> <span class="ident">s_grad</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_grad</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">s_grad</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_gradient</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">g</span>) <span class="kw">in</span> <span class="ident">s_grad</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">gradient</span>.<span class="ident">iter</span>()) {
             <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">g</span>.<span class="ident">to_ne_bytes</span>());

@@ -1469,7 +1469,7 @@
 
         <span class="self">self</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
             <span class="ident">state</span>
-                .<span class="ident">take_grad</span>()
+                .<span class="ident">take_gradient</span>()
                 .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="self">self</span>.<span class="ident">init_param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()))<span class="question-mark">?</span>,
         );

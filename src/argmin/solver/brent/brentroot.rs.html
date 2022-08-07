@@ -317,7 +317,7 @@
         <span class="kw">if</span> <span class="ident">mid</span>.<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">eff_tol</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">fb</span> <span class="op">==</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>((
                 <span class="ident">state</span>
-                    .<span class="ident">termination_reason</span>(<span class="ident">TerminationReason::TargetPrecisionReached</span>)
+                    .<span class="ident">terminate_with</span>(<span class="ident">TerminationReason::TargetPrecisionReached</span>)
                     .<span class="ident">param</span>(<span class="self">self</span>.<span class="ident">b</span>)
                     .<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">fb</span>.<span class="ident">abs</span>()),
                 <span class="prelude-val">None</span>,

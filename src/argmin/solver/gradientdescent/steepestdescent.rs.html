@@ -297,7 +297,7 @@
             ))<span class="question-mark">?</span>,
             <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">clone</span>(),
         )
-        .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">param_new</span>).<span class="ident">grad</span>(<span class="ident">new_grad</span>).<span class="ident">cost</span>(<span class="ident">new_cost</span>))
+        .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">param_new</span>).<span class="ident">gradient</span>(<span class="ident">new_grad</span>).<span class="ident">cost</span>(<span class="ident">new_cost</span>))
         .<span class="ident">ctrlc</span>(<span class="bool-val">false</span>)
         .<span class="ident">run</span>()<span class="question-mark">?</span>;
 

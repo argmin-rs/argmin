@@ -879,10 +879,10 @@
     <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};</span>
     <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
     <span class="doccomment">/// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);</span>
-    <span class="doccomment">/// let state = state.termination_reason(TerminationReason::MaxItersReached);</span>
+    <span class="doccomment">/// let state = state.terminate_with(TerminationReason::MaxItersReached);</span>
     <span class="doccomment">/// # assert_eq!(state.termination_reason, TerminationReason::MaxItersReached);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">termination_reason</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">TerminationReason</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">terminate_with</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">TerminationReason</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">termination_reason</span> <span class="op">=</span> <span class="ident">reason</span>;
         <span class="self">self</span>
     }
