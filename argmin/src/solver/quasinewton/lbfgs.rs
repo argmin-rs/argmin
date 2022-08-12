@@ -360,6 +360,7 @@ where
 
         // L-BFGS two-loop recursion
         let mut q = if self.l1_coeff > float!(0.0) {
+            // Use pseudo-gradient if L1-regularization is enabled.
             let pg = self.calculate_pseudo_gradient(&param, &prev_grad);
             pseudo_gradient = Some(pg.clone());
             pg
