@@ -9,10 +9,14 @@ use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
     LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason, KV,
 };
-use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
+use argmin_math::{
+    ArgminAdd, ArgminDot, ArgminMinMax, ArgminMul, ArgminNorm, ArgminSignum, ArgminSub,
+    ArgminZeroLike,
+};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
+use std::marker::PhantomData;
 
 /// # Limited-memory BFGS (L-BFGS) method
 ///
@@ -61,6 +65,8 @@ pub struct LBFGS<L, P, G, F> {
     tol_grad: F,
     /// Tolerance for the stopping criterion based on the change of the cost stopping criterion
     tol_cost: F,
+    /// Coefficient of L1-regularization
+    l1_coeff: F,
 }
 
 impl<L, P, G, F> LBFGS<L, P, G, F>
@@ -84,6 +90,7 @@ where
             y: VecDeque::with_capacity(m),
             tol_grad: F::epsilon().sqrt(),
             tol_cost: F::epsilon(),
+            l1_coeff: float!(0.0),
         }
     }
 
@@ -138,6 +145,117 @@ where
         self.tol_cost = tol_cost;
         Ok(self)
     }
+
+    /// Sets coefficient of L1-regularization.
+    ///
+    /// Zero or negative value: Disable L1-regularization
+    pub fn with_l1_regularization(mut self, l1_coeff: F) -> Self {
+        self.l1_coeff = l1_coeff;
+        self
+    }
+
+    fn calculate_pseudo_gradient(&self, param: &P, gradient: &G) -> G
+    where
+        P: ArgminAdd<F, P> + ArgminSub<F, P> + ArgminMul<F, P> + ArgminSignum,
+        G: ArgminAdd<G, G> + ArgminAdd<P, G> + ArgminMinMax + ArgminZeroLike,
+    {
+        let coeff_p = param
+            .add(&F::min_positive_value())
+            .signum()
+            .mul(&self.l1_coeff);
+        let coeff_n = param
+            .sub(&F::min_positive_value())
+            .signum()
+            .mul(&self.l1_coeff);
+        let zeros = gradient.zero_like();
+        G::max(&gradient.add(&coeff_n), &zeros).add(&G::min(&gradient.add(&coeff_p), &zeros))
+    }
+}
+
+struct LineSearchProblem<O, P, G, F> {
+    problem: O,
+    xi: Option<P>,
+    phantom1: PhantomData<G>,
+    phantom2: PhantomData<F>,
+}
+
+impl<O, P, G, F> LineSearchProblem<O, P, G, F>
+where
+    P: ArgminSub<F, P>,
+    F: ArgminFloat,
+{
+    fn new(problem: O) -> Self {
+        Self {
+            problem,
+            xi: None,
+            phantom1: PhantomData,
+            phantom2: PhantomData,
+        }
+    }
+
+    fn with_l1_constraint(&mut self, param: &P, pseudo_gradient: &G)
+    where
+        P: ArgminZeroLike
+            + ArgminMinMax
+            + ArgminSignum
+            + ArgminAdd<P, P>
+            + ArgminAdd<F, P>
+            + ArgminMul<P, P>
+            + ArgminSub<F, P>
+            + ArgminMul<G, P>,
+    {
+        let zeros = param.zero_like();
+        let sig_param = P::max(&param.sub(&F::min_positive_value()).signum(), &zeros).add(&P::min(
+            &param.add(&F::min_positive_value()).signum(),
+            &zeros,
+        ));
+        self.xi = Some(
+            sig_param.add(
+                &sig_param
+                    .mul(&sig_param)
+                    .sub(&float!(1.0))
+                    .mul(pseudo_gradient),
+            ),
+        );
+    }
+}
+
+impl<O, P, G, F> CostFunction for LineSearchProblem<O, P, G, F>
+where
+    O: CostFunction<Param = P, Output = F>,
+    P: ArgminMul<P, P> + ArgminMinMax + ArgminSignum + ArgminZeroLike,
+{
+    type Param = P;
+    type Output = F;
+
+    fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+        if let Some(xi) = self.xi.as_ref() {
+            let zeros = param.zero_like();
+            let param = P::max(&param.mul(xi).signum(), &zeros).mul(param);
+            self.problem.cost(&param)
+        } else {
+            self.problem.cost(param)
+        }
+    }
+}
+
+impl<O, P, G, F> Gradient for LineSearchProblem<O, P, G, F>
+where
+    O: Gradient<Param = P, Gradient = G>,
+    P: ArgminMul<P, P> + ArgminMinMax + ArgminSignum + ArgminZeroLike,
+{
+    type Param = P;
+    type Gradient = G;
+
+    fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error> {
+        if let Some(xi) = self.xi.as_ref() {
+            let zeros = param.zero_like();
+            let param = P::max(&param.mul(xi).signum(), &zeros).mul(param);
+            self.problem.gradient(&param)
+        } else {
+            self.problem.gradient(param)
+        }
+    }
 }
 
 impl<O, L, P, G, F> Solver<O, IterState<P, G, (), (), F>> for LBFGS<L, P, G, F>
@@ -147,19 +265,30 @@ where
         + SerializeAlias
         + DeserializeOwnedAlias
         + ArgminSub<P, P>
+        + ArgminSub<F, P>
         + ArgminAdd<P, P>
+        + ArgminAdd<F, P>
         + ArgminDot<G, F>
-        + ArgminMul<F, P>,
+        + ArgminMul<F, P>
+        + ArgminMul<P, P>
+        + ArgminMul<G, P>
+        + ArgminSignum
+        + ArgminZeroLike
+        + ArgminMinMax,
     G: Clone
         + SerializeAlias
         + DeserializeOwnedAlias
         + ArgminNorm<F>
         + ArgminSub<G, G>
+        + ArgminAdd<G, G>
+        + ArgminAdd<P, G>
         + ArgminDot<G, F>
         + ArgminDot<P, F>
         + ArgminMul<F, G>
-        + ArgminMul<F, P>,
-    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
+        + ArgminMul<F, P>
+        + ArgminZeroLike
+        + ArgminMinMax,
+    L: Clone + LineSearch<P, F> + Solver<LineSearchProblem<O, P, G, F>, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "L-BFGS";
@@ -213,8 +342,16 @@ where
             float!(1.0)
         };
 
+        let mut pseudo_gradient = None;
+
         // L-BFGS two-loop recursion
-        let mut q = prev_grad.clone();
+        let mut q = if self.l1_coeff > float!(0.0) {
+            let pg = self.calculate_pseudo_gradient(&param, &prev_grad);
+            pseudo_gradient = Some(pg.clone());
+            pg
+        } else {
+            prev_grad.clone()
+        };
         let cur_m = self.s.len();
         let mut alpha: Vec<F> = vec![float!(0.0); cur_m];
         let mut rho: Vec<F> = vec![float!(0.0); cur_m];
@@ -234,14 +371,25 @@ where
             r = r.add(&sk.mul(&(alpha[i] - beta)));
         }
 
-        self.linesearch.search_direction(r.mul(&float!(-1.0)));
+        let mut line_problem = LineSearchProblem::new(problem.take_problem().unwrap());
+        let d = if let Some(pg) = pseudo_gradient {
+            line_problem.with_l1_constraint(&param, &pg);
+            let zeros = r.zero_like();
+            P::max(&r.mul(&pg).signum(), &zeros)
+                .mul(&r)
+                .mul(&float!(-1.0))
+        } else {
+            r.mul(&float!(-1.0))
+        };
+
+        self.linesearch.search_direction(d);
 
         // Run solver
         let OptimizationResult {
-            problem: line_problem,
+            problem: mut line_problem,
             state: mut linesearch_state,
             ..
-        } = Executor::new(problem.take_problem().unwrap(), self.linesearch.clone())
+        } = Executor::new(line_problem, self.linesearch.clone())
             .configure(|config| {
                 config
                     .param(param.clone())
@@ -251,11 +399,18 @@ where
             .ctrlc(false)
             .run()?;
 
-        let xk1 = linesearch_state.take_param().unwrap();
+        let mut xk1 = linesearch_state.take_param().unwrap();
         let next_cost = linesearch_state.get_cost();
 
         // take back problem and take care of function evaluation counts
-        problem.consume_problem(line_problem);
+        let mut internal_line_problem = line_problem.take_problem().unwrap();
+        let xi = internal_line_problem.xi.take();
+        problem.problem = Some(internal_line_problem.problem);
+        problem.consume_func_counts(line_problem);
+        if let Some(xi) = xi {
+            let zeros = xk1.zero_like();
+            xk1 = P::max(&xk1.mul(&xi).signum(), &zeros).mul(&xk1);
+        }
 
         if state.get_iter() >= self.m as u64 {
             self.s.pop_front();
@@ -309,6 +464,7 @@ mod tests {
             m,
             s,
             y,
+            l1_coeff,
         } = lbfgs;
 
         assert_eq!(linesearch, MyFakeLineSearch {});
@@ -317,6 +473,7 @@ mod tests {
         assert_eq!(m, 3);
         assert!(s.capacity() >= 3);
         assert!(y.capacity() >= 3);
+        assert!(l1_coeff <= 0.0);
     }
 
     #[test]
@@ -457,6 +614,85 @@ mod tests {
 
         for (s, g) in s_grad.iter().zip(gradient.iter()) {
             assert_eq!(s.to_ne_bytes(), g.to_ne_bytes());
+        }
+    }
+
+    /// Example 1: x = [1, 1, 0, 0], y =  1
+    /// Example 2: x = [0, 0, 1, 1], y = -1
+    /// Example 3: x = [1, 0, 0, 0], y =  1
+    /// Example 4: x = [0, 0, 1, 0], y = -1
+    struct TestSparseProblem;
+
+    impl CostFunction for TestSparseProblem {
+        type Param = Vec<f64>;
+        type Output = f64;
+
+        fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+            let err1 = (param[0] + param[1] - 1.0).powi(2);
+            let err2 = (param[2] + param[3] + 1.0).powi(2);
+            let err3 = (param[0] - 1.0).powi(2);
+            let err4 = (param[2] + 1.0).powi(2);
+            Ok(err1 + err2 + err3 + err4)
+        }
+    }
+
+    impl Gradient for TestSparseProblem {
+        type Param = Vec<f64>;
+        type Gradient = Vec<f64>;
+
+        fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error> {
+            let mut g = vec![0.0; 4];
+            g[0] = 4.0 * param[0] + 2.0 * param[1] - 4.0;
+            g[1] = 2.0 * param[0] + 2.0 * param[1] - 2.0;
+            g[2] = 4.0 * param[2] + 2.0 * param[3] + 4.0;
+            g[3] = 2.0 * param[2] + 2.0 * param[3] + 2.0;
+            Ok(g)
+        }
+    }
+
+    #[test]
+    fn test_l1_regularization() {
+        {
+            let linesearch = MoreThuenteLineSearch::new().with_c(1e-4, 0.9).unwrap();
+
+            let param: Vec<f64> = vec![0.0; 4];
+
+            let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> =
+                LBFGS::new(linesearch, 3);
+
+            let cost = TestSparseProblem;
+            let res = Executor::new(cost, lbfgs)
+                .configure(|state| state.param(param).max_iters(2))
+                .run()
+                .unwrap();
+
+            let result_param = res.state.param.unwrap();
+
+            assert!((result_param[0] - 1.0).abs() > 1e-6);
+            assert!((result_param[1]).abs() > 1e-6);
+            assert!((result_param[2] + 1.0).abs() > 1e-6);
+            assert!((result_param[3]).abs() > 1e-6);
+        }
+        {
+            let linesearch = MoreThuenteLineSearch::new().with_c(1e-4, 0.9).unwrap();
+
+            let param: Vec<f64> = vec![0.0; 4];
+
+            let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> =
+                LBFGS::new(linesearch, 3).with_l1_regularization(2.0);
+
+            let cost = TestSparseProblem;
+            let res = Executor::new(cost, lbfgs)
+                .configure(|state| state.param(param).max_iters(2))
+                .run()
+                .unwrap();
+
+            let result_param = res.state.param.unwrap();
+
+            assert!((result_param[0] - 1.0).abs() < 1e-6);
+            assert!((result_param[1]).abs() < 1e-6);
+            assert!((result_param[2] + 1.0).abs() < 1e-6);
+            assert!((result_param[3]).abs() < 1e-6);
         }
     }
 }

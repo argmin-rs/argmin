@@ -283,3 +283,9 @@ pub trait ArgminMinMax {
     /// Select piecewise maximum
     fn max(x: &Self, y: &Self) -> Self;
 }
+
+/// Returns a number that represents the sign of `self`.
+pub trait ArgminSignum {
+    /// Returns a number that represents the sign of `self`.
+    fn signum(self) -> Self;
+}
