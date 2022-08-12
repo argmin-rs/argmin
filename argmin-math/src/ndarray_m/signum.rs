@@ -97,14 +97,14 @@ mod tests {
                     let x = Array1::from(vec![
                         Complex::new(1 as $t, 2 as $t),
                         Complex::new(4 as $t, -3 as $t),
-                        Complex::new(-8 as $t, 4 as $t)
-                        Complex::new(-8 as $t, -1 as $t)
+                        Complex::new(-8 as $t, 4 as $t),
+                        Complex::new(-8 as $t, -1 as $t),
                     ]);
                     let y = Array1::from(vec![
                         Complex::new(1 as $t, 1 as $t),
                         Complex::new(1 as $t, -1 as $t),
                         Complex::new(-1 as $t, 1 as $t),
-                        Complex::new(-1 as $t, -1 as $t)
+                        Complex::new(-1 as $t, -1 as $t),
                     ]);
                     let res = <Array1<Complex<$t>> as ArgminSignum>::signum(x);
                     for i in 0..4 {
@@ -118,7 +118,7 @@ mod tests {
                 fn [<test_signum_ndarray_ $t>]() {
                     let x = Array1::from(vec![1 as $t, -4 as $t, 8 as $t]);
                     let y = Array1::from(vec![1 as $t, -1 as $t, 1 as $t]);
-                    let res = <Array1<$t> as ArgminConj>::conj(&a);
+                    let res = <Array1<$t> as ArgminSignum>::signum(x);
                     for i in 0..3 {
                         assert_eq!(y[i], res[i]);
                     }
