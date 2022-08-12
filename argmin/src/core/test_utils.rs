@@ -239,7 +239,6 @@ impl TestSparseProblem {
     }
 }
 
-
 impl CostFunction for TestSparseProblem {
     type Param = Vec<f64>;
     type Output = f64;

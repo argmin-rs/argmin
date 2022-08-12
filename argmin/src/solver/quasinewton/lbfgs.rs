@@ -459,7 +459,10 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{test_utils::{TestProblem, TestSparseProblem}, ArgminError, IterState, State};
+    use crate::core::{
+        test_utils::{TestProblem, TestSparseProblem},
+        ArgminError, IterState, State,
+    };
     use crate::solver::linesearch::MoreThuenteLineSearch;
     use crate::test_trait_impl;
 
@@ -641,8 +644,7 @@ mod tests {
 
             let param: Vec<f64> = vec![0.0; 4];
 
-            let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> =
-                LBFGS::new(linesearch, 3);
+            let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> = LBFGS::new(linesearch, 3);
 
             let cost = TestSparseProblem::new();
             let res = Executor::new(cost, lbfgs)
