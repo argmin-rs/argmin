@@ -108,7 +108,9 @@ mod tests {
                     ]);
                     let res = <Array1<Complex<$t>> as ArgminSignum>::signum(x);
                     for i in 0..4 {
-                        assert_eq!(y[i], res[i]);
+                        let tmp = y[i] - res[i];
+                        let norm = ((tmp.re * tmp.re + tmp.im * tmp.im) as f64).sqrt();
+                        assert!(norm < std::f64::EPSILON);
                     }
                 }
             }
@@ -120,7 +122,8 @@ mod tests {
                     let y = Array1::from(vec![1 as $t, -1 as $t, 1 as $t]);
                     let res = <Array1<$t> as ArgminSignum>::signum(x);
                     for i in 0..3 {
-                        assert_eq!(y[i], res[i]);
+                        let diff = (y[i] - res[i]).abs() as f64;
+                        assert!(diff < std::f64::EPSILON);
                     }
                 }
             }
