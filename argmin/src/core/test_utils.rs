@@ -207,6 +207,104 @@ impl Anneal for TestProblem {
     }
 }
 
+/// A struct representing the following sparse problem.
+///
+/// Example 1: x = [1, 1, 0, 0], y =  1
+/// Example 2: x = [0, 0, 1, 1], y = -1
+/// Example 3: x = [1, 0, 0, 0], y =  1
+/// Example 4: x = [0, 0, 1, 0], y = -1
+///
+/// cost = Σ (w^T x - y)^2
+///
+/// Implements [`CostFunction`] and [`Gradient`].
+#[derive(Clone, Copy, Default, Debug, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+
+pub struct TestSparseProblem {}
+
+impl TestSparseProblem {
+    /// Create an instance of `TestSparseProblem`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestSparseProblem;
+    ///
+    /// let problem = TestSparseProblem::new();
+    /// # assert_eq!(problem, TestSparseProblem {});
+    /// ```
+    #[allow(dead_code)]
+    pub fn new() -> Self {
+        TestSparseProblem {}
+    }
+}
+
+
+impl CostFunction for TestSparseProblem {
+    type Param = Vec<f64>;
+    type Output = f64;
+
+    /// Returns a sum of squared errors.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestSparseProblem;
+    /// use argmin::core::CostFunction;
+    /// # use argmin::core::Error;
+    ///
+    /// # fn main() -> Result<(), Error> {
+    /// let problem = TestSparseProblem::new();
+    ///
+    /// let param = vec![1.0, 2.0, 3.0, 4.0];
+    ///
+    /// let res = problem.cost(&param)?;
+    /// # assert_eq!(res, 84f64);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+        let err1 = (param[0] + param[1] - 1.0).powi(2);
+        let err2 = (param[2] + param[3] + 1.0).powi(2);
+        let err3 = (param[0] - 1.0).powi(2);
+        let err4 = (param[2] + 1.0).powi(2);
+        Ok(err1 + err2 + err3 + err4)
+    }
+}
+
+impl Gradient for TestSparseProblem {
+    type Param = Vec<f64>;
+    type Gradient = Vec<f64>;
+
+    /// Returns a gradient of the cost function.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestSparseProblem;
+    /// use argmin::core::Gradient;
+    /// # use argmin::core::Error;
+    ///
+    /// # fn main() -> Result<(), Error> {
+    /// let problem = TestSparseProblem::new();
+    ///
+    /// let param = vec![1.0, 2.0, 3.0, 4.0];
+    ///
+    /// let res = problem.gradient(&param)?;
+    /// # assert_eq!(res, vec![4.0, 4.0, 24.0, 16.0]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error> {
+        let mut g = vec![0.0; 4];
+        g[0] = 4.0 * param[0] + 2.0 * param[1] - 4.0;
+        g[1] = 2.0 * param[0] + 2.0 * param[1] - 2.0;
+        g[2] = 4.0 * param[2] + 2.0 * param[3] + 4.0;
+        g[3] = 2.0 * param[2] + 2.0 * param[3] + 2.0;
+        Ok(g)
+    }
+}
+
 /// A (non-working) solver useful for testing
 ///
 /// Implements the [`Solver`] trait.

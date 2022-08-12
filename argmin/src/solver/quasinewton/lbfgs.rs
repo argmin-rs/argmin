@@ -50,6 +50,9 @@ use std::marker::PhantomData;
 ///
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
+///
+/// Galen Andrew and Jianfeng Gao (2007). Scalable Training of L1-Regularized Log-Linear Models,
+/// International Conference on Machine Learning.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct LBFGS<L, P, G, F> {
@@ -148,7 +151,18 @@ where
 
     /// Sets coefficient of L1-regularization.
     ///
-    /// Zero or negative value: Disable L1-regularization
+    /// `0.0` or negative value disables L1-regularization. Defaults to `0.0`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::quasinewton::LBFGS;
+    /// # use argmin::core::Error;
+    /// # fn main() -> Result<(), Error> {
+    /// # let linesearch = ();
+    /// let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> = LBFGS::new(linesearch, 3).with_l1_regularization(1.0);
+    /// # Ok(())
+    /// # }
     pub fn with_l1_regularization(mut self, l1_coeff: F) -> Self {
         self.l1_coeff = l1_coeff;
         self
@@ -442,7 +456,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{test_utils::TestProblem, ArgminError, IterState, State};
+    use crate::core::{test_utils::{TestProblem, TestSparseProblem}, ArgminError, IterState, State};
     use crate::solver::linesearch::MoreThuenteLineSearch;
     use crate::test_trait_impl;
 
@@ -617,39 +631,6 @@ mod tests {
         }
     }
 
-    /// Example 1: x = [1, 1, 0, 0], y =  1
-    /// Example 2: x = [0, 0, 1, 1], y = -1
-    /// Example 3: x = [1, 0, 0, 0], y =  1
-    /// Example 4: x = [0, 0, 1, 0], y = -1
-    struct TestSparseProblem;
-
-    impl CostFunction for TestSparseProblem {
-        type Param = Vec<f64>;
-        type Output = f64;
-
-        fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
-            let err1 = (param[0] + param[1] - 1.0).powi(2);
-            let err2 = (param[2] + param[3] + 1.0).powi(2);
-            let err3 = (param[0] - 1.0).powi(2);
-            let err4 = (param[2] + 1.0).powi(2);
-            Ok(err1 + err2 + err3 + err4)
-        }
-    }
-
-    impl Gradient for TestSparseProblem {
-        type Param = Vec<f64>;
-        type Gradient = Vec<f64>;
-
-        fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error> {
-            let mut g = vec![0.0; 4];
-            g[0] = 4.0 * param[0] + 2.0 * param[1] - 4.0;
-            g[1] = 2.0 * param[0] + 2.0 * param[1] - 2.0;
-            g[2] = 4.0 * param[2] + 2.0 * param[3] + 4.0;
-            g[3] = 2.0 * param[2] + 2.0 * param[3] + 2.0;
-            Ok(g)
-        }
-    }
-
     #[test]
     fn test_l1_regularization() {
         {
@@ -660,7 +641,7 @@ mod tests {
             let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> =
                 LBFGS::new(linesearch, 3);
 
-            let cost = TestSparseProblem;
+            let cost = TestSparseProblem::new();
             let res = Executor::new(cost, lbfgs)
                 .configure(|state| state.param(param).max_iters(2))
                 .run()
@@ -681,7 +662,7 @@ mod tests {
             let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> =
                 LBFGS::new(linesearch, 3).with_l1_regularization(2.0);
 
-            let cost = TestSparseProblem;
+            let cost = TestSparseProblem::new();
             let res = Executor::new(cost, lbfgs)
                 .configure(|state| state.param(param).max_iters(2))
                 .run()
