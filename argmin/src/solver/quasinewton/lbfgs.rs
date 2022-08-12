@@ -168,6 +168,7 @@ where
         self
     }
 
+    /// Calculates pseudo-gradient of OWL-QN method.
     fn calculate_pseudo_gradient(&self, param: &P, gradient: &G) -> G
     where
         P: ArgminAdd<F, P> + ArgminSub<F, P> + ArgminMul<F, P> + ArgminSignum,
@@ -186,6 +187,7 @@ where
     }
 }
 
+/// Wrapper problem for supporting constrained line search.
 struct LineSearchProblem<O, P, G, F> {
     problem: O,
     xi: Option<P>,
