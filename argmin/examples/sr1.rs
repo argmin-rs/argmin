@@ -28,7 +28,7 @@ impl Gradient for StyblinskiTang {
     type Param = Array1<f64>;
     type Gradient = Array1<f64>;
 
-    fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+    fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
         Ok((*p).forward_diff(&|x| styblinski_tang(&x.to_vec())))
     }
 }

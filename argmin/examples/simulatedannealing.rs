@@ -46,7 +46,7 @@ impl CostFunction for Rosenbrock {
     type Param = Vec<f64>;
     type Output = f64;
 
-    fn cost(&self, param: &Vec<f64>) -> Result<f64, Error> {
+    fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
         Ok(rosenbrock(param, self.a, self.b))
     }
 }

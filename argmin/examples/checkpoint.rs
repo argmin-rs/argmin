@@ -18,7 +18,7 @@ impl CostFunction for Rosenbrock {
     type Param = Vec<f64>;
     type Output = f64;
 
-    fn cost(&self, p: &Vec<f64>) -> Result<f64, Error> {
+    fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(rosenbrock_2d(p, 1.0, 100.0))
     }
 }
@@ -27,7 +27,7 @@ impl Gradient for Rosenbrock {
     type Param = Vec<f64>;
     type Gradient = Vec<f64>;
 
-    fn gradient(&self, p: &Vec<f64>) -> Result<Vec<f64>, Error> {
+    fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
     }
 }

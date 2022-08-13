@@ -32,7 +32,7 @@ impl Gradient for Rosenbrock {
     type Param = Vec<f64>;
     type Gradient = Vec<f64>;
 
-    fn gradient(&self, p: &Self::Param) -> Result<Self::Param, Error> {
+    fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
         Ok(rosenbrock_2d_derivative(p, self.a, self.b))
     }
 }
