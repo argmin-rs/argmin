@@ -16,7 +16,7 @@ impl CostFunction for Sphere {
     type Param = Vec<f64>;
     type Output = f64;
 
-    fn cost(&self, param: &Vec<f64>) -> Result<f64, Error> {
+    fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
         Ok(sphere(param))
     }
 }
@@ -25,7 +25,7 @@ impl Gradient for Sphere {
     type Param = Vec<f64>;
     type Gradient = Vec<f64>;
 
-    fn gradient(&self, param: &Vec<f64>) -> Result<Vec<f64>, Error> {
+    fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error> {
         Ok(sphere_derivative(param))
     }
 }
