@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["condition","Acceptance conditions"]],"struct":[["BacktrackingLineSearch","Backtracking line search"],["HagerZhangLineSearch","Hager-Zhang line search"],["MoreThuenteLineSearch","More-Thuente line search"]],"trait":[["LineSearch","Line search trait"]]});
+window.SIDEBAR_ITEMS = {"mod":[["condition","Acceptance conditions"]],"struct":[["BacktrackingLineSearch","Backtracking line search"],["HagerZhangLineSearch","Hager-Zhang line search"],["MoreThuenteLineSearch","More-Thuente line search"]],"trait":[["LineSearch","Line search trait"]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["GoldenSectionSearch","Golden-section search"]]});
+window.SIDEBAR_ITEMS = {"struct":[["GoldenSectionSearch","Golden-section search"]]};

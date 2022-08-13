@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SlogLogger","A logger using the `slog` crate as backend."]]});
+window.SIDEBAR_ITEMS = {"struct":[["SlogLogger","A logger using the `slog` crate as backend."]]};

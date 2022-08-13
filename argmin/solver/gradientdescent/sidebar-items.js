@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SteepestDescent","Steepest descent"]]});
+window.SIDEBAR_ITEMS = {"struct":[["SteepestDescent","Steepest descent"]]};

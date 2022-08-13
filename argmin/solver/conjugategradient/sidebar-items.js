@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["beta","Beta update methods for `NonlinearConjugateGradient`"]],"struct":[["ConjugateGradient","Conjugate Gradient method"],["NonlinearConjugateGradient","Non-linear Conjugate Gradient method"]]});
+window.SIDEBAR_ITEMS = {"mod":[["beta","Beta update methods for `NonlinearConjugateGradient`"]],"struct":[["ConjugateGradient","Conjugate Gradient method"],["NonlinearConjugateGradient","Non-linear Conjugate Gradient method"]]};

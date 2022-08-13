@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Landweber","Landweber iteration"]]});
+window.SIDEBAR_ITEMS = {"struct":[["Landweber","Landweber iteration"]]};
