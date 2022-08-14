@@ -401,7 +401,6 @@ where
             alpha[cur_m - i - 1] = alpha_t;
         }
         let mut r: P = q.mul(&gamma);
-
         for (i, (sk, yk)) in self.s.iter().zip(self.y.iter()).enumerate() {
             let beta: F = yk.dot(&r);
             let beta = beta.mul(rho[i]);
