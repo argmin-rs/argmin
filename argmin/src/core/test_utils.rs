@@ -219,7 +219,6 @@ impl Anneal for TestProblem {
 /// Implements [`CostFunction`] and [`Gradient`].
 #[derive(Clone, Copy, Default, Debug, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-
 pub struct TestSparseProblem {}
 
 impl TestSparseProblem {
