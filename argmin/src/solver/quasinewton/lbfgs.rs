@@ -18,6 +18,19 @@ use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::marker::PhantomData;
 
+/// Calculates pseudo-gradient of OWL-QN method.
+fn calculate_pseudo_gradient<P, G, F>(l1_coeff: F, param: &P, gradient: &G) -> G
+where
+    P: ArgminAdd<F, P> + ArgminSub<F, P> + ArgminMul<F, P> + ArgminSignum,
+    G: ArgminAdd<G, G> + ArgminAdd<P, G> + ArgminMinMax + ArgminZeroLike,
+    F: ArgminFloat,
+{
+    let coeff_p = param.add(&F::min_positive_value()).signum().mul(&l1_coeff);
+    let coeff_n = param.sub(&F::min_positive_value()).signum().mul(&l1_coeff);
+    let zeros = gradient.zero_like();
+    G::max(&gradient.add(&coeff_n), &zeros).add(&G::min(&gradient.add(&coeff_p), &zeros))
+}
+
 /// # Limited-memory BFGS (L-BFGS) method
 ///
 /// L-BFGS is an approximation to BFGS which requires a limited amount of memory. Instead of
@@ -70,6 +83,8 @@ pub struct LBFGS<L, P, G, F> {
     tol_cost: F,
     /// Coefficient of L1-regularization
     l1_coeff: Option<F>,
+    /// Unregularized gradient used for calculation of `y`.
+    l1_prev_unreg_grad: Option<G>,
 }
 
 impl<L, P, G, F> LBFGS<L, P, G, F>
@@ -94,6 +109,7 @@ where
             tol_grad: F::epsilon().sqrt(),
             tol_cost: F::epsilon(),
             l1_coeff: None,
+            l1_prev_unreg_grad: None,
         }
     }
 
@@ -173,26 +189,14 @@ where
         self.l1_coeff = Some(l1_coeff);
         Ok(self)
     }
-
-    /// Calculates pseudo-gradient of OWL-QN method.
-    fn calculate_pseudo_gradient(l1_coeff: F, param: &P, gradient: &G) -> G
-    where
-        P: ArgminAdd<F, P> + ArgminSub<F, P> + ArgminMul<F, P> + ArgminSignum,
-        G: ArgminAdd<G, G> + ArgminAdd<P, G> + ArgminMinMax + ArgminZeroLike,
-    {
-        let coeff_p = param.add(&F::min_positive_value()).signum().mul(&l1_coeff);
-        let coeff_n = param.sub(&F::min_positive_value()).signum().mul(&l1_coeff);
-        let zeros = gradient.zero_like();
-        G::max(&gradient.add(&coeff_n), &zeros).add(&G::min(&gradient.add(&coeff_p), &zeros))
-    }
 }
 
 /// Wrapper problem for supporting constrained line search.
 struct LineSearchProblem<O, P, G, F> {
     problem: O,
     xi: Option<P>,
-    phantom1: PhantomData<G>,
-    phantom2: PhantomData<F>,
+    l1_coeff: Option<F>,
+    phantom: PhantomData<G>,
 }
 
 impl<O, P, G, F> LineSearchProblem<O, P, G, F>
@@ -204,12 +208,12 @@ where
         Self {
             problem,
             xi: None,
-            phantom1: PhantomData,
-            phantom2: PhantomData,
+            l1_coeff: None,
+            phantom: PhantomData,
         }
     }
 
-    fn with_l1_constraint(&mut self, param: &P, pseudo_gradient: &G)
+    fn with_l1_constraint(&mut self, l1_coeff: F, param: &P, pseudo_gradient: &G)
     where
         P: ArgminZeroLike
             + ArgminMinMax
@@ -233,6 +237,7 @@ where
                     .mul(pseudo_gradient),
             ),
         );
+        self.l1_coeff = Some(l1_coeff);
     }
 }
 
@@ -258,7 +263,15 @@ where
 impl<O, P, G, F> Gradient for LineSearchProblem<O, P, G, F>
 where
     O: Gradient<Param = P, Gradient = G>,
-    P: ArgminMul<P, P> + ArgminMinMax + ArgminSignum + ArgminZeroLike,
+    P: ArgminAdd<F, P>
+        + ArgminMul<P, P>
+        + ArgminMul<F, P>
+        + ArgminSub<F, P>
+        + ArgminMinMax
+        + ArgminSignum
+        + ArgminZeroLike,
+    G: ArgminAdd<P, G> + ArgminZeroLike + ArgminMinMax + ArgminAdd<G, G>,
+    F: ArgminFloat,
 {
     type Param = P;
     type Gradient = G;
@@ -267,7 +280,12 @@ where
         if let Some(xi) = self.xi.as_ref() {
             let zeros = param.zero_like();
             let param = P::max(&param.mul(xi).signum(), &zeros).mul(param);
-            self.problem.gradient(&param)
+            let gradient = self.problem.gradient(&param)?;
+            Ok(calculate_pseudo_gradient(
+                self.l1_coeff.unwrap(),
+                &param,
+                &gradient,
+            ))
         } else {
             self.problem.gradient(param)
         }
@@ -278,6 +296,7 @@ impl<O, L, P, G, F> Solver<O, IterState<P, G, (), (), F>> for LBFGS<L, P, G, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone
+        + std::fmt::Debug
         + SerializeAlias
         + DeserializeOwnedAlias
         + ArgminSub<P, P>
@@ -292,6 +311,7 @@ where
         + ArgminZeroLike
         + ArgminMinMax,
     G: Clone
+        + std::fmt::Debug
         + SerializeAlias
         + DeserializeOwnedAlias
         + ArgminNorm<F>
@@ -347,10 +367,18 @@ where
             "`L-BFGS`: Parameter vector in state not set."
         ))?;
         let cur_cost = state.get_cost();
-        let prev_grad = state.take_gradient().ok_or_else(argmin_error_closure!(
+
+        // If L1 regularization is enabled, the state contains pseudo gradient.
+        let mut prev_grad = state.take_gradient().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`L-BFGS`: Gradient in state not set."
         ))?;
+        if let Some(l1_coeff) = self.l1_coeff {
+            if self.l1_prev_unreg_grad.is_none() {
+                self.l1_prev_unreg_grad = Some(prev_grad.clone());
+                prev_grad = calculate_pseudo_gradient(l1_coeff, &param, &prev_grad)
+            }
+        }
 
         let gamma: F = if let (Some(sk), Some(yk)) = (self.s.back(), self.y.back()) {
             sk.dot(yk) / yk.dot(yk)
@@ -358,17 +386,8 @@ where
             float!(1.0)
         };
 
-        let mut pseudo_gradient = None;
-
         // L-BFGS two-loop recursion
-        let mut q = if let Some(l1_coeff) = self.l1_coeff {
-            // Use pseudo-gradient if L1-regularization is enabled.
-            let pg = Self::calculate_pseudo_gradient(l1_coeff, &param, &prev_grad);
-            pseudo_gradient = Some(pg.clone());
-            pg
-        } else {
-            prev_grad.clone()
-        };
+        let mut q = prev_grad.clone();
         let cur_m = self.s.len();
         let mut alpha: Vec<F> = vec![float!(0.0); cur_m];
         let mut rho: Vec<F> = vec![float!(0.0); cur_m];
@@ -382,6 +401,7 @@ where
             alpha[cur_m - i - 1] = alpha_t;
         }
         let mut r: P = q.mul(&gamma);
+
         for (i, (sk, yk)) in self.s.iter().zip(self.y.iter()).enumerate() {
             let beta: F = yk.dot(&r);
             let beta = beta.mul(rho[i]);
@@ -389,10 +409,10 @@ where
         }
 
         let mut line_problem = LineSearchProblem::new(problem.take_problem().unwrap());
-        let d = if let Some(pg) = pseudo_gradient {
-            line_problem.with_l1_constraint(&param, &pg);
+        let d = if let Some(l1_coeff) = self.l1_coeff {
+            line_problem.with_l1_constraint(l1_coeff, &param, &prev_grad);
             let zeros = r.zero_like();
-            P::max(&r.mul(&pg).signum(), &zeros)
+            P::max(&r.mul(&prev_grad).signum(), &zeros)
                 .mul(&r)
                 .mul(&float!(-1.0))
         } else {
@@ -437,7 +457,17 @@ where
         let grad = problem.gradient(&xk1)?;
 
         self.s.push_back(xk1.sub(&param));
-        self.y.push_back(grad.sub(&prev_grad));
+        let grad = if let Some(l1_coeff) = self.l1_coeff {
+            // Stores unregularized gradient and returns L1 gradient.
+            let pseudo_grad = calculate_pseudo_gradient(l1_coeff, &param, &grad);
+            self.y
+                .push_back(grad.sub(&self.l1_prev_unreg_grad.as_ref().unwrap()));
+            self.l1_prev_unreg_grad = Some(grad);
+            pseudo_grad
+        } else {
+            self.y.push_back(grad.sub(&prev_grad));
+            grad
+        };
 
         Ok((
             state.param(xk1).cost(next_cost).gradient(grad),
@@ -485,6 +515,7 @@ mod tests {
             s,
             y,
             l1_coeff,
+            l1_prev_unreg_grad,
         } = lbfgs;
 
         assert_eq!(linesearch, MyFakeLineSearch {});
@@ -494,6 +525,7 @@ mod tests {
         assert!(s.capacity() >= 3);
         assert!(y.capacity() >= 3);
         assert!(l1_coeff.is_none());
+        assert!(l1_prev_unreg_grad.is_none());
     }
 
     #[test]
@@ -675,10 +707,11 @@ mod tests {
                 .unwrap();
 
             let result_param = res.state.param.unwrap();
+            dbg!(&result_param);
 
-            assert!((result_param[0] - 1.0).abs() < 1e-6);
+            assert!((result_param[0] - 0.5).abs() < 1e-6);
             assert!((result_param[1]).abs() < 1e-6);
-            assert!((result_param[2] + 1.0).abs() < 1e-6);
+            assert!((result_param[2] + 0.5).abs() < 1e-6);
             assert!((result_param[3]).abs() < 1e-6);
         }
     }
