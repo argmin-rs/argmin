@@ -69,7 +69,7 @@ pub struct LBFGS<L, P, G, F> {
     /// Tolerance for the stopping criterion based on the change of the cost stopping criterion
     tol_cost: F,
     /// Coefficient of L1-regularization
-    l1_coeff: F,
+    l1_coeff: Option<F>,
 }
 
 impl<L, P, G, F> LBFGS<L, P, G, F>
@@ -93,7 +93,7 @@ where
             y: VecDeque::with_capacity(m),
             tol_grad: F::epsilon().sqrt(),
             tol_cost: F::epsilon(),
-            l1_coeff: float!(0.0),
+            l1_coeff: None,
         }
     }
 
@@ -149,9 +149,9 @@ where
         Ok(self)
     }
 
-    /// Sets coefficient of L1-regularization.
+    /// Activates L1-regularization with coefficient `l1_coeff`.
     ///
-    /// `0.0` or negative value disables L1-regularization. Defaults to `0.0`.
+    /// Parameter `l1_coeff` must be `> 0.0`.
     ///
     /// # Example
     ///
@@ -160,28 +160,28 @@ where
     /// # use argmin::core::Error;
     /// # fn main() -> Result<(), Error> {
     /// # let linesearch = ();
-    /// let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> = LBFGS::new(linesearch, 3).with_l1_regularization(1.0);
+    /// let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> = LBFGS::new(linesearch, 3).with_l1_regularization(1.0)?;
     /// # Ok(())
     /// # }
-    pub fn with_l1_regularization(mut self, l1_coeff: F) -> Self {
-        self.l1_coeff = l1_coeff;
-        self
+    pub fn with_l1_regularization(mut self, l1_coeff: F) -> Result<Self, Error> {
+        if l1_coeff <= float!(0.0) {
+            return Err(argmin_error!(
+                InvalidParameter,
+                "`L-BFGS`: coefficient of L1-regularization must be > 0."
+            ));
+        }
+        self.l1_coeff = Some(l1_coeff);
+        Ok(self)
     }
 
     /// Calculates pseudo-gradient of OWL-QN method.
-    fn calculate_pseudo_gradient(&self, param: &P, gradient: &G) -> G
+    fn calculate_pseudo_gradient(l1_coeff: F, param: &P, gradient: &G) -> G
     where
         P: ArgminAdd<F, P> + ArgminSub<F, P> + ArgminMul<F, P> + ArgminSignum,
         G: ArgminAdd<G, G> + ArgminAdd<P, G> + ArgminMinMax + ArgminZeroLike,
     {
-        let coeff_p = param
-            .add(&F::min_positive_value())
-            .signum()
-            .mul(&self.l1_coeff);
-        let coeff_n = param
-            .sub(&F::min_positive_value())
-            .signum()
-            .mul(&self.l1_coeff);
+        let coeff_p = param.add(&F::min_positive_value()).signum().mul(&l1_coeff);
+        let coeff_n = param.sub(&F::min_positive_value()).signum().mul(&l1_coeff);
         let zeros = gradient.zero_like();
         G::max(&gradient.add(&coeff_n), &zeros).add(&G::min(&gradient.add(&coeff_p), &zeros))
     }
@@ -361,9 +361,9 @@ where
         let mut pseudo_gradient = None;
 
         // L-BFGS two-loop recursion
-        let mut q = if self.l1_coeff > float!(0.0) {
+        let mut q = if let Some(l1_coeff) = self.l1_coeff {
             // Use pseudo-gradient if L1-regularization is enabled.
-            let pg = self.calculate_pseudo_gradient(&param, &prev_grad);
+            let pg = Self::calculate_pseudo_gradient(l1_coeff, &param, &prev_grad);
             pseudo_gradient = Some(pg.clone());
             pg
         } else {
@@ -493,7 +493,7 @@ mod tests {
         assert_eq!(m, 3);
         assert!(s.capacity() >= 3);
         assert!(y.capacity() >= 3);
-        assert!(l1_coeff <= 0.0);
+        assert!(l1_coeff.is_none());
     }
 
     #[test]
@@ -664,8 +664,9 @@ mod tests {
 
             let param: Vec<f64> = vec![0.0; 4];
 
-            let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> =
-                LBFGS::new(linesearch, 3).with_l1_regularization(2.0);
+            let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> = LBFGS::new(linesearch, 3)
+                .with_l1_regularization(2.0)
+                .unwrap();
 
             let cost = TestSparseProblem::new();
             let res = Executor::new(cost, lbfgs)
