@@ -461,7 +461,7 @@ where
             // Stores unregularized gradient and returns L1 gradient.
             let pseudo_grad = calculate_pseudo_gradient(l1_coeff, &param, &grad);
             self.y
-                .push_back(grad.sub(&self.l1_prev_unreg_grad.as_ref().unwrap()));
+                .push_back(grad.sub(self.l1_prev_unreg_grad.as_ref().unwrap()));
             self.l1_prev_unreg_grad = Some(grad);
             pseudo_grad
         } else {
