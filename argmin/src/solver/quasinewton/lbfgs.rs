@@ -685,9 +685,9 @@ mod tests {
 
             let result_param = res.state.param.unwrap();
 
-            assert!((result_param[0] - 1.0).abs() > 1e-6);
+            assert!((result_param[0] - 0.5).abs() > 1e-6);
             assert!((result_param[1]).abs() > 1e-6);
-            assert!((result_param[2] + 1.0).abs() > 1e-6);
+            assert!((result_param[2] + 0.5).abs() > 1e-6);
             assert!((result_param[3]).abs() > 1e-6);
         }
         {
