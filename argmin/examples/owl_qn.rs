@@ -47,7 +47,9 @@ fn run() -> Result<(), Error> {
     let linesearch = MoreThuenteLineSearch::new().with_c(1e-4, 0.9)?;
 
     // Set up solver
-    let solver = LBFGS::new(linesearch, 7).with_l1_regularization(1.0)?;
+    let solver = LBFGS::new(linesearch, 7)
+        .with_l1_regularization(1.0)?
+        .with_tolerance_cost(1e-6)?;
 
     // Run solver
     let res = Executor::new(cost, solver)

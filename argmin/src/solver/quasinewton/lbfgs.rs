@@ -309,6 +309,7 @@ where
         + ArgminMul<F, P>
         + ArgminMul<P, P>
         + ArgminMul<G, P>
+        + ArgminL1Norm<F>
         + ArgminSignum
         + ArgminZeroLike
         + ArgminMinMax,
@@ -346,7 +347,11 @@ where
 
         let cost = state.get_cost();
         let cost = if cost.is_infinite() {
-            problem.cost(&param)?
+            if let Some(l1_coeff) = self.l1_coeff {
+                problem.cost(&param)? + l1_coeff * param.l1_norm()
+            } else {
+                problem.cost(&param)?
+            }
         } else {
             cost
         };
