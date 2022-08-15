@@ -10,8 +10,8 @@ use crate::core::{
     LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason, KV,
 };
 use argmin_math::{
-    ArgminAdd, ArgminDot, ArgminMinMax, ArgminMul, ArgminNorm, ArgminSignum, ArgminSub,
-    ArgminZeroLike,
+    ArgminAdd, ArgminDot, ArgminL1Norm, ArgminMinMax, ArgminMul, ArgminNorm, ArgminSignum,
+    ArgminSub, ArgminZeroLike,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -244,7 +244,8 @@ where
 impl<O, P, G, F> CostFunction for LineSearchProblem<O, P, G, F>
 where
     O: CostFunction<Param = P, Output = F>,
-    P: ArgminMul<P, P> + ArgminMinMax + ArgminSignum + ArgminZeroLike,
+    P: ArgminMul<P, P> + ArgminMinMax + ArgminSignum + ArgminZeroLike + ArgminL1Norm<F>,
+    F: ArgminFloat,
 {
     type Param = P;
     type Output = F;
@@ -253,7 +254,8 @@ where
         if let Some(xi) = self.xi.as_ref() {
             let zeros = param.zero_like();
             let param = P::max(&param.mul(xi).signum(), &zeros).mul(param);
-            self.problem.cost(&param)
+            let cost = self.problem.cost(&param)?;
+            Ok(cost + self.l1_coeff.unwrap() * param.l1_norm())
         } else {
             self.problem.cost(param)
         }
