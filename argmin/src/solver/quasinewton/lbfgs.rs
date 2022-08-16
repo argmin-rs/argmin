@@ -53,6 +53,13 @@ where
 /// other. If the change is below this tolerance (default: `EPSILON`), the algorithm stops. This
 /// parameter can be set via [`with_tolerance_cost`](`LBFGS::with_tolerance_cost`).
 ///
+/// ## Orthant-Wise Limited-memory Quasi-Newton (OWL-QN) method
+///
+/// OWL-QN is a method that adapts L-BFGS to L1-regularization. The original L-BFGS requires a
+/// loss function to be differentiable and does not support L1-regularization. Therefore,
+/// this library switches to OWL-QN when L1-regularization is specified. L1-regularization can be
+/// performed via [`with_l1_regularization`](`LBFGS::with_l1_regularization`).
+///
 /// TODO: Implement compact representation of BFGS updating (Nocedal/Wright p.230)
 ///
 /// ## Requirements on the optimization problem
