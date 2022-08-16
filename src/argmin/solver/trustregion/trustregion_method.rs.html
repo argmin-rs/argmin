@@ -448,6 +448,7 @@
 <span id="442">442</span>
 <span id="443">443</span>
 <span id="444">444</span>
+<span id="445">445</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -613,6 +614,7 @@
         <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">Hessian</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
     <span class="ident">P</span>: <span class="ident">Clone</span>
+        <span class="op">+</span> <span class="ident">std::fmt::Debug</span>
         <span class="op">+</span> <span class="ident">SerializeAlias</span>
         <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
         <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
