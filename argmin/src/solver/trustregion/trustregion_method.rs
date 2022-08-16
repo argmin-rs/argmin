@@ -163,6 +163,7 @@ where
         + Gradient<Param = P, Gradient = G>
         + Hessian<Param = P, Hessian = H>,
     P: Clone
+        + std::fmt::Debug
         + SerializeAlias
         + DeserializeOwnedAlias
         + ArgminNorm<F>
