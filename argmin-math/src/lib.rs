@@ -169,8 +169,6 @@ pub use crate::nalgebra_m::*;
 
 #[cfg(feature = "vec")]
 mod vec;
-#[cfg(feature = "vec")]
-pub use crate::vec::*;
 
 use anyhow::Error;
 
@@ -178,6 +176,12 @@ use anyhow::Error;
 pub trait ArgminDot<T, U> {
     /// Dot/scalar product of `T` and `self`
     fn dot(&self, other: &T) -> U;
+}
+
+/// Dot/scalar product of `T`.transpose() and `self`
+pub trait ArgminTDot<T, U> {
+    /// Dot/scalar product of `T`.transpose() and `self`
+    fn tdot(&self, other: &T) -> U;
 }
 
 /// Dot/scalar product of `T` and `self` weighted by W (p^TWv)
@@ -282,4 +286,109 @@ pub trait ArgminMinMax {
     fn min(x: &Self, y: &Self) -> Self;
     /// Select piecewise maximum
     fn max(x: &Self, y: &Self) -> Self;
+}
+
+/// Defines associated types
+pub trait ArgminTransition {
+    /// Associated type for 1-D array
+    type Array1D;
+    /// Associated type for 2-D array
+    type Array2D;
+}
+
+/// Create a random array
+pub trait ArgminRandomMatrix {
+    /// Draw samples from a standard Normal distribution (mean=0, stdev=1)
+    fn standard_normal(nrows: usize, ncols: usize) -> Self;
+}
+
+/// Get dimensions of an array
+pub trait ArgminSize<U> {
+    /// Get array shape
+    fn shape(&self) -> U;
+}
+
+/// Eigendecomposition for symmetric matrices
+pub trait ArgminEigenSym<U> {
+    /// Get the eigenvalues and eigenvectors of a complex Hermitian (conjugate symmetric) or a real symmetric matrix.
+    /// Returns a 1-D array containing the eigenvalues and a 2-D square array with eigenvectors (in columns).
+    fn eig_sym(&self) -> (U, Self);
+}
+
+/// Eigendecomposition
+pub trait ArgminEigen<U> {
+    /// Get the eigenvalues and eigenvectors of any matrix.
+    fn eig(&self) -> (U, U, Self);
+}
+
+/// Returns the indices that would sort an array.
+pub trait ArgminArgsort {
+    /// Perform sort and return an array of indices of the same shape.
+    fn argsort(&self) -> Vec<usize>;
+}
+
+/// Take elements from an array along an axis.
+pub trait ArgminTake<I> {
+    /// Take elements from indices along a given axis.
+    /// Returns as new array of the same size as indices
+    fn take(&self, indices: &[I], axis: u8) -> Self;
+}
+
+/// Defines iterator
+pub trait ArgminIter<T> {
+    /// Get immutable, read-only iterator
+    fn iterator<'a>(&'a self) -> Box<dyn Iterator<Item = &'a T> + 'a>;
+}
+
+/// Defines mutable iterator
+pub trait ArgminMutIter<T> {
+    /// Get mutable iterator
+    fn iterator_mut<'a>(&'a mut self) -> Box<dyn Iterator<Item = &'a mut T> + 'a>;
+}
+
+/// Defines axis iterator
+pub trait ArgminAxisIter<T> {
+    /// Get immutable, read-only row iterator
+    fn row_iterator<'a>(&'a self) -> Box<dyn Iterator<Item = T> + 'a>;
+    /// Get immutable, read-only column iterator
+    fn column_iterator<'a>(&'a self) -> Box<dyn Iterator<Item = T> + 'a>;
+}
+
+/// Defines methods that can be used to access an element at a given location
+pub trait ArgminGet<S, T> {
+    /// Get element at position
+    fn get(&self, pos: S) -> &T;
+}
+
+/// Defines methods that can be used to set an element at a given location
+pub trait ArgminSet<S, T> {
+    /// Set element at position to a new value
+    fn set(&mut self, pos: S, x: T);
+}
+
+/// Create new instance of an array
+pub trait ArgminFrom<T, S> {
+    /// Create new array from an iterator
+    fn from_iterator<I: Iterator<Item = T>>(size: S, iter: I) -> Self;
+}
+
+/// Compute the outer product of two vectors.
+pub trait ArgminOuter<T, U> {
+    /// Get an outer product of self with array other
+    fn outer(&self, other: &T) -> U;
+}
+
+/// Broadcast operation.
+pub trait ArgminBroadcast<T, U> {
+    /// Broadcast add `T` to `self`
+    fn broadcast_add(&self, other: &T) -> U;
+
+    /// Broadcast subtract `T` from `self`
+    fn broadcast_sub(&self, other: &T) -> U;
+
+    /// Broadcast multiply a `T` by `self`
+    fn broadcast_mul(&self, other: &T) -> U;
+
+    /// Broadcast divide a `T` by `self`
+    fn broadcast_div(&self, other: &T) -> U;
 }

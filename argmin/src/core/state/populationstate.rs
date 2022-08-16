@@ -30,15 +30,15 @@ use std::collections::HashMap;
 /// * termination reason (set to [`TerminationReason::NotTerminated`] if not terminated yet)
 #[derive(Clone, Default, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct PopulationState<P, F> {
+pub struct PopulationState<I, F, P> {
     /// Current individual vector
-    pub individual: Option<P>,
+    pub individual: Option<I>,
     /// Previous individual vector
-    pub prev_individual: Option<P>,
+    pub prev_individual: Option<I>,
     /// Current best individual vector
-    pub best_individual: Option<P>,
+    pub best_individual: Option<I>,
     /// Previous best individual vector
-    pub prev_best_individual: Option<P>,
+    pub prev_best_individual: Option<I>,
     /// Current cost function value
     pub cost: F,
     /// Previous cost function value
@@ -50,7 +50,7 @@ pub struct PopulationState<P, F> {
     /// Target cost function value
     pub target_cost: F,
     /// All members of the population
-    pub population: Option<Vec<P>>,
+    pub population: Option<P>,
     /// Current iteration
     pub iter: u64,
     /// Iteration number of last best cost
@@ -65,7 +65,7 @@ pub struct PopulationState<P, F> {
     pub termination_reason: TerminationReason,
 }
 
-impl<P, F> PopulationState<P, F>
+impl<I, F, P> PopulationState<I, F, P>
 where
     Self: State<Float = F>,
     F: ArgminFloat,
@@ -77,7 +77,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State};
-    /// # let state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # let individual_old = vec![1.0f64, 2.0f64];
     /// # let state = state.individual(individual_old);
     /// # assert!(state.prev_individual.is_none());
@@ -91,7 +91,7 @@ where
     /// # assert_eq!(state.individual.as_ref().unwrap()[1].to_ne_bytes(), 3.0f64.to_ne_bytes());
     /// ```
     #[must_use]
-    pub fn individual(mut self, individual: P) -> Self {
+    pub fn individual(mut self, individual: I) -> Self {
         std::mem::swap(&mut self.prev_individual, &mut self.individual);
         self.individual = Some(individual);
         self
@@ -103,7 +103,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State};
-    /// # let state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # let cost_old = 1.0f64;
     /// # let state = state.cost(cost_old);
     /// # assert_eq!(state.prev_cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());
@@ -129,7 +129,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert_eq!(state.target_cost.to_ne_bytes(), f64::NEG_INFINITY.to_ne_bytes());
     /// let state = state.target_cost(0.0);
     /// # assert_eq!(state.target_cost.to_ne_bytes(), 0.0f64.to_ne_bytes());
@@ -148,7 +148,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State};
-    /// # let state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.population.is_none());
     /// # let individual1 = vec![0.0f64, 1.0f64];
     /// # let individual2 = vec![2.0f64, 3.0f64];
@@ -159,7 +159,7 @@ where
     /// # assert_eq!(state.population.as_ref().unwrap()[1][1].to_ne_bytes(), 3.0f64.to_ne_bytes());
     /// ```
     #[must_use]
-    pub fn population(mut self, population: Vec<P>) -> Self {
+    pub fn population(mut self, population: P) -> Self {
         self.population = Some(population);
         self
     }
@@ -170,7 +170,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert_eq!(state.max_iters, std::u64::MAX);
     /// let state = state.max_iters(1000);
     /// # assert_eq!(state.max_iters, 1000);
@@ -187,7 +187,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # let state = state.cost(2.0);
     /// let cost = state.get_cost();
     /// # assert_eq!(cost.to_ne_bytes(), 2.0f64.to_ne_bytes());
@@ -202,7 +202,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # state.prev_cost = 2.0;
     /// let prev_cost = state.get_prev_cost();
     /// # assert_eq!(prev_cost.to_ne_bytes(), 2.0f64.to_ne_bytes());
@@ -217,7 +217,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # state.best_cost = 2.0;
     /// let best_cost = state.get_best_cost();
     /// # assert_eq!(best_cost.to_ne_bytes(), 2.0f64.to_ne_bytes());
@@ -232,7 +232,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # state.prev_best_cost = 2.0;
     /// let prev_best_cost = state.get_prev_best_cost();
     /// # assert_eq!(prev_best_cost.to_ne_bytes(), 2.0f64.to_ne_bytes());
@@ -247,7 +247,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert_eq!(state.target_cost.to_ne_bytes(), std::f64::NEG_INFINITY.to_ne_bytes());
     /// # state.target_cost = 0.0;
     /// let target_cost = state.get_target_cost();
@@ -263,7 +263,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.take_individual().is_none());
     /// # let mut state = state.individual(vec![1.0, 2.0]);
     /// # assert_eq!(state.individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -274,7 +274,7 @@ where
     /// # assert_eq!(individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(individual.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    pub fn take_individual(&mut self) -> Option<P> {
+    pub fn take_individual(&mut self) -> Option<I> {
         self.individual.take()
     }
 
@@ -284,7 +284,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.prev_individual.is_none());
     /// # state.prev_individual = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -293,7 +293,7 @@ where
     /// # assert_eq!(prev_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(prev_individual.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    pub fn get_prev_individual(&self) -> Option<&P> {
+    pub fn get_prev_individual(&self) -> Option<&I> {
         self.prev_individual.as_ref()
     }
 
@@ -303,7 +303,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.take_prev_individual().is_none());
     /// # state.prev_individual = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -314,7 +314,7 @@ where
     /// # assert_eq!(prev_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(prev_individual.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    pub fn take_prev_individual(&mut self) -> Option<P> {
+    pub fn take_prev_individual(&mut self) -> Option<I> {
         self.prev_individual.take()
     }
 
@@ -324,7 +324,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.prev_best_individual.is_none());
     /// # state.prev_best_individual = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_best_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -333,7 +333,7 @@ where
     /// # assert_eq!(prev_best_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(prev_best_individual.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    pub fn get_prev_best_individual(&self) -> Option<&P> {
+    pub fn get_prev_best_individual(&self) -> Option<&I> {
         self.prev_best_individual.as_ref()
     }
 
@@ -343,7 +343,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.take_best_individual().is_none());
     /// # state.best_individual = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.best_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -354,7 +354,7 @@ where
     /// # assert_eq!(best_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(best_individual.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    pub fn take_best_individual(&mut self) -> Option<P> {
+    pub fn take_best_individual(&mut self) -> Option<I> {
         self.best_individual.take()
     }
 
@@ -364,7 +364,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.take_prev_best_individual().is_none());
     /// # state.prev_best_individual = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_best_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -375,7 +375,7 @@ where
     /// # assert_eq!(prev_best_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(prev_best_individual.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    pub fn take_prev_best_individual(&mut self) -> Option<P> {
+    pub fn take_prev_best_individual(&mut self) -> Option<I> {
         self.prev_best_individual.take()
     }
 
@@ -385,7 +385,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.population.is_none());
     /// # assert!(state.get_population().is_none());
     /// # let individual1 = vec![0.0f64, 1.0f64];
@@ -401,7 +401,7 @@ where
     /// # assert_eq!(population.unwrap()[1][0].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// # assert_eq!(population.unwrap()[1][1].to_ne_bytes(), 3.0f64.to_ne_bytes());
     /// ```
-    pub fn get_population(&self) -> Option<&Vec<P>> {
+    pub fn get_population(&self) -> Option<&P> {
         self.population.as_ref()
     }
 
@@ -411,7 +411,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.population.is_none());
     /// # assert!(state.get_population().is_none());
     /// # let individual1 = vec![0.0f64, 1.0f64];
@@ -427,18 +427,18 @@ where
     /// # assert_eq!(population.unwrap()[1][0].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// # assert_eq!(population.unwrap()[1][1].to_ne_bytes(), 3.0f64.to_ne_bytes());
     /// ```
-    pub fn take_population(&mut self) -> Option<Vec<P>> {
+    pub fn take_population(&mut self) -> Option<P> {
         self.population.take()
     }
 }
 
-impl<P, F> State for PopulationState<P, F>
+impl<I, F, P> State for PopulationState<I, F, P>
 where
-    P: Clone,
+    I: Clone,
     F: ArgminFloat,
 {
     /// Type of an individual
-    type Param = P;
+    type Param = I;
     /// Floating point precision
     type Float = F;
 
@@ -450,7 +450,7 @@ where
     /// # extern crate instant;
     /// # use instant;
     /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationReason};
-    /// let state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// let state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.individual.is_none());
     /// # assert!(state.prev_individual.is_none());
     /// # assert!(state.best_individual.is_none());
@@ -496,7 +496,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     ///
     /// // Simulating a new, better individual
     /// state.best_individual = Some(vec![1.0f64]);
@@ -518,7 +518,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     ///
     /// // Simulating a new, better individual
     /// state.best_individual = Some(vec![1.0f64]);
@@ -561,7 +561,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.individual.is_none());
     /// # state.individual = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -570,7 +570,7 @@ where
     /// # assert_eq!(individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(individual.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    fn get_param(&self) -> Option<&P> {
+    fn get_param(&self) -> Option<&I> {
         self.individual.as_ref()
     }
 
@@ -580,7 +580,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert!(state.best_individual.is_none());
     /// # state.best_individual = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.best_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -589,7 +589,7 @@ where
     /// # assert_eq!(best_individual.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
     /// # assert_eq!(best_individual.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
     /// ```
-    fn get_best_param(&self) -> Option<&P> {
+    fn get_best_param(&self) -> Option<&I> {
         self.best_individual.as_ref()
     }
 
@@ -599,7 +599,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationReason};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
     /// let state = state.terminate_with(TerminationReason::MaxItersReached);
     /// # assert_eq!(state.termination_reason, TerminationReason::MaxItersReached);
@@ -617,7 +617,7 @@ where
     /// # extern crate instant;
     /// # use instant;
     /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationReason};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// let state = state.time(Some(instant::Duration::new(0, 12)));
     /// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 12));
     /// ```
@@ -632,7 +632,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # state.cost = 12.0;
     /// let cost = state.get_cost();
     /// # assert_eq!(cost.to_ne_bytes(), 12.0f64.to_ne_bytes());
@@ -647,7 +647,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # state.best_cost = 12.0;
     /// let best_cost = state.get_best_cost();
     /// # assert_eq!(best_cost.to_ne_bytes(), 12.0f64.to_ne_bytes());
@@ -662,7 +662,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # state.target_cost = 12.0;
     /// let target_cost = state.get_target_cost();
     /// # assert_eq!(target_cost.to_ne_bytes(), 12.0f64.to_ne_bytes());
@@ -677,7 +677,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # state.iter = 12;
     /// let iter = state.get_iter();
     /// # assert_eq!(iter, 12);
@@ -692,7 +692,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # state.last_best_iter = 12;
     /// let last_best_iter = state.get_last_best_iter();
     /// # assert_eq!(last_best_iter, 12);
@@ -707,7 +707,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # state.max_iters = 12;
     /// let max_iters = state.get_max_iters();
     /// # assert_eq!(max_iters, 12);
@@ -722,7 +722,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationReason};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// let termination_reason = state.get_termination_reason();
     /// # assert_eq!(termination_reason, TerminationReason::NotTerminated);
     /// ```
@@ -738,7 +738,7 @@ where
     /// # extern crate instant;
     /// # use instant;
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// let time = state.get_time();
     /// # assert_eq!(time.unwrap(), instant::Duration::new(0, 0));
     /// ```
@@ -752,7 +752,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert_eq!(state.iter, 0);
     /// state.increment_iter();
     /// # assert_eq!(state.iter, 1);
@@ -766,7 +766,7 @@ where
     /// ```
     /// # use std::collections::HashMap;
     /// # use argmin::core::{Problem, PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert_eq!(state.counts, HashMap::new());
     /// # state.counts.insert("test2".to_string(), 10u64);
     /// #
@@ -796,7 +796,7 @@ where
     /// ```
     /// # use std::collections::HashMap;
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # assert_eq!(state.counts, HashMap::new());
     /// # state.counts.insert("test2".to_string(), 10u64);
     /// let counts = state.get_func_counts();
@@ -815,7 +815,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
-    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
+    /// # let mut state: PopulationState<Vec<f64>, f64, Vec<Vec<f64>>> = PopulationState::new();
     /// # state.last_best_iter = 12;
     /// # state.iter = 12;
     /// let is_best = state.is_best();

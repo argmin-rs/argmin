@@ -232,7 +232,8 @@ where
     }
 }
 
-impl<O, P, F> Solver<O, PopulationState<Particle<P, F>, F>> for ParticleSwarm<P, F>
+impl<O, P, F> Solver<O, PopulationState<Particle<P, F>, F, Vec<Particle<P, F>>>>
+    for ParticleSwarm<P, F>
 where
     O: CostFunction<Param = P, Output = F> + SyncAlias,
     P: SerializeAlias
@@ -251,8 +252,14 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: PopulationState<Particle<P, F>, F>,
-    ) -> Result<(PopulationState<Particle<P, F>, F>, Option<KV>), Error> {
+        mut state: PopulationState<Particle<P, F>, F, Vec<Particle<P, F>>>,
+    ) -> Result<
+        (
+            PopulationState<Particle<P, F>, F, Vec<Particle<P, F>>>,
+            Option<KV>,
+        ),
+        Error,
+    > {
         // Users can provide a population or it will be randomly created.
         let particles = match state.take_population() {
             Some(mut particles) if particles.len() == self.num_particles => {
@@ -290,8 +297,14 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: PopulationState<Particle<P, F>, F>,
-    ) -> Result<(PopulationState<Particle<P, F>, F>, Option<KV>), Error> {
+        mut state: PopulationState<Particle<P, F>, F, Vec<Particle<P, F>>>,
+    ) -> Result<
+        (
+            PopulationState<Particle<P, F>, F, Vec<Particle<P, F>>>,
+            Option<KV>,
+        ),
+        Error,
+    > {
         let mut best_particle = state.take_individual().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`ParticleSwarm`: No current best individual in state."
@@ -409,6 +422,8 @@ mod tests {
     use crate::core::{test_utils::TestProblem, ArgminError, State};
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
+
+    type ParticleSwarmPopulation = Vec<Particle<Vec<f64>, f64>>;
 
     test_trait_impl!(particleswarm, ParticleSwarm<Vec<f64>, f64>);
 
@@ -633,8 +648,12 @@ mod tests {
         let lower_bound: Vec<f64> = vec![-1.0, -1.0];
         let upper_bound: Vec<f64> = vec![1.0, 1.0];
         let mut pso: ParticleSwarm<_, f64> = ParticleSwarm::new((lower_bound, upper_bound), 40);
-        let state: PopulationState<Particle<Vec<f64>, f64>, f64> = PopulationState::new()
-            .population(vec![Particle::new(vec![1.0, 2.0], 12.0, vec![0.1, 0.3])]);
+        let state: PopulationState<Particle<Vec<f64>, f64>, f64, ParticleSwarmPopulation> =
+            PopulationState::new().population(vec![Particle::new(
+                vec![1.0, 2.0],
+                12.0,
+                vec![0.1, 0.3],
+            )]);
         let res = pso.init(&mut Problem::new(TestProblem::new()), state);
         assert_error!(
             res,
@@ -653,7 +672,7 @@ mod tests {
         let particle_a = Particle::new(vec![1.0, 2.0], 12.0, vec![0.1, 0.3]);
         let particle_b = Particle::new(vec![2.0, 3.0], 10.0, vec![0.2, 0.4]);
         let mut pso: ParticleSwarm<_, f64> = ParticleSwarm::new((lower_bound, upper_bound), 2);
-        let state: PopulationState<Particle<Vec<f64>, f64>, f64> =
+        let state: PopulationState<Particle<Vec<f64>, f64>, f64, ParticleSwarmPopulation> =
             PopulationState::new().population(vec![particle_a.clone(), particle_b.clone()]);
         let res = pso.init(&mut Problem::new(TestProblem::new()), state);
         assert!(res.is_ok());
@@ -671,7 +690,8 @@ mod tests {
         let lower_bound: Vec<f64> = vec![-1.0, -1.0];
         let upper_bound: Vec<f64> = vec![1.0, 1.0];
         let mut pso: ParticleSwarm<_, f64> = ParticleSwarm::new((lower_bound, upper_bound), 40);
-        let state: PopulationState<Particle<Vec<f64>, f64>, f64> = PopulationState::new();
+        let state: PopulationState<Particle<Vec<f64>, f64>, f64, ParticleSwarmPopulation> =
+            PopulationState::new();
         let res = pso.init(&mut Problem::new(TestProblem::new()), state);
         assert!(res.is_ok());
         let (mut state, kv) = res.unwrap();
@@ -710,7 +730,8 @@ mod tests {
         let lower_bound: Vec<f64> = vec![-1.0, -1.0];
         let upper_bound: Vec<f64> = vec![1.0, 1.0];
         let mut pso: ParticleSwarm<_, f64> = ParticleSwarm::new((lower_bound, upper_bound), 100);
-        let state: PopulationState<Particle<Vec<f64>, f64>, f64> = PopulationState::new();
+        let state: PopulationState<Particle<Vec<f64>, f64>, f64, ParticleSwarmPopulation> =
+            PopulationState::new();
 
         // init
         let (mut state, _) = pso.init(&mut problem, state).unwrap();

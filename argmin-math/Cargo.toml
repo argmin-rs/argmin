@@ -37,6 +37,7 @@ num-complex_0_2 = { package = "num-complex", version = "0.2", optional = true, d
 num-traits = { version = "0.2" }
 num-integer = { version = "0.1" }
 rand = { version = "0.8.3" }
+rand_distr = { version = "0.4.3" }
 anyhow = { version = "1.0" }
 thiserror = { version = "1.0" }
 

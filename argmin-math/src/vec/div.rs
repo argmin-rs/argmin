@@ -55,6 +55,13 @@ macro_rules! make_div {
                     .collect()
             }
         }
+
+        impl ArgminDiv<$t, Vec<Vec<$t>>> for Vec<Vec<$t>> {
+            #[inline]
+            fn div(&self, other: &$t) -> Vec<Vec<$t>> {
+                self.iter().map(|a| a.div(other)).collect()
+            }
+        }
     };
 }
 
@@ -224,6 +231,27 @@ mod tests {
                     ];
                     let b = vec![];
                     <Vec<Vec<$t>> as ArgminDiv<Vec<Vec<$t>>, Vec<Vec<$t>>>>::div(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_div_scalar_mat_1_ $t>]() {
+                    let a = vec![
+                        vec![16 as $t, 12 as $t, 10 as $t],
+                        vec![8 as $t, 4 as $t, 2 as $t]
+                    ];
+                    let b = 2 as $t;
+                    let target = vec![
+                        vec![8 as $t, 6 as $t, 5 as $t],
+                        vec![4 as $t, 2 as $t, 1 as $t]
+                    ];
+                    let res = <Vec<Vec<$t>> as ArgminDiv<$t, Vec<Vec<$t>>>>::div(&a, &b);
+                    for i in 0..3 {
+                        for j in 0..2 {
+                        assert!(((target[j][i] - res[j][i]) as f64).abs() < std::f64::EPSILON);
+                        }
+                    }
                 }
             }
         };
