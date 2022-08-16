@@ -100,29 +100,27 @@ where
         } else {
             // pu = - (g^Tg)/(g^THg) * g
             let pu = g.mul(&(-g.dot(&g) / g.weighted_dot(&h, &g)));
-            // println!("pb: {:?}, pu: {:?}", pb, pu);
 
-            let utu = pu.dot(&pu);
-            let btb = pb.dot(&pb);
-            let utb = pu.dot(&pb);
+            let k = pb.sub(&pu); // p^b - p^u
+            let c = pu.dot(&k); // p^u^T * (p^b - p^u)
+            let k = k.dot(&k); // (p^b - p^u)^T (p^b - p^u)
+            let u = pu.dot(&pu); // p^u^T p^u
 
-            // compute tau
-            let delta = self.radius.powi(2);
-            let t1 = float!(3.0) * utb - btb - float!(2.0) * utu;
-            let t2 = (utb.powi(2) - float!(2.0) * utb * delta + delta * btb - btb * utu
-                + delta * utu)
-                .sqrt();
-            let t3 = float!(-2.0) * utb + btb + utu;
-            let tau1: F = -(t1 + t2) / t3;
-            let tau2: F = -(t1 - t2) / t3;
-
-            // pick maximum value of both -- not sure if this is the proper way
-            let mut tau = tau1.max(tau2);
-
-            // if calculation failed because t3 is too small, use the third option
-            if tau.is_nan() || tau.is_infinite() {
-                tau = (delta + btb - float!(2.0) * utu) / (btb - utu);
-            }
+            let delta_squared = self.radius.powi(2);
+            let t1 = (c.powi(2) + delta_squared * k - k * u).sqrt();
+            let tau = [
+                -(t1 + c - k) / k,
+                (t1 - c + k) / k,
+                (float!(2.0) * c + delta_squared - u) / (float!(2.0) * c),
+            ]
+            .into_iter()
+            // .enumerate()
+            // .map(|(i, t)| {
+            //     println!("tau{}: {}", i, t);
+            //     t
+            // })
+            .filter(|t| !t.is_nan() && !t.is_infinite() && *t >= float!(0.0) && *t <= float!(2.0))
+            .fold(float!(0.0), |acc, t| if t >= acc { t } else { acc });
 
             if tau >= float!(0.0) && tau < float!(1.0) {
                 pstar = pu.mul(&tau);
@@ -131,7 +129,7 @@ where
             } else {
                 return Err(argmin_error!(
                     PotentialBug,
-                    "tau is bigger than 2, this is not supposed to happen."
+                    "tau is outside the range [0, 2], this is not supposed to happen."
                 ));
             }
         }
@@ -236,7 +234,7 @@ mod tests {
 
         let s_param = state_out.take_param().unwrap();
 
-        assert_relative_eq!(s_param[0], -0.9730617585026131, epsilon = f64::EPSILON);
+        assert_relative_eq!(s_param[0], -0.9730617585026127, epsilon = f64::EPSILON);
         assert_relative_eq!(s_param[1], 0.2305446033629983, epsilon = f64::EPSILON);
     }
 }
