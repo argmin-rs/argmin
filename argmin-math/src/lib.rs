@@ -252,6 +252,12 @@ pub trait ArgminScaledSub<T, U, V> {
 }
 
 /// Compute the l2-norm (`U`) of `self`
+pub trait ArgminL1Norm<U> {
+    /// Compute the l1-norm (`U`) of `self`
+    fn l1_norm(&self) -> U;
+}
+
+/// Compute the l2-norm (`U`) of `self`
 pub trait ArgminNorm<U> {
     /// Compute the l2-norm (`U`) of `self`
     fn norm(&self) -> U;
@@ -282,4 +288,10 @@ pub trait ArgminMinMax {
     fn min(x: &Self, y: &Self) -> Self;
     /// Select piecewise maximum
     fn max(x: &Self, y: &Self) -> Self;
+}
+
+/// Returns a number that represents the sign of `self`.
+pub trait ArgminSignum {
+    /// Returns a number that represents the sign of `self`.
+    fn signum(self) -> Self;
 }

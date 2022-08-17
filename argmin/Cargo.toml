@@ -142,6 +142,10 @@ name = "observer"
 required-features = ["slog-logger", "gnuplot"]
 
 [[example]]
+name = "owl_qn"
+required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+
+[[example]]
 name = "particleswarm"
 required-features = []
 
