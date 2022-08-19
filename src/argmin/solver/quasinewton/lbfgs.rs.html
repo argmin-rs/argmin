@@ -735,6 +735,9 @@
 <span id="729">729</span>
 <span id="730">730</span>
 <span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -1162,9 +1165,12 @@
         <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">l1_coeff</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">l1_coeff</span> {
             <span class="ident">line_problem</span>.<span class="ident">with_l1_constraint</span>(<span class="ident">l1_coeff</span>, <span class="kw-2">&amp;</span><span class="ident">param</span>, <span class="kw-2">&amp;</span><span class="ident">prev_grad</span>);
             <span class="kw">let</span> <span class="ident">zeros</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">zero_like</span>();
-            <span class="ident">P::max</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>).<span class="ident">signum</span>(), <span class="kw-2">&amp;</span><span class="ident">zeros</span>)
-                .<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>)
-                .<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>))
+            <span class="ident">P::max</span>(
+                <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>).<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">F::min_positive_value</span>()).<span class="ident">signum</span>(),
+                <span class="kw-2">&amp;</span><span class="ident">zeros</span>,
+            )
+            .<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>)
+            .<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>))
         } <span class="kw">else</span> {
             <span class="ident">r</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>))
         };
