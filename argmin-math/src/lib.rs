@@ -24,28 +24,67 @@
 //!
 //! ## Features
 //!
-//! Support for the various backends can be switched on via features:
+//! Support for the various backends can be switched on via features. Please read this section
+//! carefully to the end before choosing a backend.
 //!
-//! | Feature                | Default | Backend                                               |
+//! ### Default features
+//!
+//! | Feature                | Default | Comment                                               |
 //! |------------------------|---------|-------------------------------------------------------|
 //! | `primitives`           | yes     | basic integer and floating point types                |
 //! | `vec`                  | yes     | `Vec`s (basic functionality)                          |
-//! | `ndarray_latest`       | no      | `ndarray` (latest supported version)                  |
-//! | `ndarray_latest-serde` | no      | `ndarray` (latest supported version) + serde support  |
-//! | `ndarray_v0_15`        | no      | `ndarray` (version 0.15)                              |
-//! | `ndarray_v0_15-serde`  | no      | `ndarray` (version 0.15) + serde support              |
-//! | `ndarray_v0_14`        | no      | `ndarray` (version 0.14)                              |
-//! | `ndarray_v0_14-serde`  | no      | `ndarray` (version 0.14) + serde support              |
-//! | `ndarray_v0_13`        | no      | `ndarray` (version 0.13)                              |
-//! | `ndarray_v0_13-serde`  | no      | `ndarray` (version 0.13) + serde support              |
-//! | `nalgebra_latest`      | no      | `nalgebra` (latest supported version)                 |
-//! | `nalgebra_latest-serde`| no      | `nalgebra` (latest supported version) + serde support |
-//! | `nalgebra_v0_31`       | no      | `nalgebra` (version 0.31)                             |
-//! | `nalgebra_v0_31-serde` | no      | `nalgebra` (version 0.31) + serde support             |
-//! | `nalgebra_v0_30`       | no      | `nalgebra` (version 0.30)                             |
-//! | `nalgebra_v0_30-serde` | no      | `nalgebra` (version 0.30) + serde support             |
-//! | `nalgebra_v0_29`       | no      | `nalgebra` (version 0.29)                             |
-//! | `nalgebra_v0_29-serde` | no      | `nalgebra` (version 0.29) + serde support             |
+//!
+//! ### `ndarray`
+//!
+//! | Feature                         | Default | Comment                                                            |
+//! |---------------------------------|---------|--------------------------------------------------------------------|
+//! | `ndarray_latest`                | no      | latest supported version                                           |
+//! | `ndarray_latest-nolinalg`       | no      | latest supported version without `ndarray-linalg`                  |
+//! | `ndarray_latest-serde`          | no      | latest supported version + serde support                           |
+//! | `ndarray_latest-nolinalg-serde` | no      | latest supported version without `ndarray-linalg` + serde support  |
+//! | `ndarray_v0_15`                 | no      | version 0.15                                                       |
+//! | `ndarray_v0_15-nolinalg`        | no      | version 0.15 without `ndarray-linalg`                              |
+//! | `ndarray_v0_15-serde`           | no      | version 0.15 + serde support                                       |
+//! | `ndarray_v0_15-nolinalg-serde`  | no      | version 0.15 without `ndarray-linalg` + serde support              |
+//! | `ndarray_v0_14`                 | no      | version 0.14                                                       |
+//! | `ndarray_v0_14-nolinalg`        | no      | version 0.14 without `ndarray-linalg`                              |
+//! | `ndarray_v0_14-serde`           | no      | version 0.14 + serde support                                       |
+//! | `ndarray_v0_14-nolinalg-serde`  | no      | version 0.14 without `ndarray-linalg` + serde support              |
+//! | `ndarray_v0_13`                 | no      | version 0.13                                                       |
+//! | `ndarray_v0_13-nolinalg`        | no      | version 0.13 without `ndarray-linalg`                              |
+//! | `ndarray_v0_13-serde`           | no      | version 0.13 + serde support                                       |
+//! | `ndarray_v0_13-nolinalg-serde`  | no      | version 0.13 without `ndarray-linalg` + serde support              |
+//!
+//! Note that the `*-nolinalg*` features do NOT pull in `ndarray-linalg` as a dependency. This
+//! avoids linking against a BLAS library. This will however disable the implementation of
+//! `ArgminInv`, meaning that any solver which requires the matrix inverse will not work with the
+//! `ndarray` backend. It is recommended to use the `*-nolinalg*` options if the matrix inverse is
+//! not needed in order to keep the compilation times low and avoid problems when linking against a
+//! BLAS library.
+//!
+//! Using the `ndarray_*` features with `ndarray-linalg` support may require to explicitly choose
+//! the `ndarray-linalg` BLAS backend in your `Cargo.toml` (see the [`ndarray-linalg` documentation
+//! for details](https://github.com/rust-ndarray/ndarray-linalg)):
+//!
+//! ```toml
+//! ndarray-linalg = { version = "<appropriate_version>", features = ["<linalg_backend>"] }
+//! ```
+//!
+//! ### `nalgebra`
+//!
+//! | Feature                | Default | Comment                                  |
+//! |------------------------|---------|------------------------------------------|
+//! | `nalgebra_latest`      | no      | latest supported version                 |
+//! | `nalgebra_latest-serde`| no      | latest supported version + serde support |
+//! | `nalgebra_v0_31`       | no      | version 0.31                             |
+//! | `nalgebra_v0_31-serde` | no      | version 0.31 + serde support             |
+//! | `nalgebra_v0_30`       | no      | version 0.30                             |
+//! | `nalgebra_v0_30-serde` | no      | version 0.30 + serde support             |
+//! | `nalgebra_v0_29`       | no      | version 0.29                             |
+//! | `nalgebra_v0_29-serde` | no      | version 0.29 + serde support             |
+//!
+//!
+//! ## Choosing a backend
 //!
 //! It is not possible to activate two versions of the same backend.
 //!
@@ -58,15 +97,8 @@
 //! `argmin-math` as well.
 //!
 //! The default features `primitives` and `vec` can be turned off in order to only compile the
-//! trait definitions. If another backend is chosen, they will automatically be turned on again.
-//!
-//! Using the `ndarray_*` features on Windows might require to explicitly choose the
-//! `ndarray-linalg` BLAS backend in the `Cargo.toml` (see the [`ndarray-linalg` documentation for
-//! details](https://github.com/rust-ndarray/ndarray-linalg)):
-//!
-//! ```toml
-//! ndarray-linalg = { version = "*", features = ["intel-mkl-static"] }
-//! ```
+//! trait definitions. If another backend is chosen, `primitives` will automatically be turned on
+//! again.
 //!
 //! ### Example
 //!
@@ -83,6 +115,24 @@
 //! not considered a breaking change. However, your code may still break if you use any of the
 //! features containing `*latest*`. It is therefore recommended to specify the actual version of the
 //! backend you are using.
+//!
+//! # Development
+//!
+//! For development and running the tests a backend for `ndarray-linalg` must be chosen. Normally
+//! one would add those as dev dependencies (the features would then be unified with the regular
+//! dependencies). However, linking somehow fails when the non-dev `ndarra-linalg` dependency is
+//! missing (which is the case for the `*-nolinalg*` features of the ndarray backend). To fix that,
+//! the `_dev_linalg_*` features were introduced. When testing and developing with one of the
+//! ndarray features with linalg support on, the appropriate `_dev_linalg_*` feature must be turned
+//! on as well. Note that the version number in `_dev_linalg_*` is always one below the `ndarray`
+//! version. For instance, for ndarray 0.15, one would use the `_dev_linalg_0_14` feature.
+//!
+//! | Development Feature   | Comment                                      |
+//! |-----------------------|----------------------------------------------|
+//! | `_dev_linalg_latest`  | latest `ndarray-linalg` for latest `ndarray` |
+//! | `_dev_linalg_0_14`    | `ndarray-linalg` v0.14 for `ndarray` v0.15   |
+//! | `_dev_linalg_0_13`    | `ndarray-linalg` v0.13 for `ndarray` v0.14   |
+//! | `_dev_linalg_0_12`    | `ndarray-linalg` v0.12 for `ndarray` v0.13   |
 //!
 //! # Contributing
 //!
@@ -113,21 +163,21 @@
 #![deny(clippy::float_cmp)]
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "nalgebra_v0_31")] {
+    if #[cfg(feature = "nalgebra_0_31")] {
         extern crate nalgebra_0_31 as nalgebra;
-    } else if #[cfg(feature = "nalgebra_v0_30")] {
+    } else if #[cfg(feature = "nalgebra_0_30")] {
         extern crate nalgebra_0_30 as nalgebra;
-    } else if #[cfg(feature = "nalgebra_v0_29")] {
+    } else if #[cfg(feature = "nalgebra_0_29")] {
         extern crate nalgebra_0_29 as nalgebra;
     }
 }
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "ndarray_v0_15")] {
+    if #[cfg(feature = "ndarray_0_15")] {
         extern crate ndarray_0_15 as ndarray;
-    } else if #[cfg(feature = "ndarray_v0_14")] {
+    } else if #[cfg(feature = "ndarray_0_14")]  {
         extern crate ndarray_0_14 as ndarray;
-    } else if #[cfg(feature = "ndarray_v0_13")] {
+    } else if #[cfg(feature = "ndarray_0_13")]  {
         extern crate ndarray_0_13 as ndarray;
     }
 }
