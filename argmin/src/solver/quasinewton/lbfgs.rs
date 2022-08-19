@@ -425,9 +425,12 @@ where
         let d = if let Some(l1_coeff) = self.l1_coeff {
             line_problem.with_l1_constraint(l1_coeff, &param, &prev_grad);
             let zeros = r.zero_like();
-            P::max(&r.mul(&prev_grad).signum(), &zeros)
-                .mul(&r)
-                .mul(&float!(-1.0))
+            P::max(
+                &r.mul(&prev_grad).sub(&F::min_positive_value()).signum(),
+                &zeros,
+            )
+            .mul(&r)
+            .mul(&float!(-1.0))
         } else {
             r.mul(&float!(-1.0))
         };
