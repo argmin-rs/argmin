@@ -5,7 +5,7 @@
         </a><h2 class="location"><a href="#">Crate argmin_math</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#traits">Traits</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../argmin_math/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
                                 <a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div>
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin_math</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin_math/lib.rs.html#8-297">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin-math provides mathematics related abstractions needed in argmin. It supports
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">argmin_math</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/argmin_math/lib.rs.html#8-347">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin-math provides mathematics related abstractions needed in argmin. It supports
 implementations of these abstractions for basic <code>Vec</code>s and for <code>ndarray</code> and <code>nalgebra</code>.
 The traits can of course also be implemented for your own types to make them compatible with
 argmin.</p>
@@ -16,28 +16,51 @@ argmin-math = &quot;0.1.0&quot;</code></pre></div>
 <p>This will activate the <code>primitives</code> and <code>vec</code> features. For other backends see the section
 below.</p>
 <h3 id="features"><a href="#features">Features</a></h3>
-<p>Support for the various backends can be switched on via features:</p>
-<div><table><thead><tr><th>Feature</th><th>Default</th><th>Backend</th></tr></thead><tbody>
+<p>Support for the various backends can be switched on via features. Please read this section
+carefully to the end before choosing a backend.</p>
+<h4 id="default-features"><a href="#default-features">Default features</a></h4><div><table><thead><tr><th>Feature</th><th>Default</th><th>Comment</th></tr></thead><tbody>
 <tr><td><code>primitives</code></td><td>yes</td><td>basic integer and floating point types</td></tr>
 <tr><td><code>vec</code></td><td>yes</td><td><code>Vec</code>s (basic functionality)</td></tr>
-<tr><td><code>ndarray_latest</code></td><td>no</td><td><code>ndarray</code> (latest supported version)</td></tr>
-<tr><td><code>ndarray_latest-serde</code></td><td>no</td><td><code>ndarray</code> (latest supported version) + serde support</td></tr>
-<tr><td><code>ndarray_v0_15</code></td><td>no</td><td><code>ndarray</code> (version 0.15)</td></tr>
-<tr><td><code>ndarray_v0_15-serde</code></td><td>no</td><td><code>ndarray</code> (version 0.15) + serde support</td></tr>
-<tr><td><code>ndarray_v0_14</code></td><td>no</td><td><code>ndarray</code> (version 0.14)</td></tr>
-<tr><td><code>ndarray_v0_14-serde</code></td><td>no</td><td><code>ndarray</code> (version 0.14) + serde support</td></tr>
-<tr><td><code>ndarray_v0_13</code></td><td>no</td><td><code>ndarray</code> (version 0.13)</td></tr>
-<tr><td><code>ndarray_v0_13-serde</code></td><td>no</td><td><code>ndarray</code> (version 0.13) + serde support</td></tr>
-<tr><td><code>nalgebra_latest</code></td><td>no</td><td><code>nalgebra</code> (latest supported version)</td></tr>
-<tr><td><code>nalgebra_latest-serde</code></td><td>no</td><td><code>nalgebra</code> (latest supported version) + serde support</td></tr>
-<tr><td><code>nalgebra_v0_31</code></td><td>no</td><td><code>nalgebra</code> (version 0.31)</td></tr>
-<tr><td><code>nalgebra_v0_31-serde</code></td><td>no</td><td><code>nalgebra</code> (version 0.31) + serde support</td></tr>
-<tr><td><code>nalgebra_v0_30</code></td><td>no</td><td><code>nalgebra</code> (version 0.30)</td></tr>
-<tr><td><code>nalgebra_v0_30-serde</code></td><td>no</td><td><code>nalgebra</code> (version 0.30) + serde support</td></tr>
-<tr><td><code>nalgebra_v0_29</code></td><td>no</td><td><code>nalgebra</code> (version 0.29)</td></tr>
-<tr><td><code>nalgebra_v0_29-serde</code></td><td>no</td><td><code>nalgebra</code> (version 0.29) + serde support</td></tr>
+</tbody></table>
+</div><h4 id="ndarray"><a href="#ndarray"><code>ndarray</code></a></h4><div><table><thead><tr><th>Feature</th><th>Default</th><th>Comment</th></tr></thead><tbody>
+<tr><td><code>ndarray_latest</code></td><td>no</td><td>latest supported version</td></tr>
+<tr><td><code>ndarray_latest-nolinalg</code></td><td>no</td><td>latest supported version without <code>ndarray-linalg</code></td></tr>
+<tr><td><code>ndarray_latest-serde</code></td><td>no</td><td>latest supported version + serde support</td></tr>
+<tr><td><code>ndarray_latest-nolinalg-serde</code></td><td>no</td><td>latest supported version without <code>ndarray-linalg</code> + serde support</td></tr>
+<tr><td><code>ndarray_v0_15</code></td><td>no</td><td>version 0.15</td></tr>
+<tr><td><code>ndarray_v0_15-nolinalg</code></td><td>no</td><td>version 0.15 without <code>ndarray-linalg</code></td></tr>
+<tr><td><code>ndarray_v0_15-serde</code></td><td>no</td><td>version 0.15 + serde support</td></tr>
+<tr><td><code>ndarray_v0_15-nolinalg-serde</code></td><td>no</td><td>version 0.15 without <code>ndarray-linalg</code> + serde support</td></tr>
+<tr><td><code>ndarray_v0_14</code></td><td>no</td><td>version 0.14</td></tr>
+<tr><td><code>ndarray_v0_14-nolinalg</code></td><td>no</td><td>version 0.14 without <code>ndarray-linalg</code></td></tr>
+<tr><td><code>ndarray_v0_14-serde</code></td><td>no</td><td>version 0.14 + serde support</td></tr>
+<tr><td><code>ndarray_v0_14-nolinalg-serde</code></td><td>no</td><td>version 0.14 without <code>ndarray-linalg</code> + serde support</td></tr>
+<tr><td><code>ndarray_v0_13</code></td><td>no</td><td>version 0.13</td></tr>
+<tr><td><code>ndarray_v0_13-nolinalg</code></td><td>no</td><td>version 0.13 without <code>ndarray-linalg</code></td></tr>
+<tr><td><code>ndarray_v0_13-serde</code></td><td>no</td><td>version 0.13 + serde support</td></tr>
+<tr><td><code>ndarray_v0_13-nolinalg-serde</code></td><td>no</td><td>version 0.13 without <code>ndarray-linalg</code> + serde support</td></tr>
 </tbody></table>
 </div>
+<p>Note that the <code>*-nolinalg*</code> features do NOT pull in <code>ndarray-linalg</code> as a dependency. This
+avoids linking against a BLAS library. This will however disable the implementation of
+<code>ArgminInv</code>, meaning that any solver which requires the matrix inverse will not work with the
+<code>ndarray</code> backend. It is recommended to use the <code>*-nolinalg*</code> options if the matrix inverse is
+not needed in order to keep the compilation times low and avoid problems when linking against a
+BLAS library.</p>
+<p>Using the <code>ndarray_*</code> features with <code>ndarray-linalg</code> support may require to explicitly choose
+the <code>ndarray-linalg</code> BLAS backend in your <code>Cargo.toml</code> (see the <a href="https://github.com/rust-ndarray/ndarray-linalg"><code>ndarray-linalg</code> documentation
+for details</a>):</p>
+<div class="example-wrap"><pre class="language-toml"><code>ndarray-linalg = { version = &quot;&lt;appropriate_version&gt;&quot;, features = [&quot;&lt;linalg_backend&gt;&quot;] }</code></pre></div><h4 id="nalgebra"><a href="#nalgebra"><code>nalgebra</code></a></h4><div><table><thead><tr><th>Feature</th><th>Default</th><th>Comment</th></tr></thead><tbody>
+<tr><td><code>nalgebra_latest</code></td><td>no</td><td>latest supported version</td></tr>
+<tr><td><code>nalgebra_latest-serde</code></td><td>no</td><td>latest supported version + serde support</td></tr>
+<tr><td><code>nalgebra_v0_31</code></td><td>no</td><td>version 0.31</td></tr>
+<tr><td><code>nalgebra_v0_31-serde</code></td><td>no</td><td>version 0.31 + serde support</td></tr>
+<tr><td><code>nalgebra_v0_30</code></td><td>no</td><td>version 0.30</td></tr>
+<tr><td><code>nalgebra_v0_30-serde</code></td><td>no</td><td>version 0.30 + serde support</td></tr>
+<tr><td><code>nalgebra_v0_29</code></td><td>no</td><td>version 0.29</td></tr>
+<tr><td><code>nalgebra_v0_29-serde</code></td><td>no</td><td>version 0.29 + serde support</td></tr>
+</tbody></table>
+</div><h3 id="choosing-a-backend"><a href="#choosing-a-backend">Choosing a backend</a></h3>
 <p>It is not possible to activate two versions of the same backend.</p>
 <p>The features labelled <code>*latest*</code> are an alias for the most recent supported version of the
 respective backend. It is however recommended to explicitly specify the desired version instead
@@ -46,11 +69,9 @@ of using any of the <code>*latest*</code> features (see section about semantic v
 deliberately turned off in <code>argmin</code>, it is necessary to activiate the <code>serde</code> support in
 <code>argmin-math</code> as well.</p>
 <p>The default features <code>primitives</code> and <code>vec</code> can be turned off in order to only compile the
-trait definitions. If another backend is chosen, they will automatically be turned on again.</p>
-<p>Using the <code>ndarray_*</code> features on Windows might require to explicitly choose the
-<code>ndarray-linalg</code> BLAS backend in the <code>Cargo.toml</code> (see the <a href="https://github.com/rust-ndarray/ndarray-linalg"><code>ndarray-linalg</code> documentation for
-details</a>):</p>
-<div class="example-wrap"><pre class="language-toml"><code>ndarray-linalg = { version = &quot;*&quot;, features = [&quot;intel-mkl-static&quot;] }</code></pre></div><h4 id="example"><a href="#example">Example</a></h4>
+trait definitions. If another backend is chosen, <code>primitives</code> will automatically be turned on
+again.</p>
+<h4 id="example"><a href="#example">Example</a></h4>
 <p>Activate support for the latest supported <code>ndarray</code> version:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
 argmin-math = { version = &quot;0.1.0&quot;, features = [&quot;ndarray_latest-serde&quot;] }</code></pre></div><h2 id="semantic-versioning"><a href="#semantic-versioning">Semantic versioning</a></h2>
@@ -58,7 +79,22 @@ argmin-math = { version = &quot;0.1.0&quot;, features = [&quot;ndarray_latest-se
 not considered a breaking change. However, your code may still break if you use any of the
 features containing <code>*latest*</code>. It is therefore recommended to specify the actual version of the
 backend you are using.</p>
-<h2 id="contributing"><a href="#contributing">Contributing</a></h2>
+<h2 id="development"><a href="#development">Development</a></h2>
+<p>For development and running the tests a backend for <code>ndarray-linalg</code> must be chosen. Normally
+one would add those as dev dependencies (the features would then be unified with the regular
+dependencies). However, linking somehow fails when the non-dev <code>ndarra-linalg</code> dependency is
+missing (which is the case for the <code>*-nolinalg*</code> features of the ndarray backend). To fix that,
+the <code>_dev_linalg_*</code> features were introduced. When testing and developing with one of the
+ndarray features with linalg support on, the appropriate <code>_dev_linalg_*</code> feature must be turned
+on as well. Note that the version number in <code>_dev_linalg_*</code> is always one below the <code>ndarray</code>
+version. For instance, for ndarray 0.15, one would use the <code>_dev_linalg_0_14</code> feature.</p>
+<div><table><thead><tr><th>Development Feature</th><th>Comment</th></tr></thead><tbody>
+<tr><td><code>_dev_linalg_latest</code></td><td>latest <code>ndarray-linalg</code> for latest <code>ndarray</code></td></tr>
+<tr><td><code>_dev_linalg_0_14</code></td><td><code>ndarray-linalg</code> v0.14 for <code>ndarray</code> v0.15</td></tr>
+<tr><td><code>_dev_linalg_0_13</code></td><td><code>ndarray-linalg</code> v0.13 for <code>ndarray</code> v0.14</td></tr>
+<tr><td><code>_dev_linalg_0_12</code></td><td><code>ndarray-linalg</code> v0.12 for <code>ndarray</code> v0.13</td></tr>
+</tbody></table>
+</div><h2 id="contributing"><a href="#contributing">Contributing</a></h2>
 <p>You found a bug? Your favourite backend is not supported? Feel free to open an issue or ideally
 submit a PR.</p>
 <h2 id="license"><a href="#license">License</a></h2>
