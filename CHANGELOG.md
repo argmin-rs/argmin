@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## argmin-math [Unreleased]
 
+## [argmin-math v0.1.1-rc.1] 2022-08-26
+
+### Fixed
+- Added possibility to deactivate the `ndarray-linalg` dependency in `argmin-math` again (@stefan-k)
+
 ## [argmin v0.6.0] and [argmin-math v0.1.0] 2022-08-09
 
 This is a rather large release with many (breaking) changes.
