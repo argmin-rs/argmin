@@ -1,6 +1,6 @@
 [package]
 name = "argmin"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -22,7 +22,7 @@ num-traits = { version = "0.2" }
 rand = { version = "0.8.5" }
 rand_xoshiro = { version = "0.6.0" }
 thiserror = "1.0"
-argmin-math = { path = "../argmin-math", version = "0.1.0", default-features = false, features = ["primitives"] }
+argmin-math = { path = "../argmin-math", version = "0.2", default-features = false, features = ["primitives"] }
 # optional
 bincode = { version = "1.3.3", optional = true }
 ctrlc = { version = "3.1.2", optional = true }

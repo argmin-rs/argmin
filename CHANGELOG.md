@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## argmin-math [Unreleased]
 
+## [argmin v0.7.0] and [argmin-math v0.2.0] 2022-08-28
+
+### Added
+- L1 regularization added to L-BFGS (also known as OWL-QN). L-BFGS now has more trait bounds, please consult the documentation if this causes problems. (#244, #248, #250, Thanks to @vbkaisetsu)
+
+### Changed
+- The `ArgminL1Norm` trait was added by @vbkaisetsu for the L1 regularization in L-BFGS. In order to make the L2 norm more consistent, the corresponding trait was renamed from `ArgminNorm` to `ArgminL2Norm` and the `norm` method was renamed to `l2_norm`. (#253, @stefan-k)
+
+### Fixed
+- Version 0.6 accidentially removed the possibility to deactivate the `ndarray-linalg` dependency in `argmin-math`. This leads to problems in downstream crates which do not need the functionality of `ndarray-linalg` and want to avoid linking angainst a BLAS. In this version, this functionality was added again. Please consult the documentation of `argmin-math` for details on the available backends and their configuration. (#243, #249, @stefan-k)
+- Fixed type alias names in examples (#245, Thanks to @vbkaisetsu)
+- Fixed a bug in dogleg method (#246, #247, @stefan-k, Thanks to @renato145 for reporting!)
+
 ## [argmin v0.6.0] and [argmin-math v0.1.0] 2022-08-09
 
 This is a rather large release with many (breaking) changes.
@@ -167,6 +180,8 @@ This is a rather large release with many (breaking) changes.
 
 For older versions please see the Git history.
 
-[Unreleased]: https://github.com/argmin-rs/argmin/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/argmin-rs/argmin/compare/v0.6.0...HEAD
 [argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0
 [argmin-math v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0
+[argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/v0.6.0...argmin_v0.7.0
+[argmin-math v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.6.0...argmin_v0.7.0
