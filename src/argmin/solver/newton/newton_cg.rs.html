@@ -361,7 +361,7 @@
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::conjugategradient::ConjugateGradient</span>;
 <span class="kw">use</span> <span class="ident">argmin_math</span>::{
-    <span class="ident">ArgminConj</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminScaledAdd</span>, <span class="ident">ArgminSub</span>, <span class="ident">ArgminZeroLike</span>,
+    <span class="ident">ArgminConj</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminL2Norm</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminScaledAdd</span>, <span class="ident">ArgminSub</span>, <span class="ident">ArgminZeroLike</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -467,10 +467,10 @@
         <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminConj</span>
         <span class="op">+</span> <span class="ident">ArgminZeroLike</span>,
-    <span class="ident">G</span>: <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span> <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
+    <span class="ident">G</span>: <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span> <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
     <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
     <span class="ident">L</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">LineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span> <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">ArgminFloat</span> <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
 {
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Newton-CG&quot;</span>;
 
@@ -504,7 +504,7 @@
 
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">cg_state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">cg</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cg_problem</span>, <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">x_p</span>.<span class="ident">clone</span>()))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">grad_norm_factor</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.5</span>).<span class="ident">min</span>(<span class="ident">grad</span>.<span class="ident">norm</span>().<span class="ident">sqrt</span>()) <span class="op">*</span> <span class="ident">grad</span>.<span class="ident">norm</span>();
+        <span class="kw">let</span> <span class="ident">grad_norm_factor</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.5</span>).<span class="ident">min</span>(<span class="ident">grad</span>.<span class="ident">l2_norm</span>().<span class="ident">sqrt</span>()) <span class="op">*</span> <span class="ident">grad</span>.<span class="ident">l2_norm</span>();
 
         <span class="kw">for</span> <span class="ident">iter</span> <span class="kw">in</span> <span class="number">0</span>.. {
             (<span class="ident">cg_state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">cg</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cg_problem</span>, <span class="ident">cg_state</span>)<span class="question-mark">?</span>;

@@ -288,7 +288,7 @@
 <span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">SerializeAlias</span>};
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminSub</span>};
+<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminL2Norm</span>, <span class="ident">ArgminSub</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
@@ -393,7 +393,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">NLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PolakRibiere</span>
 <span class="kw">where</span>
-    <span class="ident">G</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">G</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="doccomment">/// Update beta using the Polak-Ribiere method.</span>
@@ -413,7 +413,7 @@
     <span class="doccomment">/// # assert_relative_eq!(beta, 14.0/5.0, epsilon = f64::EPSILON);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dfk</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">dfk1</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">_pk</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">F</span> {
-        <span class="kw">let</span> <span class="ident">dfk_norm_sq</span> <span class="op">=</span> <span class="ident">dfk</span>.<span class="ident">norm</span>().<span class="ident">powi</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="ident">dfk_norm_sq</span> <span class="op">=</span> <span class="ident">dfk</span>.<span class="ident">l2_norm</span>().<span class="ident">powi</span>(<span class="number">2</span>);
         <span class="ident">dfk1</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">dfk1</span>.<span class="ident">sub</span>(<span class="ident">dfk</span>)) <span class="op">/</span> <span class="ident">dfk_norm_sq</span>
     }
 }
@@ -441,7 +441,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">NLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PolakRibierePlus</span>
 <span class="kw">where</span>
-    <span class="ident">G</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="ident">G</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
     <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
 {
     <span class="doccomment">/// Update beta using the Polak-Ribiere+ (PR+) method.</span>
@@ -467,7 +467,7 @@
     <span class="doccomment">/// # assert_relative_eq!(beta, 0.0, epsilon = f64::EPSILON);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dfk</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">dfk1</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">_pk</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">F</span> {
-        <span class="kw">let</span> <span class="ident">dfk_norm_sq</span> <span class="op">=</span> <span class="ident">dfk</span>.<span class="ident">norm</span>().<span class="ident">powi</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="ident">dfk_norm_sq</span> <span class="op">=</span> <span class="ident">dfk</span>.<span class="ident">l2_norm</span>().<span class="ident">powi</span>(<span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="ident">dfk1</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">dfk1</span>.<span class="ident">sub</span>(<span class="ident">dfk</span>)) <span class="op">/</span> <span class="ident">dfk_norm_sq</span>;
         <span class="macro">float!</span>(<span class="number">0.0</span>).<span class="ident">max</span>(<span class="ident">beta</span>)
     }

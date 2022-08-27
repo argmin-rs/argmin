@@ -462,7 +462,7 @@
     <span class="ident">TrustRegionRadius</span>, <span class="ident">KV</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::trustregion::reduction_ratio</span>;
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminNorm</span>, <span class="ident">ArgminWeightedDot</span>};
+<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminL2Norm</span>, <span class="ident">ArgminWeightedDot</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
@@ -617,7 +617,7 @@
         <span class="op">+</span> <span class="ident">std::fmt::Debug</span>
         <span class="op">+</span> <span class="ident">SerializeAlias</span>
         <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminNorm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
@@ -716,7 +716,7 @@
 
         <span class="kw">let</span> <span class="ident">rho</span> <span class="op">=</span> <span class="ident">reduction_ratio</span>(<span class="self">self</span>.<span class="ident">fxk</span>, <span class="ident">fxkpk</span>, <span class="self">self</span>.<span class="ident">mk0</span>, <span class="ident">mkpk</span>);
 
-        <span class="kw">let</span> <span class="ident">pk_norm</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">norm</span>();
+        <span class="kw">let</span> <span class="ident">pk_norm</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">l2_norm</span>();
 
         <span class="kw">let</span> <span class="ident">cur_radius</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">radius</span>;
 
