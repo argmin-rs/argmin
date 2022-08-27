@@ -5,14 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminNorm;
+use crate::ArgminL2Norm;
 
 use nalgebra::{
     base::{dimension::Dim, storage::Storage},
     Matrix, SimdComplexField,
 };
 
-impl<N, R, C, S> ArgminNorm<N::SimdRealField> for Matrix<N, R, C, S>
+impl<N, R, C, S> ArgminL2Norm<N::SimdRealField> for Matrix<N, R, C, S>
 where
     N: SimdComplexField,
     R: Dim,
@@ -20,7 +20,7 @@ where
     S: Storage<N, R, C>,
 {
     #[inline]
-    fn norm(&self) -> N::SimdRealField {
+    fn l2_norm(&self) -> N::SimdRealField {
         self.norm()
     }
 }
@@ -37,7 +37,7 @@ mod tests {
                 #[test]
                 fn [<test_norm_ $t>]() {
                     let a = Vector2::new(4 as $t, 3 as $t);
-                    let res = <Vector2<$t> as ArgminNorm<$t>>::norm(&a);
+                    let res = <Vector2<$t> as ArgminL2Norm<$t>>::l2_norm(&a);
                     let target = 5 as $t;
                     assert!(((target - res) as f64).abs() < std::f64::EPSILON);
                 }
@@ -51,7 +51,7 @@ mod tests {
                 #[test]
                 fn [<test_norm_signed_ $t>]() {
                     let a = Vector2::new(-4 as $t, -3 as $t);
-                    let res = <Vector2<$t> as ArgminNorm<$t>>::norm(&a);
+                    let res = <Vector2<$t> as ArgminL2Norm<$t>>::l2_norm(&a);
                     let target = 5 as $t;
                     assert!(((target - res) as f64).abs() < std::f64::EPSILON);
                 }

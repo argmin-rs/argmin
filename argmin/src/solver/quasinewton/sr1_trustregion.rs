@@ -11,7 +11,7 @@ use crate::core::{
     TrustRegionRadius, KV,
 };
 use argmin_math::{
-    ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
+    ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -192,12 +192,12 @@ where
         + ArgminAdd<P, P>
         + ArgminDot<P, F>
         + ArgminDot<P, B>
-        + ArgminNorm<F>
+        + ArgminL2Norm<F>
         + ArgminZeroLike,
     G: Clone
         + SerializeAlias
         + DeserializeOwnedAlias
-        + ArgminNorm<F>
+        + ArgminL2Norm<F>
         + ArgminDot<P, F>
         + ArgminSub<G, P>,
     B: Clone
@@ -207,7 +207,7 @@ where
         + ArgminAdd<B, B>
         + ArgminMul<F, B>,
     R: Clone + TrustRegionRadius<F> + Solver<O, IterState<P, G, (), B, F>>,
-    F: ArgminFloat + ArgminNorm<F>,
+    F: ArgminFloat + ArgminL2Norm<F>,
 {
     const NAME: &'static str = "SR1 trust region";
 
@@ -316,7 +316,7 @@ where
         };
 
         self.radius = if ap > float!(0.75) {
-            if sk.norm() <= float!(0.8) * self.radius {
+            if sk.l2_norm() <= float!(0.8) * self.radius {
                 self.radius
             } else {
                 float!(2.0) * self.radius
@@ -332,7 +332,7 @@ where
         let skykbksk: F = sk.dot(&ykbksk);
 
         let hessian_update =
-            skykbksk.abs() >= self.denominator_factor * sk.norm() * skykbksk.norm();
+            skykbksk.abs() >= self.denominator_factor * sk.l2_norm() * skykbksk.l2_norm();
         let hessian = if hessian_update {
             let a: B = ykbksk.dot(&ykbksk);
             let b: F = sk.dot(&ykbksk);
@@ -352,7 +352,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<P, G, (), B, F>) -> TerminationReason {
-        if state.get_gradient().unwrap().norm() < self.tol_grad {
+        if state.get_gradient().unwrap().l2_norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         TerminationReason::NotTerminated

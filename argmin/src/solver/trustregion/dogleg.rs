@@ -10,7 +10,7 @@ use crate::core::{
     TrustRegionRadius, KV,
 };
 use argmin_math::{
-    ArgminAdd, ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminWeightedDot,
+    ArgminAdd, ArgminDot, ArgminInv, ArgminL2Norm, ArgminMul, ArgminSub, ArgminWeightedDot,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -58,7 +58,7 @@ where
     O: Gradient<Param = P, Gradient = P> + Hessian<Param = P, Hessian = H>,
     P: Clone
         + ArgminMul<F, P>
-        + ArgminNorm<F>
+        + ArgminL2Norm<F>
         + ArgminDot<P, F>
         + ArgminAdd<P, P>
         + ArgminSub<P, P>,
@@ -95,7 +95,7 @@ where
         // pb = -H^-1g
         let pb = (h.inv()?).dot(&g).mul(&float!(-1.0));
 
-        if pb.norm() <= self.radius {
+        if pb.l2_norm() <= self.radius {
             pstar = pb;
         } else {
             // pu = - (g^Tg)/(g^THg) * g

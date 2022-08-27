@@ -5,16 +5,16 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminNorm;
+use crate::ArgminL2Norm;
 use ndarray::Array1;
 use num_complex::Complex;
 use num_integer::Roots;
 
 macro_rules! make_norm_float {
     ($t:ty) => {
-        impl ArgminNorm<$t> for Array1<$t> {
+        impl ArgminL2Norm<$t> for Array1<$t> {
             #[inline]
-            fn norm(&self) -> $t {
+            fn l2_norm(&self) -> $t {
                 self.iter().map(|a| a.powi(2)).sum::<$t>().sqrt()
             }
         }
@@ -23,16 +23,16 @@ macro_rules! make_norm_float {
 
 macro_rules! make_norm_complex_float {
     ($t:ty) => {
-        impl ArgminNorm<Complex<$t>> for Array1<Complex<$t>> {
+        impl ArgminL2Norm<Complex<$t>> for Array1<Complex<$t>> {
             #[inline]
-            fn norm(&self) -> Complex<$t> {
+            fn l2_norm(&self) -> Complex<$t> {
                 self.iter().map(|a| a.powf(2.0)).sum::<Complex<$t>>().sqrt()
             }
         }
 
-        impl ArgminNorm<$t> for Array1<Complex<$t>> {
+        impl ArgminL2Norm<$t> for Array1<Complex<$t>> {
             #[inline]
-            fn norm(&self) -> $t {
+            fn l2_norm(&self) -> $t {
                 self.iter()
                     .map(|a| a.powf(2.0))
                     .sum::<Complex<$t>>()
@@ -45,9 +45,9 @@ macro_rules! make_norm_complex_float {
 
 macro_rules! make_norm_integer {
     ($t:ty) => {
-        impl ArgminNorm<$t> for Array1<$t> {
+        impl ArgminL2Norm<$t> for Array1<$t> {
             #[inline]
-            fn norm(&self) -> $t {
+            fn l2_norm(&self) -> $t {
                 self.iter().map(|a| a.pow(2)).sum::<$t>().sqrt()
             }
         }
@@ -81,7 +81,7 @@ mod tests {
                 #[test]
                 fn [<test_norm_ $t>]() {
                     let a = array![4 as $t, 3 as $t];
-                    let res = <Array1<$t> as ArgminNorm<$t>>::norm(&a);
+                    let res = <Array1<$t> as ArgminL2Norm<$t>>::l2_norm(&a);
                     let target = 5 as $t;
                     assert!(((target - res) as f64).abs() < std::f64::EPSILON);
                 }
@@ -95,7 +95,7 @@ mod tests {
                 #[test]
                 fn [<test_norm_signed_ $t>]() {
                     let a = array![-4 as $t, -3 as $t];
-                    let res = <Array1<$t> as ArgminNorm<$t>>::norm(&a);
+                    let res = <Array1<$t> as ArgminL2Norm<$t>>::l2_norm(&a);
                     let target = 5 as $t;
                     assert!(((target - res) as f64).abs() < std::f64::EPSILON);
                 }

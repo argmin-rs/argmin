@@ -11,7 +11,7 @@ use crate::core::{
     TrustRegionRadius, KV,
 };
 use crate::solver::trustregion::reduction_ratio;
-use argmin_math::{ArgminAdd, ArgminDot, ArgminNorm, ArgminWeightedDot};
+use argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -166,7 +166,7 @@ where
         + std::fmt::Debug
         + SerializeAlias
         + DeserializeOwnedAlias
-        + ArgminNorm<F>
+        + ArgminL2Norm<F>
         + ArgminDot<P, F>
         + ArgminDot<G, F>
         + ArgminAdd<P, P>,
@@ -265,7 +265,7 @@ where
 
         let rho = reduction_ratio(self.fxk, fxkpk, self.mk0, mkpk);
 
-        let pk_norm = pk.norm();
+        let pk_norm = pk.l2_norm();
 
         let cur_radius = self.radius;
 

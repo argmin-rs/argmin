@@ -8,7 +8,7 @@
 use crate::core::{
     ArgminFloat, Error, IterState, Operator, Problem, SerializeAlias, Solver, State, KV,
 };
-use argmin_math::{ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub};
+use argmin_math::{ArgminConj, ArgminDot, ArgminL2Norm, ArgminMul, ArgminScaledAdd, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -99,7 +99,7 @@ where
         + ArgminScaledAdd<P, F, P>
         + ArgminConj
         + ArgminMul<F, P>,
-    F: ArgminFloat + ArgminNorm<F>,
+    F: ArgminFloat + ArgminL2Norm<F>,
 {
     const NAME: &'static str = "Conjugate Gradient";
 
@@ -150,7 +150,7 @@ where
         let beta = rtr_n.div(self.rtr);
         self.rtr = rtr_n;
         let p_n = r.mul(&(float!(-1.0))).scaled_add(&beta, &p);
-        let norm = r.dot(&r.conj()).norm();
+        let norm = r.dot(&r.conj()).l2_norm();
 
         self.p = Some(p_n);
         self.p_prev = Some(p);
@@ -329,7 +329,7 @@ mod tests {
         let rtr_n = -r * r;
         let beta = rtr_n / rtr;
         let p_n = -r + beta * p;
-        let norm = (r * r).norm();
+        let norm = (r * r).l2_norm();
 
         let (state, kv) = cg.next_iter(&mut problem, state).unwrap();
         assert!(kv.is_some());

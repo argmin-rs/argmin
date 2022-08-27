@@ -11,7 +11,7 @@ use crate::core::{
 };
 use crate::solver::conjugategradient::ConjugateGradient;
 use argmin_math::{
-    ArgminConj, ArgminDot, ArgminMul, ArgminNorm, ArgminScaledAdd, ArgminSub, ArgminZeroLike,
+    ArgminConj, ArgminDot, ArgminL2Norm, ArgminMul, ArgminScaledAdd, ArgminSub, ArgminZeroLike,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -117,10 +117,10 @@ where
         + ArgminMul<F, P>
         + ArgminConj
         + ArgminZeroLike,
-    G: SerializeAlias + DeserializeOwnedAlias + ArgminNorm<F> + ArgminMul<F, P>,
+    G: SerializeAlias + DeserializeOwnedAlias + ArgminL2Norm<F> + ArgminMul<F, P>,
     H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
     L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
-    F: ArgminFloat + ArgminNorm<F>,
+    F: ArgminFloat + ArgminL2Norm<F>,
 {
     const NAME: &'static str = "Newton-CG";
 
@@ -154,7 +154,7 @@ where
 
         let (mut cg_state, _) = cg.init(&mut cg_problem, IterState::new().param(x_p.clone()))?;
 
-        let grad_norm_factor = float!(0.5).min(grad.norm().sqrt()) * grad.norm();
+        let grad_norm_factor = float!(0.5).min(grad.l2_norm().sqrt()) * grad.l2_norm();
 
         for iter in 0.. {
             (cg_state, _) = cg.next_iter(&mut cg_problem, cg_state)?;

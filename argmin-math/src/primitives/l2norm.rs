@@ -5,14 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminNorm;
+use crate::ArgminL2Norm;
 use num_complex::Complex;
 
 macro_rules! make_norm_unsigned {
     ($t:ty) => {
-        impl ArgminNorm<$t> for $t {
+        impl ArgminL2Norm<$t> for $t {
             #[inline]
-            fn norm(&self) -> $t {
+            fn l2_norm(&self) -> $t {
                 *self
             }
         }
@@ -21,9 +21,9 @@ macro_rules! make_norm_unsigned {
 
 macro_rules! make_norm {
     ($t:ty) => {
-        impl ArgminNorm<$t> for $t {
+        impl ArgminL2Norm<$t> for $t {
             #[inline]
-            fn norm(&self) -> $t {
+            fn l2_norm(&self) -> $t {
                 (*self).abs()
             }
         }
@@ -32,9 +32,9 @@ macro_rules! make_norm {
 
 macro_rules! make_norm_complex {
     ($t:ty) => {
-        impl ArgminNorm<$t> for Complex<$t> {
+        impl ArgminL2Norm<$t> for Complex<$t> {
             #[inline]
-            fn norm(&self) -> $t {
+            fn l2_norm(&self) -> $t {
                 (*self).re.hypot((*self).im)
             }
         }
@@ -68,7 +68,7 @@ mod tests {
                 #[test]
                 fn [<test_norm_ $t>]() {
                     let a = 8 as $t;
-                    let res = <$t as ArgminNorm<$t>>::norm(&a);
+                    let res = <$t as ArgminL2Norm<$t>>::l2_norm(&a);
                     assert!(((a - res) as f64).abs() < std::f64::EPSILON);
                 }
             }
@@ -81,7 +81,7 @@ mod tests {
                 #[test]
                 fn [<test_norm_signed_ $t>]() {
                     let a = -8 as $t;
-                    let res = <$t as ArgminNorm<$t>>::norm(&a);
+                    let res = <$t as ArgminL2Norm<$t>>::l2_norm(&a);
                     assert!(((8 as $t - res) as f64).abs() < std::f64::EPSILON);
                 }
             }

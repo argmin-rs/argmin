@@ -17,9 +17,9 @@ mod eye;
 ))]
 mod inv;
 mod l1norm;
+mod l2norm;
 mod minmax;
 mod mul;
-mod norm;
 mod scaledadd;
 mod scaledsub;
 mod signum;
@@ -39,9 +39,9 @@ pub use eye::*;
 ))]
 pub use inv::*;
 pub use l1norm::*;
+pub use l2norm::*;
 pub use minmax::*;
 pub use mul::*;
-pub use norm::*;
 pub use scaledadd::*;
 pub use scaledsub::*;
 pub use signum::*;

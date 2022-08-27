@@ -301,16 +301,16 @@ pub trait ArgminScaledSub<T, U, V> {
     fn scaled_sub(&self, factor: &U, vec: &T) -> V;
 }
 
-/// Compute the l2-norm (`U`) of `self`
+/// Compute the l1-norm (`U`) of `self`
 pub trait ArgminL1Norm<U> {
     /// Compute the l1-norm (`U`) of `self`
     fn l1_norm(&self) -> U;
 }
 
 /// Compute the l2-norm (`U`) of `self`
-pub trait ArgminNorm<U> {
+pub trait ArgminL2Norm<U> {
     /// Compute the l2-norm (`U`) of `self`
-    fn norm(&self) -> U;
+    fn l2_norm(&self) -> U;
 }
 
 // Suboptimal: self is moved. ndarray however offers array views...

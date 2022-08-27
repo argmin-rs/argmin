@@ -9,7 +9,7 @@ use crate::core::{
     ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, State, TerminationReason,
     TrustRegionRadius, KV,
 };
-use argmin_math::{ArgminMul, ArgminNorm, ArgminWeightedDot};
+use argmin_math::{ArgminL2Norm, ArgminMul, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -54,8 +54,8 @@ where
 impl<O, F, P, G, H> Solver<O, IterState<P, G, (), H, F>> for CauchyPoint<F>
 where
     O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
-    P: Clone + ArgminMul<F, P> + ArgminWeightedDot<P, F, H> + ArgminNorm<F>,
-    G: ArgminMul<F, P> + ArgminWeightedDot<G, F, H> + ArgminNorm<F>,
+    P: Clone + ArgminMul<F, P> + ArgminWeightedDot<P, F, H>,
+    G: ArgminMul<F, P> + ArgminWeightedDot<G, F, H> + ArgminL2Norm<F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Cauchy Point";
@@ -78,7 +78,7 @@ where
             .map(Result::Ok)
             .unwrap_or_else(|| problem.gradient(&param))?;
 
-        let grad_norm = grad.norm();
+        let grad_norm = grad.l2_norm();
 
         let hessian = state
             .take_hessian()

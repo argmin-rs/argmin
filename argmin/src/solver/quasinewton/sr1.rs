@@ -9,7 +9,7 @@ use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
     LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason, KV,
 };
-use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
+use argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -154,13 +154,13 @@ where
         + ArgminDot<G, F>
         + ArgminDot<P, F>
         + ArgminDot<P, H>
-        + ArgminNorm<F>
+        + ArgminL2Norm<F>
         + ArgminMul<F, P>,
     G: Clone
         + SerializeAlias
         + DeserializeOwnedAlias
         + ArgminSub<P, P>
-        + ArgminNorm<F>
+        + ArgminL2Norm<F>
         + ArgminSub<G, G>,
     H: SerializeAlias
         + DeserializeOwnedAlias
@@ -273,8 +273,8 @@ where
         let a: H = ykmbksk.dot(&ykmbksk);
         let b: F = ykmbksk.dot(&sk);
 
-        // let hessian_update = b.abs() >= self.r * yk.norm() * skmhkyk.norm();
-        let hessian_update = b.abs() >= self.denominator_factor * sk.norm() * ykmbksk.norm();
+        // let hessian_update = b.abs() >= self.r * yk.l2_norm() * skmhkyk.l2_norm();
+        let hessian_update = b.abs() >= self.denominator_factor * sk.l2_norm() * ykmbksk.l2_norm();
 
         if hessian_update {
             inv_hessian = inv_hessian.add(&a.mul(&(float!(1.0) / b)));
@@ -291,7 +291,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationReason {
-        if state.get_gradient().unwrap().norm() < self.tol_grad {
+        if state.get_gradient().unwrap().l2_norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         if (state.get_prev_cost() - state.cost).abs() < self.tol_cost {

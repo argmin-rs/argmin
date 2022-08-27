@@ -9,7 +9,9 @@ use crate::core::{
     ArgminFloat, Error, IterState, Problem, SerializeAlias, Solver, State, TerminationReason,
     TrustRegionRadius, KV,
 };
-use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminWeightedDot, ArgminZeroLike};
+use argmin_math::{
+    ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminWeightedDot, ArgminZeroLike,
+};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -181,7 +183,7 @@ where
     P: Clone
         + SerializeAlias
         + ArgminMul<F, P>
-        + ArgminNorm<F>
+        + ArgminL2Norm<F>
         + ArgminDot<P, F>
         + ArgminAdd<P, P>
         + ArgminZeroLike,
@@ -216,7 +218,7 @@ where
             ));
         }
 
-        self.r_0_norm = r.norm();
+        self.r_0_norm = r.l2_norm();
         self.rtr = r.dot(&r);
         self.d = Some(r.mul(&float!(-1.0)));
         let p = r.zero_like();
@@ -261,7 +263,7 @@ where
         let p_n = p.add(&d.mul(&alpha));
 
         // new p violates trust region bound
-        if p_n.norm() >= self.radius {
+        if p_n.l2_norm() >= self.radius {
             let tau = self.tau(|x| x >= float!(0.0), false, &grad, &h);
             return Ok((
                 state
@@ -274,7 +276,7 @@ where
         let r = self.r.as_ref().unwrap();
         let r_n = r.add(&h.dot(d).mul(&alpha));
 
-        if r_n.norm() < self.epsilon * self.r_0_norm {
+        if r_n.l2_norm() < self.epsilon * self.r_0_norm {
             return Ok((
                 state
                     .param(p_n)
