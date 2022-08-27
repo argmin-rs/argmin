@@ -18,7 +18,7 @@
 //! Springer. ISBN 0-387-30303-0.
 
 use crate::core::{ArgminFloat, SerializeAlias};
-use argmin_math::{ArgminDot, ArgminNorm, ArgminSub};
+use argmin_math::{ArgminDot, ArgminL2Norm, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -123,7 +123,7 @@ impl PolakRibiere {
 
 impl<G, P, F> NLCGBetaUpdate<G, P, F> for PolakRibiere
 where
-    G: ArgminDot<G, F> + ArgminSub<G, G> + ArgminNorm<F>,
+    G: ArgminDot<G, F> + ArgminSub<G, G> + ArgminL2Norm<F>,
     F: ArgminFloat,
 {
     /// Update beta using the Polak-Ribiere method.
@@ -143,7 +143,7 @@ where
     /// # assert_relative_eq!(beta, 14.0/5.0, epsilon = f64::EPSILON);
     /// ```
     fn update(&self, dfk: &G, dfk1: &G, _pk: &P) -> F {
-        let dfk_norm_sq = dfk.norm().powi(2);
+        let dfk_norm_sq = dfk.l2_norm().powi(2);
         dfk1.dot(&dfk1.sub(dfk)) / dfk_norm_sq
     }
 }
@@ -171,7 +171,7 @@ impl PolakRibierePlus {
 
 impl<G, P, F> NLCGBetaUpdate<G, P, F> for PolakRibierePlus
 where
-    G: ArgminDot<G, F> + ArgminSub<G, G> + ArgminNorm<F>,
+    G: ArgminDot<G, F> + ArgminSub<G, G> + ArgminL2Norm<F>,
     F: ArgminFloat,
 {
     /// Update beta using the Polak-Ribiere+ (PR+) method.
@@ -197,7 +197,7 @@ where
     /// # assert_relative_eq!(beta, 0.0, epsilon = f64::EPSILON);
     /// ```
     fn update(&self, dfk: &G, dfk1: &G, _pk: &P) -> F {
-        let dfk_norm_sq = dfk.norm().powi(2);
+        let dfk_norm_sq = dfk.l2_norm().powi(2);
         let beta = dfk1.dot(&dfk1.sub(dfk)) / dfk_norm_sq;
         float!(0.0).max(beta)
     }

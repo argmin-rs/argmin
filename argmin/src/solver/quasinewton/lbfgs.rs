@@ -10,7 +10,7 @@ use crate::core::{
     LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason, KV,
 };
 use argmin_math::{
-    ArgminAdd, ArgminDot, ArgminL1Norm, ArgminMinMax, ArgminMul, ArgminNorm, ArgminSignum,
+    ArgminAdd, ArgminDot, ArgminL1Norm, ArgminL2Norm, ArgminMinMax, ArgminMul, ArgminSignum,
     ArgminSub, ArgminZeroLike,
 };
 #[cfg(feature = "serde1")]
@@ -324,7 +324,7 @@ where
         + std::fmt::Debug
         + SerializeAlias
         + DeserializeOwnedAlias
-        + ArgminNorm<F>
+        + ArgminL2Norm<F>
         + ArgminSub<G, G>
         + ArgminAdd<G, G>
         + ArgminAdd<P, G>
@@ -492,7 +492,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<P, G, (), (), F>) -> TerminationReason {
-        if state.get_gradient().unwrap().norm() < self.tol_grad {
+        if state.get_gradient().unwrap().l2_norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol_cost {

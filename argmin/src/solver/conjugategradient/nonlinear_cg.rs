@@ -9,7 +9,7 @@ use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
     LineSearch, NLCGBetaUpdate, OptimizationResult, Problem, SerializeAlias, Solver, State, KV,
 };
-use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm};
+use argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -128,7 +128,7 @@ where
         + DeserializeOwnedAlias
         + ArgminMul<F, P>
         + ArgminDot<G, F>
-        + ArgminNorm<F>,
+        + ArgminL2Norm<F>,
     L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
     B: NLCGBetaUpdate<G, P, F>,
     F: ArgminFloat,
@@ -203,7 +203,7 @@ where
         let new_grad = problem.gradient(&xk1)?;
 
         let restart_orthogonality = match self.restart_orthogonality {
-            Some(v) => new_grad.dot(&grad).abs() / new_grad.norm().powi(2) >= v,
+            Some(v) => new_grad.dot(&grad).abs() / new_grad.l2_norm().powi(2) >= v,
             None => false,
         };
 

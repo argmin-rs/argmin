@@ -10,7 +10,7 @@ use crate::core::{
     Jacobian, LineSearch, Operator, OptimizationResult, Problem, SerializeAlias, Solver,
     TerminationReason, KV,
 };
-use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminTranspose};
+use argmin_math::{ArgminDot, ArgminInv, ArgminL2Norm, ArgminMul, ArgminTranspose};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -86,7 +86,7 @@ where
     O: Operator<Param = P, Output = U> + Jacobian<Param = P, Jacobian = J>,
     P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminMul<F, P>,
     G: Clone + SerializeAlias + DeserializeOwnedAlias,
-    U: ArgminNorm<F>,
+    U: ArgminL2Norm<F>,
     J: Clone
         + SerializeAlias
         + DeserializeOwnedAlias
@@ -133,7 +133,7 @@ where
             ))?),
             self.linesearch.clone(),
         )
-        .configure(|config| config.param(param).gradient(grad).cost(residuals.norm()))
+        .configure(|config| config.param(param).gradient(grad).cost(residuals.l2_norm()))
         .ctrlc(false)
         .run()?;
 
@@ -195,14 +195,14 @@ impl<O, F> LineSearchProblem<O, F> {
 impl<O, P, F> CostFunction for LineSearchProblem<O, F>
 where
     O: Operator<Param = P, Output = P>,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminNorm<F>,
+    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminL2Norm<F>,
     F: ArgminFloat,
 {
     type Param = P;
     type Output = F;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(self.problem.apply(p)?.norm())
+        Ok(self.problem.apply(p)?.l2_norm())
     }
 }
 

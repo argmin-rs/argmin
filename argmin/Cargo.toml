@@ -51,7 +51,7 @@ default = ["slog-logger", "serde1"]
 wasm-bindgen = ["instant/wasm-bindgen", "getrandom/js"]
 slog-logger = ["slog", "slog-term", "slog-async"]
 serde1 = ["serde", "serde_json", "rand/serde1", "bincode", "slog-json", "rand_xoshiro/serde1"]
-_ndarrayl = ["argmin-math/ndarray_latest-serde"]
+_ndarrayl = ["argmin-math/ndarray_latest-serde", "argmin-math/_dev_linalg_latest"]
 _nalgebral = ["argmin-math/nalgebra_latest-serde"]
 
 [badges]

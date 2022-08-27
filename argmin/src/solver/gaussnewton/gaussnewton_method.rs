@@ -9,7 +9,7 @@ use crate::core::{
     ArgminFloat, Error, IterState, Jacobian, Operator, Problem, Solver, State, TerminationReason,
     KV,
 };
-use argmin_math::{ArgminDot, ArgminInv, ArgminMul, ArgminNorm, ArgminSub, ArgminTranspose};
+use argmin_math::{ArgminDot, ArgminInv, ArgminL2Norm, ArgminMul, ArgminSub, ArgminTranspose};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -113,7 +113,7 @@ impl<O, F, P, J, U> Solver<O, IterState<P, (), J, (), F>> for GaussNewton<F>
 where
     O: Operator<Param = P, Output = U> + Jacobian<Param = P, Jacobian = J>,
     P: Clone + ArgminSub<P, P> + ArgminMul<F, P>,
-    U: ArgminNorm<F>,
+    U: ArgminL2Norm<F>,
     J: Clone
         + ArgminTranspose<J>
         + ArgminInv<J>
@@ -148,7 +148,7 @@ where
 
         let new_param = param.sub(&p.mul(&self.gamma));
 
-        Ok((state.param(new_param).cost(residuals.norm()), None))
+        Ok((state.param(new_param).cost(residuals.l2_norm()), None))
     }
 
     fn terminate(&mut self, state: &IterState<P, (), J, (), F>) -> TerminationReason {

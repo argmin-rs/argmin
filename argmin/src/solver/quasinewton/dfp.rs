@@ -9,7 +9,7 @@ use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
     LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason, KV,
 };
-use argmin_math::{ArgminAdd, ArgminDot, ArgminMul, ArgminNorm, ArgminSub};
+use argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -109,7 +109,7 @@ where
         + SerializeAlias
         + DeserializeOwnedAlias
         + ArgminSub<G, G>
-        + ArgminNorm<F>
+        + ArgminL2Norm<F>
         + ArgminDot<P, F>,
     H: Clone
         + SerializeAlias
@@ -244,7 +244,7 @@ where
     }
 
     fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationReason {
-        if state.get_gradient().unwrap().norm() < self.tol_grad {
+        if state.get_gradient().unwrap().l2_norm() < self.tol_grad {
             return TerminationReason::TargetPrecisionReached;
         }
         TerminationReason::NotTerminated
