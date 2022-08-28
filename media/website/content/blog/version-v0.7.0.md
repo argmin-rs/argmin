@@ -3,7 +3,7 @@ title = "argmin 0.7.0 and argmin-math 0.2.0 released"
 description = ""
 date = 2022-08-28T00:00:00+00:00
 updated = 2022-08-28T00:00:00+00:00
-draft = true
+draft = false
 template = "blog/page.html"
 
 [taxonomies]
