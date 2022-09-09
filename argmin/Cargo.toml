@@ -118,6 +118,10 @@ name = "lbfgs"
 required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
 [[example]]
+name = "lbfgs_nalgebra"
+required-features = ["argmin-math/nalgebra_latest-serde", "slog-logger"]
+
+[[example]]
 name = "morethuente"
 required-features = ["slog-logger"]
 
