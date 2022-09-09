@@ -36,7 +36,7 @@ mod tests {
         ($t:ty) => {
             item! {
                 #[test]
-                fn [<test_conj_complex_ndarray_ $t>]() {
+                fn [<test_conj_complex_nalgebra_ $t>]() {
                     let a = Vector3::new(
                         Complex::new(1 as $t, 2 as $t),
                         Complex::new(4 as $t, -3 as $t),
@@ -58,7 +58,7 @@ mod tests {
 
             item! {
                 #[test]
-                fn [<test_conj_ndarray_ $t>]() {
+                fn [<test_conj_nalgebra_ $t>]() {
                     let a = Vector3::new(1 as $t, 4 as $t, 8 as $t);
                     let b = Vector3::new(1 as $t, 4 as $t, 8 as $t);
                     let res = <Vector3<$t> as ArgminConj>::conj(&a);
