@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## argmin-math [Unreleased]
 
+## [argmin-math v0.2.1] 2022-09-09
+
+### Added
+- Added ArgminMinMax and ArgminSignum implementation for nalgebra types. Now the L-BFGS should work work with the nalgebra backend again. (#257, #258, @stefan-k)
+- Added an L-BFGS example using the nalgebra backend (#258, @stefan-k)
+
 ## [argmin v0.7.0] and [argmin-math v0.2.0] 2022-08-28
 
 ### Added
@@ -181,7 +187,8 @@ This is a rather large release with many (breaking) changes.
 For older versions please see the Git history.
 
 [Unreleased]: https://github.com/argmin-rs/argmin/compare/v0.6.0...HEAD
-[argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0
-[argmin-math v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin_v0.6.0
-[argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/v0.6.0...argmin_v0.7.0
-[argmin-math v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.6.0...argmin_v0.7.0
+[argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin-v0.6.0
+[argmin-math v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin-v0.6.0
+[argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.6.0...argmin-v0.7.0
+[argmin-math v0.2.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.6.0...argmin-v0.7.0
+[argmin-math v0.2.1]: https://github.com/argmin-rs/argmin/compare/argmin-v0.7.0...argmin-math-v0.2.1
