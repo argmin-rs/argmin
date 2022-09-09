@@ -5,8 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-// TODO: Tests for Array2 impl
-
 use crate::ArgminMinMax;
 use ndarray::{Array1, Array2};
 
