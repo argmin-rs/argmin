@@ -72,7 +72,7 @@ where
         }
     }
 
-    /// Specifiy the number of iterations after which a restart should be performed.
+    /// Specify the number of iterations after which a restart should be performed.
     ///
     /// This allows the algorithm to "forget" previous information which may not be helpful
     /// anymore.

@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-// Deactivating this lint here because it would make the boolean expressions more difficult to
+// Deactivating this lint here because it would make the Boolean expressions more difficult to
 // read.
 #![allow(clippy::nonminimal_bool)]
 
@@ -573,7 +573,7 @@ fn cstep<F: ArgminFloat>(
         brackt = true;
     } else if sgnd < float!(0.0) {
         // Second case. A lower function value and derivatives of opposite sign. The minimum is
-        // bracketed. If the cubic step is closer to stx.x than the quadtratic (secant) step, the
+        // bracketed. If the cubic step is closer to stx.x than the quadratic (secant) step, the
         // cubic step is taken, else the quadratic step is taken.
         info = 2;
         bound = false;
@@ -606,7 +606,7 @@ fn cstep<F: ArgminFloat>(
         // Third case. A lower function value, derivatives of the same sign, and the magnitude of
         // the derivative decreases. The cubic step is only used if the cubic tends to infinity in
         // the direction of the step or if the minimum of the cubic is beyond stp.x. Otherwise the
-        // cubic step is defined to be either stpmin or stpmax. The quadtratic (secant) step is
+        // cubic step is defined to be either stpmin or stpmax. The quadratic (secant) step is
         // also computed and if the minimum is bracketed then the step closest to stx.x is taken,
         // else the step farthest away is taken.
         info = 3;
@@ -655,7 +655,7 @@ fn cstep<F: ArgminFloat>(
             stpf = stpq;
         }
     } else {
-        // Fourth case. A lower function value, derivatives of the same sign, and the magnitued of
+        // Fourth case. A lower function value, derivatives of the same sign, and the magnitude of
         // the derivative does not decrease. If the minimum is not bracketed, the step is either
         // stpmin or stpmax, else the cubic step is taken.
         info = 4;

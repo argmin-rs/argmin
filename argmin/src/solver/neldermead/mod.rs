@@ -35,7 +35,7 @@ use std::fmt;
 /// The method is based on simplices which consist of n+1 vertices for an optimization problem with
 /// n dimensions.
 /// The function to be optimized is evaluated at all vertices. Based on these cost function values
-/// the behaviour of the cost function is extrapolated in order to find the next point to be
+/// the behavior of the cost function is extrapolated in order to find the next point to be
 /// evaluated.
 ///
 /// The following actions are possible:

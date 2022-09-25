@@ -48,7 +48,7 @@ impl<O> Problem<O> {
     }
 
     /// Gives access to the stored `problem` via the closure `func` and keeps track of how many
-    /// times the function has been called. The function counts will be passed to observers labelled
+    /// times the function has been called. The function counts will be passed to observers labeled
     /// with `counts_string`. Per convention, `counts_string` is chosen as `<something>_count`.
     ///
     /// # Example
@@ -138,7 +138,7 @@ impl<O> Problem<O> {
     /// times the function has been called. In contrast to the `problem` method, this also allows
     /// to pass the number of parameter vectors which will be processed by the underlying problem.
     /// This is used by the `bulk_*` methods, which process multiple parameters at once.
-    /// The function counts will be passed to observers labelled with `counts_string`.
+    /// The function counts will be passed to observers labeled with `counts_string`.
     /// Per convention, `counts_string` is chosen as `<something>_count`.
     pub fn bulk_problem<T, F: FnOnce(&O) -> Result<T, Error>>(
         &mut self,
@@ -372,7 +372,7 @@ pub trait Operator {
 pub trait CostFunction {
     /// Type of the parameter vector
     type Param;
-    /// Tyope of the return value of the cost function
+    /// Type of the return value of the cost function
     type Output;
 
     /// Compute cost function

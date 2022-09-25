@@ -87,7 +87,7 @@ pub trait State {
     /// wrapped in `Problem`.
     fn func_counts<O>(&mut self, problem: &Problem<O>);
 
-    /// Returns currecnt cost function evaluation count
+    /// Returns current cost function evaluation count
     fn get_func_counts(&self) -> &HashMap<String, u64>;
 
     /// Set time required since the beginning of the optimization until the current iteration

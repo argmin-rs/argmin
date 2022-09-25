@@ -88,12 +88,12 @@
 //!
 //! It is not possible to activate two versions of the same backend.
 //!
-//! The features labelled `*latest*` are an alias for the most recent supported version of the
+//! The features labeled `*latest*` are an alias for the most recent supported version of the
 //! respective backend. It is however recommended to explicitly specify the desired version instead
 //! of using any of the `*latest*` features (see section about semantic versioning below).
 //!
 //! Note that `argmin` by default compiles with `serde` support. Therefore, unless `serde` is
-//! deliberately turned off in `argmin`, it is necessary to activiate the `serde` support in
+//! deliberately turned off in `argmin`, it is necessary to activate the `serde` support in
 //! `argmin-math` as well.
 //!
 //! The default features `primitives` and `vec` can be turned off in order to only compile the
@@ -136,7 +136,7 @@
 //!
 //! # Contributing
 //!
-//! You found a bug? Your favourite backend is not supported? Feel free to open an issue or ideally
+//! You found a bug? Your favorite backend is not supported? Feel free to open an issue or ideally
 //! submit a PR.
 //!
 //! # License
@@ -313,7 +313,7 @@ pub trait ArgminL2Norm<U> {
     fn l2_norm(&self) -> U;
 }
 
-// Suboptimal: self is moved. ndarray however offers array views...
+// Sub-optimal: self is moved. ndarray however offers array views...
 /// Return the transpose (`U`) of `self`
 pub trait ArgminTranspose<U> {
     /// Transpose

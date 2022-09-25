@@ -128,7 +128,7 @@ where
 
     /// Set eta
     ///
-    /// A step is taken if the actual reducation over the predicted reduction exceeds eta.
+    /// A step is taken if the actual reduction over the predicted reduction exceeds eta.
     /// Must be in (0, 10^-3) and defaults to 0.5 * 10^-3.
     ///
     /// # Example

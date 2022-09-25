@@ -22,7 +22,7 @@ pub enum TerminationReason {
     TargetPrecisionReached,
     /// No change in cost function value
     NoChangeInCost,
-    /// Acceped stall iter exceeded (Simulated Annealing)
+    /// Accepted stall iter exceeded (Simulated Annealing)
     AcceptedStallIterExceeded,
     /// Best stall iter exceeded (Simulated Annealing)
     BestStallIterExceeded,
