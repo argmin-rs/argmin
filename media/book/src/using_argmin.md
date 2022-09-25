@@ -34,7 +34,7 @@ argmin offers a number of features which can be enabled or disabled depending on
 
 - `ctrl`: This feature uses the `ctrlc` crate to properly stop the optimization (and return the current best result) after pressing `Ctrl+C` during an optimization run.
 - `rayon`: This feature adds `rayon` as a depenceny and allows for parallel computation of cost functions, operators, gradients, Jacobians and Hessians. Note that only solvers that operate on multiple parameter vectors per iteration benefit from this feature (e.g. Particle Swarm Optimization).
-
+- `full`: Enables all default and optional features.
 
 ### Experimental support for compiling to WebAssembly
 
