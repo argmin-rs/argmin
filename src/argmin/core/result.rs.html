@@ -372,7 +372,7 @@
     <span class="doccomment">/// Two `OptimizationResult`s are equal if the absolute of the difference between their best</span>
     <span class="doccomment">/// cost values is smaller than epsilon.</span>
     <span class="doccomment">/// Else, an `OptimizationResult` is better if the best cost function value is strictly better</span>
-    <span class="doccomment">/// than the other&#39;s.</span>
+    <span class="doccomment">/// than the others.</span>
     <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>) -&gt; <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>() <span class="op">-</span> <span class="ident">other</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>();
         <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">I::Float::epsilon</span>() {
@@ -389,7 +389,7 @@
     <span class="doccomment">/// Two `OptimizationResult`s are equal if the absolute of the difference between their best</span>
     <span class="doccomment">/// cost values is smaller than epsilon.</span>
     <span class="doccomment">/// Else, an `OptimizationResult` is better if the best cost function value is strictly better</span>
-    <span class="doccomment">/// than the other&#39;s.</span>
+    <span class="doccomment">/// than the others.</span>
     <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }

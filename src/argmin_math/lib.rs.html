@@ -435,12 +435,12 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! It is not possible to activate two versions of the same backend.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The features labelled `*latest*` are an alias for the most recent supported version of the</span>
+<span class="doccomment">//! The features labeled `*latest*` are an alias for the most recent supported version of the</span>
 <span class="doccomment">//! respective backend. It is however recommended to explicitly specify the desired version instead</span>
 <span class="doccomment">//! of using any of the `*latest*` features (see section about semantic versioning below).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Note that `argmin` by default compiles with `serde` support. Therefore, unless `serde` is</span>
-<span class="doccomment">//! deliberately turned off in `argmin`, it is necessary to activiate the `serde` support in</span>
+<span class="doccomment">//! deliberately turned off in `argmin`, it is necessary to activate the `serde` support in</span>
 <span class="doccomment">//! `argmin-math` as well.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The default features `primitives` and `vec` can be turned off in order to only compile the</span>
@@ -483,7 +483,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Contributing</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! You found a bug? Your favourite backend is not supported? Feel free to open an issue or ideally</span>
+<span class="doccomment">//! You found a bug? Your favorite backend is not supported? Feel free to open an issue or ideally</span>
 <span class="doccomment">//! submit a PR.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # License</span>
@@ -660,7 +660,7 @@
     <span class="kw">fn</span> <span class="ident">l2_norm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">U</span>;
 }
 
-<span class="comment">// Suboptimal: self is moved. ndarray however offers array views...</span>
+<span class="comment">// Sub-optimal: self is moved. ndarray however offers array views...</span>
 <span class="doccomment">/// Return the transpose (`U`) of `self`</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminTranspose</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Transpose</span>

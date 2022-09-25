@@ -55,7 +55,7 @@ The parameter <code>mode</code> defines the conditions under which the observer 
     <span class="comment">// Add checkpointing</span>
     .<span class="ident">checkpointing</span>(<span class="ident">checkpoint</span>);</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.ctrlc" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/argmin/core/executor.rs.html#367-370">source</a></span><h4 class="code-header">pub fn <a href="#method.ctrlc" class="fnname">ctrlc</a>(self, ctrlc: <a class="primitive" href="https://doc.rust-lang.org/1.64.0/std/primitive.bool.html">bool</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Enables or disables CTRL-C handling (default: enabled). The CTRL-C handling gracefully
-stops the solver if it is cancelled via CTRL-C (SIGINT). Requires the optional <code>ctrlc</code>
+stops the solver if it is canceled via CTRL-C (SIGINT). Requires the optional <code>ctrlc</code>
 feature to be set.</p>
 <p>Note that this does not work with nested <code>Executor</code>s. If a solver executes another solver
 internally, the inner solver needs to disable CTRL-C handling.</p>

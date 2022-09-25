@@ -8,7 +8,7 @@ to disk and as such requires the parameter vector to be serializable. Hence this
 only available with the <code>serde1</code> feature.</p>
 <p>The observer <a href="slog_logger/struct.SlogLogger.html"><code>SlogLogger</code></a> logs the progress of the
 optimization to screen or to disk. This requires the <code>slog-logger</code> feature. Writing to disk
-in addtion requires the <code>serde1</code> feature.</p>
+in addition requires the <code>serde1</code> feature.</p>
 <p>For each observer it can be defined how often it will observe the progress of the solver. This
 is indicated via the enum <code>ObserverMode</code> which can be either <code>Always</code>, <code>Never</code>, <code>NewBest</code>
 (whenever a new best solution is found) or <code>Every(i)</code> which means every <code>i</code>th iteration.</p>

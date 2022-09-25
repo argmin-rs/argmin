@@ -1104,7 +1104,7 @@
     }
 
     <span class="doccomment">/// Gives access to the stored `problem` via the closure `func` and keeps track of how many</span>
-    <span class="doccomment">/// times the function has been called. The function counts will be passed to observers labelled</span>
+    <span class="doccomment">/// times the function has been called. The function counts will be passed to observers labeled</span>
     <span class="doccomment">/// with `counts_string`. Per convention, `counts_string` is chosen as `&lt;something&gt;_count`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
@@ -1194,7 +1194,7 @@
     <span class="doccomment">/// times the function has been called. In contrast to the `problem` method, this also allows</span>
     <span class="doccomment">/// to pass the number of parameter vectors which will be processed by the underlying problem.</span>
     <span class="doccomment">/// This is used by the `bulk_*` methods, which process multiple parameters at once.</span>
-    <span class="doccomment">/// The function counts will be passed to observers labelled with `counts_string`.</span>
+    <span class="doccomment">/// The function counts will be passed to observers labeled with `counts_string`.</span>
     <span class="doccomment">/// Per convention, `counts_string` is chosen as `&lt;something&gt;_count`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bulk_problem</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">O</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
@@ -1428,7 +1428,7 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CostFunction</span> {
     <span class="doccomment">/// Type of the parameter vector</span>
     <span class="kw">type</span> <span class="ident">Param</span>;
-    <span class="doccomment">/// Tyope of the return value of the cost function</span>
+    <span class="doccomment">/// Type of the return value of the cost function</span>
     <span class="kw">type</span> <span class="ident">Output</span>;
 
     <span class="doccomment">/// Compute cost function</span>

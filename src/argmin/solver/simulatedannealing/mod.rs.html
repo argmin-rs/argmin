@@ -1019,7 +1019,7 @@
 <span class="doccomment">/// choices please see [`SATempFunc`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Reannealing can be performed if no new best solution was found for `N` iterations</span>
-<span class="doccomment">/// ([`SimulatedAnnealing::with_reannealing_best`]), or if no new accepted soluiton was found for</span>
+<span class="doccomment">/// ([`SimulatedAnnealing::with_reannealing_best`]), or if no new accepted solution was found for</span>
 <span class="doccomment">/// `N` iterations ([`SimulatedAnnealing::with_reannealing_accepted`]) or every `N` iterations</span>
 <span class="doccomment">/// without any other conditions ([`SimulatedAnnealing::with_reannealing_fixed`]).</span>
 <span class="doccomment">///</span>
@@ -1211,7 +1211,7 @@
 
     <span class="doccomment">/// Set number of iterations after which reannealing is performed</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Every `iter` iteraitons, reannealing (resetting temperature to its initial value) will be</span>
+    <span class="doccomment">/// Every `iter` iterations, reannealing (resetting temperature to its initial value) will be</span>
     <span class="doccomment">/// performed. This may help in overcoming local minima.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Defaults to `std::u64::MAX`.</span>
@@ -1380,7 +1380,7 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// Careful: The order in here is *very* important, even if it may not seem so. Everything</span>
         <span class="comment">// is linked to the iteration number, and getting things mixed up may lead to unexpected</span>
-        <span class="comment">// behaviour.</span>
+        <span class="comment">// behavior.</span>
 
         <span class="kw">let</span> <span class="ident">prev_param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
             <span class="ident">PotentialBug</span>,

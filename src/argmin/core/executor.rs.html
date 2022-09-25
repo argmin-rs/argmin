@@ -819,7 +819,7 @@
                 <span class="comment">// Set up the Ctrl-C handler</span>
                 <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">running</span>.<span class="ident">clone</span>();
                 <span class="comment">// This is currently a hack to allow checkpoints to be run again within the</span>
-                <span class="comment">// same program (usually not really a usecase anyway). Unfortunately, this</span>
+                <span class="comment">// same program (usually not really a use case anyway). Unfortunately, this</span>
                 <span class="comment">// means that any subsequent run started afterwards will have not Ctrl-C</span>
                 <span class="comment">// handling available... This should also be a problem in case one tries to run</span>
                 <span class="comment">// two consecutive optimizations. There is ongoing work in the ctrlc crate</span>
@@ -921,7 +921,7 @@
                 <span class="ident">total_time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">total_time</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">time</span>(<span class="prelude-val">Some</span>(<span class="ident">total_time</span>.<span class="ident">elapsed</span>())));
             }
 
-            <span class="comment">// Check if termination occured inside next_iter()</span>
+            <span class="comment">// Check if termination occurred inside next_iter()</span>
             <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">terminated</span>() {
                 <span class="kw">break</span>;
             }
@@ -1010,7 +1010,7 @@
     }
 
     <span class="doccomment">/// Enables or disables CTRL-C handling (default: enabled). The CTRL-C handling gracefully</span>
-    <span class="doccomment">/// stops the solver if it is cancelled via CTRL-C (SIGINT). Requires the optional `ctrlc`</span>
+    <span class="doccomment">/// stops the solver if it is canceled via CTRL-C (SIGINT). Requires the optional `ctrlc`</span>
     <span class="doccomment">/// feature to be set.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that this does not work with nested `Executor`s. If a solver executes another solver</span>

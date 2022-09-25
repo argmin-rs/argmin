@@ -470,7 +470,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The observer [`SlogLogger`](`crate::core::observers::SlogLogger`) logs the progress of the</span>
 <span class="doccomment">//! optimization to screen or to disk. This requires the `slog-logger` feature. Writing to disk</span>
-<span class="doccomment">//! in addtion requires the `serde1` feature.</span>
+<span class="doccomment">//! in addition requires the `serde1` feature.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! For each observer it can be defined how often it will observe the progress of the solver. This</span>
 <span class="doccomment">//! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`</span>
@@ -642,7 +642,7 @@
 
 <span class="doccomment">/// Container for observers.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This tpe also implements [`Observe`] and therefore can be used like a single observer.</span>
+<span class="doccomment">/// This type also implements [`Observe`] and therefore can be used like a single observer.</span>
 <span class="doccomment">/// Each observer has an [`ObserverMode`] attached which indicates when the observer will be</span>
 <span class="doccomment">/// called.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>

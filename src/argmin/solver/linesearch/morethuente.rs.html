@@ -932,7 +932,7 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="comment">// Deactivating this lint here because it would make the boolean expressions more difficult to</span>
+<span class="comment">// Deactivating this lint here because it would make the Boolean expressions more difficult to</span>
 <span class="comment">// read.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::nonminimal_bool</span>)]</span>
 
@@ -1500,7 +1500,7 @@
         <span class="ident">brackt</span> <span class="op">=</span> <span class="bool-val">true</span>;
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">sgnd</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
         <span class="comment">// Second case. A lower function value and derivatives of opposite sign. The minimum is</span>
-        <span class="comment">// bracketed. If the cubic step is closer to stx.x than the quadtratic (secant) step, the</span>
+        <span class="comment">// bracketed. If the cubic step is closer to stx.x than the quadratic (secant) step, the</span>
         <span class="comment">// cubic step is taken, else the quadratic step is taken.</span>
         <span class="ident">info</span> <span class="op">=</span> <span class="number">2</span>;
         <span class="ident">bound</span> <span class="op">=</span> <span class="bool-val">false</span>;
@@ -1533,7 +1533,7 @@
         <span class="comment">// Third case. A lower function value, derivatives of the same sign, and the magnitude of</span>
         <span class="comment">// the derivative decreases. The cubic step is only used if the cubic tends to infinity in</span>
         <span class="comment">// the direction of the step or if the minimum of the cubic is beyond stp.x. Otherwise the</span>
-        <span class="comment">// cubic step is defined to be either stpmin or stpmax. The quadtratic (secant) step is</span>
+        <span class="comment">// cubic step is defined to be either stpmin or stpmax. The quadratic (secant) step is</span>
         <span class="comment">// also computed and if the minimum is bracketed then the step closest to stx.x is taken,</span>
         <span class="comment">// else the step farthest away is taken.</span>
         <span class="ident">info</span> <span class="op">=</span> <span class="number">3</span>;
@@ -1582,7 +1582,7 @@
             <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpq</span>;
         }
     } <span class="kw">else</span> {
-        <span class="comment">// Fourth case. A lower function value, derivatives of the same sign, and the magnitued of</span>
+        <span class="comment">// Fourth case. A lower function value, derivatives of the same sign, and the magnitude of</span>
         <span class="comment">// the derivative does not decrease. If the minimum is not bracketed, the step is either</span>
         <span class="comment">// stpmin or stpmax, else the cubic step is taken.</span>
         <span class="ident">info</span> <span class="op">=</span> <span class="number">4</span>;
