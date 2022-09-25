@@ -166,7 +166,7 @@ impl<O, S, I: State> Ord for OptimizationResult<O, S, I> {
     /// Two `OptimizationResult`s are equal if the absolute of the difference between their best
     /// cost values is smaller than epsilon.
     /// Else, an `OptimizationResult` is better if the best cost function value is strictly better
-    /// than the other's.
+    /// than the others.
     fn cmp(&self, other: &OptimizationResult<O, S, I>) -> Ordering {
         let t = self.state.get_best_cost() - other.state.get_best_cost();
         if t.abs() < I::Float::epsilon() {
@@ -183,7 +183,7 @@ impl<O, S, I: State> PartialOrd for OptimizationResult<O, S, I> {
     /// Two `OptimizationResult`s are equal if the absolute of the difference between their best
     /// cost values is smaller than epsilon.
     /// Else, an `OptimizationResult` is better if the best cost function value is strictly better
-    /// than the other's.
+    /// than the others.
     fn partial_cmp(&self, other: &OptimizationResult<O, S, I>) -> Option<Ordering> {
         Some(self.cmp(other))
     }

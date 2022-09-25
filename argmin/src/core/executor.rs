@@ -151,7 +151,7 @@ where
                 // Set up the Ctrl-C handler
                 let r = running.clone();
                 // This is currently a hack to allow checkpoints to be run again within the
-                // same program (usually not really a usecase anyway). Unfortunately, this
+                // same program (usually not really a use case anyway). Unfortunately, this
                 // means that any subsequent run started afterwards will have not Ctrl-C
                 // handling available... This should also be a problem in case one tries to run
                 // two consecutive optimizations. There is ongoing work in the ctrlc crate
@@ -253,7 +253,7 @@ where
                 total_time.map(|total_time| state.time(Some(total_time.elapsed())));
             }
 
-            // Check if termination occured inside next_iter()
+            // Check if termination occurred inside next_iter()
             if state.terminated() {
                 break;
             }
@@ -342,7 +342,7 @@ where
     }
 
     /// Enables or disables CTRL-C handling (default: enabled). The CTRL-C handling gracefully
-    /// stops the solver if it is cancelled via CTRL-C (SIGINT). Requires the optional `ctrlc`
+    /// stops the solver if it is canceled via CTRL-C (SIGINT). Requires the optional `ctrlc`
     /// feature to be set.
     ///
     /// Note that this does not work with nested `Executor`s. If a solver executes another solver

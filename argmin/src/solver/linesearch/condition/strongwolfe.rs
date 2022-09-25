@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// Assures that a step length satisfies a "sufficient decrease" in cost function value (see
 /// [`ArmijoCondition`](`crate::solver::linesearch::condition::ArmijoCondition`) as well as that
-/// the absolute vlaue of the slope has been reduced sufficiently (thus making it more likely to be
+/// the absolute value of the slope has been reduced sufficiently (thus making it more likely to be
 /// close to a critical point).
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]

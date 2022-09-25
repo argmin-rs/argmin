@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 /// # Dogleg method
 ///
 /// The Dogleg method computes the intersection of the trust region boundary with a path given by
-/// the unconstraind minimum along the steepest descent direction and the optimum of the quadratic
+/// the unconstrained minimum along the steepest descent direction and the optimum of the quadratic
 /// approximation of the cost function at the current point.
 ///
 /// ## Requirements on the optimization problem

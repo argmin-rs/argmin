@@ -128,7 +128,7 @@ impl<F> Default for SATempFunc<F> {
 /// choices please see [`SATempFunc`].
 ///
 /// Reannealing can be performed if no new best solution was found for `N` iterations
-/// ([`SimulatedAnnealing::with_reannealing_best`]), or if no new accepted soluiton was found for
+/// ([`SimulatedAnnealing::with_reannealing_best`]), or if no new accepted solution was found for
 /// `N` iterations ([`SimulatedAnnealing::with_reannealing_accepted`]) or every `N` iterations
 /// without any other conditions ([`SimulatedAnnealing::with_reannealing_fixed`]).
 ///
@@ -320,7 +320,7 @@ where
 
     /// Set number of iterations after which reannealing is performed
     ///
-    /// Every `iter` iteraitons, reannealing (resetting temperature to its initial value) will be
+    /// Every `iter` iterations, reannealing (resetting temperature to its initial value) will be
     /// performed. This may help in overcoming local minima.
     ///
     /// Defaults to `std::u64::MAX`.
@@ -489,7 +489,7 @@ where
     ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up may lead to unexpected
-        // behaviour.
+        // behavior.
 
         let prev_param = state.take_param().ok_or_else(argmin_error_closure!(
             PotentialBug,

@@ -20,7 +20,7 @@ mod errors;
 mod executor;
 /// Trait alias for float types
 mod float;
-/// Key value datastructure
+/// Key value data structure
 mod kv;
 pub mod observers;
 /// Trait alias for `Send` and `Sync`

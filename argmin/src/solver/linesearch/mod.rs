@@ -8,7 +8,7 @@
 //! # Line search methods
 //!
 //! Line searches are given a position in parameter space and a direction. They obtain a step
-//! length in this direction which fulfils a given set of [acceptance conditions](`condition`).
+//! length in this direction which fulfills a given set of [acceptance conditions](`condition`).
 //!
 //! These methods are often an integral part of other methods, such as gradient descent.
 //! Each algorithm which implements the [`LineSearch`] trait can be used in these optimization

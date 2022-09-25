@@ -18,7 +18,7 @@
 //!
 //! The observer [`SlogLogger`](`crate::core::observers::SlogLogger`) logs the progress of the
 //! optimization to screen or to disk. This requires the `slog-logger` feature. Writing to disk
-//! in addtion requires the `serde1` feature.
+//! in addition requires the `serde1` feature.
 //!
 //! For each observer it can be defined how often it will observe the progress of the solver. This
 //! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`
@@ -190,7 +190,7 @@ type ObserversVec<I> = Vec<(Arc<Mutex<dyn Observe<I>>>, ObserverMode)>;
 
 /// Container for observers.
 ///
-/// This tpe also implements [`Observe`] and therefore can be used like a single observer.
+/// This type also implements [`Observe`] and therefore can be used like a single observer.
 /// Each observer has an [`ObserverMode`] attached which indicates when the observer will be
 /// called.
 #[derive(Clone, Default)]

@@ -114,7 +114,7 @@ use std::fmt::Display;
 /// Handles saving of a checkpoint. The methods [`save`](`Checkpoint::save`) (saving the
 /// checkpoint), [`load`](`Checkpoint::load`) (loading a checkpoint) are mandatory to implement.
 /// The method [`save_cond`](`Checkpoint::save_cond`) determines if the conditions for calling
-/// `save` are met, and if yes, calles `save`. [`freqency`](`Checkpoint::frequency`) returns the
+/// `save` are met, and if yes, calls `save`. [`freqency`](`Checkpoint::frequency`) returns the
 /// conditions in form of a [`CheckpointingFrequency`].
 ///
 /// # Example
