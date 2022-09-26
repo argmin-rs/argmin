@@ -12,13 +12,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install Rust
-        run: rustup update stable
+        run: rustup update nightly
 
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
 
       - name: Generate code coverage
-        run: cargo llvm-cov --features "argmin/_full_dev,argmin-math/latest_all" --workspace --lcov --output-path lcov.info
+        run: cargo +nightly llvm-cov --doctests --features "argmin/_full_dev,argmin-math/latest_all" --workspace --lcov --output-path lcov.info
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
