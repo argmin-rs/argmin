@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{DeserializeOwnedAlias, SendAlias, SerializeAlias};
+use crate::core::{kv::KVType, DeserializeOwnedAlias, SendAlias, SerializeAlias};
 use num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 use std::fmt::{Debug, Display};
 
@@ -24,6 +24,7 @@ pub trait ArgminFloat:
     + SerializeAlias
     + DeserializeOwnedAlias
     + SendAlias
+    + Into<KVType>
 {
 }
 
@@ -39,5 +40,6 @@ impl<I> ArgminFloat for I where
         + SerializeAlias
         + DeserializeOwnedAlias
         + SendAlias
+        + Into<KVType>
 {
 }
