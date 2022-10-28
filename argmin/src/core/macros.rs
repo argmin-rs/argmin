@@ -30,7 +30,7 @@
 #[macro_export]
 macro_rules! make_kv {
     ($($k:expr =>  $v:expr;)*) => {
-        $crate::core::KV { kv: vec![ $(($k, std::rc::Rc::new($v))),* ] }
+        $crate::core::KV { kv: vec![ $(($k, $v.into())),* ] }
     };
 }
 

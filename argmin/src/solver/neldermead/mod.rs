@@ -409,7 +409,7 @@ where
 
         Ok((
             state.param(self.params[0].0.clone()).cost(self.params[0].1),
-            Some(make_kv!("action" => action;)),
+            Some(make_kv!("action" => format!("{}", action);)),
         ))
     }
 

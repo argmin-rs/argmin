@@ -7,11 +7,125 @@
 
 use std::fmt;
 use std::fmt::{Debug, Display};
-use std::rc::Rc;
+
+/// Types available for use in [`KV`](KV).
+///
+/// `Float`, `Int` and `UnsignedInt` are all 64bit. The corresponding 32bit variants must be
+/// be converted to 64 bit. Preferably the `From` impls are used to create a `KVType`:
+///
+/// ```
+/// # use argmin::core::KVType;
+/// let x: KVType = 1u64.into();
+/// assert_eq!(x, KVType::UnsignedInt(1u64));
+///
+/// let x: KVType = 2u32.into();
+/// assert_eq!(x, KVType::UnsignedInt(2u64));
+///
+/// let x: KVType = 2i64.into();
+/// assert_eq!(x, KVType::Int(2i64));
+///
+/// let x: KVType = 2i32.into();
+/// assert_eq!(x, KVType::Int(2i64));
+///
+/// let x: KVType = 1.0f64.into();
+/// assert_eq!(x, KVType::Float(1f64));
+///
+/// let x: KVType = 1.0f32.into();
+/// assert_eq!(x, KVType::Float(1f64));
+///
+/// let x: KVType = true.into();
+/// assert_eq!(x, KVType::Bool(true));
+///
+/// let x: KVType = "a str".into();
+/// assert_eq!(x, KVType::Str("a str".to_string()));
+///
+/// let x: KVType = "a String".to_string().into();
+/// assert_eq!(x, KVType::Str("a String".to_string()));
+/// ```
+#[derive(Clone, PartialEq, Debug)]
+pub enum KVType {
+    /// Floating point values
+    Float(f64),
+    /// Signed integers
+    Int(i64),
+    /// Unsigned integers
+    UnsignedInt(u64),
+    /// Boolean values
+    Bool(bool),
+    /// Strings
+    Str(String),
+}
+
+impl From<f64> for KVType {
+    fn from(x: f64) -> KVType {
+        KVType::Float(x)
+    }
+}
+
+impl From<f32> for KVType {
+    fn from(x: f32) -> KVType {
+        KVType::Float(f64::from(x))
+    }
+}
+
+impl From<i64> for KVType {
+    fn from(x: i64) -> KVType {
+        KVType::Int(x)
+    }
+}
+
+impl From<u64> for KVType {
+    fn from(x: u64) -> KVType {
+        KVType::UnsignedInt(x)
+    }
+}
+
+impl From<i32> for KVType {
+    fn from(x: i32) -> KVType {
+        KVType::Int(i64::from(x))
+    }
+}
+
+impl From<u32> for KVType {
+    fn from(x: u32) -> KVType {
+        KVType::UnsignedInt(u64::from(x))
+    }
+}
+
+impl From<bool> for KVType {
+    fn from(x: bool) -> KVType {
+        KVType::Bool(x)
+    }
+}
+
+impl From<String> for KVType {
+    fn from(x: String) -> KVType {
+        KVType::Str(x)
+    }
+}
+
+impl<'a> From<&'a str> for KVType {
+    fn from(x: &'a str) -> KVType {
+        KVType::Str(x.to_string())
+    }
+}
+
+impl Display for KVType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            KVType::Float(x) => write!(f, "{}", x)?,
+            KVType::Int(x) => write!(f, "{}", x)?,
+            KVType::UnsignedInt(x) => write!(f, "{}", x)?,
+            KVType::Bool(x) => write!(f, "{}", x)?,
+            KVType::Str(x) => write!(f, "{}", x)?,
+        };
+        Ok(())
+    }
+}
 
 /// A simple key-value storage
 ///
-/// Keeps pairs of `(&'static str, Rc<dyn Display>)` and is used to pass key-value pairs to
+/// Keeps pairs of `(&'static str, KVType)` and is used to pass key-value pairs to
 /// [`Observers`](`crate::core::observers`) in each iteration of an optimization algorithm.
 /// Typically constructed using the [`make_kv!`](`crate::make_kv`) macro.
 ///
@@ -36,7 +150,7 @@ use std::rc::Rc;
 #[derive(Clone, Default)]
 pub struct KV {
     /// The actual key value storage
-    pub kv: Vec<(&'static str, Rc<dyn Display>)>,
+    pub kv: Vec<(&'static str, KVType)>,
 }
 
 impl Debug for KV {
@@ -75,19 +189,18 @@ impl KV {
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KV;
-    /// # use std::rc::Rc;
+    /// # use argmin::core::{KV, KVType};
     ///
     /// let mut kv = KV::new();
-    /// kv.push("key", Rc::new("value"));
-    /// kv.push("key", Rc::new(1234));
+    /// kv.push("key", KVType::Str("value".to_string()));
+    /// kv.push("key", KVType::Int(1234));
     /// # assert_eq!(kv.kv.len(), 2);
     /// # assert_eq!(kv.kv[0].0, "key");
     /// # assert_eq!(format!("{}", kv.kv[0].1), "value");
     /// # assert_eq!(kv.kv[1].0, "key");
     /// # assert_eq!(format!("{}", kv.kv[1].1), "1234");
     /// ```
-    pub fn push(&mut self, key: &'static str, val: Rc<dyn Display>) -> &mut Self {
+    pub fn push(&mut self, key: &'static str, val: KVType) -> &mut Self {
         self.kv.push((key, val));
         self
     }
@@ -97,17 +210,16 @@ impl KV {
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KV;
-    /// # use std::rc::Rc;
+    /// # use argmin::core::{KV, KVType};
     ///
     /// let mut kv1 = KV::new();
-    /// kv1.push("key1", Rc::new("value1"));
+    /// kv1.push("key1", KVType::Str("value1".to_string()));
     /// # assert_eq!(kv1.kv.len(), 1);
     /// # assert_eq!(kv1.kv[0].0, "key1");
     /// # assert_eq!(format!("{}", kv1.kv[0].1), "value1");
     ///
     /// let mut kv2 = KV::new();
-    /// kv2.push("key2", Rc::new("value2"));
+    /// kv2.push("key2", KVType::Str("value2".to_string()));
     /// # assert_eq!(kv2.kv.len(), 1);
     /// # assert_eq!(kv2.kv[0].0, "key2");
     /// # assert_eq!(format!("{}", kv2.kv[0].1), "value2");
@@ -126,8 +238,8 @@ impl KV {
     }
 }
 
-impl std::iter::FromIterator<(&'static str, Rc<dyn Display>)> for KV {
-    fn from_iter<I: IntoIterator<Item = (&'static str, Rc<dyn Display>)>>(iter: I) -> Self {
+impl std::iter::FromIterator<(&'static str, KVType)> for KV {
+    fn from_iter<I: IntoIterator<Item = (&'static str, KVType)>>(iter: I) -> Self {
         let mut c = KV::new();
         for i in iter {
             c.push(i.0, i.1);
@@ -136,8 +248,8 @@ impl std::iter::FromIterator<(&'static str, Rc<dyn Display>)> for KV {
     }
 }
 
-impl std::iter::Extend<(&'static str, Rc<dyn Display>)> for KV {
-    fn extend<I: IntoIterator<Item = (&'static str, Rc<dyn Display>)>>(&mut self, iter: I) {
+impl std::iter::Extend<(&'static str, KVType)> for KV {
+    fn extend<I: IntoIterator<Item = (&'static str, KVType)>>(&mut self, iter: I) {
         for i in iter {
             self.push(i.0, i.1);
         }
