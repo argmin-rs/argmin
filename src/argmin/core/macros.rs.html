@@ -210,9 +210,6 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -227,25 +224,22 @@
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::make_kv;</span>
+<span class="doccomment">/// use argmin::kv;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let kv = make_kv!(</span>
+<span class="doccomment">/// let kv = kv!(</span>
 <span class="doccomment">///     &quot;key1&quot; =&gt; &quot;value1&quot;;</span>
 <span class="doccomment">///     &quot;key2&quot; =&gt; &quot;value2&quot;;</span>
 <span class="doccomment">///     &quot;key3&quot; =&gt; 1234;</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// # assert_eq!(kv.kv.len(), 3);</span>
-<span class="doccomment">/// # assert_eq!(kv.kv[0].0, &quot;key1&quot;);</span>
-<span class="doccomment">/// # assert_eq!(format!(&quot;{}&quot;, kv.kv[0].1), &quot;value1&quot;);</span>
-<span class="doccomment">/// # assert_eq!(kv.kv[1].0, &quot;key2&quot;);</span>
-<span class="doccomment">/// # assert_eq!(format!(&quot;{}&quot;, kv.kv[1].1), &quot;value2&quot;);</span>
-<span class="doccomment">/// # assert_eq!(kv.kv[2].0, &quot;key3&quot;);</span>
-<span class="doccomment">/// # assert_eq!(format!(&quot;{}&quot;, kv.kv[2].1), &quot;1234&quot;);</span>
+<span class="doccomment">/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key1&quot;).unwrap()), &quot;value1&quot;);</span>
+<span class="doccomment">/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key2&quot;).unwrap()), &quot;value2&quot;);</span>
+<span class="doccomment">/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key3&quot;).unwrap()), &quot;1234&quot;);</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">make_kv</span> {
+<span class="macro">macro_rules!</span> <span class="ident">kv</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>:<span class="ident">expr</span> =&gt;  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>:<span class="ident">expr</span>;)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::core::KV</span> { <span class="ident">kv</span>: <span class="macro">vec!</span>[ $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>, <span class="ident">std::rc::Rc::new</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>))),<span class="op">*</span> ] }
+        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::core::KV</span> { <span class="ident">kv</span>: <span class="ident">std::collections::HashMap::from</span>([ $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>.<span class="ident">into</span>())),<span class="op">*</span> ]) }
     };
 }
 

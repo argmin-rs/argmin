@@ -881,14 +881,6 @@
 <span id="881">881</span>
 <span id="882">882</span>
 <span id="883">883</span>
-<span id="884">884</span>
-<span id="885">885</span>
-<span id="886">886</span>
-<span id="887">887</span>
-<span id="888">888</span>
-<span id="889">889</span>
-<span id="890">890</span>
-<span id="891">891</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -1361,7 +1353,7 @@
 
         <span class="prelude-val">Ok</span>((
             <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">cost</span>(<span class="ident">cost</span>),
-            <span class="prelude-val">Some</span>(<span class="macro">make_kv!</span>(
+            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(
                 <span class="string">&quot;initial_temperature&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">init_temp</span>;
                 <span class="string">&quot;stall_iter_accepted_limit&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">stall_iter_accepted_limit</span>;
                 <span class="string">&quot;stall_iter_best_limit&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">stall_iter_best_limit</span>;
@@ -1432,7 +1424,7 @@
             } <span class="kw">else</span> {
                 <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">prev_param</span>).<span class="ident">cost</span>(<span class="ident">prev_cost</span>)
             },
-            <span class="prelude-val">Some</span>(<span class="macro">make_kv!</span>(
+            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(
                 <span class="string">&quot;t&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">cur_temp</span>;
                 <span class="string">&quot;new_be&quot;</span> =&gt; <span class="ident">new_best_found</span>;
                 <span class="string">&quot;acc&quot;</span> =&gt; <span class="ident">accepted</span>;
@@ -1752,7 +1744,7 @@
         <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">sa</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">kv_expected</span> <span class="op">=</span> <span class="macro">make_kv!</span>(
+        <span class="kw">let</span> <span class="ident">kv_expected</span> <span class="op">=</span> <span class="macro">kv!</span>(
             <span class="string">&quot;initial_temperature&quot;</span> =&gt; <span class="number">100.0f64</span>;
             <span class="string">&quot;stall_iter_accepted_limit&quot;</span> =&gt; <span class="ident">stall_iter_accepted_limit</span>;
             <span class="string">&quot;stall_iter_best_limit&quot;</span> =&gt; <span class="ident">stall_iter_best_limit</span>;
@@ -1761,15 +1753,7 @@
             <span class="string">&quot;reanneal_best&quot;</span> =&gt; <span class="ident">reanneal_best</span>;
         );
 
-        <span class="ident">kv</span>.<span class="ident">unwrap</span>()
-            .<span class="ident">kv</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">zip</span>(<span class="ident">kv_expected</span>.<span class="ident">kv</span>.<span class="ident">iter</span>())
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">kv1</span>, <span class="ident">kv2</span>)<span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">kv1</span>.<span class="number">0</span>, <span class="ident">kv2</span>.<span class="number">0</span>);
-                <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">kv1</span>.<span class="number">1</span>), <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">kv2</span>.<span class="number">1</span>));
-            })
-            .<span class="ident">count</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">kv</span>.<span class="ident">unwrap</span>(), <span class="ident">kv_expected</span>);
 
         <span class="kw">let</span> <span class="ident">s_param</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
 

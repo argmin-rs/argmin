@@ -41,6 +41,8 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -48,7 +50,7 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">DeserializeOwnedAlias</span>, <span class="ident">SendAlias</span>, <span class="ident">SerializeAlias</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">kv::KVType</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">SendAlias</span>, <span class="ident">SerializeAlias</span>};
 <span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">Float</span>, <span class="ident">FloatConst</span>, <span class="ident">FromPrimitive</span>, <span class="ident">ToPrimitive</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>};
 
@@ -67,6 +69,7 @@
     <span class="op">+</span> <span class="ident">SerializeAlias</span>
     <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
     <span class="op">+</span> <span class="ident">SendAlias</span>
+    <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">KVType</span><span class="op">&gt;</span>
 {
 }
 
@@ -82,6 +85,7 @@
         <span class="op">+</span> <span class="ident">SerializeAlias</span>
         <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
         <span class="op">+</span> <span class="ident">SendAlias</span>
+        <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">KVType</span><span class="op">&gt;</span>
 {
 }
 </code></pre></div>

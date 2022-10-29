@@ -842,7 +842,7 @@
             <span class="ident">state</span>.<span class="ident">update</span>();
 
             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">logs</span> <span class="op">=</span> <span class="macro">make_kv!</span>(<span class="string">&quot;max_iters&quot;</span> =&gt; <span class="ident">state</span>.<span class="ident">get_max_iters</span>(););
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">logs</span> <span class="op">=</span> <span class="macro">kv!</span>(<span class="string">&quot;max_iters&quot;</span> =&gt; <span class="ident">state</span>.<span class="ident">get_max_iters</span>(););
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">kv</span>) <span class="op">=</span> <span class="ident">kv</span> {
                     <span class="ident">logs</span> <span class="op">=</span> <span class="ident">logs</span>.<span class="ident">merge</span>(<span class="ident">kv</span>);
@@ -902,7 +902,7 @@
 
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">timer</span> {
                     <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">duration</span>.<span class="ident">unwrap</span>();
-                    <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="macro">make_kv!</span>(
+                    <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="macro">kv!</span>(
                         <span class="string">&quot;time&quot;</span> =&gt; <span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">f64::from</span>(<span class="ident">duration</span>.<span class="ident">subsec_nanos</span>()) <span class="op">*</span> <span class="number">1e-9</span>;
                     );
                     <span class="ident">log</span> <span class="op">=</span> <span class="ident">log</span>.<span class="ident">merge</span>(<span class="ident">tmp</span>);

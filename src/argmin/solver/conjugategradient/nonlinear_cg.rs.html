@@ -489,9 +489,6 @@
 <span id="489">489</span>
 <span id="490">490</span>
 <span id="491">491</span>
-<span id="492">492</span>
-<span id="493">493</span>
-<span id="494">494</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -718,7 +715,7 @@
 
         <span class="prelude-val">Ok</span>((
             <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">xk1</span>).<span class="ident">cost</span>(<span class="ident">cost</span>).<span class="ident">gradient</span>(<span class="ident">new_grad</span>),
-            <span class="prelude-val">Some</span>(<span class="macro">make_kv!</span>(<span class="string">&quot;beta&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">beta</span>;
+            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">&quot;beta&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">beta</span>;
              <span class="string">&quot;restart_iter&quot;</span> =&gt; <span class="ident">restart_iter</span>;
              <span class="string">&quot;restart_orthogonality&quot;</span> =&gt; <span class="ident">restart_orthogonality</span>;
             )),
@@ -946,11 +943,8 @@
         <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">nlcg</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
         <span class="ident">state</span>.<span class="ident">update</span>();
-        <span class="kw">let</span> <span class="ident">kv2</span> <span class="op">=</span> <span class="macro">make_kv!</span>(<span class="string">&quot;beta&quot;</span> =&gt; <span class="number">0</span>; <span class="string">&quot;restart_iter&quot;</span> =&gt; <span class="bool-val">false</span>; <span class="string">&quot;restart_orthogonality&quot;</span> =&gt; <span class="bool-val">false</span>;);
-        <span class="kw">for</span> ((<span class="ident">k1</span>, <span class="ident">v1</span>), (<span class="ident">k2</span>, <span class="ident">v2</span>)) <span class="kw">in</span> <span class="ident">kv</span>.<span class="ident">unwrap</span>().<span class="ident">kv</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">kv2</span>.<span class="ident">kv</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">k1</span>, <span class="ident">k2</span>);
-            <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v1</span>), <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v2</span>));
-        }
+        <span class="kw">let</span> <span class="ident">kv2</span> <span class="op">=</span> <span class="macro">kv!</span>(<span class="string">&quot;beta&quot;</span> =&gt; <span class="number">0.0</span>; <span class="string">&quot;restart_iter&quot;</span> =&gt; <span class="bool-val">false</span>; <span class="string">&quot;restart_orthogonality&quot;</span> =&gt; <span class="bool-val">false</span>;);
+        <span class="macro">assert_eq!</span>(<span class="ident">kv</span>.<span class="ident">unwrap</span>(), <span class="ident">kv2</span>);
         <span class="macro">assert_relative_eq!</span>(
             <span class="ident">state</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">0</span>],
             <span class="number">1.0f64</span>,
