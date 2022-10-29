@@ -5,6 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::collections::HashMap;
 use std::fmt;
 use std::fmt::{Debug, Display};
 
@@ -252,17 +253,14 @@ impl Display for KVType {
 ///     "key3" => 1234;
 /// );
 /// # assert_eq!(kv.kv.len(), 3);
-/// # assert_eq!(kv.kv[0].0, "key1");
-/// # assert_eq!(format!("{}", kv.kv[0].1), "value1");
-/// # assert_eq!(kv.kv[1].0, "key2");
-/// # assert_eq!(format!("{}", kv.kv[1].1), "value2");
-/// # assert_eq!(kv.kv[2].0, "key3");
-/// # assert_eq!(format!("{}", kv.kv[2].1), "1234");
+/// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value1");
+/// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "value2");
+/// # assert_eq!(format!("{}", kv.get("key3").unwrap()), "1234");
 /// ```
-#[derive(Clone, Default)]
+#[derive(Clone, Default, PartialEq)]
 pub struct KV {
     /// The actual key value storage
-    pub kv: Vec<(&'static str, KVType)>,
+    pub kv: HashMap<&'static str, KVType>,
 }
 
 impl Debug for KV {
@@ -293,28 +291,43 @@ impl KV {
     /// # assert_eq!(kv.kv.len(), 0);
     /// ```
     pub fn new() -> Self {
-        KV { kv: vec![] }
+        KV { kv: HashMap::new() }
     }
 
-    /// Push a key-value pair
+    /// Insert a key-value pair
     ///
     /// # Example
     ///
     /// ```
     /// # use argmin::core::{KV, KVType};
-    ///
     /// let mut kv = KV::new();
-    /// kv.push("key", KVType::Str("value".to_string()));
-    /// kv.push("key", KVType::Int(1234));
+    /// kv.insert("key1", KVType::Str("value".to_string()));
+    /// kv.insert("key2", KVType::Int(1234));
     /// # assert_eq!(kv.kv.len(), 2);
-    /// # assert_eq!(kv.kv[0].0, "key");
-    /// # assert_eq!(format!("{}", kv.kv[0].1), "value");
-    /// # assert_eq!(kv.kv[1].0, "key");
-    /// # assert_eq!(format!("{}", kv.kv[1].1), "1234");
+    /// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value");
+    /// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "1234");
     /// ```
-    pub fn push(&mut self, key: &'static str, val: KVType) -> &mut Self {
-        self.kv.push((key, val));
+    pub fn insert(&mut self, key: &'static str, val: KVType) -> &mut Self {
+        self.kv.insert(key, val);
         self
+    }
+
+    /// Retrieve an element from the KV by key
+    ///
+    /// Returns `Some(<reference to KVType>)` if `key` is present and `None` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{KV, KVType};
+    /// let mut kv1 = KV::new();
+    /// kv1.insert("key1", KVType::Float(12.0));
+    ///
+    /// assert_eq!(kv1.get("key1"), Some(&KVType::Float(12.0)));
+    /// assert_eq!(kv1.get("non_existing"), None);
+    /// ```
+    pub fn get(&self, key: &'static str) -> Option<&KVType> {
+        self.kv.get(key)
     }
 
     /// Merge with another `KV`
@@ -323,29 +336,24 @@ impl KV {
     ///
     /// ```
     /// # use argmin::core::{KV, KVType};
-    ///
     /// let mut kv1 = KV::new();
-    /// kv1.push("key1", KVType::Str("value1".to_string()));
+    /// kv1.insert("key1", KVType::Str("value1".to_string()));
     /// # assert_eq!(kv1.kv.len(), 1);
-    /// # assert_eq!(kv1.kv[0].0, "key1");
-    /// # assert_eq!(format!("{}", kv1.kv[0].1), "value1");
+    /// # assert_eq!(format!("{}", kv1.get("key1").unwrap()), "value1");
     ///
     /// let mut kv2 = KV::new();
-    /// kv2.push("key2", KVType::Str("value2".to_string()));
+    /// kv2.insert("key2", KVType::Str("value2".to_string()));
     /// # assert_eq!(kv2.kv.len(), 1);
-    /// # assert_eq!(kv2.kv[0].0, "key2");
-    /// # assert_eq!(format!("{}", kv2.kv[0].1), "value2");
+    /// # assert_eq!(format!("{}", kv2.get("key2").unwrap()), "value2");
     ///
     /// let kv1 = kv1.merge(kv2);
     /// # assert_eq!(kv1.kv.len(), 2);
-    /// # assert_eq!(kv1.kv[0].0, "key1");
-    /// # assert_eq!(format!("{}", kv1.kv[0].1), "value1");
-    /// # assert_eq!(kv1.kv[1].0, "key2");
-    /// # assert_eq!(format!("{}", kv1.kv[1].1), "value2");
+    /// # assert_eq!(format!("{}", kv1.get("key1").unwrap()), "value1");
+    /// # assert_eq!(format!("{}", kv1.get("key2").unwrap()), "value2");
     /// ```
     #[must_use]
-    pub fn merge(mut self, mut other: KV) -> Self {
-        self.kv.append(&mut other.kv);
+    pub fn merge(mut self, other: KV) -> Self {
+        self.kv.extend(other.kv);
         self
     }
 }
@@ -354,7 +362,7 @@ impl std::iter::FromIterator<(&'static str, KVType)> for KV {
     fn from_iter<I: IntoIterator<Item = (&'static str, KVType)>>(iter: I) -> Self {
         let mut c = KV::new();
         for i in iter {
-            c.push(i.0, i.1);
+            c.insert(i.0, i.1);
         }
         c
     }
@@ -363,7 +371,7 @@ impl std::iter::FromIterator<(&'static str, KVType)> for KV {
 impl std::iter::Extend<(&'static str, KVType)> for KV {
     fn extend<I: IntoIterator<Item = (&'static str, KVType)>>(&mut self, iter: I) {
         for i in iter {
-            self.push(i.0, i.1);
+            self.insert(i.0, i.1);
         }
     }
 }

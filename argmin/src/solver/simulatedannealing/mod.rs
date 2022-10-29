@@ -870,15 +870,16 @@ mod tests {
             "reanneal_best" => reanneal_best;
         );
 
-        kv.unwrap()
-            .kv
-            .iter()
-            .zip(kv_expected.kv.iter())
-            .map(|(kv1, kv2)| {
-                assert_eq!(kv1.0, kv2.0);
-                assert_eq!(format!("{}", kv1.1), format!("{}", kv2.1));
-            })
-            .count();
+        assert_eq!(kv.unwrap(), kv_expected);
+        // kv.unwrap()
+        //     .kv
+        //     .iter()
+        //     .zip(kv_expected.kv.iter())
+        //     .map(|(kv1, kv2)| {
+        //         assert_eq!(kv1.0, kv2.0);
+        //         assert_eq!(format!("{}", kv1.1), format!("{}", kv2.1));
+        //     })
+        //     .count();
 
         let s_param = state_out.take_param().unwrap();
 
