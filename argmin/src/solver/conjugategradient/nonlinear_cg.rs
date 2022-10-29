@@ -224,7 +224,7 @@ where
 
         Ok((
             state.param(xk1).cost(cost).gradient(new_grad),
-            Some(make_kv!("beta" => self.beta;
+            Some(kv!("beta" => self.beta;
              "restart_iter" => restart_iter;
              "restart_orthogonality" => restart_orthogonality;
             )),
@@ -452,8 +452,7 @@ mod tests {
         assert!(kv.is_none());
         let (mut state, kv) = nlcg.next_iter(&mut problem, state).unwrap();
         state.update();
-        let kv2 =
-            make_kv!("beta" => 0.0; "restart_iter" => false; "restart_orthogonality" => false;);
+        let kv2 = kv!("beta" => 0.0; "restart_iter" => false; "restart_orthogonality" => false;);
         assert_eq!(kv.unwrap(), kv2);
         assert_relative_eq!(
             state.param.as_ref().unwrap()[0],

@@ -286,7 +286,7 @@ where
                 .cost(next_cost)
                 .gradient(grad)
                 .inv_hessian(inv_hessian),
-            Some(make_kv!["denominator" => b; "hessian_update" => hessian_update;]),
+            Some(kv!["denominator" => b; "hessian_update" => hessian_update;]),
         ))
     }
 

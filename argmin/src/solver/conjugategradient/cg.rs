@@ -158,7 +158,7 @@ where
 
         Ok((
             state.param(new_param).cost(norm),
-            Some(make_kv!("alpha" => alpha; "beta" => beta;)),
+            Some(kv!("alpha" => alpha; "beta" => beta;)),
         ))
     }
 }

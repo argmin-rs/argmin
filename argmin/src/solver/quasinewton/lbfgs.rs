@@ -487,7 +487,7 @@ where
 
         Ok((
             state.param(xk1).cost(next_cost).gradient(grad),
-            Some(make_kv!("gamma" => gamma;)),
+            Some(kv!("gamma" => gamma;)),
         ))
     }
 

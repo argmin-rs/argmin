@@ -296,7 +296,7 @@ where
                     .gradient(grad)
                     .hessian(hessian)
             },
-            Some(make_kv!("radius" => cur_radius;)),
+            Some(kv!("radius" => cur_radius;)),
         ))
     }
 
