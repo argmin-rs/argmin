@@ -10,16 +10,16 @@ use std::fmt::{Debug, Display};
 
 /// Types available for use in [`KV`](KV).
 ///
-/// `Float`, `Int` and `UnsignedInt` are all 64bit. The corresponding 32bit variants must be
+/// `Float`, `Int` and `Uint` are all 64bit. The corresponding 32bit variants must be
 /// be converted to 64 bit. Preferably the `From` impls are used to create a `KVType`:
 ///
 /// ```
 /// # use argmin::core::KVType;
 /// let x: KVType = 1u64.into();
-/// assert_eq!(x, KVType::UnsignedInt(1u64));
+/// assert_eq!(x, KVType::Uint(1u64));
 ///
 /// let x: KVType = 2u32.into();
-/// assert_eq!(x, KVType::UnsignedInt(2u64));
+/// assert_eq!(x, KVType::Uint(2u64));
 ///
 /// let x: KVType = 2i64.into();
 /// assert_eq!(x, KVType::Int(2i64));
@@ -49,11 +49,123 @@ pub enum KVType {
     /// Signed integers
     Int(i64),
     /// Unsigned integers
-    UnsignedInt(u64),
+    Uint(u64),
     /// Boolean values
     Bool(bool),
     /// Strings
     Str(String),
+}
+
+impl KVType {
+    /// Extract float from `KVType`
+    ///
+    /// Returns `Some(<float>)` if `KVType` is of kind `Float` and `None` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::KVType;
+    /// assert_eq!(KVType::Float(1.0).get_float(), Some(1.0));
+    /// assert_eq!(KVType::Int(1).get_float(), None);
+    /// assert_eq!(KVType::Uint(1).get_float(), None);
+    /// assert_eq!(KVType::Bool(true).get_float(), None);
+    /// assert_eq!(KVType::Str("not a float".to_string()).get_float(), None);
+    /// ```
+    pub fn get_float(&self) -> Option<f64> {
+        if let KVType::Float(x) = *self {
+            Some(x)
+        } else {
+            None
+        }
+    }
+
+    /// Extract int from `KVType`
+    ///
+    /// Returns `Some(<int>)` if `KVType` is of kind `Int` and `None` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::KVType;
+    /// assert_eq!(KVType::Int(1).get_int(), Some(1i64));
+    /// assert_eq!(KVType::Float(1.0).get_int(), None);
+    /// assert_eq!(KVType::Uint(1).get_int(), None);
+    /// assert_eq!(KVType::Bool(true).get_int(), None);
+    /// assert_eq!(KVType::Str("not an int".to_string()).get_int(), None);
+    /// ```
+    pub fn get_int(&self) -> Option<i64> {
+        if let KVType::Int(x) = *self {
+            Some(x)
+        } else {
+            None
+        }
+    }
+
+    /// Extract unsigned int from `KVType`
+    ///
+    /// Returns `Some(<unsigned int>)` if `KVType` is of kind `Uint` and `None` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::KVType;
+    /// assert_eq!(KVType::Uint(1).get_uint(), Some(1u64));
+    /// assert_eq!(KVType::Int(1).get_uint(), None);
+    /// assert_eq!(KVType::Float(1.0).get_uint(), None);
+    /// assert_eq!(KVType::Bool(true).get_uint(), None);
+    /// assert_eq!(KVType::Str("not an uint".to_string()).get_uint(), None);
+    /// ```
+    pub fn get_uint(&self) -> Option<u64> {
+        if let KVType::Uint(x) = *self {
+            Some(x)
+        } else {
+            None
+        }
+    }
+
+    /// Extract bool from `KVType`
+    ///
+    /// Returns `Some(<bool>)` if `KVType` is of kind `Bool` and `None` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::KVType;
+    /// assert_eq!(KVType::Bool(true).get_bool(), Some(true));
+    /// assert_eq!(KVType::Float(1.0).get_bool(), None);
+    /// assert_eq!(KVType::Int(1).get_bool(), None);
+    /// assert_eq!(KVType::Uint(1).get_bool(), None);
+    /// assert_eq!(KVType::Str("not a bool".to_string()).get_bool(), None);
+    /// ```
+    pub fn get_bool(&self) -> Option<bool> {
+        if let KVType::Bool(x) = *self {
+            Some(x)
+        } else {
+            None
+        }
+    }
+
+    /// Extract String from `KVType`
+    ///
+    /// Returns `Some(<string>)` if `KVType` is of kind `Str` and `None` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::KVType;
+    /// assert_eq!(KVType::Str("a string".to_string()).get_string(), Some("a string".to_string()));
+    /// assert_eq!(KVType::Float(1.0).get_string(), None);
+    /// assert_eq!(KVType::Int(1).get_string(), None);
+    /// assert_eq!(KVType::Uint(1).get_string(), None);
+    /// assert_eq!(KVType::Bool(true).get_string(), None);
+    /// ```
+    pub fn get_string(&self) -> Option<String> {
+        if let KVType::Str(x) = self {
+            Some(x.clone())
+        } else {
+            None
+        }
+    }
 }
 
 impl From<f64> for KVType {
@@ -76,7 +188,7 @@ impl From<i64> for KVType {
 
 impl From<u64> for KVType {
     fn from(x: u64) -> KVType {
-        KVType::UnsignedInt(x)
+        KVType::Uint(x)
     }
 }
 
@@ -88,7 +200,7 @@ impl From<i32> for KVType {
 
 impl From<u32> for KVType {
     fn from(x: u32) -> KVType {
-        KVType::UnsignedInt(u64::from(x))
+        KVType::Uint(u64::from(x))
     }
 }
 
@@ -115,7 +227,7 @@ impl Display for KVType {
         match self {
             KVType::Float(x) => write!(f, "{}", x)?,
             KVType::Int(x) => write!(f, "{}", x)?,
-            KVType::UnsignedInt(x) => write!(f, "{}", x)?,
+            KVType::Uint(x) => write!(f, "{}", x)?,
             KVType::Bool(x) => write!(f, "{}", x)?,
             KVType::Str(x) => write!(f, "{}", x)?,
         };
