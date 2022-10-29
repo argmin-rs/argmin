@@ -12,9 +12,9 @@
 /// # Example
 ///
 /// ```
-/// use argmin::make_kv;
+/// use argmin::kv;
 ///
-/// let kv = make_kv!(
+/// let kv = kv!(
 ///     "key1" => "value1";
 ///     "key2" => "value2";
 ///     "key3" => 1234;
@@ -25,7 +25,7 @@
 /// # assert_eq!(format!("{}", kv.get("key3").unwrap()), "1234");
 /// ```
 #[macro_export]
-macro_rules! make_kv {
+macro_rules! kv {
     ($($k:expr =>  $v:expr;)*) => {
         $crate::core::KV { kv: std::collections::HashMap::from([ $(($k, $v.into())),* ]) }
     };

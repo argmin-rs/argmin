@@ -240,14 +240,14 @@ impl Display for KVType {
 ///
 /// Keeps pairs of `(&'static str, KVType)` and is used to pass key-value pairs to
 /// [`Observers`](`crate::core::observers`) in each iteration of an optimization algorithm.
-/// Typically constructed using the [`make_kv!`](`crate::make_kv`) macro.
+/// Typically constructed using the [`kv!`](`crate::kv`) macro.
 ///
 /// # Example
 ///
 /// ```
-/// use argmin::make_kv;
+/// use argmin::kv;
 ///
-/// let kv = make_kv!(
+/// let kv = kv!(
 ///     "key1" => "value1";
 ///     "key2" => "value2";
 ///     "key3" => 1234;

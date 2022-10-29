@@ -388,7 +388,7 @@ mod tests {
             .push(test_obs_3, ObserverMode::Every(3))
             .push(test_obs_4, ObserverMode::NewBest);
 
-        obs.observe_init("test_solver", &make_kv!()).unwrap();
+        obs.observe_init("test_solver", &kv!()).unwrap();
 
         // all `init_called` should be 1, all `iter_called` 0
         for s in storages.iter() {
@@ -399,7 +399,7 @@ mod tests {
         }
 
         let mut state: TState = IterState::new();
-        obs.observe_iter(&state, &make_kv!()).unwrap();
+        obs.observe_iter(&state, &kv!()).unwrap();
 
         assert_eq!(storages[0].lock().unwrap().init_called, 1);
         assert_eq!(storages[0].lock().unwrap().iter_called, 0);
@@ -411,7 +411,7 @@ mod tests {
         assert_eq!(storages[3].lock().unwrap().iter_called, 1);
 
         state.increment_iter();
-        obs.observe_iter(&state, &make_kv!()).unwrap();
+        obs.observe_iter(&state, &kv!()).unwrap();
 
         assert_eq!(storages[0].lock().unwrap().init_called, 1);
         assert_eq!(storages[0].lock().unwrap().iter_called, 0);
@@ -424,7 +424,7 @@ mod tests {
 
         state.increment_iter();
         state.increment_iter();
-        obs.observe_iter(&state, &make_kv!()).unwrap();
+        obs.observe_iter(&state, &kv!()).unwrap();
 
         assert_eq!(storages[0].lock().unwrap().init_called, 1);
         assert_eq!(storages[0].lock().unwrap().iter_called, 0);
@@ -438,7 +438,7 @@ mod tests {
         state.increment_iter();
         // "new best found"
         state.last_best_iter = state.iter;
-        obs.observe_iter(&state, &make_kv!()).unwrap();
+        obs.observe_iter(&state, &kv!()).unwrap();
 
         assert_eq!(storages[0].lock().unwrap().init_called, 1);
         assert_eq!(storages[0].lock().unwrap().iter_called, 0);

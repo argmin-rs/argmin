@@ -470,7 +470,7 @@ where
 
         Ok((
             state.param(param).cost(cost),
-            Some(make_kv!(
+            Some(kv!(
                 "initial_temperature" => self.init_temp;
                 "stall_iter_accepted_limit" => self.stall_iter_accepted_limit;
                 "stall_iter_best_limit" => self.stall_iter_best_limit;
@@ -541,7 +541,7 @@ where
             } else {
                 state.param(prev_param).cost(prev_cost)
             },
-            Some(make_kv!(
+            Some(kv!(
                 "t" => self.cur_temp;
                 "new_be" => new_best_found;
                 "acc" => accepted;
@@ -861,7 +861,7 @@ mod tests {
         let problem = TestProblem::new();
         let (mut state_out, kv) = sa.init(&mut Problem::new(problem), state).unwrap();
 
-        let kv_expected = make_kv!(
+        let kv_expected = kv!(
             "initial_temperature" => 100.0f64;
             "stall_iter_accepted_limit" => stall_iter_accepted_limit;
             "stall_iter_best_limit" => stall_iter_best_limit;
@@ -871,15 +871,6 @@ mod tests {
         );
 
         assert_eq!(kv.unwrap(), kv_expected);
-        // kv.unwrap()
-        //     .kv
-        //     .iter()
-        //     .zip(kv_expected.kv.iter())
-        //     .map(|(kv1, kv2)| {
-        //         assert_eq!(kv1.0, kv2.0);
-        //         assert_eq!(format!("{}", kv1.1), format!("{}", kv2.1));
-        //     })
-        //     .count();
 
         let s_param = state_out.take_param().unwrap();
 

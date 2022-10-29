@@ -174,7 +174,7 @@ where
             state.update();
 
             if !self.observers.is_empty() {
-                let mut logs = make_kv!("max_iters" => state.get_max_iters(););
+                let mut logs = kv!("max_iters" => state.get_max_iters(););
 
                 if let Some(kv) = kv {
                     logs = logs.merge(kv);
@@ -234,7 +234,7 @@ where
 
                 if self.timer {
                     let duration = duration.unwrap();
-                    let tmp = make_kv!(
+                    let tmp = kv!(
                         "time" => duration.as_secs() as f64 + f64::from(duration.subsec_nanos()) * 1e-9;
                     );
                     log = log.merge(tmp);

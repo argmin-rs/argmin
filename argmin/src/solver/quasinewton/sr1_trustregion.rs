@@ -343,7 +343,7 @@ where
 
         Ok((
             state.param(xk1).cost(fk1).gradient(dfk1).hessian(hessian),
-            Some(make_kv!["ared" => ared;
+            Some(kv!["ared" => ared;
                          "pred" => pred;
                          "ap" => ap;
                          "radius" => self.radius;
