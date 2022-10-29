@@ -727,7 +727,10 @@ mod tests {
 
         let (state, kv) = nm.next_iter(&mut problem, state).unwrap();
 
-        assert_eq!(format!("{}", kv.unwrap().kv[0].1), "Reflection");
+        assert_eq!(
+            format!("{}", kv.unwrap().get("action").unwrap()),
+            "Reflection"
+        );
 
         let param = state.get_param().unwrap();
 
@@ -767,7 +770,10 @@ mod tests {
 
         let (state, kv) = nm.next_iter(&mut problem, state).unwrap();
 
-        assert_eq!(format!("{}", kv.unwrap().kv[0].1), "Expansion");
+        assert_eq!(
+            format!("{}", kv.unwrap().get("action").unwrap()),
+            "Expansion"
+        );
 
         let param = state.get_param().unwrap();
 
@@ -800,7 +806,10 @@ mod tests {
 
         let (state, kv) = nm.next_iter(&mut problem, state).unwrap();
 
-        assert_eq!(format!("{}", kv.unwrap().kv[0].1), "ContractionOutside");
+        assert_eq!(
+            format!("{}", kv.unwrap().get("action").unwrap()),
+            "ContractionOutside"
+        );
 
         let param = state.get_param().unwrap();
 
@@ -833,7 +842,10 @@ mod tests {
 
         let (state, kv) = nm.next_iter(&mut problem, state).unwrap();
 
-        assert_eq!(format!("{}", kv.unwrap().kv[0].1), "ContractionInside");
+        assert_eq!(
+            format!("{}", kv.unwrap().get("action").unwrap()),
+            "ContractionInside"
+        );
 
         let param = state.get_param().unwrap();
 

@@ -452,11 +452,9 @@ mod tests {
         assert!(kv.is_none());
         let (mut state, kv) = nlcg.next_iter(&mut problem, state).unwrap();
         state.update();
-        let kv2 = make_kv!("beta" => 0; "restart_iter" => false; "restart_orthogonality" => false;);
-        for ((k1, v1), (k2, v2)) in kv.unwrap().kv.iter().zip(kv2.kv.iter()) {
-            assert_eq!(k1, k2);
-            assert_eq!(format!("{}", v1), format!("{}", v2));
-        }
+        let kv2 =
+            make_kv!("beta" => 0.0; "restart_iter" => false; "restart_orthogonality" => false;);
+        assert_eq!(kv.unwrap(), kv2);
         assert_relative_eq!(
             state.param.as_ref().unwrap()[0],
             1.0f64,

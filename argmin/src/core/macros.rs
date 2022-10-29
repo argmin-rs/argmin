@@ -20,17 +20,14 @@
 ///     "key3" => 1234;
 /// );
 /// # assert_eq!(kv.kv.len(), 3);
-/// # assert_eq!(kv.kv[0].0, "key1");
-/// # assert_eq!(format!("{}", kv.kv[0].1), "value1");
-/// # assert_eq!(kv.kv[1].0, "key2");
-/// # assert_eq!(format!("{}", kv.kv[1].1), "value2");
-/// # assert_eq!(kv.kv[2].0, "key3");
-/// # assert_eq!(format!("{}", kv.kv[2].1), "1234");
+/// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value1");
+/// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "value2");
+/// # assert_eq!(format!("{}", kv.get("key3").unwrap()), "1234");
 /// ```
 #[macro_export]
 macro_rules! make_kv {
     ($($k:expr =>  $v:expr;)*) => {
-        $crate::core::KV { kv: vec![ $(($k, $v.into())),* ] }
+        $crate::core::KV { kv: std::collections::HashMap::from([ $(($k, $v.into())),* ]) }
     };
 }
 
