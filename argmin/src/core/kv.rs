@@ -58,6 +58,28 @@ pub enum KVType {
 }
 
 impl KVType {
+    /// Returns the kind of the `KVType`
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use argmin::core::KVType;
+    /// assert_eq!(KVType::Float(1.0).kind(), "Float");
+    /// assert_eq!(KVType::Int(1).kind(), "Int");
+    /// assert_eq!(KVType::Uint(1).kind(), "Uint");
+    /// assert_eq!(KVType::Bool(true).kind(), "Bool");
+    /// assert_eq!(KVType::Str("string".to_string()).kind(), "Str");
+    /// ```
+    pub fn kind(&self) -> &'static str {
+        match self {
+            KVType::Float(_) => "Float",
+            KVType::Int(_) => "Int",
+            KVType::Uint(_) => "Uint",
+            KVType::Bool(_) => "Bool",
+            KVType::Str(_) => "Str",
+        }
+    }
+
     /// Extract float from `KVType`
     ///
     /// Returns `Some(<float>)` if `KVType` is of kind `Float` and `None` otherwise.
@@ -328,6 +350,21 @@ impl KV {
     /// ```
     pub fn get(&self, key: &'static str) -> Option<&KVType> {
         self.kv.get(key)
+    }
+
+    /// Returns all available keys and their `KVType` kind
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{KV, KVType};
+    /// let mut kv1 = KV::new();
+    /// kv1.insert("key1", KVType::Str("value1".to_string()));
+    ///
+    /// assert_eq!(kv1.keys(), vec![("key1", "Str")]);
+    /// ```
+    pub fn keys(&self) -> Vec<(&'static str, &'static str)> {
+        self.kv.iter().map(|(&k, v)| (k, v.kind())).collect()
     }
 
     /// Merge with another `KV`
