@@ -25,6 +25,9 @@
 //! itself, while the handling of termination, parameter vectors, populations, gradients, Jacobians
 //! and Hessians is taken care of by the library.
 //!
+//! For an introduction on how to use argmin, please also have a look at the
+//! [book](http://www.argmin-rs.org/book/).
+//!
 //! # Highlights
 //!
 //! * [Checkpointing](`crate::core::checkpointing`)
