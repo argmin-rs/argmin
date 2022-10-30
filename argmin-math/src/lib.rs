@@ -10,6 +10,9 @@
 //! The traits can of course also be implemented for your own types to make them compatible with
 //! argmin.
 //!
+//! For an introduction on how to use argmin, please also have a look at the
+//! [book](http://www.argmin-rs.org/book/).
+//!
 //! # Usage
 //!
 //! Add the following line to your dependencies list:
