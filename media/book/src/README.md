@@ -4,7 +4,7 @@
 argmin is a numerical optimization library written entirely in Rust.
 
 Its goal is to offer a wide range of optimization algorithms with a consistent interface. 
-It is type-agnostic by the design, meaning that any type and/or math backend, such as `nalgebra` or `ndarray` can be used -- even your own.
+It is type-agnostic by design, meaning that any type and/or math backend, such as `nalgebra` or `ndarray` can be used -- even your own.
 
 Observers allow one to track the progress of iterations, either by using one of the provided ones for logging to screen or disk or by implementing your own.
 
@@ -21,7 +21,7 @@ argmin is designed to simplify the implementation of optimization algorithms and
 
 ## The argmin ecosystem
 
-The ecosystem constist of a number of crates:
+The ecosystem consists of a number of crates:
 
 * [argmin](https://crates.io/crates/argmin): Optimization algorithms and framework
 * [argmin-math](https://crates.io/crates/argmin-math): Interface for math backend abstraction and implementations for various versions of [ndarray](https://crates.io/crates/ndarray), [nalgebra](https://crates.io/crates/nalgebra) and `Vec`s.
