@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/simulatedannealing/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/simulatedannealing/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -881,777 +881,777 @@
 <span id="881">881</span>
 <span id="882">882</span>
 <span id="883">883</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # Simulated Annealing</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Simulated Annealing (SA) is a stochastic optimization method which imitates annealing in</span>
-<span class="doccomment">//! metallurgy. For details see [`SimulatedAnnealing`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## References</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). &quot;Optimization by Simulated Annealing&quot;.</span>
-<span class="doccomment">//! Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680</span>
-<span class="doccomment">//! DOI: 10.1126/science.220.4598.671</span>
+</span><span class="doccomment">//! # Simulated Annealing
+//!
+//! Simulated Annealing (SA) is a stochastic optimization method which imitates annealing in
+//! metallurgy. For details see [`SimulatedAnnealing`].
+//!
+//! ## References
+//!
+//! [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
+//!
+//! S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). &quot;Optimization by Simulated Annealing&quot;.
+//! Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
+//! DOI: 10.1126/science.220.4598.671
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>,
-    <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
+    TerminationReason, KV,
 };
-<span class="kw">use</span> <span class="ident">rand::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">rand_xoshiro::Xoshiro256PlusPlus</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>rand::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>rand_xoshiro::Xoshiro256PlusPlus;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// This trait handles the annealing of a parameter vector. Problems which are to be solved using</span>
-<span class="doccomment">/// [`SimulatedAnnealing`] must implement this trait.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Anneal</span> {
-    <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span>;
-    <span class="doccomment">/// Return type of the anneal function</span>
-    <span class="kw">type</span> <span class="ident">Output</span>;
-    <span class="doccomment">/// Precision of floats</span>
-    <span class="kw">type</span> <span class="ident">Float</span>;
+<span class="doccomment">/// This trait handles the annealing of a parameter vector. Problems which are to be solved using
+/// [`SimulatedAnnealing`] must implement this trait.
+</span><span class="kw">pub trait </span>Anneal {
+    <span class="doccomment">/// Type of the parameter vector
+    </span><span class="kw">type </span>Param;
+    <span class="doccomment">/// Return type of the anneal function
+    </span><span class="kw">type </span>Output;
+    <span class="doccomment">/// Precision of floats
+    </span><span class="kw">type </span>Float;
 
-    <span class="doccomment">/// Anneal a parameter vector</span>
-    <span class="kw">fn</span> <span class="ident">anneal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>, <span class="ident">extent</span>: <span class="ident"><span class="self">Self</span>::Float</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Anneal a parameter vector
+    </span><span class="kw">fn </span>anneal(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param, extent: <span class="self">Self</span>::Float) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt;;
 }
 
-<span class="doccomment">/// Wraps a call to `anneal` defined in the `Anneal` trait and as such allows to call `anneal` on</span>
-<span class="doccomment">/// an instance of `Problem`. Internally, the number of evaluations of `anneal` is counted.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Anneal</span><span class="op">&gt;</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Calls `anneal` defined in the `Anneal` trait and keeps track of the number of evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, Error};</span>
-    <span class="doccomment">/// # use argmin::solver::simulatedannealing::Anneal;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Anneal for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Output = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Float = f64;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn anneal(&amp;self, param: &amp;Self::Param, extent: Self::Float) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![1.0f64, 1.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `Anneal`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![2.0f64, 1.0f64];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.anneal(&amp;param, 1.0);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;anneal_count&quot;], 1);</span>
-    <span class="doccomment">/// # assert_eq!(res.unwrap(), vec![1.0f64, 1.0f64]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">anneal</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident">O::Param</span>, <span class="ident">extent</span>: <span class="ident">O::Float</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>(<span class="string">&quot;anneal_count&quot;</span>, <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">anneal</span>(<span class="ident">param</span>, <span class="ident">extent</span>))
+<span class="doccomment">/// Wraps a call to `anneal` defined in the `Anneal` trait and as such allows to call `anneal` on
+/// an instance of `Problem`. Internally, the number of evaluations of `anneal` is counted.
+</span><span class="kw">impl</span>&lt;O: Anneal&gt; Problem&lt;O&gt; {
+    <span class="doccomment">/// Calls `anneal` defined in the `Anneal` trait and keeps track of the number of evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Error};
+    /// # use argmin::solver::simulatedannealing::Anneal;
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Anneal for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Output = Vec&lt;f64&gt;;
+    /// #     type Float = f64;
+    /// #
+    /// #     fn anneal(&amp;self, param: &amp;Self::Param, extent: Self::Float) -&gt; Result&lt;Self::Output, Error&gt; {
+    /// #         Ok(vec![1.0f64, 1.0f64])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Anneal`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param = vec![2.0f64, 1.0f64];
+    ///
+    /// let res = problem1.anneal(&amp;param, 1.0);
+    ///
+    /// assert_eq!(problem1.counts[&quot;anneal_count&quot;], 1);
+    /// # assert_eq!(res.unwrap(), vec![1.0f64, 1.0f64]);
+    /// ```
+    </span><span class="kw">pub fn </span>anneal(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param, extent: O::Float) -&gt; <span class="prelude-ty">Result</span>&lt;O::Output, Error&gt; {
+        <span class="self">self</span>.problem(<span class="string">&quot;anneal_count&quot;</span>, |problem| problem.anneal(param, extent))
     }
 }
 
-<span class="doccomment">/// Temperature functions for Simulated Annealing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Given the initial temperature `t_init` and the iteration number `i`, the current temperature</span>
-<span class="doccomment">/// `t_i` is given as follows:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `SATempFunc::TemperatureFast`: `t_i = t_init / i`</span>
-<span class="doccomment">/// * `SATempFunc::Boltzmann`: `t_i = t_init / ln(i)`</span>
-<span class="doccomment">/// * `SATempFunc::Exponential`: `t_i = t_init * 0.95^i`</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SATempFunc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// `t_i = t_init / i`</span>
-    <span class="ident">TemperatureFast</span>,
-    <span class="doccomment">/// `t_i = t_init / ln(i)`</span>
-    <span class="ident">Boltzmann</span>,
-    <span class="doccomment">/// `t_i = t_init * x^i`</span>
-    <span class="ident">Exponential</span>(<span class="ident">F</span>),
-    <span class="comment">// /// User-provided temperature function. The first parameter must be the current temperature and</span>
-    <span class="comment">// /// the second parameter must be the iteration number.</span>
-    <span class="comment">// Custom(Box&lt;dyn Fn(f64, u64) -&gt; f64 + &#39;static&gt;),</span>
-}
+<span class="doccomment">/// Temperature functions for Simulated Annealing.
+///
+/// Given the initial temperature `t_init` and the iteration number `i`, the current temperature
+/// `t_i` is given as follows:
+///
+/// * `SATempFunc::TemperatureFast`: `t_i = t_init / i`
+/// * `SATempFunc::Boltzmann`: `t_i = t_init / ln(i)`
+/// * `SATempFunc::Exponential`: `t_i = t_init * 0.95^i`
+</span><span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub enum </span>SATempFunc&lt;F&gt; {
+    <span class="doccomment">/// `t_i = t_init / i`
+    </span>TemperatureFast,
+    <span class="doccomment">/// `t_i = t_init / ln(i)`
+    </span>Boltzmann,
+    <span class="doccomment">/// `t_i = t_init * x^i`
+    </span>Exponential(F),
+    <span class="comment">// /// User-provided temperature function. The first parameter must be the current temperature and
+    // /// the second parameter must be the iteration number.
+    // Custom(Box&lt;dyn Fn(f64, u64) -&gt; f64 + &#39;static&gt;),
+</span>}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SATempFunc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">SATempFunc::Boltzmann</span>
+<span class="kw">impl</span>&lt;F&gt; Default <span class="kw">for </span>SATempFunc&lt;F&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        SATempFunc::Boltzmann
     }
 }
 
-<span class="doccomment">/// # Simulated Annealing</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Simulated Annealing (SA) is a stochastic optimization method which imitates annealing in</span>
-<span class="doccomment">/// metallurgy. Parameter vectors are randomly modified in each iteration, where the degree of</span>
-<span class="doccomment">/// modification depends on the current temperature. The algorithm starts with a high temperature</span>
-<span class="doccomment">/// (a lot of modification and hence movement in parameter space) and continuously cools down as</span>
-<span class="doccomment">/// the iterations progress, hence narrowing down in the search. Under certain conditions,</span>
-<span class="doccomment">/// reannealing (increasing the temperature) can be performed. Solutions which are better than the</span>
-<span class="doccomment">/// previous one are always accepted and solutions which are worse are accepted with a probability</span>
-<span class="doccomment">/// proportional to the cost function value difference of previous to current parameter vector.</span>
-<span class="doccomment">/// These measures allow the algorithm to explore the parameter space in a large and a small scale</span>
-<span class="doccomment">/// and hence it is able to overcome local minima.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The initial temperature has to be provided by the user as well as the a initial parameter</span>
-<span class="doccomment">/// vector (via [`configure`](`crate::core::Executor::configure`) of</span>
-<span class="doccomment">/// [`Executor`](`crate::core::Executor`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The cooling schedule can be set with [`SimulatedAnnealing::with_temp_func`]. For the available</span>
-<span class="doccomment">/// choices please see [`SATempFunc`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Reannealing can be performed if no new best solution was found for `N` iterations</span>
-<span class="doccomment">/// ([`SimulatedAnnealing::with_reannealing_best`]), or if no new accepted solution was found for</span>
-<span class="doccomment">/// `N` iterations ([`SimulatedAnnealing::with_reannealing_accepted`]) or every `N` iterations</span>
-<span class="doccomment">/// without any other conditions ([`SimulatedAnnealing::with_reannealing_fixed`]).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The user-provided problem must implement [`Anneal`] which defines how parameter vectors are</span>
-<span class="doccomment">/// modified. Please see the Simulated Annealing example for one approach to do so for floating</span>
-<span class="doccomment">/// point parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## References</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). &quot;Optimization by Simulated Annealing&quot;.</span>
-<span class="doccomment">/// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680</span>
-<span class="doccomment">/// DOI: 10.1126/science.220.4598.671</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Initial temperature</span>
-    <span class="ident">init_temp</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Temperature function used for decreasing the temperature</span>
-    <span class="ident">temp_func</span>: <span class="ident">SATempFunc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Number of iterations used for the calculation of temperature. Needed for reannealing</span>
-    <span class="ident">temp_iter</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Number of iterations since the last accepted solution</span>
-    <span class="ident">stall_iter_accepted</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Stop if `stall_iter_accepted` exceeds this number</span>
-    <span class="ident">stall_iter_accepted_limit</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Number of iterations since the last best solution was found</span>
-    <span class="ident">stall_iter_best</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Stop if `stall_iter_best` exceeds this number</span>
-    <span class="ident">stall_iter_best_limit</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Reanneal after this number of iterations is reached</span>
-    <span class="ident">reanneal_fixed</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Number of iterations since beginning or last reannealing</span>
-    <span class="ident">reanneal_iter_fixed</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Reanneal after no accepted solution has been found for `reanneal_accepted` iterations</span>
-    <span class="ident">reanneal_accepted</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Similar to `stall_iter_accepted`, but will be reset to 0 when reannealing  is performed</span>
-    <span class="ident">reanneal_iter_accepted</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Reanneal after no new best solution has been found for `reanneal_best` iterations</span>
-    <span class="ident">reanneal_best</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Similar to `stall_iter_best`, but will be reset to 0 when reannealing is performed</span>
-    <span class="ident">reanneal_iter_best</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// current temperature</span>
-    <span class="ident">cur_temp</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// random number generator</span>
-    <span class="ident">rng</span>: <span class="ident">R</span>,
+<span class="doccomment">/// # Simulated Annealing
+///
+/// Simulated Annealing (SA) is a stochastic optimization method which imitates annealing in
+/// metallurgy. Parameter vectors are randomly modified in each iteration, where the degree of
+/// modification depends on the current temperature. The algorithm starts with a high temperature
+/// (a lot of modification and hence movement in parameter space) and continuously cools down as
+/// the iterations progress, hence narrowing down in the search. Under certain conditions,
+/// reannealing (increasing the temperature) can be performed. Solutions which are better than the
+/// previous one are always accepted and solutions which are worse are accepted with a probability
+/// proportional to the cost function value difference of previous to current parameter vector.
+/// These measures allow the algorithm to explore the parameter space in a large and a small scale
+/// and hence it is able to overcome local minima.
+///
+/// The initial temperature has to be provided by the user as well as the a initial parameter
+/// vector (via [`configure`](`crate::core::Executor::configure`) of
+/// [`Executor`](`crate::core::Executor`).
+///
+/// The cooling schedule can be set with [`SimulatedAnnealing::with_temp_func`]. For the available
+/// choices please see [`SATempFunc`].
+///
+/// Reannealing can be performed if no new best solution was found for `N` iterations
+/// ([`SimulatedAnnealing::with_reannealing_best`]), or if no new accepted solution was found for
+/// `N` iterations ([`SimulatedAnnealing::with_reannealing_accepted`]) or every `N` iterations
+/// without any other conditions ([`SimulatedAnnealing::with_reannealing_fixed`]).
+///
+/// The user-provided problem must implement [`Anneal`] which defines how parameter vectors are
+/// modified. Please see the Simulated Annealing example for one approach to do so for floating
+/// point parameters.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`].
+///
+/// ## References
+///
+/// [Wikipedia](https://en.wikipedia.org/wiki/Simulated_annealing)
+///
+/// S Kirkpatrick, CD Gelatt Jr, MP Vecchi. (1983). &quot;Optimization by Simulated Annealing&quot;.
+/// Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
+/// DOI: 10.1126/science.220.4598.671
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>SimulatedAnnealing&lt;F, R&gt; {
+    <span class="doccomment">/// Initial temperature
+    </span>init_temp: F,
+    <span class="doccomment">/// Temperature function used for decreasing the temperature
+    </span>temp_func: SATempFunc&lt;F&gt;,
+    <span class="doccomment">/// Number of iterations used for the calculation of temperature. Needed for reannealing
+    </span>temp_iter: u64,
+    <span class="doccomment">/// Number of iterations since the last accepted solution
+    </span>stall_iter_accepted: u64,
+    <span class="doccomment">/// Stop if `stall_iter_accepted` exceeds this number
+    </span>stall_iter_accepted_limit: u64,
+    <span class="doccomment">/// Number of iterations since the last best solution was found
+    </span>stall_iter_best: u64,
+    <span class="doccomment">/// Stop if `stall_iter_best` exceeds this number
+    </span>stall_iter_best_limit: u64,
+    <span class="doccomment">/// Reanneal after this number of iterations is reached
+    </span>reanneal_fixed: u64,
+    <span class="doccomment">/// Number of iterations since beginning or last reannealing
+    </span>reanneal_iter_fixed: u64,
+    <span class="doccomment">/// Reanneal after no accepted solution has been found for `reanneal_accepted` iterations
+    </span>reanneal_accepted: u64,
+    <span class="doccomment">/// Similar to `stall_iter_accepted`, but will be reset to 0 when reannealing  is performed
+    </span>reanneal_iter_accepted: u64,
+    <span class="doccomment">/// Reanneal after no new best solution has been found for `reanneal_best` iterations
+    </span>reanneal_best: u64,
+    <span class="doccomment">/// Similar to `stall_iter_best`, but will be reset to 0 when reannealing is performed
+    </span>reanneal_iter_best: u64,
+    <span class="doccomment">/// current temperature
+    </span>cur_temp: F,
+    <span class="doccomment">/// random number generator
+    </span>rng: R,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Xoshiro256PlusPlus</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;F&gt; SimulatedAnnealing&lt;F, Xoshiro256PlusPlus&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`SimulatedAnnealing`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Takes the initial temperature as input, which must be &gt;0.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Uses the `Xoshiro256PlusPlus` RNG internally. For use of another RNG, consider using</span>
-    <span class="doccomment">/// [`SimulatedAnnealing::new_with_rng`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::simulatedannealing::SimulatedAnnealing;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let sa = SimulatedAnnealing::new(100.0f64)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">initial_temperature</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">SimulatedAnnealing::new_with_rng</span>(<span class="ident">initial_temperature</span>, <span class="ident">Xoshiro256PlusPlus::from_entropy</span>())
+    <span class="doccomment">/// Construct a new instance of [`SimulatedAnnealing`]
+    ///
+    /// Takes the initial temperature as input, which must be &gt;0.
+    ///
+    /// Uses the `Xoshiro256PlusPlus` RNG internally. For use of another RNG, consider using
+    /// [`SimulatedAnnealing::new_with_rng`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::simulatedannealing::SimulatedAnnealing;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let sa = SimulatedAnnealing::new(100.0f64)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>new(initial_temperature: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        SimulatedAnnealing::new_with_rng(initial_temperature, Xoshiro256PlusPlus::from_entropy())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;F, R&gt; SimulatedAnnealing&lt;F, R&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`SimulatedAnnealing`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Takes the initial temperature as input, which must be &gt;0.</span>
-    <span class="doccomment">/// Requires a RNG which must implement `rand::Rng` (and `serde::Serialize` if the `serde1`</span>
-    <span class="doccomment">/// feature is enabled).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::simulatedannealing::SimulatedAnnealing;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let my_rng = ();</span>
-    <span class="doccomment">/// let sa = SimulatedAnnealing::new_with_rng(100.0f64, my_rng)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_rng</span>(<span class="ident">init_temp</span>: <span class="ident">F</span>, <span class="ident">rng</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">init_temp</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
+    <span class="doccomment">/// Construct a new instance of [`SimulatedAnnealing`]
+    ///
+    /// Takes the initial temperature as input, which must be &gt;0.
+    /// Requires a RNG which must implement `rand::Rng` (and `serde::Serialize` if the `serde1`
+    /// feature is enabled).
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::simulatedannealing::SimulatedAnnealing;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let my_rng = ();
+    /// let sa = SimulatedAnnealing::new_with_rng(100.0f64, my_rng)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>new_with_rng(init_temp: F, rng: R) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>init_temp &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`SimulatedAnnealing`: Initial temperature must be &gt; 0.&quot;</span>
-            ))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">SimulatedAnnealing</span> {
-                <span class="ident">init_temp</span>,
-                <span class="ident">temp_func</span>: <span class="ident">SATempFunc::TemperatureFast</span>,
-                <span class="ident">temp_iter</span>: <span class="number">0</span>,
-                <span class="ident">stall_iter_accepted</span>: <span class="number">0</span>,
-                <span class="ident">stall_iter_accepted_limit</span>: <span class="ident">std::u64::MAX</span>,
-                <span class="ident">stall_iter_best</span>: <span class="number">0</span>,
-                <span class="ident">stall_iter_best_limit</span>: <span class="ident">std::u64::MAX</span>,
-                <span class="ident">reanneal_fixed</span>: <span class="ident">std::u64::MAX</span>,
-                <span class="ident">reanneal_iter_fixed</span>: <span class="number">0</span>,
-                <span class="ident">reanneal_accepted</span>: <span class="ident">std::u64::MAX</span>,
-                <span class="ident">reanneal_iter_accepted</span>: <span class="number">0</span>,
-                <span class="ident">reanneal_best</span>: <span class="ident">std::u64::MAX</span>,
-                <span class="ident">reanneal_iter_best</span>: <span class="number">0</span>,
-                <span class="ident">cur_temp</span>: <span class="ident">init_temp</span>,
-                <span class="ident">rng</span>,
+                InvalidParameter,
+                <span class="string">&quot;`SimulatedAnnealing`: Initial temperature must be &gt; 0.&quot;
+            </span>))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(SimulatedAnnealing {
+                init_temp,
+                temp_func: SATempFunc::TemperatureFast,
+                temp_iter: <span class="number">0</span>,
+                stall_iter_accepted: <span class="number">0</span>,
+                stall_iter_accepted_limit: std::u64::MAX,
+                stall_iter_best: <span class="number">0</span>,
+                stall_iter_best_limit: std::u64::MAX,
+                reanneal_fixed: std::u64::MAX,
+                reanneal_iter_fixed: <span class="number">0</span>,
+                reanneal_accepted: std::u64::MAX,
+                reanneal_iter_accepted: <span class="number">0</span>,
+                reanneal_best: std::u64::MAX,
+                reanneal_iter_best: <span class="number">0</span>,
+                cur_temp: init_temp,
+                rng,
             })
         }
     }
 
-    <span class="doccomment">/// Set temperature function</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The temperature function defines how the temperature is decreased over the course of the</span>
-    <span class="doccomment">/// iterations.</span>
-    <span class="doccomment">/// See [`SATempFunc`] for the available options. Defaults to [`SATempFunc::TemperatureFast`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let sa = SimulatedAnnealing::new(100.0f64)?.with_temp_func(SATempFunc::Boltzmann);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_temp_func</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">temperature_func</span>: <span class="ident">SATempFunc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">temp_func</span> <span class="op">=</span> <span class="ident">temperature_func</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set temperature function
+    ///
+    /// The temperature function defines how the temperature is decreased over the course of the
+    /// iterations.
+    /// See [`SATempFunc`] for the available options. Defaults to [`SATempFunc::TemperatureFast`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let sa = SimulatedAnnealing::new(100.0f64)?.with_temp_func(SATempFunc::Boltzmann);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>with_temp_func(<span class="kw-2">mut </span><span class="self">self</span>, temperature_func: SATempFunc&lt;F&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.temp_func = temperature_func;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// If there are no accepted solutions for `iter` iterations, the algorithm stops.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `std::u64::MAX`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let sa = SimulatedAnnealing::new(100.0f64)?.with_stall_accepted(1000);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_stall_accepted</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">stall_iter_accepted_limit</span> <span class="op">=</span> <span class="ident">iter</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// If there are no accepted solutions for `iter` iterations, the algorithm stops.
+    ///
+    /// Defaults to `std::u64::MAX`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let sa = SimulatedAnnealing::new(100.0f64)?.with_stall_accepted(1000);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>with_stall_accepted(<span class="kw-2">mut </span><span class="self">self</span>, iter: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.stall_iter_accepted_limit = iter;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// If there are no new best solutions for `iter` iterations, the algorithm stops.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `std::u64::MAX`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let sa = SimulatedAnnealing::new(100.0f64)?.with_stall_best(2000);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_stall_best</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">stall_iter_best_limit</span> <span class="op">=</span> <span class="ident">iter</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// If there are no new best solutions for `iter` iterations, the algorithm stops.
+    ///
+    /// Defaults to `std::u64::MAX`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let sa = SimulatedAnnealing::new(100.0f64)?.with_stall_best(2000);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>with_stall_best(<span class="kw-2">mut </span><span class="self">self</span>, iter: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.stall_iter_best_limit = iter;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set number of iterations after which reannealing is performed</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Every `iter` iterations, reannealing (resetting temperature to its initial value) will be</span>
-    <span class="doccomment">/// performed. This may help in overcoming local minima.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `std::u64::MAX`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let sa = SimulatedAnnealing::new(100.0f64)?.with_reannealing_fixed(5000);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_reannealing_fixed</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">reanneal_fixed</span> <span class="op">=</span> <span class="ident">iter</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set number of iterations after which reannealing is performed
+    ///
+    /// Every `iter` iterations, reannealing (resetting temperature to its initial value) will be
+    /// performed. This may help in overcoming local minima.
+    ///
+    /// Defaults to `std::u64::MAX`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let sa = SimulatedAnnealing::new(100.0f64)?.with_reannealing_fixed(5000);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>with_reannealing_fixed(<span class="kw-2">mut </span><span class="self">self</span>, iter: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.reanneal_fixed = iter;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the number of iterations that need to pass after the last accepted solution was found</span>
-    <span class="doccomment">/// for reannealing to be performed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If no new accepted solution is found for `iter` iterations, reannealing (resetting</span>
-    <span class="doccomment">/// temperature to its initial value) is performed. This may help in overcoming local minima.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `std::u64::MAX`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let sa = SimulatedAnnealing::new(100.0f64)?.with_reannealing_accepted(5000);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_reannealing_accepted</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">reanneal_accepted</span> <span class="op">=</span> <span class="ident">iter</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the number of iterations that need to pass after the last accepted solution was found
+    /// for reannealing to be performed.
+    ///
+    /// If no new accepted solution is found for `iter` iterations, reannealing (resetting
+    /// temperature to its initial value) is performed. This may help in overcoming local minima.
+    ///
+    /// Defaults to `std::u64::MAX`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let sa = SimulatedAnnealing::new(100.0f64)?.with_reannealing_accepted(5000);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>with_reannealing_accepted(<span class="kw-2">mut </span><span class="self">self</span>, iter: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.reanneal_accepted = iter;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the number of iterations that need to pass after the last best solution was found</span>
-    <span class="doccomment">/// for reannealing to be performed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If no new best solution is found for `iter` iterations, reannealing (resetting temperature</span>
-    <span class="doccomment">/// to its initial value) is performed. This may help in overcoming local minima.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `std::u64::MAX`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let sa = SimulatedAnnealing::new(100.0f64)?.with_reannealing_best(5000);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_reannealing_best</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">reanneal_best</span> <span class="op">=</span> <span class="ident">iter</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the number of iterations that need to pass after the last best solution was found
+    /// for reannealing to be performed.
+    ///
+    /// If no new best solution is found for `iter` iterations, reannealing (resetting temperature
+    /// to its initial value) is performed. This may help in overcoming local minima.
+    ///
+    /// Defaults to `std::u64::MAX`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::simulatedannealing::{SimulatedAnnealing, SATempFunc};
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let sa = SimulatedAnnealing::new(100.0f64)?.with_reannealing_best(5000);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>with_reannealing_best(<span class="kw-2">mut </span><span class="self">self</span>, iter: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.reanneal_best = iter;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Update the temperature based on the current iteration number.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Updates are performed based on specific update functions. See `SATempFunc` for details.</span>
-    <span class="kw">fn</span> <span class="ident">update_temperature</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">cur_temp</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">temp_func</span> {
-            <span class="ident">SATempFunc::TemperatureFast</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">init_temp</span> <span class="op">/</span> <span class="ident">F::from_u64</span>(<span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Update the temperature based on the current iteration number.
+    ///
+    /// Updates are performed based on specific update functions. See `SATempFunc` for details.
+    </span><span class="kw">fn </span>update_temperature(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.cur_temp = <span class="kw">match </span><span class="self">self</span>.temp_func {
+            SATempFunc::TemperatureFast =&gt; {
+                <span class="self">self</span>.init_temp / F::from_u64(<span class="self">self</span>.temp_iter + <span class="number">1</span>).unwrap()
             }
-            <span class="ident">SATempFunc::Boltzmann</span> =&gt; <span class="self">self</span>.<span class="ident">init_temp</span> <span class="op">/</span> <span class="ident">F::from_u64</span>(<span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">ln</span>(),
-            <span class="ident">SATempFunc::Exponential</span>(<span class="ident">x</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">init_temp</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powf</span>(<span class="ident">F::from_u64</span>(<span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">unwrap</span>())
+            SATempFunc::Boltzmann =&gt; <span class="self">self</span>.init_temp / F::from_u64(<span class="self">self</span>.temp_iter + <span class="number">1</span>).unwrap().ln(),
+            SATempFunc::Exponential(x) =&gt; {
+                <span class="self">self</span>.init_temp * x.powf(F::from_u64(<span class="self">self</span>.temp_iter + <span class="number">1</span>).unwrap())
             }
         };
     }
 
-    <span class="doccomment">/// Perform reannealing</span>
-    <span class="kw">fn</span> <span class="ident">reanneal</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">bool</span>, <span class="ident">bool</span>) {
-        <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> (
-            <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">reanneal_fixed</span>,
-            <span class="self">self</span>.<span class="ident">reanneal_iter_accepted</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">reanneal_accepted</span>,
-            <span class="self">self</span>.<span class="ident">reanneal_iter_best</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">reanneal_best</span>,
+    <span class="doccomment">/// Perform reannealing
+    </span><span class="kw">fn </span>reanneal(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; (bool, bool, bool) {
+        <span class="kw">let </span>out = (
+            <span class="self">self</span>.reanneal_iter_fixed &gt;= <span class="self">self</span>.reanneal_fixed,
+            <span class="self">self</span>.reanneal_iter_accepted &gt;= <span class="self">self</span>.reanneal_accepted,
+            <span class="self">self</span>.reanneal_iter_best &gt;= <span class="self">self</span>.reanneal_best,
         );
-        <span class="kw">if</span> <span class="ident">out</span>.<span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">out</span>.<span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">out</span>.<span class="number">2</span> {
-            <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="self">self</span>.<span class="ident">reanneal_iter_accepted</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="self">self</span>.<span class="ident">reanneal_iter_best</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="self">self</span>.<span class="ident">cur_temp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">init_temp</span>;
-            <span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">if </span>out.<span class="number">0 </span>|| out.<span class="number">1 </span>|| out.<span class="number">2 </span>{
+            <span class="self">self</span>.reanneal_iter_fixed = <span class="number">0</span>;
+            <span class="self">self</span>.reanneal_iter_accepted = <span class="number">0</span>;
+            <span class="self">self</span>.reanneal_iter_best = <span class="number">0</span>;
+            <span class="self">self</span>.cur_temp = <span class="self">self</span>.init_temp;
+            <span class="self">self</span>.temp_iter = <span class="number">0</span>;
         }
-        <span class="ident">out</span>
+        out
     }
 
-    <span class="doccomment">/// Update the stall iter variables</span>
-    <span class="kw">fn</span> <span class="ident">update_stall_and_reanneal_iter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">accepted</span>: <span class="ident">bool</span>, <span class="ident">new_best</span>: <span class="ident">bool</span>) {
-        (<span class="self">self</span>.<span class="ident">stall_iter_accepted</span>, <span class="self">self</span>.<span class="ident">reanneal_iter_accepted</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">accepted</span> {
+    <span class="doccomment">/// Update the stall iter variables
+    </span><span class="kw">fn </span>update_stall_and_reanneal_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, accepted: bool, new_best: bool) {
+        (<span class="self">self</span>.stall_iter_accepted, <span class="self">self</span>.reanneal_iter_accepted) = <span class="kw">if </span>accepted {
             (<span class="number">0</span>, <span class="number">0</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             (
-                <span class="self">self</span>.<span class="ident">stall_iter_accepted</span> <span class="op">+</span> <span class="number">1</span>,
-                <span class="self">self</span>.<span class="ident">reanneal_iter_accepted</span> <span class="op">+</span> <span class="number">1</span>,
+                <span class="self">self</span>.stall_iter_accepted + <span class="number">1</span>,
+                <span class="self">self</span>.reanneal_iter_accepted + <span class="number">1</span>,
             )
         };
 
-        (<span class="self">self</span>.<span class="ident">stall_iter_best</span>, <span class="self">self</span>.<span class="ident">reanneal_iter_best</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">new_best</span> {
+        (<span class="self">self</span>.stall_iter_best, <span class="self">self</span>.reanneal_iter_best) = <span class="kw">if </span>new_best {
             (<span class="number">0</span>, <span class="number">0</span>)
-        } <span class="kw">else</span> {
-            (<span class="self">self</span>.<span class="ident">stall_iter_best</span> <span class="op">+</span> <span class="number">1</span>, <span class="self">self</span>.<span class="ident">reanneal_iter_best</span> <span class="op">+</span> <span class="number">1</span>)
+        } <span class="kw">else </span>{
+            (<span class="self">self</span>.stall_iter_best + <span class="number">1</span>, <span class="self">self</span>.reanneal_iter_best + <span class="number">1</span>)
         };
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Anneal</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Clone</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
-    <span class="ident">R</span>: <span class="ident">Rng</span> <span class="op">+</span> <span class="ident">SerializeAlias</span>,
+<span class="kw">impl</span>&lt;O, P, F, R&gt; Solver&lt;O, IterState&lt;P, (), (), (), F&gt;&gt; <span class="kw">for </span>SimulatedAnnealing&lt;F, R&gt;
+<span class="kw">where
+    </span>O: CostFunction&lt;Param = P, Output = F&gt; + Anneal&lt;Param = P, Output = P, Float = F&gt;,
+    P: Clone,
+    F: ArgminFloat,
+    R: Rng + SerializeAlias,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Simulated Annealing&quot;</span>;
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Simulated Annealing&quot;</span>;
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`SimulatedAnnealing` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cost</span>.<span class="ident">is_infinite</span>() {
-            <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">cost</span>
+        <span class="kw">let </span>cost = state.get_cost();
+        <span class="kw">let </span>cost = <span class="kw">if </span>cost.is_infinite() {
+            problem.cost(<span class="kw-2">&amp;</span>param)<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            cost
         };
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">cost</span>(<span class="ident">cost</span>),
+            state.param(param).cost(cost),
             <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(
-                <span class="string">&quot;initial_temperature&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">init_temp</span>;
-                <span class="string">&quot;stall_iter_accepted_limit&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">stall_iter_accepted_limit</span>;
-                <span class="string">&quot;stall_iter_best_limit&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">stall_iter_best_limit</span>;
-                <span class="string">&quot;reanneal_fixed&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_fixed</span>;
-                <span class="string">&quot;reanneal_accepted&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_accepted</span>;
-                <span class="string">&quot;reanneal_best&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_best</span>;
+                <span class="string">&quot;initial_temperature&quot; </span>=&gt; <span class="self">self</span>.init_temp;
+                <span class="string">&quot;stall_iter_accepted_limit&quot; </span>=&gt; <span class="self">self</span>.stall_iter_accepted_limit;
+                <span class="string">&quot;stall_iter_best_limit&quot; </span>=&gt; <span class="self">self</span>.stall_iter_best_limit;
+                <span class="string">&quot;reanneal_fixed&quot; </span>=&gt; <span class="self">self</span>.reanneal_fixed;
+                <span class="string">&quot;reanneal_accepted&quot; </span>=&gt; <span class="self">self</span>.reanneal_accepted;
+                <span class="string">&quot;reanneal_best&quot; </span>=&gt; <span class="self">self</span>.reanneal_best;
             )),
         ))
     }
 
-    <span class="doccomment">/// Perform one iteration of SA algorithm</span>
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// Careful: The order in here is *very* important, even if it may not seem so. Everything</span>
-        <span class="comment">// is linked to the iteration number, and getting things mixed up may lead to unexpected</span>
-        <span class="comment">// behavior.</span>
+    <span class="doccomment">/// Perform one iteration of SA algorithm
+    </span><span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="comment">// Careful: The order in here is *very* important, even if it may not seem so. Everything
+        // is linked to the iteration number, and getting things mixed up may lead to unexpected
+        // behavior.
 
-        <span class="kw">let</span> <span class="ident">prev_param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`SimulatedAnnealing`: Parameter vector in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">prev_cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
+        </span><span class="kw">let </span>prev_param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`SimulatedAnnealing`: Parameter vector in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>prev_cost = state.get_cost();
 
-        <span class="comment">// Make a move</span>
-        <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">anneal</span>(<span class="kw-2">&amp;</span><span class="ident">prev_param</span>, <span class="self">self</span>.<span class="ident">cur_temp</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Make a move
+        </span><span class="kw">let </span>new_param = problem.anneal(<span class="kw-2">&amp;</span>prev_param, <span class="self">self</span>.cur_temp)<span class="question-mark">?</span>;
 
-        <span class="comment">// Evaluate cost function with new parameter vector</span>
-        <span class="kw">let</span> <span class="ident">new_cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Evaluate cost function with new parameter vector
+        </span><span class="kw">let </span>new_cost = problem.cost(<span class="kw-2">&amp;</span>new_param)<span class="question-mark">?</span>;
 
-        <span class="comment">// Acceptance function</span>
-        <span class="comment">//</span>
-        <span class="comment">// Decide whether new parameter vector should be accepted.</span>
-        <span class="comment">// If no, move on with old parameter vector.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Any solution which satisfies `next_cost &lt; prev_cost` will be accepted. Solutions worse</span>
-        <span class="comment">// than the previous one are accepted with a probability given as:</span>
-        <span class="comment">//</span>
-        <span class="comment">// `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,</span>
-        <span class="comment">//</span>
-        <span class="comment">// which will always be between 0 and 0.5.</span>
-        <span class="kw">let</span> <span class="ident">prob</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">gen</span>();
-        <span class="kw">let</span> <span class="ident">prob</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="ident">prob</span>);
-        <span class="kw">let</span> <span class="ident">accepted</span> <span class="op">=</span> (<span class="ident">new_cost</span> <span class="op">&lt;</span> <span class="ident">prev_cost</span>)
-            <span class="op">|</span><span class="op">|</span> (<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">/</span> (<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">+</span> ((<span class="ident">new_cost</span> <span class="op">-</span> <span class="ident">prev_cost</span>) <span class="op">/</span> <span class="self">self</span>.<span class="ident">cur_temp</span>).<span class="ident">exp</span>())
-                <span class="op">&gt;</span> <span class="ident">prob</span>);
+        <span class="comment">// Acceptance function
+        //
+        // Decide whether new parameter vector should be accepted.
+        // If no, move on with old parameter vector.
+        //
+        // Any solution which satisfies `next_cost &lt; prev_cost` will be accepted. Solutions worse
+        // than the previous one are accepted with a probability given as:
+        //
+        // `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
+        //
+        // which will always be between 0 and 0.5.
+        </span><span class="kw">let </span>prob: f64 = <span class="self">self</span>.rng.gen();
+        <span class="kw">let </span>prob = <span class="macro">float!</span>(prob);
+        <span class="kw">let </span>accepted = (new_cost &lt; prev_cost)
+            || (<span class="macro">float!</span>(<span class="number">1.0</span>) / (<span class="macro">float!</span>(<span class="number">1.0</span>) + ((new_cost - prev_cost) / <span class="self">self</span>.cur_temp).exp())
+                &gt; prob);
 
-        <span class="kw">let</span> <span class="ident">new_best_found</span> <span class="op">=</span> <span class="ident">new_cost</span> <span class="op">&lt;</span> <span class="ident">state</span>.<span class="ident">best_cost</span>;
+        <span class="kw">let </span>new_best_found = new_cost &lt; state.best_cost;
 
-        <span class="comment">// Update stall iter variables</span>
-        <span class="self">self</span>.<span class="ident">update_stall_and_reanneal_iter</span>(<span class="ident">accepted</span>, <span class="ident">new_best_found</span>);
+        <span class="comment">// Update stall iter variables
+        </span><span class="self">self</span>.update_stall_and_reanneal_iter(accepted, new_best_found);
 
-        <span class="kw">let</span> (<span class="ident">r_fixed</span>, <span class="ident">r_accepted</span>, <span class="ident">r_best</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">reanneal</span>();
+        <span class="kw">let </span>(r_fixed, r_accepted, r_best) = <span class="self">self</span>.reanneal();
 
-        <span class="comment">// Update temperature for next iteration.</span>
-        <span class="self">self</span>.<span class="ident">temp_iter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="comment">// Actually not necessary as it does the same as `temp_iter`, but I&#39;ll leave it here for</span>
-        <span class="comment">// better readability.</span>
-        <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="comment">// Update temperature for next iteration.
+        </span><span class="self">self</span>.temp_iter += <span class="number">1</span>;
+        <span class="comment">// Actually not necessary as it does the same as `temp_iter`, but I&#39;ll leave it here for
+        // better readability.
+        </span><span class="self">self</span>.reanneal_iter_fixed += <span class="number">1</span>;
 
-        <span class="self">self</span>.<span class="ident">update_temperature</span>();
+        <span class="self">self</span>.update_temperature();
 
         <span class="prelude-val">Ok</span>((
-            <span class="kw">if</span> <span class="ident">accepted</span> {
-                <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">new_param</span>).<span class="ident">cost</span>(<span class="ident">new_cost</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">prev_param</span>).<span class="ident">cost</span>(<span class="ident">prev_cost</span>)
+            <span class="kw">if </span>accepted {
+                state.param(new_param).cost(new_cost)
+            } <span class="kw">else </span>{
+                state.param(prev_param).cost(prev_cost)
             },
             <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(
-                <span class="string">&quot;t&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">cur_temp</span>;
-                <span class="string">&quot;new_be&quot;</span> =&gt; <span class="ident">new_best_found</span>;
-                <span class="string">&quot;acc&quot;</span> =&gt; <span class="ident">accepted</span>;
-                <span class="string">&quot;st_i_be&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">stall_iter_best</span>;
-                <span class="string">&quot;st_i_ac&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">stall_iter_accepted</span>;
-                <span class="string">&quot;ra_i_fi&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_iter_fixed</span>;
-                <span class="string">&quot;ra_i_be&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_iter_best</span>;
-                <span class="string">&quot;ra_i_ac&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">reanneal_iter_accepted</span>;
-                <span class="string">&quot;ra_fi&quot;</span> =&gt; <span class="ident">r_fixed</span>;
-                <span class="string">&quot;ra_be&quot;</span> =&gt; <span class="ident">r_best</span>;
-                <span class="string">&quot;ra_ac&quot;</span> =&gt; <span class="ident">r_accepted</span>;
+                <span class="string">&quot;t&quot; </span>=&gt; <span class="self">self</span>.cur_temp;
+                <span class="string">&quot;new_be&quot; </span>=&gt; new_best_found;
+                <span class="string">&quot;acc&quot; </span>=&gt; accepted;
+                <span class="string">&quot;st_i_be&quot; </span>=&gt; <span class="self">self</span>.stall_iter_best;
+                <span class="string">&quot;st_i_ac&quot; </span>=&gt; <span class="self">self</span>.stall_iter_accepted;
+                <span class="string">&quot;ra_i_fi&quot; </span>=&gt; <span class="self">self</span>.reanneal_iter_fixed;
+                <span class="string">&quot;ra_i_be&quot; </span>=&gt; <span class="self">self</span>.reanneal_iter_best;
+                <span class="string">&quot;ra_i_ac&quot; </span>=&gt; <span class="self">self</span>.reanneal_iter_accepted;
+                <span class="string">&quot;ra_fi&quot; </span>=&gt; r_fixed;
+                <span class="string">&quot;ra_be&quot; </span>=&gt; r_best;
+                <span class="string">&quot;ra_ac&quot; </span>=&gt; r_accepted;
             )),
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stall_iter_accepted</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_accepted_limit</span> {
-            <span class="kw">return</span> <span class="ident">TerminationReason::AcceptedStallIterExceeded</span>;
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationReason {
+        <span class="kw">if </span><span class="self">self</span>.stall_iter_accepted &gt; <span class="self">self</span>.stall_iter_accepted_limit {
+            <span class="kw">return </span>TerminationReason::AcceptedStallIterExceeded;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stall_iter_best</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">stall_iter_best_limit</span> {
-            <span class="kw">return</span> <span class="ident">TerminationReason::BestStallIterExceeded</span>;
+        <span class="kw">if </span><span class="self">self</span>.stall_iter_best &gt; <span class="self">self</span>.stall_iter_best_limit {
+            <span class="kw">return </span>TerminationReason::BestStallIterExceeded;
         }
-        <span class="ident">TerminationReason::NotTerminated</span>
+        TerminationReason::NotTerminated
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">test_utils::TestProblem</span>, <span class="ident">ArgminError</span>, <span class="ident">State</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
-    <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{test_utils::TestProblem, ArgminError, State};
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
+    <span class="kw">use </span>approx::assert_relative_eq;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">sa</span>, <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">StdRng</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(sa, SimulatedAnnealing&lt;f64, StdRng&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">sa</span>: <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">Xoshiro256PlusPlus</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">SimulatedAnnealing</span> {
-            <span class="ident">init_temp</span>,
-            <span class="ident">temp_func</span>,
-            <span class="ident">temp_iter</span>,
-            <span class="ident">stall_iter_accepted</span>,
-            <span class="ident">stall_iter_accepted_limit</span>,
-            <span class="ident">stall_iter_best</span>,
-            <span class="ident">stall_iter_best_limit</span>,
-            <span class="ident">reanneal_fixed</span>,
-            <span class="ident">reanneal_iter_fixed</span>,
-            <span class="ident">reanneal_accepted</span>,
-            <span class="ident">reanneal_iter_accepted</span>,
-            <span class="ident">reanneal_best</span>,
-            <span class="ident">reanneal_iter_best</span>,
-            <span class="ident">cur_temp</span>,
-            <span class="ident">rng</span>: <span class="ident">_rng</span>,
-        } <span class="op">=</span> <span class="ident">sa</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>sa: SimulatedAnnealing&lt;f64, Xoshiro256PlusPlus&gt; =
+            SimulatedAnnealing::new(<span class="number">100.0</span>).unwrap();
+        <span class="kw">let </span>SimulatedAnnealing {
+            init_temp,
+            temp_func,
+            temp_iter,
+            stall_iter_accepted,
+            stall_iter_accepted_limit,
+            stall_iter_best,
+            stall_iter_best_limit,
+            reanneal_fixed,
+            reanneal_iter_fixed,
+            reanneal_accepted,
+            reanneal_iter_accepted,
+            reanneal_best,
+            reanneal_iter_best,
+            cur_temp,
+            rng: _rng,
+        } = sa;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">init_temp</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">100.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">temp_func</span>, <span class="ident">SATempFunc::TemperatureFast</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">temp_iter</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">stall_iter_accepted</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">stall_iter_accepted_limit</span>, <span class="ident">u64::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">stall_iter_best</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">stall_iter_best_limit</span>, <span class="ident">u64::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_fixed</span>, <span class="ident">u64::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_iter_fixed</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_accepted</span>, <span class="ident">u64::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_iter_accepted</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_best</span>, <span class="ident">u64::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_iter_best</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">cur_temp</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">100.0f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(init_temp.to_ne_bytes(), <span class="number">100.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(temp_func, SATempFunc::TemperatureFast);
+        <span class="macro">assert_eq!</span>(temp_iter, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(stall_iter_accepted, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(stall_iter_accepted_limit, u64::MAX);
+        <span class="macro">assert_eq!</span>(stall_iter_best, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(stall_iter_best_limit, u64::MAX);
+        <span class="macro">assert_eq!</span>(reanneal_fixed, u64::MAX);
+        <span class="macro">assert_eq!</span>(reanneal_iter_fixed, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(reanneal_accepted, u64::MAX);
+        <span class="macro">assert_eq!</span>(reanneal_iter_accepted, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(reanneal_best, u64::MAX);
+        <span class="macro">assert_eq!</span>(reanneal_iter_best, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(cur_temp.to_ne_bytes(), <span class="number">100.0f64</span>.to_ne_bytes());
 
-        <span class="kw">for</span> <span class="ident">temp</span> <span class="kw">in</span> [<span class="number">0.0</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="ident">std::f64::EPSILON</span>, <span class="op">-</span><span class="number">100.0</span>] {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="ident">temp</span>);
+        <span class="kw">for </span>temp <span class="kw">in </span>[<span class="number">0.0</span>, -<span class="number">1.0</span>, -std::f64::EPSILON, -<span class="number">100.0</span>] {
+            <span class="kw">let </span>res = SimulatedAnnealing::new(temp);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
-                <span class="string">&quot;Invalid parameter: \&quot;`SimulatedAnnealing`: Initial temperature must be &gt; 0.\&quot;&quot;</span>
-            );
+                res,
+                ArgminError,
+                <span class="string">&quot;Invalid parameter: \&quot;`SimulatedAnnealing`: Initial temperature must be &gt; 0.\&quot;&quot;
+            </span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new_with_rng</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">MyRng</span> {}
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new_with_rng() {
+        <span class="attribute">#[derive(Eq, PartialEq, Debug)]
+        </span><span class="kw">struct </span>MyRng {}
 
-        <span class="kw">let</span> <span class="ident">sa</span>: <span class="ident">SimulatedAnnealing</span><span class="op">&lt;</span><span class="ident">f64</span>, <span class="ident">MyRng</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">SimulatedAnnealing::new_with_rng</span>(<span class="number">100.0</span>, <span class="ident">MyRng</span> {}).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">SimulatedAnnealing</span> {
-            <span class="ident">init_temp</span>,
-            <span class="ident">temp_func</span>,
-            <span class="ident">temp_iter</span>,
-            <span class="ident">stall_iter_accepted</span>,
-            <span class="ident">stall_iter_accepted_limit</span>,
-            <span class="ident">stall_iter_best</span>,
-            <span class="ident">stall_iter_best_limit</span>,
-            <span class="ident">reanneal_fixed</span>,
-            <span class="ident">reanneal_iter_fixed</span>,
-            <span class="ident">reanneal_accepted</span>,
-            <span class="ident">reanneal_iter_accepted</span>,
-            <span class="ident">reanneal_best</span>,
-            <span class="ident">reanneal_iter_best</span>,
-            <span class="ident">cur_temp</span>,
-            <span class="ident">rng</span>,
-        } <span class="op">=</span> <span class="ident">sa</span>;
+        <span class="kw">let </span>sa: SimulatedAnnealing&lt;f64, MyRng&gt; =
+            SimulatedAnnealing::new_with_rng(<span class="number">100.0</span>, MyRng {}).unwrap();
+        <span class="kw">let </span>SimulatedAnnealing {
+            init_temp,
+            temp_func,
+            temp_iter,
+            stall_iter_accepted,
+            stall_iter_accepted_limit,
+            stall_iter_best,
+            stall_iter_best_limit,
+            reanneal_fixed,
+            reanneal_iter_fixed,
+            reanneal_accepted,
+            reanneal_iter_accepted,
+            reanneal_best,
+            reanneal_iter_best,
+            cur_temp,
+            rng,
+        } = sa;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">init_temp</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">100.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">temp_func</span>, <span class="ident">SATempFunc::TemperatureFast</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">temp_iter</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">stall_iter_accepted</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">stall_iter_accepted_limit</span>, <span class="ident">u64::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">stall_iter_best</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">stall_iter_best_limit</span>, <span class="ident">u64::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_fixed</span>, <span class="ident">u64::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_iter_fixed</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_accepted</span>, <span class="ident">u64::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_iter_accepted</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_best</span>, <span class="ident">u64::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">reanneal_iter_best</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">cur_temp</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">100.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="comment">// important part</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">rng</span>, <span class="ident">MyRng</span> {});
+        <span class="macro">assert_eq!</span>(init_temp.to_ne_bytes(), <span class="number">100.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(temp_func, SATempFunc::TemperatureFast);
+        <span class="macro">assert_eq!</span>(temp_iter, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(stall_iter_accepted, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(stall_iter_accepted_limit, u64::MAX);
+        <span class="macro">assert_eq!</span>(stall_iter_best, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(stall_iter_best_limit, u64::MAX);
+        <span class="macro">assert_eq!</span>(reanneal_fixed, u64::MAX);
+        <span class="macro">assert_eq!</span>(reanneal_iter_fixed, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(reanneal_accepted, u64::MAX);
+        <span class="macro">assert_eq!</span>(reanneal_iter_accepted, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(reanneal_best, u64::MAX);
+        <span class="macro">assert_eq!</span>(reanneal_iter_best, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(cur_temp.to_ne_bytes(), <span class="number">100.0f64</span>.to_ne_bytes());
+        <span class="comment">// important part
+        </span><span class="macro">assert_eq!</span>(rng, MyRng {});
 
-        <span class="kw">for</span> <span class="ident">temp</span> <span class="kw">in</span> [<span class="number">0.0</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="ident">std::f64::EPSILON</span>, <span class="op">-</span><span class="number">100.0</span>] {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new_with_rng</span>(<span class="ident">temp</span>, <span class="ident">MyRng</span> {});
+        <span class="kw">for </span>temp <span class="kw">in </span>[<span class="number">0.0</span>, -<span class="number">1.0</span>, -std::f64::EPSILON, -<span class="number">100.0</span>] {
+            <span class="kw">let </span>res = SimulatedAnnealing::new_with_rng(temp, MyRng {});
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
-                <span class="string">&quot;Invalid parameter: \&quot;`SimulatedAnnealing`: Initial temperature must be &gt; 0.\&quot;&quot;</span>
-            );
+                res,
+                ArgminError,
+                <span class="string">&quot;Invalid parameter: \&quot;`SimulatedAnnealing`: Initial temperature must be &gt; 0.\&quot;&quot;
+            </span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_temp_func</span>() {
-        <span class="kw">for</span> <span class="ident">func</span> <span class="kw">in</span> [
-            <span class="ident">SATempFunc::TemperatureFast</span>,
-            <span class="ident">SATempFunc::Boltzmann</span>,
-            <span class="ident">SATempFunc::Exponential</span>(<span class="number">2.0</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_temp_func() {
+        <span class="kw">for </span>func <span class="kw">in </span>[
+            SATempFunc::TemperatureFast,
+            SATempFunc::Boltzmann,
+            SATempFunc::Exponential(<span class="number">2.0</span>),
         ] {
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0f64</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">sa</span>.<span class="ident">with_temp_func</span>(<span class="ident">func</span>);
+            <span class="kw">let </span>sa = SimulatedAnnealing::new(<span class="number">100.0f64</span>).unwrap();
+            <span class="kw">let </span>sa = sa.with_temp_func(func);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">temp_func</span>, <span class="ident">func</span>);
+            <span class="macro">assert_eq!</span>(sa.temp_func, func);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_stall_accepted</span>() {
-        <span class="kw">for</span> <span class="ident">iter</span> <span class="kw">in</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">100000</span>] {
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0f64</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">sa</span>.<span class="ident">with_stall_accepted</span>(<span class="ident">iter</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_stall_accepted() {
+        <span class="kw">for </span>iter <span class="kw">in </span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">100000</span>] {
+            <span class="kw">let </span>sa = SimulatedAnnealing::new(<span class="number">100.0f64</span>).unwrap();
+            <span class="kw">let </span>sa = sa.with_stall_accepted(iter);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">stall_iter_accepted_limit</span>, <span class="ident">iter</span>);
+            <span class="macro">assert_eq!</span>(sa.stall_iter_accepted_limit, iter);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_stall_best</span>() {
-        <span class="kw">for</span> <span class="ident">iter</span> <span class="kw">in</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">100000</span>] {
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0f64</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">sa</span>.<span class="ident">with_stall_best</span>(<span class="ident">iter</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_stall_best() {
+        <span class="kw">for </span>iter <span class="kw">in </span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">100000</span>] {
+            <span class="kw">let </span>sa = SimulatedAnnealing::new(<span class="number">100.0f64</span>).unwrap();
+            <span class="kw">let </span>sa = sa.with_stall_best(iter);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">stall_iter_best_limit</span>, <span class="ident">iter</span>);
+            <span class="macro">assert_eq!</span>(sa.stall_iter_best_limit, iter);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_reannealing_fixed</span>() {
-        <span class="kw">for</span> <span class="ident">iter</span> <span class="kw">in</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">100000</span>] {
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0f64</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">sa</span>.<span class="ident">with_reannealing_fixed</span>(<span class="ident">iter</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_reannealing_fixed() {
+        <span class="kw">for </span>iter <span class="kw">in </span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">100000</span>] {
+            <span class="kw">let </span>sa = SimulatedAnnealing::new(<span class="number">100.0f64</span>).unwrap();
+            <span class="kw">let </span>sa = sa.with_reannealing_fixed(iter);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">reanneal_fixed</span>, <span class="ident">iter</span>);
+            <span class="macro">assert_eq!</span>(sa.reanneal_fixed, iter);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_reannealing_accepted</span>() {
-        <span class="kw">for</span> <span class="ident">iter</span> <span class="kw">in</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">100000</span>] {
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0f64</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">sa</span>.<span class="ident">with_reannealing_accepted</span>(<span class="ident">iter</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_reannealing_accepted() {
+        <span class="kw">for </span>iter <span class="kw">in </span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">100000</span>] {
+            <span class="kw">let </span>sa = SimulatedAnnealing::new(<span class="number">100.0f64</span>).unwrap();
+            <span class="kw">let </span>sa = sa.with_reannealing_accepted(iter);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">reanneal_accepted</span>, <span class="ident">iter</span>);
+            <span class="macro">assert_eq!</span>(sa.reanneal_accepted, iter);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_reannealing_best</span>() {
-        <span class="kw">for</span> <span class="ident">iter</span> <span class="kw">in</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">100000</span>] {
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0f64</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">sa</span>.<span class="ident">with_reannealing_best</span>(<span class="ident">iter</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_reannealing_best() {
+        <span class="kw">for </span>iter <span class="kw">in </span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">100000</span>] {
+            <span class="kw">let </span>sa = SimulatedAnnealing::new(<span class="number">100.0f64</span>).unwrap();
+            <span class="kw">let </span>sa = sa.with_reannealing_best(iter);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">reanneal_best</span>, <span class="ident">iter</span>);
+            <span class="macro">assert_eq!</span>(sa.reanneal_best, iter);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_update_temperature</span>() {
-        <span class="kw">for</span> (<span class="ident">func</span>, <span class="ident">val</span>) <span class="kw">in</span> [
-            (<span class="ident">SATempFunc::TemperatureFast</span>, <span class="number">100.0f64</span> <span class="op">/</span> <span class="number">2.0</span>),
-            (<span class="ident">SATempFunc::Boltzmann</span>, <span class="number">100.0f64</span> <span class="op">/</span> <span class="number">2.0f64</span>.<span class="ident">ln</span>()),
-            (<span class="ident">SATempFunc::Exponential</span>(<span class="number">3.0</span>), <span class="number">100.0</span> <span class="op">*</span> <span class="number">3.0f64</span>.<span class="ident">powi</span>(<span class="number">2</span>)),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_update_temperature() {
+        <span class="kw">for </span>(func, val) <span class="kw">in </span>[
+            (SATempFunc::TemperatureFast, <span class="number">100.0f64 </span>/ <span class="number">2.0</span>),
+            (SATempFunc::Boltzmann, <span class="number">100.0f64 </span>/ <span class="number">2.0f64</span>.ln()),
+            (SATempFunc::Exponential(<span class="number">3.0</span>), <span class="number">100.0 </span>* <span class="number">3.0f64</span>.powi(<span class="number">2</span>)),
         ] {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0f64</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">with_temp_func</span>(<span class="ident">func</span>);
-            <span class="ident">sa</span>.<span class="ident">temp_iter</span> <span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>sa = SimulatedAnnealing::new(<span class="number">100.0f64</span>)
+                .unwrap()
+                .with_temp_func(func);
+            sa.temp_iter = <span class="number">1</span>;
 
-            <span class="ident">sa</span>.<span class="ident">update_temperature</span>();
+            sa.update_temperature();
 
-            <span class="macro">assert_relative_eq!</span>(<span class="ident">sa</span>.<span class="ident">cur_temp</span>, <span class="ident">val</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+            <span class="macro">assert_relative_eq!</span>(sa.cur_temp, val, epsilon = f64::EPSILON);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_reanneal</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sa_t</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0f64</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_reanneal() {
+        <span class="kw">let </span><span class="kw-2">mut </span>sa_t = SimulatedAnnealing::new(<span class="number">100.0f64</span>).unwrap();
 
-        <span class="ident">sa_t</span>.<span class="ident">reanneal_fixed</span> <span class="op">=</span> <span class="number">10</span>;
-        <span class="ident">sa_t</span>.<span class="ident">reanneal_accepted</span> <span class="op">=</span> <span class="number">20</span>;
-        <span class="ident">sa_t</span>.<span class="ident">reanneal_best</span> <span class="op">=</span> <span class="number">30</span>;
-        <span class="ident">sa_t</span>.<span class="ident">temp_iter</span> <span class="op">=</span> <span class="number">40</span>;
-        <span class="ident">sa_t</span>.<span class="ident">cur_temp</span> <span class="op">=</span> <span class="number">50.0</span>;
+        sa_t.reanneal_fixed = <span class="number">10</span>;
+        sa_t.reanneal_accepted = <span class="number">20</span>;
+        sa_t.reanneal_best = <span class="number">30</span>;
+        sa_t.temp_iter = <span class="number">40</span>;
+        sa_t.cur_temp = <span class="number">50.0</span>;
 
-        <span class="kw">for</span> ((<span class="ident">f</span>, <span class="ident">a</span>, <span class="ident">b</span>), <span class="ident">expected</span>) <span class="kw">in</span> [
+        <span class="kw">for </span>((f, a, b), expected) <span class="kw">in </span>[
             ((<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>)),
             ((<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>)),
             ((<span class="number">11</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>)),
@@ -1664,105 +1664,105 @@
             ((<span class="number">0</span>, <span class="number">20</span>, <span class="number">30</span>), (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>)),
             ((<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>), (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>)),
         ] {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">sa_t</span>.<span class="ident">clone</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>sa = sa_t.clone();
 
-            <span class="ident">sa</span>.<span class="ident">reanneal_iter_fixed</span> <span class="op">=</span> <span class="ident">f</span>;
-            <span class="ident">sa</span>.<span class="ident">reanneal_iter_accepted</span> <span class="op">=</span> <span class="ident">a</span>;
-            <span class="ident">sa</span>.<span class="ident">reanneal_iter_best</span> <span class="op">=</span> <span class="ident">b</span>;
+            sa.reanneal_iter_fixed = f;
+            sa.reanneal_iter_accepted = a;
+            sa.reanneal_iter_best = b;
 
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">reanneal</span>(), <span class="ident">expected</span>);
+            <span class="macro">assert_eq!</span>(sa.reanneal(), expected);
 
-            <span class="kw">if</span> <span class="ident">expected</span>.<span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">expected</span>.<span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">expected</span>.<span class="number">2</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">reanneal_iter_fixed</span>, <span class="number">0</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">reanneal_iter_accepted</span>, <span class="number">0</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">reanneal_iter_best</span>, <span class="number">0</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">temp_iter</span>, <span class="number">0</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">cur_temp</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">sa</span>.<span class="ident">init_temp</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">if </span>expected.<span class="number">0 </span>|| expected.<span class="number">1 </span>|| expected.<span class="number">2 </span>{
+                <span class="macro">assert_eq!</span>(sa.reanneal_iter_fixed, <span class="number">0</span>);
+                <span class="macro">assert_eq!</span>(sa.reanneal_iter_accepted, <span class="number">0</span>);
+                <span class="macro">assert_eq!</span>(sa.reanneal_iter_best, <span class="number">0</span>);
+                <span class="macro">assert_eq!</span>(sa.temp_iter, <span class="number">0</span>);
+                <span class="macro">assert_eq!</span>(sa.cur_temp.to_ne_bytes(), sa.init_temp.to_ne_bytes());
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_update_stall_and_reanneal_iter</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sa_t</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0f64</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_update_stall_and_reanneal_iter() {
+        <span class="kw">let </span><span class="kw-2">mut </span>sa_t = SimulatedAnnealing::new(<span class="number">100.0f64</span>).unwrap();
 
-        <span class="ident">sa_t</span>.<span class="ident">stall_iter_accepted</span> <span class="op">=</span> <span class="number">10</span>;
-        <span class="ident">sa_t</span>.<span class="ident">reanneal_iter_accepted</span> <span class="op">=</span> <span class="number">20</span>;
-        <span class="ident">sa_t</span>.<span class="ident">stall_iter_best</span> <span class="op">=</span> <span class="number">30</span>;
-        <span class="ident">sa_t</span>.<span class="ident">reanneal_iter_best</span> <span class="op">=</span> <span class="number">40</span>;
+        sa_t.stall_iter_accepted = <span class="number">10</span>;
+        sa_t.reanneal_iter_accepted = <span class="number">20</span>;
+        sa_t.stall_iter_best = <span class="number">30</span>;
+        sa_t.reanneal_iter_best = <span class="number">40</span>;
 
-        <span class="kw">for</span> ((<span class="ident">a</span>, <span class="ident">b</span>), (<span class="ident">sia</span>, <span class="ident">ria</span>, <span class="ident">sib</span>, <span class="ident">rib</span>)) <span class="kw">in</span> [
+        <span class="kw">for </span>((a, b), (sia, ria, sib, rib)) <span class="kw">in </span>[
             ((<span class="bool-val">false</span>, <span class="bool-val">false</span>), (<span class="number">11</span>, <span class="number">21</span>, <span class="number">31</span>, <span class="number">41</span>)),
             ((<span class="bool-val">false</span>, <span class="bool-val">true</span>), (<span class="number">11</span>, <span class="number">21</span>, <span class="number">0</span>, <span class="number">0</span>)),
             ((<span class="bool-val">true</span>, <span class="bool-val">false</span>), (<span class="number">0</span>, <span class="number">0</span>, <span class="number">31</span>, <span class="number">41</span>)),
             ((<span class="bool-val">true</span>, <span class="bool-val">true</span>), (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)),
         ] {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">sa_t</span>.<span class="ident">clone</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>sa = sa_t.clone();
 
-            <span class="ident">sa</span>.<span class="ident">update_stall_and_reanneal_iter</span>(<span class="ident">a</span>, <span class="ident">b</span>);
+            sa.update_stall_and_reanneal_iter(a, b);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">stall_iter_accepted</span>, <span class="ident">sia</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">reanneal_iter_accepted</span>, <span class="ident">ria</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">stall_iter_best</span>, <span class="ident">sib</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">sa</span>.<span class="ident">reanneal_iter_best</span>, <span class="ident">rib</span>);
+            <span class="macro">assert_eq!</span>(sa.stall_iter_accepted, sia);
+            <span class="macro">assert_eq!</span>(sa.reanneal_iter_accepted, ria);
+            <span class="macro">assert_eq!</span>(sa.stall_iter_best, sib);
+            <span class="macro">assert_eq!</span>(sa.reanneal_iter_best, rib);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init</span>() {
-        <span class="kw">let</span> <span class="ident">param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init() {
+        <span class="kw">let </span>param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>];
 
-        <span class="kw">let</span> <span class="ident">stall_iter_accepted_limit</span> <span class="op">=</span> <span class="number">10</span>;
-        <span class="kw">let</span> <span class="ident">stall_iter_best_limit</span> <span class="op">=</span> <span class="number">20</span>;
-        <span class="kw">let</span> <span class="ident">reanneal_fixed</span> <span class="op">=</span> <span class="number">30</span>;
-        <span class="kw">let</span> <span class="ident">reanneal_accepted</span> <span class="op">=</span> <span class="number">40</span>;
-        <span class="kw">let</span> <span class="ident">reanneal_best</span> <span class="op">=</span> <span class="number">50</span>;
+        <span class="kw">let </span>stall_iter_accepted_limit = <span class="number">10</span>;
+        <span class="kw">let </span>stall_iter_best_limit = <span class="number">20</span>;
+        <span class="kw">let </span>reanneal_fixed = <span class="number">30</span>;
+        <span class="kw">let </span>reanneal_accepted = <span class="number">40</span>;
+        <span class="kw">let </span>reanneal_best = <span class="number">50</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sa</span> <span class="op">=</span> <span class="ident">SimulatedAnnealing::new</span>(<span class="number">100.0f64</span>)
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">with_stall_accepted</span>(<span class="ident">stall_iter_accepted_limit</span>)
-            .<span class="ident">with_stall_best</span>(<span class="ident">stall_iter_best_limit</span>)
-            .<span class="ident">with_reannealing_fixed</span>(<span class="ident">reanneal_fixed</span>)
-            .<span class="ident">with_reannealing_accepted</span>(<span class="ident">reanneal_accepted</span>)
-            .<span class="ident">with_reannealing_best</span>(<span class="ident">reanneal_best</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>sa = SimulatedAnnealing::new(<span class="number">100.0f64</span>)
+            .unwrap()
+            .with_stall_accepted(stall_iter_accepted_limit)
+            .with_stall_best(stall_iter_best_limit)
+            .with_reannealing_fixed(reanneal_fixed)
+            .with_reannealing_accepted(reanneal_accepted)
+            .with_reannealing_best(reanneal_best);
 
-        <span class="comment">// Forgot to initialize the parameter vector</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">sa</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>);
+        <span class="comment">// Forgot to initialize the parameter vector
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>res = sa.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`SimulatedAnnealing` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
 
-        <span class="comment">// All good.</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">param</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">sa</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// All good.
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new().param(param.clone());
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = sa.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="kw">let</span> <span class="ident">kv_expected</span> <span class="op">=</span> <span class="macro">kv!</span>(
-            <span class="string">&quot;initial_temperature&quot;</span> =&gt; <span class="number">100.0f64</span>;
-            <span class="string">&quot;stall_iter_accepted_limit&quot;</span> =&gt; <span class="ident">stall_iter_accepted_limit</span>;
-            <span class="string">&quot;stall_iter_best_limit&quot;</span> =&gt; <span class="ident">stall_iter_best_limit</span>;
-            <span class="string">&quot;reanneal_fixed&quot;</span> =&gt; <span class="ident">reanneal_fixed</span>;
-            <span class="string">&quot;reanneal_accepted&quot;</span> =&gt; <span class="ident">reanneal_accepted</span>;
-            <span class="string">&quot;reanneal_best&quot;</span> =&gt; <span class="ident">reanneal_best</span>;
+        <span class="kw">let </span>kv_expected = <span class="macro">kv!</span>(
+            <span class="string">&quot;initial_temperature&quot; </span>=&gt; <span class="number">100.0f64</span>;
+            <span class="string">&quot;stall_iter_accepted_limit&quot; </span>=&gt; stall_iter_accepted_limit;
+            <span class="string">&quot;stall_iter_best_limit&quot; </span>=&gt; stall_iter_best_limit;
+            <span class="string">&quot;reanneal_fixed&quot; </span>=&gt; reanneal_fixed;
+            <span class="string">&quot;reanneal_accepted&quot; </span>=&gt; reanneal_accepted;
+            <span class="string">&quot;reanneal_best&quot; </span>=&gt; reanneal_best;
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">kv</span>.<span class="ident">unwrap</span>(), <span class="ident">kv_expected</span>);
+        <span class="macro">assert_eq!</span>(kv.unwrap(), kv_expected);
 
-        <span class="kw">let</span> <span class="ident">s_param</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_param = state_out.take_param().unwrap();
 
-        <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">p</span>) <span class="kw">in</span> <span class="ident">s_param</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">param</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">p</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">for </span>(s, p) <span class="kw">in </span>s_param.iter().zip(param.iter()) {
+            <span class="macro">assert_eq!</span>(s.to_ne_bytes(), p.to_ne_bytes());
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">state_out</span>.<span class="ident">get_cost</span>().<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>())
+        <span class="macro">assert_eq!</span>(state_out.get_cost().to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

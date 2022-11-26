@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/trustregion/trustregion_method.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>trustregion_method.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/trustregion/trustregion_method.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>trustregion_method.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -443,450 +443,450 @@
 <span id="443">443</span>
 <span id="444">444</span>
 <span id="445">445</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>, <span class="ident">Hessian</span>,
-    <span class="ident">IterState</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
-    <span class="ident">TrustRegionRadius</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
+    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
+    TrustRegionRadius, KV,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::trustregion::reduction_ratio</span>;
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminL2Norm</span>, <span class="ident">ArgminWeightedDot</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span><span class="kw">crate</span>::solver::trustregion::reduction_ratio;
+<span class="kw">use </span>argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminWeightedDot};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// # Trust region method</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The trust region method approximates the cost function within a certain region around the</span>
-<span class="doccomment">/// current point in parameter space. Depending on the quality of this approximation, the region is</span>
-<span class="doccomment">/// either expanded or contracted.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The calculation of the actual step length and direction is performed by a method which</span>
-<span class="doccomment">/// implements [`TrustRegionRadius`](`crate::solver::trustregion::TrustRegionRadius`), such as:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [Cauchy point](`crate::solver::trustregion::CauchyPoint`)</span>
-<span class="doccomment">/// * [Dogleg method](`crate::solver::trustregion::Dogleg`)</span>
-<span class="doccomment">/// * [Steihaug method](`crate::solver::trustregion::Steihaug`)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`], [`Gradient`] and</span>
-<span class="doccomment">/// [`Hessian`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Reference</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TrustRegion</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Radius</span>
-    <span class="ident">radius</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Maximum radius</span>
-    <span class="ident">max_radius</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// eta \in [0, 1/4)</span>
-    <span class="ident">eta</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// subproblem (must implement [`crate::solver::trustregion::TrustRegionRadius`])</span>
-    <span class="ident">subproblem</span>: <span class="ident">R</span>,
-    <span class="doccomment">/// f(xk)</span>
-    <span class="ident">fxk</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// mk(0)</span>
-    <span class="ident">mk0</span>: <span class="ident">F</span>,
+<span class="doccomment">/// # Trust region method
+///
+/// The trust region method approximates the cost function within a certain region around the
+/// current point in parameter space. Depending on the quality of this approximation, the region is
+/// either expanded or contracted.
+///
+/// The calculation of the actual step length and direction is performed by a method which
+/// implements [`TrustRegionRadius`](`crate::solver::trustregion::TrustRegionRadius`), such as:
+///
+/// * [Cauchy point](`crate::solver::trustregion::CauchyPoint`)
+/// * [Dogleg method](`crate::solver::trustregion::Dogleg`)
+/// * [Steihaug method](`crate::solver::trustregion::Steihaug`)
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`], [`Gradient`] and
+/// [`Hessian`].
+///
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>TrustRegion&lt;R, F&gt; {
+    <span class="doccomment">/// Radius
+    </span>radius: F,
+    <span class="doccomment">/// Maximum radius
+    </span>max_radius: F,
+    <span class="doccomment">/// eta \in [0, 1/4)
+    </span>eta: F,
+    <span class="doccomment">/// subproblem (must implement [`crate::solver::trustregion::TrustRegionRadius`])
+    </span>subproblem: R,
+    <span class="doccomment">/// f(xk)
+    </span>fxk: F,
+    <span class="doccomment">/// mk(0)
+    </span>mk0: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">TrustRegion</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;R, F&gt; TrustRegion&lt;R, F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`TrustRegion`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::solver::trustregion::{CauchyPoint, TrustRegion};</span>
-    <span class="doccomment">/// let cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();</span>
-    <span class="doccomment">/// let tr: TrustRegion&lt;_, f64&gt; = TrustRegion::new(cp);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">subproblem</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TrustRegion</span> {
-            <span class="ident">radius</span>: <span class="macro">float!</span>(<span class="number">1.0</span>),
-            <span class="ident">max_radius</span>: <span class="macro">float!</span>(<span class="number">100.0</span>),
-            <span class="ident">eta</span>: <span class="macro">float!</span>(<span class="number">0.125</span>),
-            <span class="ident">subproblem</span>,
-            <span class="ident">fxk</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">mk0</span>: <span class="ident">F::nan</span>(),
+    <span class="doccomment">/// Construct a new instance of [`TrustRegion`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::solver::trustregion::{CauchyPoint, TrustRegion};
+    /// let cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();
+    /// let tr: TrustRegion&lt;_, f64&gt; = TrustRegion::new(cp);
+    /// ```
+    </span><span class="kw">pub fn </span>new(subproblem: R) -&gt; <span class="self">Self </span>{
+        TrustRegion {
+            radius: <span class="macro">float!</span>(<span class="number">1.0</span>),
+            max_radius: <span class="macro">float!</span>(<span class="number">100.0</span>),
+            eta: <span class="macro">float!</span>(<span class="number">0.125</span>),
+            subproblem,
+            fxk: F::nan(),
+            mk0: F::nan(),
         }
     }
 
-    <span class="doccomment">/// Set radius</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `1.0`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::trustregion::{TrustRegion, CauchyPoint};</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();</span>
-    <span class="doccomment">/// let tr: TrustRegion&lt;_, f64&gt; = TrustRegion::new(cp).with_radius(0.8)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_radius</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">radius</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`TrustRegion`: radius must be &gt; 0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set radius
+    ///
+    /// Defaults to `1.0`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::trustregion::{TrustRegion, CauchyPoint};
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();
+    /// let tr: TrustRegion&lt;_, f64&gt; = TrustRegion::new(cp).with_radius(0.8)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_radius(<span class="kw-2">mut </span><span class="self">self</span>, radius: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>radius &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`TrustRegion`: radius must be &gt; 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">radius</span> <span class="op">=</span> <span class="ident">radius</span>;
+        <span class="self">self</span>.radius = radius;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set maximum radius</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `100.0`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::trustregion::{TrustRegion, CauchyPoint};</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();</span>
-    <span class="doccomment">/// let tr: TrustRegion&lt;_, f64&gt; = TrustRegion::new(cp).with_max_radius(1000.0)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_radius</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_radius</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">max_radius</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`TrustRegion`: maximum radius must be &gt; 0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set maximum radius
+    ///
+    /// Defaults to `100.0`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::trustregion::{TrustRegion, CauchyPoint};
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();
+    /// let tr: TrustRegion&lt;_, f64&gt; = TrustRegion::new(cp).with_max_radius(1000.0)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_max_radius(<span class="kw-2">mut </span><span class="self">self</span>, max_radius: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>max_radius &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`TrustRegion`: maximum radius must be &gt; 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">max_radius</span> <span class="op">=</span> <span class="ident">max_radius</span>;
+        <span class="self">self</span>.max_radius = max_radius;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set eta</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must lie in `[0, 1/4)` and defaults to `0.125`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::trustregion::{TrustRegion, CauchyPoint};</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();</span>
-    <span class="doccomment">/// let tr: TrustRegion&lt;_, f64&gt; = TrustRegion::new(cp).with_eta(0.2)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_eta</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eta</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">eta</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.25</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">eta</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`TrustRegion`: eta must be in [0, 1/4).&quot;</span>
-            ));
+    <span class="doccomment">/// Set eta
+    ///
+    /// Must lie in `[0, 1/4)` and defaults to `0.125`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::trustregion::{TrustRegion, CauchyPoint};
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();
+    /// let tr: TrustRegion&lt;_, f64&gt; = TrustRegion::new(cp).with_eta(0.2)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_eta(<span class="kw-2">mut </span><span class="self">self</span>, eta: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>eta &gt;= <span class="macro">float!</span>(<span class="number">0.25</span>) || eta &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`TrustRegion`: eta must be in [0, 1/4).&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">eta</span> <span class="op">=</span> <span class="ident">eta</span>;
+        <span class="self">self</span>.eta = eta;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span>, <span class="ident">F</span>, <span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TrustRegion</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Hessian</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">std::fmt::Debug</span>
-        <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">G</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>,
-    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">R</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">TrustRegionRadius</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;O, R, F, P, G, H&gt; Solver&lt;O, IterState&lt;P, G, (), H, F&gt;&gt; <span class="kw">for </span>TrustRegion&lt;R, F&gt;
+<span class="kw">where
+    </span>O: CostFunction&lt;Param = P, Output = F&gt;
+        + Gradient&lt;Param = P, Gradient = G&gt;
+        + Hessian&lt;Param = P, Hessian = H&gt;,
+    P: Clone
+        + std::fmt::Debug
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminL2Norm&lt;F&gt;
+        + ArgminDot&lt;P, F&gt;
+        + ArgminDot&lt;G, F&gt;
+        + ArgminAdd&lt;P, P&gt;,
+    G: Clone + SerializeAlias + DeserializeOwnedAlias,
+    H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot&lt;P, P&gt;,
+    R: Clone + TrustRegionRadius&lt;F&gt; + Solver&lt;O, IterState&lt;P, G, (), H, F&gt;&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Trust region&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Trust region&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`TrustRegion` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">state</span>
-            .<span class="ident">take_gradient</span>()
-            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>grad = state
+            .take_gradient()
+            .map(Result::Ok)
+            .unwrap_or_else(|| problem.gradient(<span class="kw-2">&amp;</span>param))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="ident">state</span>
-            .<span class="ident">take_hessian</span>()
-            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>hessian = state
+            .take_hessian()
+            .map(Result::Ok)
+            .unwrap_or_else(|| problem.hessian(<span class="kw-2">&amp;</span>param))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="self">self</span>.<span class="ident">fxk</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cost</span>.<span class="ident">is_infinite</span>() <span class="op">&amp;&amp;</span> <span class="ident">cost</span>.<span class="ident">is_sign_positive</span>() {
-            <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">cost</span>
+        <span class="kw">let </span>cost = state.get_cost();
+        <span class="self">self</span>.fxk = <span class="kw">if </span>cost.is_infinite() &amp;&amp; cost.is_sign_positive() {
+            problem.cost(<span class="kw-2">&amp;</span>param)<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            cost
         };
 
-        <span class="self">self</span>.<span class="ident">mk0</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fxk</span>;
+        <span class="self">self</span>.mk0 = <span class="self">self</span>.fxk;
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>
-                .<span class="ident">param</span>(<span class="ident">param</span>)
-                .<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">fxk</span>)
-                .<span class="ident">gradient</span>(<span class="ident">grad</span>)
-                .<span class="ident">hessian</span>(<span class="ident">hessian</span>),
+            state
+                .param(param)
+                .cost(<span class="self">self</span>.fxk)
+                .gradient(grad)
+                .hessian(hessian),
             <span class="prelude-val">None</span>,
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`TrustRegion`: Parameter vector in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`TrustRegion`: Parameter vector in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_gradient</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`TrustRegion`: Gradient in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>grad = state.take_gradient().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`TrustRegion`: Gradient in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_hessian</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`TrustRegion`: Hessian in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>hessian = state.take_hessian().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`TrustRegion`: Hessian in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">subproblem</span>.<span class="ident">set_radius</span>(<span class="self">self</span>.<span class="ident">radius</span>);
+        <span class="self">self</span>.subproblem.set_radius(<span class="self">self</span>.radius);
 
-        <span class="kw">let</span> <span class="ident">OptimizationResult</span> {
-            <span class="ident">problem</span>: <span class="ident">sub_problem</span>,
-            <span class="ident">state</span>: <span class="kw-2">mut</span> <span class="ident">sub_state</span>,
+        <span class="kw">let </span>OptimizationResult {
+            problem: sub_problem,
+            state: <span class="kw-2">mut </span>sub_state,
             ..
-        } <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>.<span class="ident">take_problem</span>().<span class="ident">unwrap</span>(), <span class="self">self</span>.<span class="ident">subproblem</span>.<span class="ident">clone</span>())
-            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
-                <span class="ident">config</span>
-                    .<span class="ident">param</span>(<span class="ident">param</span>.<span class="ident">clone</span>())
-                    .<span class="ident">gradient</span>(<span class="ident">grad</span>.<span class="ident">clone</span>())
-                    .<span class="ident">hessian</span>(<span class="ident">hessian</span>.<span class="ident">clone</span>())
+        } = Executor::new(problem.take_problem().unwrap(), <span class="self">self</span>.subproblem.clone())
+            .configure(|config| {
+                config
+                    .param(param.clone())
+                    .gradient(grad.clone())
+                    .hessian(hessian.clone())
             })
-            .<span class="ident">ctrlc</span>(<span class="bool-val">false</span>)
-            .<span class="ident">run</span>()<span class="question-mark">?</span>;
+            .ctrlc(<span class="bool-val">false</span>)
+            .run()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="ident">sub_state</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>pk = sub_state.take_param().unwrap();
 
-        <span class="comment">// Consume intermediate problem again. This takes care of the function evaluation counts.</span>
-        <span class="ident">problem</span>.<span class="ident">consume_problem</span>(<span class="ident">sub_problem</span>);
+        <span class="comment">// Consume intermediate problem again. This takes care of the function evaluation counts.
+        </span>problem.consume_problem(sub_problem);
 
-        <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>);
-        <span class="kw">let</span> <span class="ident">fxkpk</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">mkpk</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fxk</span> <span class="op">+</span> <span class="ident">pk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>) <span class="op">+</span> <span class="macro">float!</span>(<span class="number">0.5</span>) <span class="op">*</span> <span class="ident">pk</span>.<span class="ident">weighted_dot</span>(<span class="kw-2">&amp;</span><span class="ident">hessian</span>, <span class="kw-2">&amp;</span><span class="ident">pk</span>);
+        <span class="kw">let </span>new_param = pk.add(<span class="kw-2">&amp;</span>param);
+        <span class="kw">let </span>fxkpk = problem.cost(<span class="kw-2">&amp;</span>new_param)<span class="question-mark">?</span>;
+        <span class="kw">let </span>mkpk = <span class="self">self</span>.fxk + pk.dot(<span class="kw-2">&amp;</span>grad) + <span class="macro">float!</span>(<span class="number">0.5</span>) * pk.weighted_dot(<span class="kw-2">&amp;</span>hessian, <span class="kw-2">&amp;</span>pk);
 
-        <span class="kw">let</span> <span class="ident">rho</span> <span class="op">=</span> <span class="ident">reduction_ratio</span>(<span class="self">self</span>.<span class="ident">fxk</span>, <span class="ident">fxkpk</span>, <span class="self">self</span>.<span class="ident">mk0</span>, <span class="ident">mkpk</span>);
+        <span class="kw">let </span>rho = reduction_ratio(<span class="self">self</span>.fxk, fxkpk, <span class="self">self</span>.mk0, mkpk);
 
-        <span class="kw">let</span> <span class="ident">pk_norm</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">l2_norm</span>();
+        <span class="kw">let </span>pk_norm = pk.l2_norm();
 
-        <span class="kw">let</span> <span class="ident">cur_radius</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">radius</span>;
+        <span class="kw">let </span>cur_radius = <span class="self">self</span>.radius;
 
-        <span class="self">self</span>.<span class="ident">radius</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">rho</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.25</span>) {
-            <span class="macro">float!</span>(<span class="number">0.25</span>) <span class="op">*</span> <span class="ident">pk_norm</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">rho</span> <span class="op">&gt;</span> <span class="macro">float!</span>(<span class="number">0.75</span>) <span class="op">&amp;&amp;</span> (<span class="ident">pk_norm</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">radius</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">10.0</span>) <span class="op">*</span> <span class="ident">F::epsilon</span>()
+        <span class="self">self</span>.radius = <span class="kw">if </span>rho &lt; <span class="macro">float!</span>(<span class="number">0.25</span>) {
+            <span class="macro">float!</span>(<span class="number">0.25</span>) * pk_norm
+        } <span class="kw">else if </span>rho &gt; <span class="macro">float!</span>(<span class="number">0.75</span>) &amp;&amp; (pk_norm - <span class="self">self</span>.radius).abs() &lt;= <span class="macro">float!</span>(<span class="number">10.0</span>) * F::epsilon()
         {
-            <span class="self">self</span>.<span class="ident">max_radius</span>.<span class="ident">min</span>(<span class="macro">float!</span>(<span class="number">2.0</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">radius</span>)
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">radius</span>
+            <span class="self">self</span>.max_radius.min(<span class="macro">float!</span>(<span class="number">2.0</span>) * <span class="self">self</span>.radius)
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.radius
         };
 
         <span class="prelude-val">Ok</span>((
-            <span class="kw">if</span> <span class="ident">rho</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">eta</span> {
-                <span class="self">self</span>.<span class="ident">fxk</span> <span class="op">=</span> <span class="ident">fxkpk</span>;
-                <span class="self">self</span>.<span class="ident">mk0</span> <span class="op">=</span> <span class="ident">fxkpk</span>;
-                <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
-                <span class="ident">state</span>
-                    .<span class="ident">param</span>(<span class="ident">new_param</span>)
-                    .<span class="ident">cost</span>(<span class="ident">fxkpk</span>)
-                    .<span class="ident">gradient</span>(<span class="ident">grad</span>)
-                    .<span class="ident">hessian</span>(<span class="ident">hessian</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">state</span>
-                    .<span class="ident">param</span>(<span class="ident">param</span>)
-                    .<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">fxk</span>)
-                    .<span class="ident">gradient</span>(<span class="ident">grad</span>)
-                    .<span class="ident">hessian</span>(<span class="ident">hessian</span>)
+            <span class="kw">if </span>rho &gt; <span class="self">self</span>.eta {
+                <span class="self">self</span>.fxk = fxkpk;
+                <span class="self">self</span>.mk0 = fxkpk;
+                <span class="kw">let </span>grad = problem.gradient(<span class="kw-2">&amp;</span>new_param)<span class="question-mark">?</span>;
+                <span class="kw">let </span>hessian = problem.hessian(<span class="kw-2">&amp;</span>new_param)<span class="question-mark">?</span>;
+                state
+                    .param(new_param)
+                    .cost(fxkpk)
+                    .gradient(grad)
+                    .hessian(hessian)
+            } <span class="kw">else </span>{
+                state
+                    .param(param)
+                    .cost(<span class="self">self</span>.fxk)
+                    .gradient(grad)
+                    .hessian(hessian)
             },
-            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">&quot;radius&quot;</span> =&gt; <span class="ident">cur_radius</span>;)),
+            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">&quot;radius&quot; </span>=&gt; cur_radius;)),
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="ident">TerminationReason::NotTerminated</span>
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationReason {
+        TerminationReason::NotTerminated
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::test_utils::TestProblem</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminError</span>, <span class="ident">State</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::trustregion</span>::{<span class="ident">CauchyPoint</span>, <span class="ident">Steihaug</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::test_utils::TestProblem;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{ArgminError, State};
+    <span class="kw">use </span><span class="kw">crate</span>::solver::trustregion::{CauchyPoint, Steihaug};
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">trustregion</span>, <span class="ident">TrustRegion</span><span class="op">&lt;</span><span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">TestProblem</span>, <span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(trustregion, TrustRegion&lt;Steihaug&lt;TestProblem, f64&gt;, f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">cp</span>: <span class="ident">CauchyPoint</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CauchyPoint::new</span>();
-        <span class="kw">let</span> <span class="ident">tr</span>: <span class="ident">TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">TrustRegion::new</span>(<span class="ident">cp</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();
+        <span class="kw">let </span>tr: TrustRegion&lt;<span class="kw">_</span>, f64&gt; = TrustRegion::new(cp);
 
-        <span class="kw">let</span> <span class="ident">TrustRegion</span> {
-            <span class="ident">radius</span>,
-            <span class="ident">max_radius</span>,
-            <span class="ident">eta</span>,
-            <span class="ident">subproblem</span>: <span class="kw">_</span>,
-            <span class="ident">fxk</span>,
-            <span class="ident">mk0</span>,
-        } <span class="op">=</span> <span class="ident">tr</span>;
+        <span class="kw">let </span>TrustRegion {
+            radius,
+            max_radius,
+            eta,
+            subproblem: <span class="kw">_</span>,
+            fxk,
+            mk0,
+        } = tr;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">radius</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">max_radius</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">100.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">eta</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.125f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">fxk</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::NAN</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">mk0</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::NAN</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(radius.to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(max_radius.to_ne_bytes(), <span class="number">100.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(eta.to_ne_bytes(), <span class="number">0.125f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(fxk.to_ne_bytes(), f64::NAN.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(mk0.to_ne_bytes(), f64::NAN.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_radius</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">radius</span> <span class="kw">in</span> [<span class="ident">std::f64::EPSILON</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">10.0</span>, <span class="number">100.0</span>] {
-            <span class="kw">let</span> <span class="ident">cp</span>: <span class="ident">CauchyPoint</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CauchyPoint::new</span>();
-            <span class="kw">let</span> <span class="ident">tr</span>: <span class="ident">TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">TrustRegion::new</span>(<span class="ident">cp</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">tr</span>.<span class="ident">with_radius</span>(<span class="ident">radius</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_radius() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>radius <span class="kw">in </span>[std::f64::EPSILON, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">10.0</span>, <span class="number">100.0</span>] {
+            <span class="kw">let </span>cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();
+            <span class="kw">let </span>tr: TrustRegion&lt;<span class="kw">_</span>, f64&gt; = TrustRegion::new(cp);
+            <span class="kw">let </span>res = tr.with_radius(radius);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">nm</span>.<span class="ident">radius</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">radius</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>nm = res.unwrap();
+            <span class="macro">assert_eq!</span>(nm.radius.to_ne_bytes(), radius.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">radius</span> <span class="kw">in</span> [<span class="number">0.0</span>, <span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">100.0</span>, <span class="op">-</span><span class="number">42.0</span>] {
-            <span class="kw">let</span> <span class="ident">cp</span>: <span class="ident">CauchyPoint</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CauchyPoint::new</span>();
-            <span class="kw">let</span> <span class="ident">tr</span>: <span class="ident">TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">TrustRegion::new</span>(<span class="ident">cp</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">tr</span>.<span class="ident">with_radius</span>(<span class="ident">radius</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>radius <span class="kw">in </span>[<span class="number">0.0</span>, -f64::EPSILON, -<span class="number">1.0</span>, -<span class="number">100.0</span>, -<span class="number">42.0</span>] {
+            <span class="kw">let </span>cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();
+            <span class="kw">let </span>tr: TrustRegion&lt;<span class="kw">_</span>, f64&gt; = TrustRegion::new(cp);
+            <span class="kw">let </span>res = tr.with_radius(radius);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
-                <span class="string">&quot;Invalid parameter: \&quot;`TrustRegion`: radius must be &gt; 0.\&quot;&quot;</span>
-            );
+                res,
+                ArgminError,
+                <span class="string">&quot;Invalid parameter: \&quot;`TrustRegion`: radius must be &gt; 0.\&quot;&quot;
+            </span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_eta</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">eta</span> <span class="kw">in</span> [
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_eta() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>eta <span class="kw">in </span>[
             <span class="number">0.0</span>,
-            <span class="ident">std::f64::EPSILON</span>,
+            std::f64::EPSILON,
             <span class="number">1e-2</span>,
             <span class="number">0.125</span>,
-            <span class="number">0.25</span> <span class="op">-</span> <span class="ident">std::f64::EPSILON</span>,
+            <span class="number">0.25 </span>- std::f64::EPSILON,
         ] {
-            <span class="kw">let</span> <span class="ident">cp</span>: <span class="ident">CauchyPoint</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CauchyPoint::new</span>();
-            <span class="kw">let</span> <span class="ident">tr</span>: <span class="ident">TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">TrustRegion::new</span>(<span class="ident">cp</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">tr</span>.<span class="ident">with_eta</span>(<span class="ident">eta</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+            <span class="kw">let </span>cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();
+            <span class="kw">let </span>tr: TrustRegion&lt;<span class="kw">_</span>, f64&gt; = TrustRegion::new(cp);
+            <span class="kw">let </span>res = tr.with_eta(eta);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">nm</span>.<span class="ident">eta</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">eta</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>nm = res.unwrap();
+            <span class="macro">assert_eq!</span>(nm.eta.to_ne_bytes(), eta.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">eta</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">100.0</span>, <span class="op">-</span><span class="number">42.0</span>, <span class="number">0.25</span>, <span class="number">1.0</span>] {
-            <span class="kw">let</span> <span class="ident">cp</span>: <span class="ident">CauchyPoint</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CauchyPoint::new</span>();
-            <span class="kw">let</span> <span class="ident">tr</span>: <span class="ident">TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">TrustRegion::new</span>(<span class="ident">cp</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">tr</span>.<span class="ident">with_eta</span>(<span class="ident">eta</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>eta <span class="kw">in </span>[-f64::EPSILON, -<span class="number">1.0</span>, -<span class="number">100.0</span>, -<span class="number">42.0</span>, <span class="number">0.25</span>, <span class="number">1.0</span>] {
+            <span class="kw">let </span>cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();
+            <span class="kw">let </span>tr: TrustRegion&lt;<span class="kw">_</span>, f64&gt; = TrustRegion::new(cp);
+            <span class="kw">let </span>res = tr.with_eta(eta);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
-                <span class="string">&quot;Invalid parameter: \&quot;`TrustRegion`: eta must be in [0, 1/4).\&quot;&quot;</span>
-            );
+                res,
+                ArgminError,
+                <span class="string">&quot;Invalid parameter: \&quot;`TrustRegion`: eta must be in [0, 1/4).\&quot;&quot;
+            </span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init</span>() {
-        <span class="kw">let</span> <span class="ident">param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init() {
+        <span class="kw">let </span>param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>];
 
-        <span class="kw">let</span> <span class="ident">cp</span>: <span class="ident">CauchyPoint</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CauchyPoint::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tr</span>: <span class="ident">TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">TrustRegion::new</span>(<span class="ident">cp</span>);
+        <span class="kw">let </span>cp: CauchyPoint&lt;f64&gt; = CauchyPoint::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>tr: TrustRegion&lt;<span class="kw">_</span>, f64&gt; = TrustRegion::new(cp);
 
-        <span class="comment">// Forgot to initialize parameter vector</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">tr</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>);
+        <span class="comment">// Forgot to initialize parameter vector
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>res = tr.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`TrustRegion` requires an initial parameter vector. Please &quot;</span>,
-                <span class="string">&quot;provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
 
-        <span class="comment">// All good.</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">param</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">tr</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// All good.
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; =
+            IterState::new().param(param.clone());
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = tr.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">let</span> <span class="ident">s_param</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_param = state_out.take_param().unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">s_param</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">param</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">s_param</span>[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">param</span>[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(s_param[<span class="number">0</span>].to_ne_bytes(), param[<span class="number">0</span>].to_ne_bytes());
+        <span class="macro">assert_eq!</span>(s_param[<span class="number">1</span>].to_ne_bytes(), param[<span class="number">1</span>].to_ne_bytes());
 
-        <span class="kw">let</span> <span class="ident">TrustRegion</span> {
-            <span class="ident">radius</span>,
-            <span class="ident">max_radius</span>,
-            <span class="ident">eta</span>,
-            <span class="ident">subproblem</span>: <span class="kw">_</span>,
-            <span class="ident">fxk</span>,
-            <span class="ident">mk0</span>,
-        } <span class="op">=</span> <span class="ident">tr</span>;
+        <span class="kw">let </span>TrustRegion {
+            radius,
+            max_radius,
+            eta,
+            subproblem: <span class="kw">_</span>,
+            fxk,
+            mk0,
+        } = tr;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">radius</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">max_radius</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">100.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">eta</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.125f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">fxk</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">sqrt</span>().<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">mk0</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(radius.to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(max_radius.to_ne_bytes(), <span class="number">100.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(eta.to_ne_bytes(), <span class="number">0.125f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(fxk.to_ne_bytes(), <span class="number">1.0f64</span>.sqrt().to_ne_bytes());
+        <span class="macro">assert_eq!</span>(mk0.to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

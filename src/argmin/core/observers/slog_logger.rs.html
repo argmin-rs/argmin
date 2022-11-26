@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/observers/slog_logger.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slog_logger.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/observers/slog_logger.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slog_logger.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -193,200 +193,200 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # Loggers based on the `slog` crate</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These loggers write general information about the optimization and information about the</span>
-<span class="doccomment">//! progress of the optimization for each iteration of the algorithm to screen or into a file as</span>
-<span class="doccomment">//! JSON.</span>
-<span class="doccomment">//! See [`SlogLogger`] for details regarding usage.</span>
+</span><span class="doccomment">//! # Loggers based on the `slog` crate
+//!
+//! These loggers write general information about the optimization and information about the
+//! progress of the optimization for each iteration of the algorithm to screen or into a file as
+//! JSON.
+//! See [`SlogLogger`] for details regarding usage.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::observers::Observe</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">Error</span>, <span class="ident">State</span>, <span class="ident">KV</span>};
-<span class="kw">use</span> <span class="ident">slog</span>;
-<span class="kw">use</span> <span class="ident">slog</span>::{<span class="ident">info</span>, <span class="ident">o</span>, <span class="ident">Drain</span>, <span class="ident">Key</span>, <span class="ident">Record</span>, <span class="ident">Serializer</span>};
-<span class="kw">use</span> <span class="ident">slog_async</span>;
-<span class="kw">use</span> <span class="ident">slog_async::OverflowStrategy</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">slog_json</span>;
-<span class="kw">use</span> <span class="ident">slog_term</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::fs::OpenOptions</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::sync::Mutex</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::core::observers::Observe;
+<span class="kw">use </span><span class="kw">crate</span>::core::{Error, State, KV};
+<span class="kw">use </span>slog;
+<span class="kw">use </span>slog::{info, o, Drain, Key, Record, Serializer};
+<span class="kw">use </span>slog_async;
+<span class="kw">use </span>slog_async::OverflowStrategy;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>slog_json;
+<span class="kw">use </span>slog_term;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>std::fs::OpenOptions;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>std::sync::Mutex;
 
-<span class="doccomment">/// A logger using the [`slog`](https://crates.io/crates/slog) crate as backend.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SlogLogger</span> {
-    <span class="doccomment">/// the logger</span>
-    <span class="ident">logger</span>: <span class="ident">slog::Logger</span>,
+<span class="doccomment">/// A logger using the [`slog`](https://crates.io/crates/slog) crate as backend.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>SlogLogger {
+    <span class="doccomment">/// the logger
+    </span>logger: slog::Logger,
 }
 
-<span class="kw">impl</span> <span class="ident">SlogLogger</span> {
-    <span class="doccomment">/// Log to the terminal.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Will block execution when buffer is full.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::observers::SlogLogger;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let terminal_logger = SlogLogger::term();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">term</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">SlogLogger::term_internal</span>(<span class="ident">OverflowStrategy::Block</span>)
+<span class="kw">impl </span>SlogLogger {
+    <span class="doccomment">/// Log to the terminal.
+    ///
+    /// Will block execution when buffer is full.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::SlogLogger;
+    ///
+    /// let terminal_logger = SlogLogger::term();
+    /// ```
+    </span><span class="kw">pub fn </span>term() -&gt; <span class="self">Self </span>{
+        SlogLogger::term_internal(OverflowStrategy::Block)
     }
 
-    <span class="doccomment">/// Log to the terminal without blocking execution.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Messages may be lost in case of buffer overflow.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::observers::SlogLogger;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let terminal_logger = SlogLogger::term_noblock();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">term_noblock</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">SlogLogger::term_internal</span>(<span class="ident">OverflowStrategy::Drop</span>)
+    <span class="doccomment">/// Log to the terminal without blocking execution.
+    ///
+    /// Messages may be lost in case of buffer overflow.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::SlogLogger;
+    ///
+    /// let terminal_logger = SlogLogger::term_noblock();
+    /// ```
+    </span><span class="kw">pub fn </span>term_noblock() -&gt; <span class="self">Self </span>{
+        SlogLogger::term_internal(OverflowStrategy::Drop)
     }
 
-    <span class="doccomment">/// Create terminal logger with a given `OverflowStragegy`.</span>
-    <span class="kw">fn</span> <span class="ident">term_internal</span>(<span class="ident">overflow_strategy</span>: <span class="ident">OverflowStrategy</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">decorator</span> <span class="op">=</span> <span class="ident">slog_term::TermDecorator::new</span>().<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">drain</span> <span class="op">=</span> <span class="ident">slog_term::FullFormat::new</span>(<span class="ident">decorator</span>)
-            .<span class="ident">use_original_order</span>()
-            .<span class="ident">build</span>()
-            .<span class="ident">fuse</span>();
-        <span class="kw">let</span> <span class="ident">drain</span> <span class="op">=</span> <span class="ident">slog_async::Async::new</span>(<span class="ident">drain</span>)
-            .<span class="ident">overflow_strategy</span>(<span class="ident">overflow_strategy</span>)
-            .<span class="ident">build</span>()
-            .<span class="ident">fuse</span>();
-        <span class="ident">SlogLogger</span> {
-            <span class="ident">logger</span>: <span class="ident">slog::Logger::root</span>(<span class="ident">drain</span>, <span class="macro">o!</span>()),
+    <span class="doccomment">/// Create terminal logger with a given `OverflowStragegy`.
+    </span><span class="kw">fn </span>term_internal(overflow_strategy: OverflowStrategy) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>decorator = slog_term::TermDecorator::new().build();
+        <span class="kw">let </span>drain = slog_term::FullFormat::new(decorator)
+            .use_original_order()
+            .build()
+            .fuse();
+        <span class="kw">let </span>drain = slog_async::Async::new(drain)
+            .overflow_strategy(overflow_strategy)
+            .build()
+            .fuse();
+        SlogLogger {
+            logger: slog::Logger::root(drain, <span class="macro">o!</span>()),
         }
     }
 
-    <span class="doccomment">/// Log JSON to a file while blocking execution in case of full buffers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `truncate` is set to `true`, the content of existing log files will be cleared.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only available if the `serde1` feature is set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::observers::SlogLogger;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let file_logger = SlogLogger::file(&quot;logfile.log&quot;, true);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">file</span>: <span class="ident">N</span>, <span class="ident">truncate</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">SlogLogger::file_internal</span>(<span class="ident">file</span>, <span class="ident">OverflowStrategy::Block</span>, <span class="ident">truncate</span>)
+    <span class="doccomment">/// Log JSON to a file while blocking execution in case of full buffers.
+    ///
+    /// If `truncate` is set to `true`, the content of existing log files will be cleared.
+    ///
+    /// Only available if the `serde1` feature is set.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::SlogLogger;
+    ///
+    /// let file_logger = SlogLogger::file(&quot;logfile.log&quot;, true);
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+    </span><span class="kw">pub fn </span>file&lt;N: AsRef&lt;str&gt;&gt;(file: N, truncate: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        SlogLogger::file_internal(file, OverflowStrategy::Block, truncate)
     }
 
-    <span class="doccomment">/// Log JSON to a file without blocking execution.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Messages may be lost in case of buffer overflow.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `truncate` is set to `true`, the content of existing log files will be cleared.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only available if the `serde1` feature is set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::observers::SlogLogger;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let file_logger = SlogLogger::file_noblock(&quot;logfile.log&quot;, true);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_noblock</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">file</span>: <span class="ident">N</span>, <span class="ident">truncate</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">SlogLogger::file_internal</span>(<span class="ident">file</span>, <span class="ident">OverflowStrategy::Drop</span>, <span class="ident">truncate</span>)
+    <span class="doccomment">/// Log JSON to a file without blocking execution.
+    ///
+    /// Messages may be lost in case of buffer overflow.
+    ///
+    /// If `truncate` is set to `true`, the content of existing log files will be cleared.
+    ///
+    /// Only available if the `serde1` feature is set.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::SlogLogger;
+    ///
+    /// let file_logger = SlogLogger::file_noblock(&quot;logfile.log&quot;, true);
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+    </span><span class="kw">pub fn </span>file_noblock&lt;N: AsRef&lt;str&gt;&gt;(file: N, truncate: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        SlogLogger::file_internal(file, OverflowStrategy::Drop, truncate)
     }
 
-    <span class="doccomment">/// Create file logger with a given `OverflowStrategy`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only available if the `serde1` feature is set.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">file_internal</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="ident">file</span>: <span class="ident">N</span>,
-        <span class="ident">overflow_strategy</span>: <span class="ident">OverflowStrategy</span>,
-        <span class="ident">truncate</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// Logging to file</span>
-        <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">OpenOptions::new</span>()
-            .<span class="ident">create</span>(<span class="bool-val">true</span>)
-            .<span class="ident">write</span>(<span class="bool-val">true</span>)
-            .<span class="ident">truncate</span>(<span class="ident">truncate</span>)
-            .<span class="ident">open</span>(<span class="ident">file</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">drain</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">slog_json::Json::new</span>(<span class="ident">file</span>).<span class="ident">build</span>()).<span class="ident">map</span>(<span class="ident">slog::Fuse</span>);
-        <span class="kw">let</span> <span class="ident">drain</span> <span class="op">=</span> <span class="ident">slog_async::Async::new</span>(<span class="ident">drain</span>)
-            .<span class="ident">overflow_strategy</span>(<span class="ident">overflow_strategy</span>)
-            .<span class="ident">build</span>()
-            .<span class="ident">fuse</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">SlogLogger</span> {
-            <span class="ident">logger</span>: <span class="ident">slog::Logger::root</span>(<span class="ident">drain</span>, <span class="macro">o!</span>()),
+    <span class="doccomment">/// Create file logger with a given `OverflowStrategy`.
+    ///
+    /// Only available if the `serde1` feature is set.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+    </span><span class="kw">fn </span>file_internal&lt;N: AsRef&lt;str&gt;&gt;(
+        file: N,
+        overflow_strategy: OverflowStrategy,
+        truncate: bool,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="comment">// Logging to file
+        </span><span class="kw">let </span>file = OpenOptions::new()
+            .create(<span class="bool-val">true</span>)
+            .write(<span class="bool-val">true</span>)
+            .truncate(truncate)
+            .open(file.as_ref())<span class="question-mark">?</span>;
+        <span class="kw">let </span>drain = Mutex::new(slog_json::Json::new(file).build()).map(slog::Fuse);
+        <span class="kw">let </span>drain = slog_async::Async::new(drain)
+            .overflow_strategy(overflow_strategy)
+            .build()
+            .fuse();
+        <span class="prelude-val">Ok</span>(SlogLogger {
+            logger: slog::Logger::root(drain, <span class="macro">o!</span>()),
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">slog::KV</span> <span class="kw">for</span> <span class="ident">KV</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_record</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span>, <span class="ident">serializer</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Serializer</span>) -&gt; <span class="ident">slog::Result</span> {
-        <span class="kw">for</span> <span class="ident">idx</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">kv</span>.<span class="ident">iter</span>() {
-            <span class="ident">serializer</span>.<span class="ident">emit_str</span>(<span class="ident">Key::from</span>(<span class="kw-2">*</span><span class="ident">idx</span>.<span class="number">0</span>), <span class="kw-2">&amp;</span><span class="ident">idx</span>.<span class="number">1</span>.<span class="ident">to_string</span>())<span class="question-mark">?</span>;
+<span class="kw">impl </span>slog::KV <span class="kw">for </span>KV {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, _record: <span class="kw-2">&amp;</span>Record, serializer: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Serializer) -&gt; slog::Result {
+        <span class="kw">for </span>idx <span class="kw">in </span><span class="self">self</span>.kv.iter() {
+            serializer.emit_str(Key::from(<span class="kw-2">*</span>idx.<span class="number">0</span>), <span class="kw-2">&amp;</span>idx.<span class="number">1</span>.to_string())<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">struct</span> <span class="ident">LogState</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">I</span>);
+<span class="kw">struct </span>LogState&lt;I&gt;(I);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">slog::KV</span> <span class="kw">for</span> <span class="ident">LogState</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">State</span>,
+<span class="kw">impl</span>&lt;I&gt; slog::KV <span class="kw">for </span>LogState&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>I&gt;
+<span class="kw">where
+    </span>I: State,
 {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_record</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span>, <span class="ident">serializer</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Serializer</span>) -&gt; <span class="ident">slog::Result</span> {
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get_func_counts</span>().<span class="ident">iter</span>() {
-            <span class="ident">serializer</span>.<span class="ident">emit_u64</span>(<span class="ident">Key::from</span>(<span class="ident">k</span>.<span class="ident">clone</span>()), <span class="ident">v</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, _record: <span class="kw-2">&amp;</span>Record, serializer: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Serializer) -&gt; slog::Result {
+        <span class="kw">for </span>(k, <span class="kw-2">&amp;</span>v) <span class="kw">in </span><span class="self">self</span>.<span class="number">0</span>.get_func_counts().iter() {
+            serializer.emit_u64(Key::from(k.clone()), v)<span class="question-mark">?</span>;
         }
-        <span class="ident">serializer</span>.<span class="ident">emit_str</span>(<span class="ident">Key::from</span>(<span class="string">&quot;best_cost&quot;</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">get_best_cost</span>().<span class="ident">to_string</span>())<span class="question-mark">?</span>;
-        <span class="ident">serializer</span>.<span class="ident">emit_str</span>(<span class="ident">Key::from</span>(<span class="string">&quot;cost&quot;</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">get_cost</span>().<span class="ident">to_string</span>())<span class="question-mark">?</span>;
-        <span class="ident">serializer</span>.<span class="ident">emit_u64</span>(<span class="ident">Key::from</span>(<span class="string">&quot;iter&quot;</span>), <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get_iter</span>())<span class="question-mark">?</span>;
+        serializer.emit_str(Key::from(<span class="string">&quot;best_cost&quot;</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.get_best_cost().to_string())<span class="question-mark">?</span>;
+        serializer.emit_str(Key::from(<span class="string">&quot;cost&quot;</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.get_cost().to_string())<span class="question-mark">?</span>;
+        serializer.emit_u64(Key::from(<span class="string">&quot;iter&quot;</span>), <span class="self">self</span>.<span class="number">0</span>.get_iter())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SlogLogger</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">State</span>,
+<span class="kw">impl</span>&lt;I&gt; Observe&lt;I&gt; <span class="kw">for </span>SlogLogger
+<span class="kw">where
+    </span>I: State,
 {
-    <span class="doccomment">/// Log basic information about the optimization after initialization.</span>
-    <span class="kw">fn</span> <span class="ident">observe_init</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">kv</span>: <span class="kw-2">&amp;</span><span class="ident">KV</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">info!</span>(<span class="self">self</span>.<span class="ident">logger</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>; <span class="ident">kv</span>);
+    <span class="doccomment">/// Log basic information about the optimization after initialization.
+    </span><span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: <span class="kw-2">&amp;</span>str, kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="macro">info!</span>(<span class="self">self</span>.logger, <span class="string">&quot;{}&quot;</span>, msg; kv);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Logs information about the progress of the optimization after every iteration.</span>
-    <span class="kw">fn</span> <span class="ident">observe_iter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">I</span>, <span class="ident">kv</span>: <span class="kw-2">&amp;</span><span class="ident">KV</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">info!</span>(<span class="self">self</span>.<span class="ident">logger</span>, <span class="string">&quot;&quot;</span>; <span class="ident">LogState</span>(<span class="ident">state</span>), <span class="ident">kv</span>);
+    <span class="doccomment">/// Logs information about the progress of the optimization after every iteration.
+    </span><span class="kw">fn </span>observe_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>I, kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="macro">info!</span>(<span class="self">self</span>.logger, <span class="string">&quot;&quot;</span>; LogState(state), kv);
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="macro">send_sync_test!</span>(<span class="ident">argmin_slog_loggerv</span>, <span class="ident">SlogLogger</span>);
+    <span class="macro">send_sync_test!</span>(argmin_slog_loggerv, SlogLogger);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

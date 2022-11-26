@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../argmin/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../argmin/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -210,101 +210,101 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # Macros</span>
+</span><span class="doccomment">//! # Macros
 
-<span class="doccomment">/// Creates an `KV` at compile time</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::kv;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let kv = kv!(</span>
-<span class="doccomment">///     &quot;key1&quot; =&gt; &quot;value1&quot;;</span>
-<span class="doccomment">///     &quot;key2&quot; =&gt; &quot;value2&quot;;</span>
-<span class="doccomment">///     &quot;key3&quot; =&gt; 1234;</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # assert_eq!(kv.kv.len(), 3);</span>
-<span class="doccomment">/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key1&quot;).unwrap()), &quot;value1&quot;);</span>
-<span class="doccomment">/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key2&quot;).unwrap()), &quot;value2&quot;);</span>
-<span class="doccomment">/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key3&quot;).unwrap()), &quot;1234&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">kv</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>:<span class="ident">expr</span> =&gt;  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>:<span class="ident">expr</span>;)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::core::KV</span> { <span class="ident">kv</span>: <span class="ident">std::collections::HashMap::from</span>([ $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>.<span class="ident">into</span>())),<span class="op">*</span> ]) }
+/// Creates an `KV` at compile time
+///
+/// # Example
+///
+/// ```
+/// use argmin::kv;
+///
+/// let kv = kv!(
+///     &quot;key1&quot; =&gt; &quot;value1&quot;;
+///     &quot;key2&quot; =&gt; &quot;value2&quot;;
+///     &quot;key3&quot; =&gt; 1234;
+/// );
+/// # assert_eq!(kv.kv.len(), 3);
+/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key1&quot;).unwrap()), &quot;value1&quot;);
+/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key2&quot;).unwrap()), &quot;value2&quot;);
+/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key3&quot;).unwrap()), &quot;1234&quot;);
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>kv {
+    ($(<span class="macro-nonterminal">$k</span>:expr =&gt;  <span class="macro-nonterminal">$v</span>:expr;)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$crate::core::KV </span>{ kv: std::collections::HashMap::from([ $((<span class="macro-nonterminal">$k</span>, <span class="macro-nonterminal">$v</span>.into())),* ]) }
     };
 }
 
-<span class="doccomment">/// Release an `T` from an `Option&lt;T&gt;` if it is not `None`. If it is `None`, return an</span>
-<span class="doccomment">/// `ArgminError` with a provided message.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">check_param</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span> {
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::core::ArgminError</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span> {
-                    <span class="ident">text</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>.<span class="ident">to_string</span>(),
+<span class="doccomment">/// Release an `T` from an `Option&lt;T&gt;` if it is not `None`. If it is `None`, return an
+/// `ArgminError` with a provided message.
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>check_param {
+    (<span class="macro-nonterminal">$param</span>:expr, <span class="macro-nonterminal">$msg</span>:expr, <span class="macro-nonterminal">$error</span>:ident) =&gt; {
+        <span class="kw">match </span><span class="macro-nonterminal">$param </span>{
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro-nonterminal">$crate::core::ArgminError</span>::<span class="macro-nonterminal">$error </span>{
+                    text: <span class="macro-nonterminal">$msg</span>.to_string(),
                 }
-                .<span class="ident">into</span>());
+                .into());
             }
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">clone</span>(),
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>x) =&gt; x.clone(),
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro">check_param!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>, <span class="ident">NotInitialized</span>)
+    (<span class="macro-nonterminal">$param</span>:expr, <span class="macro-nonterminal">$msg</span>:expr) =&gt; {
+        <span class="macro">check_param!</span>(<span class="macro-nonterminal">$param</span>, <span class="macro-nonterminal">$msg</span>, NotInitialized)
     };
 }
 
-<span class="doccomment">/// Create an `ArgminError` with a provided message.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">argmin_error</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error_type</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::core::ArgminError</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error_type</span> {
-            <span class="ident">text</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>.<span class="ident">to_string</span>(),
+<span class="doccomment">/// Create an `ArgminError` with a provided message.
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>argmin_error {
+    (<span class="macro-nonterminal">$error_type</span>:ident, <span class="macro-nonterminal">$msg</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$crate::core::ArgminError</span>::<span class="macro-nonterminal">$error_type </span>{
+            text: <span class="macro-nonterminal">$msg</span>.to_string(),
         }
-        .<span class="ident">into</span>()
+        .into()
     };
 }
 
-<span class="doccomment">/// Create an `ArgminError` with a provided message wrapped in a closure for use in</span>
-<span class="doccomment">/// `.ok_or_else(...)` methods on `Option`s.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">argmin_error_closure</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error_type</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="op">|</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::core::Error</span> { <span class="macro-nonterminal">$</span><span class="macro">crate::argmin_error!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error_type</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>) }
+<span class="doccomment">/// Create an `ArgminError` with a provided message wrapped in a closure for use in
+/// `.ok_or_else(...)` methods on `Option`s.
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>argmin_error_closure {
+    (<span class="macro-nonterminal">$error_type</span>:ident, <span class="macro-nonterminal">$msg</span>:expr) =&gt; {
+        || -&gt; <span class="macro-nonterminal">$crate::core::Error </span>{ <span class="macro-nonterminal">$</span><span class="macro">crate::argmin_error!</span>(<span class="macro-nonterminal">$error_type</span>, <span class="macro-nonterminal">$msg</span>) }
     };
 }
 
-<span class="doccomment">/// Convert a constant to a float of given precision</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">float</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::from_f64</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>).<span class="ident">unwrap</span>()
+<span class="doccomment">/// Convert a constant to a float of given precision
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>float {
+    (<span class="macro-nonterminal">$t</span>:ident, <span class="macro-nonterminal">$val</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$t::from_f64</span>(<span class="macro-nonterminal">$val</span>).unwrap()
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="ident">F::from_f64</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>).<span class="ident">unwrap</span>()
+    (<span class="macro-nonterminal">$val</span>:expr) =&gt; {
+        F::from_f64(<span class="macro-nonterminal">$val</span>).unwrap()
     };
 }
 
-<span class="doccomment">/// Creates the `bulk_X` methods.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">bulk</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="macro">paste::item!</span> {
-            <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(
+<span class="doccomment">/// Creates the `bulk_X` methods.
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>bulk {
+    (<span class="macro-nonterminal">$method_name</span>:tt, <span class="macro-nonterminal">$input</span>:ty, <span class="macro-nonterminal">$output</span>:ty) =&gt; {
+        <span class="macro">paste::item! </span>{
+            <span class="attribute">#[doc = <span class="macro">concat!</span>(
                 <span class="string">&quot;Compute `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
                 <span class="string">&quot;` in bulk. &quot;</span>,
                 <span class="string">&quot;If the `rayon` feature is enabled, multiple calls to `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
                 <span class="string">&quot;` will be run in parallel using `rayon`, otherwise they will execute &quot;</span>,
                 <span class="string">&quot;sequentially. If the `rayon` feature is enabled, parallelization can still be &quot;</span>,
                 <span class="string">&quot;turned off by overwriting `parallelize` to return `false`. This can be useful &quot;</span>,
@@ -312,115 +312,115 @@
                 <span class="string">&quot;Note that even if `parallelize` is set to false, the parameter vectors and the &quot;</span>,
                 <span class="string">&quot;problem are still required to be `Send` and `Sync`. Those bounds are linked to &quot;</span>,
                 <span class="string">&quot;the `rayon` feature. This method can be overwritten.&quot;</span>,
-            )]</span>
-            <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">bulk_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span><span class="op">&gt;</span>]<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">P</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">P</span>: <span class="ident">std::borrow::Borrow</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SyncAlias</span>,
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>: <span class="ident">SendAlias</span>,
-                <span class="self">Self</span>: <span class="ident">SyncAlias</span>,
+            )]
+            </span><span class="kw">fn </span>[&lt;bulk_ <span class="macro-nonterminal">$method_name</span>&gt;]&lt;<span class="lifetime">&#39;a</span>, P&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[P]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="macro-nonterminal">$output</span>&gt;, Error&gt;
+            <span class="kw">where
+                </span>P: std::borrow::Borrow&lt;<span class="macro-nonterminal">$input</span>&gt; + SyncAlias,
+                <span class="macro-nonterminal">$output</span>: SendAlias,
+                <span class="self">Self</span>: SyncAlias,
             {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rayon&quot;</span>)]</span>
-                {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">parallelize</span>() {
-                        <span class="ident">params</span>.<span class="ident">par_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>(<span class="ident">p</span>.<span class="ident">borrow</span>())).<span class="ident">collect</span>()
-                    } <span class="kw">else</span> {
-                        <span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>(<span class="ident">p</span>.<span class="ident">borrow</span>())).<span class="ident">collect</span>()
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;rayon&quot;</span>)]
+                </span>{
+                    <span class="kw">if </span><span class="self">self</span>.parallelize() {
+                        params.par_iter().map(|p| <span class="self">self</span>.<span class="macro-nonterminal">$method_name</span>(p.borrow())).collect()
+                    } <span class="kw">else </span>{
+                        params.iter().map(|p| <span class="self">self</span>.<span class="macro-nonterminal">$method_name</span>(p.borrow())).collect()
                     }
                 }
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rayon&quot;</span>))]</span>
-                {
-                    <span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>(<span class="ident">p</span>.<span class="ident">borrow</span>())).<span class="ident">collect</span>()
+                <span class="attribute">#[cfg(not(feature = <span class="string">&quot;rayon&quot;</span>))]
+                </span>{
+                    params.iter().map(|p| <span class="self">self</span>.<span class="macro-nonterminal">$method_name</span>(p.borrow())).collect()
                 }
             }
         }
 
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="attribute">#[doc = <span class="macro">concat!</span>(
                     <span class="string">&quot;Indicates whether to parallelize calls to `&quot;</span>,
-                    <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>),
+                    <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
                     <span class="string">&quot;` when using `bulk_&quot;</span>,
-                    <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>),
+                    <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
                     <span class="string">&quot;`. By default returns true, but can be set manually to `false` if needed. &quot;</span>,
                     <span class="string">&quot;This allows users to turn off parallelization for certain traits &quot;</span>,
                     <span class="string">&quot;implemented on their problem. &quot;</span>,
                     <span class="string">&quot;Note that parallelization requires the `rayon` feature to be enabled, &quot;</span>,
                     <span class="string">&quot;otherwise calls to `&quot;</span>,
-                    <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>),
-                    <span class="string">&quot;` will be executed sequentially independent of how `parallelize` is set.&quot;</span>
-                )]</span>
-        <span class="kw">fn</span> <span class="ident">parallelize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-            <span class="bool-val">true</span>
-        }
+                    <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
+                    <span class="string">&quot;` will be executed sequentially independent of how `parallelize` is set.&quot;
+                </span>)]
+        </span><span class="kw">fn </span>parallelize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+            <span class="bool-val">true
+        </span>}
     };
 }
 
-<span class="doccomment">/// Implements a simple send and a simple sync test for a given type.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">send_sync_test</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="macro">paste::item!</span> {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-            <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">test_send_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span>]() {
-                <span class="kw">fn</span> <span class="ident">assert_send</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span>() {}
-                <span class="ident">assert_send</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>();
+<span class="doccomment">/// Implements a simple send and a simple sync test for a given type.
+</span><span class="attribute">#[cfg(test)]
+</span><span class="macro">macro_rules! </span>send_sync_test {
+    (<span class="macro-nonterminal">$n</span>:ident, <span class="macro-nonterminal">$t</span>:ty) =&gt; {
+        <span class="macro">paste::item! </span>{
+            <span class="attribute">#[test]
+            #[allow(non_snake_case)]
+            </span><span class="kw">fn </span>[&lt;test_send_ <span class="macro-nonterminal">$n</span>&gt;]() {
+                <span class="kw">fn </span>assert_send&lt;T: Send&gt;() {}
+                assert_send::&lt;<span class="macro-nonterminal">$t</span>&gt;();
             }
         }
 
-        <span class="macro">paste::item!</span> {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-            <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">test_sync_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span>]() {
-                <span class="kw">fn</span> <span class="ident">assert_sync</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sync</span><span class="op">&gt;</span>() {}
-                <span class="ident">assert_sync</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>();
-            }
-        }
-    };
-}
-
-<span class="doccomment">/// Creates tests for asserting that a struct implements `Send`, `Sync` and `Clone`</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">test_trait_impl</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="macro">paste::item!</span> {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-            <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">test_send_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span>]() {
-                <span class="kw">fn</span> <span class="ident">assert_send</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span>() {}
-                <span class="ident">assert_send</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>();
-            }
-        }
-
-        <span class="macro">paste::item!</span> {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-            <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">test_sync_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span>]() {
-                <span class="kw">fn</span> <span class="ident">assert_sync</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sync</span><span class="op">&gt;</span>() {}
-                <span class="ident">assert_sync</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>();
-            }
-        }
-
-        <span class="macro">paste::item!</span> {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-            <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">test_clone_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span>]() {
-                <span class="kw">fn</span> <span class="ident">assert_clone</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span>() {}
-                <span class="ident">assert_clone</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>();
+        <span class="macro">paste::item! </span>{
+            <span class="attribute">#[test]
+            #[allow(non_snake_case)]
+            </span><span class="kw">fn </span>[&lt;test_sync_ <span class="macro-nonterminal">$n</span>&gt;]() {
+                <span class="kw">fn </span>assert_sync&lt;T: Sync&gt;() {}
+                assert_sync::&lt;<span class="macro-nonterminal">$t</span>&gt;();
             }
         }
     };
 }
 
-<span class="doccomment">/// Asserts that expression $n leads to an error of type $t and text $s</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_error</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">expr</span>) =&gt; {
+<span class="doccomment">/// Creates tests for asserting that a struct implements `Send`, `Sync` and `Clone`
+</span><span class="attribute">#[cfg(test)]
+#[macro_export]
+</span><span class="macro">macro_rules! </span>test_trait_impl {
+    (<span class="macro-nonterminal">$n</span>:ident, <span class="macro-nonterminal">$t</span>:ty) =&gt; {
+        <span class="macro">paste::item! </span>{
+            <span class="attribute">#[test]
+            #[allow(non_snake_case)]
+            </span><span class="kw">fn </span>[&lt;test_send_ <span class="macro-nonterminal">$n</span>&gt;]() {
+                <span class="kw">fn </span>assert_send&lt;T: Send&gt;() {}
+                assert_send::&lt;<span class="macro-nonterminal">$t</span>&gt;();
+            }
+        }
+
+        <span class="macro">paste::item! </span>{
+            <span class="attribute">#[test]
+            #[allow(non_snake_case)]
+            </span><span class="kw">fn </span>[&lt;test_sync_ <span class="macro-nonterminal">$n</span>&gt;]() {
+                <span class="kw">fn </span>assert_sync&lt;T: Sync&gt;() {}
+                assert_sync::&lt;<span class="macro-nonterminal">$t</span>&gt;();
+            }
+        }
+
+        <span class="macro">paste::item! </span>{
+            <span class="attribute">#[test]
+            #[allow(non_snake_case)]
+            </span><span class="kw">fn </span>[&lt;test_clone_ <span class="macro-nonterminal">$n</span>&gt;]() {
+                <span class="kw">fn </span>assert_clone&lt;T: Clone&gt;() {}
+                assert_clone::&lt;<span class="macro-nonterminal">$t</span>&gt;();
+            }
+        }
+    };
+}
+
+<span class="doccomment">/// Asserts that expression $n leads to an error of type $t and text $s
+</span><span class="attribute">#[cfg(test)]
+#[macro_export]
+</span><span class="macro">macro_rules! </span>assert_error {
+    (<span class="macro-nonterminal">$n</span>:expr, <span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$s</span>:expr) =&gt; {
         <span class="macro">assert_eq!</span>(
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>.<span class="ident">err</span>().<span class="ident">unwrap</span>().<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>
-        );
+            <span class="macro-nonterminal">$n</span>.err().unwrap().downcast_ref::&lt;<span class="macro-nonterminal">$t</span>&gt;().unwrap().to_string(),
+            <span class="macro-nonterminal">$s
+        </span>);
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/goldensectionsearch/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/goldensectionsearch/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -497,504 +497,504 @@
 <span id="497">497</span>
 <span id="498">498</span>
 <span id="499">499</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # Golden-section search</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The golden-section search is a technique for finding an extremum (minimum or maximum) of a</span>
-<span class="doccomment">//! function inside a specified interval.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [`GoldenSectionSearch`] for details.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Reference</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;https://en.wikipedia.org/wiki/Golden-section_search&gt;</span>
+</span><span class="doccomment">//! # Golden-section search
+//!
+//! The golden-section search is a technique for finding an extremum (minimum or maximum) of a
+//! function inside a specified interval.
+//!
+//! See [`GoldenSectionSearch`] for details.
+//!
+//! ## Reference
+//!
+//! &lt;https://en.wikipedia.org/wiki/Golden-section_search&gt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, Error, IterState, Problem, Solver, TerminationReason, KV,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="comment">// Golden ratio is actually 1.61803398874989484820, but that is too much precision for f64.</span>
-<span class="kw">const</span> <span class="ident">GOLDEN_RATIO</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.618_033_988_749_895</span>;
-<span class="kw">const</span> <span class="ident">G1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="op">-</span><span class="number">1.0</span> <span class="op">+</span> <span class="ident">GOLDEN_RATIO</span>;
-<span class="kw">const</span> <span class="ident">G2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.0</span> <span class="op">-</span> <span class="ident">G1</span>;
+<span class="comment">// Golden ratio is actually 1.61803398874989484820, but that is too much precision for f64.
+</span><span class="kw">const </span>GOLDEN_RATIO: f64 = <span class="number">1.618_033_988_749_895</span>;
+<span class="kw">const </span>G1: f64 = -<span class="number">1.0 </span>+ GOLDEN_RATIO;
+<span class="kw">const </span>G2: f64 = <span class="number">1.0 </span>- G1;
 
-<span class="doccomment">/// # Golden-section search</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The golden-section search is a technique for finding an extremum (minimum or maximum) of a</span>
-<span class="doccomment">/// function inside a specified interval.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The method operates by successively narrowing the range of values on the specified interval,</span>
-<span class="doccomment">/// which makes it relatively slow, but very robust. The technique derives its name from the fact</span>
-<span class="doccomment">/// that the algorithm maintains the function values for four points whose three interval widths</span>
-<span class="doccomment">/// are in the ratio 2-φ:2φ-3:2-φ where φ is the golden ratio. These ratios are maintained for each</span>
-<span class="doccomment">/// iteration and are maximally efficient.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires an initial guess which is to be provided via [`Executor`](`crate::core::Executor`)s</span>
-<span class="doccomment">/// `configure` method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Reference</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;https://en.wikipedia.org/wiki/Golden-section_search&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GoldenSectionSearch</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="ident">g1</span>: <span class="ident">F</span>,
-    <span class="ident">g2</span>: <span class="ident">F</span>,
-    <span class="ident">min_bound</span>: <span class="ident">F</span>,
-    <span class="ident">max_bound</span>: <span class="ident">F</span>,
-    <span class="ident">tolerance</span>: <span class="ident">F</span>,
+<span class="doccomment">/// # Golden-section search
+///
+/// The golden-section search is a technique for finding an extremum (minimum or maximum) of a
+/// function inside a specified interval.
+///
+/// The method operates by successively narrowing the range of values on the specified interval,
+/// which makes it relatively slow, but very robust. The technique derives its name from the fact
+/// that the algorithm maintains the function values for four points whose three interval widths
+/// are in the ratio 2-φ:2φ-3:2-φ where φ is the golden ratio. These ratios are maintained for each
+/// iteration and are maximally efficient.
+///
+/// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.
+///
+/// Requires an initial guess which is to be provided via [`Executor`](`crate::core::Executor`)s
+/// `configure` method.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`].
+///
+/// ## Reference
+///
+/// &lt;https://en.wikipedia.org/wiki/Golden-section_search&gt;
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>GoldenSectionSearch&lt;F&gt; {
+    g1: F,
+    g2: F,
+    min_bound: F,
+    max_bound: F,
+    tolerance: F,
 
-    <span class="ident">x0</span>: <span class="ident">F</span>,
-    <span class="ident">x1</span>: <span class="ident">F</span>,
-    <span class="ident">x2</span>: <span class="ident">F</span>,
-    <span class="ident">x3</span>: <span class="ident">F</span>,
-    <span class="ident">f1</span>: <span class="ident">F</span>,
-    <span class="ident">f2</span>: <span class="ident">F</span>,
+    x0: F,
+    x1: F,
+    x2: F,
+    x3: F,
+    f1: F,
+    f2: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">GoldenSectionSearch</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;F&gt; GoldenSectionSearch&lt;F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`GoldenSectionSearch`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::goldensectionsearch::GoldenSectionSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let gss = GoldenSectionSearch::new(-2.5f64, 3.0f64)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">min_bound</span>: <span class="ident">F</span>, <span class="ident">max_bound</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">max_bound</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">min_bound</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`GoldenSectionSearch`: `min_bound` must be smaller than `max_bound`.&quot;</span>
-            ));
+    <span class="doccomment">/// Construct a new instance of [`GoldenSectionSearch`].
+    ///
+    /// The `min_bound` and `max_bound` arguments define values that bracket the expected minimum.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::goldensectionsearch::GoldenSectionSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let gss = GoldenSectionSearch::new(-2.5f64, 3.0f64)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>new(min_bound: F, max_bound: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>max_bound &lt;= min_bound {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`GoldenSectionSearch`: `min_bound` must be smaller than `max_bound`.&quot;
+            </span>));
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">GoldenSectionSearch</span> {
-            <span class="ident">g1</span>: <span class="ident">F::from</span>(<span class="ident">G1</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">g2</span>: <span class="ident">F::from</span>(<span class="ident">G2</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">min_bound</span>,
-            <span class="ident">max_bound</span>,
-            <span class="ident">tolerance</span>: <span class="ident">F::from</span>(<span class="number">0.01</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">x0</span>: <span class="ident">min_bound</span>,
-            <span class="ident">x1</span>: <span class="ident">F::zero</span>(),
-            <span class="ident">x2</span>: <span class="ident">F::zero</span>(),
-            <span class="ident">x3</span>: <span class="ident">max_bound</span>,
-            <span class="ident">f1</span>: <span class="ident">F::zero</span>(),
-            <span class="ident">f2</span>: <span class="ident">F::zero</span>(),
+        <span class="prelude-val">Ok</span>(GoldenSectionSearch {
+            g1: F::from(G1).unwrap(),
+            g2: F::from(G2).unwrap(),
+            min_bound,
+            max_bound,
+            tolerance: F::from(<span class="number">0.01</span>).unwrap(),
+            x0: min_bound,
+            x1: F::zero(),
+            x2: F::zero(),
+            x3: max_bound,
+            f1: F::zero(),
+            f2: F::zero(),
         })
     }
 
-    <span class="doccomment">/// Set tolerance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be larger than `0` and defaults to `0.01`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::goldensectionsearch::GoldenSectionSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let gss = GoldenSectionSearch::new(-2.5f64, 3.0f64)?.with_tolerance(0.0001)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tolerance</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">tolerance</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`GoldenSectionSearch`: Tolerance must be larger than 0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set tolerance.
+    ///
+    /// Must be larger than `0` and defaults to `0.01`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::goldensectionsearch::GoldenSectionSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let gss = GoldenSectionSearch::new(-2.5f64, 3.0f64)?.with_tolerance(0.0001)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_tolerance(<span class="kw-2">mut </span><span class="self">self</span>, tolerance: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>tolerance &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`GoldenSectionSearch`: Tolerance must be larger than 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">tolerance</span> <span class="op">=</span> <span class="ident">tolerance</span>;
+        <span class="self">self</span>.tolerance = tolerance;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">F</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GoldenSectionSearch</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">F</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;O, F&gt; Solver&lt;O, IterState&lt;F, (), (), (), F&gt;&gt; <span class="kw">for </span>GoldenSectionSearch&lt;F&gt;
+<span class="kw">where
+    </span>O: CostFunction&lt;Param = F, Output = F&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Golden-section search&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Golden-section search&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">F</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">F</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">init_estimate</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;F, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;F, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>init_estimate = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`GoldenSectionSearch` requires an initial estimate. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">init_estimate</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">min_bound</span> <span class="op">|</span><span class="op">|</span> <span class="ident">init_estimate</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">max_bound</span> {
+        <span class="kw">if </span>init_estimate &lt; <span class="self">self</span>.min_bound || init_estimate &gt; <span class="self">self</span>.max_bound {
             <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound].&quot;</span>
-            ))
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">ie_min</span> <span class="op">=</span> <span class="ident">init_estimate</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">min_bound</span>;
-            <span class="kw">let</span> <span class="ident">max_ie</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_bound</span> <span class="op">-</span> <span class="ident">init_estimate</span>;
-            <span class="kw">let</span> (<span class="ident">x1</span>, <span class="ident">x2</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">max_ie</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">ie_min</span>.<span class="ident">abs</span>() {
-                (<span class="ident">init_estimate</span>, <span class="ident">init_estimate</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">g2</span> <span class="op">*</span> <span class="ident">max_ie</span>)
-            } <span class="kw">else</span> {
-                (<span class="ident">init_estimate</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">g2</span> <span class="op">*</span> <span class="ident">ie_min</span>, <span class="ident">init_estimate</span>)
+                InvalidParameter,
+                <span class="string">&quot;`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound].&quot;
+            </span>))
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>ie_min = init_estimate - <span class="self">self</span>.min_bound;
+            <span class="kw">let </span>max_ie = <span class="self">self</span>.max_bound - init_estimate;
+            <span class="kw">let </span>(x1, x2) = <span class="kw">if </span>max_ie.abs() &gt; ie_min.abs() {
+                (init_estimate, init_estimate + <span class="self">self</span>.g2 * max_ie)
+            } <span class="kw">else </span>{
+                (init_estimate - <span class="self">self</span>.g2 * ie_min, init_estimate)
             };
-            <span class="self">self</span>.<span class="ident">x1</span> <span class="op">=</span> <span class="ident">x1</span>;
-            <span class="self">self</span>.<span class="ident">x2</span> <span class="op">=</span> <span class="ident">x2</span>;
-            <span class="self">self</span>.<span class="ident">f1</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">x1</span>)<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">f2</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">x2</span>)<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">f1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">f2</span> {
-                <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="self">self</span>.<span class="ident">x1</span>).<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">f1</span>), <span class="prelude-val">None</span>))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="self">self</span>.<span class="ident">x2</span>).<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">f2</span>), <span class="prelude-val">None</span>))
+            <span class="self">self</span>.x1 = x1;
+            <span class="self">self</span>.x2 = x2;
+            <span class="self">self</span>.f1 = problem.cost(<span class="kw-2">&amp;</span><span class="self">self</span>.x1)<span class="question-mark">?</span>;
+            <span class="self">self</span>.f2 = problem.cost(<span class="kw-2">&amp;</span><span class="self">self</span>.x2)<span class="question-mark">?</span>;
+            <span class="kw">if </span><span class="self">self</span>.f1 &lt; <span class="self">self</span>.f2 {
+                <span class="prelude-val">Ok</span>((state.param(<span class="self">self</span>.x1).cost(<span class="self">self</span>.f1), <span class="prelude-val">None</span>))
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Ok</span>((state.param(<span class="self">self</span>.x2).cost(<span class="self">self</span>.f2), <span class="prelude-val">None</span>))
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">F</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">F</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">f2</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">f1</span> {
-            <span class="self">self</span>.<span class="ident">x0</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x1</span>;
-            <span class="self">self</span>.<span class="ident">x1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x2</span>;
-            <span class="self">self</span>.<span class="ident">x2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">g1</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x1</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">g2</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x3</span>;
-            <span class="self">self</span>.<span class="ident">f1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f2</span>;
-            <span class="self">self</span>.<span class="ident">f2</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">x2</span>)<span class="question-mark">?</span>;
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">x3</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x2</span>;
-            <span class="self">self</span>.<span class="ident">x2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">x1</span>;
-            <span class="self">self</span>.<span class="ident">x1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">g1</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x2</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">g2</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">x0</span>;
-            <span class="self">self</span>.<span class="ident">f2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f1</span>;
-            <span class="self">self</span>.<span class="ident">f1</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">x1</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        state: IterState&lt;F, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;F, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.f2 &lt; <span class="self">self</span>.f1 {
+            <span class="self">self</span>.x0 = <span class="self">self</span>.x1;
+            <span class="self">self</span>.x1 = <span class="self">self</span>.x2;
+            <span class="self">self</span>.x2 = <span class="self">self</span>.g1 * <span class="self">self</span>.x1 + <span class="self">self</span>.g2 * <span class="self">self</span>.x3;
+            <span class="self">self</span>.f1 = <span class="self">self</span>.f2;
+            <span class="self">self</span>.f2 = problem.cost(<span class="kw-2">&amp;</span><span class="self">self</span>.x2)<span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.x3 = <span class="self">self</span>.x2;
+            <span class="self">self</span>.x2 = <span class="self">self</span>.x1;
+            <span class="self">self</span>.x1 = <span class="self">self</span>.g1 * <span class="self">self</span>.x2 + <span class="self">self</span>.g2 * <span class="self">self</span>.x0;
+            <span class="self">self</span>.f2 = <span class="self">self</span>.f1;
+            <span class="self">self</span>.f1 = problem.cost(<span class="kw-2">&amp;</span><span class="self">self</span>.x1)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">f1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">f2</span> {
-            <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="self">self</span>.<span class="ident">x1</span>).<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">f1</span>), <span class="prelude-val">None</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="self">self</span>.<span class="ident">x2</span>).<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">f2</span>), <span class="prelude-val">None</span>))
+        <span class="kw">if </span><span class="self">self</span>.f1 &lt; <span class="self">self</span>.f2 {
+            <span class="prelude-val">Ok</span>((state.param(<span class="self">self</span>.x1).cost(<span class="self">self</span>.f1), <span class="prelude-val">None</span>))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>((state.param(<span class="self">self</span>.x2).cost(<span class="self">self</span>.f2), <span class="prelude-val">None</span>))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">F</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tolerance</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">x1</span>.<span class="ident">abs</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">x2</span>.<span class="ident">abs</span>()) <span class="op">&gt;</span><span class="op">=</span> (<span class="self">self</span>.<span class="ident">x3</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">x0</span>).<span class="ident">abs</span>() {
-            <span class="kw">return</span> <span class="ident">TerminationReason::TargetToleranceReached</span>;
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;F, (), (), (), F&gt;) -&gt; TerminationReason {
+        <span class="kw">if </span><span class="self">self</span>.tolerance * (<span class="self">self</span>.x1.abs() + <span class="self">self</span>.x2.abs()) &gt;= (<span class="self">self</span>.x3 - <span class="self">self</span>.x0).abs() {
+            <span class="kw">return </span>TerminationReason::TargetToleranceReached;
         }
-        <span class="ident">TerminationReason::NotTerminated</span>
+        TerminationReason::NotTerminated
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminError</span>, <span class="ident">State</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
-    <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{ArgminError, State};
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
+    <span class="kw">use </span>approx::assert_relative_eq;
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">GssTestProblem</span> {}
+    <span class="attribute">#[derive(Clone)]
+    </span><span class="kw">struct </span>GssTestProblem {}
 
-    <span class="kw">impl</span> <span class="ident">CostFunction</span> <span class="kw">for</span> <span class="ident">GssTestProblem</span> {
-        <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">f64</span>;
-        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
+    <span class="kw">impl </span>CostFunction <span class="kw">for </span>GssTestProblem {
+        <span class="kw">type </span>Param = f64;
+        <span class="kw">type </span>Output = f64;
 
-        <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-            <span class="prelude-val">Ok</span>((<span class="ident">x</span> <span class="op">+</span> <span class="number">3.0</span>) <span class="op">*</span> (<span class="ident">x</span> <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">powi</span>(<span class="number">2</span>))
+        <span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, x: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
+            <span class="prelude-val">Ok</span>((x + <span class="number">3.0</span>) * (x - <span class="number">1.0</span>).powi(<span class="number">2</span>))
         }
     }
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">golden_section_search</span>, <span class="ident">GoldenSectionSearch</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(golden_section_search, GoldenSectionSearch&lt;f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">GoldenSectionSearch</span> {
-            <span class="ident">g1</span>,
-            <span class="ident">g2</span>,
-            <span class="ident">min_bound</span>,
-            <span class="ident">max_bound</span>,
-            <span class="ident">tolerance</span>,
-            <span class="ident">x0</span>,
-            <span class="ident">x1</span>,
-            <span class="ident">x2</span>,
-            <span class="ident">x3</span>,
-            <span class="ident">f1</span>,
-            <span class="ident">f2</span>,
-        } <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="op">-</span><span class="number">2.5f64</span>, <span class="number">3.0f64</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>GoldenSectionSearch {
+            g1,
+            g2,
+            min_bound,
+            max_bound,
+            tolerance,
+            x0,
+            x1,
+            x2,
+            x3,
+            f1,
+            f2,
+        } = GoldenSectionSearch::new(-<span class="number">2.5f64</span>, <span class="number">3.0f64</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">g1</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">G1</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">g2</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">G2</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">min_bound</span>.<span class="ident">to_ne_bytes</span>(), (<span class="op">-</span><span class="number">2.5f64</span>).<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">max_bound</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">3.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">tolerance</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.01f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">x0</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">min_bound</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">x1</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">x2</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">x3</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">max_bound</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">f1</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">f2</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(g1.to_ne_bytes(), G1.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(g2.to_ne_bytes(), G2.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(min_bound.to_ne_bytes(), (-<span class="number">2.5f64</span>).to_ne_bytes());
+        <span class="macro">assert_eq!</span>(max_bound.to_ne_bytes(), <span class="number">3.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(tolerance.to_ne_bytes(), <span class="number">0.01f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(x0.to_ne_bytes(), min_bound.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(x1.to_ne_bytes(), <span class="number">0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(x2.to_ne_bytes(), <span class="number">0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(x3.to_ne_bytes(), max_bound.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(f1.to_ne_bytes(), <span class="number">0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(f2.to_ne_bytes(), <span class="number">0f64</span>.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new_errors</span>() {
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="number">2.5f64</span>, <span class="op">-</span><span class="number">3.0f64</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new_errors() {
+        <span class="kw">let </span>res = GoldenSectionSearch::new(<span class="number">2.5f64</span>, -<span class="number">3.0f64</span>);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Invalid parameter: \&quot;`GoldenSectionSearch`: &quot;</span>,
-                <span class="string">&quot;`min_bound` must be smaller than `max_bound`.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;`min_bound` must be smaller than `max_bound`.\&quot;&quot;
+            </span>)
         );
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="number">2.5f64</span>, <span class="number">2.5f64</span>);
+        <span class="kw">let </span>res = GoldenSectionSearch::new(<span class="number">2.5f64</span>, <span class="number">2.5f64</span>);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Invalid parameter: \&quot;`GoldenSectionSearch`: &quot;</span>,
-                <span class="string">&quot;`min_bound` must be smaller than `max_bound`.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;`min_bound` must be smaller than `max_bound`.\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_tolerance</span>() {
-        <span class="kw">let</span> <span class="ident">GoldenSectionSearch</span> { <span class="ident">tolerance</span>, .. } <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="op">-</span><span class="number">2.5f64</span>, <span class="number">3.0f64</span>)
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">with_tolerance</span>(<span class="number">0.001</span>)
-            .<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_tolerance() {
+        <span class="kw">let </span>GoldenSectionSearch { tolerance, .. } = GoldenSectionSearch::new(-<span class="number">2.5f64</span>, <span class="number">3.0f64</span>)
+            .unwrap()
+            .with_tolerance(<span class="number">0.001</span>)
+            .unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">tolerance</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.001f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(tolerance.to_ne_bytes(), <span class="number">0.001f64</span>.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_tolerance_errors</span>() {
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="op">-</span><span class="number">2.5f64</span>, <span class="number">3.0f64</span>)
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">with_tolerance</span>(<span class="number">0.0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_tolerance_errors() {
+        <span class="kw">let </span>res = GoldenSectionSearch::new(-<span class="number">2.5f64</span>, <span class="number">3.0f64</span>)
+            .unwrap()
+            .with_tolerance(<span class="number">0.0</span>);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;`GoldenSectionSearch`: Tolerance must be larger than 0.\&quot;&quot;</span>
-        );
+            res,
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;`GoldenSectionSearch`: Tolerance must be larger than 0.\&quot;&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="op">-</span><span class="number">2.5f64</span>, <span class="number">3.0f64</span>)
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">with_tolerance</span>(<span class="op">-</span><span class="number">1.0</span>);
+        <span class="kw">let </span>res = GoldenSectionSearch::new(-<span class="number">2.5f64</span>, <span class="number">3.0f64</span>)
+            .unwrap()
+            .with_tolerance(-<span class="number">1.0</span>);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;`GoldenSectionSearch`: Tolerance must be larger than 0.\&quot;&quot;</span>
-        );
+            res,
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;`GoldenSectionSearch`: Tolerance must be larger than 0.\&quot;&quot;
+        </span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_param_not_initialized</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gss</span> <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="op">-</span><span class="number">2.5f64</span>, <span class="number">3.0f64</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">gss</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">GssTestProblem</span> {}), <span class="ident">IterState::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_param_not_initialized() {
+        <span class="kw">let </span><span class="kw-2">mut </span>gss = GoldenSectionSearch::new(-<span class="number">2.5f64</span>, <span class="number">3.0f64</span>).unwrap();
+        <span class="kw">let </span>res = gss.init(<span class="kw-2">&amp;mut </span>Problem::new(GssTestProblem {}), IterState::new());
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`GoldenSectionSearch` requires an initial estimate. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_param_outside_bounds</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gss</span> <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="op">-</span><span class="number">2.5f64</span>, <span class="number">3.0f64</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">gss</span>.<span class="ident">init</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">GssTestProblem</span> {}),
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="number">5.0f64</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_param_outside_bounds() {
+        <span class="kw">let </span><span class="kw-2">mut </span>gss = GoldenSectionSearch::new(-<span class="number">2.5f64</span>, <span class="number">3.0f64</span>).unwrap();
+        <span class="kw">let </span>res = gss.init(
+            <span class="kw-2">&amp;mut </span>Problem::new(GssTestProblem {}),
+            IterState::new().param(<span class="number">5.0f64</span>),
         );
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Invalid parameter: \&quot;`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound].\&quot;&quot;</span>,
             )
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gss</span> <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="op">-</span><span class="number">2.5f64</span>, <span class="number">3.0f64</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">GssTestProblem</span> {};
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">gss</span>
-            .<span class="ident">init</span>(
-                <span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>.<span class="ident">clone</span>()),
-                <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="op">-</span><span class="number">0.5f64</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init() {
+        <span class="kw">let </span><span class="kw-2">mut </span>gss = GoldenSectionSearch::new(-<span class="number">2.5f64</span>, <span class="number">3.0f64</span>).unwrap();
+        <span class="kw">let </span>problem = GssTestProblem {};
+        <span class="kw">let </span>(state, kv) = gss
+            .init(
+                <span class="kw-2">&amp;mut </span>Problem::new(problem.clone()),
+                IterState::new().param(-<span class="number">0.5f64</span>),
             )
-            .<span class="ident">unwrap</span>();
+            .unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">let</span> <span class="ident">GoldenSectionSearch</span> {
-            <span class="ident">g1</span>,
-            <span class="ident">g2</span>,
-            <span class="ident">min_bound</span>,
-            <span class="ident">max_bound</span>,
-            <span class="ident">tolerance</span>,
-            <span class="ident">x0</span>,
-            <span class="ident">x1</span>,
-            <span class="ident">x2</span>,
-            <span class="ident">x3</span>,
-            <span class="ident">f1</span>,
-            <span class="ident">f2</span>,
-        } <span class="op">=</span> <span class="ident">gss</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>GoldenSectionSearch {
+            g1,
+            g2,
+            min_bound,
+            max_bound,
+            tolerance,
+            x0,
+            x1,
+            x2,
+            x3,
+            f1,
+            f2,
+        } = gss.clone();
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">x1</span>, <span class="op">-</span><span class="number">0.5f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">x2</span>, <span class="op">-</span><span class="number">0.5f64</span> <span class="op">+</span> <span class="ident">g2</span> <span class="op">*</span> <span class="number">3.5f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">f1</span>, <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">x1</span>).<span class="ident">unwrap</span>(), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">f2</span>, <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">x2</span>).<span class="ident">unwrap</span>(), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="kw">if</span> <span class="ident">f1</span> <span class="op">&lt;</span> <span class="ident">f2</span> {
-            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(), <span class="ident">x1</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-            <span class="macro">assert_relative_eq!</span>(<span class="ident">state</span>.<span class="ident">cost</span>, <span class="ident">f1</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        } <span class="kw">else</span> {
-            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(), <span class="ident">x2</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-            <span class="macro">assert_relative_eq!</span>(<span class="ident">state</span>.<span class="ident">cost</span>, <span class="ident">f2</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(x1, -<span class="number">0.5f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(x2, -<span class="number">0.5f64 </span>+ g2 * <span class="number">3.5f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(f1, problem.cost(<span class="kw-2">&amp;</span>x1).unwrap(), epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(f2, problem.cost(<span class="kw-2">&amp;</span>x2).unwrap(), epsilon = f64::EPSILON);
+        <span class="kw">if </span>f1 &lt; f2 {
+            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span>state.param.as_ref().unwrap(), x1, epsilon = f64::EPSILON);
+            <span class="macro">assert_relative_eq!</span>(state.cost, f1, epsilon = f64::EPSILON);
+        } <span class="kw">else </span>{
+            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span>state.param.as_ref().unwrap(), x2, epsilon = f64::EPSILON);
+            <span class="macro">assert_relative_eq!</span>(state.cost, f2, epsilon = f64::EPSILON);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">g1</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">G1</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">g2</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">G2</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">min_bound</span>.<span class="ident">to_ne_bytes</span>(), (<span class="op">-</span><span class="number">2.5f64</span>).<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">max_bound</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">3.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">tolerance</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.01f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">x0</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">min_bound</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">x3</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">max_bound</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(g1.to_ne_bytes(), G1.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(g2.to_ne_bytes(), G2.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(min_bound.to_ne_bytes(), (-<span class="number">2.5f64</span>).to_ne_bytes());
+        <span class="macro">assert_eq!</span>(max_bound.to_ne_bytes(), <span class="number">3.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(tolerance.to_ne_bytes(), <span class="number">0.01f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(x0.to_ne_bytes(), min_bound.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(x3.to_ne_bytes(), max_bound.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter_1</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gss</span> <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="op">-</span><span class="number">2.5f64</span>, <span class="number">3.0f64</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">GssTestProblem</span> {});
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter_1() {
+        <span class="kw">let </span><span class="kw-2">mut </span>gss = GoldenSectionSearch::new(-<span class="number">2.5f64</span>, <span class="number">3.0f64</span>).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(GssTestProblem {});
 
-        <span class="ident">gss</span>.<span class="ident">f1</span> <span class="op">=</span> <span class="number">10.0f64</span>;
-        <span class="ident">gss</span>.<span class="ident">f2</span> <span class="op">=</span> <span class="number">5.0f64</span>;
-        <span class="ident">gss</span>.<span class="ident">x0</span> <span class="op">=</span> <span class="number">0.0f64</span>;
-        <span class="ident">gss</span>.<span class="ident">x1</span> <span class="op">=</span> <span class="number">1.0f64</span>;
-        <span class="ident">gss</span>.<span class="ident">x2</span> <span class="op">=</span> <span class="number">2.0f64</span>;
-        <span class="ident">gss</span>.<span class="ident">x3</span> <span class="op">=</span> <span class="number">3.0f64</span>;
+        gss.f1 = <span class="number">10.0f64</span>;
+        gss.f2 = <span class="number">5.0f64</span>;
+        gss.x0 = <span class="number">0.0f64</span>;
+        gss.x1 = <span class="number">1.0f64</span>;
+        gss.x2 = <span class="number">2.0f64</span>;
+        gss.x3 = <span class="number">3.0f64</span>;
 
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">gss</span>
-            .<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="op">-</span><span class="number">0.5f64</span>))
-            .<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(state, kv) = gss
+            .next_iter(<span class="kw-2">&amp;mut </span>problem, IterState::new().param(-<span class="number">0.5f64</span>))
+            .unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">let</span> <span class="ident">GoldenSectionSearch</span> {
-            <span class="ident">g1</span>,
-            <span class="ident">g2</span>,
-            <span class="ident">min_bound</span>,
-            <span class="ident">max_bound</span>,
-            <span class="ident">tolerance</span>,
-            <span class="ident">x0</span>,
-            <span class="ident">x1</span>,
-            <span class="ident">x2</span>,
-            <span class="ident">x3</span>,
-            <span class="ident">f1</span>,
-            <span class="ident">f2</span>,
-        } <span class="op">=</span> <span class="ident">gss</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>GoldenSectionSearch {
+            g1,
+            g2,
+            min_bound,
+            max_bound,
+            tolerance,
+            x0,
+            x1,
+            x2,
+            x3,
+            f1,
+            f2,
+        } = gss.clone();
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">x0</span>, <span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">x1</span>, <span class="number">2.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">x2</span>, <span class="ident">g1</span> <span class="op">*</span> <span class="number">2.0f64</span> <span class="op">+</span> <span class="ident">g2</span> <span class="op">*</span> <span class="ident">x3</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">f1</span>, <span class="number">5.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">f2</span>, <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">x2</span>).<span class="ident">unwrap</span>(), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">g1</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">G1</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">g2</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">G2</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">min_bound</span>.<span class="ident">to_ne_bytes</span>(), (<span class="op">-</span><span class="number">2.5f64</span>).<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">max_bound</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">3.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">tolerance</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.01f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="kw">if</span> <span class="ident">f1</span> <span class="op">&lt;</span> <span class="ident">f2</span> {
-            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(), <span class="ident">x1</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-            <span class="macro">assert_relative_eq!</span>(<span class="ident">state</span>.<span class="ident">cost</span>, <span class="ident">f1</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        } <span class="kw">else</span> {
-            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(), <span class="ident">x2</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-            <span class="macro">assert_relative_eq!</span>(<span class="ident">state</span>.<span class="ident">cost</span>, <span class="ident">f2</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(x0, <span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(x1, <span class="number">2.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(x2, g1 * <span class="number">2.0f64 </span>+ g2 * x3, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(f1, <span class="number">5.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(f2, problem.cost(<span class="kw-2">&amp;</span>x2).unwrap(), epsilon = f64::EPSILON);
+        <span class="macro">assert_eq!</span>(g1.to_ne_bytes(), G1.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(g2.to_ne_bytes(), G2.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(min_bound.to_ne_bytes(), (-<span class="number">2.5f64</span>).to_ne_bytes());
+        <span class="macro">assert_eq!</span>(max_bound.to_ne_bytes(), <span class="number">3.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(tolerance.to_ne_bytes(), <span class="number">0.01f64</span>.to_ne_bytes());
+        <span class="kw">if </span>f1 &lt; f2 {
+            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span>state.param.as_ref().unwrap(), x1, epsilon = f64::EPSILON);
+            <span class="macro">assert_relative_eq!</span>(state.cost, f1, epsilon = f64::EPSILON);
+        } <span class="kw">else </span>{
+            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span>state.param.as_ref().unwrap(), x2, epsilon = f64::EPSILON);
+            <span class="macro">assert_relative_eq!</span>(state.cost, f2, epsilon = f64::EPSILON);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter_2</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gss</span> <span class="op">=</span> <span class="ident">GoldenSectionSearch::new</span>(<span class="op">-</span><span class="number">2.5f64</span>, <span class="number">3.0f64</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">GssTestProblem</span> {});
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter_2() {
+        <span class="kw">let </span><span class="kw-2">mut </span>gss = GoldenSectionSearch::new(-<span class="number">2.5f64</span>, <span class="number">3.0f64</span>).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(GssTestProblem {});
 
-        <span class="ident">gss</span>.<span class="ident">f1</span> <span class="op">=</span> <span class="number">5.0f64</span>;
-        <span class="ident">gss</span>.<span class="ident">f2</span> <span class="op">=</span> <span class="number">10.0f64</span>;
-        <span class="ident">gss</span>.<span class="ident">x0</span> <span class="op">=</span> <span class="number">0.0f64</span>;
-        <span class="ident">gss</span>.<span class="ident">x1</span> <span class="op">=</span> <span class="number">1.0f64</span>;
-        <span class="ident">gss</span>.<span class="ident">x2</span> <span class="op">=</span> <span class="number">2.0f64</span>;
-        <span class="ident">gss</span>.<span class="ident">x3</span> <span class="op">=</span> <span class="number">3.0f64</span>;
+        gss.f1 = <span class="number">5.0f64</span>;
+        gss.f2 = <span class="number">10.0f64</span>;
+        gss.x0 = <span class="number">0.0f64</span>;
+        gss.x1 = <span class="number">1.0f64</span>;
+        gss.x2 = <span class="number">2.0f64</span>;
+        gss.x3 = <span class="number">3.0f64</span>;
 
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">gss</span>
-            .<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="op">-</span><span class="number">0.5f64</span>))
-            .<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(state, kv) = gss
+            .next_iter(<span class="kw-2">&amp;mut </span>problem, IterState::new().param(-<span class="number">0.5f64</span>))
+            .unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">let</span> <span class="ident">GoldenSectionSearch</span> {
-            <span class="ident">g1</span>,
-            <span class="ident">g2</span>,
-            <span class="ident">min_bound</span>,
-            <span class="ident">max_bound</span>,
-            <span class="ident">tolerance</span>,
-            <span class="ident">x0</span>,
-            <span class="ident">x1</span>,
-            <span class="ident">x2</span>,
-            <span class="ident">x3</span>,
-            <span class="ident">f1</span>,
-            <span class="ident">f2</span>,
-        } <span class="op">=</span> <span class="ident">gss</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>GoldenSectionSearch {
+            g1,
+            g2,
+            min_bound,
+            max_bound,
+            tolerance,
+            x0,
+            x1,
+            x2,
+            x3,
+            f1,
+            f2,
+        } = gss.clone();
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">x0</span>, <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">x1</span>, <span class="ident">g1</span> <span class="op">*</span> <span class="ident">x2</span> <span class="op">+</span> <span class="ident">g2</span> <span class="op">*</span> <span class="ident">x0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">x2</span>, <span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">x3</span>, <span class="number">2.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">f1</span>, <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">x1</span>).<span class="ident">unwrap</span>(), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">f2</span>, <span class="number">5.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">g1</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">G1</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">g2</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">G2</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">min_bound</span>.<span class="ident">to_ne_bytes</span>(), (<span class="op">-</span><span class="number">2.5f64</span>).<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">max_bound</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">3.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">tolerance</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.01f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="kw">if</span> <span class="ident">f1</span> <span class="op">&lt;</span> <span class="ident">f2</span> {
-            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(), <span class="ident">x1</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-            <span class="macro">assert_relative_eq!</span>(<span class="ident">state</span>.<span class="ident">cost</span>, <span class="ident">f1</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        } <span class="kw">else</span> {
-            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(), <span class="ident">x2</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-            <span class="macro">assert_relative_eq!</span>(<span class="ident">state</span>.<span class="ident">cost</span>, <span class="ident">f2</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(x0, <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(x1, g1 * x2 + g2 * x0, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(x2, <span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(x3, <span class="number">2.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(f1, problem.cost(<span class="kw-2">&amp;</span>x1).unwrap(), epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(f2, <span class="number">5.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_eq!</span>(g1.to_ne_bytes(), G1.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(g2.to_ne_bytes(), G2.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(min_bound.to_ne_bytes(), (-<span class="number">2.5f64</span>).to_ne_bytes());
+        <span class="macro">assert_eq!</span>(max_bound.to_ne_bytes(), <span class="number">3.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(tolerance.to_ne_bytes(), <span class="number">0.01f64</span>.to_ne_bytes());
+        <span class="kw">if </span>f1 &lt; f2 {
+            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span>state.param.as_ref().unwrap(), x1, epsilon = f64::EPSILON);
+            <span class="macro">assert_relative_eq!</span>(state.cost, f1, epsilon = f64::EPSILON);
+        } <span class="kw">else </span>{
+            <span class="macro">assert_relative_eq!</span>(<span class="kw-2">*</span>state.param.as_ref().unwrap(), x2, epsilon = f64::EPSILON);
+            <span class="macro">assert_relative_eq!</span>(state.cost, f2, epsilon = f64::EPSILON);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

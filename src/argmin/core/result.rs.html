@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/result.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>result.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../argmin/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/result.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>result.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../argmin/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -204,211 +204,211 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">State</span>};
-<span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">Float</span>, <span class="ident">FromPrimitive</span>};
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Problem, Solver, State};
+<span class="kw">use </span>num_traits::{Float, FromPrimitive};
+<span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// Result of an optimization returned by after running an `Executor`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Consists of the problem and the final state of the solver.</span>
-<span class="doccomment">/// Both can be accessed via deconstructing or via the methods</span>
-<span class="doccomment">/// [`problem`](`OptimizationResult::problem`) and [`state`](`OptimizationResult::state`).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Problem</span>
-    <span class="kw">pub</span> <span class="ident">problem</span>: <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Solver</span>
-    <span class="kw">pub</span> <span class="ident">solver</span>: <span class="ident">S</span>,
-    <span class="doccomment">/// Iteration state</span>
-    <span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">I</span>,
+<span class="doccomment">/// Result of an optimization returned by after running an `Executor`.
+///
+/// Consists of the problem and the final state of the solver.
+/// Both can be accessed via deconstructing or via the methods
+/// [`problem`](`OptimizationResult::problem`) and [`state`](`OptimizationResult::state`).
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>OptimizationResult&lt;O, S, I&gt; {
+    <span class="doccomment">/// Problem
+    </span><span class="kw">pub </span>problem: Problem&lt;O&gt;,
+    <span class="doccomment">/// Solver
+    </span><span class="kw">pub </span>solver: S,
+    <span class="doccomment">/// Iteration state
+    </span><span class="kw">pub </span>state: I,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructs a new instance of `OptimizationResult` from a `problem` and a `state`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, OptimizationResult, IterState, State};</span>
-    <span class="doccomment">/// # use argmin::core::test_utils::TestProblem;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # type Rosenbrock = TestProblem;</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug)]</span>
-    <span class="doccomment">/// # struct SomeSolver {}</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let rosenbrock = Rosenbrock::new();</span>
-    <span class="doccomment">/// let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();</span>
-    <span class="doccomment">/// let solver = SomeSolver {};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let result = OptimizationResult::new(Problem::new(rosenbrock), solver, state);</span>
-    <span class="doccomment">/// # let OptimizationResult { mut problem, solver, state } = result;</span>
-    <span class="doccomment">/// # assert_eq!(problem.take_problem().unwrap(), TestProblem::new());</span>
-    <span class="doccomment">/// # assert_eq!(solver, SomeSolver {});</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">problem</span>: <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">solver</span>: <span class="ident">S</span>, <span class="ident">state</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">OptimizationResult</span> {
-            <span class="ident">problem</span>,
-            <span class="ident">solver</span>,
-            <span class="ident">state</span>,
+<span class="kw">impl</span>&lt;O, S, I&gt; OptimizationResult&lt;O, S, I&gt; {
+    <span class="doccomment">/// Constructs a new instance of `OptimizationResult` from a `problem` and a `state`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, OptimizationResult, IterState, State};
+    /// # use argmin::core::test_utils::TestProblem;
+    /// #
+    /// # type Rosenbrock = TestProblem;
+    /// # #[derive(Eq, PartialEq, Debug)]
+    /// # struct SomeSolver {}
+    /// #
+    /// let rosenbrock = Rosenbrock::new();
+    /// let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+    /// let solver = SomeSolver {};
+    ///
+    /// let result = OptimizationResult::new(Problem::new(rosenbrock), solver, state);
+    /// # let OptimizationResult { mut problem, solver, state } = result;
+    /// # assert_eq!(problem.take_problem().unwrap(), TestProblem::new());
+    /// # assert_eq!(solver, SomeSolver {});
+    /// ```
+    </span><span class="kw">pub fn </span>new(problem: Problem&lt;O&gt;, solver: S, state: I) -&gt; <span class="self">Self </span>{
+        OptimizationResult {
+            problem,
+            solver,
+            state,
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the stored problem.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, OptimizationResult, IterState, State};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Rosenbrock {}</span>
-    <span class="doccomment">/// # let solver = ();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let problem: &amp;Problem&lt;Rosenbrock&gt; = result.problem();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">problem</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">problem</span>
+    <span class="doccomment">/// Returns a reference to the stored problem.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, OptimizationResult, IterState, State};
+    /// #
+    /// # struct Rosenbrock {}
+    /// # let solver = ();
+    /// #
+    /// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+    /// #
+    /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
+    /// #
+    /// let problem: &amp;Problem&lt;Rosenbrock&gt; = result.problem();
+    /// ```
+    </span><span class="kw">pub fn </span>problem(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Problem&lt;O&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.problem
     }
 
-    <span class="doccomment">/// Returns a reference to the stored solver.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, OptimizationResult, IterState, State};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Rosenbrock {}</span>
-    <span class="doccomment">/// # let solver = ();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let solver = result.solver();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">solver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">S</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">solver</span>
+    <span class="doccomment">/// Returns a reference to the stored solver.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, OptimizationResult, IterState, State};
+    /// #
+    /// # struct Rosenbrock {}
+    /// # let solver = ();
+    /// #
+    /// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+    /// #
+    /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
+    /// #
+    /// let solver = result.solver();
+    /// ```
+    </span><span class="kw">pub fn </span>solver(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>S {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.solver
     }
 
-    <span class="doccomment">/// Returns a reference to the stored state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, OptimizationResult, IterState, State};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Rosenbrock {}</span>
-    <span class="doccomment">/// # let solver = ();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let state: &amp;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = result.state();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">I</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>
+    <span class="doccomment">/// Returns a reference to the stored state.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, OptimizationResult, IterState, State};
+    /// #
+    /// # struct Rosenbrock {}
+    /// # let solver = ();
+    /// #
+    /// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+    /// #
+    /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
+    /// #
+    /// let state: &amp;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = result.state();
+    /// ```
+    </span><span class="kw">pub fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>I {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.state
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">State</span>,
-    <span class="ident">I::Param</span>: <span class="ident">fmt::Debug</span>,
-    <span class="ident">S</span>: <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;O, S, I&gt; std::fmt::Display <span class="kw">for </span>OptimizationResult&lt;O, S, I&gt;
+<span class="kw">where
+    </span>I: State,
+    I::Param: fmt::Debug,
+    S: Solver&lt;O, I&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;OptimizationResult:&quot;</span>)<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;    Solver:        {}&quot;</span>, <span class="ident">S::NAME</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;OptimizationResult:&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;    Solver:        {}&quot;</span>, S::NAME)<span class="question-mark">?</span>;
         <span class="macro">writeln!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;    param (best):  {}&quot;</span>,
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">best_param</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_best_param</span>() {
-                <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">best_param</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">String::from</span>(<span class="string">&quot;None&quot;</span>)
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(best_param) = <span class="self">self</span>.state.get_best_param() {
+                <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, best_param)
+            } <span class="kw">else </span>{
+                String::from(<span class="string">&quot;None&quot;</span>)
             }
         )<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;    cost (best):   {}&quot;</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>())<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;    iters (best):  {}&quot;</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_last_best_iter</span>())<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;    iters (total): {}&quot;</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_iter</span>())<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;    cost (best):   {}&quot;</span>, <span class="self">self</span>.state.get_best_cost())<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;    iters (best):  {}&quot;</span>, <span class="self">self</span>.state.get_last_best_iter())<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;    iters (total): {}&quot;</span>, <span class="self">self</span>.state.get_iter())<span class="question-mark">?</span>;
         <span class="macro">writeln!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;    termination:   {}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_termination_reason</span>()
+            <span class="self">self</span>.state.get_termination_reason()
         )<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_time</span>() {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;    time:          {:?}&quot;</span>, <span class="ident">time</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(time) = <span class="self">self</span>.state.get_time() {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;    time:          {:?}&quot;</span>, time)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span>: <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I::Float</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;O, S, I: State&gt; PartialEq <span class="kw">for </span>OptimizationResult&lt;O, S, I&gt;
+<span class="kw">where
+    </span>I::Float: ArgminFloat,
 {
-    <span class="doccomment">/// Two `OptimizationResult`s are equal if the absolute of the difference between their best</span>
-    <span class="doccomment">/// cost values is smaller than epsilon.</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>() <span class="op">-</span> <span class="ident">other</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>()).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">I::Float::epsilon</span>()
+    <span class="doccomment">/// Two `OptimizationResult`s are equal if the absolute of the difference between their best
+    /// cost values is smaller than epsilon.
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>OptimizationResult&lt;O, S, I&gt;) -&gt; bool {
+        (<span class="self">self</span>.state.get_best_cost() - other.state.get_best_cost()).abs() &lt; I::Float::epsilon()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span>: <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;O, S, I: State&gt; Eq <span class="kw">for </span>OptimizationResult&lt;O, S, I&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span>: <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Two `OptimizationResult`s are equal if the absolute of the difference between their best</span>
-    <span class="doccomment">/// cost values is smaller than epsilon.</span>
-    <span class="doccomment">/// Else, an `OptimizationResult` is better if the best cost function value is strictly better</span>
-    <span class="doccomment">/// than the others.</span>
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>() <span class="op">-</span> <span class="ident">other</span>.<span class="ident">state</span>.<span class="ident">get_best_cost</span>();
-        <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">I::Float::epsilon</span>() {
-            <span class="ident">Ordering::Equal</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">t</span> <span class="op">&gt;</span> <span class="ident">I::Float::from_f64</span>(<span class="number">0.0</span>).<span class="ident">unwrap</span>() {
-            <span class="ident">Ordering::Greater</span>
-        } <span class="kw">else</span> {
-            <span class="ident">Ordering::Less</span>
+<span class="kw">impl</span>&lt;O, S, I: State&gt; Ord <span class="kw">for </span>OptimizationResult&lt;O, S, I&gt; {
+    <span class="doccomment">/// Two `OptimizationResult`s are equal if the absolute of the difference between their best
+    /// cost values is smaller than epsilon.
+    /// Else, an `OptimizationResult` is better if the best cost function value is strictly better
+    /// than the others.
+    </span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>OptimizationResult&lt;O, S, I&gt;) -&gt; Ordering {
+        <span class="kw">let </span>t = <span class="self">self</span>.state.get_best_cost() - other.state.get_best_cost();
+        <span class="kw">if </span>t.abs() &lt; I::Float::epsilon() {
+            Ordering::Equal
+        } <span class="kw">else if </span>t &gt; I::Float::from_f64(<span class="number">0.0</span>).unwrap() {
+            Ordering::Greater
+        } <span class="kw">else </span>{
+            Ordering::Less
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span>: <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Two `OptimizationResult`s are equal if the absolute of the difference between their best</span>
-    <span class="doccomment">/// cost values is smaller than epsilon.</span>
-    <span class="doccomment">/// Else, an `OptimizationResult` is better if the best cost function value is strictly better</span>
-    <span class="doccomment">/// than the others.</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="kw">impl</span>&lt;O, S, I: State&gt; PartialOrd <span class="kw">for </span>OptimizationResult&lt;O, S, I&gt; {
+    <span class="doccomment">/// Two `OptimizationResult`s are equal if the absolute of the difference between their best
+    /// cost values is smaller than epsilon.
+    /// Else, an `OptimizationResult` is better if the best cost function value is strictly better
+    /// than the others.
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>OptimizationResult&lt;O, S, I&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-        <span class="ident">test_utils</span>::{<span class="ident">TestProblem</span>, <span class="ident">TestSolver</span>},
-        <span class="ident">IterState</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{
+        test_utils::{TestProblem, TestSolver},
+        IterState,
     };
 
     <span class="macro">send_sync_test!</span>(
-        <span class="ident">optimizationresult</span>,
-        <span class="ident">OptimizationResult</span><span class="op">&lt;</span><span class="ident">TestProblem</span>, <span class="ident">TestSolver</span>, <span class="ident">IterState</span><span class="op">&lt;</span>(), (), (), (), <span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>
+        optimizationresult,
+        OptimizationResult&lt;TestProblem, TestSolver, IterState&lt;(), (), (), (), f64&gt;&gt;
     );
 
-    <span class="comment">// TODO: More tests, in particular the checking that the output is as intended.</span>
-}
+    <span class="comment">// TODO: More tests, in particular the checking that the output is as intended.
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/conjugategradient/beta.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>beta.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/conjugategradient/beta.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>beta.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -262,269 +262,269 @@
 <span id="262">262</span>
 <span id="263">263</span>
 <span id="264">264</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # Beta update methods for [`NonlinearConjugateGradient`](`crate::solver::conjugategradient::NonlinearConjugateGradient`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These methods define the update procedure for</span>
-<span class="doccomment">//! [`NonlinearConjugateGradient`](`crate::solver::conjugategradient::NonlinearConjugateGradient`).</span>
-<span class="doccomment">//! They are based on the [`NLCGBetaUpdate`] trait which enables users to implement their own beta</span>
-<span class="doccomment">//! update methods.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Reference</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
+</span><span class="doccomment">//! # Beta update methods for [`NonlinearConjugateGradient`](`crate::solver::conjugategradient::NonlinearConjugateGradient`)
+//!
+//! These methods define the update procedure for
+//! [`NonlinearConjugateGradient`](`crate::solver::conjugategradient::NonlinearConjugateGradient`).
+//! They are based on the [`NLCGBetaUpdate`] trait which enables users to implement their own beta
+//! update methods.
+//!
+//! # Reference
+//!
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! Springer. ISBN 0-387-30303-0.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">SerializeAlias</span>};
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminL2Norm</span>, <span class="ident">ArgminSub</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, SerializeAlias};
+<span class="kw">use </span>argmin_math::{ArgminDot, ArgminL2Norm, ArgminSub};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// Interface for beta update methods ([`NonlinearConjugateGradient`](`crate::solver::conjugategradient::NonlinearConjugateGradient`))</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use argmin::core::{ArgminFloat, NLCGBetaUpdate};</span>
-<span class="doccomment">/// #[cfg(feature = &quot;serde1&quot;)]</span>
-<span class="doccomment">/// use serde::{Deserialize, Serialize};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[cfg_attr(feature = &quot;serde1&quot;, derive(Serialize, Deserialize))]</span>
-<span class="doccomment">/// struct MyBetaMethod {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl&lt;G, P, F&gt; NLCGBetaUpdate&lt;G, P, F&gt; for MyBetaMethod</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///     F: ArgminFloat,</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     fn update(&amp;self, dfk: &amp;G, dfk1: &amp;G, p_k: &amp;P) -&gt; F {</span>
-<span class="doccomment">///         // Compute updated beta</span>
-<span class="doccomment">/// #       F::nan()</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>: <span class="ident">SerializeAlias</span> {
-    <span class="doccomment">/// Update beta.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Parameters</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `\nabla f_k`</span>
-    <span class="doccomment">/// * `\nabla f_{k+1}`</span>
-    <span class="doccomment">/// * `p_k`</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nabla_f_k</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">nabla_f_k_p_1</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">p_k</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">F</span>;
+<span class="doccomment">/// Interface for beta update methods ([`NonlinearConjugateGradient`](`crate::solver::conjugategradient::NonlinearConjugateGradient`))
+///
+/// # Example
+///
+/// ```
+/// # use argmin::core::{ArgminFloat, NLCGBetaUpdate};
+/// #[cfg(feature = &quot;serde1&quot;)]
+/// use serde::{Deserialize, Serialize};
+///
+/// #[cfg_attr(feature = &quot;serde1&quot;, derive(Serialize, Deserialize))]
+/// struct MyBetaMethod {}
+///
+/// impl&lt;G, P, F&gt; NLCGBetaUpdate&lt;G, P, F&gt; for MyBetaMethod
+/// where
+///     F: ArgminFloat,
+/// {
+///     fn update(&amp;self, dfk: &amp;G, dfk1: &amp;G, p_k: &amp;P) -&gt; F {
+///         // Compute updated beta
+/// #       F::nan()
+///     }
+/// }
+/// ```
+</span><span class="kw">pub trait </span>NLCGBetaUpdate&lt;G, P, F&gt;: SerializeAlias {
+    <span class="doccomment">/// Update beta.
+    ///
+    /// # Parameters
+    ///
+    /// * `\nabla f_k`
+    /// * `\nabla f_{k+1}`
+    /// * `p_k`
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;</span><span class="self">self</span>, nabla_f_k: <span class="kw-2">&amp;</span>G, nabla_f_k_p_1: <span class="kw-2">&amp;</span>G, p_k: <span class="kw-2">&amp;</span>P) -&gt; F;
 }
 
-<span class="doccomment">/// Fletcher and Reeves (FR) method</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Formula: `&lt;\nabla f_{k+1}, \nabla f_{k+1}&gt; / &lt;\nabla f_k, \nabla f_k&gt;`</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FletcherReeves</span> {}
+<span class="doccomment">/// Fletcher and Reeves (FR) method
+///
+/// Formula: `&lt;\nabla f_{k+1}, \nabla f_{k+1}&gt; / &lt;\nabla f_k, \nabla f_k&gt;`
+</span><span class="attribute">#[derive(Default, Copy, Clone, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>FletcherReeves {}
 
-<span class="kw">impl</span> <span class="ident">FletcherReeves</span> {
-    <span class="doccomment">/// Construct a new instance of `FletcherReeves`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::beta::FletcherReeves;</span>
-    <span class="doccomment">/// let beta_method = FletcherReeves::new();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">FletcherReeves</span> {}
+<span class="kw">impl </span>FletcherReeves {
+    <span class="doccomment">/// Construct a new instance of `FletcherReeves`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::conjugategradient::beta::FletcherReeves;
+    /// let beta_method = FletcherReeves::new();
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        FletcherReeves {}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">NLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FletcherReeves</span>
-<span class="kw">where</span>
-    <span class="ident">G</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;G, P, F&gt; NLCGBetaUpdate&lt;G, P, F&gt; <span class="kw">for </span>FletcherReeves
+<span class="kw">where
+    </span>G: ArgminDot&lt;G, F&gt;,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Update beta using the Fletcher-Reeves method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Formula: `&lt;\nabla f_{k+1}, \nabla f_{k+1}&gt; / &lt;\nabla f_k, \nabla f_k&gt;`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate approx;</span>
-    <span class="doccomment">/// # use approx::assert_relative_eq;</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::beta::{NLCGBetaUpdate, FletcherReeves};</span>
-    <span class="doccomment">/// # let dfk = vec![1f64, 2.0];</span>
-    <span class="doccomment">/// # let dfk1 = vec![3f64, 4.0];</span>
-    <span class="doccomment">/// let beta_method = FletcherReeves::new();</span>
-    <span class="doccomment">/// let beta: f64 = beta_method.update(&amp;dfk, &amp;dfk1, &amp;());</span>
-    <span class="doccomment">/// # assert_relative_eq!(beta, 5.0, epsilon = f64::EPSILON);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dfk</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">dfk1</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">_pk</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">F</span> {
-        <span class="ident">dfk1</span>.<span class="ident">dot</span>(<span class="ident">dfk1</span>) <span class="op">/</span> <span class="ident">dfk</span>.<span class="ident">dot</span>(<span class="ident">dfk</span>)
+    <span class="doccomment">/// Update beta using the Fletcher-Reeves method.
+    ///
+    /// Formula: `&lt;\nabla f_{k+1}, \nabla f_{k+1}&gt; / &lt;\nabla f_k, \nabla f_k&gt;`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate approx;
+    /// # use approx::assert_relative_eq;
+    /// # use argmin::solver::conjugategradient::beta::{NLCGBetaUpdate, FletcherReeves};
+    /// # let dfk = vec![1f64, 2.0];
+    /// # let dfk1 = vec![3f64, 4.0];
+    /// let beta_method = FletcherReeves::new();
+    /// let beta: f64 = beta_method.update(&amp;dfk, &amp;dfk1, &amp;());
+    /// # assert_relative_eq!(beta, 5.0, epsilon = f64::EPSILON);
+    /// ```
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;</span><span class="self">self</span>, dfk: <span class="kw-2">&amp;</span>G, dfk1: <span class="kw-2">&amp;</span>G, _pk: <span class="kw-2">&amp;</span>P) -&gt; F {
+        dfk1.dot(dfk1) / dfk.dot(dfk)
     }
 }
 
-<span class="doccomment">/// Polak and Ribiere (PR) method</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PolakRibiere</span> {}
+<span class="doccomment">/// Polak and Ribiere (PR) method
+</span><span class="attribute">#[derive(Default, Copy, Clone, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>PolakRibiere {}
 
-<span class="kw">impl</span> <span class="ident">PolakRibiere</span> {
-    <span class="doccomment">/// Construct a new instance of `PolakRibiere`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::beta::PolakRibiere;</span>
-    <span class="doccomment">/// let beta_method = PolakRibiere::new();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">PolakRibiere</span> {}
+<span class="kw">impl </span>PolakRibiere {
+    <span class="doccomment">/// Construct a new instance of `PolakRibiere`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::conjugategradient::beta::PolakRibiere;
+    /// let beta_method = PolakRibiere::new();
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        PolakRibiere {}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">NLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PolakRibiere</span>
-<span class="kw">where</span>
-    <span class="ident">G</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;G, P, F&gt; NLCGBetaUpdate&lt;G, P, F&gt; <span class="kw">for </span>PolakRibiere
+<span class="kw">where
+    </span>G: ArgminDot&lt;G, F&gt; + ArgminSub&lt;G, G&gt; + ArgminL2Norm&lt;F&gt;,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Update beta using the Polak-Ribiere method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Formula: `&lt;\nabla f_{k+1}, (\nabla f_{k+1} - \nabla f_k)&gt; / ||\nabla f_k||^2`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate approx;</span>
-    <span class="doccomment">/// # use approx::assert_relative_eq;</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::beta::{NLCGBetaUpdate, PolakRibiere};</span>
-    <span class="doccomment">/// # let dfk = vec![1f64, 2.0];</span>
-    <span class="doccomment">/// # let dfk1 = vec![3f64, 4.0];</span>
-    <span class="doccomment">/// let beta_method = PolakRibiere::new();</span>
-    <span class="doccomment">/// let beta = beta_method.update(&amp;dfk, &amp;dfk1, &amp;());</span>
-    <span class="doccomment">/// # assert_relative_eq!(beta, 14.0/5.0, epsilon = f64::EPSILON);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dfk</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">dfk1</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">_pk</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">F</span> {
-        <span class="kw">let</span> <span class="ident">dfk_norm_sq</span> <span class="op">=</span> <span class="ident">dfk</span>.<span class="ident">l2_norm</span>().<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="ident">dfk1</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">dfk1</span>.<span class="ident">sub</span>(<span class="ident">dfk</span>)) <span class="op">/</span> <span class="ident">dfk_norm_sq</span>
+    <span class="doccomment">/// Update beta using the Polak-Ribiere method.
+    ///
+    /// Formula: `&lt;\nabla f_{k+1}, (\nabla f_{k+1} - \nabla f_k)&gt; / ||\nabla f_k||^2`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate approx;
+    /// # use approx::assert_relative_eq;
+    /// # use argmin::solver::conjugategradient::beta::{NLCGBetaUpdate, PolakRibiere};
+    /// # let dfk = vec![1f64, 2.0];
+    /// # let dfk1 = vec![3f64, 4.0];
+    /// let beta_method = PolakRibiere::new();
+    /// let beta = beta_method.update(&amp;dfk, &amp;dfk1, &amp;());
+    /// # assert_relative_eq!(beta, 14.0/5.0, epsilon = f64::EPSILON);
+    /// ```
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;</span><span class="self">self</span>, dfk: <span class="kw-2">&amp;</span>G, dfk1: <span class="kw-2">&amp;</span>G, _pk: <span class="kw-2">&amp;</span>P) -&gt; F {
+        <span class="kw">let </span>dfk_norm_sq = dfk.l2_norm().powi(<span class="number">2</span>);
+        dfk1.dot(<span class="kw-2">&amp;</span>dfk1.sub(dfk)) / dfk_norm_sq
     }
 }
 
-<span class="doccomment">/// Polak and Ribiere Plus (PR+) method</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Formula: `max(0, &lt;\nabla f_{k+1}, (\nabla f_{k+1} - \nabla f_k)&gt; / ||\nabla f_k||^2)`</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PolakRibierePlus</span> {}
+<span class="doccomment">/// Polak and Ribiere Plus (PR+) method
+///
+/// Formula: `max(0, &lt;\nabla f_{k+1}, (\nabla f_{k+1} - \nabla f_k)&gt; / ||\nabla f_k||^2)`
+</span><span class="attribute">#[derive(Default, Copy, Clone, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>PolakRibierePlus {}
 
-<span class="kw">impl</span> <span class="ident">PolakRibierePlus</span> {
-    <span class="doccomment">/// Construct a new instance of `PolakRibierePlus`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::beta::PolakRibierePlus;</span>
-    <span class="doccomment">/// let beta_method = PolakRibierePlus::new();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">PolakRibierePlus</span> {}
+<span class="kw">impl </span>PolakRibierePlus {
+    <span class="doccomment">/// Construct a new instance of `PolakRibierePlus`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::conjugategradient::beta::PolakRibierePlus;
+    /// let beta_method = PolakRibierePlus::new();
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        PolakRibierePlus {}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">NLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PolakRibierePlus</span>
-<span class="kw">where</span>
-    <span class="ident">G</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;G, P, F&gt; NLCGBetaUpdate&lt;G, P, F&gt; <span class="kw">for </span>PolakRibierePlus
+<span class="kw">where
+    </span>G: ArgminDot&lt;G, F&gt; + ArgminSub&lt;G, G&gt; + ArgminL2Norm&lt;F&gt;,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Update beta using the Polak-Ribiere+ (PR+) method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Formula: `max(0, &lt;\nabla f_{k+1}, (\nabla f_{k+1} - \nabla f_k)&gt; / ||\nabla f_k||^2)`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate approx;</span>
-    <span class="doccomment">/// # use approx::assert_relative_eq;</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::beta::{NLCGBetaUpdate, PolakRibierePlus};</span>
-    <span class="doccomment">/// # let dfk = vec![1f64, 2.0];</span>
-    <span class="doccomment">/// # let dfk1 = vec![3f64, 4.0];</span>
-    <span class="doccomment">/// let beta_method = PolakRibierePlus::new();</span>
-    <span class="doccomment">/// let beta = beta_method.update(&amp;dfk, &amp;dfk1, &amp;());</span>
-    <span class="doccomment">/// # assert_relative_eq!(beta, 14.0/5.0, epsilon = f64::EPSILON);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let dfk = vec![5f64, 6.0];</span>
-    <span class="doccomment">/// # let dfk1 = vec![3f64, 4.0];</span>
-    <span class="doccomment">/// # let beta_method = PolakRibierePlus::new();</span>
-    <span class="doccomment">/// # let beta = beta_method.update(&amp;dfk, &amp;dfk1, &amp;());</span>
-    <span class="doccomment">/// # assert_relative_eq!(beta, 0.0, epsilon = f64::EPSILON);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dfk</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">dfk1</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">_pk</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">F</span> {
-        <span class="kw">let</span> <span class="ident">dfk_norm_sq</span> <span class="op">=</span> <span class="ident">dfk</span>.<span class="ident">l2_norm</span>().<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="ident">dfk1</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">dfk1</span>.<span class="ident">sub</span>(<span class="ident">dfk</span>)) <span class="op">/</span> <span class="ident">dfk_norm_sq</span>;
-        <span class="macro">float!</span>(<span class="number">0.0</span>).<span class="ident">max</span>(<span class="ident">beta</span>)
+    <span class="doccomment">/// Update beta using the Polak-Ribiere+ (PR+) method.
+    ///
+    /// Formula: `max(0, &lt;\nabla f_{k+1}, (\nabla f_{k+1} - \nabla f_k)&gt; / ||\nabla f_k||^2)`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate approx;
+    /// # use approx::assert_relative_eq;
+    /// # use argmin::solver::conjugategradient::beta::{NLCGBetaUpdate, PolakRibierePlus};
+    /// # let dfk = vec![1f64, 2.0];
+    /// # let dfk1 = vec![3f64, 4.0];
+    /// let beta_method = PolakRibierePlus::new();
+    /// let beta = beta_method.update(&amp;dfk, &amp;dfk1, &amp;());
+    /// # assert_relative_eq!(beta, 14.0/5.0, epsilon = f64::EPSILON);
+    /// #
+    /// # let dfk = vec![5f64, 6.0];
+    /// # let dfk1 = vec![3f64, 4.0];
+    /// # let beta_method = PolakRibierePlus::new();
+    /// # let beta = beta_method.update(&amp;dfk, &amp;dfk1, &amp;());
+    /// # assert_relative_eq!(beta, 0.0, epsilon = f64::EPSILON);
+    /// ```
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;</span><span class="self">self</span>, dfk: <span class="kw-2">&amp;</span>G, dfk1: <span class="kw-2">&amp;</span>G, _pk: <span class="kw-2">&amp;</span>P) -&gt; F {
+        <span class="kw">let </span>dfk_norm_sq = dfk.l2_norm().powi(<span class="number">2</span>);
+        <span class="kw">let </span>beta = dfk1.dot(<span class="kw-2">&amp;</span>dfk1.sub(dfk)) / dfk_norm_sq;
+        <span class="macro">float!</span>(<span class="number">0.0</span>).max(beta)
     }
 }
 
-<span class="doccomment">/// Hestenes and Stiefel (HS) method</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Formula: `&lt;\nabla f_{k+1}, (\nabla f_{k+1} - \nabla f_k)&gt; / &lt;(\nabla f_{k+1} - \nabla f_k), p_k&gt;`</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HestenesStiefel</span> {}
+<span class="doccomment">/// Hestenes and Stiefel (HS) method
+///
+/// Formula: `&lt;\nabla f_{k+1}, (\nabla f_{k+1} - \nabla f_k)&gt; / &lt;(\nabla f_{k+1} - \nabla f_k), p_k&gt;`
+</span><span class="attribute">#[derive(Default, Copy, Clone, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>HestenesStiefel {}
 
-<span class="kw">impl</span> <span class="ident">HestenesStiefel</span> {
-    <span class="doccomment">/// Construct a new instance of `HestenesStiefel`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::beta::HestenesStiefel;</span>
-    <span class="doccomment">/// let beta_method = HestenesStiefel::new();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">HestenesStiefel</span> {}
+<span class="kw">impl </span>HestenesStiefel {
+    <span class="doccomment">/// Construct a new instance of `HestenesStiefel`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::conjugategradient::beta::HestenesStiefel;
+    /// let beta_method = HestenesStiefel::new();
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        HestenesStiefel {}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">NLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HestenesStiefel</span>
-<span class="kw">where</span>
-    <span class="ident">G</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;G, P, F&gt; NLCGBetaUpdate&lt;G, P, F&gt; <span class="kw">for </span>HestenesStiefel
+<span class="kw">where
+    </span>G: ArgminDot&lt;G, F&gt; + ArgminDot&lt;P, F&gt; + ArgminSub&lt;G, G&gt;,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Update beta using the Hestenes-Stiefel method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Formula: `&lt;\nabla f_{k+1}, (\nabla f_{k+1} - \nabla f_k)&gt; / &lt;(\nabla f_{k+1} - \nabla f_k), p_k&gt;`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate approx;</span>
-    <span class="doccomment">/// # use approx::assert_relative_eq;</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::beta::{NLCGBetaUpdate, HestenesStiefel};</span>
-    <span class="doccomment">/// # let dfk = vec![1f64, 2.0];</span>
-    <span class="doccomment">/// # let dfk1 = vec![3f64, 4.0];</span>
-    <span class="doccomment">/// # let pk = vec![5f64, 6.0];</span>
-    <span class="doccomment">/// let beta_method = HestenesStiefel::new();</span>
-    <span class="doccomment">/// let beta: f64 = beta_method.update(&amp;dfk, &amp;dfk1, &amp;pk);</span>
-    <span class="doccomment">/// # assert_relative_eq!(beta, 14.0/22.0, epsilon = f64::EPSILON);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dfk</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">dfk1</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">F</span> {
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">dfk1</span>.<span class="ident">sub</span>(<span class="ident">dfk</span>);
-        <span class="ident">dfk1</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>) <span class="op">/</span> <span class="ident">d</span>.<span class="ident">dot</span>(<span class="ident">pk</span>)
+    <span class="doccomment">/// Update beta using the Hestenes-Stiefel method.
+    ///
+    /// Formula: `&lt;\nabla f_{k+1}, (\nabla f_{k+1} - \nabla f_k)&gt; / &lt;(\nabla f_{k+1} - \nabla f_k), p_k&gt;`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate approx;
+    /// # use approx::assert_relative_eq;
+    /// # use argmin::solver::conjugategradient::beta::{NLCGBetaUpdate, HestenesStiefel};
+    /// # let dfk = vec![1f64, 2.0];
+    /// # let dfk1 = vec![3f64, 4.0];
+    /// # let pk = vec![5f64, 6.0];
+    /// let beta_method = HestenesStiefel::new();
+    /// let beta: f64 = beta_method.update(&amp;dfk, &amp;dfk1, &amp;pk);
+    /// # assert_relative_eq!(beta, 14.0/22.0, epsilon = f64::EPSILON);
+    /// ```
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;</span><span class="self">self</span>, dfk: <span class="kw-2">&amp;</span>G, dfk1: <span class="kw-2">&amp;</span>G, pk: <span class="kw-2">&amp;</span>P) -&gt; F {
+        <span class="kw">let </span>d = dfk1.sub(dfk);
+        dfk1.dot(<span class="kw-2">&amp;</span>d) / d.dot(pk)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">fletcher_reeves</span>, <span class="ident">FletcherReeves</span>);
-    <span class="macro">test_trait_impl!</span>(<span class="ident">polak_ribiere</span>, <span class="ident">PolakRibiere</span>);
-    <span class="macro">test_trait_impl!</span>(<span class="ident">polak_ribiere_plus</span>, <span class="ident">PolakRibierePlus</span>);
-    <span class="macro">test_trait_impl!</span>(<span class="ident">hestenes_stiefel</span>, <span class="ident">HestenesStiefel</span>);
+    <span class="macro">test_trait_impl!</span>(fletcher_reeves, FletcherReeves);
+    <span class="macro">test_trait_impl!</span>(polak_ribiere, PolakRibiere);
+    <span class="macro">test_trait_impl!</span>(polak_ribiere_plus, PolakRibierePlus);
+    <span class="macro">test_trait_impl!</span>(hestenes_stiefel, HestenesStiefel);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

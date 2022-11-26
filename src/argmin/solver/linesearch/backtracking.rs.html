@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/backtracking.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>backtracking.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/backtracking.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>backtracking.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -709,716 +709,716 @@
 <span id="709">709</span>
 <span id="710">710</span>
 <span id="711">711</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">Gradient</span>, <span class="ident">IterState</span>, <span class="ident">LineSearch</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>,
-    <span class="ident">Solver</span>, <span class="ident">State</span>, <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
+    Solver, State, TerminationReason, KV,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::linesearch::condition</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">argmin_math::ArgminScaledAdd</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span><span class="kw">crate</span>::solver::linesearch::condition::<span class="kw-2">*</span>;
+<span class="kw">use </span>argmin_math::ArgminScaledAdd;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// # Backtracking line search</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The Backtracking line search is a method which finds a step length from a given point along a</span>
-<span class="doccomment">/// given direction, such that this step length obeys the Armijo (sufficient decrease) condition.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## References</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Wikipedia: &lt;https://en.wikipedia.org/wiki/Backtracking_line_search&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// initial parameter vector</span>
-    <span class="ident">init_param</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// initial cost</span>
-    <span class="ident">init_cost</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// initial gradient</span>
-    <span class="ident">init_grad</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Search direction</span>
-    <span class="ident">search_direction</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Contraction factor rho</span>
-    <span class="ident">rho</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Stopping condition</span>
-    <span class="ident">condition</span>: <span class="ident">L</span>,
-    <span class="doccomment">/// alpha</span>
-    <span class="ident">alpha</span>: <span class="ident">F</span>,
+<span class="doccomment">/// # Backtracking line search
+///
+/// The Backtracking line search is a method which finds a step length from a given point along a
+/// given direction, such that this step length obeys the Armijo (sufficient decrease) condition.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
+/// ## References
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
+///
+/// Wikipedia: &lt;https://en.wikipedia.org/wiki/Backtracking_line_search&gt;
+</span><span class="attribute">#[derive(Clone, Eq, PartialEq, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>BacktrackingLineSearch&lt;P, G, L, F&gt; {
+    <span class="doccomment">/// initial parameter vector
+    </span>init_param: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// initial cost
+    </span>init_cost: F,
+    <span class="doccomment">/// initial gradient
+    </span>init_grad: <span class="prelude-ty">Option</span>&lt;G&gt;,
+    <span class="doccomment">/// Search direction
+    </span>search_direction: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// Contraction factor rho
+    </span>rho: F,
+    <span class="doccomment">/// Stopping condition
+    </span>condition: L,
+    <span class="doccomment">/// alpha
+    </span>alpha: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, G, L, F&gt; BacktrackingLineSearch&lt;P, G, L, F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of `BacktrackingLineSearch`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::BacktrackingLineSearch;</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::condition::ArmijoCondition;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let backtracking: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, _, f64&gt; =</span>
-    <span class="doccomment">///     BacktrackingLineSearch::new(ArmijoCondition::new(0.0001f64));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">condition</span>: <span class="ident">L</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">BacktrackingLineSearch</span> {
-            <span class="ident">init_param</span>: <span class="prelude-val">None</span>,
-            <span class="ident">init_cost</span>: <span class="ident">F::infinity</span>(),
-            <span class="ident">init_grad</span>: <span class="prelude-val">None</span>,
-            <span class="ident">search_direction</span>: <span class="prelude-val">None</span>,
-            <span class="ident">rho</span>: <span class="macro">float!</span>(<span class="number">0.9</span>),
-            <span class="ident">condition</span>,
-            <span class="ident">alpha</span>: <span class="macro">float!</span>(<span class="number">1.0</span>),
+    <span class="doccomment">/// Construct a new instance of `BacktrackingLineSearch`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::BacktrackingLineSearch;
+    /// # use argmin::solver::linesearch::condition::ArmijoCondition;
+    ///
+    /// let backtracking: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, _, f64&gt; =
+    ///     BacktrackingLineSearch::new(ArmijoCondition::new(0.0001f64));
+    /// ```
+    </span><span class="kw">pub fn </span>new(condition: L) -&gt; <span class="self">Self </span>{
+        BacktrackingLineSearch {
+            init_param: <span class="prelude-val">None</span>,
+            init_cost: F::infinity(),
+            init_grad: <span class="prelude-val">None</span>,
+            search_direction: <span class="prelude-val">None</span>,
+            rho: <span class="macro">float!</span>(<span class="number">0.9</span>),
+            condition,
+            alpha: <span class="macro">float!</span>(<span class="number">1.0</span>),
         }
     }
 
-    <span class="doccomment">/// Set contraction factor rho</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This factor must be in (0, 1).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::BacktrackingLineSearch;</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::condition::ArmijoCondition;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let backtracking: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, _, f64&gt; =</span>
-    <span class="doccomment">/// #     BacktrackingLineSearch::new(ArmijoCondition::new(0.0001f64));</span>
-    <span class="doccomment">/// let backtracking = backtracking.rho(0.5)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rho</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rho</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">rho</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">rho</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;BacktrackingLineSearch: Contraction factor rho must be in (0, 1).&quot;</span>
-            ));
+    <span class="doccomment">/// Set contraction factor rho
+    ///
+    /// This factor must be in (0, 1).
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::Error;
+    /// # use argmin::solver::linesearch::BacktrackingLineSearch;
+    /// # use argmin::solver::linesearch::condition::ArmijoCondition;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let backtracking: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, _, f64&gt; =
+    /// #     BacktrackingLineSearch::new(ArmijoCondition::new(0.0001f64));
+    /// let backtracking = backtracking.rho(0.5)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>rho(<span class="kw-2">mut </span><span class="self">self</span>, rho: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>rho &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || rho &gt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;BacktrackingLineSearch: Contraction factor rho must be in (0, 1).&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">rho</span> <span class="op">=</span> <span class="ident">rho</span>;
+        <span class="self">self</span>.rho = rho;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">LineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, G, L, F&gt; LineSearch&lt;P, F&gt; <span class="kw">for </span>BacktrackingLineSearch&lt;P, G, L, F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Set search direction</span>
-    <span class="kw">fn</span> <span class="ident">search_direction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">search_direction</span>: <span class="ident">P</span>) {
-        <span class="self">self</span>.<span class="ident">search_direction</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">search_direction</span>);
+    <span class="doccomment">/// Set search direction
+    </span><span class="kw">fn </span>search_direction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, search_direction: P) {
+        <span class="self">self</span>.search_direction = <span class="prelude-val">Some</span>(search_direction);
     }
 
-    <span class="doccomment">/// Set initial step length</span>
-    <span class="kw">fn</span> <span class="ident">initial_step_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;LineSearch: Initial alpha must be &gt; 0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set initial step length
+    </span><span class="kw">fn </span>initial_step_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alpha: F) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">if </span>alpha &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;LineSearch: Initial alpha must be &gt; 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">alpha</span> <span class="op">=</span> <span class="ident">alpha</span>;
+        <span class="self">self</span>.alpha = alpha;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">L</span>: <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>: <span class="ident">State</span><span class="op">&lt;</span><span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, G, L, F&gt; BacktrackingLineSearch&lt;P, G, L, F&gt;
+<span class="kw">where
+    </span>P: ArgminScaledAdd&lt;P, F, P&gt;,
+    L: LineSearchCondition&lt;P, G, F&gt;,
+    IterState&lt;P, G, (), (), F&gt;: State&lt;Float = F&gt;,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Perform a single backtracking step</span>
-    <span class="kw">fn</span> <span class="ident">backtracking_step</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Perform a single backtracking step
+    </span><span class="kw">fn </span>backtracking_step&lt;O&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        state: IterState&lt;P, G, (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;IterState&lt;P, G, (), (), F&gt;, Error&gt;
+    <span class="kw">where
+        </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
     {
-        <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">init_param</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-                <span class="ident">PotentialBug</span>,
-                <span class="string">&quot;`BacktrackingLineSearch`: Initial parameter vector not set.&quot;</span>
-            ))<span class="question-mark">?</span>
-            .<span class="ident">scaled_add</span>(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">alpha</span>,
-                <span class="self">self</span>.<span class="ident">search_direction</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-                        <span class="ident">PotentialBug</span>,
-                        <span class="string">&quot;`BacktrackingLineSearch`: Search direction not set.&quot;</span>
-                    ))<span class="question-mark">?</span>,
+        <span class="kw">let </span>new_param = <span class="self">self
+            </span>.init_param
+            .as_ref()
+            .ok_or_else(<span class="macro">argmin_error_closure!</span>(
+                PotentialBug,
+                <span class="string">&quot;`BacktrackingLineSearch`: Initial parameter vector not set.&quot;
+            </span>))<span class="question-mark">?
+            </span>.scaled_add(
+                <span class="kw-2">&amp;</span><span class="self">self</span>.alpha,
+                <span class="self">self</span>.search_direction
+                    .as_ref()
+                    .ok_or_else(<span class="macro">argmin_error_closure!</span>(
+                        PotentialBug,
+                        <span class="string">&quot;`BacktrackingLineSearch`: Search direction not set.&quot;
+                    </span>))<span class="question-mark">?</span>,
             );
 
-        <span class="kw">let</span> <span class="ident">cur_cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>cur_cost = problem.cost(<span class="kw-2">&amp;</span>new_param)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">condition</span>.<span class="ident">requires_current_gradient</span>() {
-            <span class="ident">state</span>
-                .<span class="ident">gradient</span>(<span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>)
-                .<span class="ident">param</span>(<span class="ident">new_param</span>)
-                .<span class="ident">cost</span>(<span class="ident">cur_cost</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">new_param</span>).<span class="ident">cost</span>(<span class="ident">cur_cost</span>)
+        <span class="kw">let </span>out = <span class="kw">if </span><span class="self">self</span>.condition.requires_current_gradient() {
+            state
+                .gradient(problem.gradient(<span class="kw-2">&amp;</span>new_param)<span class="question-mark">?</span>)
+                .param(new_param)
+                .cost(cur_cost)
+        } <span class="kw">else </span>{
+            state.param(new_param).cost(cur_cost)
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">out</span>)
+        <span class="prelude-val">Ok</span>(out)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">G</span>: <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="ident">L</span>: <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SerializeAlias</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;O, P, G, L, F&gt; Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt; <span class="kw">for </span>BacktrackingLineSearch&lt;P, G, L, F&gt;
+<span class="kw">where
+    </span>P: Clone + SerializeAlias + ArgminScaledAdd&lt;P, F, P&gt;,
+    G: SerializeAlias + ArgminScaledAdd&lt;P, F, P&gt;,
+    O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
+    L: LineSearchCondition&lt;P, G, F&gt; + SerializeAlias,
+    F: ArgminFloat,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Backtracking line search&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Backtracking line search&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">NotInitialized</span>,
-                <span class="string">&quot;BacktrackingLineSearch: search_direction must be set.&quot;</span>
-            ));
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.search_direction.is_none() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                NotInitialized,
+                <span class="string">&quot;BacktrackingLineSearch: search_direction must be set.&quot;
+            </span>));
         }
 
-        <span class="kw">let</span> <span class="ident">init_param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+        <span class="kw">let </span>init_param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`BacktrackingLineSearch` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
+        <span class="kw">let </span>cost = state.get_cost();
 
-        <span class="self">self</span>.<span class="ident">init_cost</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cost</span>.<span class="ident">is_infinite</span>() {
-            <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">init_param</span>)<span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">cost</span>
+        <span class="self">self</span>.init_cost = <span class="kw">if </span>cost.is_infinite() {
+            problem.cost(<span class="kw-2">&amp;</span>init_param)<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            cost
         };
 
-        <span class="kw">let</span> <span class="ident">init_grad</span> <span class="op">=</span> <span class="ident">state</span>
-            .<span class="ident">take_gradient</span>()
-            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">init_param</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>init_grad = state
+            .take_gradient()
+            .map(Result::Ok)
+            .unwrap_or_else(|| problem.gradient(<span class="kw-2">&amp;</span>init_param))<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">init_param</span>);
-        <span class="self">self</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">init_grad</span>);
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">backtracking_step</span>(<span class="ident">problem</span>, <span class="ident">state</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>, <span class="prelude-val">None</span>))
+        <span class="self">self</span>.init_param = <span class="prelude-val">Some</span>(init_param);
+        <span class="self">self</span>.init_grad = <span class="prelude-val">Some</span>(init_grad);
+        <span class="kw">let </span>state = <span class="self">self</span>.backtracking_step(problem, state)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">alpha</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">alpha</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">rho</span>;
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">backtracking_step</span>(<span class="ident">problem</span>, <span class="ident">state</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>, <span class="prelude-val">None</span>))
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        state: IterState&lt;P, G, (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="self">self</span>.alpha = <span class="self">self</span>.alpha * <span class="self">self</span>.rho;
+        <span class="kw">let </span>state = <span class="self">self</span>.backtracking_step(problem, state)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">condition</span>.<span class="ident">evaluate_condition</span>(
-            <span class="ident">state</span>.<span class="ident">cost</span>,
-            <span class="ident">state</span>.<span class="ident">get_gradient</span>(),
-            <span class="self">self</span>.<span class="ident">init_cost</span>,
-            <span class="self">self</span>.<span class="ident">init_grad</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(),
-            <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(),
-            <span class="self">self</span>.<span class="ident">alpha</span>,
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), (), F&gt;) -&gt; TerminationReason {
+        <span class="kw">if </span><span class="self">self</span>.condition.evaluate_condition(
+            state.cost,
+            state.get_gradient(),
+            <span class="self">self</span>.init_cost,
+            <span class="self">self</span>.init_grad.as_ref().unwrap(),
+            <span class="self">self</span>.search_direction.as_ref().unwrap(),
+            <span class="self">self</span>.alpha,
         ) {
-            <span class="ident">TerminationReason::LineSearchConditionMet</span>
-        } <span class="kw">else</span> {
-            <span class="ident">TerminationReason::NotTerminated</span>
+            TerminationReason::LineSearchConditionMet
+        } <span class="kw">else </span>{
+            TerminationReason::NotTerminated
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::assert_error</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">test_utils::TestProblem</span>, <span class="ident">ArgminError</span>, <span class="ident">Executor</span>, <span class="ident">State</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
-    <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
-    <span class="kw">use</span> <span class="ident">num_traits::Float</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::assert_error;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{test_utils::TestProblem, ArgminError, Executor, State};
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
+    <span class="kw">use </span>approx::assert_relative_eq;
+    <span class="kw">use </span>num_traits::Float;
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">BTTestProblem</span> {}
+    <span class="attribute">#[derive(Debug, Clone)]
+    </span><span class="kw">struct </span>BTTestProblem {}
 
-    <span class="kw">impl</span> <span class="ident">CostFunction</span> <span class="kw">for</span> <span class="ident">BTTestProblem</span> {
-        <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
+    <span class="kw">impl </span>CostFunction <span class="kw">for </span>BTTestProblem {
+        <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+        <span class="kw">type </span>Output = f64;
 
-        <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">p</span>[<span class="number">0</span>].<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">p</span>[<span class="number">1</span>].<span class="ident">powi</span>(<span class="number">2</span>))
+        <span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
+            <span class="prelude-val">Ok</span>(p[<span class="number">0</span>].powi(<span class="number">2</span>) + p[<span class="number">1</span>].powi(<span class="number">2</span>))
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">Gradient</span> <span class="kw">for</span> <span class="ident">BTTestProblem</span> {
-        <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-        <span class="kw">type</span> <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+    <span class="kw">impl </span>Gradient <span class="kw">for </span>BTTestProblem {
+        <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+        <span class="kw">type </span>Gradient = Vec&lt;f64&gt;;
 
-        <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Gradient</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-            <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="number">2.0</span> <span class="op">*</span> <span class="ident">p</span>[<span class="number">0</span>], <span class="number">2.0</span> <span class="op">*</span> <span class="ident">p</span>[<span class="number">1</span>]])
+        <span class="kw">fn </span>gradient(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Gradient, Error&gt; {
+            <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="number">2.0 </span>* p[<span class="number">0</span>], <span class="number">2.0 </span>* p[<span class="number">1</span>]])
         }
     }
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">backtrackinglinesearch</span>,
-                    <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">TestProblem</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(backtrackinglinesearch,
+                    BacktrackingLineSearch&lt;TestProblem, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">ls</span>.<span class="ident">init_param</span>, <span class="prelude-val">None</span>);
-        <span class="macro">assert!</span>(<span class="ident">ls</span>.<span class="ident">init_cost</span>.<span class="ident">is_infinite</span>());
-        <span class="macro">assert!</span>(<span class="ident">ls</span>.<span class="ident">init_cost</span>.<span class="ident">is_sign_positive</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">ls</span>.<span class="ident">init_grad</span>, <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">ls</span>.<span class="ident">search_direction</span>, <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">ls</span>.<span class="ident">rho</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.9f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">ls</span>.<span class="ident">alpha</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(ls.init_param, <span class="prelude-val">None</span>);
+        <span class="macro">assert!</span>(ls.init_cost.is_infinite());
+        <span class="macro">assert!</span>(ls.init_cost.is_sign_positive());
+        <span class="macro">assert_eq!</span>(ls.init_grad, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(ls.search_direction, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(ls.rho.to_ne_bytes(), <span class="number">0.9f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(ls.alpha.to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rho</span>() {
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rho() {
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">ls</span>.<span class="ident">rho</span>(<span class="number">1.0f64</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;BacktrackingLineSearch: Contraction factor rho must be in (0, 1).\&quot;&quot;</span>
-        );
+            ls.rho(<span class="number">1.0f64</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;BacktrackingLineSearch: Contraction factor rho must be in (0, 1).\&quot;&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">ls</span>.<span class="ident">rho</span>(<span class="number">0.0f64</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;BacktrackingLineSearch: Contraction factor rho must be in (0, 1).\&quot;&quot;</span>
-        );
+            ls.rho(<span class="number">0.0f64</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;BacktrackingLineSearch: Contraction factor rho must be in (0, 1).\&quot;&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
-        <span class="macro">assert!</span>(<span class="ident">ls</span>.<span class="ident">rho</span>(<span class="number">0.0f64</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>).<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(ls.rho(<span class="number">0.0f64 </span>+ f64::EPSILON).is_ok());
 
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
-        <span class="macro">assert!</span>(<span class="ident">ls</span>.<span class="ident">rho</span>(<span class="number">1.0f64</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>).<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(ls.rho(<span class="number">1.0f64 </span>- f64::EPSILON).is_ok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_search_direction</span>() {
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
-        <span class="ident">ls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_search_direction() {
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
+        ls.search_direction(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>]);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">ls</span>.<span class="ident">search_direction</span>, <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>]));
+        <span class="macro">assert_eq!</span>(ls.search_direction, <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>]));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_initial_step_length</span>() {
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_initial_step_length() {
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
-        <span class="macro">assert!</span>(<span class="ident">ls</span>.<span class="ident">initial_step_length</span>(<span class="ident">f64::EPSILON</span>).<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(ls.initial_step_length(f64::EPSILON).is_ok());
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">ls</span>.<span class="ident">initial_step_length</span>(<span class="number">0.0f64</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;LineSearch: Initial alpha must be &gt; 0.\&quot;&quot;</span>
-        );
+            ls.initial_step_length(<span class="number">0.0f64</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;LineSearch: Initial alpha must be &gt; 0.\&quot;&quot;
+        </span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_param_not_initialized</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">linesearch</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">ArmijoCondition::new</span>(<span class="number">0.2</span>).<span class="ident">unwrap</span>());
-        <span class="ident">linesearch</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>]);
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">linesearch</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">IterState::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_param_not_initialized() {
+        <span class="kw">let </span><span class="kw-2">mut </span>linesearch: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(ArmijoCondition::new(<span class="number">0.2</span>).unwrap());
+        linesearch.search_direction(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>]);
+        <span class="kw">let </span>res = linesearch.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), IterState::new());
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`BacktrackingLineSearch` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_step_armijo</span>() {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::Problem</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_step_armijo() {
+        <span class="kw">use </span><span class="kw">crate</span>::core::Problem;
 
-        <span class="kw">let</span> <span class="ident">prob</span> <span class="op">=</span> <span class="ident">BTTestProblem</span> {};
+        <span class="kw">let </span>prob = BTTestProblem {};
 
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
-        <span class="ident">ls</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">init_cost</span> <span class="op">=</span> <span class="ident">f64::infinity</span>();
-        <span class="ident">ls</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">2.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">initial_step_length</span>(<span class="number">0.8</span>).<span class="ident">unwrap</span>();
+        ls.init_param = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>]);
+        ls.init_cost = f64::infinity();
+        ls.init_grad = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">2.0</span>, <span class="number">0.0</span>]);
+        ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
+        ls.initial_step_length(<span class="number">0.8</span>).unwrap();
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ls</span>.<span class="ident">backtracking_step</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">prob</span>), <span class="ident">IterState::new</span>());
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>data = ls.backtracking_step(<span class="kw-2">&amp;mut </span>Problem::new(prob), IterState::new());
+        <span class="macro">assert!</span>(data.is_ok());
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_cost</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="number">0.6</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">cost</span>, <span class="number">0.6f64</span>.<span class="ident">powi</span>(<span class="number">2</span>), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>param = data.as_ref().unwrap().get_param().unwrap();
+        <span class="kw">let </span>cost = data.as_ref().unwrap().get_cost();
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], <span class="number">0.6</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], <span class="number">0.0</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(cost, <span class="number">0.6f64</span>.powi(<span class="number">2</span>), epsilon = f64::EPSILON);
 
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_gradient</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(data.as_ref().unwrap().get_gradient().is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_step_wolfe</span>() {
-        <span class="comment">// Wolfe, in contrast to Armijo, requires the current gradient. This test makes sure that</span>
-        <span class="comment">// the implementation of the backtracking linesearch properly considers this.</span>
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::Problem</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_step_wolfe() {
+        <span class="comment">// Wolfe, in contrast to Armijo, requires the current gradient. This test makes sure that
+        // the implementation of the backtracking linesearch properly considers this.
+        </span><span class="kw">use </span><span class="kw">crate</span>::core::Problem;
 
-        <span class="kw">let</span> <span class="ident">prob</span> <span class="op">=</span> <span class="ident">BTTestProblem</span> {};
+        <span class="kw">let </span>prob = BTTestProblem {};
 
-        <span class="kw">let</span> <span class="ident">c1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">c2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.9</span>;
-        <span class="kw">let</span> <span class="ident">wolfe</span> <span class="op">=</span> <span class="ident">WolfeCondition::new</span>(<span class="ident">c1</span>, <span class="ident">c2</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">WolfeCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">wolfe</span>);
+        <span class="kw">let </span>c1: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>c2: f64 = <span class="number">0.9</span>;
+        <span class="kw">let </span>wolfe = WolfeCondition::new(c1, c2).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, WolfeCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(wolfe);
 
-        <span class="ident">ls</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">init_cost</span> <span class="op">=</span> <span class="ident">f64::infinity</span>();
-        <span class="ident">ls</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">2.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">initial_step_length</span>(<span class="number">0.8</span>).<span class="ident">unwrap</span>();
+        ls.init_param = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>]);
+        ls.init_cost = f64::infinity();
+        ls.init_grad = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">2.0</span>, <span class="number">0.0</span>]);
+        ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
+        ls.initial_step_length(<span class="number">0.8</span>).unwrap();
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ls</span>.<span class="ident">backtracking_step</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">prob</span>), <span class="ident">IterState::new</span>());
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>data = ls.backtracking_step(<span class="kw-2">&amp;mut </span>Problem::new(prob), IterState::new());
+        <span class="macro">assert!</span>(data.is_ok());
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_cost</span>();
-        <span class="kw">let</span> <span class="ident">gradient</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_gradient</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="number">0.6</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">cost</span>, <span class="number">0.6f64</span>.<span class="ident">powi</span>(<span class="number">2</span>), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">gradient</span>[<span class="number">0</span>], <span class="number">2.0</span> <span class="op">*</span> <span class="number">0.6</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">gradient</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>param = data.as_ref().unwrap().get_param().unwrap();
+        <span class="kw">let </span>cost = data.as_ref().unwrap().get_cost();
+        <span class="kw">let </span>gradient = data.as_ref().unwrap().get_gradient().unwrap();
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], <span class="number">0.6</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], <span class="number">0.0</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(cost, <span class="number">0.6f64</span>.powi(<span class="number">2</span>), epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(gradient[<span class="number">0</span>], <span class="number">2.0 </span>* <span class="number">0.6</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(gradient[<span class="number">1</span>], <span class="number">0.0</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_armijo</span>() {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::IterState</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::Problem</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_armijo() {
+        <span class="kw">use </span><span class="kw">crate</span>::core::IterState;
+        <span class="kw">use </span><span class="kw">crate</span>::core::Problem;
 
-        <span class="kw">let</span> <span class="ident">prob</span> <span class="op">=</span> <span class="ident">BTTestProblem</span> {};
+        <span class="kw">let </span>prob = BTTestProblem {};
 
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
-        <span class="ident">ls</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">init_cost</span> <span class="op">=</span> <span class="ident">f64::infinity</span>();
-        <span class="comment">// in contrast to the step tests above, it is not necessary to set the init_grad here</span>
-        <span class="comment">// because it will be computed in init if not present.</span>
-        <span class="ident">ls</span>.<span class="ident">initial_step_length</span>(<span class="number">0.8</span>).<span class="ident">unwrap</span>();
+        ls.init_param = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>]);
+        ls.init_cost = f64::infinity();
+        <span class="comment">// in contrast to the step tests above, it is not necessary to set the init_grad here
+        // because it will be computed in init if not present.
+        </span>ls.initial_step_length(<span class="number">0.8</span>).unwrap();
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">ls</span>.<span class="ident">init</span>(
-                <span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">prob</span>.<span class="ident">clone</span>()),
-                <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>())
+            ls.init(
+                <span class="kw-2">&amp;mut </span>Problem::new(prob.clone()),
+                IterState::new().param(ls.init_param.clone().unwrap())
             ),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;</span>
+            ArgminError,
+            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;
+        </span>);
+
+        ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
+
+        <span class="kw">let </span>data = ls.init(
+            <span class="kw-2">&amp;mut </span>Problem::new(prob),
+            IterState::new().param(ls.init_param.clone().unwrap()),
         );
+        <span class="macro">assert!</span>(data.is_ok());
 
-        <span class="ident">ls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
+        <span class="kw">let </span>data = data.unwrap().<span class="number">0</span>;
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ls</span>.<span class="ident">init</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">prob</span>),
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>()),
-        );
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>param = data.get_param().unwrap();
+        <span class="kw">let </span>cost = data.get_cost();
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], <span class="number">0.6</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], <span class="number">0.0</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(cost, <span class="number">0.6f64</span>.powi(<span class="number">2</span>), epsilon = f64::EPSILON);
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">unwrap</span>().<span class="number">0</span>;
-
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_cost</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="number">0.6</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">cost</span>, <span class="number">0.6f64</span>.<span class="ident">powi</span>(<span class="number">2</span>), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">get_gradient</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(data.get_gradient().is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_wolfe</span>() {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::IterState</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::Problem</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_wolfe() {
+        <span class="kw">use </span><span class="kw">crate</span>::core::IterState;
+        <span class="kw">use </span><span class="kw">crate</span>::core::Problem;
 
-        <span class="kw">let</span> <span class="ident">prob</span> <span class="op">=</span> <span class="ident">BTTestProblem</span> {};
+        <span class="kw">let </span>prob = BTTestProblem {};
 
-        <span class="kw">let</span> <span class="ident">c1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">c2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.9</span>;
-        <span class="kw">let</span> <span class="ident">wolfe</span> <span class="op">=</span> <span class="ident">WolfeCondition::new</span>(<span class="ident">c1</span>, <span class="ident">c2</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">WolfeCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">wolfe</span>);
+        <span class="kw">let </span>c1: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>c2: f64 = <span class="number">0.9</span>;
+        <span class="kw">let </span>wolfe = WolfeCondition::new(c1, c2).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, WolfeCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(wolfe);
 
-        <span class="ident">ls</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">init_cost</span> <span class="op">=</span> <span class="ident">f64::infinity</span>();
-        <span class="comment">// in contrast to the step tests above, it is not necessary to set the init_grad here</span>
-        <span class="comment">// because it will be computed in init if not present.</span>
-        <span class="ident">ls</span>.<span class="ident">initial_step_length</span>(<span class="number">0.8</span>).<span class="ident">unwrap</span>();
+        ls.init_param = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>]);
+        ls.init_cost = f64::infinity();
+        <span class="comment">// in contrast to the step tests above, it is not necessary to set the init_grad here
+        // because it will be computed in init if not present.
+        </span>ls.initial_step_length(<span class="number">0.8</span>).unwrap();
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">ls</span>.<span class="ident">init</span>(
-                <span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">prob</span>.<span class="ident">clone</span>()),
-                <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>())
+            ls.init(
+                <span class="kw-2">&amp;mut </span>Problem::new(prob.clone()),
+                IterState::new().param(ls.init_param.clone().unwrap())
             ),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;</span>
+            ArgminError,
+            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;
+        </span>);
+
+        ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
+
+        <span class="kw">let </span>data = ls.init(
+            <span class="kw-2">&amp;mut </span>Problem::new(prob),
+            IterState::new().param(ls.init_param.clone().unwrap()),
         );
+        <span class="macro">assert!</span>(data.is_ok());
 
-        <span class="ident">ls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
+        <span class="kw">let </span>data = data.unwrap().<span class="number">0</span>;
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ls</span>.<span class="ident">init</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">prob</span>),
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>()),
-        );
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">is_ok</span>());
-
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">unwrap</span>().<span class="number">0</span>;
-
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_cost</span>();
-        <span class="kw">let</span> <span class="ident">gradient</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_gradient</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="number">0.6</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">cost</span>, <span class="number">0.6f64</span>.<span class="ident">powi</span>(<span class="number">2</span>), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">gradient</span>[<span class="number">0</span>], <span class="number">2.0</span> <span class="op">*</span> <span class="number">0.6</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">gradient</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>param = data.get_param().unwrap();
+        <span class="kw">let </span>cost = data.get_cost();
+        <span class="kw">let </span>gradient = data.get_gradient().unwrap();
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], <span class="number">0.6</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], <span class="number">0.0</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(cost, <span class="number">0.6f64</span>.powi(<span class="number">2</span>), epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(gradient[<span class="number">0</span>], <span class="number">2.0 </span>* <span class="number">0.6</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(gradient[<span class="number">1</span>], <span class="number">0.0</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter</span>() {
-        <span class="comment">// Similar to step test, but with the added check that self.alpha is reduced.</span>
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::Problem</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter() {
+        <span class="comment">// Similar to step test, but with the added check that self.alpha is reduced.
+        </span><span class="kw">use </span><span class="kw">crate</span>::core::Problem;
 
-        <span class="kw">let</span> <span class="ident">prob</span> <span class="op">=</span> <span class="ident">BTTestProblem</span> {};
+        <span class="kw">let </span>prob = BTTestProblem {};
 
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
-        <span class="kw">let</span> <span class="ident">init_alpha</span> <span class="op">=</span> <span class="number">0.8</span>;
-        <span class="ident">ls</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">init_cost</span> <span class="op">=</span> <span class="ident">f64::infinity</span>();
-        <span class="ident">ls</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">2.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">initial_step_length</span>(<span class="ident">init_alpha</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>init_alpha = <span class="number">0.8</span>;
+        ls.init_param = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>]);
+        ls.init_cost = f64::infinity();
+        ls.init_grad = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">2.0</span>, <span class="number">0.0</span>]);
+        ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
+        ls.initial_step_length(init_alpha).unwrap();
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ls</span>.<span class="ident">next_iter</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">prob</span>),
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>()),
+        <span class="kw">let </span>data = ls.next_iter(
+            <span class="kw-2">&amp;mut </span>Problem::new(prob),
+            IterState::new().param(ls.init_param.clone().unwrap()),
         );
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(data.is_ok());
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="number">0</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="number">0</span>.<span class="ident">get_cost</span>();
-        <span class="comment">// step is smaller than compared to step test, because of the reduced alpha.</span>
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="number">0.44</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">cost</span>, <span class="number">0.44f64</span>.<span class="ident">powi</span>(<span class="number">2</span>), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>param = data.as_ref().unwrap().<span class="number">0</span>.get_param().unwrap();
+        <span class="kw">let </span>cost = data.as_ref().unwrap().<span class="number">0</span>.get_cost();
+        <span class="comment">// step is smaller than compared to step test, because of the reduced alpha.
+        </span><span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], <span class="number">0.44</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], <span class="number">0.0</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(cost, <span class="number">0.44f64</span>.powi(<span class="number">2</span>), epsilon = f64::EPSILON);
 
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="number">0</span>.<span class="ident">get_gradient</span>().<span class="ident">is_none</span>());
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">ls</span>.<span class="ident">alpha</span>, <span class="ident">ls</span>.<span class="ident">rho</span> <span class="op">*</span> <span class="number">0.8</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert!</span>(data.as_ref().unwrap().<span class="number">0</span>.get_gradient().is_none());
+        <span class="macro">assert_relative_eq!</span>(ls.alpha, ls.rho * <span class="number">0.8</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_termination</span>() {
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_termination() {
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
-        <span class="kw">let</span> <span class="ident">init_alpha</span> <span class="op">=</span> <span class="number">0.8</span>;
-        <span class="ident">ls</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">init_cost</span> <span class="op">=</span> <span class="ident">f64::infinity</span>();
-        <span class="ident">ls</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">2.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">initial_step_length</span>(<span class="ident">init_alpha</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>init_alpha = <span class="number">0.8</span>;
+        ls.init_param = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>]);
+        ls.init_cost = f64::infinity();
+        ls.init_grad = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">2.0</span>, <span class="number">0.0</span>]);
+        ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
+        ls.initial_step_length(init_alpha).unwrap();
 
-        <span class="kw">let</span> <span class="ident">init_param</span> <span class="op">=</span> <span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>init_param = ls.init_param.clone().unwrap();
         <span class="macro">assert_eq!</span>(
-            <span class="op">&lt;</span><span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&lt;</span>
-                <span class="ident">TestProblem</span>,
-                <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), <span class="ident">f64</span><span class="op">&gt;</span>,
-            <span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::terminate</span>(
-                <span class="kw-2">&amp;mut</span> <span class="ident">ls</span>,
-                <span class="kw-2">&amp;</span><span class="ident">IterState</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), <span class="ident">f64</span><span class="op">&gt;</span><span class="ident">::new</span>().<span class="ident">param</span>(<span class="ident">init_param</span>)
+            &lt;BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; <span class="kw">as </span>Solver&lt;
+                TestProblem,
+                IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;,
+            &gt;&gt;::terminate(
+                <span class="kw-2">&amp;mut </span>ls,
+                <span class="kw-2">&amp;</span>IterState::&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;::new().param(init_param)
             ),
-            <span class="ident">TerminationReason::LineSearchConditionMet</span>
+            TerminationReason::LineSearchConditionMet
         );
 
-        <span class="ident">ls</span>.<span class="ident">init_cost</span> <span class="op">=</span> <span class="number">0.0f64</span>;
+        ls.init_cost = <span class="number">0.0f64</span>;
 
-        <span class="kw">let</span> <span class="ident">init_param</span> <span class="op">=</span> <span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>init_param = ls.init_param.clone().unwrap();
         <span class="macro">assert_eq!</span>(
-            <span class="op">&lt;</span><span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&lt;</span>
-                <span class="ident">TestProblem</span>,
-                <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), <span class="ident">f64</span><span class="op">&gt;</span>,
-            <span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::terminate</span>(
-                <span class="kw-2">&amp;mut</span> <span class="ident">ls</span>,
-                <span class="kw-2">&amp;</span><span class="ident">IterState</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), <span class="ident">f64</span><span class="op">&gt;</span><span class="ident">::new</span>().<span class="ident">param</span>(<span class="ident">init_param</span>)
+            &lt;BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; <span class="kw">as </span>Solver&lt;
+                TestProblem,
+                IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;,
+            &gt;&gt;::terminate(
+                <span class="kw-2">&amp;mut </span>ls,
+                <span class="kw-2">&amp;</span>IterState::&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;::new().param(init_param)
             ),
-            <span class="ident">TerminationReason::NotTerminated</span>
+            TerminationReason::NotTerminated
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_executor_1</span>() {
-        <span class="kw">let</span> <span class="ident">prob</span> <span class="op">=</span> <span class="ident">BTTestProblem</span> {};
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_executor_1() {
+        <span class="kw">let </span>prob = BTTestProblem {};
 
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
-        <span class="ident">ls</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">init_cost</span> <span class="op">=</span> <span class="ident">f64::infinity</span>();
-        <span class="comment">// in contrast to the step tests above, it is not necessary to set the init_grad here</span>
-        <span class="comment">// because it will be computed in init if not present.</span>
-        <span class="ident">ls</span>.<span class="ident">initial_step_length</span>(<span class="number">0.8</span>).<span class="ident">unwrap</span>();
+        ls.init_param = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>]);
+        ls.init_cost = f64::infinity();
+        <span class="comment">// in contrast to the step tests above, it is not necessary to set the init_grad here
+        // because it will be computed in init if not present.
+        </span>ls.initial_step_length(<span class="number">0.8</span>).unwrap();
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">Executor::new</span>(<span class="ident">prob</span>.<span class="ident">clone</span>(), <span class="ident">ls</span>.<span class="ident">clone</span>())
-                .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>()).<span class="ident">max_iters</span>(<span class="number">10</span>))
-                .<span class="ident">run</span>(),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;</span>
-        );
+            Executor::new(prob.clone(), ls.clone())
+                .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(<span class="number">10</span>))
+                .run(),
+            ArgminError,
+            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;
+        </span>);
 
-        <span class="ident">ls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
+        ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">prob</span>, <span class="ident">ls</span>.<span class="ident">clone</span>())
-            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>()).<span class="ident">max_iters</span>(<span class="number">10</span>))
-            .<span class="ident">run</span>();
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>data = Executor::new(prob, ls.clone())
+            .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(<span class="number">10</span>))
+            .run();
+        <span class="macro">assert!</span>(data.is_ok());
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">unwrap</span>().<span class="ident">state</span>;
+        <span class="kw">let </span>data = data.unwrap().state;
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="number">0.6</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">data</span>.<span class="ident">get_cost</span>(), <span class="number">0.6</span>.<span class="ident">powi</span>(<span class="number">2</span>), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">iter</span>, <span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">func_counts</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_func_counts</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">func_counts</span>[<span class="string">&quot;cost_count&quot;</span>], <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">func_counts</span>[<span class="string">&quot;gradient_count&quot;</span>], <span class="number">1</span>);
+        <span class="kw">let </span>param = data.get_param().unwrap();
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], <span class="number">0.6</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], <span class="number">0.0</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(data.get_cost(), <span class="number">0.6</span>.powi(<span class="number">2</span>), epsilon = f64::EPSILON);
+        <span class="macro">assert_eq!</span>(data.iter, <span class="number">0</span>);
+        <span class="kw">let </span>func_counts = data.get_func_counts();
+        <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;cost_count&quot;</span>], <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;gradient_count&quot;</span>], <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">data</span>.<span class="ident">termination_reason</span>,
-            <span class="ident">TerminationReason::LineSearchConditionMet</span>
+            data.termination_reason,
+            TerminationReason::LineSearchConditionMet
         );
 
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">get_gradient</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(data.get_gradient().is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_executor_2</span>() {
-        <span class="kw">let</span> <span class="ident">prob</span> <span class="op">=</span> <span class="ident">BTTestProblem</span> {};
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_executor_2() {
+        <span class="kw">let </span>prob = BTTestProblem {};
 
-        <span class="comment">// difference compared to test_executor_1: c is larger to force another backtracking step</span>
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.2</span>;
-        <span class="kw">let</span> <span class="ident">armijo</span> <span class="op">=</span> <span class="ident">ArmijoCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ls</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">armijo</span>);
+        <span class="comment">// difference compared to test_executor_1: c is larger to force another backtracking step
+        </span><span class="kw">let </span>c: f64 = <span class="number">0.2</span>;
+        <span class="kw">let </span>armijo = ArmijoCondition::new(c).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>ls: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(armijo);
 
-        <span class="ident">ls</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>]);
-        <span class="ident">ls</span>.<span class="ident">init_cost</span> <span class="op">=</span> <span class="ident">f64::infinity</span>();
-        <span class="comment">// in contrast to the step tests above, it is not necessary to set the init_grad here</span>
-        <span class="comment">// because it will be computed in init if not present.</span>
-        <span class="ident">ls</span>.<span class="ident">initial_step_length</span>(<span class="number">0.8</span>).<span class="ident">unwrap</span>();
+        ls.init_param = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>]);
+        ls.init_cost = f64::infinity();
+        <span class="comment">// in contrast to the step tests above, it is not necessary to set the init_grad here
+        // because it will be computed in init if not present.
+        </span>ls.initial_step_length(<span class="number">0.8</span>).unwrap();
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">Executor::new</span>(<span class="ident">prob</span>.<span class="ident">clone</span>(), <span class="ident">ls</span>.<span class="ident">clone</span>())
-                .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>()).<span class="ident">max_iters</span>(<span class="number">10</span>))
-                .<span class="ident">run</span>(),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;</span>
-        );
+            Executor::new(prob.clone(), ls.clone())
+                .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(<span class="number">10</span>))
+                .run(),
+            ArgminError,
+            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;
+        </span>);
 
-        <span class="ident">ls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
+        ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">prob</span>, <span class="ident">ls</span>.<span class="ident">clone</span>())
-            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">ls</span>.<span class="ident">init_param</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>()).<span class="ident">max_iters</span>(<span class="number">10</span>))
-            .<span class="ident">run</span>();
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>data = Executor::new(prob, ls.clone())
+            .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(<span class="number">10</span>))
+            .run();
+        <span class="macro">assert!</span>(data.is_ok());
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">unwrap</span>().<span class="ident">state</span>;
+        <span class="kw">let </span>data = data.unwrap().state;
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="number">0.44</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">data</span>.<span class="ident">get_cost</span>(), <span class="number">0.44f64</span>.<span class="ident">powi</span>(<span class="number">2</span>), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">iter</span>, <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">func_counts</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_func_counts</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">func_counts</span>[<span class="string">&quot;cost_count&quot;</span>], <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">func_counts</span>[<span class="string">&quot;gradient_count&quot;</span>], <span class="number">1</span>);
+        <span class="kw">let </span>param = data.get_param().unwrap();
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], <span class="number">0.44</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], <span class="number">0.0</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(data.get_cost(), <span class="number">0.44f64</span>.powi(<span class="number">2</span>), epsilon = f64::EPSILON);
+        <span class="macro">assert_eq!</span>(data.iter, <span class="number">1</span>);
+        <span class="kw">let </span>func_counts = data.get_func_counts();
+        <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;cost_count&quot;</span>], <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;gradient_count&quot;</span>], <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">data</span>.<span class="ident">termination_reason</span>,
-            <span class="ident">TerminationReason::LineSearchConditionMet</span>
+            data.termination_reason,
+            TerminationReason::LineSearchConditionMet
         );
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">get_gradient</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(data.get_gradient().is_none());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

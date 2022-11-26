@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin-math/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../argmin_math/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../argmin_math/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../argmin_math/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin-math/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../argmin_math/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../argmin_math/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../argmin_math/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -348,355 +348,355 @@
 <span id="348">348</span>
 <span id="349">349</span>
 <span id="350">350</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! argmin-math provides mathematics related abstractions needed in argmin. It supports</span>
-<span class="doccomment">//! implementations of these abstractions for basic `Vec`s and for `ndarray` and `nalgebra`.</span>
-<span class="doccomment">//! The traits can of course also be implemented for your own types to make them compatible with</span>
-<span class="doccomment">//! argmin.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For an introduction on how to use argmin, please also have a look at the</span>
-<span class="doccomment">//! [book](http://www.argmin-rs.org/book/).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Add the following line to your dependencies list:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot;argmin-math = \&quot;&quot;</span>, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>), <span class="string">&quot;\&quot;&quot;</span>)]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This will activate the `primitives` and `vec` features. For other backends see the section</span>
-<span class="doccomment">//! below.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Support for the various backends can be switched on via features. Please read this section</span>
-<span class="doccomment">//! carefully to the end before choosing a backend.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Default features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Feature                | Default | Comment                                               |</span>
-<span class="doccomment">//! |------------------------|---------|-------------------------------------------------------|</span>
-<span class="doccomment">//! | `primitives`           | yes     | basic integer and floating point types                |</span>
-<span class="doccomment">//! | `vec`                  | yes     | `Vec`s (basic functionality)                          |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### `ndarray`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Feature                         | Default | Comment                                                            |</span>
-<span class="doccomment">//! |---------------------------------|---------|--------------------------------------------------------------------|</span>
-<span class="doccomment">//! | `ndarray_latest`                | no      | latest supported version                                           |</span>
-<span class="doccomment">//! | `ndarray_latest-nolinalg`       | no      | latest supported version without `ndarray-linalg`                  |</span>
-<span class="doccomment">//! | `ndarray_latest-serde`          | no      | latest supported version + serde support                           |</span>
-<span class="doccomment">//! | `ndarray_latest-nolinalg-serde` | no      | latest supported version without `ndarray-linalg` + serde support  |</span>
-<span class="doccomment">//! | `ndarray_v0_15`                 | no      | version 0.15                                                       |</span>
-<span class="doccomment">//! | `ndarray_v0_15-nolinalg`        | no      | version 0.15 without `ndarray-linalg`                              |</span>
-<span class="doccomment">//! | `ndarray_v0_15-serde`           | no      | version 0.15 + serde support                                       |</span>
-<span class="doccomment">//! | `ndarray_v0_15-nolinalg-serde`  | no      | version 0.15 without `ndarray-linalg` + serde support              |</span>
-<span class="doccomment">//! | `ndarray_v0_14`                 | no      | version 0.14                                                       |</span>
-<span class="doccomment">//! | `ndarray_v0_14-nolinalg`        | no      | version 0.14 without `ndarray-linalg`                              |</span>
-<span class="doccomment">//! | `ndarray_v0_14-serde`           | no      | version 0.14 + serde support                                       |</span>
-<span class="doccomment">//! | `ndarray_v0_14-nolinalg-serde`  | no      | version 0.14 without `ndarray-linalg` + serde support              |</span>
-<span class="doccomment">//! | `ndarray_v0_13`                 | no      | version 0.13                                                       |</span>
-<span class="doccomment">//! | `ndarray_v0_13-nolinalg`        | no      | version 0.13 without `ndarray-linalg`                              |</span>
-<span class="doccomment">//! | `ndarray_v0_13-serde`           | no      | version 0.13 + serde support                                       |</span>
-<span class="doccomment">//! | `ndarray_v0_13-nolinalg-serde`  | no      | version 0.13 without `ndarray-linalg` + serde support              |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that the `*-nolinalg*` features do NOT pull in `ndarray-linalg` as a dependency. This</span>
-<span class="doccomment">//! avoids linking against a BLAS library. This will however disable the implementation of</span>
-<span class="doccomment">//! `ArgminInv`, meaning that any solver which requires the matrix inverse will not work with the</span>
-<span class="doccomment">//! `ndarray` backend. It is recommended to use the `*-nolinalg*` options if the matrix inverse is</span>
-<span class="doccomment">//! not needed in order to keep the compilation times low and avoid problems when linking against a</span>
-<span class="doccomment">//! BLAS library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Using the `ndarray_*` features with `ndarray-linalg` support may require to explicitly choose</span>
-<span class="doccomment">//! the `ndarray-linalg` BLAS backend in your `Cargo.toml` (see the [`ndarray-linalg` documentation</span>
-<span class="doccomment">//! for details](https://github.com/rust-ndarray/ndarray-linalg)):</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! ndarray-linalg = { version = &quot;&lt;appropriate_version&gt;&quot;, features = [&quot;&lt;linalg_backend&gt;&quot;] }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### `nalgebra`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Feature                | Default | Comment                                  |</span>
-<span class="doccomment">//! |------------------------|---------|------------------------------------------|</span>
-<span class="doccomment">//! | `nalgebra_latest`      | no      | latest supported version                 |</span>
-<span class="doccomment">//! | `nalgebra_latest-serde`| no      | latest supported version + serde support |</span>
-<span class="doccomment">//! | `nalgebra_v0_31`       | no      | version 0.31                             |</span>
-<span class="doccomment">//! | `nalgebra_v0_31-serde` | no      | version 0.31 + serde support             |</span>
-<span class="doccomment">//! | `nalgebra_v0_30`       | no      | version 0.30                             |</span>
-<span class="doccomment">//! | `nalgebra_v0_30-serde` | no      | version 0.30 + serde support             |</span>
-<span class="doccomment">//! | `nalgebra_v0_29`       | no      | version 0.29                             |</span>
-<span class="doccomment">//! | `nalgebra_v0_29-serde` | no      | version 0.29 + serde support             |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Choosing a backend</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It is not possible to activate two versions of the same backend.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The features labeled `*latest*` are an alias for the most recent supported version of the</span>
-<span class="doccomment">//! respective backend. It is however recommended to explicitly specify the desired version instead</span>
-<span class="doccomment">//! of using any of the `*latest*` features (see section about semantic versioning below).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that `argmin` by default compiles with `serde` support. Therefore, unless `serde` is</span>
-<span class="doccomment">//! deliberately turned off in `argmin`, it is necessary to activate the `serde` support in</span>
-<span class="doccomment">//! `argmin-math` as well.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The default features `primitives` and `vec` can be turned off in order to only compile the</span>
-<span class="doccomment">//! trait definitions. If another backend is chosen, `primitives` will automatically be turned on</span>
-<span class="doccomment">//! again.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Example</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Activate support for the latest supported `ndarray` version:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot;argmin-math = { version = \&quot;&quot;</span>, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>), <span class="string">&quot;\&quot;, features = [\&quot;ndarray_latest-serde\&quot;] }&quot;</span>)]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Semantic versioning</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate follows semantic versioning. Adding a new backend or a new version of a backend is</span>
-<span class="doccomment">//! not considered a breaking change. However, your code may still break if you use any of the</span>
-<span class="doccomment">//! features containing `*latest*`. It is therefore recommended to specify the actual version of the</span>
-<span class="doccomment">//! backend you are using.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Development</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For development and running the tests a backend for `ndarray-linalg` must be chosen. Normally</span>
-<span class="doccomment">//! one would add those as dev dependencies (the features would then be unified with the regular</span>
-<span class="doccomment">//! dependencies). However, linking somehow fails when the non-dev `ndarra-linalg` dependency is</span>
-<span class="doccomment">//! missing (which is the case for the `*-nolinalg*` features of the ndarray backend). To fix that,</span>
-<span class="doccomment">//! the `_dev_linalg_*` features were introduced. When testing and developing with one of the</span>
-<span class="doccomment">//! ndarray features with linalg support on, the appropriate `_dev_linalg_*` feature must be turned</span>
-<span class="doccomment">//! on as well. Note that the version number in `_dev_linalg_*` is always one below the `ndarray`</span>
-<span class="doccomment">//! version. For instance, for ndarray 0.15, one would use the `_dev_linalg_0_14` feature.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Development Feature   | Comment                                      |</span>
-<span class="doccomment">//! |-----------------------|----------------------------------------------|</span>
-<span class="doccomment">//! | `_dev_linalg_latest`  | latest `ndarray-linalg` for latest `ndarray` |</span>
-<span class="doccomment">//! | `_dev_linalg_0_14`    | `ndarray-linalg` v0.14 for `ndarray` v0.15   |</span>
-<span class="doccomment">//! | `_dev_linalg_0_13`    | `ndarray-linalg` v0.13 for `ndarray` v0.14   |</span>
-<span class="doccomment">//! | `_dev_linalg_0_12`    | `ndarray-linalg` v0.12 for `ndarray` v0.13   |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Contributing</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You found a bug? Your favorite backend is not supported? Feel free to open an issue or ideally</span>
-<span class="doccomment">//! submit a PR.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # License</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Licensed under either of</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   * Apache License, Version 2.0,</span>
-<span class="doccomment">//!     ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE) or</span>
-<span class="doccomment">//!     &lt;http://www.apache.org/licenses/LICENSE-2.0&gt;)</span>
-<span class="doccomment">//!   * MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT) or</span>
-<span class="doccomment">//!     &lt;http://opensource.org/licenses/MIT&gt;)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! at your option.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Contribution</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion</span>
-<span class="doccomment">//! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,</span>
-<span class="doccomment">//! without any additional terms or conditions.</span>
+</span><span class="doccomment">//! argmin-math provides mathematics related abstractions needed in argmin. It supports
+//! implementations of these abstractions for basic `Vec`s and for `ndarray` and `nalgebra`.
+//! The traits can of course also be implemented for your own types to make them compatible with
+//! argmin.
+//!
+//! For an introduction on how to use argmin, please also have a look at the
+//! [book](http://www.argmin-rs.org/book/).
+//!
+//! # Usage
+//!
+//! Add the following line to your dependencies list:
+//!
+//! ```toml
+//! [dependencies]
+</span><span class="attribute">#![doc = <span class="macro">concat!</span>(<span class="string">&quot;argmin-math = \&quot;&quot;</span>, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>), <span class="string">&quot;\&quot;&quot;</span>)]
+</span><span class="doccomment">//! ```
+//!
+//! This will activate the `primitives` and `vec` features. For other backends see the section
+//! below.
+//!
+//! ## Features
+//!
+//! Support for the various backends can be switched on via features. Please read this section
+//! carefully to the end before choosing a backend.
+//!
+//! ### Default features
+//!
+//! | Feature                | Default | Comment                                               |
+//! |------------------------|---------|-------------------------------------------------------|
+//! | `primitives`           | yes     | basic integer and floating point types                |
+//! | `vec`                  | yes     | `Vec`s (basic functionality)                          |
+//!
+//! ### `ndarray`
+//!
+//! | Feature                         | Default | Comment                                                            |
+//! |---------------------------------|---------|--------------------------------------------------------------------|
+//! | `ndarray_latest`                | no      | latest supported version                                           |
+//! | `ndarray_latest-nolinalg`       | no      | latest supported version without `ndarray-linalg`                  |
+//! | `ndarray_latest-serde`          | no      | latest supported version + serde support                           |
+//! | `ndarray_latest-nolinalg-serde` | no      | latest supported version without `ndarray-linalg` + serde support  |
+//! | `ndarray_v0_15`                 | no      | version 0.15                                                       |
+//! | `ndarray_v0_15-nolinalg`        | no      | version 0.15 without `ndarray-linalg`                              |
+//! | `ndarray_v0_15-serde`           | no      | version 0.15 + serde support                                       |
+//! | `ndarray_v0_15-nolinalg-serde`  | no      | version 0.15 without `ndarray-linalg` + serde support              |
+//! | `ndarray_v0_14`                 | no      | version 0.14                                                       |
+//! | `ndarray_v0_14-nolinalg`        | no      | version 0.14 without `ndarray-linalg`                              |
+//! | `ndarray_v0_14-serde`           | no      | version 0.14 + serde support                                       |
+//! | `ndarray_v0_14-nolinalg-serde`  | no      | version 0.14 without `ndarray-linalg` + serde support              |
+//! | `ndarray_v0_13`                 | no      | version 0.13                                                       |
+//! | `ndarray_v0_13-nolinalg`        | no      | version 0.13 without `ndarray-linalg`                              |
+//! | `ndarray_v0_13-serde`           | no      | version 0.13 + serde support                                       |
+//! | `ndarray_v0_13-nolinalg-serde`  | no      | version 0.13 without `ndarray-linalg` + serde support              |
+//!
+//! Note that the `*-nolinalg*` features do NOT pull in `ndarray-linalg` as a dependency. This
+//! avoids linking against a BLAS library. This will however disable the implementation of
+//! `ArgminInv`, meaning that any solver which requires the matrix inverse will not work with the
+//! `ndarray` backend. It is recommended to use the `*-nolinalg*` options if the matrix inverse is
+//! not needed in order to keep the compilation times low and avoid problems when linking against a
+//! BLAS library.
+//!
+//! Using the `ndarray_*` features with `ndarray-linalg` support may require to explicitly choose
+//! the `ndarray-linalg` BLAS backend in your `Cargo.toml` (see the [`ndarray-linalg` documentation
+//! for details](https://github.com/rust-ndarray/ndarray-linalg)):
+//!
+//! ```toml
+//! ndarray-linalg = { version = &quot;&lt;appropriate_version&gt;&quot;, features = [&quot;&lt;linalg_backend&gt;&quot;] }
+//! ```
+//!
+//! ### `nalgebra`
+//!
+//! | Feature                | Default | Comment                                  |
+//! |------------------------|---------|------------------------------------------|
+//! | `nalgebra_latest`      | no      | latest supported version                 |
+//! | `nalgebra_latest-serde`| no      | latest supported version + serde support |
+//! | `nalgebra_v0_31`       | no      | version 0.31                             |
+//! | `nalgebra_v0_31-serde` | no      | version 0.31 + serde support             |
+//! | `nalgebra_v0_30`       | no      | version 0.30                             |
+//! | `nalgebra_v0_30-serde` | no      | version 0.30 + serde support             |
+//! | `nalgebra_v0_29`       | no      | version 0.29                             |
+//! | `nalgebra_v0_29-serde` | no      | version 0.29 + serde support             |
+//!
+//!
+//! ## Choosing a backend
+//!
+//! It is not possible to activate two versions of the same backend.
+//!
+//! The features labeled `*latest*` are an alias for the most recent supported version of the
+//! respective backend. It is however recommended to explicitly specify the desired version instead
+//! of using any of the `*latest*` features (see section about semantic versioning below).
+//!
+//! Note that `argmin` by default compiles with `serde` support. Therefore, unless `serde` is
+//! deliberately turned off in `argmin`, it is necessary to activate the `serde` support in
+//! `argmin-math` as well.
+//!
+//! The default features `primitives` and `vec` can be turned off in order to only compile the
+//! trait definitions. If another backend is chosen, `primitives` will automatically be turned on
+//! again.
+//!
+//! ### Example
+//!
+//! Activate support for the latest supported `ndarray` version:
+//!
+//! ```toml
+//! [dependencies]
+</span><span class="attribute">#![doc = <span class="macro">concat!</span>(<span class="string">&quot;argmin-math = { version = \&quot;&quot;</span>, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>), <span class="string">&quot;\&quot;, features = [\&quot;ndarray_latest-serde\&quot;] }&quot;</span>)]
+</span><span class="doccomment">//! ```
+//!
+//! # Semantic versioning
+//!
+//! This crate follows semantic versioning. Adding a new backend or a new version of a backend is
+//! not considered a breaking change. However, your code may still break if you use any of the
+//! features containing `*latest*`. It is therefore recommended to specify the actual version of the
+//! backend you are using.
+//!
+//! # Development
+//!
+//! For development and running the tests a backend for `ndarray-linalg` must be chosen. Normally
+//! one would add those as dev dependencies (the features would then be unified with the regular
+//! dependencies). However, linking somehow fails when the non-dev `ndarra-linalg` dependency is
+//! missing (which is the case for the `*-nolinalg*` features of the ndarray backend). To fix that,
+//! the `_dev_linalg_*` features were introduced. When testing and developing with one of the
+//! ndarray features with linalg support on, the appropriate `_dev_linalg_*` feature must be turned
+//! on as well. Note that the version number in `_dev_linalg_*` is always one below the `ndarray`
+//! version. For instance, for ndarray 0.15, one would use the `_dev_linalg_0_14` feature.
+//!
+//! | Development Feature   | Comment                                      |
+//! |-----------------------|----------------------------------------------|
+//! | `_dev_linalg_latest`  | latest `ndarray-linalg` for latest `ndarray` |
+//! | `_dev_linalg_0_14`    | `ndarray-linalg` v0.14 for `ndarray` v0.15   |
+//! | `_dev_linalg_0_13`    | `ndarray-linalg` v0.13 for `ndarray` v0.14   |
+//! | `_dev_linalg_0_12`    | `ndarray-linalg` v0.12 for `ndarray` v0.13   |
+//!
+//! # Contributing
+//!
+//! You found a bug? Your favorite backend is not supported? Feel free to open an issue or ideally
+//! submit a PR.
+//!
+//! # License
+//!
+//! Licensed under either of
+//!
+//!   * Apache License, Version 2.0,
+//!     ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE) or
+//!     &lt;http://www.apache.org/licenses/LICENSE-2.0&gt;)
+//!   * MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT) or
+//!     &lt;http://opensource.org/licenses/MIT&gt;)
+//!
+//! at your option.
+//!
+//! ## Contribution
+//!
+//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
+//! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
+//! without any additional terms or conditions.
 
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="comment">// Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,</span>
-<span class="comment">// this is just to make sure that it will always stay this way.)</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">clippy::float_cmp</span>)]</span>
+</span><span class="attribute">#![warn(missing_docs)]
+</span><span class="comment">// Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,
+// this is just to make sure that it will always stay this way.)
+</span><span class="attribute">#![deny(clippy::float_cmp)]
 
-<span class="macro">cfg_if::cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nalgebra_0_31&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nalgebra_0_31</span> <span class="kw">as</span> <span class="ident">nalgebra</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nalgebra_0_30&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nalgebra_0_30</span> <span class="kw">as</span> <span class="ident">nalgebra</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nalgebra_0_29&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nalgebra_0_29</span> <span class="kw">as</span> <span class="ident">nalgebra</span>;
+</span><span class="macro">cfg_if::cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;nalgebra_0_31&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>nalgebra_0_31 <span class="kw">as </span>nalgebra;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;nalgebra_0_30&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>nalgebra_0_30 <span class="kw">as </span>nalgebra;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;nalgebra_0_29&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>nalgebra_0_29 <span class="kw">as </span>nalgebra;
     }
 }
 
-<span class="macro">cfg_if::cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarray_0_15&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ndarray_0_15</span> <span class="kw">as</span> <span class="ident">ndarray</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarray_0_14&quot;</span>)]</span>  {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ndarray_0_14</span> <span class="kw">as</span> <span class="ident">ndarray</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarray_0_13&quot;</span>)]</span>  {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ndarray_0_13</span> <span class="kw">as</span> <span class="ident">ndarray</span>;
+<span class="macro">cfg_if::cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;ndarray_0_15&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>ndarray_0_15 <span class="kw">as </span>ndarray;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;ndarray_0_14&quot;</span>)]  </span>{
+        <span class="kw">extern crate </span>ndarray_0_14 <span class="kw">as </span>ndarray;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;ndarray_0_13&quot;</span>)]  </span>{
+        <span class="kw">extern crate </span>ndarray_0_13 <span class="kw">as </span>ndarray;
     }
 }
 
-<span class="macro">cfg_if::cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarray-linalg_0_14&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ndarray_linalg_0_14</span> <span class="kw">as</span> <span class="ident">ndarray_linalg</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarray-linalg_0_13&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ndarray_linalg_0_13</span> <span class="kw">as</span> <span class="ident">ndarray_linalg</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarray-linalg_0_12&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ndarray_linalg_0_12</span> <span class="kw">as</span> <span class="ident">ndarray_linalg</span>;
+<span class="macro">cfg_if::cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;ndarray-linalg_0_14&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>ndarray_linalg_0_14 <span class="kw">as </span>ndarray_linalg;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;ndarray-linalg_0_13&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>ndarray_linalg_0_13 <span class="kw">as </span>ndarray_linalg;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;ndarray-linalg_0_12&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>ndarray_linalg_0_12 <span class="kw">as </span>ndarray_linalg;
     }
 }
 
-<span class="macro">cfg_if::cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;num-complex_0_2&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">num_complex_0_2</span> <span class="kw">as</span> <span class="ident">num_complex</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;num-complex_0_3&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">num_complex_0_3</span> <span class="kw">as</span> <span class="ident">num_complex</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;num-complex_0_4&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">num_complex_0_4</span> <span class="kw">as</span> <span class="ident">num_complex</span>;
+<span class="macro">cfg_if::cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;num-complex_0_2&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>num_complex_0_2 <span class="kw">as </span>num_complex;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;num-complex_0_3&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>num_complex_0_3 <span class="kw">as </span>num_complex;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;num-complex_0_4&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>num_complex_0_4 <span class="kw">as </span>num_complex;
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;primitives&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">primitives</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;primitives&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::primitives</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;primitives&quot;</span>)]
+</span><span class="kw">mod </span>primitives;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;primitives&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::primitives::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarray_all&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">ndarray_m</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ndarray_all&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ndarray_m</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;ndarray_all&quot;</span>)]
+</span><span class="kw">mod </span>ndarray_m;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;ndarray_all&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::ndarray_m::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nalgebra_all&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">nalgebra_m</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nalgebra_all&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::nalgebra_m</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;nalgebra_all&quot;</span>)]
+</span><span class="kw">mod </span>nalgebra_m;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;nalgebra_all&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::nalgebra_m::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vec&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">vec</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vec&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vec</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;vec&quot;</span>)]
+</span><span class="kw">mod </span>vec;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;vec&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::vec::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">anyhow::Error</span>;
+<span class="kw">use </span>anyhow::Error;
 
-<span class="doccomment">/// Dot/scalar product of `T` and `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Dot/scalar product of `T` and `self`</span>
-    <span class="kw">fn</span> <span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">U</span>;
+<span class="doccomment">/// Dot/scalar product of `T` and `self`
+</span><span class="kw">pub trait </span>ArgminDot&lt;T, U&gt; {
+    <span class="doccomment">/// Dot/scalar product of `T` and `self`
+    </span><span class="kw">fn </span>dot(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; U;
 }
 
-<span class="doccomment">/// Dot/scalar product of `T` and `self` weighted by W (p^TWv)</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Dot/scalar product of `T` and `self`</span>
-    <span class="kw">fn</span> <span class="ident">weighted_dot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="ident">V</span>, <span class="ident">vec</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">U</span>;
+<span class="doccomment">/// Dot/scalar product of `T` and `self` weighted by W (p^TWv)
+</span><span class="kw">pub trait </span>ArgminWeightedDot&lt;T, U, V&gt; {
+    <span class="doccomment">/// Dot/scalar product of `T` and `self`
+    </span><span class="kw">fn </span>weighted_dot(<span class="kw-2">&amp;</span><span class="self">self</span>, w: <span class="kw-2">&amp;</span>V, vec: <span class="kw-2">&amp;</span>T) -&gt; U;
 }
 
-<span class="doccomment">/// Return param vector of all zeros (for now, this is a hack. It should be done better)</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminZero</span> {
-    <span class="doccomment">/// Return zero(s)</span>
-    <span class="kw">fn</span> <span class="ident">zero</span>() -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// Return param vector of all zeros (for now, this is a hack. It should be done better)
+</span><span class="kw">pub trait </span>ArgminZero {
+    <span class="doccomment">/// Return zero(s)
+    </span><span class="kw">fn </span>zero() -&gt; <span class="self">Self</span>;
 }
 
-<span class="doccomment">/// Return the conjugate</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminConj</span> {
-    <span class="doccomment">/// Return conjugate</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">fn</span> <span class="ident">conj</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// Return the conjugate
+</span><span class="kw">pub trait </span>ArgminConj {
+    <span class="doccomment">/// Return conjugate
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">fn </span>conj(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>;
 }
 
-<span class="doccomment">/// Zero for dynamically sized objects</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminZeroLike</span> {
-    <span class="doccomment">/// Return zero(s)</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">fn</span> <span class="ident">zero_like</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// Zero for dynamically sized objects
+</span><span class="kw">pub trait </span>ArgminZeroLike {
+    <span class="doccomment">/// Return zero(s)
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">fn </span>zero_like(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>;
 }
 
-<span class="doccomment">/// Identity matrix</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminEye</span> {
-    <span class="doccomment">/// Identity matrix of size `n`</span>
-    <span class="kw">fn</span> <span class="ident">eye</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span>;
-    <span class="doccomment">/// Identity matrix of same size as `self`</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eye_like</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// Identity matrix
+</span><span class="kw">pub trait </span>ArgminEye {
+    <span class="doccomment">/// Identity matrix of size `n`
+    </span><span class="kw">fn </span>eye(n: usize) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Identity matrix of same size as `self`
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">fn </span>eye_like(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>;
 }
 
-<span class="doccomment">/// Add a `T` to `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Add a `T` to `self`</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">U</span>;
+<span class="doccomment">/// Add a `T` to `self`
+</span><span class="kw">pub trait </span>ArgminAdd&lt;T, U&gt; {
+    <span class="doccomment">/// Add a `T` to `self`
+    </span><span class="kw">fn </span>add(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; U;
 }
 
-<span class="doccomment">/// Subtract a `T` from `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Subtract a `T` from `self`</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">U</span>;
+<span class="doccomment">/// Subtract a `T` from `self`
+</span><span class="kw">pub trait </span>ArgminSub&lt;T, U&gt; {
+    <span class="doccomment">/// Subtract a `T` from `self`
+    </span><span class="kw">fn </span>sub(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; U;
 }
 
-<span class="doccomment">/// (Pointwise) Multiply a `T` with `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// (Pointwise) Multiply a `T` with `self`</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">U</span>;
+<span class="doccomment">/// (Pointwise) Multiply a `T` with `self`
+</span><span class="kw">pub trait </span>ArgminMul&lt;T, U&gt; {
+    <span class="doccomment">/// (Pointwise) Multiply a `T` with `self`
+    </span><span class="kw">fn </span>mul(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; U;
 }
 
-<span class="doccomment">/// (Pointwise) Divide a `T` by `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminDiv</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// (Pointwise) Divide a `T` by `self`</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">U</span>;
+<span class="doccomment">/// (Pointwise) Divide a `T` by `self`
+</span><span class="kw">pub trait </span>ArgminDiv&lt;T, U&gt; {
+    <span class="doccomment">/// (Pointwise) Divide a `T` by `self`
+    </span><span class="kw">fn </span>div(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; U;
 }
 
-<span class="doccomment">/// Add a `T` scaled by an `U` to `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Add a `T` scaled by an `U` to `self`</span>
-    <span class="kw">fn</span> <span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">factor</span>: <span class="kw-2">&amp;</span><span class="ident">U</span>, <span class="ident">vec</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">V</span>;
+<span class="doccomment">/// Add a `T` scaled by an `U` to `self`
+</span><span class="kw">pub trait </span>ArgminScaledAdd&lt;T, U, V&gt; {
+    <span class="doccomment">/// Add a `T` scaled by an `U` to `self`
+    </span><span class="kw">fn </span>scaled_add(<span class="kw-2">&amp;</span><span class="self">self</span>, factor: <span class="kw-2">&amp;</span>U, vec: <span class="kw-2">&amp;</span>T) -&gt; V;
 }
 
-<span class="doccomment">/// Subtract a `T` scaled by an `U` from `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Subtract a `T` scaled by an `U` from `self`</span>
-    <span class="kw">fn</span> <span class="ident">scaled_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">factor</span>: <span class="kw-2">&amp;</span><span class="ident">U</span>, <span class="ident">vec</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">V</span>;
+<span class="doccomment">/// Subtract a `T` scaled by an `U` from `self`
+</span><span class="kw">pub trait </span>ArgminScaledSub&lt;T, U, V&gt; {
+    <span class="doccomment">/// Subtract a `T` scaled by an `U` from `self`
+    </span><span class="kw">fn </span>scaled_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, factor: <span class="kw-2">&amp;</span>U, vec: <span class="kw-2">&amp;</span>T) -&gt; V;
 }
 
-<span class="doccomment">/// Compute the l1-norm (`U`) of `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminL1Norm</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Compute the l1-norm (`U`) of `self`</span>
-    <span class="kw">fn</span> <span class="ident">l1_norm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">U</span>;
+<span class="doccomment">/// Compute the l1-norm (`U`) of `self`
+</span><span class="kw">pub trait </span>ArgminL1Norm&lt;U&gt; {
+    <span class="doccomment">/// Compute the l1-norm (`U`) of `self`
+    </span><span class="kw">fn </span>l1_norm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; U;
 }
 
-<span class="doccomment">/// Compute the l2-norm (`U`) of `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Compute the l2-norm (`U`) of `self`</span>
-    <span class="kw">fn</span> <span class="ident">l2_norm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">U</span>;
+<span class="doccomment">/// Compute the l2-norm (`U`) of `self`
+</span><span class="kw">pub trait </span>ArgminL2Norm&lt;U&gt; {
+    <span class="doccomment">/// Compute the l2-norm (`U`) of `self`
+    </span><span class="kw">fn </span>l2_norm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; U;
 }
 
-<span class="comment">// Sub-optimal: self is moved. ndarray however offers array views...</span>
-<span class="doccomment">/// Return the transpose (`U`) of `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminTranspose</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Transpose</span>
-    <span class="kw">fn</span> <span class="ident">t</span>(<span class="self">self</span>) -&gt; <span class="ident">U</span>;
+<span class="comment">// Sub-optimal: self is moved. ndarray however offers array views...
+</span><span class="doccomment">/// Return the transpose (`U`) of `self`
+</span><span class="kw">pub trait </span>ArgminTranspose&lt;U&gt; {
+    <span class="doccomment">/// Transpose
+    </span><span class="kw">fn </span>t(<span class="self">self</span>) -&gt; U;
 }
 
-<span class="doccomment">/// Compute the inverse (`T`) of `self`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminInv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Compute the inverse</span>
-    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Compute the inverse (`T`) of `self`
+</span><span class="kw">pub trait </span>ArgminInv&lt;T&gt; {
+    <span class="doccomment">/// Compute the inverse
+    </span><span class="kw">fn </span>inv(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;;
 }
 
-<span class="doccomment">/// Create a random number</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminRandom</span> {
-    <span class="doccomment">/// Get a random element between min and max,</span>
-    <span class="kw">fn</span> <span class="ident">rand_from_range</span>(<span class="ident">min</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">max</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// Create a random number
+</span><span class="kw">pub trait </span>ArgminRandom {
+    <span class="doccomment">/// Get a random element between min and max,
+    </span><span class="kw">fn </span>rand_from_range(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>;
 }
 
-<span class="doccomment">/// Minimum and Maximum of type `T`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminMinMax</span> {
-    <span class="doccomment">/// Select piecewise minimum</span>
-    <span class="kw">fn</span> <span class="ident">min</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>;
-    <span class="doccomment">/// Select piecewise maximum</span>
-    <span class="kw">fn</span> <span class="ident">max</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// Minimum and Maximum of type `T`
+</span><span class="kw">pub trait </span>ArgminMinMax {
+    <span class="doccomment">/// Select piecewise minimum
+    </span><span class="kw">fn </span>min(x: <span class="kw-2">&amp;</span><span class="self">Self</span>, y: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Select piecewise maximum
+    </span><span class="kw">fn </span>max(x: <span class="kw-2">&amp;</span><span class="self">Self</span>, y: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>;
 }
 
-<span class="doccomment">/// Returns a number that represents the sign of `self`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminSignum</span> {
-    <span class="doccomment">/// Returns a number that represents the sign of `self`.</span>
-    <span class="kw">fn</span> <span class="ident">signum</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// Returns a number that represents the sign of `self`.
+</span><span class="kw">pub trait </span>ArgminSignum {
+    <span class="doccomment">/// Returns a number that represents the sign of `self`.
+    </span><span class="kw">fn </span>signum(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="argmin_math" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="argmin_math" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

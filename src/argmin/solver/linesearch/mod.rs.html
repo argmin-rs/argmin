@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -85,92 +85,92 @@
 <span id="85">85</span>
 <span id="86">86</span>
 <span id="87">87</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # Line search methods</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Line searches are given a position in parameter space and a direction. They obtain a step</span>
-<span class="doccomment">//! length in this direction which fulfills a given set of [acceptance conditions](`condition`).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These methods are often an integral part of other methods, such as gradient descent.</span>
-<span class="doccomment">//! Each algorithm which implements the [`LineSearch`] trait can be used in these optimization</span>
-<span class="doccomment">//! methods.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Available line searches</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [Backtracking line search](`BacktrackingLineSearch`)</span>
-<span class="doccomment">//! * [More-Thuente line search](`MoreThuenteLineSearch`)</span>
-<span class="doccomment">//! * [Hager-Zhang line search](`HagerZhangLineSearch`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## References</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">//! Springer. ISBN 0-387-30303-0.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! \[1\] Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient</span>
-<span class="doccomment">//! decrease.&quot; ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.</span>
-<span class="doccomment">//! DOI: &lt;https://doi.org/10.1145/192115.192132&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! \[2\] William W. Hager and Hongchao Zhang. &quot;A new conjugate gradient method with guaranteed</span>
-<span class="doccomment">//! descent and an efficient line search.&quot; SIAM J. Optim. 16(1), 2006, 170-192.</span>
-<span class="doccomment">//! DOI: &lt;https://doi.org/10.1137/030601880&gt;</span>
+</span><span class="doccomment">//! # Line search methods
+//!
+//! Line searches are given a position in parameter space and a direction. They obtain a step
+//! length in this direction which fulfills a given set of [acceptance conditions](`condition`).
+//!
+//! These methods are often an integral part of other methods, such as gradient descent.
+//! Each algorithm which implements the [`LineSearch`] trait can be used in these optimization
+//! methods.
+//!
+//! ## Available line searches
+//!
+//! * [Backtracking line search](`BacktrackingLineSearch`)
+//! * [More-Thuente line search](`MoreThuenteLineSearch`)
+//! * [Hager-Zhang line search](`HagerZhangLineSearch`)
+//!
+//! ## References
+//!
+//! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+//! Springer. ISBN 0-387-30303-0.
+//!
+//! \[1\] Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient
+//! decrease.&quot; ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
+//! DOI: &lt;https://doi.org/10.1145/192115.192132&gt;
+//!
+//! \[2\] William W. Hager and Hongchao Zhang. &quot;A new conjugate gradient method with guaranteed
+//! descent and an efficient line search.&quot; SIAM J. Optim. 16(1), 2006, 170-192.
+//! DOI: &lt;https://doi.org/10.1137/030601880&gt;
 
-<span class="kw">mod</span> <span class="ident">backtracking</span>;
-<span class="doccomment">/// Acceptance conditions</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">condition</span>;
-<span class="kw">mod</span> <span class="ident">hagerzhang</span>;
-<span class="kw">mod</span> <span class="ident">morethuente</span>;
+</span><span class="kw">mod </span>backtracking;
+<span class="doccomment">/// Acceptance conditions
+</span><span class="kw">pub mod </span>condition;
+<span class="kw">mod </span>hagerzhang;
+<span class="kw">mod </span>morethuente;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::backtracking::BacktrackingLineSearch</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::hagerzhang::HagerZhangLineSearch</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::morethuente::MoreThuenteLineSearch</span>;
+<span class="kw">pub use </span><span class="self">self</span>::backtracking::BacktrackingLineSearch;
+<span class="kw">pub use </span><span class="self">self</span>::hagerzhang::HagerZhangLineSearch;
+<span class="kw">pub use </span><span class="self">self</span>::morethuente::MoreThuenteLineSearch;
 
-<span class="doccomment">/// # Line search trait</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For a method to be used as a line search, it has to implement this trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It enables the optimization method to set the search direction and the initial step length of</span>
-<span class="doccomment">/// the line search.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::solver::linesearch::LineSearch;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct MyLineSearch&lt;P, F&gt; {</span>
-<span class="doccomment">///     // `P` is the type of the search direction, typically the same as the parameter vector</span>
-<span class="doccomment">///     search_direction: P,</span>
-<span class="doccomment">///     // `F` is a floating point value (f32 or f64)</span>
-<span class="doccomment">///     init_step_length: F,</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl&lt;P, F&gt; LineSearch&lt;P, F&gt; for MyLineSearch&lt;P, F&gt; {</span>
-<span class="doccomment">///     fn search_direction(&amp;mut self, direction: P) {</span>
-<span class="doccomment">///         self.search_direction = direction;</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     fn initial_step_length(&amp;mut self, step_length: F) -&gt; Result&lt;(), argmin::core::Error&gt; {</span>
-<span class="doccomment">///         self.init_step_length = step_length;</span>
-<span class="doccomment">///         Ok(())</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Set the search direction</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the direction in which the line search will be performed.</span>
-    <span class="kw">fn</span> <span class="ident">search_direction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">P</span>);
+<span class="doccomment">/// # Line search trait
+///
+/// For a method to be used as a line search, it has to implement this trait.
+///
+/// It enables the optimization method to set the search direction and the initial step length of
+/// the line search.
+///
+/// ## Example
+///
+/// ```
+/// use argmin::solver::linesearch::LineSearch;
+///
+/// struct MyLineSearch&lt;P, F&gt; {
+///     // `P` is the type of the search direction, typically the same as the parameter vector
+///     search_direction: P,
+///     // `F` is a floating point value (f32 or f64)
+///     init_step_length: F,
+///     // ...
+/// }
+///
+/// impl&lt;P, F&gt; LineSearch&lt;P, F&gt; for MyLineSearch&lt;P, F&gt; {
+///     fn search_direction(&amp;mut self, direction: P) {
+///         self.search_direction = direction;
+///     }
+///
+///     fn initial_step_length(&amp;mut self, step_length: F) -&gt; Result&lt;(), argmin::core::Error&gt; {
+///         self.init_step_length = step_length;
+///         Ok(())
+///     }
+/// }
+/// ```
+</span><span class="kw">pub trait </span>LineSearch&lt;P, F&gt; {
+    <span class="doccomment">/// Set the search direction
+    ///
+    /// This is the direction in which the line search will be performed.
+    </span><span class="kw">fn </span>search_direction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, direction: P);
 
-    <span class="doccomment">/// Set the initial step length</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This indicates the first step length which will be tried.</span>
-    <span class="kw">fn</span> <span class="ident">initial_step_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">step_length</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">crate</span>::core::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Set the initial step length
+    ///
+    /// This indicates the first step length which will be tried.
+    </span><span class="kw">fn </span>initial_step_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, step_length: F) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw">crate</span>::core::Error&gt;;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

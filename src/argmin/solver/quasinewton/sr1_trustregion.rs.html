@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/quasinewton/sr1_trustregion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sr1_trustregion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/quasinewton/sr1_trustregion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sr1_trustregion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -559,566 +559,566 @@
 <span id="559">559</span>
 <span id="560">560</span>
 <span id="561">561</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2019-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2019-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>, <span class="ident">Hessian</span>,
-    <span class="ident">IterState</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>,
-    <span class="ident">TrustRegionRadius</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
+    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
+    TrustRegionRadius, KV,
 };
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{
-    <span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminL2Norm</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminSub</span>, <span class="ident">ArgminWeightedDot</span>, <span class="ident">ArgminZeroLike</span>,
+<span class="kw">use </span>argmin_math::{
+    ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// # SR1 Trust region method</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A Quasi-Newton method which uses symmetric rank 1 (SR1) updating of the Hessian in a trust</span>
-<span class="doccomment">/// region framework. An initial parameter vector must be provided, initial cost, gradient and</span>
-<span class="doccomment">/// Hessian are optional and will be computed if not provided.</span>
-<span class="doccomment">/// Requires a [trust region sub problem](`crate::solver::trustregion`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`], [`Gradient`] and</span>
-<span class="doccomment">/// [`Hessian`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Reference</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// parameter for skipping rule</span>
-    <span class="ident">denominator_factor</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// subproblem</span>
-    <span class="ident">subproblem</span>: <span class="ident">R</span>,
-    <span class="doccomment">/// Radius</span>
-    <span class="ident">radius</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// eta \in (0, 10^-3)</span>
-    <span class="ident">eta</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Tolerance for the stopping criterion based on the change of the norm on the gradient</span>
-    <span class="ident">tol_grad</span>: <span class="ident">F</span>,
+<span class="doccomment">/// # SR1 Trust region method
+///
+/// A Quasi-Newton method which uses symmetric rank 1 (SR1) updating of the Hessian in a trust
+/// region framework. An initial parameter vector must be provided, initial cost, gradient and
+/// Hessian are optional and will be computed if not provided.
+/// Requires a [trust region sub problem](`crate::solver::trustregion`).
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`], [`Gradient`] and
+/// [`Hessian`].
+///
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>SR1TrustRegion&lt;R, F&gt; {
+    <span class="doccomment">/// parameter for skipping rule
+    </span>denominator_factor: F,
+    <span class="doccomment">/// subproblem
+    </span>subproblem: R,
+    <span class="doccomment">/// Radius
+    </span>radius: F,
+    <span class="doccomment">/// eta \in (0, 10^-3)
+    </span>eta: F,
+    <span class="doccomment">/// Tolerance for the stopping criterion based on the change of the norm on the gradient
+    </span>tol_grad: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;R, F&gt; SR1TrustRegion&lt;R, F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`SR1TrustRegion`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::quasinewton::SR1TrustRegion;</span>
-    <span class="doccomment">/// # let subproblem = ();</span>
-    <span class="doccomment">/// let subproblem = argmin::solver::trustregion::Steihaug::new().with_max_iters(20);</span>
-    <span class="doccomment">/// # // The next line defines the type of `subproblem`. This is done here hidden in order to</span>
-    <span class="doccomment">/// # // not litter the docs. When all of this is fed into an Executor, the compiler will</span>
-    <span class="doccomment">/// # // figure out the types.</span>
-    <span class="doccomment">/// # let subproblem: argmin::solver::trustregion::Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = subproblem;</span>
-    <span class="doccomment">/// let sr1: SR1TrustRegion&lt;_, f64&gt; = SR1TrustRegion::new(subproblem);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">subproblem</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SR1TrustRegion</span> {
-            <span class="ident">denominator_factor</span>: <span class="macro">float!</span>(<span class="number">1e-8</span>),
-            <span class="ident">subproblem</span>,
-            <span class="ident">radius</span>: <span class="macro">float!</span>(<span class="number">1.0</span>),
-            <span class="ident">eta</span>: <span class="macro">float!</span>(<span class="number">0.5</span> <span class="op">*</span> <span class="number">1e-3</span>),
-            <span class="ident">tol_grad</span>: <span class="macro">float!</span>(<span class="number">1e-3</span>),
+    <span class="doccomment">/// Construct a new instance of [`SR1TrustRegion`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::quasinewton::SR1TrustRegion;
+    /// # let subproblem = ();
+    /// let subproblem = argmin::solver::trustregion::Steihaug::new().with_max_iters(20);
+    /// # // The next line defines the type of `subproblem`. This is done here hidden in order to
+    /// # // not litter the docs. When all of this is fed into an Executor, the compiler will
+    /// # // figure out the types.
+    /// # let subproblem: argmin::solver::trustregion::Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = subproblem;
+    /// let sr1: SR1TrustRegion&lt;_, f64&gt; = SR1TrustRegion::new(subproblem);
+    /// ```
+    </span><span class="kw">pub fn </span>new(subproblem: R) -&gt; <span class="self">Self </span>{
+        SR1TrustRegion {
+            denominator_factor: <span class="macro">float!</span>(<span class="number">1e-8</span>),
+            subproblem,
+            radius: <span class="macro">float!</span>(<span class="number">1.0</span>),
+            eta: <span class="macro">float!</span>(<span class="number">0.5 </span>* <span class="number">1e-3</span>),
+            tol_grad: <span class="macro">float!</span>(<span class="number">1e-3</span>),
         }
     }
 
-    <span class="doccomment">/// Set denominator factor</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the denominator of the update is below the `demoninator_factor` (scaled with other</span>
-    <span class="doccomment">/// factors derived from the parameter vectors and the gradients), then the update of the</span>
-    <span class="doccomment">/// inverse Hessian will be skipped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be in `(0, 1)` and defaults to `1e-8`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::quasinewton::SR1TrustRegion;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let subproblem = ();</span>
-    <span class="doccomment">/// let sr1: SR1TrustRegion&lt;_, f64&gt; = SR1TrustRegion::new(subproblem).with_denominator_factor(1e-7)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_denominator_factor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">denominator_factor</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">denominator_factor</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">denominator_factor</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`SR1TrustRegion`: denominator_factor must be in (0, 1).&quot;</span>
-            ));
+    <span class="doccomment">/// Set denominator factor
+    ///
+    /// If the denominator of the update is below the `demoninator_factor` (scaled with other
+    /// factors derived from the parameter vectors and the gradients), then the update of the
+    /// inverse Hessian will be skipped.
+    ///
+    /// Must be in `(0, 1)` and defaults to `1e-8`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::quasinewton::SR1TrustRegion;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let subproblem = ();
+    /// let sr1: SR1TrustRegion&lt;_, f64&gt; = SR1TrustRegion::new(subproblem).with_denominator_factor(1e-7)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_denominator_factor(<span class="kw-2">mut </span><span class="self">self</span>, denominator_factor: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>denominator_factor &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || denominator_factor &gt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`SR1TrustRegion`: denominator_factor must be in (0, 1).&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">denominator_factor</span> <span class="op">=</span> <span class="ident">denominator_factor</span>;
+        <span class="self">self</span>.denominator_factor = denominator_factor;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set initial radius</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to 1.0.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::quasinewton::SR1TrustRegion;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let subproblem = ();</span>
-    <span class="doccomment">/// let sr1: SR1TrustRegion&lt;_, f64&gt; = SR1TrustRegion::new(subproblem).with_radius(2.0);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_radius</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">radius</span> <span class="op">=</span> <span class="ident">radius</span>.<span class="ident">abs</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set initial radius
+    ///
+    /// Defaults to 1.0.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::quasinewton::SR1TrustRegion;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let subproblem = ();
+    /// let sr1: SR1TrustRegion&lt;_, f64&gt; = SR1TrustRegion::new(subproblem).with_radius(2.0);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>with_radius(<span class="kw-2">mut </span><span class="self">self</span>, radius: F) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.radius = radius.abs();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set eta</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A step is taken if the actual reduction over the predicted reduction exceeds eta.</span>
-    <span class="doccomment">/// Must be in (0, 10^-3) and defaults to 0.5 * 10^-3.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::quasinewton::SR1TrustRegion;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let subproblem = ();</span>
-    <span class="doccomment">/// let sr1: SR1TrustRegion&lt;_, f64&gt; = SR1TrustRegion::new(subproblem).with_eta(10e-4)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_eta</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eta</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">eta</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">10e-3</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">eta</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;SR1TrustRegion: eta must be in (0, 10^-3).&quot;</span>
-            ));
+    <span class="doccomment">/// Set eta
+    ///
+    /// A step is taken if the actual reduction over the predicted reduction exceeds eta.
+    /// Must be in (0, 10^-3) and defaults to 0.5 * 10^-3.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::quasinewton::SR1TrustRegion;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let subproblem = ();
+    /// let sr1: SR1TrustRegion&lt;_, f64&gt; = SR1TrustRegion::new(subproblem).with_eta(10e-4)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_eta(<span class="kw-2">mut </span><span class="self">self</span>, eta: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>eta &gt;= <span class="macro">float!</span>(<span class="number">10e-3</span>) || eta &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;SR1TrustRegion: eta must be in (0, 10^-3).&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">eta</span> <span class="op">=</span> <span class="ident">eta</span>;
+        <span class="self">self</span>.eta = eta;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// The algorithm stops if the norm of the gradient is below `tol_grad`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The provided value must be non-negative. Defaults to `10^-3`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::quasinewton::SR1TrustRegion;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let subproblem = ();</span>
-    <span class="doccomment">/// let sr1: SR1TrustRegion&lt;_, f64&gt; = SR1TrustRegion::new(subproblem).with_tolerance_grad(1e-6)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance_grad</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol_grad</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">tol_grad</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`SR1TrustRegion`: gradient tolerance must be &gt;= 0.&quot;</span>
-            ));
+    <span class="doccomment">/// The algorithm stops if the norm of the gradient is below `tol_grad`.
+    ///
+    /// The provided value must be non-negative. Defaults to `10^-3`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::quasinewton::SR1TrustRegion;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let subproblem = ();
+    /// let sr1: SR1TrustRegion&lt;_, f64&gt; = SR1TrustRegion::new(subproblem).with_tolerance_grad(1e-6)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_tolerance_grad(<span class="kw-2">mut </span><span class="self">self</span>, tol_grad: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>tol_grad &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`SR1TrustRegion`: gradient tolerance must be &gt;= 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">tol_grad</span> <span class="op">=</span> <span class="ident">tol_grad</span>;
+        <span class="self">self</span>.tol_grad = tol_grad;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span>, <span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Hessian</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">B</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminZeroLike</span>,
-    <span class="ident">G</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">B</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>,
-    <span class="ident">R</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">TrustRegionRadius</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span> <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;O, R, P, G, B, F&gt; Solver&lt;O, IterState&lt;P, G, (), B, F&gt;&gt; <span class="kw">for </span>SR1TrustRegion&lt;R, F&gt;
+<span class="kw">where
+    </span>O: CostFunction&lt;Param = P, Output = F&gt;
+        + Gradient&lt;Param = P, Gradient = G&gt;
+        + Hessian&lt;Param = P, Hessian = B&gt;,
+    P: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminSub&lt;P, P&gt;
+        + ArgminAdd&lt;P, P&gt;
+        + ArgminDot&lt;P, F&gt;
+        + ArgminDot&lt;P, B&gt;
+        + ArgminL2Norm&lt;F&gt;
+        + ArgminZeroLike,
+    G: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminL2Norm&lt;F&gt;
+        + ArgminDot&lt;P, F&gt;
+        + ArgminSub&lt;G, P&gt;,
+    B: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminDot&lt;P, P&gt;
+        + ArgminAdd&lt;B, B&gt;
+        + ArgminMul&lt;F, B&gt;,
+    R: Clone + TrustRegionRadius&lt;F&gt; + Solver&lt;O, IterState&lt;P, G, (), B, F&gt;&gt;,
+    F: ArgminFloat + ArgminL2Norm&lt;F&gt;,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;SR1 trust region&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;SR1 trust region&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), B, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), B, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`SR1TrustRegion` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cost</span>.<span class="ident">is_infinite</span>() {
-            <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">cost</span>
+        <span class="kw">let </span>cost = state.get_cost();
+        <span class="kw">let </span>cost = <span class="kw">if </span>cost.is_infinite() {
+            problem.cost(<span class="kw-2">&amp;</span>param)<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            cost
         };
 
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">state</span>
-            .<span class="ident">take_gradient</span>()
-            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>grad = state
+            .take_gradient()
+            .map(Result::Ok)
+            .unwrap_or_else(|| problem.gradient(<span class="kw-2">&amp;</span>param))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="ident">state</span>
-            .<span class="ident">take_hessian</span>()
-            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>hessian = state
+            .take_hessian()
+            .map(Result::Ok)
+            .unwrap_or_else(|| problem.hessian(<span class="kw-2">&amp;</span>param))<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>
-                .<span class="ident">param</span>(<span class="ident">param</span>)
-                .<span class="ident">cost</span>(<span class="ident">cost</span>)
-                .<span class="ident">gradient</span>(<span class="ident">grad</span>)
-                .<span class="ident">hessian</span>(<span class="ident">hessian</span>),
+            state
+                .param(param)
+                .cost(cost)
+                .gradient(grad)
+                .hessian(hessian),
             <span class="prelude-val">None</span>,
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`SR1TrustRegion`: Parameter vector in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), B, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), B, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>xk = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`SR1TrustRegion`: Parameter vector in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
+        <span class="kw">let </span>cost = state.get_cost();
 
-        <span class="kw">let</span> <span class="ident">prev_grad</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_gradient</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`SR1TrustRegion`: Gradient in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>prev_grad = state.take_gradient().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`SR1TrustRegion`: Gradient in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_hessian</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`SR1TrustRegion`: Hessian in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>hessian = state.take_hessian().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`SR1TrustRegion`: Hessian in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">subproblem</span>.<span class="ident">set_radius</span>(<span class="self">self</span>.<span class="ident">radius</span>);
+        <span class="self">self</span>.subproblem.set_radius(<span class="self">self</span>.radius);
 
-        <span class="kw">let</span> <span class="ident">OptimizationResult</span> {
-            <span class="ident">problem</span>: <span class="ident">sub_problem</span>,
-            <span class="ident">state</span>: <span class="kw-2">mut</span> <span class="ident">sub_state</span>,
+        <span class="kw">let </span>OptimizationResult {
+            problem: sub_problem,
+            state: <span class="kw-2">mut </span>sub_state,
             ..
-        } <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>.<span class="ident">take_problem</span>().<span class="ident">unwrap</span>(), <span class="self">self</span>.<span class="ident">subproblem</span>.<span class="ident">clone</span>())
-            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
-                <span class="ident">config</span>
-                    .<span class="ident">param</span>(<span class="ident">xk</span>.<span class="ident">zero_like</span>())
-                    .<span class="ident">hessian</span>(<span class="ident">hessian</span>.<span class="ident">clone</span>())
-                    .<span class="ident">gradient</span>(<span class="ident">prev_grad</span>.<span class="ident">clone</span>())
-                    .<span class="ident">cost</span>(<span class="ident">cost</span>)
+        } = Executor::new(problem.take_problem().unwrap(), <span class="self">self</span>.subproblem.clone())
+            .configure(|config| {
+                config
+                    .param(xk.zero_like())
+                    .hessian(hessian.clone())
+                    .gradient(prev_grad.clone())
+                    .cost(cost)
             })
-            .<span class="ident">ctrlc</span>(<span class="bool-val">false</span>)
-            .<span class="ident">run</span>()<span class="question-mark">?</span>;
+            .ctrlc(<span class="bool-val">false</span>)
+            .run()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">sk</span> <span class="op">=</span> <span class="ident">sub_state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`SR1TrustRegion`: No parameters returned by line search.&quot;</span>
-        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>sk = sub_state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`SR1TrustRegion`: No parameters returned by line search.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="ident">problem</span>.<span class="ident">consume_problem</span>(<span class="ident">sub_problem</span>);
+        problem.consume_problem(sub_problem);
 
-        <span class="kw">let</span> <span class="ident">xksk</span> <span class="op">=</span> <span class="ident">xk</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
-        <span class="kw">let</span> <span class="ident">dfk1</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xksk</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">yk</span> <span class="op">=</span> <span class="ident">dfk1</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>);
-        <span class="kw">let</span> <span class="ident">fk1</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">xksk</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>xksk = xk.add(<span class="kw-2">&amp;</span>sk);
+        <span class="kw">let </span>dfk1 = problem.gradient(<span class="kw-2">&amp;</span>xksk)<span class="question-mark">?</span>;
+        <span class="kw">let </span>yk = dfk1.sub(<span class="kw-2">&amp;</span>prev_grad);
+        <span class="kw">let </span>fk1 = problem.cost(<span class="kw-2">&amp;</span>xksk)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">ared</span> <span class="op">=</span> <span class="ident">cost</span> <span class="op">-</span> <span class="ident">fk1</span>;
-        <span class="kw">let</span> <span class="ident">tmp1</span>: <span class="ident">F</span> <span class="op">=</span> <span class="ident">prev_grad</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
-        <span class="kw">let</span> <span class="ident">tmp2</span>: <span class="ident">F</span> <span class="op">=</span> <span class="ident">sk</span>.<span class="ident">weighted_dot</span>(<span class="kw-2">&amp;</span><span class="ident">hessian</span>, <span class="kw-2">&amp;</span><span class="ident">sk</span>);
-        <span class="kw">let</span> <span class="ident">tmp2</span>: <span class="ident">F</span> <span class="op">=</span> <span class="ident">tmp2</span>.<span class="ident">mul</span>(<span class="macro">float!</span>(<span class="number">0.5</span>));
-        <span class="kw">let</span> <span class="ident">pred</span> <span class="op">=</span> <span class="op">-</span><span class="ident">tmp1</span> <span class="op">-</span> <span class="ident">tmp2</span>;
-        <span class="kw">let</span> <span class="ident">ap</span> <span class="op">=</span> <span class="ident">ared</span> <span class="op">/</span> <span class="ident">pred</span>;
+        <span class="kw">let </span>ared = cost - fk1;
+        <span class="kw">let </span>tmp1: F = prev_grad.dot(<span class="kw-2">&amp;</span>sk);
+        <span class="kw">let </span>tmp2: F = sk.weighted_dot(<span class="kw-2">&amp;</span>hessian, <span class="kw-2">&amp;</span>sk);
+        <span class="kw">let </span>tmp2: F = tmp2.mul(<span class="macro">float!</span>(<span class="number">0.5</span>));
+        <span class="kw">let </span>pred = -tmp1 - tmp2;
+        <span class="kw">let </span>ap = ared / pred;
 
-        <span class="kw">let</span> (<span class="ident">xk1</span>, <span class="ident">fk1</span>, <span class="ident">dfk1</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">ap</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">eta</span> {
-            (<span class="ident">xksk</span>, <span class="ident">fk1</span>, <span class="ident">dfk1</span>)
-        } <span class="kw">else</span> {
-            (<span class="ident">xk</span>, <span class="ident">cost</span>, <span class="ident">prev_grad</span>)
+        <span class="kw">let </span>(xk1, fk1, dfk1) = <span class="kw">if </span>ap &gt; <span class="self">self</span>.eta {
+            (xksk, fk1, dfk1)
+        } <span class="kw">else </span>{
+            (xk, cost, prev_grad)
         };
 
-        <span class="self">self</span>.<span class="ident">radius</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ap</span> <span class="op">&gt;</span> <span class="macro">float!</span>(<span class="number">0.75</span>) {
-            <span class="kw">if</span> <span class="ident">sk</span>.<span class="ident">l2_norm</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.8</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">radius</span> {
-                <span class="self">self</span>.<span class="ident">radius</span>
-            } <span class="kw">else</span> {
-                <span class="macro">float!</span>(<span class="number">2.0</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">radius</span>
+        <span class="self">self</span>.radius = <span class="kw">if </span>ap &gt; <span class="macro">float!</span>(<span class="number">0.75</span>) {
+            <span class="kw">if </span>sk.l2_norm() &lt;= <span class="macro">float!</span>(<span class="number">0.8</span>) * <span class="self">self</span>.radius {
+                <span class="self">self</span>.radius
+            } <span class="kw">else </span>{
+                <span class="macro">float!</span>(<span class="number">2.0</span>) * <span class="self">self</span>.radius
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ap</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.75</span>) <span class="op">&amp;&amp;</span> <span class="ident">ap</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.1</span>) {
-            <span class="self">self</span>.<span class="ident">radius</span>
-        } <span class="kw">else</span> {
-            <span class="macro">float!</span>(<span class="number">0.5</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">radius</span>
+        } <span class="kw">else if </span>ap &lt;= <span class="macro">float!</span>(<span class="number">0.75</span>) &amp;&amp; ap &gt;= <span class="macro">float!</span>(<span class="number">0.1</span>) {
+            <span class="self">self</span>.radius
+        } <span class="kw">else </span>{
+            <span class="macro">float!</span>(<span class="number">0.5</span>) * <span class="self">self</span>.radius
         };
 
-        <span class="kw">let</span> <span class="ident">bksk</span> <span class="op">=</span> <span class="ident">hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
-        <span class="kw">let</span> <span class="ident">ykbksk</span> <span class="op">=</span> <span class="ident">yk</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">bksk</span>);
-        <span class="kw">let</span> <span class="ident">skykbksk</span>: <span class="ident">F</span> <span class="op">=</span> <span class="ident">sk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">ykbksk</span>);
+        <span class="kw">let </span>bksk = hessian.dot(<span class="kw-2">&amp;</span>sk);
+        <span class="kw">let </span>ykbksk = yk.sub(<span class="kw-2">&amp;</span>bksk);
+        <span class="kw">let </span>skykbksk: F = sk.dot(<span class="kw-2">&amp;</span>ykbksk);
 
-        <span class="kw">let</span> <span class="ident">hessian_update</span> <span class="op">=</span>
-            <span class="ident">skykbksk</span>.<span class="ident">abs</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">denominator_factor</span> <span class="op">*</span> <span class="ident">sk</span>.<span class="ident">l2_norm</span>() <span class="op">*</span> <span class="ident">skykbksk</span>.<span class="ident">l2_norm</span>();
-        <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">hessian_update</span> {
-            <span class="kw">let</span> <span class="ident">a</span>: <span class="ident">B</span> <span class="op">=</span> <span class="ident">ykbksk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">ykbksk</span>);
-            <span class="kw">let</span> <span class="ident">b</span>: <span class="ident">F</span> <span class="op">=</span> <span class="ident">sk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">ykbksk</span>);
-            <span class="ident">hessian</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">/</span> <span class="ident">b</span>)))
-        } <span class="kw">else</span> {
-            <span class="ident">hessian</span>
+        <span class="kw">let </span>hessian_update =
+            skykbksk.abs() &gt;= <span class="self">self</span>.denominator_factor * sk.l2_norm() * skykbksk.l2_norm();
+        <span class="kw">let </span>hessian = <span class="kw">if </span>hessian_update {
+            <span class="kw">let </span>a: B = ykbksk.dot(<span class="kw-2">&amp;</span>ykbksk);
+            <span class="kw">let </span>b: F = sk.dot(<span class="kw-2">&amp;</span>ykbksk);
+            hessian.add(<span class="kw-2">&amp;</span>a.mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="number">1.0</span>) / b)))
+        } <span class="kw">else </span>{
+            hessian
         };
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">xk1</span>).<span class="ident">cost</span>(<span class="ident">fk1</span>).<span class="ident">gradient</span>(<span class="ident">dfk1</span>).<span class="ident">hessian</span>(<span class="ident">hessian</span>),
-            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>[<span class="string">&quot;ared&quot;</span> =&gt; <span class="ident">ared</span>;
-                         <span class="string">&quot;pred&quot;</span> =&gt; <span class="ident">pred</span>;
-                         <span class="string">&quot;ap&quot;</span> =&gt; <span class="ident">ap</span>;
-                         <span class="string">&quot;radius&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">radius</span>;
-                         <span class="string">&quot;hessian_update&quot;</span> =&gt; <span class="ident">hessian_update</span>;]),
+            state.param(xk1).cost(fk1).gradient(dfk1).hessian(hessian),
+            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>[<span class="string">&quot;ared&quot; </span>=&gt; ared;
+                         <span class="string">&quot;pred&quot; </span>=&gt; pred;
+                         <span class="string">&quot;ap&quot; </span>=&gt; ap;
+                         <span class="string">&quot;radius&quot; </span>=&gt; <span class="self">self</span>.radius;
+                         <span class="string">&quot;hessian_update&quot; </span>=&gt; hessian_update;]),
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_gradient</span>().<span class="ident">unwrap</span>().<span class="ident">l2_norm</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tol_grad</span> {
-            <span class="kw">return</span> <span class="ident">TerminationReason::TargetPrecisionReached</span>;
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), B, F&gt;) -&gt; TerminationReason {
+        <span class="kw">if </span>state.get_gradient().unwrap().l2_norm() &lt; <span class="self">self</span>.tol_grad {
+            <span class="kw">return </span>TerminationReason::TargetPrecisionReached;
         }
-        <span class="ident">TerminationReason::NotTerminated</span>
+        TerminationReason::NotTerminated
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">test_utils::TestProblem</span>, <span class="ident">ArgminError</span>, <span class="ident">IterState</span>, <span class="ident">State</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::trustregion::CauchyPoint</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{test_utils::TestProblem, ArgminError, IterState, State};
+    <span class="kw">use </span><span class="kw">crate</span>::solver::trustregion::CauchyPoint;
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">sr1</span>, <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="ident">CauchyPoint</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(sr1, SR1TrustRegion&lt;CauchyPoint&lt;f64&gt;, f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">MyFakeSubProblem</span> {}
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="attribute">#[derive(Eq, PartialEq, Debug)]
+        </span><span class="kw">struct </span>MyFakeSubProblem {}
 
-        <span class="kw">let</span> <span class="ident">sr1</span>: <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SR1TrustRegion::new</span>(<span class="ident">MyFakeSubProblem</span> {});
-        <span class="kw">let</span> <span class="ident">SR1TrustRegion</span> {
-            <span class="ident">denominator_factor</span>,
-            <span class="ident">subproblem</span>,
-            <span class="ident">radius</span>,
-            <span class="ident">eta</span>,
-            <span class="ident">tol_grad</span>,
-        } <span class="op">=</span> <span class="ident">sr1</span>;
+        <span class="kw">let </span>sr1: SR1TrustRegion&lt;<span class="kw">_</span>, f64&gt; = SR1TrustRegion::new(MyFakeSubProblem {});
+        <span class="kw">let </span>SR1TrustRegion {
+            denominator_factor,
+            subproblem,
+            radius,
+            eta,
+            tol_grad,
+        } = sr1;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">denominator_factor</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1e-8f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">subproblem</span>, <span class="ident">MyFakeSubProblem</span> {});
-        <span class="macro">assert_eq!</span>(<span class="ident">radius</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">eta</span>.<span class="ident">to_ne_bytes</span>(), (<span class="number">0.5f64</span> <span class="op">*</span> <span class="number">1e-3f64</span>).<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">tol_grad</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1e-3f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(denominator_factor.to_ne_bytes(), <span class="number">1e-8f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(subproblem, MyFakeSubProblem {});
+        <span class="macro">assert_eq!</span>(radius.to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(eta.to_ne_bytes(), (<span class="number">0.5f64 </span>* <span class="number">1e-3f64</span>).to_ne_bytes());
+        <span class="macro">assert_eq!</span>(tol_grad.to_ne_bytes(), <span class="number">1e-3f64</span>.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_denominator_factor</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">MyFakeSubProblem</span> {}
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_denominator_factor() {
+        <span class="attribute">#[derive(Eq, PartialEq, Debug, Clone, Copy)]
+        </span><span class="kw">struct </span>MyFakeSubProblem {}
 
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">tol</span> <span class="kw">in</span> [<span class="ident">f64::EPSILON</span>, <span class="number">1e-8</span>, <span class="number">1e-6</span>, <span class="number">1e-2</span>, <span class="number">1.0</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>] {
-            <span class="kw">let</span> <span class="ident">sr1</span>: <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SR1TrustRegion::new</span>(<span class="ident">MyFakeSubProblem</span> {});
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">sr1</span>.<span class="ident">with_denominator_factor</span>(<span class="ident">tol</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>tol <span class="kw">in </span>[f64::EPSILON, <span class="number">1e-8</span>, <span class="number">1e-6</span>, <span class="number">1e-2</span>, <span class="number">1.0 </span>- f64::EPSILON] {
+            <span class="kw">let </span>sr1: SR1TrustRegion&lt;<span class="kw">_</span>, f64&gt; = SR1TrustRegion::new(MyFakeSubProblem {});
+            <span class="kw">let </span>res = sr1.with_denominator_factor(tol);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">nm</span>.<span class="ident">denominator_factor</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">tol</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>nm = res.unwrap();
+            <span class="macro">assert_eq!</span>(nm.denominator_factor.to_ne_bytes(), tol.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">tol</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="number">0.0</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>] {
-            <span class="kw">let</span> <span class="ident">sr1</span>: <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SR1TrustRegion::new</span>(<span class="ident">MyFakeSubProblem</span> {});
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">sr1</span>.<span class="ident">with_denominator_factor</span>(<span class="ident">tol</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>tol <span class="kw">in </span>[-f64::EPSILON, <span class="number">0.0</span>, -<span class="number">1.0</span>, <span class="number">1.0</span>] {
+            <span class="kw">let </span>sr1: SR1TrustRegion&lt;<span class="kw">_</span>, f64&gt; = SR1TrustRegion::new(MyFakeSubProblem {});
+            <span class="kw">let </span>res = sr1.with_denominator_factor(tol);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
-                <span class="string">&quot;Invalid parameter: \&quot;`SR1TrustRegion`: denominator_factor must be in (0, 1).\&quot;&quot;</span>
-            );
+                res,
+                ArgminError,
+                <span class="string">&quot;Invalid parameter: \&quot;`SR1TrustRegion`: denominator_factor must be in (0, 1).\&quot;&quot;
+            </span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_tolerance_grad</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">MyFakeSubProblem</span> {}
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_tolerance_grad() {
+        <span class="attribute">#[derive(Eq, PartialEq, Debug, Clone, Copy)]
+        </span><span class="kw">struct </span>MyFakeSubProblem {}
 
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">tol</span> <span class="kw">in</span> [<span class="number">1e-6</span>, <span class="number">0.0</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>] {
-            <span class="kw">let</span> <span class="ident">sr1</span>: <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SR1TrustRegion::new</span>(<span class="ident">MyFakeSubProblem</span> {});
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">sr1</span>.<span class="ident">with_tolerance_grad</span>(<span class="ident">tol</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>tol <span class="kw">in </span>[<span class="number">1e-6</span>, <span class="number">0.0</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>] {
+            <span class="kw">let </span>sr1: SR1TrustRegion&lt;<span class="kw">_</span>, f64&gt; = SR1TrustRegion::new(MyFakeSubProblem {});
+            <span class="kw">let </span>res = sr1.with_tolerance_grad(tol);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">nm</span>.<span class="ident">tol_grad</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">tol</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>nm = res.unwrap();
+            <span class="macro">assert_eq!</span>(nm.tol_grad.to_ne_bytes(), tol.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">tol</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">100.0</span>, <span class="op">-</span><span class="number">42.0</span>] {
-            <span class="kw">let</span> <span class="ident">sr1</span>: <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SR1TrustRegion::new</span>(<span class="ident">MyFakeSubProblem</span> {});
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">sr1</span>.<span class="ident">with_tolerance_grad</span>(<span class="ident">tol</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>tol <span class="kw">in </span>[-f64::EPSILON, -<span class="number">1.0</span>, -<span class="number">100.0</span>, -<span class="number">42.0</span>] {
+            <span class="kw">let </span>sr1: SR1TrustRegion&lt;<span class="kw">_</span>, f64&gt; = SR1TrustRegion::new(MyFakeSubProblem {});
+            <span class="kw">let </span>res = sr1.with_tolerance_grad(tol);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
-                <span class="string">&quot;Invalid parameter: \&quot;`SR1TrustRegion`: gradient tolerance must be &gt;= 0.\&quot;&quot;</span>
-            );
+                res,
+                ArgminError,
+                <span class="string">&quot;Invalid parameter: \&quot;`SR1TrustRegion`: gradient tolerance must be &gt;= 0.\&quot;&quot;
+            </span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init</span>() {
-        <span class="kw">let</span> <span class="ident">subproblem</span> <span class="op">=</span> <span class="ident">CauchyPoint::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init() {
+        <span class="kw">let </span>subproblem = CauchyPoint::new();
 
-        <span class="kw">let</span> <span class="ident">param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sr1</span>: <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SR1TrustRegion::new</span>(<span class="ident">subproblem</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>sr1: SR1TrustRegion&lt;<span class="kw">_</span>, f64&gt; = SR1TrustRegion::new(subproblem);
 
-        <span class="comment">// Forgot to initialize the parameter vector</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">sr1</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>);
+        <span class="comment">// Forgot to initialize the parameter vector
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>res = sr1.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`SR1TrustRegion` requires an initial parameter vector. Please &quot;</span>,
-                <span class="string">&quot;provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
 
-        <span class="comment">// All good.</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">param</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">sr1</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// All good.
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; =
+            IterState::new().param(param.clone());
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = sr1.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">let</span> <span class="ident">s_param</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_param = state_out.take_param().unwrap();
 
-        <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">p</span>) <span class="kw">in</span> <span class="ident">s_param</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">param</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">p</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">for </span>(s, p) <span class="kw">in </span>s_param.iter().zip(param.iter()) {
+            <span class="macro">assert_eq!</span>(s.to_ne_bytes(), p.to_ne_bytes());
         }
 
-        <span class="kw">let</span> <span class="ident">s_grad</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_gradient</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_grad = state_out.take_gradient().unwrap();
 
-        <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">p</span>) <span class="kw">in</span> <span class="ident">s_grad</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">param</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">p</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">for </span>(s, p) <span class="kw">in </span>s_grad.iter().zip(param.iter()) {
+            <span class="macro">assert_eq!</span>(s.to_ne_bytes(), p.to_ne_bytes());
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">state_out</span>.<span class="ident">get_cost</span>().<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>())
+        <span class="macro">assert_eq!</span>(state_out.get_cost().to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_provided_cost</span>() {
-        <span class="kw">let</span> <span class="ident">subproblem</span> <span class="op">=</span> <span class="ident">CauchyPoint::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_provided_cost() {
+        <span class="kw">let </span>subproblem = CauchyPoint::new();
 
-        <span class="kw">let</span> <span class="ident">param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sr1</span>: <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SR1TrustRegion::new</span>(<span class="ident">subproblem</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>sr1: SR1TrustRegion&lt;<span class="kw">_</span>, f64&gt; = SR1TrustRegion::new(subproblem);
 
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">cost</span>(<span class="number">1234.0</span>);
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; =
+            IterState::new().param(param).cost(<span class="number">1234.0</span>);
 
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> (<span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">sr1</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>(state_out, kv) = sr1.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">state_out</span>.<span class="ident">get_cost</span>().<span class="ident">to_ne_bytes</span>(), <span class="number">1234.0f64</span>.<span class="ident">to_ne_bytes</span>())
+        <span class="macro">assert_eq!</span>(state_out.get_cost().to_ne_bytes(), <span class="number">1234.0f64</span>.to_ne_bytes())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_provided_grad</span>() {
-        <span class="kw">let</span> <span class="ident">subproblem</span> <span class="op">=</span> <span class="ident">CauchyPoint::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_provided_grad() {
+        <span class="kw">let </span>subproblem = CauchyPoint::new();
 
-        <span class="kw">let</span> <span class="ident">param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">gradient</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">4.0</span>, <span class="number">9.0</span>];
+        <span class="kw">let </span>param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>gradient: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">4.0</span>, <span class="number">9.0</span>];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sr1</span>: <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SR1TrustRegion::new</span>(<span class="ident">subproblem</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>sr1: SR1TrustRegion&lt;<span class="kw">_</span>, f64&gt; = SR1TrustRegion::new(subproblem);
 
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">param</span>).<span class="ident">gradient</span>(<span class="ident">gradient</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; =
+            IterState::new().param(param).gradient(gradient.clone());
 
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">sr1</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = sr1.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">let</span> <span class="ident">s_grad</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_gradient</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_grad = state_out.take_gradient().unwrap();
 
-        <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">g</span>) <span class="kw">in</span> <span class="ident">s_grad</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">gradient</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">g</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">for </span>(s, g) <span class="kw">in </span>s_grad.iter().zip(gradient.iter()) {
+            <span class="macro">assert_eq!</span>(s.to_ne_bytes(), g.to_ne_bytes());
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_provided_hessian</span>() {
-        <span class="kw">let</span> <span class="ident">subproblem</span> <span class="op">=</span> <span class="ident">CauchyPoint::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_provided_hessian() {
+        <span class="kw">let </span>subproblem = CauchyPoint::new();
 
-        <span class="kw">let</span> <span class="ident">param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">gradient</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">4.0</span>, <span class="number">9.0</span>];
-        <span class="kw">let</span> <span class="ident">hessian</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]];
+        <span class="kw">let </span>param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>gradient: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">4.0</span>, <span class="number">9.0</span>];
+        <span class="kw">let </span>hessian: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sr1</span>: <span class="ident">SR1TrustRegion</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SR1TrustRegion::new</span>(<span class="ident">subproblem</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>sr1: SR1TrustRegion&lt;<span class="kw">_</span>, f64&gt; = SR1TrustRegion::new(subproblem);
 
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>()
-            .<span class="ident">param</span>(<span class="ident">param</span>)
-            .<span class="ident">gradient</span>(<span class="ident">gradient</span>)
-            .<span class="ident">hessian</span>(<span class="ident">hessian</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new()
+            .param(param)
+            .gradient(gradient)
+            .hessian(hessian.clone());
 
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">sr1</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = sr1.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">let</span> <span class="ident">s_hessian</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_hessian</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_hessian = state_out.take_hessian().unwrap();
 
-        <span class="kw">for</span> (<span class="ident">s1</span>, <span class="ident">g1</span>) <span class="kw">in</span> <span class="ident">s_hessian</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">hessian</span>.<span class="ident">iter</span>()) {
-            <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">g</span>) <span class="kw">in</span> <span class="ident">s1</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">g1</span>.<span class="ident">iter</span>()) {
-                <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">g</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">for </span>(s1, g1) <span class="kw">in </span>s_hessian.iter().zip(hessian.iter()) {
+            <span class="kw">for </span>(s, g) <span class="kw">in </span>s1.iter().zip(g1.iter()) {
+                <span class="macro">assert_eq!</span>(s.to_ne_bytes(), g.to_ne_bytes());
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

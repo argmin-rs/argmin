@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/checkpointing/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/checkpointing/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -232,239 +232,239 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # Checkpointing</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Checkpointing is a useful mechanism for mitigating the effects of crashes when software is run</span>
-<span class="doccomment">//! in an unstable environment, particularly for long run times. Checkpoints are saved regularly</span>
-<span class="doccomment">//! with a user-chosen frequency. Optimizations can then be resumed from a given checkpoint after a</span>
-<span class="doccomment">//! crash.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For saving checkpoints to disk, `FileCheckpoint` is provided.</span>
-<span class="doccomment">//! Via the `Checkpoint` trait other checkpointing approaches can be implemented.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `CheckpointingFrequency` defines how often checkpoints are saved and can be chosen to be</span>
-<span class="doccomment">//! either `Always` (every iteration), `Every(u64)` (every Nth iteration) or `Never`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following example shows how the `checkpointing` method is used to activate checkpointing.</span>
-<span class="doccomment">//! If no checkpoint is available on disk, an optimization will be started from scratch. If the run</span>
-<span class="doccomment">//! crashes and a checkpoint is found on disk, then it will resume from the checkpoint.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Example</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # extern crate argmin;</span>
-<span class="doccomment">//! # extern crate argmin_testfunctions;</span>
-<span class="doccomment">//! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
-<span class="doccomment">//! # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-<span class="doccomment">//! # use argmin::core::observers::SlogLogger;</span>
-<span class="doccomment">//! # use argmin::solver::landweber::Landweber;</span>
-<span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[derive(Default)]</span>
-<span class="doccomment">//! # struct Rosenbrock {}</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # /// Implement `CostFunction` for `Rosenbrock`</span>
-<span class="doccomment">//! # impl CostFunction for Rosenbrock {</span>
-<span class="doccomment">//! #     /// Type of the parameter vector</span>
-<span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
-<span class="doccomment">//! #     type Output = f64;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     /// Apply the cost function to a parameter `p`</span>
-<span class="doccomment">//! #     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-<span class="doccomment">//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # /// Implement `Gradient` for `Rosenbrock`</span>
-<span class="doccomment">//! # impl Gradient for Rosenbrock {</span>
-<span class="doccomment">//! #     /// Type of the parameter vector</span>
-<span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
-<span class="doccomment">//! #     type Gradient = Vec&lt;f64&gt;;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     /// Compute the gradient at parameter `p`.</span>
-<span class="doccomment">//! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {</span>
-<span class="doccomment">//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # fn run() -&gt; Result&lt;(), Error&gt; {</span>
-<span class="doccomment">//! #     // define inital parameter vector</span>
-<span class="doccomment">//! #     let init_param: Vec&lt;f64&gt; = vec![1.2, 1.2];</span>
-<span class="doccomment">//! #     let my_optimization_problem = Rosenbrock {};</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     let iters = 35;</span>
-<span class="doccomment">//! #     let solver = Landweber::new(0.001);</span>
-<span class="doccomment">//! // [...]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
-<span class="doccomment">//! let checkpoint = FileCheckpoint::new(</span>
-<span class="doccomment">//!     &quot;.checkpoints&quot;,</span>
-<span class="doccomment">//!     &quot;optim&quot;,</span>
-<span class="doccomment">//!     CheckpointingFrequency::Every(20)</span>
-<span class="doccomment">//! );</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
-<span class="doccomment">//! let res = Executor::new(my_optimization_problem, solver)</span>
-<span class="doccomment">//!     .configure(|config| config.param(init_param).max_iters(iters))</span>
-<span class="doccomment">//!     .checkpointing(checkpoint)</span>
-<span class="doccomment">//!     .run()?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // [...]</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # fn main() {</span>
-<span class="doccomment">//! #     if let Err(ref e) = run() {</span>
-<span class="doccomment">//! #         println!(&quot;{}&quot;, e);</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
+</span><span class="doccomment">//! # Checkpointing
+//!
+//! Checkpointing is a useful mechanism for mitigating the effects of crashes when software is run
+//! in an unstable environment, particularly for long run times. Checkpoints are saved regularly
+//! with a user-chosen frequency. Optimizations can then be resumed from a given checkpoint after a
+//! crash.
+//!
+//! For saving checkpoints to disk, `FileCheckpoint` is provided.
+//! Via the `Checkpoint` trait other checkpointing approaches can be implemented.
+//!
+//! The `CheckpointingFrequency` defines how often checkpoints are saved and can be chosen to be
+//! either `Always` (every iteration), `Every(u64)` (every Nth iteration) or `Never`.
+//!
+//! The following example shows how the `checkpointing` method is used to activate checkpointing.
+//! If no checkpoint is available on disk, an optimization will be started from scratch. If the run
+//! crashes and a checkpoint is found on disk, then it will resume from the checkpoint.
+//!
+//! ## Example
+//!
+//! ```rust
+//! # extern crate argmin;
+//! # extern crate argmin_testfunctions;
+//! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
+//! # #[cfg(feature = &quot;serde1&quot;)]
+//! # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
+//! # #[cfg(feature = &quot;slog-logger&quot;)]
+//! # use argmin::core::observers::SlogLogger;
+//! # use argmin::solver::landweber::Landweber;
+//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! #
+//! # #[derive(Default)]
+//! # struct Rosenbrock {}
+//! #
+//! # /// Implement `CostFunction` for `Rosenbrock`
+//! # impl CostFunction for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec&lt;f64&gt;;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Output = f64;
+//! #
+//! #     /// Apply the cost function to a parameter `p`
+//! #     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {
+//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
+//! #     }
+//! # }
+//! #
+//! # /// Implement `Gradient` for `Rosenbrock`
+//! # impl Gradient for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec&lt;f64&gt;;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Gradient = Vec&lt;f64&gt;;
+//! #
+//! #     /// Compute the gradient at parameter `p`.
+//! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {
+//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+//! #     }
+//! # }
+//! #
+//! # fn run() -&gt; Result&lt;(), Error&gt; {
+//! #     // define inital parameter vector
+//! #     let init_param: Vec&lt;f64&gt; = vec![1.2, 1.2];
+//! #     let my_optimization_problem = Rosenbrock {};
+//! #
+//! #     let iters = 35;
+//! #     let solver = Landweber::new(0.001);
+//! // [...]
+//!
+//! # #[cfg(feature = &quot;serde1&quot;)]
+//! let checkpoint = FileCheckpoint::new(
+//!     &quot;.checkpoints&quot;,
+//!     &quot;optim&quot;,
+//!     CheckpointingFrequency::Every(20)
+//! );
+//!
+//! #
+//! # #[cfg(feature = &quot;serde1&quot;)]
+//! let res = Executor::new(my_optimization_problem, solver)
+//!     .configure(|config| config.param(init_param).max_iters(iters))
+//!     .checkpointing(checkpoint)
+//!     .run()?;
+//!
+//! // [...]
+//! #
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!(&quot;{}&quot;, e);
+//! #     }
+//! # }
+//! ```
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">file</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">mod </span>file;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::checkpointing::file::FileCheckpoint</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::core::checkpointing::file::FileCheckpoint;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::Error</span>;
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
+<span class="kw">use </span><span class="kw">crate</span>::core::Error;
+<span class="kw">use </span>std::default::Default;
+<span class="kw">use </span>std::fmt::Display;
 
-<span class="doccomment">/// An interface for checkpointing methods</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Handles saving of a checkpoint. The methods [`save`](`Checkpoint::save`) (saving the</span>
-<span class="doccomment">/// checkpoint), [`load`](`Checkpoint::load`) (loading a checkpoint) are mandatory to implement.</span>
-<span class="doccomment">/// The method [`save_cond`](`Checkpoint::save_cond`) determines if the conditions for calling</span>
-<span class="doccomment">/// `save` are met, and if yes, calls `save`. [`freqency`](`Checkpoint::frequency`) returns the</span>
-<span class="doccomment">/// conditions in form of a [`CheckpointingFrequency`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate serde;</span>
-<span class="doccomment">/// use argmin::core::Error;</span>
-<span class="doccomment">/// use argmin::core::checkpointing::{Checkpoint, CheckpointingFrequency};</span>
-<span class="doccomment">/// use serde::{Serialize, de::DeserializeOwned};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct MyCheckpoint {</span>
-<span class="doccomment">///    frequency: CheckpointingFrequency,</span>
-<span class="doccomment">///    // ..</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl&lt;S, I&gt; Checkpoint&lt;S, I&gt; for MyCheckpoint</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///     // Both `solver` (`S`) and `state` (`I`) (probably) need to be (de)serializable</span>
-<span class="doccomment">///     S: Serialize + DeserializeOwned,</span>
-<span class="doccomment">///     I: Serialize + DeserializeOwned,</span>
-<span class="doccomment">/// #     S: Default,</span>
-<span class="doccomment">/// #     I: Default,</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     fn save(&amp;self, solver: &amp;S, state: &amp;I) -&gt; Result&lt;(), Error&gt; {</span>
-<span class="doccomment">///         // Save `solver` and `state`</span>
-<span class="doccomment">///         Ok(())</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     fn load(&amp;self) -&gt; Result&lt;Option&lt;(S, I)&gt;, Error&gt; {</span>
-<span class="doccomment">///         // Load `solver` and `state` from checkpoint</span>
-<span class="doccomment">///         // Return `Ok(None)` in case checkpoint is not found.</span>
-<span class="doccomment">/// #         let solver = S::default();</span>
-<span class="doccomment">/// #         let state = I::default();</span>
-<span class="doccomment">///         Ok(Some((solver, state)))</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     fn frequency(&amp;self) -&gt; CheckpointingFrequency {</span>
-<span class="doccomment">///         self.frequency</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # fn main() {}</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Checkpoint</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Save a checkpoint</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Gets a reference to the current `solver` of type `S` and to the current `state` of type</span>
-    <span class="doccomment">/// `I`. Both solver and state can maintain state. Optimization problems itself are not allowed</span>
-    <span class="doccomment">/// to have state which changes during an optimization (at least not in the context of</span>
-    <span class="doccomment">/// checkpointing).</span>
-    <span class="kw">fn</span> <span class="ident">save</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">solver</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An interface for checkpointing methods
+///
+/// Handles saving of a checkpoint. The methods [`save`](`Checkpoint::save`) (saving the
+/// checkpoint), [`load`](`Checkpoint::load`) (loading a checkpoint) are mandatory to implement.
+/// The method [`save_cond`](`Checkpoint::save_cond`) determines if the conditions for calling
+/// `save` are met, and if yes, calls `save`. [`freqency`](`Checkpoint::frequency`) returns the
+/// conditions in form of a [`CheckpointingFrequency`].
+///
+/// # Example
+///
+/// ```
+/// # extern crate serde;
+/// use argmin::core::Error;
+/// use argmin::core::checkpointing::{Checkpoint, CheckpointingFrequency};
+/// use serde::{Serialize, de::DeserializeOwned};
+///
+/// struct MyCheckpoint {
+///    frequency: CheckpointingFrequency,
+///    // ..
+/// }
+///
+/// impl&lt;S, I&gt; Checkpoint&lt;S, I&gt; for MyCheckpoint
+/// where
+///     // Both `solver` (`S`) and `state` (`I`) (probably) need to be (de)serializable
+///     S: Serialize + DeserializeOwned,
+///     I: Serialize + DeserializeOwned,
+/// #     S: Default,
+/// #     I: Default,
+/// {
+///     fn save(&amp;self, solver: &amp;S, state: &amp;I) -&gt; Result&lt;(), Error&gt; {
+///         // Save `solver` and `state`
+///         Ok(())
+///     }
+///
+///     fn load(&amp;self) -&gt; Result&lt;Option&lt;(S, I)&gt;, Error&gt; {
+///         // Load `solver` and `state` from checkpoint
+///         // Return `Ok(None)` in case checkpoint is not found.
+/// #         let solver = S::default();
+/// #         let state = I::default();
+///         Ok(Some((solver, state)))
+///     }
+///
+///     fn frequency(&amp;self) -&gt; CheckpointingFrequency {
+///         self.frequency
+///     }
+/// }
+/// # fn main() {}
+/// ```
+</span><span class="kw">pub trait </span>Checkpoint&lt;S, I&gt; {
+    <span class="doccomment">/// Save a checkpoint
+    ///
+    /// Gets a reference to the current `solver` of type `S` and to the current `state` of type
+    /// `I`. Both solver and state can maintain state. Optimization problems itself are not allowed
+    /// to have state which changes during an optimization (at least not in the context of
+    /// checkpointing).
+    </span><span class="kw">fn </span>save(<span class="kw-2">&amp;</span><span class="self">self</span>, solver: <span class="kw-2">&amp;</span>S, state: <span class="kw-2">&amp;</span>I) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;;
 
-    <span class="doccomment">/// Saves a checkpoint when the checkpointing condition is met.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calls [`save`](`Checkpoint::save`) in each iteration (`CheckpointingFrequency::Always`),</span>
-    <span class="doccomment">/// every X iterations (`CheckpointingFrequency::Every(X)`) or never</span>
-    <span class="doccomment">/// (`CheckpointingFrequency::Never`).</span>
-    <span class="kw">fn</span> <span class="ident">save_cond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">solver</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">I</span>, <span class="ident">iter</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">frequency</span>() {
-            <span class="ident">CheckpointingFrequency::Always</span> =&gt; <span class="self">self</span>.<span class="ident">save</span>(<span class="ident">solver</span>, <span class="ident">state</span>)<span class="question-mark">?</span>,
-            <span class="ident">CheckpointingFrequency::Every</span>(<span class="ident">it</span>) <span class="kw">if</span> <span class="ident">iter</span> <span class="op">%</span> <span class="ident">it</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="self">self</span>.<span class="ident">save</span>(<span class="ident">solver</span>, <span class="ident">state</span>)<span class="question-mark">?</span>,
-            <span class="ident">CheckpointingFrequency::Never</span> <span class="op">|</span> <span class="ident">CheckpointingFrequency::Every</span>(<span class="kw">_</span>) =&gt; {}
+    <span class="doccomment">/// Saves a checkpoint when the checkpointing condition is met.
+    ///
+    /// Calls [`save`](`Checkpoint::save`) in each iteration (`CheckpointingFrequency::Always`),
+    /// every X iterations (`CheckpointingFrequency::Every(X)`) or never
+    /// (`CheckpointingFrequency::Never`).
+    </span><span class="kw">fn </span>save_cond(<span class="kw-2">&amp;</span><span class="self">self</span>, solver: <span class="kw-2">&amp;</span>S, state: <span class="kw-2">&amp;</span>I, iter: u64) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">match </span><span class="self">self</span>.frequency() {
+            CheckpointingFrequency::Always =&gt; <span class="self">self</span>.save(solver, state)<span class="question-mark">?</span>,
+            CheckpointingFrequency::Every(it) <span class="kw">if </span>iter % it == <span class="number">0 </span>=&gt; <span class="self">self</span>.save(solver, state)<span class="question-mark">?</span>,
+            CheckpointingFrequency::Never | CheckpointingFrequency::Every(<span class="kw">_</span>) =&gt; {}
         };
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Loads a saved checkpoint</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the solver of type `S` and the `state` of type `I`.</span>
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">S</span>, <span class="ident">I</span>)<span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Loads a saved checkpoint
+    ///
+    /// Returns the solver of type `S` and the `state` of type `I`.
+    </span><span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;(S, I)&gt;, Error&gt;;
 
-    <span class="doccomment">/// Indicates how often checkpoints should be saved</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns enum `CheckpointingFrequency`.</span>
-    <span class="kw">fn</span> <span class="ident">frequency</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CheckpointingFrequency</span>;
+    <span class="doccomment">/// Indicates how often checkpoints should be saved
+    ///
+    /// Returns enum `CheckpointingFrequency`.
+    </span><span class="kw">fn </span>frequency(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CheckpointingFrequency;
 }
 
-<span class="doccomment">/// Defines at which intervals a checkpoint is saved.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::core::checkpointing::CheckpointingFrequency;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // A checkpoint every 10 iterations</span>
-<span class="doccomment">/// let every_10 = CheckpointingFrequency::Every(10);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // A checkpoint in each iteration</span>
-<span class="doccomment">/// let always = CheckpointingFrequency::Always;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // The default is `CheckpointingFrequency::Always`</span>
-<span class="doccomment">/// assert_eq!(CheckpointingFrequency::default(), CheckpointingFrequency::Always);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CheckpointingFrequency</span> {
-    <span class="doccomment">/// Never create checkpoint</span>
-    <span class="ident">Never</span>,
-    <span class="doccomment">/// Create checkpoint every N iterations</span>
-    <span class="ident">Every</span>(<span class="ident">u64</span>),
-    <span class="doccomment">/// Create checkpoint in every iteration</span>
-    <span class="ident">Always</span>,
+<span class="doccomment">/// Defines at which intervals a checkpoint is saved.
+///
+/// # Example
+///
+/// ```
+/// use argmin::core::checkpointing::CheckpointingFrequency;
+///
+/// // A checkpoint every 10 iterations
+/// let every_10 = CheckpointingFrequency::Every(10);
+///
+/// // A checkpoint in each iteration
+/// let always = CheckpointingFrequency::Always;
+///
+/// // The default is `CheckpointingFrequency::Always`
+/// assert_eq!(CheckpointingFrequency::default(), CheckpointingFrequency::Always);
+/// ```
+</span><span class="attribute">#[derive(Clone, Eq, PartialEq, Debug, Hash, Copy)]
+</span><span class="kw">pub enum </span>CheckpointingFrequency {
+    <span class="doccomment">/// Never create checkpoint
+    </span>Never,
+    <span class="doccomment">/// Create checkpoint every N iterations
+    </span>Every(u64),
+    <span class="doccomment">/// Create checkpoint in every iteration
+    </span>Always,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CheckpointingFrequency</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">CheckpointingFrequency</span> {
-        <span class="ident">CheckpointingFrequency::Always</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>CheckpointingFrequency {
+    <span class="kw">fn </span>default() -&gt; CheckpointingFrequency {
+        CheckpointingFrequency::Always
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">CheckpointingFrequency</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">CheckpointingFrequency::Never</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Never&quot;</span>),
-            <span class="ident">CheckpointingFrequency::Every</span>(<span class="ident">i</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Every({})&quot;</span>, <span class="ident">i</span>),
-            <span class="ident">CheckpointingFrequency::Always</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Always&quot;</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span>CheckpointingFrequency {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            CheckpointingFrequency::Never =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Never&quot;</span>),
+            CheckpointingFrequency::Every(i) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Every({})&quot;</span>, i),
+            CheckpointingFrequency::Always =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Always&quot;</span>),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

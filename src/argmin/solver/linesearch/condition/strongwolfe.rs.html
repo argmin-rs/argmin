@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/condition/strongwolfe.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>strongwolfe.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../argmin/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/condition/strongwolfe.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>strongwolfe.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../argmin/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -234,241 +234,241 @@
 <span id="234">234</span>
 <span id="235">235</span>
 <span id="236">236</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::LineSearchCondition</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">Error</span>};
-<span class="kw">use</span> <span class="ident">argmin_math::ArgminDot</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+</span><span class="kw">use </span><span class="kw">super</span>::LineSearchCondition;
+<span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Error};
+<span class="kw">use </span>argmin_math::ArgminDot;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// # Strong Wolfe conditions</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Assures that a step length satisfies a &quot;sufficient decrease&quot; in cost function value (see</span>
-<span class="doccomment">/// [`ArmijoCondition`](`crate::solver::linesearch::condition::ArmijoCondition`) as well as that</span>
-<span class="doccomment">/// the absolute value of the slope has been reduced sufficiently (thus making it more likely to be</span>
-<span class="doccomment">/// close to a critical point).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StrongWolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="ident">c1</span>: <span class="ident">F</span>,
-    <span class="ident">c2</span>: <span class="ident">F</span>,
+<span class="doccomment">/// # Strong Wolfe conditions
+///
+/// Assures that a step length satisfies a &quot;sufficient decrease&quot; in cost function value (see
+/// [`ArmijoCondition`](`crate::solver::linesearch::condition::ArmijoCondition`) as well as that
+/// the absolute value of the slope has been reduced sufficiently (thus making it more likely to be
+/// close to a critical point).
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>StrongWolfeCondition&lt;F&gt; {
+    c1: F,
+    c2: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">StrongWolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;F&gt; StrongWolfeCondition&lt;F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`StrongWolfeCondition`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::condition::StrongWolfeCondition;</span>
-    <span class="doccomment">/// let strongwolfe = StrongWolfeCondition::new(0.0001f64, 0.1f64);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c1</span>: <span class="ident">F</span>, <span class="ident">c2</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">c1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)&quot;</span>
-            ));
+    <span class="doccomment">/// Construct a new instance of [`StrongWolfeCondition`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::condition::StrongWolfeCondition;
+    /// let strongwolfe = StrongWolfeCondition::new(0.0001f64, 0.1f64);
+    /// ```
+    </span><span class="kw">pub fn </span>new(c1: F, c2: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>c1 &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || c1 &gt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)&quot;
+            </span>));
         }
-        <span class="kw">if</span> <span class="ident">c2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">c1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)&quot;</span>
-            ));
+        <span class="kw">if </span>c2 &lt;= c1 || c2 &gt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)&quot;
+            </span>));
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">StrongWolfeCondition</span> { <span class="ident">c1</span>, <span class="ident">c2</span> })
+        <span class="prelude-val">Ok</span>(StrongWolfeCondition { c1, c2 })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrongWolfeCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">G</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;T, G, F&gt; LineSearchCondition&lt;T, G, F&gt; <span class="kw">for </span>StrongWolfeCondition&lt;F&gt;
+<span class="kw">where
+    </span>G: ArgminDot&lt;T, F&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">fn</span> <span class="ident">evaluate_condition</span>(
+    <span class="kw">fn </span>evaluate_condition(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">current_cost</span>: <span class="ident">F</span>,
-        <span class="ident">current_gradient</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">G</span><span class="op">&gt;</span>,
-        <span class="ident">initial_cost</span>: <span class="ident">F</span>,
-        <span class="ident">initial_gradient</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>,
-        <span class="ident">search_direction</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-        <span class="ident">step_length</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">initial_gradient</span>.<span class="ident">dot</span>(<span class="ident">search_direction</span>);
-        (<span class="ident">current_cost</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">initial_cost</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">c1</span> <span class="op">*</span> <span class="ident">step_length</span> <span class="op">*</span> <span class="ident">tmp</span>)
-            <span class="op">&amp;&amp;</span> <span class="ident">current_gradient</span>
-                .<span class="ident">expect</span>(<span class="string">&quot;Gradient not supplied to `evaluate_condition` of `StrongWolveCondition`&quot;</span>)
-                .<span class="ident">dot</span>(<span class="ident">search_direction</span>)
-                .<span class="ident">abs</span>()
-                <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">c2</span> <span class="op">*</span> <span class="ident">tmp</span>.<span class="ident">abs</span>()
+        current_cost: F,
+        current_gradient: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>G&gt;,
+        initial_cost: F,
+        initial_gradient: <span class="kw-2">&amp;</span>G,
+        search_direction: <span class="kw-2">&amp;</span>T,
+        step_length: F,
+    ) -&gt; bool {
+        <span class="kw">let </span>tmp = initial_gradient.dot(search_direction);
+        (current_cost &lt;= initial_cost + <span class="self">self</span>.c1 * step_length * tmp)
+            &amp;&amp; current_gradient
+                .expect(<span class="string">&quot;Gradient not supplied to `evaluate_condition` of `StrongWolveCondition`&quot;</span>)
+                .dot(search_direction)
+                .abs()
+                &lt;= <span class="self">self</span>.c2 * tmp.abs()
     }
 
-    <span class="kw">fn</span> <span class="ident">requires_current_gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>requires_current_gradient(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::assert_error</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::ArgminError</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::assert_error;
+    <span class="kw">use </span><span class="kw">crate</span>::core::ArgminError;
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">strongwolfe</span>, <span class="ident">StrongWolfeCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(strongwolfe, StrongWolfeCondition&lt;f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_strongwolfe_new</span>() {
-        <span class="kw">let</span> <span class="ident">c1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">c2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.08</span>;
-        <span class="kw">let</span> <span class="ident">StrongWolfeCondition</span> {
-            <span class="ident">c1</span>: <span class="ident">c1_wolfe</span>,
-            <span class="ident">c2</span>: <span class="ident">c2_wolfe</span>,
-        } <span class="op">=</span> <span class="ident">StrongWolfeCondition::new</span>(<span class="ident">c1</span>, <span class="ident">c2</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">c1</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">c1_wolfe</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">c2</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">c2_wolfe</span>.<span class="ident">to_ne_bytes</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_strongwolfe_new() {
+        <span class="kw">let </span>c1: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>c2: f64 = <span class="number">0.08</span>;
+        <span class="kw">let </span>StrongWolfeCondition {
+            c1: c1_wolfe,
+            c2: c2_wolfe,
+        } = StrongWolfeCondition::new(c1, c2).unwrap();
+        <span class="macro">assert_eq!</span>(c1.to_ne_bytes(), c1_wolfe.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(c2.to_ne_bytes(), c2_wolfe.to_ne_bytes());
 
-        <span class="comment">// c1</span>
-        <span class="macro">assert_error!</span>(
-            <span class="ident">StrongWolfeCondition::new</span>(<span class="number">1.0</span>, <span class="number">0.5</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)\&quot;&quot;</span>
-        );
-
-        <span class="macro">assert_error!</span>(
-            <span class="ident">StrongWolfeCondition::new</span>(<span class="number">0.0</span>, <span class="number">0.5</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)\&quot;&quot;</span>
-        );
+        <span class="comment">// c1
+        </span><span class="macro">assert_error!</span>(
+            StrongWolfeCondition::new(<span class="number">1.0</span>, <span class="number">0.5</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)\&quot;&quot;
+        </span>);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">StrongWolfeCondition::new</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.5</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)\&quot;&quot;</span>
-        );
+            StrongWolfeCondition::new(<span class="number">0.0</span>, <span class="number">0.5</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)\&quot;&quot;
+        </span>);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">StrongWolfeCondition::new</span>(<span class="number">2.0</span>, <span class="number">0.5</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)\&quot;&quot;</span>
-        );
-
-        <span class="comment">// c2</span>
-        <span class="macro">assert_error!</span>(
-            <span class="ident">StrongWolfeCondition::new</span>(<span class="number">0.5</span>, <span class="op">-</span><span class="number">1.0</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)\&quot;&quot;</span>
-        );
+            StrongWolfeCondition::new(-<span class="number">1.0</span>, <span class="number">0.5</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)\&quot;&quot;
+        </span>);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">StrongWolfeCondition::new</span>(<span class="number">0.5</span>, <span class="number">0.0</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)\&quot;&quot;</span>
-        );
+            StrongWolfeCondition::new(<span class="number">2.0</span>, <span class="number">0.5</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c1 must be in (0, 1)\&quot;&quot;
+        </span>);
+
+        <span class="comment">// c2
+        </span><span class="macro">assert_error!</span>(
+            StrongWolfeCondition::new(<span class="number">0.5</span>, -<span class="number">1.0</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)\&quot;&quot;
+        </span>);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">StrongWolfeCondition::new</span>(<span class="number">0.5</span>, <span class="number">0.5</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)\&quot;&quot;</span>
-        );
+            StrongWolfeCondition::new(<span class="number">0.5</span>, <span class="number">0.0</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)\&quot;&quot;
+        </span>);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">StrongWolfeCondition::new</span>(<span class="number">0.5</span>, <span class="number">1.0</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)\&quot;&quot;</span>
-        );
+            StrongWolfeCondition::new(<span class="number">0.5</span>, <span class="number">0.5</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)\&quot;&quot;
+        </span>);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">StrongWolfeCondition::new</span>(<span class="number">0.5</span>, <span class="number">2.0</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)\&quot;&quot;</span>
-        );
+            StrongWolfeCondition::new(<span class="number">0.5</span>, <span class="number">1.0</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)\&quot;&quot;
+        </span>);
+
+        <span class="macro">assert_error!</span>(
+            StrongWolfeCondition::new(<span class="number">0.5</span>, <span class="number">2.0</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;StrongWolfeCondition: Parameter c2 must be in (c1, 1)\&quot;&quot;
+        </span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_strongwolfe</span>() {
-        <span class="comment">// Armijo basically never active (c1 so low that only constraint on gradients have impact</span>
-        <span class="comment">// on the chosen function).</span>
-        <span class="kw">let</span> <span class="ident">c1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">c2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.9</span>;
-        <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="ident">StrongWolfeCondition::new</span>(<span class="ident">c1</span>, <span class="ident">c2</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">powf</span>(<span class="number">2.0</span>) <span class="op">+</span> <span class="ident">y</span>.<span class="ident">powf</span>(<span class="number">2.0</span>);
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="op">|</span><span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="number">2.0</span> <span class="op">*</span> <span class="ident">x</span>, <span class="number">2.0</span> <span class="op">*</span> <span class="ident">y</span>];
-        <span class="kw">let</span> <span class="ident">initial_x</span> <span class="op">=</span> <span class="op">-</span><span class="number">1.0</span>;
-        <span class="kw">let</span> <span class="ident">initial_y</span> <span class="op">=</span> <span class="op">-</span><span class="number">0.0</span>;
-        <span class="kw">let</span> <span class="ident">search_direction</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>];
-        <span class="kw">for</span> (<span class="ident">alpha</span>, <span class="ident">acc</span>) <span class="kw">in</span> [
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_strongwolfe() {
+        <span class="comment">// Armijo basically never active (c1 so low that only constraint on gradients have impact
+        // on the chosen function).
+        </span><span class="kw">let </span>c1: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>c2: f64 = <span class="number">0.9</span>;
+        <span class="kw">let </span>cond = StrongWolfeCondition::new(c1, c2).unwrap();
+        <span class="kw">let </span>f = |x: f64, y: f64| x.powf(<span class="number">2.0</span>) + y.powf(<span class="number">2.0</span>);
+        <span class="kw">let </span>g = |x: f64, y: f64| <span class="macro">vec!</span>[<span class="number">2.0 </span>* x, <span class="number">2.0 </span>* y];
+        <span class="kw">let </span>initial_x = -<span class="number">1.0</span>;
+        <span class="kw">let </span>initial_y = -<span class="number">0.0</span>;
+        <span class="kw">let </span>search_direction = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>];
+        <span class="kw">for </span>(alpha, acc) <span class="kw">in </span>[
             (<span class="number">0.001</span>, <span class="bool-val">false</span>),
             (<span class="number">0.03</span>, <span class="bool-val">false</span>),
-            (<span class="number">0.1</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>, <span class="bool-val">false</span>),
+            (<span class="number">0.1 </span>- f64::EPSILON, <span class="bool-val">false</span>),
             (<span class="number">0.1</span>, <span class="bool-val">true</span>),
             (<span class="number">0.15</span>, <span class="bool-val">true</span>),
             (<span class="number">0.9</span>, <span class="bool-val">true</span>),
             (<span class="number">0.99</span>, <span class="bool-val">true</span>),
             (<span class="number">1.0</span>, <span class="bool-val">true</span>),
             (<span class="number">1.9</span>, <span class="bool-val">true</span>),
-            (<span class="number">1.9</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="bool-val">false</span>),
+            (<span class="number">1.9 </span>+ f64::EPSILON, <span class="bool-val">false</span>),
             (<span class="number">2.0</span>, <span class="bool-val">false</span>),
             (<span class="number">2.3</span>, <span class="bool-val">false</span>),
         ] {
             <span class="macro">assert_eq!</span>(
-                <span class="ident">cond</span>.<span class="ident">evaluate_condition</span>(
-                    <span class="ident">f</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>)),
-                    <span class="ident">f</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">search_direction</span>,
-                    <span class="ident">alpha</span>,
+                cond.evaluate_condition(
+                    f(initial_x + alpha, initial_y),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>g(initial_x + alpha, initial_y)),
+                    f(initial_x, initial_y),
+                    <span class="kw-2">&amp;</span>g(initial_x, initial_y),
+                    <span class="kw-2">&amp;</span>search_direction,
+                    alpha,
                 ),
-                <span class="ident">acc</span>
+                acc
             );
         }
 
-        <span class="comment">// Armijo active</span>
-        <span class="kw">let</span> <span class="ident">c1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.5</span>;
-        <span class="kw">let</span> <span class="ident">c2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.9</span>;
-        <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="ident">StrongWolfeCondition::new</span>(<span class="ident">c1</span>, <span class="ident">c2</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">powf</span>(<span class="number">2.0</span>) <span class="op">+</span> <span class="ident">y</span>.<span class="ident">powf</span>(<span class="number">2.0</span>);
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="op">|</span><span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="number">2.0</span> <span class="op">*</span> <span class="ident">x</span>, <span class="number">2.0</span> <span class="op">*</span> <span class="ident">y</span>];
-        <span class="kw">let</span> <span class="ident">initial_x</span> <span class="op">=</span> <span class="op">-</span><span class="number">1.0</span>;
-        <span class="kw">let</span> <span class="ident">initial_y</span> <span class="op">=</span> <span class="op">-</span><span class="number">0.0</span>;
-        <span class="kw">let</span> <span class="ident">search_direction</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>];
-        <span class="kw">for</span> (<span class="ident">alpha</span>, <span class="ident">acc</span>) <span class="kw">in</span> [
+        <span class="comment">// Armijo active
+        </span><span class="kw">let </span>c1: f64 = <span class="number">0.5</span>;
+        <span class="kw">let </span>c2: f64 = <span class="number">0.9</span>;
+        <span class="kw">let </span>cond = StrongWolfeCondition::new(c1, c2).unwrap();
+        <span class="kw">let </span>f = |x: f64, y: f64| x.powf(<span class="number">2.0</span>) + y.powf(<span class="number">2.0</span>);
+        <span class="kw">let </span>g = |x: f64, y: f64| <span class="macro">vec!</span>[<span class="number">2.0 </span>* x, <span class="number">2.0 </span>* y];
+        <span class="kw">let </span>initial_x = -<span class="number">1.0</span>;
+        <span class="kw">let </span>initial_y = -<span class="number">0.0</span>;
+        <span class="kw">let </span>search_direction = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>];
+        <span class="kw">for </span>(alpha, acc) <span class="kw">in </span>[
             (<span class="number">0.001</span>, <span class="bool-val">false</span>),
             (<span class="number">0.03</span>, <span class="bool-val">false</span>),
-            (<span class="number">0.1</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>, <span class="bool-val">false</span>),
+            (<span class="number">0.1 </span>- f64::EPSILON, <span class="bool-val">false</span>),
             (<span class="number">0.1</span>, <span class="bool-val">true</span>),
             (<span class="number">0.15</span>, <span class="bool-val">true</span>),
             (<span class="number">0.9</span>, <span class="bool-val">true</span>),
             (<span class="number">0.99</span>, <span class="bool-val">true</span>),
             (<span class="number">1.0</span>, <span class="bool-val">true</span>),
-            (<span class="number">1.0</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="bool-val">false</span>),
+            (<span class="number">1.0 </span>+ f64::EPSILON, <span class="bool-val">false</span>),
             (<span class="number">1.9</span>, <span class="bool-val">false</span>),
             (<span class="number">2.0</span>, <span class="bool-val">false</span>),
             (<span class="number">2.3</span>, <span class="bool-val">false</span>),
         ] {
             <span class="macro">assert_eq!</span>(
-                <span class="ident">cond</span>.<span class="ident">evaluate_condition</span>(
-                    <span class="ident">f</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>)),
-                    <span class="ident">f</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">search_direction</span>,
-                    <span class="ident">alpha</span>,
+                cond.evaluate_condition(
+                    f(initial_x + alpha, initial_y),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>g(initial_x + alpha, initial_y)),
+                    f(initial_x, initial_y),
+                    <span class="kw-2">&amp;</span>g(initial_x, initial_y),
+                    <span class="kw-2">&amp;</span>search_direction,
+                    alpha,
                 ),
-                <span class="ident">acc</span>
+                acc
             );
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

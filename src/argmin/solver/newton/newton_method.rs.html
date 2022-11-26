@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/newton/newton_method.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>newton_method.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/newton/newton_method.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>newton_method.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -286,293 +286,293 @@
 <span id="286">286</span>
 <span id="287">287</span>
 <span id="288">288</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">Gradient</span>, <span class="ident">Hessian</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">KV</span>};
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminInv</span>, <span class="ident">ArgminScaledSub</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, KV};
+<span class="kw">use </span>argmin_math::{ArgminDot, ArgminInv, ArgminScaledSub};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::default::Default;
 
-<span class="doccomment">/// # Newton&#39;s method</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Newton&#39;s method iteratively finds the stationary points of a function f by using a second order</span>
-<span class="doccomment">/// approximation of f at the current point.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The stepsize `gamma` can be adjusted with the [`with_gamma`](`Newton::with_gamma`) method. It</span>
-<span class="doccomment">/// must be in `(0, 1])` and defaults to `1`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`Gradient`] and [`Hessian`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Reference</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// gamma</span>
-    <span class="ident">gamma</span>: <span class="ident">F</span>,
+<span class="doccomment">/// # Newton&#39;s method
+///
+/// Newton&#39;s method iteratively finds the stationary points of a function f by using a second order
+/// approximation of f at the current point.
+///
+/// The stepsize `gamma` can be adjusted with the [`with_gamma`](`Newton::with_gamma`) method. It
+/// must be in `(0, 1])` and defaults to `1`.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`Gradient`] and [`Hessian`].
+///
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
+</span><span class="attribute">#[derive(Clone, Copy)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>Newton&lt;F&gt; {
+    <span class="doccomment">/// gamma
+    </span>gamma: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;F&gt; Newton&lt;F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`Newton`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::newton::Newton;</span>
-    <span class="doccomment">/// let newton: Newton&lt;f64&gt; = Newton::new();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Newton</span> { <span class="ident">gamma</span>: <span class="macro">float!</span>(<span class="number">1.0</span>) }
+    <span class="doccomment">/// Construct a new instance of [`Newton`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::newton::Newton;
+    /// let newton: Newton&lt;f64&gt; = Newton::new();
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Newton { gamma: <span class="macro">float!</span>(<span class="number">1.0</span>) }
     }
 
-    <span class="doccomment">/// Set step size gamma</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Gamma must be in `(0, 1]` and defaults to `1`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::newton::Newton;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let newton: Newton&lt;f64&gt; = Newton::new().with_gamma(0.4)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">gamma</span> <span class="op">&gt;</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;Newton: gamma must be in  (0, 1].&quot;</span>
-            ));
+    <span class="doccomment">/// Set step size gamma
+    ///
+    /// Gamma must be in `(0, 1]` and defaults to `1`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::newton::Newton;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let newton: Newton&lt;f64&gt; = Newton::new().with_gamma(0.4)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_gamma(<span class="kw-2">mut </span><span class="self">self</span>, gamma: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>gamma &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || gamma &gt; <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;Newton: gamma must be in  (0, 1].&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span>;
+        <span class="self">self</span>.gamma = gamma;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;F&gt; Default <span class="kw">for </span>Newton&lt;F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-        <span class="ident">Newton::new</span>()
+    <span class="kw">fn </span>default() -&gt; Newton&lt;F&gt; {
+        Newton::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Hessian</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminScaledSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">H</span>: <span class="ident">ArgminInv</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;O, P, G, H, F&gt; Solver&lt;O, IterState&lt;P, G, (), H, F&gt;&gt; <span class="kw">for </span>Newton&lt;F&gt;
+<span class="kw">where
+    </span>O: Gradient&lt;Param = P, Gradient = G&gt; + Hessian&lt;Param = P, Hessian = H&gt;,
+    P: Clone + ArgminScaledSub&lt;P, F, P&gt;,
+    H: ArgminInv&lt;H&gt; + ArgminDot&lt;G, P&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Newton method&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Newton method&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`Newton` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">hessian</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="ident">param</span>.<span class="ident">scaled_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">gamma</span>, <span class="kw-2">&amp;</span><span class="ident">hessian</span>.<span class="ident">inv</span>()<span class="question-mark">?</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>));
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">new_param</span>), <span class="prelude-val">None</span>))
+        <span class="kw">let </span>grad = problem.gradient(<span class="kw-2">&amp;</span>param)<span class="question-mark">?</span>;
+        <span class="kw">let </span>hessian = problem.hessian(<span class="kw-2">&amp;</span>param)<span class="question-mark">?</span>;
+        <span class="kw">let </span>new_param = param.scaled_sub(<span class="kw-2">&amp;</span><span class="self">self</span>.gamma, <span class="kw-2">&amp;</span>hessian.inv()<span class="question-mark">?</span>.dot(<span class="kw-2">&amp;</span>grad));
+        <span class="prelude-val">Ok</span>((state.param(new_param), <span class="prelude-val">None</span>))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::ArgminError</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::Executor</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::ArgminError;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;_ndarrayl&quot;</span>)]
+    </span><span class="kw">use </span><span class="kw">crate</span>::core::Executor;
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;_ndarrayl&quot;</span>)]
+    </span><span class="kw">use </span>approx::assert_relative_eq;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">newton_method</span>, <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(newton_method, Newton&lt;f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">solver</span>.<span class="ident">gamma</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>solver: Newton&lt;f64&gt; = Newton::new();
+        <span class="macro">assert_eq!</span>(solver.gamma.to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_default</span>() {
-        <span class="kw">let</span> <span class="ident">solver_new</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>();
-        <span class="kw">let</span> <span class="ident">solver_def</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::default</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_default() {
+        <span class="kw">let </span>solver_new: Newton&lt;f64&gt; = Newton::new();
+        <span class="kw">let </span>solver_def: Newton&lt;f64&gt; = Newton::default();
         <span class="macro">assert_eq!</span>(
-            <span class="ident">solver_new</span>.<span class="ident">gamma</span>.<span class="ident">to_ne_bytes</span>(),
-            <span class="ident">solver_def</span>.<span class="ident">gamma</span>.<span class="ident">to_ne_bytes</span>()
+            solver_new.gamma.to_ne_bytes(),
+            solver_def.gamma.to_ne_bytes()
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_gamma</span>() {
-        <span class="kw">for</span> <span class="ident">new_gamma</span> <span class="kw">in</span> [<span class="ident">f64::EPSILON</span>, <span class="number">0.1</span>, <span class="number">0.5</span>, <span class="number">0.9</span>, <span class="number">1.0</span>] {
-            <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">with_gamma</span>(<span class="ident">new_gamma</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">solver</span>.<span class="ident">gamma</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">new_gamma</span>.<span class="ident">to_ne_bytes</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_gamma() {
+        <span class="kw">for </span>new_gamma <span class="kw">in </span>[f64::EPSILON, <span class="number">0.1</span>, <span class="number">0.5</span>, <span class="number">0.9</span>, <span class="number">1.0</span>] {
+            <span class="kw">let </span>solver: Newton&lt;f64&gt; = Newton::new().with_gamma(new_gamma).unwrap();
+            <span class="macro">assert_eq!</span>(solver.gamma.to_ne_bytes(), new_gamma.to_ne_bytes());
         }
 
-        <span class="kw">for</span> <span class="ident">new_gamma</span> <span class="kw">in</span> [<span class="number">1.0</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="number">2.0</span>, <span class="number">0.0</span>, <span class="op">-</span><span class="number">1.0</span>] {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">with_gamma</span>(<span class="ident">new_gamma</span>);
+        <span class="kw">for </span>new_gamma <span class="kw">in </span>[<span class="number">1.0 </span>+ f64::EPSILON, <span class="number">2.0</span>, <span class="number">0.0</span>, -<span class="number">1.0</span>] {
+            <span class="kw">let </span>res = Newton::new().with_gamma(new_gamma);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
-                <span class="string">&quot;Invalid parameter: \&quot;Newton: gamma must be in  (0, 1].\&quot;&quot;</span>
-            );
+                res,
+                ArgminError,
+                <span class="string">&quot;Invalid parameter: \&quot;Newton: gamma must be in  (0, 1].\&quot;&quot;
+            </span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter_param_not_initialized</span>() {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::State</span>;
-        <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">Array</span>, <span class="ident">Array1</span>, <span class="ident">Array2</span>};
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">newton</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;_ndarrayl&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>test_next_iter_param_not_initialized() {
+        <span class="kw">use </span><span class="kw">crate</span>::core::State;
+        <span class="kw">use </span>ndarray::{Array, Array1, Array2};
+        <span class="kw">let </span><span class="kw-2">mut </span>newton: Newton&lt;f64&gt; = Newton::new();
 
-        <span class="kw">struct</span> <span class="ident">NewtonProblem</span> {}
+        <span class="kw">struct </span>NewtonProblem {}
 
-        <span class="kw">impl</span> <span class="ident">Gradient</span> <span class="kw">for</span> <span class="ident">NewtonProblem</span> {
-            <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-            <span class="kw">type</span> <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+        <span class="kw">impl </span>Gradient <span class="kw">for </span>NewtonProblem {
+            <span class="kw">type </span>Param = Array1&lt;f64&gt;;
+            <span class="kw">type </span>Gradient = Array1&lt;f64&gt;;
 
-            <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Gradient</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">Array1::from_vec</span>(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>]))
+            <span class="kw">fn </span>gradient(<span class="kw-2">&amp;</span><span class="self">self</span>, _p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Gradient, Error&gt; {
+                <span class="prelude-val">Ok</span>(Array1::from_vec(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>]))
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">Hessian</span> <span class="kw">for</span> <span class="ident">NewtonProblem</span> {
-            <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-            <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+        <span class="kw">impl </span>Hessian <span class="kw">for </span>NewtonProblem {
+            <span class="kw">type </span>Param = Array1&lt;f64&gt;;
+            <span class="kw">type </span>Hessian = Array2&lt;f64&gt;;
 
-            <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">Array::from_shape_vec</span>((<span class="number">2</span>, <span class="number">2</span>), <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>])<span class="question-mark">?</span>)
+            <span class="kw">fn </span>hessian(<span class="kw-2">&amp;</span><span class="self">self</span>, _p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Hessian, Error&gt; {
+                <span class="prelude-val">Ok</span>(Array::from_shape_vec((<span class="number">2</span>, <span class="number">2</span>), <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>])<span class="question-mark">?</span>)
             }
         }
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">newton</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">NewtonProblem</span> {}), <span class="ident">IterState::new</span>());
+        <span class="kw">let </span>res = newton.next_iter(<span class="kw-2">&amp;mut </span>Problem::new(NewtonProblem {}), IterState::new());
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`Newton` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_solver</span>() {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::State</span>;
-        <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">Array</span>, <span class="ident">Array1</span>, <span class="ident">Array2</span>};
-        <span class="kw">struct</span> <span class="ident">Problem</span> {}
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;_ndarrayl&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>test_solver() {
+        <span class="kw">use </span><span class="kw">crate</span>::core::State;
+        <span class="kw">use </span>ndarray::{Array, Array1, Array2};
+        <span class="kw">struct </span>Problem {}
 
-        <span class="kw">impl</span> <span class="ident">Gradient</span> <span class="kw">for</span> <span class="ident">Problem</span> {
-            <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-            <span class="kw">type</span> <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+        <span class="kw">impl </span>Gradient <span class="kw">for </span>Problem {
+            <span class="kw">type </span>Param = Array1&lt;f64&gt;;
+            <span class="kw">type </span>Gradient = Array1&lt;f64&gt;;
 
-            <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Gradient</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">Array1::from_vec</span>(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>]))
+            <span class="kw">fn </span>gradient(<span class="kw-2">&amp;</span><span class="self">self</span>, _p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Gradient, Error&gt; {
+                <span class="prelude-val">Ok</span>(Array1::from_vec(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>]))
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">Hessian</span> <span class="kw">for</span> <span class="ident">Problem</span> {
-            <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-            <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+        <span class="kw">impl </span>Hessian <span class="kw">for </span>Problem {
+            <span class="kw">type </span>Param = Array1&lt;f64&gt;;
+            <span class="kw">type </span>Hessian = Array2&lt;f64&gt;;
 
-            <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">Array::from_shape_vec</span>((<span class="number">2</span>, <span class="number">2</span>), <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>])<span class="question-mark">?</span>)
+            <span class="kw">fn </span>hessian(<span class="kw-2">&amp;</span><span class="self">self</span>, _p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Hessian, Error&gt; {
+                <span class="prelude-val">Ok</span>(Array::from_shape_vec((<span class="number">2</span>, <span class="number">2</span>), <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>])<span class="question-mark">?</span>)
             }
         }
 
-        <span class="comment">// Single iteration, starting from [0, 0], gamma = 1</span>
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem</span> {};
-        <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>();
-        <span class="kw">let</span> <span class="ident">init_param</span> <span class="op">=</span> <span class="ident">Array1::from_vec</span>(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
+        <span class="comment">// Single iteration, starting from [0, 0], gamma = 1
+        </span><span class="kw">let </span>problem = Problem {};
+        <span class="kw">let </span>solver: Newton&lt;f64&gt; = Newton::new();
+        <span class="kw">let </span>init_param = Array1::from_vec(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
-            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">init_param</span>).<span class="ident">max_iters</span>(<span class="number">1</span>))
-            .<span class="ident">run</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">state</span>
-            .<span class="ident">get_best_param</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">clone</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">1.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="op">-</span><span class="number">2.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>param = Executor::new(problem, solver)
+            .configure(|config| config.param(init_param).max_iters(<span class="number">1</span>))
+            .run()
+            .unwrap()
+            .state
+            .get_best_param()
+            .unwrap()
+            .clone();
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], -<span class="number">1.0</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], -<span class="number">2.0</span>, epsilon = f64::EPSILON);
 
-        <span class="comment">// Two iterations, starting from [0, 0], gamma = 1</span>
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem</span> {};
-        <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>();
-        <span class="kw">let</span> <span class="ident">init_param</span> <span class="op">=</span> <span class="ident">Array1::from_vec</span>(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
+        <span class="comment">// Two iterations, starting from [0, 0], gamma = 1
+        </span><span class="kw">let </span>problem = Problem {};
+        <span class="kw">let </span>solver: Newton&lt;f64&gt; = Newton::new();
+        <span class="kw">let </span>init_param = Array1::from_vec(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
-            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">init_param</span>).<span class="ident">max_iters</span>(<span class="number">2</span>))
-            .<span class="ident">run</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">state</span>
-            .<span class="ident">get_best_param</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">clone</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">2.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="op">-</span><span class="number">4.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>param = Executor::new(problem, solver)
+            .configure(|config| config.param(init_param).max_iters(<span class="number">2</span>))
+            .run()
+            .unwrap()
+            .state
+            .get_best_param()
+            .unwrap()
+            .clone();
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], -<span class="number">2.0</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], -<span class="number">4.0</span>, epsilon = f64::EPSILON);
 
-        <span class="comment">// Single iteration, starting from [0, 0], gamma = 0.5</span>
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem</span> {};
-        <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">with_gamma</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">init_param</span> <span class="op">=</span> <span class="ident">Array1::from_vec</span>(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
+        <span class="comment">// Single iteration, starting from [0, 0], gamma = 0.5
+        </span><span class="kw">let </span>problem = Problem {};
+        <span class="kw">let </span>solver: Newton&lt;f64&gt; = Newton::new().with_gamma(<span class="number">0.5</span>).unwrap();
+        <span class="kw">let </span>init_param = Array1::from_vec(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
-            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">init_param</span>).<span class="ident">max_iters</span>(<span class="number">1</span>))
-            .<span class="ident">run</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">state</span>
-            .<span class="ident">get_best_param</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">clone</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">0.5</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="op">-</span><span class="number">1.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>param = Executor::new(problem, solver)
+            .configure(|config| config.param(init_param).max_iters(<span class="number">1</span>))
+            .run()
+            .unwrap()
+            .state
+            .get_best_param()
+            .unwrap()
+            .clone();
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], -<span class="number">0.5</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], -<span class="number">1.0</span>, epsilon = f64::EPSILON);
 
-        <span class="comment">// Two iterations, starting from [0, 0], gamma = 0.5</span>
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem</span> {};
-        <span class="kw">let</span> <span class="ident">solver</span>: <span class="ident">Newton</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Newton::new</span>().<span class="ident">with_gamma</span>(<span class="number">0.5</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">init_param</span> <span class="op">=</span> <span class="ident">Array1::from_vec</span>(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
+        <span class="comment">// Two iterations, starting from [0, 0], gamma = 0.5
+        </span><span class="kw">let </span>problem = Problem {};
+        <span class="kw">let </span>solver: Newton&lt;f64&gt; = Newton::new().with_gamma(<span class="number">0.5</span>).unwrap();
+        <span class="kw">let </span>init_param = Array1::from_vec(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>, <span class="ident">solver</span>)
-            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">init_param</span>).<span class="ident">max_iters</span>(<span class="number">2</span>))
-            .<span class="ident">run</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">state</span>
-            .<span class="ident">get_best_param</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">clone</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">1.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="op">-</span><span class="number">2.0</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>param = Executor::new(problem, solver)
+            .configure(|config| config.param(init_param).max_iters(<span class="number">2</span>))
+            .run()
+            .unwrap()
+            .state
+            .get_best_param()
+            .unwrap()
+            .clone();
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], -<span class="number">1.0</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], -<span class="number">2.0</span>, epsilon = f64::EPSILON);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

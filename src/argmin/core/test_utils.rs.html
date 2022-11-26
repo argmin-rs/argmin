@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/test_utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test_utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../argmin/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/test_utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test_utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../argmin/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -337,344 +337,344 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">Gradient</span>, <span class="ident">Hessian</span>, <span class="ident">IterState</span>, <span class="ident">Jacobian</span>, <span class="ident">Operator</span>, <span class="ident">Problem</span>, <span class="ident">Solver</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    CostFunction, Error, Gradient, Hessian, IterState, Jacobian, Operator, Problem, Solver, KV,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::simulatedannealing::Anneal</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
+<span class="kw">use </span><span class="kw">crate</span>::solver::simulatedannealing::Anneal;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::fmt::Debug;
 
-<span class="doccomment">/// Pseudo problem useful for testing</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Implements [`CostFunction`], [`Operator`], [`Gradient`], [`Jacobian`], [`Hessian`], and</span>
-<span class="doccomment">/// [`Anneal`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestProblem</span> {}
+<span class="doccomment">/// Pseudo problem useful for testing
+///
+/// Implements [`CostFunction`], [`Operator`], [`Gradient`], [`Jacobian`], [`Hessian`], and
+/// [`Anneal`].
+</span><span class="attribute">#[derive(Clone, Copy, Default, Debug, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>TestProblem {}
 
-<span class="kw">impl</span> <span class="ident">TestProblem</span> {
-    <span class="doccomment">/// Create an instance of `TestProblem`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestProblem;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let problem = TestProblem::new();</span>
-    <span class="doccomment">/// # assert_eq!(problem, TestProblem {});</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">TestProblem</span> {}
+<span class="kw">impl </span>TestProblem {
+    <span class="doccomment">/// Create an instance of `TestProblem`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestProblem;
+    ///
+    /// let problem = TestProblem::new();
+    /// # assert_eq!(problem, TestProblem {});
+    /// ```
+    </span><span class="attribute">#[allow(dead_code)]
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        TestProblem {}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Operator</span> <span class="kw">for</span> <span class="ident">TestProblem</span> {
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Operator <span class="kw">for </span>TestProblem {
+    <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+    <span class="kw">type </span>Output = Vec&lt;f64&gt;;
 
-    <span class="doccomment">/// Returns a clone of parameter `p`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestProblem;</span>
-    <span class="doccomment">/// use argmin::core::Operator;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let problem = TestProblem::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![1.0, 2.0];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem.apply(&amp;param)?;</span>
-    <span class="doccomment">/// # assert_eq!(res, param);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">clone</span>())
+    <span class="doccomment">/// Returns a clone of parameter `p`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestProblem;
+    /// use argmin::core::Operator;
+    /// # use argmin::core::Error;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let problem = TestProblem::new();
+    ///
+    /// let param = vec![1.0, 2.0];
+    ///
+    /// let res = problem.apply(&amp;param)?;
+    /// # assert_eq!(res, param);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>apply(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
+        <span class="prelude-val">Ok</span>(p.clone())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CostFunction</span> <span class="kw">for</span> <span class="ident">TestProblem</span> {
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
+<span class="kw">impl </span>CostFunction <span class="kw">for </span>TestProblem {
+    <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+    <span class="kw">type </span>Output = f64;
 
-    <span class="doccomment">/// Returns `1.0f64`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestProblem;</span>
-    <span class="doccomment">/// use argmin::core::CostFunction;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let problem = TestProblem::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![1.0, 2.0];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem.cost(&amp;param)?;</span>
-    <span class="doccomment">/// # assert_eq!(res, 1.0f64);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Returns `1.0f64`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestProblem;
+    /// use argmin::core::CostFunction;
+    /// # use argmin::core::Error;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let problem = TestProblem::new();
+    ///
+    /// let param = vec![1.0, 2.0];
+    ///
+    /// let res = problem.cost(&amp;param)?;
+    /// # assert_eq!(res, 1.0f64);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, _p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
         <span class="prelude-val">Ok</span>(<span class="number">1.0f64</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Gradient</span> <span class="kw">for</span> <span class="ident">TestProblem</span> {
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Gradient <span class="kw">for </span>TestProblem {
+    <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+    <span class="kw">type </span>Gradient = Vec&lt;f64&gt;;
 
-    <span class="doccomment">/// Returns a clone of parameter `p`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestProblem;</span>
-    <span class="doccomment">/// use argmin::core::Gradient;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let problem = TestProblem::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![1.0, 2.0];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem.gradient(&amp;param)?;</span>
-    <span class="doccomment">/// # assert_eq!(res, param);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Param</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">clone</span>())
+    <span class="doccomment">/// Returns a clone of parameter `p`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestProblem;
+    /// use argmin::core::Gradient;
+    /// # use argmin::core::Error;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let problem = TestProblem::new();
+    ///
+    /// let param = vec![1.0, 2.0];
+    ///
+    /// let res = problem.gradient(&amp;param)?;
+    /// # assert_eq!(res, param);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>gradient(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Param, Error&gt; {
+        <span class="prelude-val">Ok</span>(p.clone())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Hessian</span> <span class="kw">for</span> <span class="ident">TestProblem</span> {
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Hessian <span class="kw">for </span>TestProblem {
+    <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+    <span class="kw">type </span>Hessian = Vec&lt;Vec&lt;f64&gt;&gt;;
 
-    <span class="doccomment">/// Returns `vec![p, p]`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestProblem;</span>
-    <span class="doccomment">/// use argmin::core::Hessian;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let problem = TestProblem::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![1.0, 2.0];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem.hessian(&amp;param)?;</span>
-    <span class="doccomment">/// # assert_eq!(res, vec![param.clone(), param.clone()]);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">p</span>.<span class="ident">clone</span>(), <span class="ident">p</span>.<span class="ident">clone</span>()])
+    <span class="doccomment">/// Returns `vec![p, p]`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestProblem;
+    /// use argmin::core::Hessian;
+    /// # use argmin::core::Error;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let problem = TestProblem::new();
+    ///
+    /// let param = vec![1.0, 2.0];
+    ///
+    /// let res = problem.hessian(&amp;param)?;
+    /// # assert_eq!(res, vec![param.clone(), param.clone()]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>hessian(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Hessian, Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[p.clone(), p.clone()])
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Jacobian</span> <span class="kw">for</span> <span class="ident">TestProblem</span> {
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Jacobian</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Jacobian <span class="kw">for </span>TestProblem {
+    <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+    <span class="kw">type </span>Jacobian = Vec&lt;Vec&lt;f64&gt;&gt;;
 
-    <span class="doccomment">/// Returns `vec![p, p]`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestProblem;</span>
-    <span class="doccomment">/// use argmin::core::Jacobian;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let problem = TestProblem::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![1.0, 2.0];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem.jacobian(&amp;param)?;</span>
-    <span class="doccomment">/// # assert_eq!(res, vec![param.clone(), param.clone()]);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">jacobian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Jacobian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">p</span>.<span class="ident">clone</span>(), <span class="ident">p</span>.<span class="ident">clone</span>()])
+    <span class="doccomment">/// Returns `vec![p, p]`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestProblem;
+    /// use argmin::core::Jacobian;
+    /// # use argmin::core::Error;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let problem = TestProblem::new();
+    ///
+    /// let param = vec![1.0, 2.0];
+    ///
+    /// let res = problem.jacobian(&amp;param)?;
+    /// # assert_eq!(res, vec![param.clone(), param.clone()]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>jacobian(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Jacobian, Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[p.clone(), p.clone()])
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Anneal</span> <span class="kw">for</span> <span class="ident">TestProblem</span> {
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Float</span> <span class="op">=</span> <span class="ident">f64</span>;
+<span class="kw">impl </span>Anneal <span class="kw">for </span>TestProblem {
+    <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+    <span class="kw">type </span>Output = Vec&lt;f64&gt;;
+    <span class="kw">type </span>Float = f64;
 
-    <span class="doccomment">/// Returns a clone of parameter `p`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestProblem;</span>
-    <span class="doccomment">/// use argmin::solver::simulatedannealing::Anneal;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let problem = TestProblem::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![1.0, 2.0];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem.anneal(&amp;param, 1.0)?;</span>
-    <span class="doccomment">/// # assert_eq!(res, param);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">anneal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>, <span class="ident">_t</span>: <span class="ident"><span class="self">Self</span>::Float</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">clone</span>())
+    <span class="doccomment">/// Returns a clone of parameter `p`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestProblem;
+    /// use argmin::solver::simulatedannealing::Anneal;
+    /// # use argmin::core::Error;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let problem = TestProblem::new();
+    ///
+    /// let param = vec![1.0, 2.0];
+    ///
+    /// let res = problem.anneal(&amp;param, 1.0)?;
+    /// # assert_eq!(res, param);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>anneal(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param, _t: <span class="self">Self</span>::Float) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
+        <span class="prelude-val">Ok</span>(p.clone())
     }
 }
 
-<span class="doccomment">/// A struct representing the following sparse problem.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example 1: x = [1, 1, 0, 0], y =  1</span>
-<span class="doccomment">/// Example 2: x = [0, 0, 1, 1], y = -1</span>
-<span class="doccomment">/// Example 3: x = [1, 0, 0, 0], y =  1</span>
-<span class="doccomment">/// Example 4: x = [0, 0, 1, 0], y = -1</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// cost = Σ (w^T x - y)^2</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Implements [`CostFunction`] and [`Gradient`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestSparseProblem</span> {}
+<span class="doccomment">/// A struct representing the following sparse problem.
+///
+/// Example 1: x = [1, 1, 0, 0], y =  1
+/// Example 2: x = [0, 0, 1, 1], y = -1
+/// Example 3: x = [1, 0, 0, 0], y =  1
+/// Example 4: x = [0, 0, 1, 0], y = -1
+///
+/// cost = Σ (w^T x - y)^2
+///
+/// Implements [`CostFunction`] and [`Gradient`].
+</span><span class="attribute">#[derive(Clone, Copy, Default, Debug, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>TestSparseProblem {}
 
-<span class="kw">impl</span> <span class="ident">TestSparseProblem</span> {
-    <span class="doccomment">/// Create an instance of `TestSparseProblem`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestSparseProblem;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let problem = TestSparseProblem::new();</span>
-    <span class="doccomment">/// # assert_eq!(problem, TestSparseProblem {});</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">TestSparseProblem</span> {}
+<span class="kw">impl </span>TestSparseProblem {
+    <span class="doccomment">/// Create an instance of `TestSparseProblem`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestSparseProblem;
+    ///
+    /// let problem = TestSparseProblem::new();
+    /// # assert_eq!(problem, TestSparseProblem {});
+    /// ```
+    </span><span class="attribute">#[allow(dead_code)]
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        TestSparseProblem {}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CostFunction</span> <span class="kw">for</span> <span class="ident">TestSparseProblem</span> {
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
+<span class="kw">impl </span>CostFunction <span class="kw">for </span>TestSparseProblem {
+    <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+    <span class="kw">type </span>Output = f64;
 
-    <span class="doccomment">/// Returns a sum of squared errors.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestSparseProblem;</span>
-    <span class="doccomment">/// use argmin::core::CostFunction;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let problem = TestSparseProblem::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![1.0, 2.0, 3.0, 4.0];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem.cost(&amp;param)?;</span>
-    <span class="doccomment">/// # assert_eq!(res, 84f64);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">err1</span> <span class="op">=</span> (<span class="ident">param</span>[<span class="number">0</span>] <span class="op">+</span> <span class="ident">param</span>[<span class="number">1</span>] <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">err2</span> <span class="op">=</span> (<span class="ident">param</span>[<span class="number">2</span>] <span class="op">+</span> <span class="ident">param</span>[<span class="number">3</span>] <span class="op">+</span> <span class="number">1.0</span>).<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">err3</span> <span class="op">=</span> (<span class="ident">param</span>[<span class="number">0</span>] <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">err4</span> <span class="op">=</span> (<span class="ident">param</span>[<span class="number">2</span>] <span class="op">+</span> <span class="number">1.0</span>).<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">err1</span> <span class="op">+</span> <span class="ident">err2</span> <span class="op">+</span> <span class="ident">err3</span> <span class="op">+</span> <span class="ident">err4</span>)
+    <span class="doccomment">/// Returns a sum of squared errors.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestSparseProblem;
+    /// use argmin::core::CostFunction;
+    /// # use argmin::core::Error;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let problem = TestSparseProblem::new();
+    ///
+    /// let param = vec![1.0, 2.0, 3.0, 4.0];
+    ///
+    /// let res = problem.cost(&amp;param)?;
+    /// # assert_eq!(res, 84f64);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
+        <span class="kw">let </span>err1 = (param[<span class="number">0</span>] + param[<span class="number">1</span>] - <span class="number">1.0</span>).powi(<span class="number">2</span>);
+        <span class="kw">let </span>err2 = (param[<span class="number">2</span>] + param[<span class="number">3</span>] + <span class="number">1.0</span>).powi(<span class="number">2</span>);
+        <span class="kw">let </span>err3 = (param[<span class="number">0</span>] - <span class="number">1.0</span>).powi(<span class="number">2</span>);
+        <span class="kw">let </span>err4 = (param[<span class="number">2</span>] + <span class="number">1.0</span>).powi(<span class="number">2</span>);
+        <span class="prelude-val">Ok</span>(err1 + err2 + err3 + err4)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Gradient</span> <span class="kw">for</span> <span class="ident">TestSparseProblem</span> {
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Gradient <span class="kw">for </span>TestSparseProblem {
+    <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+    <span class="kw">type </span>Gradient = Vec&lt;f64&gt;;
 
-    <span class="doccomment">/// Returns a gradient of the cost function.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestSparseProblem;</span>
-    <span class="doccomment">/// use argmin::core::Gradient;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let problem = TestSparseProblem::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![1.0, 2.0, 3.0, 4.0];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem.gradient(&amp;param)?;</span>
-    <span class="doccomment">/// # assert_eq!(res, vec![4.0, 4.0, 24.0, 16.0]);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Gradient</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0.0</span>; <span class="number">4</span>];
-        <span class="ident">g</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">4.0</span> <span class="op">*</span> <span class="ident">param</span>[<span class="number">0</span>] <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">param</span>[<span class="number">1</span>] <span class="op">-</span> <span class="number">4.0</span>;
-        <span class="ident">g</span>[<span class="number">1</span>] <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">param</span>[<span class="number">0</span>] <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">param</span>[<span class="number">1</span>] <span class="op">-</span> <span class="number">2.0</span>;
-        <span class="ident">g</span>[<span class="number">2</span>] <span class="op">=</span> <span class="number">4.0</span> <span class="op">*</span> <span class="ident">param</span>[<span class="number">2</span>] <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">param</span>[<span class="number">3</span>] <span class="op">+</span> <span class="number">4.0</span>;
-        <span class="ident">g</span>[<span class="number">3</span>] <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">param</span>[<span class="number">2</span>] <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">param</span>[<span class="number">3</span>] <span class="op">+</span> <span class="number">2.0</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">g</span>)
+    <span class="doccomment">/// Returns a gradient of the cost function.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestSparseProblem;
+    /// use argmin::core::Gradient;
+    /// # use argmin::core::Error;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let problem = TestSparseProblem::new();
+    ///
+    /// let param = vec![1.0, 2.0, 3.0, 4.0];
+    ///
+    /// let res = problem.gradient(&amp;param)?;
+    /// # assert_eq!(res, vec![4.0, 4.0, 24.0, 16.0]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>gradient(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Gradient, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>g = <span class="macro">vec!</span>[<span class="number">0.0</span>; <span class="number">4</span>];
+        g[<span class="number">0</span>] = <span class="number">4.0 </span>* param[<span class="number">0</span>] + <span class="number">2.0 </span>* param[<span class="number">1</span>] - <span class="number">4.0</span>;
+        g[<span class="number">1</span>] = <span class="number">2.0 </span>* param[<span class="number">0</span>] + <span class="number">2.0 </span>* param[<span class="number">1</span>] - <span class="number">2.0</span>;
+        g[<span class="number">2</span>] = <span class="number">4.0 </span>* param[<span class="number">2</span>] + <span class="number">2.0 </span>* param[<span class="number">3</span>] + <span class="number">4.0</span>;
+        g[<span class="number">3</span>] = <span class="number">2.0 </span>* param[<span class="number">2</span>] + <span class="number">2.0 </span>* param[<span class="number">3</span>] + <span class="number">2.0</span>;
+        <span class="prelude-val">Ok</span>(g)
     }
 }
 
-<span class="doccomment">/// A (non-working) solver useful for testing</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Implements the [`Solver`] trait.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestSolver</span> {}
+<span class="doccomment">/// A (non-working) solver useful for testing
+///
+/// Implements the [`Solver`] trait.
+</span><span class="attribute">#[derive(Clone, Copy, Default, Eq, PartialEq, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>TestSolver {}
 
-<span class="kw">impl</span> <span class="ident">TestSolver</span> {
-    <span class="doccomment">/// Create an instance of `TestSolver`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::test_utils::TestSolver;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let solver = TestSolver::new();</span>
-    <span class="doccomment">/// # assert_eq!(solver, TestSolver {});</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">TestSolver</span> {
-        <span class="ident">TestSolver</span> {}
+<span class="kw">impl </span>TestSolver {
+    <span class="doccomment">/// Create an instance of `TestSolver`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::test_utils::TestSolver;
+    ///
+    /// let solver = TestSolver::new();
+    /// # assert_eq!(solver, TestSolver {});
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; TestSolver {
+        TestSolver {}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TestSolver</span> {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;TestSolver&quot;</span>;
+<span class="kw">impl</span>&lt;O&gt; Solver&lt;O, IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; <span class="kw">for </span>TestSolver {
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;TestSolver&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>, <span class="prelude-val">None</span>))
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

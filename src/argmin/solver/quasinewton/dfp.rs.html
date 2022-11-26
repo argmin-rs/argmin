@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/quasinewton/dfp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dfp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/quasinewton/dfp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dfp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -425,432 +425,432 @@
 <span id="425">425</span>
 <span id="426">426</span>
 <span id="427">427</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>, <span class="ident">IterState</span>,
-    <span class="ident">LineSearch</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
+    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason, KV,
 };
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminL2Norm</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminSub</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminSub};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// # Davidon-Fletcher-Powell (DFP) method</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The Davidon-Fletcher-Powell algorithm (DFP) is a method for solving unconstrained nonlinear</span>
-<span class="doccomment">/// optimization problems.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The algorithm requires a line search which is provided via the constructor. Additionally an</span>
-<span class="doccomment">/// initial guess for the parameter vector and an initial inverse Hessian is required, which are to</span>
-<span class="doccomment">/// be provided via the [`configure`](`crate::core::Executor::configure`) method of the</span>
-<span class="doccomment">/// [`Executor`](`crate::core::Executor`) (See [`IterState`], in particular [`IterState::param`]</span>
-<span class="doccomment">/// and [`IterState::inv_hessian`]).</span>
-<span class="doccomment">/// In the same way the initial gradient and cost function corresponding to the initial parameter</span>
-<span class="doccomment">/// vector can be provided. If these are not provided, they will be computed during initialization</span>
-<span class="doccomment">/// of the algorithm.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A tolerance on the gradient can be configured with</span>
-<span class="doccomment">/// [`with_tolerance_grad`](`DFP::with_tolerance_grad`): If the norm of the gradient is below</span>
-<span class="doccomment">/// said tolerance, the algorithm stops. It defaults to `sqrt(EPSILON)`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Reference</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DFP</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// line search</span>
-    <span class="ident">linesearch</span>: <span class="ident">L</span>,
-    <span class="doccomment">/// Tolerance for the stopping criterion based on the change of the norm on the gradient</span>
-    <span class="ident">tol_grad</span>: <span class="ident">F</span>,
+<span class="doccomment">/// # Davidon-Fletcher-Powell (DFP) method
+///
+/// The Davidon-Fletcher-Powell algorithm (DFP) is a method for solving unconstrained nonlinear
+/// optimization problems.
+///
+/// The algorithm requires a line search which is provided via the constructor. Additionally an
+/// initial guess for the parameter vector and an initial inverse Hessian is required, which are to
+/// be provided via the [`configure`](`crate::core::Executor::configure`) method of the
+/// [`Executor`](`crate::core::Executor`) (See [`IterState`], in particular [`IterState::param`]
+/// and [`IterState::inv_hessian`]).
+/// In the same way the initial gradient and cost function corresponding to the initial parameter
+/// vector can be provided. If these are not provided, they will be computed during initialization
+/// of the algorithm.
+///
+/// A tolerance on the gradient can be configured with
+/// [`with_tolerance_grad`](`DFP::with_tolerance_grad`): If the norm of the gradient is below
+/// said tolerance, the algorithm stops. It defaults to `sqrt(EPSILON)`.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>DFP&lt;L, F&gt; {
+    <span class="doccomment">/// line search
+    </span>linesearch: L,
+    <span class="doccomment">/// Tolerance for the stopping criterion based on the change of the norm on the gradient
+    </span>tol_grad: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">DFP</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;L, F&gt; DFP&lt;L, F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`DFP`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::quasinewton::DFP;</span>
-    <span class="doccomment">/// # let linesearch = ();</span>
-    <span class="doccomment">/// let dfp: DFP&lt;_, f64&gt; = DFP::new(linesearch);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">linesearch</span>: <span class="ident">L</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">DFP</span> {
-            <span class="ident">linesearch</span>,
-            <span class="ident">tol_grad</span>: <span class="ident">F::epsilon</span>().<span class="ident">sqrt</span>(),
+    <span class="doccomment">/// Construct a new instance of [`DFP`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::quasinewton::DFP;
+    /// # let linesearch = ();
+    /// let dfp: DFP&lt;_, f64&gt; = DFP::new(linesearch);
+    /// ```
+    </span><span class="kw">pub fn </span>new(linesearch: L) -&gt; <span class="self">Self </span>{
+        DFP {
+            linesearch,
+            tol_grad: F::epsilon().sqrt(),
         }
     }
 
-    <span class="doccomment">/// The algorithm stops if the norm of the gradient is below `tol_grad`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The provided value must be non-negative. Defaults to `sqrt(EPSILON)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::quasinewton::DFP;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let linesearch = ();</span>
-    <span class="doccomment">/// let dfp: DFP&lt;_, f64&gt; = DFP::new(linesearch).with_tolerance_grad(1e-6)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tolerance_grad</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol_grad</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">tol_grad</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`DFP`: gradient tolerance must be &gt;= 0.&quot;</span>
-            ));
+    <span class="doccomment">/// The algorithm stops if the norm of the gradient is below `tol_grad`.
+    ///
+    /// The provided value must be non-negative. Defaults to `sqrt(EPSILON)`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::quasinewton::DFP;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let linesearch = ();
+    /// let dfp: DFP&lt;_, f64&gt; = DFP::new(linesearch).with_tolerance_grad(1e-6)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_tolerance_grad(<span class="kw-2">mut </span><span class="self">self</span>, tol_grad: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>tol_grad &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`DFP`: gradient tolerance must be &gt;= 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">tol_grad</span> <span class="op">=</span> <span class="ident">tol_grad</span>;
+        <span class="self">self</span>.tol_grad = tol_grad;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">L</span>, <span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DFP</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">H</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">G</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">G</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">H</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">H</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">H</span><span class="op">&gt;</span>,
-    <span class="ident">L</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">LineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;O, L, P, G, H, F&gt; Solver&lt;O, IterState&lt;P, G, (), H, F&gt;&gt; <span class="kw">for </span>DFP&lt;L, F&gt;
+<span class="kw">where
+    </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
+    P: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminSub&lt;P, P&gt;
+        + ArgminDot&lt;G, F&gt;
+        + ArgminDot&lt;P, H&gt;
+        + ArgminMul&lt;F, P&gt;,
+    G: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminSub&lt;G, G&gt;
+        + ArgminL2Norm&lt;F&gt;
+        + ArgminDot&lt;P, F&gt;,
+    H: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminSub&lt;H, H&gt;
+        + ArgminDot&lt;G, P&gt;
+        + ArgminAdd&lt;H, H&gt;
+        + ArgminMul&lt;F, H&gt;,
+    L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;DFP&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;DFP&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`DFP` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">inv_hessian</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_inv_hessian</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+        <span class="kw">let </span>inv_hessian = state.take_inv_hessian().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`DFP` requires an initial inverse Hessian. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cost</span>.<span class="ident">is_infinite</span>() {
-            <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>)<span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">cost</span>
+        <span class="kw">let </span>cost = state.get_cost();
+        <span class="kw">let </span>cost = <span class="kw">if </span>cost.is_infinite() {
+            problem.cost(<span class="kw-2">&amp;</span>param)<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            cost
         };
 
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">state</span>
-            .<span class="ident">take_gradient</span>()
-            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>grad = state
+            .take_gradient()
+            .map(Result::Ok)
+            .unwrap_or_else(|| problem.gradient(<span class="kw-2">&amp;</span>param))<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>
-                .<span class="ident">param</span>(<span class="ident">param</span>)
-                .<span class="ident">cost</span>(<span class="ident">cost</span>)
-                .<span class="ident">gradient</span>(<span class="ident">grad</span>)
-                .<span class="ident">inv_hessian</span>(<span class="ident">inv_hessian</span>),
+            state
+                .param(param)
+                .cost(cost)
+                .gradient(grad)
+                .inv_hessian(inv_hessian),
             <span class="prelude-val">None</span>,
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`DFP`: Parameter vector in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`DFP`: Parameter vector in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>cost = state.get_cost();
 
-        <span class="kw">let</span> <span class="ident">prev_grad</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_gradient</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`DFP`: Gradient in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>prev_grad = state.take_gradient().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`DFP`: Gradient in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">inv_hessian</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_inv_hessian</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`DFP`: Inverse Hessian in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>inv_hessian = state.take_inv_hessian().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`DFP`: Inverse Hessian in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>));
+        <span class="kw">let </span>p = inv_hessian.dot(<span class="kw-2">&amp;</span>prev_grad).mul(<span class="kw-2">&amp;</span><span class="macro">float!</span>(-<span class="number">1.0</span>));
 
-        <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">search_direction</span>(<span class="ident">p</span>);
+        <span class="self">self</span>.linesearch.search_direction(p);
 
-        <span class="kw">let</span> <span class="ident">OptimizationResult</span> {
-            <span class="ident">problem</span>: <span class="ident">line_problem</span>,
-            <span class="ident">state</span>: <span class="kw-2">mut</span> <span class="ident">linesearch_state</span>,
+        <span class="kw">let </span>OptimizationResult {
+            problem: line_problem,
+            state: <span class="kw-2">mut </span>linesearch_state,
             ..
-        } <span class="op">=</span> <span class="ident">Executor::new</span>(<span class="ident">problem</span>.<span class="ident">take_problem</span>().<span class="ident">unwrap</span>(), <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">clone</span>())
-            .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
-                <span class="ident">config</span>
-                    .<span class="ident">param</span>(<span class="ident">param</span>.<span class="ident">clone</span>())
-                    .<span class="ident">gradient</span>(<span class="ident">prev_grad</span>.<span class="ident">clone</span>())
-                    .<span class="ident">cost</span>(<span class="ident">cost</span>)
+        } = Executor::new(problem.take_problem().unwrap(), <span class="self">self</span>.linesearch.clone())
+            .configure(|config| {
+                config
+                    .param(param.clone())
+                    .gradient(prev_grad.clone())
+                    .cost(cost)
             })
-            .<span class="ident">ctrlc</span>(<span class="bool-val">false</span>)
-            .<span class="ident">run</span>()<span class="question-mark">?</span>;
+            .ctrlc(<span class="bool-val">false</span>)
+            .run()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">xk1</span> <span class="op">=</span> <span class="ident">linesearch_state</span>
-            .<span class="ident">take_param</span>()
-            .<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-                <span class="ident">PotentialBug</span>,
-                <span class="string">&quot;`DFP`: No parameters returned by line search.&quot;</span>
-            ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>xk1 = linesearch_state
+            .take_param()
+            .ok_or_else(<span class="macro">argmin_error_closure!</span>(
+                PotentialBug,
+                <span class="string">&quot;`DFP`: No parameters returned by line search.&quot;
+            </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">next_cost</span> <span class="op">=</span> <span class="ident">linesearch_state</span>.<span class="ident">get_cost</span>();
+        <span class="kw">let </span>next_cost = linesearch_state.get_cost();
 
-        <span class="comment">// take care of function eval counts</span>
-        <span class="ident">problem</span>.<span class="ident">consume_problem</span>(<span class="ident">line_problem</span>);
+        <span class="comment">// take care of function eval counts
+        </span>problem.consume_problem(line_problem);
 
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk1</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">yk</span> <span class="op">=</span> <span class="ident">grad</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">prev_grad</span>);
+        <span class="kw">let </span>grad = problem.gradient(<span class="kw-2">&amp;</span>xk1)<span class="question-mark">?</span>;
+        <span class="kw">let </span>yk = grad.sub(<span class="kw-2">&amp;</span>prev_grad);
 
-        <span class="kw">let</span> <span class="ident">sk</span> <span class="op">=</span> <span class="ident">xk1</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>);
+        <span class="kw">let </span>sk = xk1.sub(<span class="kw-2">&amp;</span>param);
 
-        <span class="kw">let</span> <span class="ident">yksk</span>: <span class="ident">F</span> <span class="op">=</span> <span class="ident">yk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
+        <span class="kw">let </span>yksk: F = yk.dot(<span class="kw-2">&amp;</span>sk);
 
-        <span class="kw">let</span> <span class="ident">sksk</span>: <span class="ident">H</span> <span class="op">=</span> <span class="ident">sk</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
+        <span class="kw">let </span>sksk: H = sk.dot(<span class="kw-2">&amp;</span>sk);
 
-        <span class="kw">let</span> <span class="ident">tmp3</span>: <span class="ident">P</span> <span class="op">=</span> <span class="ident">inv_hessian</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">yk</span>);
-        <span class="kw">let</span> <span class="ident">tmp4</span>: <span class="ident">F</span> <span class="op">=</span> <span class="ident">tmp3</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">yk</span>);
-        <span class="kw">let</span> <span class="ident">tmp3</span>: <span class="ident">H</span> <span class="op">=</span> <span class="ident">tmp3</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">tmp3</span>);
-        <span class="kw">let</span> <span class="ident">tmp3</span>: <span class="ident">H</span> <span class="op">=</span> <span class="ident">tmp3</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">/</span> <span class="ident">tmp4</span>));
+        <span class="kw">let </span>tmp3: P = inv_hessian.dot(<span class="kw-2">&amp;</span>yk);
+        <span class="kw">let </span>tmp4: F = tmp3.dot(<span class="kw-2">&amp;</span>yk);
+        <span class="kw">let </span>tmp3: H = tmp3.dot(<span class="kw-2">&amp;</span>tmp3);
+        <span class="kw">let </span>tmp3: H = tmp3.mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="number">1.0</span>) / tmp4));
 
-        <span class="kw">let</span> <span class="ident">inv_hessian</span> <span class="op">=</span> <span class="ident">inv_hessian</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">tmp3</span>).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">sksk</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">/</span> <span class="ident">yksk</span>)));
+        <span class="kw">let </span>inv_hessian = inv_hessian.sub(<span class="kw-2">&amp;</span>tmp3).add(<span class="kw-2">&amp;</span>sksk.mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="number">1.0</span>) / yksk)));
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>
-                .<span class="ident">param</span>(<span class="ident">xk1</span>)
-                .<span class="ident">cost</span>(<span class="ident">next_cost</span>)
-                .<span class="ident">gradient</span>(<span class="ident">grad</span>)
-                .<span class="ident">inv_hessian</span>(<span class="ident">inv_hessian</span>),
+            state
+                .param(xk1)
+                .cost(next_cost)
+                .gradient(grad)
+                .inv_hessian(inv_hessian),
             <span class="prelude-val">None</span>,
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_gradient</span>().<span class="ident">unwrap</span>().<span class="ident">l2_norm</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tol_grad</span> {
-            <span class="kw">return</span> <span class="ident">TerminationReason::TargetPrecisionReached</span>;
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationReason {
+        <span class="kw">if </span>state.get_gradient().unwrap().l2_norm() &lt; <span class="self">self</span>.tol_grad {
+            <span class="kw">return </span>TerminationReason::TargetPrecisionReached;
         }
-        <span class="ident">TerminationReason::NotTerminated</span>
+        TerminationReason::NotTerminated
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">test_utils::TestProblem</span>, <span class="ident">ArgminError</span>, <span class="ident">IterState</span>, <span class="ident">State</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::linesearch::MoreThuenteLineSearch</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{test_utils::TestProblem, ArgminError, IterState, State};
+    <span class="kw">use </span><span class="kw">crate</span>::solver::linesearch::MoreThuenteLineSearch;
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
 
     <span class="macro">test_trait_impl!</span>(
-        <span class="ident">dfp</span>,
-        <span class="ident">DFP</span><span class="op">&lt;</span><span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>
+        dfp,
+        DFP&lt;MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt;, f64&gt;
     );
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">MyFakeLineSearch</span> {}
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="attribute">#[derive(Eq, PartialEq, Debug)]
+        </span><span class="kw">struct </span>MyFakeLineSearch {}
 
-        <span class="kw">let</span> <span class="ident">dfp</span>: <span class="ident">DFP</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">DFP::new</span>(<span class="ident">MyFakeLineSearch</span> {});
-        <span class="kw">let</span> <span class="ident">DFP</span> {
-            <span class="ident">linesearch</span>,
-            <span class="ident">tol_grad</span>,
-        } <span class="op">=</span> <span class="ident">dfp</span>;
+        <span class="kw">let </span>dfp: DFP&lt;<span class="kw">_</span>, f64&gt; = DFP::new(MyFakeLineSearch {});
+        <span class="kw">let </span>DFP {
+            linesearch,
+            tol_grad,
+        } = dfp;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">linesearch</span>, <span class="ident">MyFakeLineSearch</span> {});
-        <span class="macro">assert_eq!</span>(<span class="ident">tol_grad</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::EPSILON</span>.<span class="ident">sqrt</span>().<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(linesearch, MyFakeLineSearch {});
+        <span class="macro">assert_eq!</span>(tol_grad.to_ne_bytes(), f64::EPSILON.sqrt().to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_tolerance_grad</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">MyFakeLineSearch</span> {}
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_tolerance_grad() {
+        <span class="attribute">#[derive(Eq, PartialEq, Debug, Clone, Copy)]
+        </span><span class="kw">struct </span>MyFakeLineSearch {}
 
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">tol</span> <span class="kw">in</span> [<span class="number">1e-6</span>, <span class="number">0.0</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>] {
-            <span class="kw">let</span> <span class="ident">dfp</span>: <span class="ident">DFP</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">DFP::new</span>(<span class="ident">MyFakeLineSearch</span> {});
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">dfp</span>.<span class="ident">with_tolerance_grad</span>(<span class="ident">tol</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>tol <span class="kw">in </span>[<span class="number">1e-6</span>, <span class="number">0.0</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>] {
+            <span class="kw">let </span>dfp: DFP&lt;<span class="kw">_</span>, f64&gt; = DFP::new(MyFakeLineSearch {});
+            <span class="kw">let </span>res = dfp.with_tolerance_grad(tol);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">nm</span>.<span class="ident">tol_grad</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">tol</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>nm = res.unwrap();
+            <span class="macro">assert_eq!</span>(nm.tol_grad.to_ne_bytes(), tol.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">tol</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">100.0</span>, <span class="op">-</span><span class="number">42.0</span>] {
-            <span class="kw">let</span> <span class="ident">dfp</span>: <span class="ident">DFP</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">DFP::new</span>(<span class="ident">MyFakeLineSearch</span> {});
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">dfp</span>.<span class="ident">with_tolerance_grad</span>(<span class="ident">tol</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>tol <span class="kw">in </span>[-f64::EPSILON, -<span class="number">1.0</span>, -<span class="number">100.0</span>, -<span class="number">42.0</span>] {
+            <span class="kw">let </span>dfp: DFP&lt;<span class="kw">_</span>, f64&gt; = DFP::new(MyFakeLineSearch {});
+            <span class="kw">let </span>res = dfp.with_tolerance_grad(tol);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
-                <span class="string">&quot;Invalid parameter: \&quot;`DFP`: gradient tolerance must be &gt;= 0.\&quot;&quot;</span>
-            );
+                res,
+                ArgminError,
+                <span class="string">&quot;Invalid parameter: \&quot;`DFP`: gradient tolerance must be &gt;= 0.\&quot;&quot;
+            </span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>().<span class="ident">with_c</span>(<span class="number">1e-4</span>, <span class="number">0.9</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init() {
+        <span class="kw">let </span>linesearch = MoreThuenteLineSearch::new().with_c(<span class="number">1e-4</span>, <span class="number">0.9</span>).unwrap();
 
-        <span class="kw">let</span> <span class="ident">param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">inv_hessian</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]];
+        <span class="kw">let </span>param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>inv_hessian: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dfp</span>: <span class="ident">DFP</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">DFP::new</span>(<span class="ident">linesearch</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>dfp: DFP&lt;<span class="kw">_</span>, f64&gt; = DFP::new(linesearch);
 
-        <span class="comment">// Forgot to initialize the parameter vector</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">dfp</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>);
+        <span class="comment">// Forgot to initialize the parameter vector
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>res = dfp.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`DFP` requires an initial parameter vector. Please &quot;</span>,
-                <span class="string">&quot;provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
 
-        <span class="comment">// Forgot initial inverse Hessian guess</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="ident">param</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">dfp</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>);
+        <span class="comment">// Forgot initial inverse Hessian guess
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; =
+            IterState::new().param(param.clone());
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>res = dfp.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`DFP` requires an initial inverse Hessian. Please &quot;</span>,
-                <span class="string">&quot;provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
 
-        <span class="comment">// All good.</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>()
-            .<span class="ident">param</span>(<span class="ident">param</span>.<span class="ident">clone</span>())
-            .<span class="ident">inv_hessian</span>(<span class="ident">inv_hessian</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">dfp</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// All good.
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new()
+            .param(param.clone())
+            .inv_hessian(inv_hessian.clone());
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = dfp.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">let</span> <span class="ident">s_param</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_param = state_out.take_param().unwrap();
 
-        <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">p</span>) <span class="kw">in</span> <span class="ident">s_param</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">param</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">p</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">for </span>(s, p) <span class="kw">in </span>s_param.iter().zip(param.iter()) {
+            <span class="macro">assert_eq!</span>(s.to_ne_bytes(), p.to_ne_bytes());
         }
 
-        <span class="kw">let</span> <span class="ident">s_grad</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_gradient</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_grad = state_out.take_gradient().unwrap();
 
-        <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">p</span>) <span class="kw">in</span> <span class="ident">s_grad</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">param</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">p</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">for </span>(s, p) <span class="kw">in </span>s_grad.iter().zip(param.iter()) {
+            <span class="macro">assert_eq!</span>(s.to_ne_bytes(), p.to_ne_bytes());
         }
 
-        <span class="kw">let</span> <span class="ident">s_inv_hessian</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_inv_hessian</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_inv_hessian = state_out.take_inv_hessian().unwrap();
 
-        <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">h</span>) <span class="kw">in</span> <span class="ident">s_inv_hessian</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">flatten</span>()
-            .<span class="ident">zip</span>(<span class="ident">inv_hessian</span>.<span class="ident">iter</span>().<span class="ident">flatten</span>())
+        <span class="kw">for </span>(s, h) <span class="kw">in </span>s_inv_hessian
+            .iter()
+            .flatten()
+            .zip(inv_hessian.iter().flatten())
         {
-            <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">h</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="macro">assert_eq!</span>(s.to_ne_bytes(), h.to_ne_bytes());
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">state_out</span>.<span class="ident">get_cost</span>().<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>())
+        <span class="macro">assert_eq!</span>(state_out.get_cost().to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_provided_cost</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>().<span class="ident">with_c</span>(<span class="number">1e-4</span>, <span class="number">0.9</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_provided_cost() {
+        <span class="kw">let </span>linesearch = MoreThuenteLineSearch::new().with_c(<span class="number">1e-4</span>, <span class="number">0.9</span>).unwrap();
 
-        <span class="kw">let</span> <span class="ident">param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">inv_hessian</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]];
+        <span class="kw">let </span>param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>inv_hessian: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dfp</span>: <span class="ident">DFP</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">DFP::new</span>(<span class="ident">linesearch</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>dfp: DFP&lt;<span class="kw">_</span>, f64&gt; = DFP::new(linesearch);
 
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>()
-            .<span class="ident">param</span>(<span class="ident">param</span>)
-            .<span class="ident">inv_hessian</span>(<span class="ident">inv_hessian</span>)
-            .<span class="ident">cost</span>(<span class="number">1234.0</span>);
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new()
+            .param(param)
+            .inv_hessian(inv_hessian)
+            .cost(<span class="number">1234.0</span>);
 
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> (<span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">dfp</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>(state_out, kv) = dfp.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">state_out</span>.<span class="ident">get_cost</span>().<span class="ident">to_ne_bytes</span>(), <span class="number">1234.0f64</span>.<span class="ident">to_ne_bytes</span>())
+        <span class="macro">assert_eq!</span>(state_out.get_cost().to_ne_bytes(), <span class="number">1234.0f64</span>.to_ne_bytes())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_provided_grad</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>().<span class="ident">with_c</span>(<span class="number">1e-4</span>, <span class="number">0.9</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_provided_grad() {
+        <span class="kw">let </span>linesearch = MoreThuenteLineSearch::new().with_c(<span class="number">1e-4</span>, <span class="number">0.9</span>).unwrap();
 
-        <span class="kw">let</span> <span class="ident">param</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">gradient</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">4.0</span>, <span class="number">9.0</span>];
-        <span class="kw">let</span> <span class="ident">inv_hessian</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]];
+        <span class="kw">let </span>param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>gradient: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">4.0</span>, <span class="number">9.0</span>];
+        <span class="kw">let </span>inv_hessian: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dfp</span>: <span class="ident">DFP</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">DFP::new</span>(<span class="ident">linesearch</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>dfp: DFP&lt;<span class="kw">_</span>, f64&gt; = DFP::new(linesearch);
 
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>()
-            .<span class="ident">param</span>(<span class="ident">param</span>)
-            .<span class="ident">inv_hessian</span>(<span class="ident">inv_hessian</span>)
-            .<span class="ident">gradient</span>(<span class="ident">gradient</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new()
+            .param(param)
+            .inv_hessian(inv_hessian)
+            .gradient(gradient.clone());
 
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">dfp</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = dfp.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">let</span> <span class="ident">s_grad</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_gradient</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_grad = state_out.take_gradient().unwrap();
 
-        <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">g</span>) <span class="kw">in</span> <span class="ident">s_grad</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">gradient</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">g</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">for </span>(s, g) <span class="kw">in </span>s_grad.iter().zip(gradient.iter()) {
+            <span class="macro">assert_eq!</span>(s.to_ne_bytes(), g.to_ne_bytes());
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

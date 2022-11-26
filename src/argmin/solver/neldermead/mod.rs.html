@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/neldermead/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/neldermead/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -868,875 +868,875 @@
 <span id="868">868</span>
 <span id="869">869</span>
 <span id="870">870</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # Nelder-Mead method</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The Nelder-Mead method a heuristic search method for nonlinear optimization problems which does</span>
-<span class="doccomment">//! not require derivatives.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [`NelderMead`] for details.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## References</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;http://www.scholarpedia.org/article/Nelder-Mead_algorithm#Simplex_transformation_algorithm&gt;</span>
+</span><span class="doccomment">//! # Nelder-Mead method
+//!
+//! The Nelder-Mead method a heuristic search method for nonlinear optimization problems which does
+//! not require derivatives.
+//!
+//! See [`NelderMead`] for details.
+//!
+//! ## References
+//!
+//! &lt;https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method&gt;
+//!
+//! &lt;http://www.scholarpedia.org/article/Nelder-Mead_algorithm#Simplex_transformation_algorithm&gt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>,
-    <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
+    TerminationReason, KV,
 };
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminSub</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// # Nelder-Mead method</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The Nelder-Mead method a heuristic search method for nonlinear optimization problems which does</span>
-<span class="doccomment">/// not require derivatives.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The method is based on simplices which consist of n+1 vertices for an optimization problem with</span>
-<span class="doccomment">/// n dimensions.</span>
-<span class="doccomment">/// The function to be optimized is evaluated at all vertices. Based on these cost function values</span>
-<span class="doccomment">/// the behavior of the cost function is extrapolated in order to find the next point to be</span>
-<span class="doccomment">/// evaluated.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following actions are possible:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1) Reflection (Parameter `alpha`, defaults to `1`, configurable via</span>
-<span class="doccomment">///    [`with_alpha`](`NelderMead::with_alpha`))</span>
-<span class="doccomment">/// 2) Expansion (Parameter `gamma`, defaults to `2`, configurable via</span>
-<span class="doccomment">///    [`with_gamma`](`NelderMead::with_gamma`))</span>
-<span class="doccomment">/// 3) Contraction inside or outside (Parameter `rho`, defaults to `0.5`, configurable via</span>
-<span class="doccomment">///    [`with_rho`](`NelderMead::with_rho`))</span>
-<span class="doccomment">/// 4) Shrink (Parameter `sigma`, defaults to `0.5`, configurable via</span>
-<span class="doccomment">///    [`with_sigma`](`NelderMead::with_sigma`))</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## References</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;http://www.scholarpedia.org/article/Nelder-Mead_algorithm#Simplex_transformation_algorithm&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// alpha</span>
-    <span class="ident">alpha</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// gamma</span>
-    <span class="ident">gamma</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// rho</span>
-    <span class="ident">rho</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// sigma</span>
-    <span class="ident">sigma</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// parameters</span>
-    <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">P</span>, <span class="ident">F</span>)<span class="op">&gt;</span>,
-    <span class="doccomment">/// Sample standard deviation tolerance</span>
-    <span class="ident">sd_tolerance</span>: <span class="ident">F</span>,
+<span class="doccomment">/// # Nelder-Mead method
+///
+/// The Nelder-Mead method a heuristic search method for nonlinear optimization problems which does
+/// not require derivatives.
+///
+/// The method is based on simplices which consist of n+1 vertices for an optimization problem with
+/// n dimensions.
+/// The function to be optimized is evaluated at all vertices. Based on these cost function values
+/// the behavior of the cost function is extrapolated in order to find the next point to be
+/// evaluated.
+///
+/// The following actions are possible:
+///
+/// 1) Reflection (Parameter `alpha`, defaults to `1`, configurable via
+///    [`with_alpha`](`NelderMead::with_alpha`))
+/// 2) Expansion (Parameter `gamma`, defaults to `2`, configurable via
+///    [`with_gamma`](`NelderMead::with_gamma`))
+/// 3) Contraction inside or outside (Parameter `rho`, defaults to `0.5`, configurable via
+///    [`with_rho`](`NelderMead::with_rho`))
+/// 4) Shrink (Parameter `sigma`, defaults to `0.5`, configurable via
+///    [`with_sigma`](`NelderMead::with_sigma`))
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`].
+///
+/// ## References
+///
+/// &lt;https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method&gt;
+///
+/// &lt;http://www.scholarpedia.org/article/Nelder-Mead_algorithm#Simplex_transformation_algorithm&gt;
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>NelderMead&lt;P, F&gt; {
+    <span class="doccomment">/// alpha
+    </span>alpha: F,
+    <span class="doccomment">/// gamma
+    </span>gamma: F,
+    <span class="doccomment">/// rho
+    </span>rho: F,
+    <span class="doccomment">/// sigma
+    </span>sigma: F,
+    <span class="doccomment">/// parameters
+    </span>params: Vec&lt;(P, F)&gt;,
+    <span class="doccomment">/// Sample standard deviation tolerance
+    </span>sd_tolerance: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, F&gt; NelderMead&lt;P, F&gt;
+<span class="kw">where
+    </span>P: Clone + ArgminAdd&lt;P, P&gt; + ArgminSub&lt;P, P&gt; + ArgminMul&lt;F, P&gt;,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of `NelderMead`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Takes a vector of parameter vectors. The number of parameter vectors must be `n + 1` where</span>
-    <span class="doccomment">/// `n` is the number of optimization parameters.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::neldermead::NelderMead;</span>
-    <span class="doccomment">/// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];</span>
-    <span class="doccomment">/// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(vec_of_parameters);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">NelderMead</span> {
-            <span class="ident">alpha</span>: <span class="macro">float!</span>(<span class="number">1.0</span>),
-            <span class="ident">gamma</span>: <span class="macro">float!</span>(<span class="number">2.0</span>),
-            <span class="ident">rho</span>: <span class="macro">float!</span>(<span class="number">0.5</span>),
-            <span class="ident">sigma</span>: <span class="macro">float!</span>(<span class="number">0.5</span>),
-            <span class="ident">params</span>: <span class="ident">params</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> (<span class="ident">p</span>, <span class="ident">F::nan</span>())).<span class="ident">collect</span>(),
-            <span class="ident">sd_tolerance</span>: <span class="ident">F::epsilon</span>(),
+    <span class="doccomment">/// Construct a new instance of `NelderMead`
+    ///
+    /// Takes a vector of parameter vectors. The number of parameter vectors must be `n + 1` where
+    /// `n` is the number of optimization parameters.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::neldermead::NelderMead;
+    /// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];
+    /// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(vec_of_parameters);
+    /// ```
+    </span><span class="kw">pub fn </span>new(params: Vec&lt;P&gt;) -&gt; <span class="self">Self </span>{
+        NelderMead {
+            alpha: <span class="macro">float!</span>(<span class="number">1.0</span>),
+            gamma: <span class="macro">float!</span>(<span class="number">2.0</span>),
+            rho: <span class="macro">float!</span>(<span class="number">0.5</span>),
+            sigma: <span class="macro">float!</span>(<span class="number">0.5</span>),
+            params: params.into_iter().map(|p| (p, F::nan())).collect(),
+            sd_tolerance: F::epsilon(),
         }
     }
 
-    <span class="doccomment">/// Set sample standard deviation tolerance</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be non-negative and defaults to `EPSILON`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::neldermead::NelderMead;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];</span>
-    <span class="doccomment">/// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     NelderMead::new(vec_of_parameters).with_sd_tolerance(1e-6)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sd_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">tol</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`Nelder-Mead`: sd_tolerance must be &gt;= 0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set sample standard deviation tolerance
+    ///
+    /// Must be non-negative and defaults to `EPSILON`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::neldermead::NelderMead;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];
+    /// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; =
+    ///     NelderMead::new(vec_of_parameters).with_sd_tolerance(1e-6)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_sd_tolerance(<span class="kw-2">mut </span><span class="self">self</span>, tol: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>tol &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`Nelder-Mead`: sd_tolerance must be &gt;= 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">sd_tolerance</span> <span class="op">=</span> <span class="ident">tol</span>;
+        <span class="self">self</span>.sd_tolerance = tol;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set alpha parameter for reflection</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be larger than 0 and defaults to 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::neldermead::NelderMead;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];</span>
-    <span class="doccomment">/// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     NelderMead::new(vec_of_parameters).with_alpha(0.9)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_alpha</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`Nelder-Mead`: alpha must be &gt; 0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set alpha parameter for reflection
+    ///
+    /// Must be larger than 0 and defaults to 1.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::neldermead::NelderMead;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];
+    /// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; =
+    ///     NelderMead::new(vec_of_parameters).with_alpha(0.9)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_alpha(<span class="kw-2">mut </span><span class="self">self</span>, alpha: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>alpha &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`Nelder-Mead`: alpha must be &gt; 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">alpha</span> <span class="op">=</span> <span class="ident">alpha</span>;
+        <span class="self">self</span>.alpha = alpha;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set gamma for expansion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be larger than 1 and defaults to 2.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::neldermead::NelderMead;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];</span>
-    <span class="doccomment">/// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     NelderMead::new(vec_of_parameters).with_gamma(1.9)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`Nelder-Mead`: gamma must be &gt; 1.&quot;</span>
-            ));
+    <span class="doccomment">/// Set gamma for expansion
+    ///
+    /// Must be larger than 1 and defaults to 2.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::neldermead::NelderMead;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];
+    /// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; =
+    ///     NelderMead::new(vec_of_parameters).with_gamma(1.9)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_gamma(<span class="kw-2">mut </span><span class="self">self</span>, gamma: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>gamma &lt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`Nelder-Mead`: gamma must be &gt; 1.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span>;
+        <span class="self">self</span>.gamma = gamma;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set rho for contraction</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be in (0, 0.5] and defaults to 0.5.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::neldermead::NelderMead;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];</span>
-    <span class="doccomment">/// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     NelderMead::new(vec_of_parameters).with_rho(0.4)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_rho</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rho</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">rho</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">rho</span> <span class="op">&gt;</span> <span class="macro">float!</span>(<span class="number">0.5</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`Nelder-Mead`: rho must be in (0, 0.5].&quot;</span>
-            ));
+    <span class="doccomment">/// Set rho for contraction
+    ///
+    /// Must be in (0, 0.5] and defaults to 0.5.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::neldermead::NelderMead;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];
+    /// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; =
+    ///     NelderMead::new(vec_of_parameters).with_rho(0.4)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_rho(<span class="kw-2">mut </span><span class="self">self</span>, rho: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>rho &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || rho &gt; <span class="macro">float!</span>(<span class="number">0.5</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`Nelder-Mead`: rho must be in (0, 0.5].&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">rho</span> <span class="op">=</span> <span class="ident">rho</span>;
+        <span class="self">self</span>.rho = rho;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set sigma for shrinking</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be in (0, 1] and defaults to 0.5.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::neldermead::NelderMead;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];</span>
-    <span class="doccomment">/// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     NelderMead::new(vec_of_parameters).with_sigma(0.4)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sigma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sigma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">sigma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">sigma</span> <span class="op">&gt;</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`Nelder-Mead`: sigma must be in (0, 1].&quot;</span>
-            ));
+    <span class="doccomment">/// Set sigma for shrinking
+    ///
+    /// Must be in (0, 1] and defaults to 0.5.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::neldermead::NelderMead;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let vec_of_parameters = vec![vec![1.0], vec![2.0], vec![3.0]];
+    /// let nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; =
+    ///     NelderMead::new(vec_of_parameters).with_sigma(0.4)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_sigma(<span class="kw-2">mut </span><span class="self">self</span>, sigma: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>sigma &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || sigma &gt; <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`Nelder-Mead`: sigma must be in (0, 1].&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">sigma</span> <span class="op">=</span> <span class="ident">sigma</span>;
+        <span class="self">self</span>.sigma = sigma;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Sort parameters vectors based on their cost function values</span>
-    <span class="kw">fn</span> <span class="ident">sort_param_vecs</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">params</span>
-            .<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="number">1</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="ident">std::cmp::Ordering::Equal</span>));
+    <span class="doccomment">/// Sort parameters vectors based on their cost function values
+    </span><span class="kw">fn </span>sort_param_vecs(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.params
+            .sort_by(|a, b| a.<span class="number">1</span>.partial_cmp(<span class="kw-2">&amp;</span>b.<span class="number">1</span>).unwrap_or(std::cmp::Ordering::Equal));
     }
 
-    <span class="doccomment">/// Calculate centroid of all vectors but the worst</span>
-    <span class="kw">fn</span> <span class="ident">calculate_centroid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">P</span> {
-        <span class="comment">// Number of parameters is number of parameter vectors minus 1</span>
-        <span class="kw">let</span> <span class="ident">num_param</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">params</span>
-            .<span class="ident">iter</span>()
-            <span class="comment">// Avoid the worst vector</span>
-            .<span class="ident">take</span>(<span class="ident">num_param</span>)
-            <span class="comment">// First one is used as the accumulator, therefore exclude it from the iterator</span>
-            .<span class="ident">skip</span>(<span class="number">1</span>)
-            <span class="comment">// Add all vectors to the first</span>
-            .<span class="ident">fold</span>(<span class="self">self</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">p</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="number">0</span>))
-            <span class="comment">// Scale</span>
-            .<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">/</span> (<span class="macro">float!</span>(<span class="ident">num_param</span> <span class="kw">as</span> <span class="ident">f64</span>))))
+    <span class="doccomment">/// Calculate centroid of all vectors but the worst
+    </span><span class="kw">fn </span>calculate_centroid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; P {
+        <span class="comment">// Number of parameters is number of parameter vectors minus 1
+        </span><span class="kw">let </span>num_param = <span class="self">self</span>.params.len() - <span class="number">1</span>;
+        <span class="self">self</span>.params
+            .iter()
+            <span class="comment">// Avoid the worst vector
+            </span>.take(num_param)
+            <span class="comment">// First one is used as the accumulator, therefore exclude it from the iterator
+            </span>.skip(<span class="number">1</span>)
+            <span class="comment">// Add all vectors to the first
+            </span>.fold(<span class="self">self</span>.params[<span class="number">0</span>].<span class="number">0</span>.clone(), |acc, p| acc.add(<span class="kw-2">&amp;</span>p.<span class="number">0</span>))
+            <span class="comment">// Scale
+            </span>.mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="number">1.0</span>) / (<span class="macro">float!</span>(num_param <span class="kw">as </span>f64))))
     }
 
-    <span class="doccomment">/// Reflect</span>
-    <span class="kw">fn</span> <span class="ident">reflect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x0</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">P</span> {
-        <span class="ident">x0</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">x0</span>.<span class="ident">sub</span>(<span class="ident">x</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">alpha</span>))
+    <span class="doccomment">/// Reflect
+    </span><span class="kw">fn </span>reflect(<span class="kw-2">&amp;</span><span class="self">self</span>, x0: <span class="kw-2">&amp;</span>P, x: <span class="kw-2">&amp;</span>P) -&gt; P {
+        x0.add(<span class="kw-2">&amp;</span>x0.sub(x).mul(<span class="kw-2">&amp;</span><span class="self">self</span>.alpha))
     }
 
-    <span class="doccomment">/// Expand</span>
-    <span class="kw">fn</span> <span class="ident">expand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x0</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">P</span> {
-        <span class="ident">x0</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">sub</span>(<span class="ident">x0</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">gamma</span>))
+    <span class="doccomment">/// Expand
+    </span><span class="kw">fn </span>expand(<span class="kw-2">&amp;</span><span class="self">self</span>, x0: <span class="kw-2">&amp;</span>P, x: <span class="kw-2">&amp;</span>P) -&gt; P {
+        x0.add(<span class="kw-2">&amp;</span>x.sub(x0).mul(<span class="kw-2">&amp;</span><span class="self">self</span>.gamma))
     }
 
-    <span class="doccomment">/// Contract</span>
-    <span class="kw">fn</span> <span class="ident">contract</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x0</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="ident">P</span> {
-        <span class="ident">x0</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">sub</span>(<span class="ident">x0</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rho</span>))
+    <span class="doccomment">/// Contract
+    </span><span class="kw">fn </span>contract(<span class="kw-2">&amp;</span><span class="self">self</span>, x0: <span class="kw-2">&amp;</span>P, x: <span class="kw-2">&amp;</span>P) -&gt; P {
+        x0.add(<span class="kw-2">&amp;</span>x.sub(x0).mul(<span class="kw-2">&amp;</span><span class="self">self</span>.rho))
     }
 
-    <span class="doccomment">/// Shrink</span>
-    <span class="kw">fn</span> <span class="ident">shrink</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">cost</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Shrink
+    </span><span class="kw">fn </span>shrink&lt;S&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>cost: S) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+    <span class="kw">where
+        </span>S: FnMut(<span class="kw-2">&amp;</span>P) -&gt; <span class="prelude-ty">Result</span>&lt;F, Error&gt;,
     {
-        <span class="comment">// The best parameter vector unfortunately has to be cloned once.</span>
-        <span class="kw">let</span> <span class="ident">x0</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>.<span class="ident">clone</span>();
-        <span class="self">self</span>.<span class="ident">params</span>
-            .<span class="ident">iter_mut</span>()
-            <span class="comment">// Best one is not modified</span>
-            .<span class="ident">skip</span>(<span class="number">1</span>)
-            .<span class="ident">try_for_each</span>(<span class="op">|</span>(<span class="ident">p</span>, <span class="ident">c</span>)<span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="kw-2">*</span><span class="ident">p</span> <span class="op">=</span> <span class="ident">x0</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">x0</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sigma</span>));
-                <span class="kw-2">*</span><span class="ident">c</span> <span class="op">=</span> (<span class="ident">cost</span>)(<span class="ident">p</span>)<span class="question-mark">?</span>;
+        <span class="comment">// The best parameter vector unfortunately has to be cloned once.
+        </span><span class="kw">let </span>x0 = <span class="self">self</span>.params[<span class="number">0</span>].<span class="number">0</span>.clone();
+        <span class="self">self</span>.params
+            .iter_mut()
+            <span class="comment">// Best one is not modified
+            </span>.skip(<span class="number">1</span>)
+            .try_for_each(|(p, c)| -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+                <span class="kw-2">*</span>p = x0.add(<span class="kw-2">&amp;</span>p.sub(<span class="kw-2">&amp;</span>x0).mul(<span class="kw-2">&amp;</span><span class="self">self</span>.sigma));
+                <span class="kw-2">*</span>c = (cost)(p)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Action</span> {
-    <span class="ident">Reflection</span>,
-    <span class="ident">Expansion</span>,
-    <span class="ident">ContractionOutside</span>,
-    <span class="ident">ContractionInside</span>,
-    <span class="ident">Shrink</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>Action {
+    Reflection,
+    Expansion,
+    ContractionOutside,
+    ContractionInside,
+    Shrink,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Action</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Action::Reflection</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Reflection&quot;</span>),
-            <span class="ident">Action::Expansion</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Expansion&quot;</span>),
-            <span class="ident">Action::ContractionOutside</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ContractionOutside&quot;</span>),
-            <span class="ident">Action::ContractionInside</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ContractionInside&quot;</span>),
-            <span class="ident">Action::Shrink</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Shrink&quot;</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Action {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Action::Reflection =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Reflection&quot;</span>),
+            Action::Expansion =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Expansion&quot;</span>),
+            Action::ContractionOutside =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;ContractionOutside&quot;</span>),
+            Action::ContractionInside =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;ContractionInside&quot;</span>),
+            Action::Shrink =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Shrink&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span> <span class="op">+</span> <span class="ident">std::iter::Sum</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;O, P, F&gt; Solver&lt;O, IterState&lt;P, (), (), (), F&gt;&gt; <span class="kw">for </span>NelderMead&lt;P, F&gt;
+<span class="kw">where
+    </span>O: CostFunction&lt;Param = P, Output = F&gt;,
+    P: Clone + SerializeAlias + ArgminSub&lt;P, P&gt; + ArgminAdd&lt;P, P&gt; + ArgminMul&lt;F, P&gt;,
+    F: ArgminFloat + std::iter::Sum&lt;F&gt;,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Nelder-Mead method&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Nelder-Mead method&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">params</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">p</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="ident">p</span>).<span class="ident">unwrap</span>());
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        state: IterState&lt;P, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="self">self</span>.params
+            .iter_mut()
+            .for_each(|(p, c)| <span class="kw-2">*</span>c = problem.cost(p).unwrap());
 
-        <span class="self">self</span>.<span class="ident">sort_param_vecs</span>();
+        <span class="self">self</span>.sort_param_vecs();
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>.<span class="ident">param</span>(<span class="self">self</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">1</span>),
+            state.param(<span class="self">self</span>.params[<span class="number">0</span>].<span class="number">0</span>.clone()).cost(<span class="self">self</span>.params[<span class="number">0</span>].<span class="number">1</span>),
             <span class="prelude-val">None</span>,
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">num_param_vecs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">len</span>();
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        state: IterState&lt;P, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>num_param_vecs = <span class="self">self</span>.params.len();
 
-        <span class="kw">let</span> <span class="ident">x0</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calculate_centroid</span>();
+        <span class="kw">let </span>x0 = <span class="self">self</span>.calculate_centroid();
 
-        <span class="kw">let</span> <span class="ident">p_best</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">params</span>[<span class="number">0</span>];
-        <span class="kw">let</span> <span class="ident">p_worst</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">params</span>[<span class="ident">num_param_vecs</span> <span class="op">-</span> <span class="number">1</span>];
-        <span class="kw">let</span> <span class="ident">p_second_worst</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">params</span>[<span class="ident">num_param_vecs</span> <span class="op">-</span> <span class="number">2</span>];
+        <span class="kw">let </span>p_best = <span class="kw-2">&amp;</span><span class="self">self</span>.params[<span class="number">0</span>];
+        <span class="kw">let </span>p_worst = <span class="kw-2">&amp;</span><span class="self">self</span>.params[num_param_vecs - <span class="number">1</span>];
+        <span class="kw">let </span>p_second_worst = <span class="kw-2">&amp;</span><span class="self">self</span>.params[num_param_vecs - <span class="number">2</span>];
 
-        <span class="kw">let</span> <span class="ident">xr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">reflect</span>(<span class="kw-2">&amp;</span><span class="ident">x0</span>, <span class="kw-2">&amp;</span><span class="ident">p_worst</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">xr_cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">xr</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>xr = <span class="self">self</span>.reflect(<span class="kw-2">&amp;</span>x0, <span class="kw-2">&amp;</span>p_worst.<span class="number">0</span>);
+        <span class="kw">let </span>xr_cost = problem.cost(<span class="kw-2">&amp;</span>xr)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">xr_cost</span> <span class="op">&lt;</span> <span class="ident">p_second_worst</span>.<span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">xr_cost</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">p_best</span>.<span class="number">1</span> {
-            <span class="comment">// reflection</span>
-            <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">params</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>() <span class="op">=</span> (<span class="ident">xr</span>, <span class="ident">xr_cost</span>);
-            <span class="ident">Action::Reflection</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">xr_cost</span> <span class="op">&lt;</span> <span class="ident">p_best</span>.<span class="number">1</span> {
-            <span class="comment">// expansion</span>
-            <span class="kw">let</span> <span class="ident">xe</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">expand</span>(<span class="kw-2">&amp;</span><span class="ident">x0</span>, <span class="kw-2">&amp;</span><span class="ident">xr</span>);
-            <span class="kw">let</span> <span class="ident">xe_cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">xe</span>)<span class="question-mark">?</span>;
-            <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">params</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>() <span class="op">=</span> <span class="kw">if</span> <span class="ident">xe_cost</span> <span class="op">&lt;</span> <span class="ident">xr_cost</span> {
-                (<span class="ident">xe</span>, <span class="ident">xe_cost</span>)
-            } <span class="kw">else</span> {
-                (<span class="ident">xr</span>, <span class="ident">xr_cost</span>)
+        <span class="kw">let </span>action = <span class="kw">if </span>xr_cost &lt; p_second_worst.<span class="number">1 </span>&amp;&amp; xr_cost &gt;= p_best.<span class="number">1 </span>{
+            <span class="comment">// reflection
+            </span><span class="kw-2">*</span><span class="self">self</span>.params.last_mut().unwrap() = (xr, xr_cost);
+            Action::Reflection
+        } <span class="kw">else if </span>xr_cost &lt; p_best.<span class="number">1 </span>{
+            <span class="comment">// expansion
+            </span><span class="kw">let </span>xe = <span class="self">self</span>.expand(<span class="kw-2">&amp;</span>x0, <span class="kw-2">&amp;</span>xr);
+            <span class="kw">let </span>xe_cost = problem.cost(<span class="kw-2">&amp;</span>xe)<span class="question-mark">?</span>;
+            <span class="kw-2">*</span><span class="self">self</span>.params.last_mut().unwrap() = <span class="kw">if </span>xe_cost &lt; xr_cost {
+                (xe, xe_cost)
+            } <span class="kw">else </span>{
+                (xr, xr_cost)
             };
-            <span class="ident">Action::Expansion</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">xr_cost</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">p_second_worst</span>.<span class="number">1</span> {
-            <span class="comment">// contraction</span>
-            <span class="kw">if</span> <span class="ident">xr_cost</span> <span class="op">&lt;</span> <span class="ident">p_worst</span>.<span class="number">1</span> {
-                <span class="comment">// Outside</span>
-                <span class="kw">let</span> <span class="ident">xc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">contract</span>(<span class="kw-2">&amp;</span><span class="ident">x0</span>, <span class="kw-2">&amp;</span><span class="ident">xr</span>);
-                <span class="kw">let</span> <span class="ident">xc_cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">xc</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">xc_cost</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">xr_cost</span> {
-                    <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">params</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>() <span class="op">=</span> (<span class="ident">xc</span>, <span class="ident">xc_cost</span>);
-                    <span class="ident">Action::ContractionOutside</span>
-                } <span class="kw">else</span> {
-                    <span class="comment">// shrink</span>
-                    <span class="self">self</span>.<span class="ident">shrink</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="ident">x</span>))<span class="question-mark">?</span>;
-                    <span class="ident">Action::Shrink</span>
+            Action::Expansion
+        } <span class="kw">else if </span>xr_cost &gt;= p_second_worst.<span class="number">1 </span>{
+            <span class="comment">// contraction
+            </span><span class="kw">if </span>xr_cost &lt; p_worst.<span class="number">1 </span>{
+                <span class="comment">// Outside
+                </span><span class="kw">let </span>xc = <span class="self">self</span>.contract(<span class="kw-2">&amp;</span>x0, <span class="kw-2">&amp;</span>xr);
+                <span class="kw">let </span>xc_cost = problem.cost(<span class="kw-2">&amp;</span>xc)<span class="question-mark">?</span>;
+                <span class="kw">if </span>xc_cost &lt;= xr_cost {
+                    <span class="kw-2">*</span><span class="self">self</span>.params.last_mut().unwrap() = (xc, xc_cost);
+                    Action::ContractionOutside
+                } <span class="kw">else </span>{
+                    <span class="comment">// shrink
+                    </span><span class="self">self</span>.shrink(|x| problem.cost(x))<span class="question-mark">?</span>;
+                    Action::Shrink
                 }
-            } <span class="kw">else</span> {
-                <span class="comment">// Inside</span>
-                <span class="kw">let</span> <span class="ident">xc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">contract</span>(<span class="kw-2">&amp;</span><span class="ident">x0</span>, <span class="kw-2">&amp;</span><span class="ident">p_worst</span>.<span class="number">0</span>);
-                <span class="kw">let</span> <span class="ident">xc_cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">xc</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">xc_cost</span> <span class="op">&lt;</span> <span class="ident">p_worst</span>.<span class="number">1</span> {
-                    <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">params</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>() <span class="op">=</span> (<span class="ident">xc</span>, <span class="ident">xc_cost</span>);
-                    <span class="ident">Action::ContractionInside</span>
-                } <span class="kw">else</span> {
-                    <span class="comment">// shrink</span>
-                    <span class="self">self</span>.<span class="ident">shrink</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="ident">x</span>))<span class="question-mark">?</span>;
-                    <span class="ident">Action::Shrink</span>
+            } <span class="kw">else </span>{
+                <span class="comment">// Inside
+                </span><span class="kw">let </span>xc = <span class="self">self</span>.contract(<span class="kw-2">&amp;</span>x0, <span class="kw-2">&amp;</span>p_worst.<span class="number">0</span>);
+                <span class="kw">let </span>xc_cost = problem.cost(<span class="kw-2">&amp;</span>xc)<span class="question-mark">?</span>;
+                <span class="kw">if </span>xc_cost &lt; p_worst.<span class="number">1 </span>{
+                    <span class="kw-2">*</span><span class="self">self</span>.params.last_mut().unwrap() = (xc, xc_cost);
+                    Action::ContractionInside
+                } <span class="kw">else </span>{
+                    <span class="comment">// shrink
+                    </span><span class="self">self</span>.shrink(|x| problem.cost(x))<span class="question-mark">?</span>;
+                    Action::Shrink
                 }
             }
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">PotentialBug</span>,
-                <span class="string">&quot;`NelderMead`: Reached unreachable point.&quot;</span>
-            ));
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                PotentialBug,
+                <span class="string">&quot;`NelderMead`: Reached unreachable point.&quot;
+            </span>));
         };
 
-        <span class="self">self</span>.<span class="ident">sort_param_vecs</span>();
+        <span class="self">self</span>.sort_param_vecs();
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>.<span class="ident">param</span>(<span class="self">self</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">&quot;action&quot;</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">action</span>);)),
+            state.param(<span class="self">self</span>.params[<span class="number">0</span>].<span class="number">0</span>.clone()).cost(<span class="self">self</span>.params[<span class="number">0</span>].<span class="number">1</span>),
+            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">&quot;action&quot; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, action);)),
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, (), (), (), <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="self">self</span>.<span class="ident">params</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">f64</span>);
-        <span class="kw">let</span> <span class="ident">c0</span>: <span class="ident">F</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span>).<span class="ident">sum</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>() <span class="op">/</span> <span class="ident">n</span>;
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">F</span> <span class="op">=</span> (<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">/</span> (<span class="ident">n</span> <span class="op">-</span> <span class="macro">float!</span>(<span class="number">1.0</span>))
-            <span class="op">*</span> <span class="self">self</span>
-                .<span class="ident">params</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">c</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">c</span> <span class="op">-</span> <span class="ident">c0</span>).<span class="ident">powi</span>(<span class="number">2</span>))
-                .<span class="ident">sum</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>())
-        .<span class="ident">sqrt</span>();
-        <span class="kw">if</span> <span class="ident">s</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">sd_tolerance</span> {
-            <span class="kw">return</span> <span class="ident">TerminationReason::TargetToleranceReached</span>;
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationReason {
+        <span class="kw">let </span>n = <span class="macro">float!</span>(<span class="self">self</span>.params.len() <span class="kw">as </span>f64);
+        <span class="kw">let </span>c0: F = <span class="self">self</span>.params.iter().map(|(<span class="kw">_</span>, c)| <span class="kw-2">*</span>c).sum::&lt;F&gt;() / n;
+        <span class="kw">let </span>s: F = (<span class="macro">float!</span>(<span class="number">1.0</span>) / (n - <span class="macro">float!</span>(<span class="number">1.0</span>))
+            * <span class="self">self
+                </span>.params
+                .iter()
+                .map(|(<span class="kw">_</span>, c)| (<span class="kw-2">*</span>c - c0).powi(<span class="number">2</span>))
+                .sum::&lt;F&gt;())
+        .sqrt();
+        <span class="kw">if </span>s &lt; <span class="self">self</span>.sd_tolerance {
+            <span class="kw">return </span>TerminationReason::TargetToleranceReached;
         }
-        <span class="ident">TerminationReason::NotTerminated</span>
+        TerminationReason::NotTerminated
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">test_utils::TestProblem</span>, <span class="ident">ArgminError</span>, <span class="ident">IterState</span>, <span class="ident">State</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
-    <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{test_utils::TestProblem, ArgminError, IterState, State};
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
+    <span class="kw">use </span>approx::assert_relative_eq;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">nelder_mead</span>, <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">TestProblem</span>, <span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(nelder_mead, NelderMead&lt;TestProblem, f64&gt;);
 
-    <span class="kw">struct</span> <span class="ident">MwProblem</span> {}
+    <span class="kw">struct </span>MwProblem {}
 
-    <span class="kw">impl</span> <span class="ident">CostFunction</span> <span class="kw">for</span> <span class="ident">MwProblem</span> {
-        <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
+    <span class="kw">impl </span>CostFunction <span class="kw">for </span>MwProblem {
+        <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+        <span class="kw">type </span>Output = f64;
 
-        <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0.0</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">x</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">2</span>)))
+        <span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
+            <span class="prelude-val">Ok</span>(p.iter().fold(<span class="number">0.0</span>, |acc, x| acc + x.powi(<span class="number">2</span>)))
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
-        <span class="kw">let</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>params = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
+        <span class="kw">let </span>nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(params);
 
-        <span class="kw">let</span> <span class="ident">NelderMead</span> {
-            <span class="ident">alpha</span>,
-            <span class="ident">gamma</span>,
-            <span class="ident">rho</span>,
-            <span class="ident">sigma</span>,
-            <span class="ident">params</span>,
-            <span class="ident">sd_tolerance</span>,
-        } <span class="op">=</span> <span class="ident">nm</span>;
+        <span class="kw">let </span>NelderMead {
+            alpha,
+            gamma,
+            rho,
+            sigma,
+            params,
+            sd_tolerance,
+        } = nm;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">alpha</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">gamma</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">2.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">rho</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.5f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">sigma</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.5f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">1</span>].<span class="number">0</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(), <span class="number">2.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">0</span>].<span class="number">1</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::NAN</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">1</span>].<span class="number">1</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::NAN</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">sd_tolerance</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::EPSILON</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="macro">assert_eq!</span>(alpha.to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(gamma.to_ne_bytes(), <span class="number">2.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(rho.to_ne_bytes(), <span class="number">0.5f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(sigma.to_ne_bytes(), <span class="number">0.5f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(params[<span class="number">0</span>].<span class="number">0</span>[<span class="number">0</span>].to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(params[<span class="number">1</span>].<span class="number">0</span>[<span class="number">0</span>].to_ne_bytes(), <span class="number">2.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(params[<span class="number">0</span>].<span class="number">1</span>.to_ne_bytes(), f64::NAN.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(params[<span class="number">1</span>].<span class="number">1</span>.to_ne_bytes(), f64::NAN.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(sd_tolerance.to_ne_bytes(), f64::EPSILON.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_sd_tolerance</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">tol</span> <span class="kw">in</span> [<span class="number">1e-6</span>, <span class="number">0.0</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>] {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
-            <span class="kw">let</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">with_sd_tolerance</span>(<span class="ident">tol</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_sd_tolerance() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>tol <span class="kw">in </span>[<span class="number">1e-6</span>, <span class="number">0.0</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>] {
+            <span class="kw">let </span>params = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
+            <span class="kw">let </span>nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(params);
+            <span class="kw">let </span>res = nm.with_sd_tolerance(tol);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">nm</span>.<span class="ident">sd_tolerance</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">tol</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>nm = res.unwrap();
+            <span class="macro">assert_eq!</span>(nm.sd_tolerance.to_ne_bytes(), tol.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">tol</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">100.0</span>, <span class="op">-</span><span class="number">42.0</span>] {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
-            <span class="kw">let</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">with_sd_tolerance</span>(<span class="ident">tol</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>tol <span class="kw">in </span>[-f64::EPSILON, -<span class="number">1.0</span>, -<span class="number">100.0</span>, -<span class="number">42.0</span>] {
+            <span class="kw">let </span>params = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
+            <span class="kw">let </span>nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(params);
+            <span class="kw">let </span>res = nm.with_sd_tolerance(tol);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`Nelder-Mead`: &quot;</span>,
-                    <span class="string">&quot;sd_tolerance must be &gt;= 0.\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;sd_tolerance must be &gt;= 0.\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_alpha</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">alpha</span> <span class="kw">in</span> [<span class="ident">f64::EPSILON</span>, <span class="number">1e-6</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>] {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
-            <span class="kw">let</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">with_alpha</span>(<span class="ident">alpha</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_alpha() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>alpha <span class="kw">in </span>[f64::EPSILON, <span class="number">1e-6</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>] {
+            <span class="kw">let </span>params = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
+            <span class="kw">let </span>nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(params);
+            <span class="kw">let </span>res = nm.with_alpha(alpha);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">nm</span>.<span class="ident">alpha</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">alpha</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>nm = res.unwrap();
+            <span class="macro">assert_eq!</span>(nm.alpha.to_ne_bytes(), alpha.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">alpha</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">100.0</span>, <span class="op">-</span><span class="number">42.0</span>] {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
-            <span class="kw">let</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">with_alpha</span>(<span class="ident">alpha</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>alpha <span class="kw">in </span>[-f64::EPSILON, -<span class="number">1.0</span>, -<span class="number">100.0</span>, -<span class="number">42.0</span>] {
+            <span class="kw">let </span>params = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
+            <span class="kw">let </span>nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(params);
+            <span class="kw">let </span>res = nm.with_alpha(alpha);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`Nelder-Mead`: &quot;</span>,
-                    <span class="string">&quot;alpha must be &gt; 0.\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;alpha must be &gt; 0.\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_rho</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">rho</span> <span class="kw">in</span> [<span class="ident">f64::EPSILON</span>, <span class="number">0.1</span>, <span class="number">0.3</span>, <span class="number">0.5</span>] {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
-            <span class="kw">let</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">with_rho</span>(<span class="ident">rho</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_rho() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>rho <span class="kw">in </span>[f64::EPSILON, <span class="number">0.1</span>, <span class="number">0.3</span>, <span class="number">0.5</span>] {
+            <span class="kw">let </span>params = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
+            <span class="kw">let </span>nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(params);
+            <span class="kw">let </span>res = nm.with_rho(rho);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">nm</span>.<span class="ident">rho</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">rho</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>nm = res.unwrap();
+            <span class="macro">assert_eq!</span>(nm.rho.to_ne_bytes(), rho.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">rho</span> <span class="kw">in</span> [<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.5</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="number">1.0</span>] {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
-            <span class="kw">let</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">with_rho</span>(<span class="ident">rho</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>rho <span class="kw">in </span>[-<span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.5 </span>+ f64::EPSILON, <span class="number">1.0</span>] {
+            <span class="kw">let </span>params = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
+            <span class="kw">let </span>nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(params);
+            <span class="kw">let </span>res = nm.with_rho(rho);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`Nelder-Mead`: &quot;</span>,
-                    <span class="string">&quot;rho must be in (0, 0.5].\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;rho must be in (0, 0.5].\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_sigma</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">sigma</span> <span class="kw">in</span> [<span class="ident">f64::EPSILON</span>, <span class="number">0.3</span>, <span class="number">0.5</span>, <span class="number">0.9</span>, <span class="number">1.0</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>] {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
-            <span class="kw">let</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">with_sigma</span>(<span class="ident">sigma</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_sigma() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>sigma <span class="kw">in </span>[f64::EPSILON, <span class="number">0.3</span>, <span class="number">0.5</span>, <span class="number">0.9</span>, <span class="number">1.0 </span>- f64::EPSILON] {
+            <span class="kw">let </span>params = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
+            <span class="kw">let </span>nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(params);
+            <span class="kw">let </span>res = nm.with_sigma(sigma);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">nm</span>.<span class="ident">sigma</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">sigma</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>nm = res.unwrap();
+            <span class="macro">assert_eq!</span>(nm.sigma.to_ne_bytes(), sigma.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">sigma</span> <span class="kw">in</span> [<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="number">10.0</span>] {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
-            <span class="kw">let</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">with_sigma</span>(<span class="ident">sigma</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>sigma <span class="kw">in </span>[-<span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">1.0 </span>+ f64::EPSILON, <span class="number">10.0</span>] {
+            <span class="kw">let </span>params = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>]];
+            <span class="kw">let </span>nm: NelderMead&lt;Vec&lt;f64&gt;, f64&gt; = NelderMead::new(params);
+            <span class="kw">let </span>res = nm.with_sigma(sigma);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`Nelder-Mead`: &quot;</span>,
-                    <span class="string">&quot;sigma must be in (0, 1].\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;sigma must be in (0, 1].\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_sort_param_vecs</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>]];
-        <span class="kw">let</span> <span class="ident">params_sorted</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>]];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="ident">nm</span>.<span class="ident">params</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">p</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">=</span> <span class="ident">p</span>[<span class="number">0</span>]);
-        <span class="ident">nm</span>.<span class="ident">sort_param_vecs</span>();
-        <span class="kw">for</span> ((<span class="ident">p</span>, <span class="ident">c</span>), <span class="ident">ps</span>) <span class="kw">in</span> <span class="ident">nm</span>.<span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">params_sorted</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">ps</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">ps</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_sort_param_vecs() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>]];
+        <span class="kw">let </span>params_sorted: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">3.0</span>]];
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        nm.params.iter_mut().for_each(|(p, c)| <span class="kw-2">*</span>c = p[<span class="number">0</span>]);
+        nm.sort_param_vecs();
+        <span class="kw">for </span>((p, c), ps) <span class="kw">in </span>nm.params.iter().zip(params_sorted.iter()) {
+            <span class="macro">assert_eq!</span>(p[<span class="number">0</span>].to_ne_bytes(), ps[<span class="number">0</span>].to_ne_bytes());
+            <span class="macro">assert_eq!</span>(c.to_ne_bytes(), ps[<span class="number">0</span>].to_ne_bytes());
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_calculate_centroid</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.2</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.4</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>]];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="ident">nm</span>.<span class="ident">params</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">i</span>, (<span class="kw">_</span>, <span class="ident">c</span>))<span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span>);
-        <span class="ident">nm</span>.<span class="ident">sort_param_vecs</span>();
-        <span class="kw">let</span> <span class="ident">centroid</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">calculate_centroid</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">centroid</span>[<span class="number">0</span>], <span class="number">0.3f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">centroid</span>[<span class="number">1</span>], <span class="number">0.5f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_calculate_centroid() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.2</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.4</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>]];
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        nm.params
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, (<span class="kw">_</span>, c))| <span class="kw-2">*</span>c = i <span class="kw">as </span>f64);
+        nm.sort_param_vecs();
+        <span class="kw">let </span>centroid = nm.calculate_centroid();
+        <span class="macro">assert_relative_eq!</span>(centroid[<span class="number">0</span>], <span class="number">0.3f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(centroid[<span class="number">1</span>], <span class="number">0.5f64</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_reflect</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="ident">nm</span>.<span class="ident">params</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">i</span>, (<span class="kw">_</span>, <span class="ident">c</span>))<span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span>);
-        <span class="ident">nm</span>.<span class="ident">sort_param_vecs</span>();
-        <span class="kw">let</span> <span class="ident">centroid</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">calculate_centroid</span>();
-        <span class="kw">let</span> <span class="ident">reflected</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">reflect</span>(<span class="kw-2">&amp;</span><span class="ident">centroid</span>, <span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">reflected</span>[<span class="number">0</span>], <span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">reflected</span>[<span class="number">1</span>], <span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_reflect() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]];
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        nm.params
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, (<span class="kw">_</span>, c))| <span class="kw-2">*</span>c = i <span class="kw">as </span>f64);
+        nm.sort_param_vecs();
+        <span class="kw">let </span>centroid = nm.calculate_centroid();
+        <span class="kw">let </span>reflected = nm.reflect(<span class="kw-2">&amp;</span>centroid, <span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
+        <span class="macro">assert_relative_eq!</span>(reflected[<span class="number">0</span>], <span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(reflected[<span class="number">1</span>], <span class="number">1.0f64</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_expand</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="ident">nm</span>.<span class="ident">params</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">i</span>, (<span class="kw">_</span>, <span class="ident">c</span>))<span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span>);
-        <span class="ident">nm</span>.<span class="ident">sort_param_vecs</span>();
-        <span class="kw">let</span> <span class="ident">centroid</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">calculate_centroid</span>();
-        <span class="kw">let</span> <span class="ident">expanded</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">expand</span>(<span class="kw-2">&amp;</span><span class="ident">centroid</span>, <span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>]);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">expanded</span>[<span class="number">0</span>], <span class="number">1.5f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">expanded</span>[<span class="number">1</span>], <span class="number">1.5f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_expand() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]];
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        nm.params
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, (<span class="kw">_</span>, c))| <span class="kw-2">*</span>c = i <span class="kw">as </span>f64);
+        nm.sort_param_vecs();
+        <span class="kw">let </span>centroid = nm.calculate_centroid();
+        <span class="kw">let </span>expanded = nm.expand(<span class="kw-2">&amp;</span>centroid, <span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>]);
+        <span class="macro">assert_relative_eq!</span>(expanded[<span class="number">0</span>], <span class="number">1.5f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(expanded[<span class="number">1</span>], <span class="number">1.5f64</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_contract</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="ident">nm</span>.<span class="ident">params</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">i</span>, (<span class="kw">_</span>, <span class="ident">c</span>))<span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span>);
-        <span class="ident">nm</span>.<span class="ident">sort_param_vecs</span>();
-        <span class="kw">let</span> <span class="ident">centroid</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">calculate_centroid</span>();
-        <span class="kw">let</span> <span class="ident">contracted</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">contract</span>(<span class="kw-2">&amp;</span><span class="ident">centroid</span>, <span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>]);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">contracted</span>[<span class="number">0</span>], <span class="number">0.75f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">contracted</span>[<span class="number">1</span>], <span class="number">0.75f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_contract() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]];
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        nm.params
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, (<span class="kw">_</span>, c))| <span class="kw-2">*</span>c = i <span class="kw">as </span>f64);
+        nm.sort_param_vecs();
+        <span class="kw">let </span>centroid = nm.calculate_centroid();
+        <span class="kw">let </span>contracted = nm.contract(<span class="kw-2">&amp;</span>centroid, <span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>]);
+        <span class="macro">assert_relative_eq!</span>(contracted[<span class="number">0</span>], <span class="number">0.75f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(contracted[<span class="number">1</span>], <span class="number">0.75f64</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_shrink</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>]];
-        <span class="kw">let</span> <span class="ident">params_shrunk</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.5</span>], <span class="macro">vec!</span>[<span class="number">0.5</span>, <span class="number">0.0</span>]];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="ident">nm</span>.<span class="ident">params</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">i</span>, (<span class="kw">_</span>, <span class="ident">c</span>))<span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span>);
-        <span class="ident">nm</span>.<span class="ident">sort_param_vecs</span>();
-        <span class="ident">nm</span>.<span class="ident">shrink</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="number">1.0f64</span>)).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_shrink() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>]];
+        <span class="kw">let </span>params_shrunk: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.5</span>], <span class="macro">vec!</span>[<span class="number">0.5</span>, <span class="number">0.0</span>]];
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        nm.params
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, (<span class="kw">_</span>, c))| <span class="kw-2">*</span>c = i <span class="kw">as </span>f64);
+        nm.sort_param_vecs();
+        nm.shrink(|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="number">1.0f64</span>)).unwrap();
 
-        <span class="kw">for</span> ((<span class="ident">p</span>, <span class="kw">_</span>), <span class="ident">ps</span>) <span class="kw">in</span> <span class="ident">nm</span>.<span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">params_shrunk</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">ps</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">ps</span>[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>());
+        <span class="kw">for </span>((p, <span class="kw">_</span>), ps) <span class="kw">in </span>nm.params.iter().zip(params_shrunk.iter()) {
+            <span class="macro">assert_eq!</span>(p[<span class="number">0</span>].to_ne_bytes(), ps[<span class="number">0</span>].to_ne_bytes());
+            <span class="macro">assert_eq!</span>(p[<span class="number">1</span>].to_ne_bytes(), ps[<span class="number">1</span>].to_ne_bytes());
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="op">-</span><span class="number">0.5</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">0.7</span>, <span class="op">-</span><span class="number">1.0</span>]];
-        <span class="kw">let</span> <span class="ident">params_sorted</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            (<span class="macro">vec!</span>[<span class="number">0.7</span>, <span class="op">-</span><span class="number">1.0</span>], <span class="number">0.7f64</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="number">1.0f64</span>.<span class="ident">powi</span>(<span class="number">2</span>)),
-            (<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>], <span class="number">2.0</span>),
-            (<span class="macro">vec!</span>[<span class="op">-</span><span class="number">0.5</span>, <span class="number">2.0</span>], <span class="number">0.5f64</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="number">2.0f64</span>.<span class="ident">powi</span>(<span class="number">2</span>)),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[-<span class="number">0.5</span>, <span class="number">2.0</span>], <span class="macro">vec!</span>[<span class="number">0.7</span>, -<span class="number">1.0</span>]];
+        <span class="kw">let </span>params_sorted: Vec&lt;(Vec&lt;f64&gt;, f64)&gt; = <span class="macro">vec!</span>[
+            (<span class="macro">vec!</span>[<span class="number">0.7</span>, -<span class="number">1.0</span>], <span class="number">0.7f64</span>.powi(<span class="number">2</span>) + <span class="number">1.0f64</span>.powi(<span class="number">2</span>)),
+            (<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>], <span class="number">2.0</span>),
+            (<span class="macro">vec!</span>[-<span class="number">0.5</span>, <span class="number">2.0</span>], <span class="number">0.5f64</span>.powi(<span class="number">2</span>) + <span class="number">2.0f64</span>.powi(<span class="number">2</span>)),
         ];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">MwProblem</span> {};
-        <span class="kw">let</span> (<span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span>problem = MwProblem {};
+        <span class="kw">let </span>(state_out, kv) = nm.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">for</span> ((<span class="ident">p</span>, <span class="ident">c</span>), (<span class="ident">ps</span>, <span class="ident">cs</span>)) <span class="kw">in</span> <span class="ident">nm</span>.<span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">params_sorted</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_relative_eq!</span>(<span class="ident">c</span>, <span class="ident">cs</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">ps</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">p</span>[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">ps</span>[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>());
+        <span class="kw">for </span>((p, c), (ps, cs)) <span class="kw">in </span>nm.params.iter().zip(params_sorted.iter()) {
+            <span class="macro">assert_relative_eq!</span>(c, cs, epsilon = f64::EPSILON);
+            <span class="macro">assert_eq!</span>(p[<span class="number">0</span>].to_ne_bytes(), ps[<span class="number">0</span>].to_ne_bytes());
+            <span class="macro">assert_eq!</span>(p[<span class="number">1</span>].to_ne_bytes(), ps[<span class="number">1</span>].to_ne_bytes());
         }
 
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">2</span> {
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
             <span class="macro">assert_relative_eq!</span>(
-                <span class="ident">state_out</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>()[<span class="ident">i</span>],
-                <span class="ident">params_sorted</span>[<span class="number">0</span>].<span class="number">0</span>[<span class="ident">i</span>],
-                <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+                state_out.get_param().unwrap()[i],
+                params_sorted[<span class="number">0</span>].<span class="number">0</span>[i],
+                epsilon = f64::EPSILON
             );
         }
 
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">state_out</span>.<span class="ident">get_cost</span>(),
-            <span class="number">0.7f64</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="number">1.0f64</span>.<span class="ident">powi</span>(<span class="number">2</span>),
-            <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+            state_out.get_cost(),
+            <span class="number">0.7f64</span>.powi(<span class="number">2</span>) + <span class="number">1.0f64</span>.powi(<span class="number">2</span>),
+            epsilon = f64::EPSILON
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter_reflection</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="op">-</span><span class="number">0.1</span>, <span class="number">0.65</span>], <span class="macro">vec!</span>[<span class="op">-</span><span class="number">0.1</span>, <span class="op">-</span><span class="number">0.95</span>]];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">MwProblem</span> {});
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter_reflection() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[-<span class="number">0.1</span>, <span class="number">0.65</span>], <span class="macro">vec!</span>[-<span class="number">0.1</span>, -<span class="number">0.95</span>]];
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(MwProblem {});
+        <span class="kw">let </span>(state, <span class="kw">_</span>) = nm.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(state, kv) = nm.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">kv</span>.<span class="ident">unwrap</span>().<span class="ident">get</span>(<span class="string">&quot;action&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="string">&quot;Reflection&quot;</span>
-        );
+            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, kv.unwrap().get(<span class="string">&quot;action&quot;</span>).unwrap()),
+            <span class="string">&quot;Reflection&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>param = state.get_param().unwrap();
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">0.1f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="number">0.65f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], -<span class="number">0.1f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], <span class="number">0.65f64</span>, epsilon = f64::EPSILON);
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">cost</span>, <span class="number">0.4325f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>cost = state.get_cost();
+        <span class="macro">assert_relative_eq!</span>(cost, <span class="number">0.4325f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">0.1f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">0.65f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">1</span>, <span class="number">0.4325f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">0</span>[<span class="number">0</span>], -<span class="number">0.1f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">0.65f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">1</span>, <span class="number">0.4325f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="number">0.8f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="op">-</span><span class="number">0.3f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">1</span>, <span class="number">0.73f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="number">0.8f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">0</span>[<span class="number">1</span>], -<span class="number">0.3f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">1</span>, <span class="number">0.73f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">0.1f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="op">-</span><span class="number">0.95f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">1</span>, <span class="number">0.9125f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">0</span>[<span class="number">0</span>], -<span class="number">0.1f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">0</span>[<span class="number">1</span>], -<span class="number">0.95f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">1</span>, <span class="number">0.9125f64</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter_expansion</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="macro">vec!</span>[<span class="op">-</span><span class="number">2.0</span>, <span class="number">0.0</span>],
-            <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>],
-            <span class="comment">// make sure that the last to vectors don&#39;t evaluate to the same cost function value</span>
-            <span class="comment">// which may cause strangeness in the sorting.</span>
-            <span class="comment">// Check this again if this test starts failing randomly...</span>
-            <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>],
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter_expansion() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[
+            <span class="macro">vec!</span>[-<span class="number">2.0</span>, <span class="number">0.0</span>],
+            <span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>],
+            <span class="comment">// make sure that the last to vectors don&#39;t evaluate to the same cost function value
+            // which may cause strangeness in the sorting.
+            // Check this again if this test starts failing randomly...
+            </span><span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0 </span>- f64::EPSILON],
         ];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">MwProblem</span> {});
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(MwProblem {});
+        <span class="kw">let </span>(state, <span class="kw">_</span>) = nm.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(state, kv) = nm.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">kv</span>.<span class="ident">unwrap</span>().<span class="ident">get</span>(<span class="string">&quot;action&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="string">&quot;Expansion&quot;</span>
-        );
+            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, kv.unwrap().get(<span class="string">&quot;action&quot;</span>).unwrap()),
+            <span class="string">&quot;Expansion&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>param = state.get_param().unwrap();
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">cost</span>, <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>cost = state.get_cost();
+        <span class="macro">assert_relative_eq!</span>(cost, <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">1</span>, <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">1</span>, <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">1</span>, <span class="number">2.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">0</span>[<span class="number">0</span>], -<span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">1</span>, <span class="number">2.0f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="op">-</span><span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">1</span>, <span class="number">2.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">0</span>[<span class="number">0</span>], -<span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">0</span>[<span class="number">1</span>], -<span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">1</span>, <span class="number">2.0f64</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter_contraction_outside</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.1</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="op">-</span><span class="number">0.1</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="op">-</span><span class="number">0.1</span>, <span class="op">-</span><span class="number">0.5</span>]];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">MwProblem</span> {});
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter_contraction_outside() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[-<span class="number">1.1</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[-<span class="number">0.1</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[-<span class="number">0.1</span>, -<span class="number">0.5</span>]];
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(MwProblem {});
+        <span class="kw">let </span>(state, <span class="kw">_</span>) = nm.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(state, kv) = nm.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">kv</span>.<span class="ident">unwrap</span>().<span class="ident">get</span>(<span class="string">&quot;action&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="string">&quot;ContractionOutside&quot;</span>
-        );
+            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, kv.unwrap().get(<span class="string">&quot;action&quot;</span>).unwrap()),
+            <span class="string">&quot;ContractionOutside&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>param = state.get_param().unwrap();
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">0.1f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="op">-</span><span class="number">0.5f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], -<span class="number">0.1f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], -<span class="number">0.5f64</span>, epsilon = f64::EPSILON);
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">cost</span>, <span class="number">0.26f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>cost = state.get_cost();
+        <span class="macro">assert_relative_eq!</span>(cost, <span class="number">0.26f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">0.1f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="op">-</span><span class="number">0.5f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">1</span>, <span class="number">0.26f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">0</span>[<span class="number">0</span>], -<span class="number">0.1f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">0</span>[<span class="number">1</span>], -<span class="number">0.5f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">1</span>, <span class="number">0.26f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="number">0.4f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">0.375f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">1</span>, <span class="number">0.300625f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="number">0.4f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">0.375f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">1</span>, <span class="number">0.300625f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">0.1f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">1</span>, <span class="number">1.01f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">0</span>[<span class="number">0</span>], -<span class="number">0.1f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">1</span>, <span class="number">1.01f64</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter_contraction_inside</span>() {
-        <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="op">-</span><span class="number">0.5</span>]];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nm</span>: <span class="ident">NelderMead</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NelderMead::new</span>(<span class="ident">params</span>);
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">MwProblem</span> {});
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter_contraction_inside() {
+        <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, -<span class="number">0.5</span>]];
+        <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(MwProblem {});
+        <span class="kw">let </span>(state, <span class="kw">_</span>) = nm.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(state, kv) = nm.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">kv</span>.<span class="ident">unwrap</span>().<span class="ident">get</span>(<span class="string">&quot;action&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="string">&quot;ContractionInside&quot;</span>
-        );
+            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, kv.unwrap().get(<span class="string">&quot;action&quot;</span>).unwrap()),
+            <span class="string">&quot;ContractionInside&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>param = state.get_param().unwrap();
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">0.25f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">param</span>[<span class="number">1</span>], <span class="number">0.375f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">0</span>], -<span class="number">0.25f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(param[<span class="number">1</span>], <span class="number">0.375f64</span>, epsilon = f64::EPSILON);
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">cost</span>, <span class="number">0.203125f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="kw">let </span>cost = state.get_cost();
+        <span class="macro">assert_relative_eq!</span>(cost, <span class="number">0.203125f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">0.25f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">0.375f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">0</span>].<span class="number">1</span>, <span class="number">0.203125f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">0</span>[<span class="number">0</span>], -<span class="number">0.25f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">0.375f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">0</span>].<span class="number">1</span>, <span class="number">0.203125f64</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="op">-</span><span class="number">0.5f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">1</span>].<span class="number">1</span>, <span class="number">0.25</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">0</span>[<span class="number">1</span>], -<span class="number">0.5f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">1</span>].<span class="number">1</span>, <span class="number">0.25</span>, epsilon = f64::EPSILON);
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">0</span>[<span class="number">0</span>], <span class="op">-</span><span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">nm</span>.<span class="ident">params</span>[<span class="number">2</span>].<span class="number">1</span>, <span class="number">1.00f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">0</span>[<span class="number">0</span>], -<span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">0</span>[<span class="number">1</span>], <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(nm.params[<span class="number">2</span>].<span class="number">1</span>, <span class="number">1.00f64</span>, epsilon = f64::EPSILON);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

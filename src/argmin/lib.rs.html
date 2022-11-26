@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../argmin/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../argmin/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -114,121 +114,121 @@
 <span id="114">114</span>
 <span id="115">115</span>
 <span id="116">116</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! argmin is a numerical optimization library written entirely in Rust.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Its goal is to offer a wide range of optimization algorithms with a consistent interface.</span>
-<span class="doccomment">//! It is type-agnostic by the design, meaning that any type and/or math backend, such as</span>
-<span class="doccomment">//! `nalgebra` or `ndarray` can be used -- even your own.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Observers allow one to track the progress of iterations, either by using one of the provided</span>
-<span class="doccomment">//! ones for logging to screen or disk or by implementing your own.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! An optional checkpointing mechanism helps to mitigate the negative effects of crashes in</span>
-<span class="doccomment">//! unstable computing environments.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Due to Rusts powerful generics and traits, most features can be exchanged by your own tailored</span>
-<span class="doccomment">//! implementations.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! argmin is designed to simplify the implementation of optimization algorithms and as such can</span>
-<span class="doccomment">//! also be used as a toolbox for the development of new algorithms. One can focus on the algorithm</span>
-<span class="doccomment">//! itself, while the handling of termination, parameter vectors, populations, gradients, Jacobians</span>
-<span class="doccomment">//! and Hessians is taken care of by the library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For an introduction on how to use argmin, please also have a look at the</span>
-<span class="doccomment">//! [book](http://www.argmin-rs.org/book/).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Highlights</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [Checkpointing](`crate::core::checkpointing`)</span>
-<span class="doccomment">//! * [Observers](`crate::core::observers`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Algorithms</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Line searches](`crate::solver::linesearch`)</span>
-<span class="doccomment">//!   - [Backtracking line search](`crate::solver::linesearch::BacktrackingLineSearch`)</span>
-<span class="doccomment">//!   - [More-Thuente line search](`crate::solver::linesearch::MoreThuenteLineSearch`)</span>
-<span class="doccomment">//!   - [Hager-Zhang line search](`crate::solver::linesearch::HagerZhangLineSearch`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Trust region method](`crate::solver::trustregion::TrustRegion`)</span>
-<span class="doccomment">//!   - [Cauchy point method](`crate::solver::trustregion::CauchyPoint`)</span>
-<span class="doccomment">//!   - [Dogleg method](`crate::solver::trustregion::Dogleg`)</span>
-<span class="doccomment">//!   - [Steihaug method](`crate::solver::trustregion::Steihaug`)</span>
-<span class="doccomment">//!   </span>
-<span class="doccomment">//! - [Steepest descent](`crate::solver::gradientdescent::SteepestDescent`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Conjugate gradient methods](`crate::solver::conjugategradient`)</span>
-<span class="doccomment">//!   - [Conjugate gradient method](`crate::solver::conjugategradient::ConjugateGradient`)</span>
-<span class="doccomment">//!   - [Nonlinear conjugate gradient method](`crate::solver::conjugategradient::NonlinearConjugateGradient`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Newton methods](`crate::solver::newton`)</span>
-<span class="doccomment">//!   - [Newton&#39;s method](`crate::solver::newton::Newton`)</span>
-<span class="doccomment">//!   - [Newton-CG](solver/newton/newton_cg/struct.NewtonCG.html)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Quasi-Newton methods](`crate::solver::quasinewton`)</span>
-<span class="doccomment">//!   - [BFGS](`crate::solver::quasinewton::BFGS`)</span>
-<span class="doccomment">//!   - [L-BFGS](`crate::solver::quasinewton::LBFGS`)</span>
-<span class="doccomment">//!   - [DFP](`crate::solver::quasinewton::DFP`)</span>
-<span class="doccomment">//!   - [SR1](`crate::solver::quasinewton::SR1`)</span>
-<span class="doccomment">//!   - [SR1-TrustRegion](`crate::solver::quasinewton::SR1TrustRegion`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Gauss-Newton methods](`crate::solver::gaussnewton`)</span>
-<span class="doccomment">//!   - [Gauss-Newton method](`crate::solver::gaussnewton::GaussNewton`)</span>
-<span class="doccomment">//!   - [Gauss-Newton method with linesearch](`crate::solver::gaussnewton::GaussNewtonLS`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Golden-section search](`crate::solver::goldensectionsearch::GoldenSectionSearch`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Landweber iteration](`crate::solver::landweber::Landweber`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Brent&#39;s methods](`crate::solver::brent`)</span>
-<span class="doccomment">//!   - [Brent&#39;s minimization method](`crate::solver::brent::BrentOpt`)</span>
-<span class="doccomment">//!   - [Brent&#39;s root finding method](`crate::solver::brent::BrentRoot`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Nelder-Mead method](`crate::solver::neldermead::NelderMead`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Simulated Annealing](`crate::solver::simulatedannealing::SimulatedAnnealing`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Particle Swarm Optimization](`crate::solver::particleswarm::ParticleSwarm`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # License</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Licensed under either of</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   * Apache License, Version 2.0,</span>
-<span class="doccomment">//!     ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE) or</span>
-<span class="doccomment">//!     &lt;http://www.apache.org/licenses/LICENSE-2.0&gt;)</span>
-<span class="doccomment">//!   * MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT) or</span>
-<span class="doccomment">//!     &lt;http://opensource.org/licenses/MIT&gt;)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! at your option.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Contribution</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion</span>
-<span class="doccomment">//! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,</span>
-<span class="doccomment">//! without any additional terms or conditions.</span>
+</span><span class="doccomment">//! argmin is a numerical optimization library written entirely in Rust.
+//!
+//! Its goal is to offer a wide range of optimization algorithms with a consistent interface.
+//! It is type-agnostic by design, meaning that any type and/or math backend, such as
+//! `nalgebra` or `ndarray` can be used -- even your own.
+//!
+//! Observers allow one to track the progress of iterations, either by using one of the provided
+//! ones for logging to screen or disk or by implementing your own.
+//!
+//! An optional checkpointing mechanism helps to mitigate the negative effects of crashes in
+//! unstable computing environments.
+//!
+//! Due to Rusts powerful generics and traits, most features can be exchanged by your own tailored
+//! implementations.
+//!
+//! argmin is designed to simplify the implementation of optimization algorithms and as such can
+//! also be used as a toolbox for the development of new algorithms. One can focus on the algorithm
+//! itself, while the handling of termination, parameter vectors, populations, gradients, Jacobians
+//! and Hessians is taken care of by the library.
+//!
+//! For an introduction on how to use argmin, please also have a look at the
+//! [book](http://www.argmin-rs.org/book/).
+//!
+//! # Highlights
+//!
+//! * [Checkpointing](`crate::core::checkpointing`)
+//! * [Observers](`crate::core::observers`)
+//!
+//!
+//! # Algorithms
+//!
+//! - [Line searches](`crate::solver::linesearch`)
+//!   - [Backtracking line search](`crate::solver::linesearch::BacktrackingLineSearch`)
+//!   - [More-Thuente line search](`crate::solver::linesearch::MoreThuenteLineSearch`)
+//!   - [Hager-Zhang line search](`crate::solver::linesearch::HagerZhangLineSearch`)
+//!
+//! - [Trust region method](`crate::solver::trustregion::TrustRegion`)
+//!   - [Cauchy point method](`crate::solver::trustregion::CauchyPoint`)
+//!   - [Dogleg method](`crate::solver::trustregion::Dogleg`)
+//!   - [Steihaug method](`crate::solver::trustregion::Steihaug`)
+//!   
+//! - [Steepest descent](`crate::solver::gradientdescent::SteepestDescent`)
+//!
+//! - [Conjugate gradient methods](`crate::solver::conjugategradient`)
+//!   - [Conjugate gradient method](`crate::solver::conjugategradient::ConjugateGradient`)
+//!   - [Nonlinear conjugate gradient method](`crate::solver::conjugategradient::NonlinearConjugateGradient`)
+//!
+//! - [Newton methods](`crate::solver::newton`)
+//!   - [Newton&#39;s method](`crate::solver::newton::Newton`)
+//!   - [Newton-CG](solver/newton/newton_cg/struct.NewtonCG.html)
+//!
+//! - [Quasi-Newton methods](`crate::solver::quasinewton`)
+//!   - [BFGS](`crate::solver::quasinewton::BFGS`)
+//!   - [L-BFGS](`crate::solver::quasinewton::LBFGS`)
+//!   - [DFP](`crate::solver::quasinewton::DFP`)
+//!   - [SR1](`crate::solver::quasinewton::SR1`)
+//!   - [SR1-TrustRegion](`crate::solver::quasinewton::SR1TrustRegion`)
+//!
+//! - [Gauss-Newton methods](`crate::solver::gaussnewton`)
+//!   - [Gauss-Newton method](`crate::solver::gaussnewton::GaussNewton`)
+//!   - [Gauss-Newton method with linesearch](`crate::solver::gaussnewton::GaussNewtonLS`)
+//!
+//! - [Golden-section search](`crate::solver::goldensectionsearch::GoldenSectionSearch`)
+//!
+//! - [Landweber iteration](`crate::solver::landweber::Landweber`)
+//!
+//! - [Brent&#39;s methods](`crate::solver::brent`)
+//!   - [Brent&#39;s minimization method](`crate::solver::brent::BrentOpt`)
+//!   - [Brent&#39;s root finding method](`crate::solver::brent::BrentRoot`)
+//!
+//! - [Nelder-Mead method](`crate::solver::neldermead::NelderMead`)
+//!
+//! - [Simulated Annealing](`crate::solver::simulatedannealing::SimulatedAnnealing`)
+//!
+//! - [Particle Swarm Optimization](`crate::solver::particleswarm::ParticleSwarm`)
+//!
+//! # License
+//!
+//! Licensed under either of
+//!
+//!   * Apache License, Version 2.0,
+//!     ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE) or
+//!     &lt;http://www.apache.org/licenses/LICENSE-2.0&gt;)
+//!   * MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT) or
+//!     &lt;http://opensource.org/licenses/MIT&gt;)
+//!
+//! at your option.
+//!
+//! ## Contribution
+//!
+//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
+//! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
+//! without any additional terms or conditions.
 
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_attributes</span>)]</span>
-<span class="comment">// Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,</span>
-<span class="comment">// this is just to make sure that it will always stay this way.)</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">clippy::float_cmp</span>)]</span>
+</span><span class="attribute">#![warn(missing_docs)]
+#![allow(unused_attributes)]
+</span><span class="comment">// Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,
+// this is just to make sure that it will always stay this way.)
+</span><span class="attribute">#![deny(clippy::float_cmp)]
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">core</span>;
+#[macro_use]
+</span><span class="kw">pub mod </span>core;
 
-<span class="doccomment">/// Solvers</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">solver</span>;
+<span class="doccomment">/// Solvers
+</span><span class="kw">pub mod </span>solver;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;_ndarrayl&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span>;
+<span class="attribute">#[cfg(test)]
+#[cfg(feature = <span class="string">&quot;_ndarrayl&quot;</span>)]
+</span><span class="kw">mod </span>tests;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

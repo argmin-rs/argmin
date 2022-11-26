@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/state/linearprogramstate.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>linearprogramstate.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/state/linearprogramstate.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>linearprogramstate.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -550,557 +550,557 @@
 <span id="550">550</span>
 <span id="551">551</span>
 <span id="552">552</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">Problem</span>, <span class="ident">State</span>, <span class="ident">TerminationReason</span>};
-<span class="kw">use</span> <span class="ident">instant</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Problem, State, TerminationReason};
+<span class="kw">use </span>instant;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="doccomment">/// Maintains the state from iteration to iteration of a solver</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is passed from one iteration of an algorithm to the next.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Keeps track of</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * parameter vector of current and previous iteration</span>
-<span class="doccomment">/// * best parameter vector of current and previous iteration</span>
-<span class="doccomment">/// * cost function value of current and previous iteration</span>
-<span class="doccomment">/// * current and previous best cost function value</span>
-<span class="doccomment">/// * target cost function value</span>
-<span class="doccomment">/// * current iteration number</span>
-<span class="doccomment">/// * iteration number where the last best parameter vector was found</span>
-<span class="doccomment">/// * maximum number of iterations that will be executed</span>
-<span class="doccomment">/// * problem function evaluation counts (cost function, gradient, jacobian, hessian,</span>
-<span class="doccomment">/// * elapsed time</span>
-<span class="doccomment">/// * termination reason (set to [`TerminationReason::NotTerminated`] if not terminated yet)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LinearProgramState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Current parameter vector</span>
-    <span class="kw">pub</span> <span class="ident">param</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Previous parameter vector</span>
-    <span class="kw">pub</span> <span class="ident">prev_param</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Current best parameter vector</span>
-    <span class="kw">pub</span> <span class="ident">best_param</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Previous best parameter vector</span>
-    <span class="kw">pub</span> <span class="ident">prev_best_param</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Current cost function value</span>
-    <span class="kw">pub</span> <span class="ident">cost</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Previous cost function value</span>
-    <span class="kw">pub</span> <span class="ident">prev_cost</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Current best cost function value</span>
-    <span class="kw">pub</span> <span class="ident">best_cost</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Previous best cost function value</span>
-    <span class="kw">pub</span> <span class="ident">prev_best_cost</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Target cost function value</span>
-    <span class="kw">pub</span> <span class="ident">target_cost</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Current iteration</span>
-    <span class="kw">pub</span> <span class="ident">iter</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Iteration number of last best cost</span>
-    <span class="kw">pub</span> <span class="ident">last_best_iter</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Maximum number of iterations</span>
-    <span class="kw">pub</span> <span class="ident">max_iters</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Evaluation counts</span>
-    <span class="kw">pub</span> <span class="ident">counts</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Time required so far</span>
-    <span class="kw">pub</span> <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">instant::Duration</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Reason of termination</span>
-    <span class="kw">pub</span> <span class="ident">termination_reason</span>: <span class="ident">TerminationReason</span>,
+<span class="doccomment">/// Maintains the state from iteration to iteration of a solver
+///
+/// This struct is passed from one iteration of an algorithm to the next.
+///
+/// Keeps track of
+///
+/// * parameter vector of current and previous iteration
+/// * best parameter vector of current and previous iteration
+/// * cost function value of current and previous iteration
+/// * current and previous best cost function value
+/// * target cost function value
+/// * current iteration number
+/// * iteration number where the last best parameter vector was found
+/// * maximum number of iterations that will be executed
+/// * problem function evaluation counts (cost function, gradient, jacobian, hessian,
+/// * elapsed time
+/// * termination reason (set to [`TerminationReason::NotTerminated`] if not terminated yet)
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>LinearProgramState&lt;P, F&gt; {
+    <span class="doccomment">/// Current parameter vector
+    </span><span class="kw">pub </span>param: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// Previous parameter vector
+    </span><span class="kw">pub </span>prev_param: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// Current best parameter vector
+    </span><span class="kw">pub </span>best_param: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// Previous best parameter vector
+    </span><span class="kw">pub </span>prev_best_param: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// Current cost function value
+    </span><span class="kw">pub </span>cost: F,
+    <span class="doccomment">/// Previous cost function value
+    </span><span class="kw">pub </span>prev_cost: F,
+    <span class="doccomment">/// Current best cost function value
+    </span><span class="kw">pub </span>best_cost: F,
+    <span class="doccomment">/// Previous best cost function value
+    </span><span class="kw">pub </span>prev_best_cost: F,
+    <span class="doccomment">/// Target cost function value
+    </span><span class="kw">pub </span>target_cost: F,
+    <span class="doccomment">/// Current iteration
+    </span><span class="kw">pub </span>iter: u64,
+    <span class="doccomment">/// Iteration number of last best cost
+    </span><span class="kw">pub </span>last_best_iter: u64,
+    <span class="doccomment">/// Maximum number of iterations
+    </span><span class="kw">pub </span>max_iters: u64,
+    <span class="doccomment">/// Evaluation counts
+    </span><span class="kw">pub </span>counts: HashMap&lt;String, u64&gt;,
+    <span class="doccomment">/// Time required so far
+    </span><span class="kw">pub </span>time: <span class="prelude-ty">Option</span>&lt;instant::Duration&gt;,
+    <span class="doccomment">/// Reason of termination
+    </span><span class="kw">pub </span>termination_reason: TerminationReason,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">LinearProgramState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Set parameter vector. This shifts the stored parameter vector to the previous parameter</span>
-    <span class="doccomment">/// vector.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State};</span>
-    <span class="doccomment">/// # let state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # let param_old = vec![1.0f64, 2.0f64];</span>
-    <span class="doccomment">/// # let state = state.param(param_old);</span>
-    <span class="doccomment">/// # assert!(state.prev_param.is_none());</span>
-    <span class="doccomment">/// # assert_eq!(state.param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # let param = vec![0.0f64, 3.0f64];</span>
-    <span class="doccomment">/// let state = state.param(param);</span>
-    <span class="doccomment">/// # assert_eq!(state.prev_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.prev_param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.param.as_ref().unwrap()[0].to_ne_bytes(), 0.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.param.as_ref().unwrap()[1].to_ne_bytes(), 3.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">param</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="ident">P</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">prev_param</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">param</span>);
-        <span class="self">self</span>.<span class="ident">param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">param</span>);
-        <span class="self">self</span>
-    }
+<span class="kw">impl</span>&lt;P, F&gt; LinearProgramState&lt;P, F&gt; {
+    <span class="doccomment">/// Set parameter vector. This shifts the stored parameter vector to the previous parameter
+    /// vector.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State};
+    /// # let state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # let param_old = vec![1.0f64, 2.0f64];
+    /// # let state = state.param(param_old);
+    /// # assert!(state.prev_param.is_none());
+    /// # assert_eq!(state.param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(state.param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+    /// # let param = vec![0.0f64, 3.0f64];
+    /// let state = state.param(param);
+    /// # assert_eq!(state.prev_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(state.prev_param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+    /// # assert_eq!(state.param.as_ref().unwrap()[0].to_ne_bytes(), 0.0f64.to_ne_bytes());
+    /// # assert_eq!(state.param.as_ref().unwrap()[1].to_ne_bytes(), 3.0f64.to_ne_bytes());
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>param(<span class="kw-2">mut </span><span class="self">self</span>, param: P) -&gt; <span class="self">Self </span>{
+        std::mem::swap(<span class="kw-2">&amp;mut </span><span class="self">self</span>.prev_param, <span class="kw-2">&amp;mut </span><span class="self">self</span>.param);
+        <span class="self">self</span>.param = <span class="prelude-val">Some</span>(param);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set target cost.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When this cost is reached, the algorithm will stop. The default is</span>
-    <span class="doccomment">/// `Self::Float::NEG_INFINITY`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # assert_eq!(state.target_cost.to_ne_bytes(), f64::NEG_INFINITY.to_ne_bytes());</span>
-    <span class="doccomment">/// let state = state.target_cost(0.0);</span>
-    <span class="doccomment">/// # assert_eq!(state.target_cost.to_ne_bytes(), 0.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target_cost</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">target_cost</span> <span class="op">=</span> <span class="ident">target_cost</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set target cost.
+    ///
+    /// When this cost is reached, the algorithm will stop. The default is
+    /// `Self::Float::NEG_INFINITY`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # assert_eq!(state.target_cost.to_ne_bytes(), f64::NEG_INFINITY.to_ne_bytes());
+    /// let state = state.target_cost(0.0);
+    /// # assert_eq!(state.target_cost.to_ne_bytes(), 0.0f64.to_ne_bytes());
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>target_cost(<span class="kw-2">mut </span><span class="self">self</span>, target_cost: F) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.target_cost = target_cost;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set maximum number of iterations</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # assert_eq!(state.max_iters, std::u64::MAX);</span>
-    <span class="doccomment">/// let state = state.max_iters(1000);</span>
-    <span class="doccomment">/// # assert_eq!(state.max_iters, 1000);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_iters</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iters</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_iters</span> <span class="op">=</span> <span class="ident">iters</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set maximum number of iterations
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # assert_eq!(state.max_iters, std::u64::MAX);
+    /// let state = state.max_iters(1000);
+    /// # assert_eq!(state.max_iters, 1000);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>max_iters(<span class="kw-2">mut </span><span class="self">self</span>, iters: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.max_iters = iters;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the current cost function value. This shifts the stored cost function value to the</span>
-    <span class="doccomment">/// previous cost function value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State};</span>
-    <span class="doccomment">/// # let state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # let cost_old = 1.0f64;</span>
-    <span class="doccomment">/// # let state = state.cost(cost_old);</span>
-    <span class="doccomment">/// # assert_eq!(state.prev_cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.cost.to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # let cost = 0.0f64;</span>
-    <span class="doccomment">/// let state = state.cost(cost);</span>
-    <span class="doccomment">/// # assert_eq!(state.prev_cost.to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.cost.to_ne_bytes(), 0.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">prev_cost</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">cost</span>);
-        <span class="self">self</span>.<span class="ident">cost</span> <span class="op">=</span> <span class="ident">cost</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the current cost function value. This shifts the stored cost function value to the
+    /// previous cost function value.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State};
+    /// # let state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # let cost_old = 1.0f64;
+    /// # let state = state.cost(cost_old);
+    /// # assert_eq!(state.prev_cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());
+    /// # assert_eq!(state.cost.to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # let cost = 0.0f64;
+    /// let state = state.cost(cost);
+    /// # assert_eq!(state.prev_cost.to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(state.cost.to_ne_bytes(), 0.0f64.to_ne_bytes());
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>cost(<span class="kw-2">mut </span><span class="self">self</span>, cost: F) -&gt; <span class="self">Self </span>{
+        std::mem::swap(<span class="kw-2">&amp;mut </span><span class="self">self</span>.prev_cost, <span class="kw-2">&amp;mut </span><span class="self">self</span>.cost);
+        <span class="self">self</span>.cost = cost;
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">State</span> <span class="kw">for</span> <span class="ident">LinearProgramState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Clone</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, F&gt; State <span class="kw">for </span>LinearProgramState&lt;P, F&gt;
+<span class="kw">where
+    </span>P: Clone,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Type of parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>;
-    <span class="doccomment">/// Floating point precision</span>
-    <span class="kw">type</span> <span class="ident">Float</span> <span class="op">=</span> <span class="ident">F</span>;
+    <span class="doccomment">/// Type of parameter vector
+    </span><span class="kw">type </span>Param = P;
+    <span class="doccomment">/// Floating point precision
+    </span><span class="kw">type </span>Float = F;
 
-    <span class="doccomment">/// Create new `LinearProgramState` instance</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate instant;</span>
-    <span class="doccomment">/// # use instant;</span>
-    <span class="doccomment">/// # use std::collections::HashMap;</span>
-    <span class="doccomment">/// # use argmin::core::TerminationReason;</span>
-    <span class="doccomment">/// use argmin::core::{LinearProgramState, State};</span>
-    <span class="doccomment">/// let state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # assert!(state.param.is_none());</span>
-    <span class="doccomment">/// # assert!(state.prev_param.is_none());</span>
-    <span class="doccomment">/// # assert!(state.best_param.is_none());</span>
-    <span class="doccomment">/// # assert!(state.prev_best_param.is_none());</span>
-    <span class="doccomment">/// # assert_eq!(state.cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.prev_cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.best_cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.prev_best_cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.target_cost.to_ne_bytes(), f64::NEG_INFINITY.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.iter, 0);</span>
-    <span class="doccomment">/// # assert_eq!(state.last_best_iter, 0);</span>
-    <span class="doccomment">/// # assert_eq!(state.max_iters, std::u64::MAX);</span>
-    <span class="doccomment">/// # assert_eq!(state.counts, HashMap::new());</span>
-    <span class="doccomment">/// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 0));</span>
-    <span class="doccomment">/// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">LinearProgramState</span> {
-            <span class="ident">param</span>: <span class="prelude-val">None</span>,
-            <span class="ident">prev_param</span>: <span class="prelude-val">None</span>,
-            <span class="ident">best_param</span>: <span class="prelude-val">None</span>,
-            <span class="ident">prev_best_param</span>: <span class="prelude-val">None</span>,
-            <span class="ident">cost</span>: <span class="ident"><span class="self">Self</span>::Float::infinity</span>(),
-            <span class="ident">prev_cost</span>: <span class="ident"><span class="self">Self</span>::Float::infinity</span>(),
-            <span class="ident">best_cost</span>: <span class="ident"><span class="self">Self</span>::Float::infinity</span>(),
-            <span class="ident">prev_best_cost</span>: <span class="ident"><span class="self">Self</span>::Float::infinity</span>(),
-            <span class="ident">target_cost</span>: <span class="ident"><span class="self">Self</span>::Float::neg_infinity</span>(),
-            <span class="ident">iter</span>: <span class="number">0</span>,
-            <span class="ident">last_best_iter</span>: <span class="number">0</span>,
-            <span class="ident">max_iters</span>: <span class="ident">std::u64::MAX</span>,
-            <span class="ident">counts</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">time</span>: <span class="prelude-val">Some</span>(<span class="ident">instant::Duration::new</span>(<span class="number">0</span>, <span class="number">0</span>)),
-            <span class="ident">termination_reason</span>: <span class="ident">TerminationReason::NotTerminated</span>,
+    <span class="doccomment">/// Create new `LinearProgramState` instance
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate instant;
+    /// # use instant;
+    /// # use std::collections::HashMap;
+    /// # use argmin::core::TerminationReason;
+    /// use argmin::core::{LinearProgramState, State};
+    /// let state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    ///
+    /// # assert!(state.param.is_none());
+    /// # assert!(state.prev_param.is_none());
+    /// # assert!(state.best_param.is_none());
+    /// # assert!(state.prev_best_param.is_none());
+    /// # assert_eq!(state.cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());
+    /// # assert_eq!(state.prev_cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());
+    /// # assert_eq!(state.best_cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());
+    /// # assert_eq!(state.prev_best_cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());
+    /// # assert_eq!(state.target_cost.to_ne_bytes(), f64::NEG_INFINITY.to_ne_bytes());
+    /// # assert_eq!(state.iter, 0);
+    /// # assert_eq!(state.last_best_iter, 0);
+    /// # assert_eq!(state.max_iters, std::u64::MAX);
+    /// # assert_eq!(state.counts, HashMap::new());
+    /// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 0));
+    /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
+    /// ```
+    </span><span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        LinearProgramState {
+            param: <span class="prelude-val">None</span>,
+            prev_param: <span class="prelude-val">None</span>,
+            best_param: <span class="prelude-val">None</span>,
+            prev_best_param: <span class="prelude-val">None</span>,
+            cost: <span class="self">Self</span>::Float::infinity(),
+            prev_cost: <span class="self">Self</span>::Float::infinity(),
+            best_cost: <span class="self">Self</span>::Float::infinity(),
+            prev_best_cost: <span class="self">Self</span>::Float::infinity(),
+            target_cost: <span class="self">Self</span>::Float::neg_infinity(),
+            iter: <span class="number">0</span>,
+            last_best_iter: <span class="number">0</span>,
+            max_iters: std::u64::MAX,
+            counts: HashMap::new(),
+            time: <span class="prelude-val">Some</span>(instant::Duration::new(<span class="number">0</span>, <span class="number">0</span>)),
+            termination_reason: TerminationReason::NotTerminated,
         }
     }
 
-    <span class="doccomment">/// Checks if the current parameter vector is better than the previous best parameter value. If</span>
-    <span class="doccomment">/// a new best parameter vector was found, the state is updated accordingly.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Simulating a new, better parameter vector</span>
-    <span class="doccomment">/// state.best_param = Some(vec![1.0f64]);</span>
-    <span class="doccomment">/// state.best_cost = 10.0;</span>
-    <span class="doccomment">/// state.param = Some(vec![2.0f64]);</span>
-    <span class="doccomment">/// state.cost = 5.0;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Calling update</span>
-    <span class="doccomment">/// state.update();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Check if update was successful</span>
-    <span class="doccomment">/// assert_eq!(state.best_param.as_ref().unwrap()[0], 2.0f64);</span>
-    <span class="doccomment">/// assert_eq!(state.best_cost.to_ne_bytes(), state.best_cost.to_ne_bytes());</span>
-    <span class="doccomment">/// assert!(state.is_best());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For algorithms which do not compute the cost function, every new parameter vector will be</span>
-    <span class="doccomment">/// the new best:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Simulating a new, better parameter vector</span>
-    <span class="doccomment">/// state.best_param = Some(vec![1.0f64]);</span>
-    <span class="doccomment">/// state.param = Some(vec![2.0f64]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Calling update</span>
-    <span class="doccomment">/// state.update();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Check if update was successful</span>
-    <span class="doccomment">/// assert_eq!(state.best_param.as_ref().unwrap()[0], 2.0f64);</span>
-    <span class="doccomment">/// assert_eq!(state.best_cost.to_ne_bytes(), state.best_cost.to_ne_bytes());</span>
-    <span class="doccomment">/// assert!(state.is_best());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// check if parameters are the best so far</span>
-        <span class="comment">// Comparison is done using `&lt;` to avoid new solutions with the same cost function value as</span>
-        <span class="comment">// the current best to be accepted. However, some solvers to not compute the cost function</span>
-        <span class="comment">// value (such as the Newton method). Those will always have `Inf` cost. Therefore if both</span>
-        <span class="comment">// the new value and the previous best value are `Inf`, the solution is also accepted. Care</span>
-        <span class="comment">// is taken that both `Inf` also have the same sign.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cost</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">best_cost</span>
-            <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">cost</span>.<span class="ident">is_infinite</span>()
-                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">best_cost</span>.<span class="ident">is_infinite</span>()
-                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">cost</span>.<span class="ident">is_sign_positive</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">best_cost</span>.<span class="ident">is_sign_positive</span>())
+    <span class="doccomment">/// Checks if the current parameter vector is better than the previous best parameter value. If
+    /// a new best parameter vector was found, the state is updated accordingly.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    ///
+    /// // Simulating a new, better parameter vector
+    /// state.best_param = Some(vec![1.0f64]);
+    /// state.best_cost = 10.0;
+    /// state.param = Some(vec![2.0f64]);
+    /// state.cost = 5.0;
+    ///
+    /// // Calling update
+    /// state.update();
+    ///
+    /// // Check if update was successful
+    /// assert_eq!(state.best_param.as_ref().unwrap()[0], 2.0f64);
+    /// assert_eq!(state.best_cost.to_ne_bytes(), state.best_cost.to_ne_bytes());
+    /// assert!(state.is_best());
+    /// ```
+    ///
+    /// For algorithms which do not compute the cost function, every new parameter vector will be
+    /// the new best:
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    ///
+    /// // Simulating a new, better parameter vector
+    /// state.best_param = Some(vec![1.0f64]);
+    /// state.param = Some(vec![2.0f64]);
+    ///
+    /// // Calling update
+    /// state.update();
+    ///
+    /// // Check if update was successful
+    /// assert_eq!(state.best_param.as_ref().unwrap()[0], 2.0f64);
+    /// assert_eq!(state.best_cost.to_ne_bytes(), state.best_cost.to_ne_bytes());
+    /// assert!(state.is_best());
+    /// ```
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// check if parameters are the best so far
+        // Comparison is done using `&lt;` to avoid new solutions with the same cost function value as
+        // the current best to be accepted. However, some solvers to not compute the cost function
+        // value (such as the Newton method). Those will always have `Inf` cost. Therefore if both
+        // the new value and the previous best value are `Inf`, the solution is also accepted. Care
+        // is taken that both `Inf` also have the same sign.
+        </span><span class="kw">if </span><span class="self">self</span>.cost &lt; <span class="self">self</span>.best_cost
+            || (<span class="self">self</span>.cost.is_infinite()
+                &amp;&amp; <span class="self">self</span>.best_cost.is_infinite()
+                &amp;&amp; <span class="self">self</span>.cost.is_sign_positive() == <span class="self">self</span>.best_cost.is_sign_positive())
         {
-            <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()).<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cost</span>;
-            <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">prev_best_param</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">best_param</span>);
-            <span class="self">self</span>.<span class="ident">best_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">param</span>);
-            <span class="ident">std::mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">prev_best_cost</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">best_cost</span>);
-            <span class="self">self</span>.<span class="ident">best_cost</span> <span class="op">=</span> <span class="ident">cost</span>;
-            <span class="self">self</span>.<span class="ident">last_best_iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>;
+            <span class="kw">let </span>param = (<span class="kw-2">*</span><span class="self">self</span>.param.as_ref().unwrap()).clone();
+            <span class="kw">let </span>cost = <span class="self">self</span>.cost;
+            std::mem::swap(<span class="kw-2">&amp;mut </span><span class="self">self</span>.prev_best_param, <span class="kw-2">&amp;mut </span><span class="self">self</span>.best_param);
+            <span class="self">self</span>.best_param = <span class="prelude-val">Some</span>(param);
+            std::mem::swap(<span class="kw-2">&amp;mut </span><span class="self">self</span>.prev_best_cost, <span class="kw-2">&amp;mut </span><span class="self">self</span>.best_cost);
+            <span class="self">self</span>.best_cost = cost;
+            <span class="self">self</span>.last_best_iter = <span class="self">self</span>.iter;
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the current parameter vector</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # assert!(state.param.is_none());</span>
-    <span class="doccomment">/// # state.param = Some(vec![1.0, 2.0]);</span>
-    <span class="doccomment">/// # assert_eq!(state.param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// let param = state.get_param();  // Option&lt;&amp;P&gt;</span>
-    <span class="doccomment">/// # assert_eq!(param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_param</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">P</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Returns a reference to the current parameter vector
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # assert!(state.param.is_none());
+    /// # state.param = Some(vec![1.0, 2.0]);
+    /// # assert_eq!(state.param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(state.param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+    /// let param = state.get_param();  // Option&lt;&amp;P&gt;
+    /// # assert_eq!(param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+    /// ```
+    </span><span class="kw">fn </span>get_param(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>P&gt; {
+        <span class="self">self</span>.param.as_ref()
     }
 
-    <span class="doccomment">/// Returns a reference to the current best parameter vector</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # assert!(state.best_param.is_none());</span>
-    <span class="doccomment">/// # state.best_param = Some(vec![1.0, 2.0]);</span>
-    <span class="doccomment">/// # assert_eq!(state.best_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(state.best_param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// let best_param = state.get_best_param();  // Option&lt;&amp;P&gt;</span>
-    <span class="doccomment">/// # assert_eq!(best_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// # assert_eq!(best_param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_best_param</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">P</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">best_param</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Returns a reference to the current best parameter vector
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # assert!(state.best_param.is_none());
+    /// # state.best_param = Some(vec![1.0, 2.0]);
+    /// # assert_eq!(state.best_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(state.best_param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+    /// let best_param = state.get_best_param();  // Option&lt;&amp;P&gt;
+    /// # assert_eq!(best_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(best_param.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+    /// ```
+    </span><span class="kw">fn </span>get_best_param(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>P&gt; {
+        <span class="self">self</span>.best_param.as_ref()
     }
 
-    <span class="doccomment">/// Sets the termination reason (default: [`TerminationReason::NotTerminated`])</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);</span>
-    <span class="doccomment">/// let state = state.terminate_with(TerminationReason::MaxItersReached);</span>
-    <span class="doccomment">/// # assert_eq!(state.termination_reason, TerminationReason::MaxItersReached);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">terminate_with</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">TerminationReason</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">termination_reason</span> <span class="op">=</span> <span class="ident">reason</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets the termination reason (default: [`TerminationReason::NotTerminated`])
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
+    /// let state = state.terminate_with(TerminationReason::MaxItersReached);
+    /// # assert_eq!(state.termination_reason, TerminationReason::MaxItersReached);
+    /// ```
+    </span><span class="kw">fn </span>terminate_with(<span class="kw-2">mut </span><span class="self">self</span>, reason: TerminationReason) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.termination_reason = reason;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the time required so far.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate instant;
+    /// # use instant;
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// let state = state.time(Some(instant::Duration::new(0, 12)));
+    /// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 12));
+    /// ```
+    </span><span class="kw">fn </span>time(<span class="kw-2">&amp;mut </span><span class="self">self</span>, time: <span class="prelude-ty">Option</span>&lt;instant::Duration&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.time = time;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Returns current cost function value.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # state.cost = 12.0;
+    /// let cost = state.get_cost();
+    /// # assert_eq!(cost.to_ne_bytes(), 12.0f64.to_ne_bytes());
+    /// ```
+    </span><span class="kw">fn </span>get_cost(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Float {
+        <span class="self">self</span>.cost
     }
 
-    <span class="doccomment">/// Sets the time required so far.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate instant;</span>
-    <span class="doccomment">/// # use instant;</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// let state = state.time(Some(instant::Duration::new(0, 12)));</span>
-    <span class="doccomment">/// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 12));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">time</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">instant::Duration</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">time</span> <span class="op">=</span> <span class="ident">time</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns current best cost function value.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # state.best_cost = 12.0;
+    /// let best_cost = state.get_best_cost();
+    /// # assert_eq!(best_cost.to_ne_bytes(), 12.0f64.to_ne_bytes());
+    /// ```
+    </span><span class="kw">fn </span>get_best_cost(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Float {
+        <span class="self">self</span>.best_cost
     }
 
-    <span class="doccomment">/// Returns current cost function value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # state.cost = 12.0;</span>
-    <span class="doccomment">/// let cost = state.get_cost();</span>
-    <span class="doccomment">/// # assert_eq!(cost.to_ne_bytes(), 12.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Float</span> {
-        <span class="self">self</span>.<span class="ident">cost</span>
+    <span class="doccomment">/// Returns target cost function value.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # state.target_cost = 12.0;
+    /// let target_cost = state.get_target_cost();
+    /// # assert_eq!(target_cost.to_ne_bytes(), 12.0f64.to_ne_bytes());
+    /// ```
+    </span><span class="kw">fn </span>get_target_cost(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Float {
+        <span class="self">self</span>.target_cost
     }
 
-    <span class="doccomment">/// Returns current best cost function value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # state.best_cost = 12.0;</span>
-    <span class="doccomment">/// let best_cost = state.get_best_cost();</span>
-    <span class="doccomment">/// # assert_eq!(best_cost.to_ne_bytes(), 12.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_best_cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Float</span> {
-        <span class="self">self</span>.<span class="ident">best_cost</span>
+    <span class="doccomment">/// Returns current number of iterations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # state.iter = 12;
+    /// let iter = state.get_iter();
+    /// # assert_eq!(iter, 12);
+    /// ```
+    </span><span class="kw">fn </span>get_iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.iter
     }
 
-    <span class="doccomment">/// Returns target cost function value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # state.target_cost = 12.0;</span>
-    <span class="doccomment">/// let target_cost = state.get_target_cost();</span>
-    <span class="doccomment">/// # assert_eq!(target_cost.to_ne_bytes(), 12.0f64.to_ne_bytes());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_target_cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Float</span> {
-        <span class="self">self</span>.<span class="ident">target_cost</span>
+    <span class="doccomment">/// Returns iteration number of last best parameter vector.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # state.last_best_iter = 12;
+    /// let last_best_iter = state.get_last_best_iter();
+    /// # assert_eq!(last_best_iter, 12);
+    /// ```
+    </span><span class="kw">fn </span>get_last_best_iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.last_best_iter
     }
 
-    <span class="doccomment">/// Returns current number of iterations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # state.iter = 12;</span>
-    <span class="doccomment">/// let iter = state.get_iter();</span>
-    <span class="doccomment">/// # assert_eq!(iter, 12);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>
+    <span class="doccomment">/// Returns the maximum number of iterations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # state.max_iters = 12;
+    /// let max_iters = state.get_max_iters();
+    /// # assert_eq!(max_iters, 12);
+    /// ```
+    </span><span class="kw">fn </span>get_max_iters(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.max_iters
     }
 
-    <span class="doccomment">/// Returns iteration number of last best parameter vector.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # state.last_best_iter = 12;</span>
-    <span class="doccomment">/// let last_best_iter = state.get_last_best_iter();</span>
-    <span class="doccomment">/// # assert_eq!(last_best_iter, 12);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_last_best_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">last_best_iter</span>
+    <span class="doccomment">/// Returns the termination reason.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// let termination_reason = state.get_termination_reason();
+    /// # assert_eq!(termination_reason, TerminationReason::NotTerminated);
+    /// ```
+    </span><span class="kw">fn </span>get_termination_reason(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TerminationReason {
+        <span class="self">self</span>.termination_reason
     }
 
-    <span class="doccomment">/// Returns the maximum number of iterations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # state.max_iters = 12;</span>
-    <span class="doccomment">/// let max_iters = state.get_max_iters();</span>
-    <span class="doccomment">/// # assert_eq!(max_iters, 12);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_max_iters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">max_iters</span>
+    <span class="doccomment">/// Returns the time elapsed since the start of the optimization.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate instant;
+    /// # use instant;
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// let time = state.get_time();
+    /// # assert_eq!(time.unwrap(), instant::Duration::new(0, 0));
+    /// ```
+    </span><span class="kw">fn </span>get_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;instant::Duration&gt; {
+        <span class="self">self</span>.time
     }
 
-    <span class="doccomment">/// Returns the termination reason.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// let termination_reason = state.get_termination_reason();</span>
-    <span class="doccomment">/// # assert_eq!(termination_reason, TerminationReason::NotTerminated);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_termination_reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="self">self</span>.<span class="ident">termination_reason</span>
+    <span class="doccomment">/// Increments the number of iterations by one
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # assert_eq!(state.iter, 0);
+    /// state.increment_iter();
+    /// # assert_eq!(state.iter, 1);
+    /// ```
+    </span><span class="kw">fn </span>increment_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.iter += <span class="number">1</span>;
     }
 
-    <span class="doccomment">/// Returns the time elapsed since the start of the optimization.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate instant;</span>
-    <span class="doccomment">/// # use instant;</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// let time = state.get_time();</span>
-    <span class="doccomment">/// # assert_eq!(time.unwrap(), instant::Duration::new(0, 0));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">instant::Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">time</span>
-    }
-
-    <span class="doccomment">/// Increments the number of iterations by one</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # assert_eq!(state.iter, 0);</span>
-    <span class="doccomment">/// state.increment_iter();</span>
-    <span class="doccomment">/// # assert_eq!(state.iter, 1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">increment_iter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">iter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-    }
-
-    <span class="doccomment">/// Set all function evaluation counts to the evaluation counts of another `Problem`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::collections::HashMap;</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # assert_eq!(state.counts, HashMap::new());</span>
-    <span class="doccomment">/// # state.counts.insert(&quot;test2&quot;.to_string(), 10u64);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let mut problem = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">/// # problem.counts.insert(&quot;test1&quot;, 10u64);</span>
-    <span class="doccomment">/// # problem.counts.insert(&quot;test2&quot;, 2);</span>
-    <span class="doccomment">/// state.func_counts(&amp;problem);</span>
-    <span class="doccomment">/// # let mut hm = HashMap::new();</span>
-    <span class="doccomment">/// # hm.insert(&quot;test1&quot;.to_string(), 10u64);</span>
-    <span class="doccomment">/// # hm.insert(&quot;test2&quot;.to_string(), 2u64);</span>
-    <span class="doccomment">/// # assert_eq!(state.counts, hm);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">func_counts</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">problem</span>: <span class="kw-2">&amp;</span><span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>) {
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>) <span class="kw">in</span> <span class="ident">problem</span>.<span class="ident">counts</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">counts</span>.<span class="ident">entry</span>(<span class="ident">k</span>.<span class="ident">to_string</span>()).<span class="ident">or_insert</span>(<span class="number">0</span>);
-            <span class="kw-2">*</span><span class="ident">count</span> <span class="op">=</span> <span class="ident">v</span>
+    <span class="doccomment">/// Set all function evaluation counts to the evaluation counts of another `Problem`.
+    ///
+    /// ```
+    /// # use std::collections::HashMap;
+    /// # use argmin::core::{Problem, LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # assert_eq!(state.counts, HashMap::new());
+    /// # state.counts.insert(&quot;test2&quot;.to_string(), 10u64);
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # let mut problem = Problem::new(UserDefinedProblem {});
+    /// # problem.counts.insert(&quot;test1&quot;, 10u64);
+    /// # problem.counts.insert(&quot;test2&quot;, 2);
+    /// state.func_counts(&amp;problem);
+    /// # let mut hm = HashMap::new();
+    /// # hm.insert(&quot;test1&quot;.to_string(), 10u64);
+    /// # hm.insert(&quot;test2&quot;.to_string(), 2u64);
+    /// # assert_eq!(state.counts, hm);
+    /// ```
+    </span><span class="kw">fn </span>func_counts&lt;O&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, problem: <span class="kw-2">&amp;</span>Problem&lt;O&gt;) {
+        <span class="kw">for </span>(k, <span class="kw-2">&amp;</span>v) <span class="kw">in </span>problem.counts.iter() {
+            <span class="kw">let </span>count = <span class="self">self</span>.counts.entry(k.to_string()).or_insert(<span class="number">0</span>);
+            <span class="kw-2">*</span>count = v
         }
     }
 
-    <span class="doccomment">/// Returns function evaluation counts</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::collections::HashMap;</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # assert_eq!(state.counts, HashMap::new());</span>
-    <span class="doccomment">/// # state.counts.insert(&quot;test2&quot;.to_string(), 10u64);</span>
-    <span class="doccomment">/// let counts = state.get_func_counts();</span>
-    <span class="doccomment">/// # let mut hm = HashMap::new();</span>
-    <span class="doccomment">/// # hm.insert(&quot;test2&quot;.to_string(), 10u64);</span>
-    <span class="doccomment">/// # assert_eq!(*counts, hm);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">get_func_counts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">counts</span>
+    <span class="doccomment">/// Returns function evaluation counts
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use std::collections::HashMap;
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # assert_eq!(state.counts, HashMap::new());
+    /// # state.counts.insert(&quot;test2&quot;.to_string(), 10u64);
+    /// let counts = state.get_func_counts();
+    /// # let mut hm = HashMap::new();
+    /// # hm.insert(&quot;test2&quot;.to_string(), 10u64);
+    /// # assert_eq!(*counts, hm);
+    /// ```
+    </span><span class="kw">fn </span>get_func_counts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashMap&lt;String, u64&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.counts
     }
 
-    <span class="doccomment">/// Returns whether the current parameter vector is also the best parameter vector found so</span>
-    <span class="doccomment">/// far.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{LinearProgramState, State, ArgminFloat};</span>
-    <span class="doccomment">/// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();</span>
-    <span class="doccomment">/// # state.last_best_iter = 12;</span>
-    <span class="doccomment">/// # state.iter = 12;</span>
-    <span class="doccomment">/// let is_best = state.is_best();</span>
-    <span class="doccomment">/// # assert!(is_best);</span>
-    <span class="doccomment">/// # state.last_best_iter = 12;</span>
-    <span class="doccomment">/// # state.iter = 21;</span>
-    <span class="doccomment">/// # let is_best = state.is_best();</span>
-    <span class="doccomment">/// # assert!(!is_best);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">is_best</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">last_best_iter</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">iter</span>
+    <span class="doccomment">/// Returns whether the current parameter vector is also the best parameter vector found so
+    /// far.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
+    /// # state.last_best_iter = 12;
+    /// # state.iter = 12;
+    /// let is_best = state.is_best();
+    /// # assert!(is_best);
+    /// # state.last_best_iter = 12;
+    /// # state.iter = 21;
+    /// # let is_best = state.is_best();
+    /// # assert!(!is_best);
+    /// ```
+    </span><span class="kw">fn </span>is_best(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.last_best_iter == <span class="self">self</span>.iter
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/morethuente.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>morethuente.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/morethuente.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>morethuente.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -925,932 +925,932 @@
 <span id="925">925</span>
 <span id="926">926</span>
 <span id="927">927</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="comment">// Deactivating this lint here because it would make the Boolean expressions more difficult to</span>
-<span class="comment">// read.</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::nonminimal_bool</span>)]</span>
+// Deactivating this lint here because it would make the Boolean expressions more difficult to
+// read.
+</span><span class="attribute">#![allow(clippy::nonminimal_bool)]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">Gradient</span>, <span class="ident">IterState</span>, <span class="ident">LineSearch</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>,
-    <span class="ident">Solver</span>, <span class="ident">State</span>, <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
+    Solver, State, TerminationReason, KV,
 };
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminScaledAdd</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
+<span class="kw">use </span>argmin_math::{ArgminDot, ArgminScaledAdd};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::default::Default;
 
-<span class="doccomment">/// # More-Thuente line search</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The More-Thuente line search is a method which finds an appropriate step length from a starting</span>
-<span class="doccomment">/// point and a search direction. This point obeys the strong Wolfe conditions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// With the method [`with_c`](`MoreThuenteLineSearch::with_c`) the scaling factors for the</span>
-<span class="doccomment">/// sufficient decrease condition and the curvature condition can be supplied. By default they are</span>
-<span class="doccomment">/// set to `c1 = 1e-4` and `c2 = 0.9`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Bounds on the range where step lengths are being searched for can be set with</span>
-<span class="doccomment">/// [`with_bounds`](`MoreThuenteLineSearch::with_bounds`) which accepts a lower and an upper bound.</span>
-<span class="doccomment">/// Both values need to be non-negative and `lower &lt; upper`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// One of the reasons for the algorithm to terminate is when the the relative width of the</span>
-<span class="doccomment">/// uncertainty interval is smaller than a given tolerance (default: `1e-10`). This tolerance can</span>
-<span class="doccomment">/// be set via [`with_width_tolerance`](`MoreThuenteLineSearch::with_width_tolerance`) and must be</span>
-<span class="doccomment">/// non-negative.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// TODO: Add missing stopping criteria!</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## References</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This implementation follows the excellent MATLAB implementation of Dianne P. O&#39;Leary at</span>
-<span class="doccomment">/// &lt;http://www.cs.umd.edu/users/oleary/software/&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient</span>
-<span class="doccomment">/// decrease.&quot; ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.</span>
-<span class="doccomment">/// DOI: &lt;https://doi.org/10.1145/192115.192132&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Search direction</span>
-    <span class="ident">search_direction</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// initial parameter vector</span>
-    <span class="ident">init_param</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// initial cost</span>
-    <span class="ident">finit</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// initial gradient</span>
-    <span class="ident">init_grad</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Search direction in 1D</span>
-    <span class="ident">dginit</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// dgtest</span>
-    <span class="ident">dgtest</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// c1</span>
-    <span class="ident">ftol</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// c2</span>
-    <span class="ident">gtol</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// xtrapf</span>
-    <span class="ident">xtrapf</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// width of interval</span>
-    <span class="ident">width</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// width of what?</span>
-    <span class="ident">width1</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// xtol</span>
-    <span class="ident">xtol</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// alpha</span>
-    <span class="ident">alpha</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// stpmin</span>
-    <span class="ident">stpmin</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// stpmax</span>
-    <span class="ident">stpmax</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// current step</span>
-    <span class="ident">stp</span>: <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// stx (one endpoint of uncertainty interval)</span>
-    <span class="ident">stx</span>: <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// sty (another endpoint of uncertainty interval)</span>
-    <span class="ident">sty</span>: <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// f</span>
-    <span class="ident">f</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// bracketed</span>
-    <span class="ident">brackt</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// stage1</span>
-    <span class="ident">stage1</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// infoc</span>
-    <span class="ident">infoc</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// # More-Thuente line search
+///
+/// The More-Thuente line search is a method which finds an appropriate step length from a starting
+/// point and a search direction. This point obeys the strong Wolfe conditions.
+///
+/// With the method [`with_c`](`MoreThuenteLineSearch::with_c`) the scaling factors for the
+/// sufficient decrease condition and the curvature condition can be supplied. By default they are
+/// set to `c1 = 1e-4` and `c2 = 0.9`.
+///
+/// Bounds on the range where step lengths are being searched for can be set with
+/// [`with_bounds`](`MoreThuenteLineSearch::with_bounds`) which accepts a lower and an upper bound.
+/// Both values need to be non-negative and `lower &lt; upper`.
+///
+/// One of the reasons for the algorithm to terminate is when the the relative width of the
+/// uncertainty interval is smaller than a given tolerance (default: `1e-10`). This tolerance can
+/// be set via [`with_width_tolerance`](`MoreThuenteLineSearch::with_width_tolerance`) and must be
+/// non-negative.
+///
+/// TODO: Add missing stopping criteria!
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
+/// ## References
+///
+/// This implementation follows the excellent MATLAB implementation of Dianne P. O&#39;Leary at
+/// &lt;http://www.cs.umd.edu/users/oleary/software/&gt;
+///
+/// Jorge J. More and David J. Thuente. &quot;Line search algorithms with guaranteed sufficient
+/// decrease.&quot; ACM Trans. Math. Softw. 20, 3 (September 1994), 286-307.
+/// DOI: &lt;https://doi.org/10.1145/192115.192132&gt;
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>MoreThuenteLineSearch&lt;P, G, F&gt; {
+    <span class="doccomment">/// Search direction
+    </span>search_direction: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// initial parameter vector
+    </span>init_param: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// initial cost
+    </span>finit: F,
+    <span class="doccomment">/// initial gradient
+    </span>init_grad: <span class="prelude-ty">Option</span>&lt;G&gt;,
+    <span class="doccomment">/// Search direction in 1D
+    </span>dginit: F,
+    <span class="doccomment">/// dgtest
+    </span>dgtest: F,
+    <span class="doccomment">/// c1
+    </span>ftol: F,
+    <span class="doccomment">/// c2
+    </span>gtol: F,
+    <span class="doccomment">/// xtrapf
+    </span>xtrapf: F,
+    <span class="doccomment">/// width of interval
+    </span>width: F,
+    <span class="doccomment">/// width of what?
+    </span>width1: F,
+    <span class="doccomment">/// xtol
+    </span>xtol: F,
+    <span class="doccomment">/// alpha
+    </span>alpha: F,
+    <span class="doccomment">/// stpmin
+    </span>stpmin: F,
+    <span class="doccomment">/// stpmax
+    </span>stpmax: F,
+    <span class="doccomment">/// current step
+    </span>stp: Step&lt;F&gt;,
+    <span class="doccomment">/// stx (one endpoint of uncertainty interval)
+    </span>stx: Step&lt;F&gt;,
+    <span class="doccomment">/// sty (another endpoint of uncertainty interval)
+    </span>sty: Step&lt;F&gt;,
+    <span class="doccomment">/// f
+    </span>f: F,
+    <span class="doccomment">/// bracketed
+    </span>brackt: bool,
+    <span class="doccomment">/// stage1
+    </span>stage1: bool,
+    <span class="doccomment">/// infoc
+    </span>infoc: usize,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">struct</span> <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">x</span>: <span class="ident">F</span>,
-    <span class="kw">pub</span> <span class="ident">fx</span>: <span class="ident">F</span>,
-    <span class="kw">pub</span> <span class="ident">gx</span>: <span class="ident">F</span>,
+<span class="attribute">#[derive(Clone, Eq, PartialEq, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">struct </span>Step&lt;F&gt; {
+    <span class="kw">pub </span>x: F,
+    <span class="kw">pub </span>fx: F,
+    <span class="kw">pub </span>gx: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new instance of `Step`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">F</span>, <span class="ident">fx</span>: <span class="ident">F</span>, <span class="ident">gx</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Step</span> { <span class="ident">x</span>, <span class="ident">fx</span>, <span class="ident">gx</span> }
+<span class="kw">impl</span>&lt;F&gt; Step&lt;F&gt; {
+    <span class="doccomment">/// Create a new instance of `Step`
+    </span><span class="kw">pub fn </span>new(x: F, fx: F, gx: F) -&gt; <span class="self">Self </span>{
+        Step { x, fx, gx }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;F&gt; Default <span class="kw">for </span>Step&lt;F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Step</span> {
-            <span class="ident">x</span>: <span class="macro">float!</span>(<span class="number">0.0</span>),
-            <span class="ident">fx</span>: <span class="macro">float!</span>(<span class="number">0.0</span>),
-            <span class="ident">gx</span>: <span class="macro">float!</span>(<span class="number">0.0</span>),
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Step {
+            x: <span class="macro">float!</span>(<span class="number">0.0</span>),
+            fx: <span class="macro">float!</span>(<span class="number">0.0</span>),
+            gx: <span class="macro">float!</span>(<span class="number">0.0</span>),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, G, F&gt; MoreThuenteLineSearch&lt;P, G, F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of `MoreThuenteLineSearch`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
-    <span class="doccomment">/// let mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">MoreThuenteLineSearch</span> {
-            <span class="ident">search_direction</span>: <span class="prelude-val">None</span>,
-            <span class="ident">init_param</span>: <span class="prelude-val">None</span>,
-            <span class="ident">finit</span>: <span class="ident">F::infinity</span>(),
-            <span class="ident">init_grad</span>: <span class="prelude-val">None</span>,
-            <span class="ident">dginit</span>: <span class="macro">float!</span>(<span class="number">0.0</span>),
-            <span class="ident">dgtest</span>: <span class="macro">float!</span>(<span class="number">0.0</span>),
-            <span class="ident">ftol</span>: <span class="macro">float!</span>(<span class="number">1e-4</span>),
-            <span class="ident">gtol</span>: <span class="macro">float!</span>(<span class="number">0.9</span>),
-            <span class="ident">xtrapf</span>: <span class="macro">float!</span>(<span class="number">4.0</span>),
-            <span class="ident">width</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">width1</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">xtol</span>: <span class="macro">float!</span>(<span class="number">1e-10</span>),
-            <span class="ident">alpha</span>: <span class="macro">float!</span>(<span class="number">1.0</span>),
-            <span class="ident">stpmin</span>: <span class="ident">F::epsilon</span>().<span class="ident">sqrt</span>(),
-            <span class="ident">stpmax</span>: <span class="ident">F::infinity</span>(),
-            <span class="ident">stp</span>: <span class="ident">Step::default</span>(),
-            <span class="ident">stx</span>: <span class="ident">Step::default</span>(),
-            <span class="ident">sty</span>: <span class="ident">Step::default</span>(),
-            <span class="ident">f</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">brackt</span>: <span class="bool-val">false</span>,
-            <span class="ident">stage1</span>: <span class="bool-val">true</span>,
-            <span class="ident">infoc</span>: <span class="number">1</span>,
+    <span class="doccomment">/// Construct a new instance of `MoreThuenteLineSearch`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// let mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        MoreThuenteLineSearch {
+            search_direction: <span class="prelude-val">None</span>,
+            init_param: <span class="prelude-val">None</span>,
+            finit: F::infinity(),
+            init_grad: <span class="prelude-val">None</span>,
+            dginit: <span class="macro">float!</span>(<span class="number">0.0</span>),
+            dgtest: <span class="macro">float!</span>(<span class="number">0.0</span>),
+            ftol: <span class="macro">float!</span>(<span class="number">1e-4</span>),
+            gtol: <span class="macro">float!</span>(<span class="number">0.9</span>),
+            xtrapf: <span class="macro">float!</span>(<span class="number">4.0</span>),
+            width: F::nan(),
+            width1: F::nan(),
+            xtol: <span class="macro">float!</span>(<span class="number">1e-10</span>),
+            alpha: <span class="macro">float!</span>(<span class="number">1.0</span>),
+            stpmin: F::epsilon().sqrt(),
+            stpmax: F::infinity(),
+            stp: Step::default(),
+            stx: Step::default(),
+            sty: Step::default(),
+            f: F::nan(),
+            brackt: <span class="bool-val">false</span>,
+            stage1: <span class="bool-val">true</span>,
+            infoc: <span class="number">1</span>,
         }
     }
 
-    <span class="doccomment">/// Set the constants c1 and c2 for the sufficient decrease and curvature conditions,</span>
-    <span class="doccomment">/// respectively. `0 &lt; c1 &lt; c2 &lt; 1` must hold.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default values are `c1 = 1e-4` and `c2 = 0.9`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     MoreThuenteLineSearch::new().with_c(1e-3, 0.8)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_c</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">c1</span>: <span class="ident">F</span>, <span class="ident">c2</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">c1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">c2</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`MoreThuenteLineSearch`: Parameter c1 must be in (0, c2).&quot;</span>
-            ));
+    <span class="doccomment">/// Set the constants c1 and c2 for the sufficient decrease and curvature conditions,
+    /// respectively. `0 &lt; c1 &lt; c2 &lt; 1` must hold.
+    ///
+    /// The default values are `c1 = 1e-4` and `c2 = 0.9`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =
+    ///     MoreThuenteLineSearch::new().with_c(1e-3, 0.8)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_c(<span class="kw-2">mut </span><span class="self">self</span>, c1: F, c2: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>c1 &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || c1 &gt;= c2 {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`MoreThuenteLineSearch`: Parameter c1 must be in (0, c2).&quot;
+            </span>));
         }
-        <span class="kw">if</span> <span class="ident">c2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">c1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`MoreThuenteLineSearch`: Parameter c2 must be in (c1, 1).&quot;</span>
-            ));
+        <span class="kw">if </span>c2 &lt;= c1 || c2 &gt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`MoreThuenteLineSearch`: Parameter c2 must be in (c1, 1).&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">ftol</span> <span class="op">=</span> <span class="ident">c1</span>;
-        <span class="self">self</span>.<span class="ident">gtol</span> <span class="op">=</span> <span class="ident">c2</span>;
+        <span class="self">self</span>.ftol = c1;
+        <span class="self">self</span>.gtol = c2;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set lower and upper bound of step</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults are `step_min = sqrt(EPS)` and `step_max = INF`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `step_min` must be smaller than `step_max`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     MoreThuenteLineSearch::new().with_bounds(1e-6, 10.0)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_bounds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">step_min</span>: <span class="ident">F</span>, <span class="ident">step_max</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">step_min</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`MoreThuenteLineSearch`: step_min must be &gt;= 0.0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set lower and upper bound of step
+    ///
+    /// Defaults are `step_min = sqrt(EPS)` and `step_max = INF`.
+    ///
+    /// `step_min` must be smaller than `step_max`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =
+    ///     MoreThuenteLineSearch::new().with_bounds(1e-6, 10.0)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_bounds(<span class="kw-2">mut </span><span class="self">self</span>, step_min: F, step_max: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>step_min &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`MoreThuenteLineSearch`: step_min must be &gt;= 0.0.&quot;
+            </span>));
         }
-        <span class="kw">if</span> <span class="ident">step_max</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">step_min</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`MoreThuenteLineSearch`: step_min must be smaller than step_max.&quot;</span>
-            ));
+        <span class="kw">if </span>step_max &lt;= step_min {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`MoreThuenteLineSearch`: step_min must be smaller than step_max.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">stpmin</span> <span class="op">=</span> <span class="ident">step_min</span>;
-        <span class="self">self</span>.<span class="ident">stpmax</span> <span class="op">=</span> <span class="ident">step_max</span>;
+        <span class="self">self</span>.stpmin = step_min;
+        <span class="self">self</span>.stpmax = step_max;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set relative tolerance on width of uncertainty interval</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The algorithm terminates when the relative width of the uncertainty interval is below the</span>
-    <span class="doccomment">/// supplied tolerance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be non-negative and defaults to `1e-10`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     MoreThuenteLineSearch::new().with_width_tolerance(1e-9)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_width_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">xtol</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">xtol</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`MoreThuenteLineSearch`: relative width tolerance must be &gt;= 0.0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set relative tolerance on width of uncertainty interval
+    ///
+    /// The algorithm terminates when the relative width of the uncertainty interval is below the
+    /// supplied tolerance.
+    ///
+    /// Must be non-negative and defaults to `1e-10`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::MoreThuenteLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =
+    ///     MoreThuenteLineSearch::new().with_width_tolerance(1e-9)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_width_tolerance(<span class="kw-2">mut </span><span class="self">self</span>, xtol: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>xtol &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`MoreThuenteLineSearch`: relative width tolerance must be &gt;= 0.0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">xtol</span> <span class="op">=</span> <span class="ident">xtol</span>;
+        <span class="self">self</span>.xtol = xtol;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, G, F&gt; Default <span class="kw">for </span>MoreThuenteLineSearch&lt;P, G, F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">MoreThuenteLineSearch::new</span>()
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        MoreThuenteLineSearch::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">LineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, G, F&gt; LineSearch&lt;P, F&gt; <span class="kw">for </span>MoreThuenteLineSearch&lt;P, G, F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Set search direction</span>
-    <span class="kw">fn</span> <span class="ident">search_direction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">search_direction</span>: <span class="ident">P</span>) {
-        <span class="self">self</span>.<span class="ident">search_direction</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">search_direction</span>);
+    <span class="doccomment">/// Set search direction
+    </span><span class="kw">fn </span>search_direction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, search_direction: P) {
+        <span class="self">self</span>.search_direction = <span class="prelude-val">Some</span>(search_direction);
     }
 
-    <span class="doccomment">/// Set initial alpha value</span>
-    <span class="kw">fn</span> <span class="ident">initial_step_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">alpha</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;MoreThuenteLineSearch: Initial alpha must be &gt; 0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set initial alpha value
+    </span><span class="kw">fn </span>initial_step_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alpha: F) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">if </span>alpha &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;MoreThuenteLineSearch: Initial alpha must be &gt; 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">alpha</span> <span class="op">=</span> <span class="ident">alpha</span>;
+        <span class="self">self</span>.alpha = alpha;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">G</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, G, O, F&gt; Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt; <span class="kw">for </span>MoreThuenteLineSearch&lt;P, G, F&gt;
+<span class="kw">where
+    </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
+    P: Clone + SerializeAlias + ArgminDot&lt;G, F&gt; + ArgminScaledAdd&lt;P, F, P&gt;,
+    G: Clone + SerializeAlias + ArgminDot&lt;P, F&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;More-Thuente Line search&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;More-Thuente Line search&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="macro">check_param!</span>(
-            <span class="self">self</span>.<span class="ident">search_direction</span>,
+            <span class="self">self</span>.search_direction,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`MoreThuenteLineSearch`: Search direction not initialized. &quot;</span>,
-                <span class="string">&quot;Call `search_direction` before executing the solver.&quot;</span>
-            )
+                <span class="string">&quot;Call `search_direction` before executing the solver.&quot;
+            </span>)
         );
 
-        <span class="self">self</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+        <span class="self">self</span>.init_param = <span class="prelude-val">Some</span>(state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`MoreThuenteLineSearch` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>);
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="self">self</span>.<span class="ident">finit</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cost</span>.<span class="ident">is_infinite</span>() {
-            <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">init_param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())<span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">cost</span>
+        <span class="kw">let </span>cost = state.get_cost();
+        <span class="self">self</span>.finit = <span class="kw">if </span>cost.is_infinite() {
+            problem.cost(<span class="self">self</span>.init_param.as_ref().unwrap())<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            cost
         };
 
-        <span class="self">self</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
-            <span class="ident">state</span>
-                .<span class="ident">take_gradient</span>()
-                .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="self">self</span>.<span class="ident">init_param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()))<span class="question-mark">?</span>,
+        <span class="self">self</span>.init_grad = <span class="prelude-val">Some</span>(
+            state
+                .take_gradient()
+                .map(Result::Ok)
+                .unwrap_or_else(|| problem.gradient(<span class="self">self</span>.init_param.as_ref().unwrap()))<span class="question-mark">?</span>,
         );
 
-        <span class="self">self</span>.<span class="ident">dginit</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">init_grad</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">dot</span>(<span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
+        <span class="self">self</span>.dginit = <span class="self">self
+            </span>.init_grad
+            .as_ref()
+            .unwrap()
+            .dot(<span class="self">self</span>.search_direction.as_ref().unwrap());
 
-        <span class="comment">// compute search direction in 1D</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">dginit</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">ConditionViolated</span>,
-                <span class="string">&quot;`MoreThuenteLineSearch`: Search direction must be a descent direction.&quot;</span>
-            ));
+        <span class="comment">// compute search direction in 1D
+        </span><span class="kw">if </span><span class="self">self</span>.dginit &gt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                ConditionViolated,
+                <span class="string">&quot;`MoreThuenteLineSearch`: Search direction must be a descent direction.&quot;
+            </span>));
         }
 
-        <span class="self">self</span>.<span class="ident">stage1</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="self">self</span>.<span class="ident">brackt</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="self">self</span>.stage1 = <span class="bool-val">true</span>;
+        <span class="self">self</span>.brackt = <span class="bool-val">false</span>;
 
-        <span class="self">self</span>.<span class="ident">dgtest</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ftol</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span>;
-        <span class="self">self</span>.<span class="ident">width</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stpmax</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">stpmin</span>;
-        <span class="self">self</span>.<span class="ident">width1</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">2.0</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">width</span>;
-        <span class="self">self</span>.<span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">finit</span>;
+        <span class="self">self</span>.dgtest = <span class="self">self</span>.ftol * <span class="self">self</span>.dginit;
+        <span class="self">self</span>.width = <span class="self">self</span>.stpmax - <span class="self">self</span>.stpmin;
+        <span class="self">self</span>.width1 = <span class="macro">float!</span>(<span class="number">2.0</span>) * <span class="self">self</span>.width;
+        <span class="self">self</span>.f = <span class="self">self</span>.finit;
 
-        <span class="self">self</span>.<span class="ident">stp</span> <span class="op">=</span> <span class="ident">Step::new</span>(<span class="self">self</span>.<span class="ident">alpha</span>, <span class="ident">F::nan</span>(), <span class="ident">F::nan</span>());
-        <span class="self">self</span>.<span class="ident">stx</span> <span class="op">=</span> <span class="ident">Step::new</span>(<span class="macro">float!</span>(<span class="number">0.0</span>), <span class="self">self</span>.<span class="ident">finit</span>, <span class="self">self</span>.<span class="ident">dginit</span>);
-        <span class="self">self</span>.<span class="ident">sty</span> <span class="op">=</span> <span class="ident">Step::new</span>(<span class="macro">float!</span>(<span class="number">0.0</span>), <span class="self">self</span>.<span class="ident">finit</span>, <span class="self">self</span>.<span class="ident">dginit</span>);
+        <span class="self">self</span>.stp = Step::new(<span class="self">self</span>.alpha, F::nan(), F::nan());
+        <span class="self">self</span>.stx = Step::new(<span class="macro">float!</span>(<span class="number">0.0</span>), <span class="self">self</span>.finit, <span class="self">self</span>.dginit);
+        <span class="self">self</span>.sty = Step::new(<span class="macro">float!</span>(<span class="number">0.0</span>), <span class="self">self</span>.finit, <span class="self">self</span>.dginit);
 
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>, <span class="prelude-val">None</span>))
+        <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// set the minimum and maximum steps to correspond to the present interval of uncertainty</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> (<span class="ident">stmin</span>, <span class="ident">stmax</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">brackt</span> {
-            (<span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span>.<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">x</span>), <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span>.<span class="ident">max</span>(<span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">x</span>))
-        } <span class="kw">else</span> {
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        state: IterState&lt;P, G, (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="comment">// set the minimum and maximum steps to correspond to the present interval of uncertainty
+        </span><span class="kw">let </span><span class="kw-2">mut </span>info = <span class="number">0</span>;
+        <span class="kw">let </span>(stmin, stmax) = <span class="kw">if </span><span class="self">self</span>.brackt {
+            (<span class="self">self</span>.stx.x.min(<span class="self">self</span>.sty.x), <span class="self">self</span>.stx.x.max(<span class="self">self</span>.sty.x))
+        } <span class="kw">else </span>{
             (
-                <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span>,
-                <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">xtrapf</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span>),
+                <span class="self">self</span>.stx.x,
+                <span class="self">self</span>.stp.x + <span class="self">self</span>.xtrapf * (<span class="self">self</span>.stp.x - <span class="self">self</span>.stx.x),
             )
         };
 
-        <span class="comment">// alpha needs to be within bounds</span>
-        <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>.<span class="ident">max</span>(<span class="self">self</span>.<span class="ident">stpmin</span>);
-        <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>.<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">stpmax</span>);
+        <span class="comment">// alpha needs to be within bounds
+        </span><span class="self">self</span>.stp.x = <span class="self">self</span>.stp.x.max(<span class="self">self</span>.stpmin);
+        <span class="self">self</span>.stp.x = <span class="self">self</span>.stp.x.min(<span class="self">self</span>.stpmax);
 
-        <span class="comment">// If an unusual termination is to occur then let alpha be the lowest point obtained so</span>
-        <span class="comment">// far.</span>
-        <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">brackt</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">stmin</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">stmax</span>))
-            <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">brackt</span> <span class="op">&amp;&amp;</span> (<span class="ident">stmax</span> <span class="op">-</span> <span class="ident">stmin</span>) <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">xtol</span> <span class="op">*</span> <span class="ident">stmax</span>)
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">infoc</span> <span class="op">==</span> <span class="number">0</span>
+        <span class="comment">// If an unusual termination is to occur then let alpha be the lowest point obtained so
+        // far.
+        </span><span class="kw">if </span>(<span class="self">self</span>.brackt &amp;&amp; (<span class="self">self</span>.stp.x &lt;= stmin || <span class="self">self</span>.stp.x &gt;= stmax))
+            || (<span class="self">self</span>.brackt &amp;&amp; (stmax - stmin) &lt;= <span class="self">self</span>.xtol * stmax)
+            || <span class="self">self</span>.infoc == <span class="number">0
+        </span>{
+            <span class="self">self</span>.stp.x = <span class="self">self</span>.stx.x;
+        }
+
+        <span class="comment">// Evaluate the function and gradient at new stp.x and compute the directional derivative
+        </span><span class="kw">let </span>new_param = <span class="self">self
+            </span>.init_param
+            .as_ref()
+            .unwrap()
+            .scaled_add(<span class="kw-2">&amp;</span><span class="self">self</span>.stp.x, <span class="self">self</span>.search_direction.as_ref().unwrap());
+        <span class="self">self</span>.f = problem.cost(<span class="kw-2">&amp;</span>new_param)<span class="question-mark">?</span>;
+        <span class="kw">let </span>new_grad = problem.gradient(<span class="kw-2">&amp;</span>new_param)<span class="question-mark">?</span>;
+        <span class="kw">let </span>cur_cost = <span class="self">self</span>.f;
+        <span class="kw">let </span>cur_param = new_param;
+        <span class="kw">let </span>cur_grad = new_grad.clone();
+        <span class="comment">// self.stx.fx = new_cost;
+        </span><span class="kw">let </span>dg = <span class="self">self</span>.search_direction.as_ref().unwrap().dot(<span class="kw-2">&amp;</span>new_grad);
+        <span class="kw">let </span>ftest1 = <span class="self">self</span>.finit + <span class="self">self</span>.stp.x * <span class="self">self</span>.dgtest;
+        <span class="comment">// self.stp.fx = new_cost;
+        // self.stp.gx = dg;
+
+        </span><span class="kw">if </span>(<span class="self">self</span>.brackt &amp;&amp; (<span class="self">self</span>.stp.x &lt;= stmin || <span class="self">self</span>.stp.x &gt;= stmax)) || <span class="self">self</span>.infoc == <span class="number">0 </span>{
+            info = <span class="number">6</span>;
+        }
+
+        <span class="kw">if </span>(<span class="self">self</span>.stp.x - <span class="self">self</span>.stpmax).abs() &lt; F::epsilon() &amp;&amp; <span class="self">self</span>.f &lt;= ftest1 &amp;&amp; dg &lt;= <span class="self">self</span>.dgtest
         {
-            <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span>;
+            info = <span class="number">5</span>;
         }
 
-        <span class="comment">// Evaluate the function and gradient at new stp.x and compute the directional derivative</span>
-        <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">init_param</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
-        <span class="self">self</span>.<span class="ident">f</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">new_param</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">cur_cost</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>;
-        <span class="kw">let</span> <span class="ident">cur_param</span> <span class="op">=</span> <span class="ident">new_param</span>;
-        <span class="kw">let</span> <span class="ident">cur_grad</span> <span class="op">=</span> <span class="ident">new_grad</span>.<span class="ident">clone</span>();
-        <span class="comment">// self.stx.fx = new_cost;</span>
-        <span class="kw">let</span> <span class="ident">dg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">new_grad</span>);
-        <span class="kw">let</span> <span class="ident">ftest1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
-        <span class="comment">// self.stp.fx = new_cost;</span>
-        <span class="comment">// self.stp.gx = dg;</span>
-
-        <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">brackt</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">stmin</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">stmax</span>)) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">infoc</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">info</span> <span class="op">=</span> <span class="number">6</span>;
-        }
-
-        <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">stpmax</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">F::epsilon</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">ftest1</span> <span class="op">&amp;&amp;</span> <span class="ident">dg</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">dgtest</span>
+        <span class="kw">if </span>(<span class="self">self</span>.stp.x - <span class="self">self</span>.stpmin).abs() &lt; F::epsilon() &amp;&amp; (<span class="self">self</span>.f &gt; ftest1 || dg &gt;= <span class="self">self</span>.dgtest)
         {
-            <span class="ident">info</span> <span class="op">=</span> <span class="number">5</span>;
+            info = <span class="number">4</span>;
         }
 
-        <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">stpmin</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">F::epsilon</span>() <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">f</span> <span class="op">&gt;</span> <span class="ident">ftest1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">dg</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">dgtest</span>)
-        {
-            <span class="ident">info</span> <span class="op">=</span> <span class="number">4</span>;
+        <span class="kw">if </span><span class="self">self</span>.brackt &amp;&amp; stmax - stmin &lt;= <span class="self">self</span>.xtol * stmax {
+            info = <span class="number">2</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">brackt</span> <span class="op">&amp;&amp;</span> <span class="ident">stmax</span> <span class="op">-</span> <span class="ident">stmin</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">xtol</span> <span class="op">*</span> <span class="ident">stmax</span> {
-            <span class="ident">info</span> <span class="op">=</span> <span class="number">2</span>;
+        <span class="kw">if </span><span class="self">self</span>.f &lt;= ftest1 &amp;&amp; dg.abs() &lt;= <span class="self">self</span>.gtol * (-<span class="self">self</span>.dginit) {
+            info = <span class="number">1</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">ftest1</span> <span class="op">&amp;&amp;</span> <span class="ident">dg</span>.<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">gtol</span> <span class="op">*</span> (<span class="op">-</span><span class="self">self</span>.<span class="ident">dginit</span>) {
-            <span class="ident">info</span> <span class="op">=</span> <span class="number">1</span>;
-        }
-
-        <span class="kw">if</span> <span class="ident">info</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>((
-                <span class="ident">state</span>
-                    .<span class="ident">param</span>(<span class="ident">cur_param</span>)
-                    .<span class="ident">cost</span>(<span class="ident">cur_cost</span>)
-                    .<span class="ident">gradient</span>(<span class="ident">cur_grad</span>)
-                    .<span class="ident">terminate_with</span>(<span class="ident">TerminationReason::LineSearchConditionMet</span>),
+        <span class="kw">if </span>info != <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>((
+                state
+                    .param(cur_param)
+                    .cost(cur_cost)
+                    .gradient(cur_grad)
+                    .terminate_with(TerminationReason::LineSearchConditionMet),
                 <span class="prelude-val">None</span>,
             ));
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage1</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">ftest1</span> <span class="op">&amp;&amp;</span> <span class="ident">dg</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">ftol</span>.<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">gtol</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span> {
-            <span class="self">self</span>.<span class="ident">stage1</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span><span class="self">self</span>.stage1 &amp;&amp; <span class="self">self</span>.f &lt;= ftest1 &amp;&amp; dg &gt;= <span class="self">self</span>.ftol.min(<span class="self">self</span>.gtol) * <span class="self">self</span>.dginit {
+            <span class="self">self</span>.stage1 = <span class="bool-val">false</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage1</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">fx</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">f</span> <span class="op">&gt;</span> <span class="ident">ftest1</span> {
-            <span class="kw">let</span> <span class="ident">fm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
-            <span class="kw">let</span> <span class="ident">fxm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">fx</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
-            <span class="kw">let</span> <span class="ident">fym</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">fx</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
-            <span class="kw">let</span> <span class="ident">dgm</span> <span class="op">=</span> <span class="ident">dg</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
-            <span class="kw">let</span> <span class="ident">dgxm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
-            <span class="kw">let</span> <span class="ident">dgym</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">gx</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
+        <span class="kw">if </span><span class="self">self</span>.stage1 &amp;&amp; <span class="self">self</span>.f &lt;= <span class="self">self</span>.stp.fx &amp;&amp; <span class="self">self</span>.f &gt; ftest1 {
+            <span class="kw">let </span>fm = <span class="self">self</span>.f - <span class="self">self</span>.stp.x * <span class="self">self</span>.dgtest;
+            <span class="kw">let </span>fxm = <span class="self">self</span>.stx.fx - <span class="self">self</span>.stx.x * <span class="self">self</span>.dgtest;
+            <span class="kw">let </span>fym = <span class="self">self</span>.sty.fx - <span class="self">self</span>.sty.x * <span class="self">self</span>.dgtest;
+            <span class="kw">let </span>dgm = dg - <span class="self">self</span>.dgtest;
+            <span class="kw">let </span>dgxm = <span class="self">self</span>.stx.gx - <span class="self">self</span>.dgtest;
+            <span class="kw">let </span>dgym = <span class="self">self</span>.sty.gx - <span class="self">self</span>.dgtest;
 
-            <span class="kw">let</span> (<span class="ident">stx1</span>, <span class="ident">sty1</span>, <span class="ident">stp1</span>, <span class="ident">brackt1</span>, <span class="ident">_stmin</span>, <span class="ident">_stmax</span>, <span class="ident">infoc</span>) <span class="op">=</span> <span class="ident">cstep</span>(
-                <span class="ident">Step::new</span>(<span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span>, <span class="ident">fxm</span>, <span class="ident">dgxm</span>),
-                <span class="ident">Step::new</span>(<span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">x</span>, <span class="ident">fym</span>, <span class="ident">dgym</span>),
-                <span class="ident">Step::new</span>(<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="ident">fm</span>, <span class="ident">dgm</span>),
-                <span class="self">self</span>.<span class="ident">brackt</span>,
-                <span class="ident">stmin</span>,
-                <span class="ident">stmax</span>,
+            <span class="kw">let </span>(stx1, sty1, stp1, brackt1, _stmin, _stmax, infoc) = cstep(
+                Step::new(<span class="self">self</span>.stx.x, fxm, dgxm),
+                Step::new(<span class="self">self</span>.sty.x, fym, dgym),
+                Step::new(<span class="self">self</span>.stp.x, fm, dgm),
+                <span class="self">self</span>.brackt,
+                stmin,
+                stmax,
             )<span class="question-mark">?</span>;
 
-            <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span> <span class="op">=</span> <span class="ident">stx1</span>.<span class="ident">x</span>;
-            <span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">x</span> <span class="op">=</span> <span class="ident">sty1</span>.<span class="ident">x</span>;
-            <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">=</span> <span class="ident">stp1</span>.<span class="ident">x</span>;
-            <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">fx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">fx</span> <span class="op">+</span> <span class="ident">stx1</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
-            <span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">fx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">fx</span> <span class="op">+</span> <span class="ident">sty1</span>.<span class="ident">x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
-            <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
-            <span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">gx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">gx</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">dgtest</span>;
-            <span class="self">self</span>.<span class="ident">brackt</span> <span class="op">=</span> <span class="ident">brackt1</span>;
-            <span class="self">self</span>.<span class="ident">stp</span> <span class="op">=</span> <span class="ident">stp1</span>;
-            <span class="self">self</span>.<span class="ident">infoc</span> <span class="op">=</span> <span class="ident">infoc</span>;
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> (<span class="ident">stx1</span>, <span class="ident">sty1</span>, <span class="ident">stp1</span>, <span class="ident">brackt1</span>, <span class="ident">_stmin</span>, <span class="ident">_stmax</span>, <span class="ident">infoc</span>) <span class="op">=</span> <span class="ident">cstep</span>(
-                <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">clone</span>(),
-                <span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">clone</span>(),
-                <span class="ident">Step::new</span>(<span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">f</span>, <span class="ident">dg</span>),
-                <span class="self">self</span>.<span class="ident">brackt</span>,
-                <span class="ident">stmin</span>,
-                <span class="ident">stmax</span>,
+            <span class="self">self</span>.stx.x = stx1.x;
+            <span class="self">self</span>.sty.x = sty1.x;
+            <span class="self">self</span>.stp.x = stp1.x;
+            <span class="self">self</span>.stx.fx = <span class="self">self</span>.stx.fx + stx1.x * <span class="self">self</span>.dgtest;
+            <span class="self">self</span>.sty.fx = <span class="self">self</span>.sty.fx + sty1.x * <span class="self">self</span>.dgtest;
+            <span class="self">self</span>.stx.gx = <span class="self">self</span>.stx.gx + <span class="self">self</span>.dgtest;
+            <span class="self">self</span>.sty.gx = <span class="self">self</span>.sty.gx + <span class="self">self</span>.dgtest;
+            <span class="self">self</span>.brackt = brackt1;
+            <span class="self">self</span>.stp = stp1;
+            <span class="self">self</span>.infoc = infoc;
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>(stx1, sty1, stp1, brackt1, _stmin, _stmax, infoc) = cstep(
+                <span class="self">self</span>.stx.clone(),
+                <span class="self">self</span>.sty.clone(),
+                Step::new(<span class="self">self</span>.stp.x, <span class="self">self</span>.f, dg),
+                <span class="self">self</span>.brackt,
+                stmin,
+                stmax,
             )<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">stx</span> <span class="op">=</span> <span class="ident">stx1</span>;
-            <span class="self">self</span>.<span class="ident">sty</span> <span class="op">=</span> <span class="ident">sty1</span>;
-            <span class="self">self</span>.<span class="ident">stp</span> <span class="op">=</span> <span class="ident">stp1</span>;
-            <span class="self">self</span>.<span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">fx</span>;
-            <span class="comment">// dg = self.stp.gx;</span>
-            <span class="self">self</span>.<span class="ident">brackt</span> <span class="op">=</span> <span class="ident">brackt1</span>;
-            <span class="self">self</span>.<span class="ident">infoc</span> <span class="op">=</span> <span class="ident">infoc</span>;
+            <span class="self">self</span>.stx = stx1;
+            <span class="self">self</span>.sty = sty1;
+            <span class="self">self</span>.stp = stp1;
+            <span class="self">self</span>.f = <span class="self">self</span>.stp.fx;
+            <span class="comment">// dg = self.stp.gx;
+            </span><span class="self">self</span>.brackt = brackt1;
+            <span class="self">self</span>.infoc = infoc;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">brackt</span> {
-            <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.66</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">width1</span> {
-                <span class="self">self</span>.<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span> <span class="op">+</span> <span class="macro">float!</span>(<span class="number">0.5</span>) <span class="op">*</span> (<span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span>);
+        <span class="kw">if </span><span class="self">self</span>.brackt {
+            <span class="kw">if </span>(<span class="self">self</span>.sty.x - <span class="self">self</span>.stx.x).abs() &gt;= <span class="macro">float!</span>(<span class="number">0.66</span>) * <span class="self">self</span>.width1 {
+                <span class="self">self</span>.stp.x = <span class="self">self</span>.stx.x + <span class="macro">float!</span>(<span class="number">0.5</span>) * (<span class="self">self</span>.sty.x - <span class="self">self</span>.stx.x);
             }
-            <span class="self">self</span>.<span class="ident">width1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">width</span>;
-            <span class="self">self</span>.<span class="ident">width</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">sty</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">stx</span>.<span class="ident">x</span>).<span class="ident">abs</span>();
+            <span class="self">self</span>.width1 = <span class="self">self</span>.width;
+            <span class="self">self</span>.width = (<span class="self">self</span>.sty.x - <span class="self">self</span>.stx.x).abs();
         }
 
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>, <span class="prelude-val">None</span>))
+        <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
     }
 }
 
-<span class="kw">type</span> <span class="ident">CstepReturnValue</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">bool</span>, <span class="ident">F</span>, <span class="ident">F</span>, <span class="ident">usize</span>);
+<span class="kw">type </span>CstepReturnValue&lt;F&gt; = (Step&lt;F&gt;, Step&lt;F&gt;, Step&lt;F&gt;, bool, F, F, usize);
 
-<span class="kw">fn</span> <span class="ident">cstep</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span>(
-    <span class="ident">stx</span>: <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">sty</span>: <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">stp</span>: <span class="ident">Step</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">brackt</span>: <span class="ident">bool</span>,
-    <span class="ident">stpmin</span>: <span class="ident">F</span>,
-    <span class="ident">stpmax</span>: <span class="ident">F</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CstepReturnValue</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="ident">bound</span>: <span class="ident">bool</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stpf</span>: <span class="ident">F</span>;
-    <span class="kw">let</span> <span class="ident">stpc</span>: <span class="ident">F</span>;
-    <span class="kw">let</span> <span class="ident">stpq</span>: <span class="ident">F</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">brackt</span> <span class="op">=</span> <span class="ident">brackt</span>;
+<span class="kw">fn </span>cstep&lt;F: ArgminFloat&gt;(
+    stx: Step&lt;F&gt;,
+    sty: Step&lt;F&gt;,
+    stp: Step&lt;F&gt;,
+    brackt: bool,
+    stpmin: F,
+    stpmax: F,
+) -&gt; <span class="prelude-ty">Result</span>&lt;CstepReturnValue&lt;F&gt;, Error&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>info: usize = <span class="number">0</span>;
+    <span class="kw">let </span>bound: bool;
+    <span class="kw">let </span><span class="kw-2">mut </span>stpf: F;
+    <span class="kw">let </span>stpc: F;
+    <span class="kw">let </span>stpq: F;
+    <span class="kw">let </span><span class="kw-2">mut </span>brackt = brackt;
 
-    <span class="comment">// check inputs</span>
-    <span class="kw">if</span> (<span class="ident">brackt</span> <span class="op">&amp;&amp;</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">stx</span>.<span class="ident">x</span>.<span class="ident">min</span>(<span class="ident">sty</span>.<span class="ident">x</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">stx</span>.<span class="ident">x</span>.<span class="ident">max</span>(<span class="ident">sty</span>.<span class="ident">x</span>)))
-        <span class="op">|</span><span class="op">|</span> <span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">*</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">x</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>)
-        <span class="op">|</span><span class="op">|</span> <span class="ident">stpmax</span> <span class="op">&lt;</span> <span class="ident">stpmin</span>
+    <span class="comment">// check inputs
+    </span><span class="kw">if </span>(brackt &amp;&amp; (stp.x &lt;= stx.x.min(sty.x) || stp.x &gt;= stx.x.max(sty.x)))
+        || stx.gx * (stp.x - stx.x) &gt;= <span class="macro">float!</span>(<span class="number">0.0</span>)
+        || stpmax &lt; stpmin
     {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">stx</span>, <span class="ident">sty</span>, <span class="ident">stp</span>, <span class="ident">brackt</span>, <span class="ident">stpmin</span>, <span class="ident">stpmax</span>, <span class="ident">info</span>));
+        <span class="kw">return </span><span class="prelude-val">Ok</span>((stx, sty, stp, brackt, stpmin, stpmax, info));
     }
 
-    <span class="comment">// determine if the derivatives have opposite sign</span>
-    <span class="kw">let</span> <span class="ident">sgnd</span> <span class="op">=</span> <span class="ident">stp</span>.<span class="ident">gx</span> <span class="op">*</span> (<span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">/</span> <span class="ident">stx</span>.<span class="ident">gx</span>.<span class="ident">abs</span>());
+    <span class="comment">// determine if the derivatives have opposite sign
+    </span><span class="kw">let </span>sgnd = stp.gx * (stx.gx / stx.gx.abs());
 
-    <span class="kw">if</span> <span class="ident">stp</span>.<span class="ident">fx</span> <span class="op">&gt;</span> <span class="ident">stx</span>.<span class="ident">fx</span> {
-        <span class="comment">// First case. A higher function value. The minimum is bracketed. If the cubic step is closer to</span>
-        <span class="comment">// stx.x than the quadratic step, the cubic step is taken, else the average of the cubic and</span>
-        <span class="comment">// the quadratic steps is taken.</span>
-        <span class="ident">info</span> <span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">bound</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">let</span> <span class="ident">theta</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">3.0</span>) <span class="op">*</span> (<span class="ident">stx</span>.<span class="ident">fx</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">fx</span>) <span class="op">/</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">x</span>) <span class="op">+</span> <span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">+</span> <span class="ident">stp</span>.<span class="ident">gx</span>;
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">theta</span>, <span class="ident">stx</span>.<span class="ident">gx</span>, <span class="ident">stp</span>.<span class="ident">gx</span>];
-        <span class="comment">// Check for a NaN or Inf in tmp before sorting</span>
-        <span class="kw">if</span> <span class="ident">tmp</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">is_infinite</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">ConditionViolated</span>,
-                <span class="string">&quot;MoreThuenteLineSearch: NaN or Inf encountered during iteration&quot;</span>
-            ));
+    <span class="kw">if </span>stp.fx &gt; stx.fx {
+        <span class="comment">// First case. A higher function value. The minimum is bracketed. If the cubic step is closer to
+        // stx.x than the quadratic step, the cubic step is taken, else the average of the cubic and
+        // the quadratic steps is taken.
+        </span>info = <span class="number">1</span>;
+        bound = <span class="bool-val">true</span>;
+        <span class="kw">let </span>theta = <span class="macro">float!</span>(<span class="number">3.0</span>) * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        <span class="kw">let </span>tmp = <span class="macro">vec!</span>[theta, stx.gx, stp.gx];
+        <span class="comment">// Check for a NaN or Inf in tmp before sorting
+        </span><span class="kw">if </span>tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                ConditionViolated,
+                <span class="string">&quot;MoreThuenteLineSearch: NaN or Inf encountered during iteration&quot;
+            </span>));
         }
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">tmp</span>.<span class="ident">iter</span>().<span class="ident">max_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">partial_cmp</span>(<span class="ident">b</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">s</span> <span class="op">*</span> ((<span class="ident">theta</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> (<span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>) <span class="op">*</span> (<span class="ident">stp</span>.<span class="ident">gx</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>)).<span class="ident">sqrt</span>();
-        <span class="kw">if</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">stx</span>.<span class="ident">x</span> {
-            <span class="ident">gamma</span> <span class="op">=</span> <span class="op">-</span><span class="ident">gamma</span>;
-        }
-
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> (<span class="ident">gamma</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">gx</span>) <span class="op">+</span> <span class="ident">theta</span>;
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> ((<span class="ident">gamma</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">gx</span>) <span class="op">+</span> <span class="ident">gamma</span>) <span class="op">+</span> <span class="ident">stp</span>.<span class="ident">gx</span>;
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">p</span> <span class="op">/</span> <span class="ident">q</span>;
-        <span class="ident">stpc</span> <span class="op">=</span> <span class="ident">stx</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">r</span> <span class="op">*</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">x</span>);
-        <span class="ident">stpq</span> <span class="op">=</span> <span class="ident">stx</span>.<span class="ident">x</span>
-            <span class="op">+</span> ((<span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">/</span> ((<span class="ident">stx</span>.<span class="ident">fx</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">fx</span>) <span class="op">/</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">x</span>) <span class="op">+</span> <span class="ident">stx</span>.<span class="ident">gx</span>)) <span class="op">/</span> <span class="macro">float!</span>(<span class="number">2.0</span>))
-                <span class="op">*</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">x</span>);
-        <span class="kw">if</span> (<span class="ident">stpc</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> (<span class="ident">stpq</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">x</span>).<span class="ident">abs</span>() {
-            <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpc</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpc</span> <span class="op">+</span> (<span class="ident">stpq</span> <span class="op">-</span> <span class="ident">stpc</span>) <span class="op">/</span> <span class="macro">float!</span>(<span class="number">2.0</span>);
-        }
-        <span class="ident">brackt</span> <span class="op">=</span> <span class="bool-val">true</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">sgnd</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-        <span class="comment">// Second case. A lower function value and derivatives of opposite sign. The minimum is</span>
-        <span class="comment">// bracketed. If the cubic step is closer to stx.x than the quadratic (secant) step, the</span>
-        <span class="comment">// cubic step is taken, else the quadratic step is taken.</span>
-        <span class="ident">info</span> <span class="op">=</span> <span class="number">2</span>;
-        <span class="ident">bound</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="ident">theta</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">3.0</span>) <span class="op">*</span> (<span class="ident">stx</span>.<span class="ident">fx</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">fx</span>) <span class="op">/</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">x</span>) <span class="op">+</span> <span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">+</span> <span class="ident">stp</span>.<span class="ident">gx</span>;
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">theta</span>, <span class="ident">stx</span>.<span class="ident">gx</span>, <span class="ident">stp</span>.<span class="ident">gx</span>];
-        <span class="comment">// Check for a NaN or Inf in tmp before sorting</span>
-        <span class="kw">if</span> <span class="ident">tmp</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">is_infinite</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">ConditionViolated</span>,
-                <span class="string">&quot;MoreThuenteLineSearch: NaN or Inf encountered during iteration&quot;</span>
-            ));
-        }
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">tmp</span>.<span class="ident">iter</span>().<span class="ident">max_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">partial_cmp</span>(<span class="ident">b</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">s</span> <span class="op">*</span> ((<span class="ident">theta</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> (<span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>) <span class="op">*</span> (<span class="ident">stp</span>.<span class="ident">gx</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>)).<span class="ident">sqrt</span>();
-        <span class="kw">if</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">stx</span>.<span class="ident">x</span> {
-            <span class="ident">gamma</span> <span class="op">=</span> <span class="op">-</span><span class="ident">gamma</span>;
-        }
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> (<span class="ident">gamma</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">gx</span>) <span class="op">+</span> <span class="ident">theta</span>;
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> ((<span class="ident">gamma</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">gx</span>) <span class="op">+</span> <span class="ident">gamma</span>) <span class="op">+</span> <span class="ident">stx</span>.<span class="ident">gx</span>;
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">p</span> <span class="op">/</span> <span class="ident">q</span>;
-        <span class="ident">stpc</span> <span class="op">=</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">r</span> <span class="op">*</span> (<span class="ident">stx</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">x</span>);
-        <span class="ident">stpq</span> <span class="op">=</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">+</span> (<span class="ident">stp</span>.<span class="ident">gx</span> <span class="op">/</span> (<span class="ident">stp</span>.<span class="ident">gx</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">gx</span>)) <span class="op">*</span> (<span class="ident">stx</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">x</span>);
-        <span class="kw">if</span> (<span class="ident">stpc</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">x</span>).<span class="ident">abs</span>() <span class="op">&gt;</span> (<span class="ident">stpq</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">x</span>).<span class="ident">abs</span>() {
-            <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpc</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpq</span>;
-        }
-        <span class="ident">brackt</span> <span class="op">=</span> <span class="bool-val">true</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stp</span>.<span class="ident">gx</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">stx</span>.<span class="ident">gx</span>.<span class="ident">abs</span>() {
-        <span class="comment">// Third case. A lower function value, derivatives of the same sign, and the magnitude of</span>
-        <span class="comment">// the derivative decreases. The cubic step is only used if the cubic tends to infinity in</span>
-        <span class="comment">// the direction of the step or if the minimum of the cubic is beyond stp.x. Otherwise the</span>
-        <span class="comment">// cubic step is defined to be either stpmin or stpmax. The quadratic (secant) step is</span>
-        <span class="comment">// also computed and if the minimum is bracketed then the step closest to stx.x is taken,</span>
-        <span class="comment">// else the step farthest away is taken.</span>
-        <span class="ident">info</span> <span class="op">=</span> <span class="number">3</span>;
-        <span class="ident">bound</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">let</span> <span class="ident">theta</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">3.0</span>) <span class="op">*</span> (<span class="ident">stx</span>.<span class="ident">fx</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">fx</span>) <span class="op">/</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">x</span>) <span class="op">+</span> <span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">+</span> <span class="ident">stp</span>.<span class="ident">gx</span>;
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">theta</span>, <span class="ident">stx</span>.<span class="ident">gx</span>, <span class="ident">stp</span>.<span class="ident">gx</span>];
-        <span class="comment">// Check for a NaN or Inf in tmp before sorting</span>
-        <span class="kw">if</span> <span class="ident">tmp</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">is_infinite</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">ConditionViolated</span>,
-                <span class="string">&quot;`MoreThuenteLineSearch`: NaN or Inf encountered during iteration&quot;</span>
-            ));
-        }
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">tmp</span>.<span class="ident">iter</span>().<span class="ident">max_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">partial_cmp</span>(<span class="ident">b</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
-        <span class="comment">// the case gamma == 0 only arises if the cubic does not tend to infinity in the direction</span>
-        <span class="comment">// of the step.</span>
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">s</span>
-            <span class="op">*</span> <span class="macro">float!</span>(<span class="number">0.0</span>)
-                .<span class="ident">max</span>((<span class="ident">theta</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> (<span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>) <span class="op">*</span> (<span class="ident">stp</span>.<span class="ident">gx</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>))
-                .<span class="ident">sqrt</span>();
-        <span class="kw">if</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">stx</span>.<span class="ident">x</span> {
-            <span class="ident">gamma</span> <span class="op">=</span> <span class="op">-</span><span class="ident">gamma</span>;
+        <span class="kw">let </span>s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>gamma = <span class="kw-2">*</span>s * ((theta / <span class="kw-2">*</span>s).powi(<span class="number">2</span>) - (stx.gx / <span class="kw-2">*</span>s) * (stp.gx / <span class="kw-2">*</span>s)).sqrt();
+        <span class="kw">if </span>stp.x &lt; stx.x {
+            gamma = -gamma;
         }
 
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> (<span class="ident">gamma</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">gx</span>) <span class="op">+</span> <span class="ident">theta</span>;
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> (<span class="ident">gamma</span> <span class="op">+</span> (<span class="ident">stx</span>.<span class="ident">gx</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">gx</span>)) <span class="op">+</span> <span class="ident">gamma</span>;
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">p</span> <span class="op">/</span> <span class="ident">q</span>;
-        <span class="kw">if</span> <span class="ident">r</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">&amp;&amp;</span> <span class="ident">gamma</span> <span class="op">!</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="ident">stpc</span> <span class="op">=</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">r</span> <span class="op">*</span> (<span class="ident">stx</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">x</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">stx</span>.<span class="ident">x</span> {
-            <span class="ident">stpc</span> <span class="op">=</span> <span class="ident">stpmax</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">stpc</span> <span class="op">=</span> <span class="ident">stpmin</span>;
+        <span class="kw">let </span>p = (gamma - stx.gx) + theta;
+        <span class="kw">let </span>q = ((gamma - stx.gx) + gamma) + stp.gx;
+        <span class="kw">let </span>r = p / q;
+        stpc = stx.x + r * (stp.x - stx.x);
+        stpq = stx.x
+            + ((stx.gx / ((stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx)) / <span class="macro">float!</span>(<span class="number">2.0</span>))
+                * (stp.x - stx.x);
+        <span class="kw">if </span>(stpc - stx.x).abs() &lt; (stpq - stx.x).abs() {
+            stpf = stpc;
+        } <span class="kw">else </span>{
+            stpf = stpc + (stpq - stpc) / <span class="macro">float!</span>(<span class="number">2.0</span>);
         }
-        <span class="ident">stpq</span> <span class="op">=</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">+</span> (<span class="ident">stp</span>.<span class="ident">gx</span> <span class="op">/</span> (<span class="ident">stp</span>.<span class="ident">gx</span> <span class="op">-</span> <span class="ident">stx</span>.<span class="ident">gx</span>)) <span class="op">*</span> (<span class="ident">stx</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">x</span>);
-        <span class="kw">if</span> <span class="ident">brackt</span> {
-            <span class="kw">if</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stpc</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stpq</span>).<span class="ident">abs</span>() {
-                <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpc</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpq</span>;
+        brackt = <span class="bool-val">true</span>;
+    } <span class="kw">else if </span>sgnd &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+        <span class="comment">// Second case. A lower function value and derivatives of opposite sign. The minimum is
+        // bracketed. If the cubic step is closer to stx.x than the quadratic (secant) step, the
+        // cubic step is taken, else the quadratic step is taken.
+        </span>info = <span class="number">2</span>;
+        bound = <span class="bool-val">false</span>;
+        <span class="kw">let </span>theta = <span class="macro">float!</span>(<span class="number">3.0</span>) * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        <span class="kw">let </span>tmp = <span class="macro">vec!</span>[theta, stx.gx, stp.gx];
+        <span class="comment">// Check for a NaN or Inf in tmp before sorting
+        </span><span class="kw">if </span>tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                ConditionViolated,
+                <span class="string">&quot;MoreThuenteLineSearch: NaN or Inf encountered during iteration&quot;
+            </span>));
+        }
+        <span class="kw">let </span>s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>gamma = <span class="kw-2">*</span>s * ((theta / <span class="kw-2">*</span>s).powi(<span class="number">2</span>) - (stx.gx / <span class="kw-2">*</span>s) * (stp.gx / <span class="kw-2">*</span>s)).sqrt();
+        <span class="kw">if </span>stp.x &gt; stx.x {
+            gamma = -gamma;
+        }
+        <span class="kw">let </span>p = (gamma - stp.gx) + theta;
+        <span class="kw">let </span>q = ((gamma - stp.gx) + gamma) + stx.gx;
+        <span class="kw">let </span>r = p / q;
+        stpc = stp.x + r * (stx.x - stp.x);
+        stpq = stp.x + (stp.gx / (stp.gx - stx.gx)) * (stx.x - stp.x);
+        <span class="kw">if </span>(stpc - stp.x).abs() &gt; (stpq - stp.x).abs() {
+            stpf = stpc;
+        } <span class="kw">else </span>{
+            stpf = stpq;
+        }
+        brackt = <span class="bool-val">true</span>;
+    } <span class="kw">else if </span>stp.gx.abs() &lt; stx.gx.abs() {
+        <span class="comment">// Third case. A lower function value, derivatives of the same sign, and the magnitude of
+        // the derivative decreases. The cubic step is only used if the cubic tends to infinity in
+        // the direction of the step or if the minimum of the cubic is beyond stp.x. Otherwise the
+        // cubic step is defined to be either stpmin or stpmax. The quadratic (secant) step is
+        // also computed and if the minimum is bracketed then the step closest to stx.x is taken,
+        // else the step farthest away is taken.
+        </span>info = <span class="number">3</span>;
+        bound = <span class="bool-val">true</span>;
+        <span class="kw">let </span>theta = <span class="macro">float!</span>(<span class="number">3.0</span>) * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
+        <span class="kw">let </span>tmp = <span class="macro">vec!</span>[theta, stx.gx, stp.gx];
+        <span class="comment">// Check for a NaN or Inf in tmp before sorting
+        </span><span class="kw">if </span>tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                ConditionViolated,
+                <span class="string">&quot;`MoreThuenteLineSearch`: NaN or Inf encountered during iteration&quot;
+            </span>));
+        }
+        <span class="kw">let </span>s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        <span class="comment">// the case gamma == 0 only arises if the cubic does not tend to infinity in the direction
+        // of the step.
+
+        </span><span class="kw">let </span><span class="kw-2">mut </span>gamma = <span class="kw-2">*</span>s
+            * <span class="macro">float!</span>(<span class="number">0.0</span>)
+                .max((theta / <span class="kw-2">*</span>s).powi(<span class="number">2</span>) - (stx.gx / <span class="kw-2">*</span>s) * (stp.gx / <span class="kw-2">*</span>s))
+                .sqrt();
+        <span class="kw">if </span>stp.x &gt; stx.x {
+            gamma = -gamma;
+        }
+
+        <span class="kw">let </span>p = (gamma - stp.gx) + theta;
+        <span class="kw">let </span>q = (gamma + (stx.gx - stp.gx)) + gamma;
+        <span class="kw">let </span>r = p / q;
+        <span class="kw">if </span>r &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) &amp;&amp; gamma != <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            stpc = stp.x + r * (stx.x - stp.x);
+        } <span class="kw">else if </span>stp.x &gt; stx.x {
+            stpc = stpmax;
+        } <span class="kw">else </span>{
+            stpc = stpmin;
+        }
+        stpq = stp.x + (stp.gx / (stp.gx - stx.gx)) * (stx.x - stp.x);
+        <span class="kw">if </span>brackt {
+            <span class="kw">if </span>(stp.x - stpc).abs() &lt; (stp.x - stpq).abs() {
+                stpf = stpc;
+            } <span class="kw">else </span>{
+                stpf = stpq;
             }
-        } <span class="kw">else</span> <span class="kw">if</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stpc</span>).<span class="ident">abs</span>() <span class="op">&gt;</span> (<span class="ident">stp</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stpq</span>).<span class="ident">abs</span>() {
-            <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpc</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpq</span>;
+        } <span class="kw">else if </span>(stp.x - stpc).abs() &gt; (stp.x - stpq).abs() {
+            stpf = stpc;
+        } <span class="kw">else </span>{
+            stpf = stpq;
         }
-    } <span class="kw">else</span> {
-        <span class="comment">// Fourth case. A lower function value, derivatives of the same sign, and the magnitude of</span>
-        <span class="comment">// the derivative does not decrease. If the minimum is not bracketed, the step is either</span>
-        <span class="comment">// stpmin or stpmax, else the cubic step is taken.</span>
-        <span class="ident">info</span> <span class="op">=</span> <span class="number">4</span>;
-        <span class="ident">bound</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">if</span> <span class="ident">brackt</span> {
-            <span class="kw">let</span> <span class="ident">theta</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">3.0</span>) <span class="op">*</span> (<span class="ident">stp</span>.<span class="ident">fx</span> <span class="op">-</span> <span class="ident">sty</span>.<span class="ident">fx</span>) <span class="op">/</span> (<span class="ident">sty</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">x</span>) <span class="op">+</span> <span class="ident">sty</span>.<span class="ident">gx</span> <span class="op">+</span> <span class="ident">stp</span>.<span class="ident">gx</span>;
-            <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">theta</span>, <span class="ident">sty</span>.<span class="ident">gx</span>, <span class="ident">stp</span>.<span class="ident">gx</span>];
-            <span class="comment">// Check for a NaN or Inf in tmp before sorting</span>
-            <span class="kw">if</span> <span class="ident">tmp</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">is_infinite</span>()) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                    <span class="ident">ConditionViolated</span>,
-                    <span class="string">&quot;MoreThuenteLineSearch: NaN or Inf encountered during iteration&quot;</span>
-                ));
+    } <span class="kw">else </span>{
+        <span class="comment">// Fourth case. A lower function value, derivatives of the same sign, and the magnitude of
+        // the derivative does not decrease. If the minimum is not bracketed, the step is either
+        // stpmin or stpmax, else the cubic step is taken.
+        </span>info = <span class="number">4</span>;
+        bound = <span class="bool-val">false</span>;
+        <span class="kw">if </span>brackt {
+            <span class="kw">let </span>theta = <span class="macro">float!</span>(<span class="number">3.0</span>) * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
+            <span class="kw">let </span>tmp = <span class="macro">vec!</span>[theta, sty.gx, stp.gx];
+            <span class="comment">// Check for a NaN or Inf in tmp before sorting
+            </span><span class="kw">if </span>tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                    ConditionViolated,
+                    <span class="string">&quot;MoreThuenteLineSearch: NaN or Inf encountered during iteration&quot;
+                </span>));
             }
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">tmp</span>.<span class="ident">iter</span>().<span class="ident">max_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">partial_cmp</span>(<span class="ident">b</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">s</span> <span class="op">*</span> ((<span class="ident">theta</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> (<span class="ident">sty</span>.<span class="ident">gx</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>) <span class="op">*</span> (<span class="ident">stp</span>.<span class="ident">gx</span> <span class="op">/</span> <span class="kw-2">*</span><span class="ident">s</span>)).<span class="ident">sqrt</span>();
-            <span class="kw">if</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">sty</span>.<span class="ident">x</span> {
-                <span class="ident">gamma</span> <span class="op">=</span> <span class="op">-</span><span class="ident">gamma</span>;
+            <span class="kw">let </span>s = tmp.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+            <span class="kw">let </span><span class="kw-2">mut </span>gamma = <span class="kw-2">*</span>s * ((theta / <span class="kw-2">*</span>s).powi(<span class="number">2</span>) - (sty.gx / <span class="kw-2">*</span>s) * (stp.gx / <span class="kw-2">*</span>s)).sqrt();
+            <span class="kw">if </span>stp.x &gt; sty.x {
+                gamma = -gamma;
             }
-            <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> (<span class="ident">gamma</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">gx</span>) <span class="op">+</span> <span class="ident">theta</span>;
-            <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> ((<span class="ident">gamma</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">gx</span>) <span class="op">+</span> <span class="ident">gamma</span>) <span class="op">+</span> <span class="ident">sty</span>.<span class="ident">gx</span>;
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">p</span> <span class="op">/</span> <span class="ident">q</span>;
-            <span class="ident">stpc</span> <span class="op">=</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">r</span> <span class="op">*</span> (<span class="ident">sty</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stp</span>.<span class="ident">x</span>);
-            <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpc</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stp</span>.<span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">stx</span>.<span class="ident">x</span> {
-            <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpmax</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpmin</span>;
+            <span class="kw">let </span>p = (gamma - stp.gx) + theta;
+            <span class="kw">let </span>q = ((gamma - stp.gx) + gamma) + sty.gx;
+            <span class="kw">let </span>r = p / q;
+            stpc = stp.x + r * (sty.x - stp.x);
+            stpf = stpc;
+        } <span class="kw">else if </span>stp.x &gt; stx.x {
+            stpf = stpmax;
+        } <span class="kw">else </span>{
+            stpf = stpmin;
         }
     }
-    <span class="comment">// Update the interval of uncertainty. This update does not depend on the new step or the case</span>
-    <span class="comment">// analysis above.</span>
+    <span class="comment">// Update the interval of uncertainty. This update does not depend on the new step or the case
+    // analysis above.
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stx_o</span> <span class="op">=</span> <span class="ident">stx</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sty_o</span> <span class="op">=</span> <span class="ident">sty</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stp_o</span> <span class="op">=</span> <span class="ident">stp</span>;
-    <span class="kw">if</span> <span class="ident">stp_o</span>.<span class="ident">fx</span> <span class="op">&gt;</span> <span class="ident">stx_o</span>.<span class="ident">fx</span> {
-        <span class="ident">sty_o</span> <span class="op">=</span> <span class="ident">Step::new</span>(<span class="ident">stp_o</span>.<span class="ident">x</span>, <span class="ident">stp_o</span>.<span class="ident">fx</span>, <span class="ident">stp_o</span>.<span class="ident">gx</span>);
-    } <span class="kw">else</span> {
-        <span class="kw">if</span> <span class="ident">sgnd</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="ident">sty_o</span> <span class="op">=</span> <span class="ident">Step::new</span>(<span class="ident">stx_o</span>.<span class="ident">x</span>, <span class="ident">stx_o</span>.<span class="ident">fx</span>, <span class="ident">stx_o</span>.<span class="ident">gx</span>);
+    </span><span class="kw">let </span><span class="kw-2">mut </span>stx_o = stx;
+    <span class="kw">let </span><span class="kw-2">mut </span>sty_o = sty;
+    <span class="kw">let </span><span class="kw-2">mut </span>stp_o = stp;
+    <span class="kw">if </span>stp_o.fx &gt; stx_o.fx {
+        sty_o = Step::new(stp_o.x, stp_o.fx, stp_o.gx);
+    } <span class="kw">else </span>{
+        <span class="kw">if </span>sgnd &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            sty_o = Step::new(stx_o.x, stx_o.fx, stx_o.gx);
         }
-        <span class="ident">stx_o</span> <span class="op">=</span> <span class="ident">Step::new</span>(<span class="ident">stp_o</span>.<span class="ident">x</span>, <span class="ident">stp_o</span>.<span class="ident">fx</span>, <span class="ident">stp_o</span>.<span class="ident">gx</span>);
+        stx_o = Step::new(stp_o.x, stp_o.fx, stp_o.gx);
     }
 
-    <span class="comment">// compute the new step and safeguard it.</span>
+    <span class="comment">// compute the new step and safeguard it.
 
-    <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpmax</span>.<span class="ident">min</span>(<span class="ident">stpf</span>);
-    <span class="ident">stpf</span> <span class="op">=</span> <span class="ident">stpmin</span>.<span class="ident">max</span>(<span class="ident">stpf</span>);
+    </span>stpf = stpmax.min(stpf);
+    stpf = stpmin.max(stpf);
 
-    <span class="ident">stp_o</span>.<span class="ident">x</span> <span class="op">=</span> <span class="ident">stpf</span>;
-    <span class="kw">if</span> <span class="ident">brackt</span> <span class="op">&amp;&amp;</span> <span class="ident">bound</span> {
-        <span class="kw">if</span> <span class="ident">sty_o</span>.<span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">stx_o</span>.<span class="ident">x</span> {
-            <span class="ident">stp_o</span>.<span class="ident">x</span> <span class="op">=</span> <span class="ident">stp_o</span>.<span class="ident">x</span>.<span class="ident">min</span>(<span class="ident">stx_o</span>.<span class="ident">x</span> <span class="op">+</span> <span class="macro">float!</span>(<span class="number">0.66</span>) <span class="op">*</span> (<span class="ident">sty_o</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stx_o</span>.<span class="ident">x</span>));
-        } <span class="kw">else</span> {
-            <span class="ident">stp_o</span>.<span class="ident">x</span> <span class="op">=</span> <span class="ident">stp_o</span>.<span class="ident">x</span>.<span class="ident">max</span>(<span class="ident">stx_o</span>.<span class="ident">x</span> <span class="op">+</span> <span class="macro">float!</span>(<span class="number">0.66</span>) <span class="op">*</span> (<span class="ident">sty_o</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">stx_o</span>.<span class="ident">x</span>));
+    stp_o.x = stpf;
+    <span class="kw">if </span>brackt &amp;&amp; bound {
+        <span class="kw">if </span>sty_o.x &gt; stx_o.x {
+            stp_o.x = stp_o.x.min(stx_o.x + <span class="macro">float!</span>(<span class="number">0.66</span>) * (sty_o.x - stx_o.x));
+        } <span class="kw">else </span>{
+            stp_o.x = stp_o.x.max(stx_o.x + <span class="macro">float!</span>(<span class="number">0.66</span>) * (sty_o.x - stx_o.x));
         }
     }
 
-    <span class="prelude-val">Ok</span>((<span class="ident">stx_o</span>, <span class="ident">sty_o</span>, <span class="ident">stp_o</span>, <span class="ident">brackt</span>, <span class="ident">stpmin</span>, <span class="ident">stpmax</span>, <span class="ident">info</span>))
+    <span class="prelude-val">Ok</span>((stx_o, sty_o, stp_o, brackt, stpmin, stpmax, info))
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">test_utils::TestProblem</span>, <span class="ident">ArgminError</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{test_utils::TestProblem, ArgminError, IterState, Problem};
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">morethuente</span>, <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(morethuente, MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">MoreThuenteLineSearch</span> {
-            <span class="ident">search_direction</span>,
-            <span class="ident">init_param</span>,
-            <span class="ident">finit</span>,
-            <span class="ident">init_grad</span>,
-            <span class="ident">dginit</span>,
-            <span class="ident">dgtest</span>,
-            <span class="ident">ftol</span>,
-            <span class="ident">gtol</span>,
-            <span class="ident">xtrapf</span>,
-            <span class="ident">width</span>,
-            <span class="ident">width1</span>,
-            <span class="ident">xtol</span>,
-            <span class="ident">alpha</span>,
-            <span class="ident">stpmin</span>,
-            <span class="ident">stpmax</span>,
-            <span class="ident">stp</span>,
-            <span class="ident">stx</span>,
-            <span class="ident">sty</span>,
-            <span class="ident">f</span>,
-            <span class="ident">brackt</span>,
-            <span class="ident">stage1</span>,
-            <span class="ident">infoc</span>,
-        } <span class="op">=</span> <span class="ident">mtls</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>MoreThuenteLineSearch {
+            search_direction,
+            init_param,
+            finit,
+            init_grad,
+            dginit,
+            dgtest,
+            ftol,
+            gtol,
+            xtrapf,
+            width,
+            width1,
+            xtol,
+            alpha,
+            stpmin,
+            stpmax,
+            stp,
+            stx,
+            sty,
+            f,
+            brackt,
+            stage1,
+            infoc,
+        } = mtls;
 
-        <span class="macro">assert!</span>(<span class="ident">search_direction</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">init_param</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">finit</span>.<span class="ident">is_infinite</span>());
-        <span class="macro">assert!</span>(<span class="ident">finit</span>.<span class="ident">is_sign_positive</span>());
-        <span class="macro">assert!</span>(<span class="ident">init_grad</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">dginit</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">dgtest</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">ftol</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1e-4f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">gtol</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.9f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">xtrapf</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">4.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert!</span>(<span class="ident">width</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert!</span>(<span class="ident">width1</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">xtol</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1e-10f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">alpha</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">stpmin</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::EPSILON</span>.<span class="ident">sqrt</span>().<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert!</span>(<span class="ident">stpmax</span>.<span class="ident">is_infinite</span>());
-        <span class="macro">assert!</span>(<span class="ident">stpmax</span>.<span class="ident">is_sign_positive</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">stp</span>, <span class="ident">Step::default</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">stx</span>, <span class="ident">Step::default</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">sty</span>, <span class="ident">Step::default</span>());
-        <span class="macro">assert!</span>(<span class="ident">f</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">brackt</span>);
-        <span class="macro">assert!</span>(<span class="ident">stage1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">infoc</span>, <span class="number">1</span>);
+        <span class="macro">assert!</span>(search_direction.is_none());
+        <span class="macro">assert!</span>(init_param.is_none());
+        <span class="macro">assert!</span>(finit.is_infinite());
+        <span class="macro">assert!</span>(finit.is_sign_positive());
+        <span class="macro">assert!</span>(init_grad.is_none());
+        <span class="macro">assert_eq!</span>(dginit.to_ne_bytes(), <span class="number">0.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(dgtest.to_ne_bytes(), <span class="number">0.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(ftol.to_ne_bytes(), <span class="number">1e-4f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(gtol.to_ne_bytes(), <span class="number">0.9f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(xtrapf.to_ne_bytes(), <span class="number">4.0f64</span>.to_ne_bytes());
+        <span class="macro">assert!</span>(width.is_nan());
+        <span class="macro">assert!</span>(width1.is_nan());
+        <span class="macro">assert_eq!</span>(xtol.to_ne_bytes(), <span class="number">1e-10f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(alpha.to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(stpmin.to_ne_bytes(), f64::EPSILON.sqrt().to_ne_bytes());
+        <span class="macro">assert!</span>(stpmax.is_infinite());
+        <span class="macro">assert!</span>(stpmax.is_sign_positive());
+        <span class="macro">assert_eq!</span>(stp, Step::default());
+        <span class="macro">assert_eq!</span>(stx, Step::default());
+        <span class="macro">assert_eq!</span>(sty, Step::default());
+        <span class="macro">assert!</span>(f.is_nan());
+        <span class="macro">assert!</span>(!brackt);
+        <span class="macro">assert!</span>(stage1);
+        <span class="macro">assert_eq!</span>(infoc, <span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_c_correct</span>() {
-        <span class="kw">let</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">with_c</span>(<span class="number">0.1</span>, <span class="number">0.9</span>);
-        <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_c_correct() {
+        <span class="kw">let </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>res = mtls.with_c(<span class="number">0.1</span>, <span class="number">0.9</span>);
+        <span class="macro">assert!</span>(res.is_ok());
 
-        <span class="kw">let</span> <span class="ident">mtls</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">mtls</span>.<span class="ident">ftol</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.1f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">mtls</span>.<span class="ident">gtol</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.9f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">let </span>mtls = res.unwrap();
+        <span class="macro">assert_eq!</span>(mtls.ftol.to_ne_bytes(), <span class="number">0.1f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(mtls.gtol.to_ne_bytes(), <span class="number">0.9f64</span>.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_c_c1_larger_than_c2</span>() {
-        <span class="kw">let</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">with_c</span>(<span class="number">0.9</span>, <span class="number">0.1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_c_c1_larger_than_c2() {
+        <span class="kw">let </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>res = mtls.with_c(<span class="number">0.9</span>, <span class="number">0.1</span>);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Invalid parameter: \&quot;`MoreThuenteLineSearch`: &quot;</span>,
-                <span class="string">&quot;Parameter c1 must be in (0, c2).\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Parameter c1 must be in (0, c2).\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_c_c1_smaller_than_0</span>() {
-        <span class="kw">let</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">with_c</span>(<span class="op">-</span><span class="number">0.9</span>, <span class="number">0.99</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_c_c1_smaller_than_0() {
+        <span class="kw">let </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>res = mtls.with_c(-<span class="number">0.9</span>, <span class="number">0.99</span>);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Invalid parameter: \&quot;`MoreThuenteLineSearch`: &quot;</span>,
-                <span class="string">&quot;Parameter c1 must be in (0, c2).\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Parameter c1 must be in (0, c2).\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_c_c2_larger_than_1</span>() {
-        <span class="kw">let</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">with_c</span>(<span class="number">0.1</span>, <span class="number">1.01</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_c_c2_larger_than_1() {
+        <span class="kw">let </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>res = mtls.with_c(<span class="number">0.1</span>, <span class="number">1.01</span>);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Invalid parameter: \&quot;`MoreThuenteLineSearch`: &quot;</span>,
-                <span class="string">&quot;Parameter c2 must be in (c1, 1).\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Parameter c2 must be in (c1, 1).\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_bounds_correct</span>() {
-        <span class="kw">let</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">with_bounds</span>(<span class="number">0.1</span>, <span class="number">0.9</span>);
-        <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_bounds_correct() {
+        <span class="kw">let </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>res = mtls.with_bounds(<span class="number">0.1</span>, <span class="number">0.9</span>);
+        <span class="macro">assert!</span>(res.is_ok());
 
-        <span class="kw">let</span> <span class="ident">mtls</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">mtls</span>.<span class="ident">stpmin</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.1f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">mtls</span>.<span class="ident">stpmax</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.9f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">let </span>mtls = res.unwrap();
+        <span class="macro">assert_eq!</span>(mtls.stpmin.to_ne_bytes(), <span class="number">0.1f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(mtls.stpmax.to_ne_bytes(), <span class="number">0.9f64</span>.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_bounds_step_min_smaller_than_0</span>() {
-        <span class="kw">let</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">with_bounds</span>(<span class="op">-</span><span class="number">0.1</span>, <span class="number">0.99</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_bounds_step_min_smaller_than_0() {
+        <span class="kw">let </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>res = mtls.with_bounds(-<span class="number">0.1</span>, <span class="number">0.99</span>);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Invalid parameter: \&quot;`MoreThuenteLineSearch`: &quot;</span>,
-                <span class="string">&quot;step_min must be &gt;= 0.0.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;step_min must be &gt;= 0.0.\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_bounds_step_min_larger_than_step_max</span>() {
-        <span class="kw">let</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">with_bounds</span>(<span class="number">10.0</span>, <span class="number">0.99</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_bounds_step_min_larger_than_step_max() {
+        <span class="kw">let </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>res = mtls.with_bounds(<span class="number">10.0</span>, <span class="number">0.99</span>);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Invalid parameter: \&quot;`MoreThuenteLineSearch`: &quot;</span>,
-                <span class="string">&quot;step_min must be smaller than step_max.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;step_min must be smaller than step_max.\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_width_tolerance_correct</span>() {
-        <span class="kw">let</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">with_width_tolerance</span>(<span class="number">1e-9</span>);
-        <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_width_tolerance_correct() {
+        <span class="kw">let </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>res = mtls.with_width_tolerance(<span class="number">1e-9</span>);
+        <span class="macro">assert!</span>(res.is_ok());
 
-        <span class="kw">let</span> <span class="ident">mtls</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">mtls</span>.<span class="ident">xtol</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1e-9f64</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="kw">let </span>mtls = res.unwrap();
+        <span class="macro">assert_eq!</span>(mtls.xtol.to_ne_bytes(), <span class="number">1e-9f64</span>.to_ne_bytes());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_width_tolerance_negative_xtol</span>() {
-        <span class="kw">let</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">with_width_tolerance</span>(<span class="op">-</span><span class="number">1e-10</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_width_tolerance_negative_xtol() {
+        <span class="kw">let </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>res = mtls.with_width_tolerance(-<span class="number">1e-10</span>);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Invalid parameter: \&quot;`MoreThuenteLineSearch`: &quot;</span>,
-                <span class="string">&quot;relative width tolerance must be &gt;= 0.0.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;relative width tolerance must be &gt;= 0.0.\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_search_direction_not_set</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">IterState::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_search_direction_not_set() {
+        <span class="kw">let </span><span class="kw-2">mut </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        <span class="kw">let </span>res = mtls.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), IterState::new());
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`MoreThuenteLineSearch`: Search direction not initialized. &quot;</span>,
-                <span class="string">&quot;Call `search_direction` before executing the solver.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Call `search_direction` before executing the solver.\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_param_not_set</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mtls</span>: <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MoreThuenteLineSearch::new</span>();
-        <span class="ident">mtls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>]);
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">mtls</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">IterState::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_param_not_set() {
+        <span class="kw">let </span><span class="kw-2">mut </span>mtls: MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = MoreThuenteLineSearch::new();
+        mtls.search_direction(<span class="macro">vec!</span>[<span class="number">1.0f64</span>]);
+        <span class="kw">let </span>res = mtls.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), IterState::new());
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`MoreThuenteLineSearch` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

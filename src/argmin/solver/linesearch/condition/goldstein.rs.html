@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/condition/goldstein.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>goldstein.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../argmin/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/condition/goldstein.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>goldstein.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../argmin/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -148,130 +148,130 @@
 <span id="148">148</span>
 <span id="149">149</span>
 <span id="150">150</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::LineSearchCondition</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">Error</span>};
-<span class="kw">use</span> <span class="ident">argmin_math::ArgminDot</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+</span><span class="kw">use </span><span class="kw">super</span>::LineSearchCondition;
+<span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Error};
+<span class="kw">use </span>argmin_math::ArgminDot;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// # Goldstein conditions</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Ensures sufficient decrease of the cost function value and also bounds the step length from</span>
-<span class="doccomment">/// below.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GoldsteinCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="ident">c</span>: <span class="ident">F</span>,
+<span class="doccomment">/// # Goldstein conditions
+///
+/// Ensures sufficient decrease of the cost function value and also bounds the step length from
+/// below.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>GoldsteinCondition&lt;F&gt; {
+    c: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">GoldsteinCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;F&gt; GoldsteinCondition&lt;F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`GoldsteinCondition`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::condition::GoldsteinCondition;</span>
-    <span class="doccomment">/// let goldstein = GoldsteinCondition::new(0.1f64);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.5</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)&quot;</span>
-            ));
+    <span class="doccomment">/// Construct a new instance of [`GoldsteinCondition`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::condition::GoldsteinCondition;
+    /// let goldstein = GoldsteinCondition::new(0.1f64);
+    /// ```
+    </span><span class="kw">pub fn </span>new(c: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>c &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || c &gt;= <span class="macro">float!</span>(<span class="number">0.5</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)&quot;
+            </span>));
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">GoldsteinCondition</span> { <span class="ident">c</span> })
+        <span class="prelude-val">Ok</span>(GoldsteinCondition { c })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">LineSearchCondition</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GoldsteinCondition</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">G</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;T, G, F&gt; LineSearchCondition&lt;T, G, F&gt; <span class="kw">for </span>GoldsteinCondition&lt;F&gt;
+<span class="kw">where
+    </span>G: ArgminDot&lt;T, F&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">fn</span> <span class="ident">evaluate_condition</span>(
+    <span class="kw">fn </span>evaluate_condition(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">current_cost</span>: <span class="ident">F</span>,
-        <span class="ident">_current_gradient</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">G</span><span class="op">&gt;</span>,
-        <span class="ident">initial_cost</span>: <span class="ident">F</span>,
-        <span class="ident">initial_gradient</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>,
-        <span class="ident">search_direction</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-        <span class="ident">step_length</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">step_length</span> <span class="op">*</span> <span class="ident">initial_gradient</span>.<span class="ident">dot</span>(<span class="ident">search_direction</span>);
-        <span class="ident">initial_cost</span> <span class="op">+</span> (<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">-</span> <span class="self">self</span>.<span class="ident">c</span>) <span class="op">*</span> <span class="ident">tmp</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">current_cost</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">current_cost</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">initial_cost</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">c</span> <span class="op">*</span> <span class="ident">tmp</span>
+        current_cost: F,
+        _current_gradient: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>G&gt;,
+        initial_cost: F,
+        initial_gradient: <span class="kw-2">&amp;</span>G,
+        search_direction: <span class="kw-2">&amp;</span>T,
+        step_length: F,
+    ) -&gt; bool {
+        <span class="kw">let </span>tmp = step_length * initial_gradient.dot(search_direction);
+        initial_cost + (<span class="macro">float!</span>(<span class="number">1.0</span>) - <span class="self">self</span>.c) * tmp &lt;= current_cost
+            &amp;&amp; current_cost &lt;= initial_cost + <span class="self">self</span>.c * tmp
     }
 
-    <span class="kw">fn</span> <span class="ident">requires_current_gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>requires_current_gradient(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::assert_error</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::ArgminError</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::assert_error;
+    <span class="kw">use </span><span class="kw">crate</span>::core::ArgminError;
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">goldstein</span>, <span class="ident">GoldsteinCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(goldstein, GoldsteinCondition&lt;f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_goldstein_new</span>() {
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.01</span>;
-        <span class="kw">let</span> <span class="ident">GoldsteinCondition</span> { <span class="ident">c</span>: <span class="ident">c_arm</span> } <span class="op">=</span> <span class="ident">GoldsteinCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">c_arm</span>.<span class="ident">to_ne_bytes</span>());
-
-        <span class="macro">assert_error!</span>(
-            <span class="ident">GoldsteinCondition::new</span>(<span class="number">0.5f64</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)\&quot;&quot;</span>
-        );
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_goldstein_new() {
+        <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
+        <span class="kw">let </span>GoldsteinCondition { c: c_arm } = GoldsteinCondition::new(c).unwrap();
+        <span class="macro">assert_eq!</span>(c.to_ne_bytes(), c_arm.to_ne_bytes());
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">GoldsteinCondition::new</span>(<span class="number">1.0f64</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)\&quot;&quot;</span>
-        );
+            GoldsteinCondition::new(<span class="number">0.5f64</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)\&quot;&quot;
+        </span>);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">GoldsteinCondition::new</span>(<span class="number">0.0f64</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)\&quot;&quot;</span>
-        );
+            GoldsteinCondition::new(<span class="number">1.0f64</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)\&quot;&quot;
+        </span>);
 
         <span class="macro">assert_error!</span>(
-            <span class="ident">GoldsteinCondition::new</span>(<span class="op">-</span><span class="number">1.0f64</span>),
-            <span class="ident">ArgminError</span>,
-            <span class="string">&quot;Invalid parameter: \&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)\&quot;&quot;</span>
-        );
+            GoldsteinCondition::new(<span class="number">0.0f64</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)\&quot;&quot;
+        </span>);
+
+        <span class="macro">assert_error!</span>(
+            GoldsteinCondition::new(-<span class="number">1.0f64</span>),
+            ArgminError,
+            <span class="string">&quot;Invalid parameter: \&quot;GoldsteinCondition: Parameter c must be in (0, 0.5)\&quot;&quot;
+        </span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_goldstein</span>() {
-        <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.1</span>;
-        <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="ident">GoldsteinCondition::new</span>(<span class="ident">c</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">powf</span>(<span class="number">2.0</span>) <span class="op">+</span> <span class="ident">y</span>.<span class="ident">powf</span>(<span class="number">2.0</span>);
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="op">|</span><span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="number">2.0</span> <span class="op">*</span> <span class="ident">x</span>, <span class="number">2.0</span> <span class="op">*</span> <span class="ident">y</span>];
-        <span class="kw">let</span> <span class="ident">initial_x</span> <span class="op">=</span> <span class="op">-</span><span class="number">1.0</span>;
-        <span class="kw">let</span> <span class="ident">initial_y</span> <span class="op">=</span> <span class="op">-</span><span class="number">0.0</span>;
-        <span class="kw">let</span> <span class="ident">search_direction</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>];
-        <span class="comment">// Need a larger epsilon here, I suppose because of more severe round off errors.</span>
-        <span class="kw">for</span> (<span class="ident">alpha</span>, <span class="ident">acc</span>) <span class="kw">in</span> [
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_goldstein() {
+        <span class="kw">let </span>c: f64 = <span class="number">0.1</span>;
+        <span class="kw">let </span>cond = GoldsteinCondition::new(c).unwrap();
+        <span class="kw">let </span>f = |x: f64, y: f64| x.powf(<span class="number">2.0</span>) + y.powf(<span class="number">2.0</span>);
+        <span class="kw">let </span>g = |x: f64, y: f64| <span class="macro">vec!</span>[<span class="number">2.0 </span>* x, <span class="number">2.0 </span>* y];
+        <span class="kw">let </span>initial_x = -<span class="number">1.0</span>;
+        <span class="kw">let </span>initial_y = -<span class="number">0.0</span>;
+        <span class="kw">let </span>search_direction = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>];
+        <span class="comment">// Need a larger epsilon here, I suppose because of more severe round off errors.
+        </span><span class="kw">for </span>(alpha, acc) <span class="kw">in </span>[
             (<span class="number">0.001</span>, <span class="bool-val">false</span>),
             (<span class="number">0.03</span>, <span class="bool-val">false</span>),
-            (<span class="number">0.2</span> <span class="op">-</span> <span class="number">6.0</span> <span class="op">*</span> <span class="ident">f64::EPSILON</span>, <span class="bool-val">false</span>),
+            (<span class="number">0.2 </span>- <span class="number">6.0 </span>* f64::EPSILON, <span class="bool-val">false</span>),
             (<span class="number">0.2</span>, <span class="bool-val">true</span>),
             (<span class="number">0.2</span>, <span class="bool-val">true</span>),
             (<span class="number">0.5</span>, <span class="bool-val">true</span>),
@@ -279,24 +279,24 @@
             (<span class="number">0.99</span>, <span class="bool-val">true</span>),
             (<span class="number">1.0</span>, <span class="bool-val">true</span>),
             (<span class="number">1.5</span>, <span class="bool-val">true</span>),
-            (<span class="number">1.8</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>, <span class="bool-val">true</span>),
+            (<span class="number">1.8 </span>- f64::EPSILON, <span class="bool-val">true</span>),
             (<span class="number">1.8</span>, <span class="bool-val">false</span>),
             (<span class="number">2.0</span>, <span class="bool-val">false</span>),
             (<span class="number">2.3</span>, <span class="bool-val">false</span>),
         ] {
             <span class="macro">assert_eq!</span>(
-                <span class="ident">cond</span>.<span class="ident">evaluate_condition</span>(
-                    <span class="ident">f</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span> <span class="op">+</span> <span class="ident">alpha</span>, <span class="ident">initial_y</span>)),
-                    <span class="ident">f</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">g</span>(<span class="ident">initial_x</span>, <span class="ident">initial_y</span>),
-                    <span class="kw-2">&amp;</span><span class="ident">search_direction</span>,
-                    <span class="ident">alpha</span>,
+                cond.evaluate_condition(
+                    f(initial_x + alpha, initial_y),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>g(initial_x + alpha, initial_y)),
+                    f(initial_x, initial_y),
+                    <span class="kw-2">&amp;</span>g(initial_x, initial_y),
+                    <span class="kw-2">&amp;</span>search_direction,
+                    alpha,
                 ),
-                <span class="ident">acc</span>
+                acc
             );
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

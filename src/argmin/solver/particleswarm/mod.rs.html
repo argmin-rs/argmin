@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/particleswarm/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/particleswarm/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -730,647 +730,647 @@
 <span id="730">730</span>
 <span id="731">731</span>
 <span id="732">732</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # Particle Swarm Optimization (PSO)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Canonical implementation of the particle swarm optimization method as outlined in \[0\] in</span>
-<span class="doccomment">//! chapter II, section A.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For details see [`ParticleSwarm`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## References</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! \[0\] Zambrano-Bigiarini, M. et.al. (2013): Standard Particle Swarm Optimisation 2011 at</span>
-<span class="doccomment">//! CEC-2013: A baseline for future PSO improvements. 2013 IEEE Congress on Evolutionary</span>
-<span class="doccomment">//! Computation. &lt;https://doi.org/10.1109/CEC.2013.6557848&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! \[1\] &lt;https://en.wikipedia.org/wiki/Particle_swarm_optimization&gt;</span>
+</span><span class="doccomment">//! # Particle Swarm Optimization (PSO)
+//!
+//! Canonical implementation of the particle swarm optimization method as outlined in \[0\] in
+//! chapter II, section A.
+//!
+//! For details see [`ParticleSwarm`].
+//!
+//! ## References
+//!
+//! \[0\] Zambrano-Bigiarini, M. et.al. (2013): Standard Particle Swarm Optimisation 2011 at
+//! CEC-2013: A baseline for future PSO improvements. 2013 IEEE Congress on Evolutionary
+//! Computation. &lt;https://doi.org/10.1109/CEC.2013.6557848&gt;
+//!
+//! \[1\] &lt;https://en.wikipedia.org/wiki/Particle_swarm_optimization&gt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">PopulationState</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">SyncAlias</span>,
-    <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, Error, PopulationState, Problem, SerializeAlias, Solver, SyncAlias,
+    KV,
 };
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminMinMax</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminRandom</span>, <span class="ident">ArgminSub</span>, <span class="ident">ArgminZeroLike</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// # Particle Swarm Optimization (PSO)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Canonical implementation of the particle swarm optimization method as outlined in \[0\] in</span>
-<span class="doccomment">/// chapter II, section A.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `rayon` feature enables parallel computation of the cost function. This can be beneficial</span>
-<span class="doccomment">/// for expensive cost functions, but may cause a drop in performance for cheap cost functions. Be</span>
-<span class="doccomment">/// sure to benchmark both parallel and sequential computation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## References</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// \[0\] Zambrano-Bigiarini, M. et.al. (2013): Standard Particle Swarm Optimisation 2011 at</span>
-<span class="doccomment">/// CEC-2013: A baseline for future PSO improvements. 2013 IEEE Congress on Evolutionary</span>
-<span class="doccomment">/// Computation. &lt;https://doi.org/10.1109/CEC.2013.6557848&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// \[1\] &lt;https://en.wikipedia.org/wiki/Particle_swarm_optimization&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Inertia weight</span>
-    <span class="ident">weight_inertia</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Cognitive acceleration coefficient</span>
-    <span class="ident">weight_cognitive</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Social acceleration coefficient</span>
-    <span class="ident">weight_social</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Bounds on parameter space</span>
-    <span class="ident">bounds</span>: (<span class="ident">P</span>, <span class="ident">P</span>),
-    <span class="doccomment">/// Number of particles</span>
-    <span class="ident">num_particles</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// # Particle Swarm Optimization (PSO)
+///
+/// Canonical implementation of the particle swarm optimization method as outlined in \[0\] in
+/// chapter II, section A.
+///
+/// The `rayon` feature enables parallel computation of the cost function. This can be beneficial
+/// for expensive cost functions, but may cause a drop in performance for cheap cost functions. Be
+/// sure to benchmark both parallel and sequential computation.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`].
+///
+/// ## References
+///
+/// \[0\] Zambrano-Bigiarini, M. et.al. (2013): Standard Particle Swarm Optimisation 2011 at
+/// CEC-2013: A baseline for future PSO improvements. 2013 IEEE Congress on Evolutionary
+/// Computation. &lt;https://doi.org/10.1109/CEC.2013.6557848&gt;
+///
+/// \[1\] &lt;https://en.wikipedia.org/wiki/Particle_swarm_optimization&gt;
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>ParticleSwarm&lt;P, F&gt; {
+    <span class="doccomment">/// Inertia weight
+    </span>weight_inertia: F,
+    <span class="doccomment">/// Cognitive acceleration coefficient
+    </span>weight_cognitive: F,
+    <span class="doccomment">/// Social acceleration coefficient
+    </span>weight_social: F,
+    <span class="doccomment">/// Bounds on parameter space
+    </span>bounds: (P, P),
+    <span class="doccomment">/// Number of particles
+    </span>num_particles: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SyncAlias</span> <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminRandom</span> <span class="op">+</span> <span class="ident">ArgminZeroLike</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, F&gt; ParticleSwarm&lt;P, F&gt;
+<span class="kw">where
+    </span>P: Clone + SyncAlias + ArgminSub&lt;P, P&gt; + ArgminMul&lt;F, P&gt; + ArgminRandom + ArgminZeroLike,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of `ParticleSwarm`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Takes the number of particles and bounds on the search space as inputs. `bounds` is a tuple</span>
-    <span class="doccomment">/// `(lower_bound, upper_bound)`, where `lower_bound` and `upper_bound` are of the same type as</span>
-    <span class="doccomment">/// the position of a particle (`P`) and of the same length as the problem as dimensions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The inertia weight on velocity and the social and cognitive acceleration factors can be</span>
-    <span class="doccomment">/// adapted with [`with_inertia_factor`](`ParticleSwarm::with_inertia_factor`),</span>
-    <span class="doccomment">/// [`with_cognitive_factor`](`ParticleSwarm::with_cognitive_factor`) and</span>
-    <span class="doccomment">/// [`with_social_factor`](`ParticleSwarm::with_social_factor`), respectively.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The weights and acceleration factors default to:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * inertia: `1/(2 * ln(2))`</span>
-    <span class="doccomment">/// * cognitive: `0.5 + ln(2)`</span>
-    <span class="doccomment">/// * social: `0.5 + ln(2)`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::particleswarm::ParticleSwarm;</span>
-    <span class="doccomment">/// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];</span>
-    <span class="doccomment">/// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];</span>
-    <span class="doccomment">/// let pso: ParticleSwarm&lt;_, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), 40);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">bounds</span>: (<span class="ident">P</span>, <span class="ident">P</span>), <span class="ident">num_particles</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ParticleSwarm</span> {
-            <span class="ident">weight_inertia</span>: <span class="macro">float!</span>(<span class="number">1.0f64</span> <span class="op">/</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="number">2.0f64</span>.<span class="ident">ln</span>())),
-            <span class="ident">weight_cognitive</span>: <span class="macro">float!</span>(<span class="number">0.5</span> <span class="op">+</span> <span class="number">2.0f64</span>.<span class="ident">ln</span>()),
-            <span class="ident">weight_social</span>: <span class="macro">float!</span>(<span class="number">0.5</span> <span class="op">+</span> <span class="number">2.0f64</span>.<span class="ident">ln</span>()),
-            <span class="ident">bounds</span>,
-            <span class="ident">num_particles</span>,
+    <span class="doccomment">/// Construct a new instance of `ParticleSwarm`
+    ///
+    /// Takes the number of particles and bounds on the search space as inputs. `bounds` is a tuple
+    /// `(lower_bound, upper_bound)`, where `lower_bound` and `upper_bound` are of the same type as
+    /// the position of a particle (`P`) and of the same length as the problem as dimensions.
+    ///
+    /// The inertia weight on velocity and the social and cognitive acceleration factors can be
+    /// adapted with [`with_inertia_factor`](`ParticleSwarm::with_inertia_factor`),
+    /// [`with_cognitive_factor`](`ParticleSwarm::with_cognitive_factor`) and
+    /// [`with_social_factor`](`ParticleSwarm::with_social_factor`), respectively.
+    ///
+    /// The weights and acceleration factors default to:
+    ///
+    /// * inertia: `1/(2 * ln(2))`
+    /// * cognitive: `0.5 + ln(2)`
+    /// * social: `0.5 + ln(2)`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::particleswarm::ParticleSwarm;
+    /// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];
+    /// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];
+    /// let pso: ParticleSwarm&lt;_, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), 40);
+    /// ```
+    </span><span class="kw">pub fn </span>new(bounds: (P, P), num_particles: usize) -&gt; <span class="self">Self </span>{
+        ParticleSwarm {
+            weight_inertia: <span class="macro">float!</span>(<span class="number">1.0f64 </span>/ (<span class="number">2.0 </span>* <span class="number">2.0f64</span>.ln())),
+            weight_cognitive: <span class="macro">float!</span>(<span class="number">0.5 </span>+ <span class="number">2.0f64</span>.ln()),
+            weight_social: <span class="macro">float!</span>(<span class="number">0.5 </span>+ <span class="number">2.0f64</span>.ln()),
+            bounds,
+            num_particles,
         }
     }
 
-    <span class="doccomment">/// Set inertia factor on particle velocity</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `1/(2 * ln(2))`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::particleswarm::ParticleSwarm;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];</span>
-    <span class="doccomment">/// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];</span>
-    <span class="doccomment">/// let pso: ParticleSwarm&lt;_, f64&gt; =</span>
-    <span class="doccomment">///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_inertia_factor(0.5)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_inertia_factor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">factor</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">factor</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`ParticleSwarm`: inertia factor must be &gt;=0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set inertia factor on particle velocity
+    ///
+    /// Defaults to `1/(2 * ln(2))`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::particleswarm::ParticleSwarm;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];
+    /// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];
+    /// let pso: ParticleSwarm&lt;_, f64&gt; =
+    ///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_inertia_factor(0.5)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_inertia_factor(<span class="kw-2">mut </span><span class="self">self</span>, factor: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>factor &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`ParticleSwarm`: inertia factor must be &gt;=0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">weight_inertia</span> <span class="op">=</span> <span class="ident">factor</span>;
+        <span class="self">self</span>.weight_inertia = factor;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set cognitive acceleration factor</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `0.5 + ln(2)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::particleswarm::ParticleSwarm;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];</span>
-    <span class="doccomment">/// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];</span>
-    <span class="doccomment">/// let pso: ParticleSwarm&lt;_, f64&gt; =</span>
-    <span class="doccomment">///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_cognitive_factor(1.1)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_cognitive_factor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">factor</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">factor</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`ParticleSwarm`: cognitive factor must be &gt;=0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set cognitive acceleration factor
+    ///
+    /// Defaults to `0.5 + ln(2)`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::particleswarm::ParticleSwarm;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];
+    /// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];
+    /// let pso: ParticleSwarm&lt;_, f64&gt; =
+    ///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_cognitive_factor(1.1)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_cognitive_factor(<span class="kw-2">mut </span><span class="self">self</span>, factor: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>factor &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`ParticleSwarm`: cognitive factor must be &gt;=0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">weight_cognitive</span> <span class="op">=</span> <span class="ident">factor</span>;
+        <span class="self">self</span>.weight_cognitive = factor;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set social acceleration factor</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `0.5 + ln(2)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::particleswarm::ParticleSwarm;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];</span>
-    <span class="doccomment">/// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];</span>
-    <span class="doccomment">/// let pso: ParticleSwarm&lt;_, f64&gt; =</span>
-    <span class="doccomment">///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_social_factor(1.1)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_social_factor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">factor</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">factor</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`ParticleSwarm`: social factor must be &gt;=0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set social acceleration factor
+    ///
+    /// Defaults to `0.5 + ln(2)`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::particleswarm::ParticleSwarm;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];
+    /// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];
+    /// let pso: ParticleSwarm&lt;_, f64&gt; =
+    ///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_social_factor(1.1)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_social_factor(<span class="kw-2">mut </span><span class="self">self</span>, factor: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>factor &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`ParticleSwarm`: social factor must be &gt;=0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">weight_social</span> <span class="op">=</span> <span class="ident">factor</span>;
+        <span class="self">self</span>.weight_social = factor;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Initializes all particles randomly and sorts them by their cost function values</span>
-    <span class="kw">fn</span> <span class="ident">initialize_particles</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SyncAlias</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">positions</span>, <span class="ident">velocities</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">initialize_positions_and_velocities</span>();
+    <span class="doccomment">/// Initializes all particles randomly and sorts them by their cost function values
+    </span><span class="kw">fn </span>initialize_particles&lt;O: CostFunction&lt;Param = P, Output = F&gt; + SyncAlias&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Particle&lt;P, F&gt;&gt;, Error&gt; {
+        <span class="kw">let </span>(positions, velocities) = <span class="self">self</span>.initialize_positions_and_velocities();
 
-        <span class="kw">let</span> <span class="ident">costs</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">bulk_cost</span>(<span class="kw-2">&amp;</span><span class="ident">positions</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>costs = problem.bulk_cost(<span class="kw-2">&amp;</span>positions)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">positions</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">zip</span>(<span class="ident">velocities</span>.<span class="ident">into_iter</span>())
-            .<span class="ident">zip</span>(<span class="ident">costs</span>.<span class="ident">into_iter</span>())
-            .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">p</span>, <span class="ident">v</span>), <span class="ident">c</span>)<span class="op">|</span> <span class="ident">Particle::new</span>(<span class="ident">p</span>, <span class="ident">c</span>, <span class="ident">v</span>))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>particles = positions
+            .into_iter()
+            .zip(velocities.into_iter())
+            .zip(costs.into_iter())
+            .map(|((p, v), c)| Particle::new(p, c, v))
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="comment">// sort them, such that the first one is the best one</span>
-        <span class="ident">particles</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
-            <span class="ident">a</span>.<span class="ident">cost</span>
-                .<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">cost</span>)
-                .<span class="ident">unwrap_or</span>(<span class="ident">std::cmp::Ordering::Equal</span>)
+        <span class="comment">// sort them, such that the first one is the best one
+        </span>particles.sort_by(|a, b| {
+            a.cost
+                .partial_cmp(<span class="kw-2">&amp;</span>b.cost)
+                .unwrap_or(std::cmp::Ordering::Equal)
         });
 
-        <span class="prelude-val">Ok</span>(<span class="ident">particles</span>)
+        <span class="prelude-val">Ok</span>(particles)
     }
 
-    <span class="doccomment">/// Initializes positions and velocities for all particles</span>
-    <span class="kw">fn</span> <span class="ident">initialize_positions_and_velocities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> (<span class="ident">min</span>, <span class="ident">max</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bounds</span>;
-        <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="ident">max</span>.<span class="ident">sub</span>(<span class="ident">min</span>);
-        <span class="kw">let</span> <span class="ident">delta_neg</span> <span class="op">=</span> <span class="ident">delta</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>));
+    <span class="doccomment">/// Initializes positions and velocities for all particles
+    </span><span class="kw">fn </span>initialize_positions_and_velocities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;P&gt;, Vec&lt;P&gt;) {
+        <span class="kw">let </span>(min, max) = <span class="kw-2">&amp;</span><span class="self">self</span>.bounds;
+        <span class="kw">let </span>delta = max.sub(min);
+        <span class="kw">let </span>delta_neg = delta.mul(<span class="kw-2">&amp;</span><span class="macro">float!</span>(-<span class="number">1.0</span>));
 
         (
-            (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">num_particles</span>)
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">P::rand_from_range</span>(<span class="ident">min</span>, <span class="ident">max</span>))
-                .<span class="ident">collect</span>(),
-            (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">num_particles</span>)
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">P::rand_from_range</span>(<span class="kw-2">&amp;</span><span class="ident">delta_neg</span>, <span class="kw-2">&amp;</span><span class="ident">delta</span>))
-                .<span class="ident">collect</span>(),
+            (<span class="number">0</span>..<span class="self">self</span>.num_particles)
+                .into_iter()
+                .map(|<span class="kw">_</span>| P::rand_from_range(min, max))
+                .collect(),
+            (<span class="number">0</span>..<span class="self">self</span>.num_particles)
+                .into_iter()
+                .map(|<span class="kw">_</span>| P::rand_from_range(<span class="kw-2">&amp;</span>delta_neg, <span class="kw-2">&amp;</span>delta))
+                .collect(),
         )
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">PopulationState</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SyncAlias</span>,
-    <span class="ident">P</span>: <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">SyncAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminSub</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminZeroLike</span>
-        <span class="op">+</span> <span class="ident">ArgminRandom</span>
-        <span class="op">+</span> <span class="ident">ArgminMinMax</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;O, P, F&gt; Solver&lt;O, PopulationState&lt;Particle&lt;P, F&gt;, F&gt;&gt; <span class="kw">for </span>ParticleSwarm&lt;P, F&gt;
+<span class="kw">where
+    </span>O: CostFunction&lt;Param = P, Output = F&gt; + SyncAlias,
+    P: SerializeAlias
+        + Clone
+        + SyncAlias
+        + ArgminAdd&lt;P, P&gt;
+        + ArgminSub&lt;P, P&gt;
+        + ArgminMul&lt;F, P&gt;
+        + ArgminZeroLike
+        + ArgminRandom
+        + ArgminMinMax,
+    F: ArgminFloat,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Particle Swarm Optimization&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Particle Swarm Optimization&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">PopulationState</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">PopulationState</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// Users can provide a population or it will be randomly created.</span>
-        <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">take_population</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">particles</span>) <span class="kw">if</span> <span class="ident">particles</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">num_particles</span> =&gt; {
-                <span class="comment">// sort them first</span>
-                <span class="ident">particles</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
-                    <span class="ident">a</span>.<span class="ident">cost</span>
-                        .<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">cost</span>)
-                        .<span class="ident">unwrap_or</span>(<span class="ident">std::cmp::Ordering::Equal</span>)
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: PopulationState&lt;Particle&lt;P, F&gt;, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(PopulationState&lt;Particle&lt;P, F&gt;, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="comment">// Users can provide a population or it will be randomly created.
+        </span><span class="kw">let </span>particles = <span class="kw">match </span>state.take_population() {
+            <span class="prelude-val">Some</span>(<span class="kw-2">mut </span>particles) <span class="kw">if </span>particles.len() == <span class="self">self</span>.num_particles =&gt; {
+                <span class="comment">// sort them first
+                </span>particles.sort_by(|a, b| {
+                    a.cost
+                        .partial_cmp(<span class="kw-2">&amp;</span>b.cost)
+                        .unwrap_or(std::cmp::Ordering::Equal)
                 });
-                <span class="ident">particles</span>
+                particles
             }
-            <span class="prelude-val">Some</span>(<span class="ident">particles</span>) =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                    <span class="ident">InvalidParameter</span>,
+            <span class="prelude-val">Some</span>(particles) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                    InvalidParameter,
                     <span class="macro">format!</span>(
                         <span class="string">&quot;`ParticleSwarm`: Provided list of particles is of length {}, expected {}&quot;</span>,
-                        <span class="ident">particles</span>.<span class="ident">len</span>(),
-                        <span class="self">self</span>.<span class="ident">num_particles</span>
+                        particles.len(),
+                        <span class="self">self</span>.num_particles
                     )
                 ))
             }
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">initialize_particles</span>(<span class="ident">problem</span>)<span class="question-mark">?</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.initialize_particles(problem)<span class="question-mark">?</span>,
         };
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>
-                .<span class="ident">individual</span>(<span class="ident">particles</span>[<span class="number">0</span>].<span class="ident">clone</span>())
-                .<span class="ident">cost</span>(<span class="ident">particles</span>[<span class="number">0</span>].<span class="ident">cost</span>)
-                .<span class="ident">population</span>(<span class="ident">particles</span>),
+            state
+                .individual(particles[<span class="number">0</span>].clone())
+                .cost(particles[<span class="number">0</span>].cost)
+                .population(particles),
             <span class="prelude-val">None</span>,
         ))
     }
 
-    <span class="doccomment">/// Perform one iteration of algorithm</span>
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">PopulationState</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">PopulationState</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">best_particle</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_individual</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`ParticleSwarm`: No current best individual in state.&quot;</span>
-        ))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">best_cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_population</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`ParticleSwarm`: No population in state.&quot;</span>
-        ))<span class="question-mark">?</span>;
+    <span class="doccomment">/// Perform one iteration of algorithm
+    </span><span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: PopulationState&lt;Particle&lt;P, F&gt;, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(PopulationState&lt;Particle&lt;P, F&gt;, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>best_particle = state.take_individual().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`ParticleSwarm`: No current best individual in state.&quot;
+        </span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>best_cost = state.get_cost();
+        <span class="kw">let </span><span class="kw-2">mut </span>particles = state.take_population().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`ParticleSwarm`: No population in state.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="ident">P::zero_like</span>(<span class="kw-2">&amp;</span><span class="ident">best_particle</span>.<span class="ident">position</span>);
+        <span class="kw">let </span>zero = P::zero_like(<span class="kw-2">&amp;</span>best_particle.position);
 
-        <span class="kw">let</span> <span class="ident">positions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">particles</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                <span class="comment">// New velocity is composed of</span>
-                <span class="comment">// 1) previous velocity (momentum),</span>
-                <span class="comment">// 2) motion toward particle optimum and</span>
-                <span class="comment">// 3) motion toward global optimum.</span>
+        <span class="kw">let </span>positions: Vec&lt;<span class="kw">_</span>&gt; = particles
+            .iter_mut()
+            .map(|p| {
+                <span class="comment">// New velocity is composed of
+                // 1) previous velocity (momentum),
+                // 2) motion toward particle optimum and
+                // 3) motion toward global optimum.
 
-                <span class="comment">// ad 1)</span>
-                <span class="kw">let</span> <span class="ident">momentum</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">velocity</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">weight_inertia</span>);
+                // ad 1)
+                </span><span class="kw">let </span>momentum = p.velocity.mul(<span class="kw-2">&amp;</span><span class="self">self</span>.weight_inertia);
 
-                <span class="comment">// ad 2)</span>
-                <span class="kw">let</span> <span class="ident">to_optimum</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">best_position</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">position</span>);
-                <span class="kw">let</span> <span class="ident">pull_to_optimum</span> <span class="op">=</span> <span class="ident">P::rand_from_range</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">to_optimum</span>);
-                <span class="kw">let</span> <span class="ident">pull_to_optimum</span> <span class="op">=</span> <span class="ident">pull_to_optimum</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">weight_cognitive</span>);
+                <span class="comment">// ad 2)
+                </span><span class="kw">let </span>to_optimum = p.best_position.sub(<span class="kw-2">&amp;</span>p.position);
+                <span class="kw">let </span>pull_to_optimum = P::rand_from_range(<span class="kw-2">&amp;</span>zero, <span class="kw-2">&amp;</span>to_optimum);
+                <span class="kw">let </span>pull_to_optimum = pull_to_optimum.mul(<span class="kw-2">&amp;</span><span class="self">self</span>.weight_cognitive);
 
-                <span class="comment">// ad 3)</span>
-                <span class="kw">let</span> <span class="ident">to_global_optimum</span> <span class="op">=</span> <span class="ident">best_particle</span>.<span class="ident">position</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">position</span>);
-                <span class="kw">let</span> <span class="ident">pull_to_global_optimum</span> <span class="op">=</span>
-                    <span class="ident">P::rand_from_range</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">to_global_optimum</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">weight_social</span>);
+                <span class="comment">// ad 3)
+                </span><span class="kw">let </span>to_global_optimum = best_particle.position.sub(<span class="kw-2">&amp;</span>p.position);
+                <span class="kw">let </span>pull_to_global_optimum =
+                    P::rand_from_range(<span class="kw-2">&amp;</span>zero, <span class="kw-2">&amp;</span>to_global_optimum).mul(<span class="kw-2">&amp;</span><span class="self">self</span>.weight_social);
 
-                <span class="ident">p</span>.<span class="ident">velocity</span> <span class="op">=</span> <span class="ident">momentum</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">pull_to_optimum</span>).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">pull_to_global_optimum</span>);
-                <span class="kw">let</span> <span class="ident">new_position</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">position</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">velocity</span>);
+                p.velocity = momentum.add(<span class="kw-2">&amp;</span>pull_to_optimum).add(<span class="kw-2">&amp;</span>pull_to_global_optimum);
+                <span class="kw">let </span>new_position = p.position.add(<span class="kw-2">&amp;</span>p.velocity);
 
-                <span class="comment">// Limit to search window</span>
-                <span class="ident">p</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">P::min</span>(<span class="kw-2">&amp;</span><span class="ident">P::max</span>(<span class="kw-2">&amp;</span><span class="ident">new_position</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bounds</span>.<span class="number">0</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bounds</span>.<span class="number">1</span>);
-                <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">position</span>
+                <span class="comment">// Limit to search window
+                </span>p.position = P::min(<span class="kw-2">&amp;</span>P::max(<span class="kw-2">&amp;</span>new_position, <span class="kw-2">&amp;</span><span class="self">self</span>.bounds.<span class="number">0</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.bounds.<span class="number">1</span>);
+                <span class="kw-2">&amp;</span>p.position
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">costs</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">bulk_cost</span>(<span class="kw-2">&amp;</span><span class="ident">positions</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>costs = problem.bulk_cost(<span class="kw-2">&amp;</span>positions)<span class="question-mark">?</span>;
 
-        <span class="kw">for</span> (<span class="ident">p</span>, <span class="ident">c</span>) <span class="kw">in</span> <span class="ident">particles</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">costs</span>.<span class="ident">into_iter</span>()) {
-            <span class="ident">p</span>.<span class="ident">cost</span> <span class="op">=</span> <span class="ident">c</span>;
+        <span class="kw">for </span>(p, c) <span class="kw">in </span>particles.iter_mut().zip(costs.into_iter()) {
+            p.cost = c;
 
-            <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">cost</span> <span class="op">&lt;</span> <span class="ident">p</span>.<span class="ident">best_cost</span> {
-                <span class="ident">p</span>.<span class="ident">best_position</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">position</span>.<span class="ident">clone</span>();
-                <span class="ident">p</span>.<span class="ident">best_cost</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">cost</span>;
+            <span class="kw">if </span>p.cost &lt; p.best_cost {
+                p.best_position = p.position.clone();
+                p.best_cost = p.cost;
 
-                <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">cost</span> <span class="op">&lt;</span> <span class="ident">best_cost</span> {
-                    <span class="ident">best_particle</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">position</span>.<span class="ident">clone</span>();
-                    <span class="ident">best_particle</span>.<span class="ident">best_position</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">position</span>.<span class="ident">clone</span>();
-                    <span class="ident">best_particle</span>.<span class="ident">cost</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">cost</span>;
-                    <span class="ident">best_particle</span>.<span class="ident">best_cost</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">cost</span>;
-                    <span class="ident">best_cost</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">cost</span>;
+                <span class="kw">if </span>p.cost &lt; best_cost {
+                    best_particle.position = p.position.clone();
+                    best_particle.best_position = p.position.clone();
+                    best_particle.cost = p.cost;
+                    best_particle.best_cost = p.cost;
+                    best_cost = p.cost;
                 }
             }
         }
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>
-                .<span class="ident">individual</span>(<span class="ident">best_particle</span>)
-                .<span class="ident">cost</span>(<span class="ident">best_cost</span>)
-                .<span class="ident">population</span>(<span class="ident">particles</span>),
+            state
+                .individual(best_particle)
+                .cost(best_cost)
+                .population(particles),
             <span class="prelude-val">None</span>,
         ))
     }
 }
 
-<span class="doccomment">/// A single particle</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Position of particle</span>
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">T</span>,
-    <span class="doccomment">/// Velocity of particle</span>
-    <span class="ident">velocity</span>: <span class="ident">T</span>,
-    <span class="doccomment">/// Cost of particle</span>
-    <span class="kw">pub</span> <span class="ident">cost</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// Best position of particle so far</span>
-    <span class="ident">best_position</span>: <span class="ident">T</span>,
-    <span class="doccomment">/// Best cost of particle so far</span>
-    <span class="ident">best_cost</span>: <span class="ident">F</span>,
+<span class="doccomment">/// A single particle
+</span><span class="attribute">#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>Particle&lt;T, F&gt; {
+    <span class="doccomment">/// Position of particle
+    </span><span class="kw">pub </span>position: T,
+    <span class="doccomment">/// Velocity of particle
+    </span>velocity: T,
+    <span class="doccomment">/// Cost of particle
+    </span><span class="kw">pub </span>cost: F,
+    <span class="doccomment">/// Best position of particle so far
+    </span>best_position: T,
+    <span class="doccomment">/// Best cost of particle so far
+    </span>best_cost: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;T, F&gt; Particle&lt;T, F&gt;
+<span class="kw">where
+    </span>T: Clone,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Create a new particle with a given position, cost and velocity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::particleswarm::Particle;</span>
-    <span class="doccomment">/// let particle: Particle&lt;Vec&lt;f64&gt;, f64&gt; = Particle::new(vec![0.0, 1.4], 12.0, vec![0.1, 0.5]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">position</span>: <span class="ident">T</span>, <span class="ident">cost</span>: <span class="ident">F</span>, <span class="ident">velocity</span>: <span class="ident">T</span>) -&gt; <span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-        <span class="ident">Particle</span> {
-            <span class="ident">position</span>: <span class="ident">position</span>.<span class="ident">clone</span>(),
-            <span class="ident">velocity</span>,
-            <span class="ident">cost</span>,
-            <span class="ident">best_position</span>: <span class="ident">position</span>,
-            <span class="ident">best_cost</span>: <span class="ident">cost</span>,
+    <span class="doccomment">/// Create a new particle with a given position, cost and velocity.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::particleswarm::Particle;
+    /// let particle: Particle&lt;Vec&lt;f64&gt;, f64&gt; = Particle::new(vec![0.0, 1.4], 12.0, vec![0.1, 0.5]);
+    /// ```
+    </span><span class="kw">pub fn </span>new(position: T, cost: F, velocity: T) -&gt; Particle&lt;T, F&gt; {
+        Particle {
+            position: position.clone(),
+            velocity,
+            cost,
+            best_position: position,
+            best_cost: cost,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">test_utils::TestProblem</span>, <span class="ident">ArgminError</span>, <span class="ident">State</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
-    <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{test_utils::TestProblem, ArgminError, State};
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
+    <span class="kw">use </span>approx::assert_relative_eq;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">particleswarm</span>, <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(particleswarm, ParticleSwarm&lt;Vec&lt;f64&gt;, f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">lower_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">upper_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">pso</span>: <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>.<span class="ident">clone</span>(), <span class="ident">upper_bound</span>.<span class="ident">clone</span>()), <span class="number">40</span>);
-        <span class="kw">let</span> <span class="ident">ParticleSwarm</span> {
-            <span class="ident">weight_inertia</span>,
-            <span class="ident">weight_cognitive</span>,
-            <span class="ident">weight_social</span>,
-            <span class="ident">bounds</span>,
-            <span class="ident">num_particles</span>,
-        } <span class="op">=</span> <span class="ident">pso</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
+        <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; =
+            ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), <span class="number">40</span>);
+        <span class="kw">let </span>ParticleSwarm {
+            weight_inertia,
+            weight_cognitive,
+            weight_social,
+            bounds,
+            num_particles,
+        } = pso;
 
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">weight_inertia</span>,
-            (<span class="number">1.0f64</span> <span class="op">/</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="number">2.0f64</span>.<span class="ident">ln</span>())),
-            <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+            weight_inertia,
+            (<span class="number">1.0f64 </span>/ (<span class="number">2.0 </span>* <span class="number">2.0f64</span>.ln())),
+            epsilon = f64::EPSILON
         );
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">weight_cognitive</span>,
-            (<span class="number">0.5f64</span> <span class="op">+</span> <span class="number">2.0f64</span>.<span class="ident">ln</span>()),
-            <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+            weight_cognitive,
+            (<span class="number">0.5f64 </span>+ <span class="number">2.0f64</span>.ln()),
+            epsilon = f64::EPSILON
         );
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">weight_social</span>,
-            (<span class="number">0.5f64</span> <span class="op">+</span> <span class="number">2.0f64</span>.<span class="ident">ln</span>()),
-            <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+            weight_social,
+            (<span class="number">0.5f64 </span>+ <span class="number">2.0f64</span>.ln()),
+            epsilon = f64::EPSILON
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">lower_bound</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">bounds</span>.<span class="number">0</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">lower_bound</span>[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">bounds</span>.<span class="number">0</span>[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">upper_bound</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">bounds</span>.<span class="number">1</span>[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">upper_bound</span>[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>(), <span class="ident">bounds</span>.<span class="number">1</span>[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">num_particles</span>, <span class="number">40</span>);
+        <span class="macro">assert_eq!</span>(lower_bound[<span class="number">0</span>].to_ne_bytes(), bounds.<span class="number">0</span>[<span class="number">0</span>].to_ne_bytes());
+        <span class="macro">assert_eq!</span>(lower_bound[<span class="number">1</span>].to_ne_bytes(), bounds.<span class="number">0</span>[<span class="number">1</span>].to_ne_bytes());
+        <span class="macro">assert_eq!</span>(upper_bound[<span class="number">0</span>].to_ne_bytes(), bounds.<span class="number">1</span>[<span class="number">0</span>].to_ne_bytes());
+        <span class="macro">assert_eq!</span>(upper_bound[<span class="number">1</span>].to_ne_bytes(), bounds.<span class="number">1</span>[<span class="number">1</span>].to_ne_bytes());
+        <span class="macro">assert_eq!</span>(num_particles, <span class="number">40</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_inertia_factor</span>() {
-        <span class="kw">let</span> <span class="ident">lower_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">upper_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_inertia_factor() {
+        <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
+        <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
 
-        <span class="kw">for</span> <span class="ident">inertia</span> <span class="kw">in</span> [<span class="number">0.0</span>, <span class="ident">f64::EPSILON</span>, <span class="number">0.5</span>, <span class="number">1.0</span>, <span class="number">1.2</span>, <span class="number">3.0</span>] {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>.<span class="ident">clone</span>(), <span class="ident">upper_bound</span>.<span class="ident">clone</span>()), <span class="number">40</span>)
-                .<span class="ident">with_inertia_factor</span>(<span class="ident">inertia</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+        <span class="kw">for </span>inertia <span class="kw">in </span>[<span class="number">0.0</span>, f64::EPSILON, <span class="number">0.5</span>, <span class="number">1.0</span>, <span class="number">1.2</span>, <span class="number">3.0</span>] {
+            <span class="kw">let </span>res = ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), <span class="number">40</span>)
+                .with_inertia_factor(inertia);
+            <span class="macro">assert!</span>(res.is_ok());
             <span class="macro">assert_eq!</span>(
-                <span class="ident">res</span>.<span class="ident">unwrap</span>().<span class="ident">weight_inertia</span>.<span class="ident">to_ne_bytes</span>(),
-                <span class="ident">inertia</span>.<span class="ident">to_ne_bytes</span>()
+                res.unwrap().weight_inertia.to_ne_bytes(),
+                inertia.to_ne_bytes()
             );
         }
 
-        <span class="kw">for</span> <span class="ident">inertia</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">0.5</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.2</span>, <span class="op">-</span><span class="number">3.0</span>] {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>.<span class="ident">clone</span>(), <span class="ident">upper_bound</span>.<span class="ident">clone</span>()), <span class="number">40</span>)
-                .<span class="ident">with_inertia_factor</span>(<span class="ident">inertia</span>);
+        <span class="kw">for </span>inertia <span class="kw">in </span>[-f64::EPSILON, -<span class="number">0.5</span>, -<span class="number">1.0</span>, -<span class="number">1.2</span>, -<span class="number">3.0</span>] {
+            <span class="kw">let </span>res = ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), <span class="number">40</span>)
+                .with_inertia_factor(inertia);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`ParticleSwarm`: &quot;</span>,
-                    <span class="string">&quot;inertia factor must be &gt;=0.\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;inertia factor must be &gt;=0.\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_cognitive_factor</span>() {
-        <span class="kw">let</span> <span class="ident">lower_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">upper_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_cognitive_factor() {
+        <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
+        <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
 
-        <span class="kw">for</span> <span class="ident">cognitive</span> <span class="kw">in</span> [<span class="number">0.0</span>, <span class="ident">f64::EPSILON</span>, <span class="number">0.5</span>, <span class="number">1.0</span>, <span class="number">1.2</span>, <span class="number">3.0</span>] {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>.<span class="ident">clone</span>(), <span class="ident">upper_bound</span>.<span class="ident">clone</span>()), <span class="number">40</span>)
-                .<span class="ident">with_cognitive_factor</span>(<span class="ident">cognitive</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+        <span class="kw">for </span>cognitive <span class="kw">in </span>[<span class="number">0.0</span>, f64::EPSILON, <span class="number">0.5</span>, <span class="number">1.0</span>, <span class="number">1.2</span>, <span class="number">3.0</span>] {
+            <span class="kw">let </span>res = ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), <span class="number">40</span>)
+                .with_cognitive_factor(cognitive);
+            <span class="macro">assert!</span>(res.is_ok());
             <span class="macro">assert_eq!</span>(
-                <span class="ident">res</span>.<span class="ident">unwrap</span>().<span class="ident">weight_cognitive</span>.<span class="ident">to_ne_bytes</span>(),
-                <span class="ident">cognitive</span>.<span class="ident">to_ne_bytes</span>()
+                res.unwrap().weight_cognitive.to_ne_bytes(),
+                cognitive.to_ne_bytes()
             );
         }
 
-        <span class="kw">for</span> <span class="ident">cognitive</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">0.5</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.2</span>, <span class="op">-</span><span class="number">3.0</span>] {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>.<span class="ident">clone</span>(), <span class="ident">upper_bound</span>.<span class="ident">clone</span>()), <span class="number">40</span>)
-                .<span class="ident">with_cognitive_factor</span>(<span class="ident">cognitive</span>);
+        <span class="kw">for </span>cognitive <span class="kw">in </span>[-f64::EPSILON, -<span class="number">0.5</span>, -<span class="number">1.0</span>, -<span class="number">1.2</span>, -<span class="number">3.0</span>] {
+            <span class="kw">let </span>res = ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), <span class="number">40</span>)
+                .with_cognitive_factor(cognitive);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`ParticleSwarm`: &quot;</span>,
-                    <span class="string">&quot;cognitive factor must be &gt;=0.\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;cognitive factor must be &gt;=0.\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_social_factor</span>() {
-        <span class="kw">let</span> <span class="ident">lower_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">upper_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_social_factor() {
+        <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
+        <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
 
-        <span class="kw">for</span> <span class="ident">social</span> <span class="kw">in</span> [<span class="number">0.0</span>, <span class="ident">f64::EPSILON</span>, <span class="number">0.5</span>, <span class="number">1.0</span>, <span class="number">1.2</span>, <span class="number">3.0</span>] {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>.<span class="ident">clone</span>(), <span class="ident">upper_bound</span>.<span class="ident">clone</span>()), <span class="number">40</span>)
-                .<span class="ident">with_social_factor</span>(<span class="ident">social</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+        <span class="kw">for </span>social <span class="kw">in </span>[<span class="number">0.0</span>, f64::EPSILON, <span class="number">0.5</span>, <span class="number">1.0</span>, <span class="number">1.2</span>, <span class="number">3.0</span>] {
+            <span class="kw">let </span>res = ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), <span class="number">40</span>)
+                .with_social_factor(social);
+            <span class="macro">assert!</span>(res.is_ok());
             <span class="macro">assert_eq!</span>(
-                <span class="ident">res</span>.<span class="ident">unwrap</span>().<span class="ident">weight_social</span>.<span class="ident">to_ne_bytes</span>(),
-                <span class="ident">social</span>.<span class="ident">to_ne_bytes</span>()
+                res.unwrap().weight_social.to_ne_bytes(),
+                social.to_ne_bytes()
             );
         }
 
-        <span class="kw">for</span> <span class="ident">social</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">0.5</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.2</span>, <span class="op">-</span><span class="number">3.0</span>] {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>.<span class="ident">clone</span>(), <span class="ident">upper_bound</span>.<span class="ident">clone</span>()), <span class="number">40</span>)
-                .<span class="ident">with_social_factor</span>(<span class="ident">social</span>);
+        <span class="kw">for </span>social <span class="kw">in </span>[-f64::EPSILON, -<span class="number">0.5</span>, -<span class="number">1.0</span>, -<span class="number">1.2</span>, -<span class="number">3.0</span>] {
+            <span class="kw">let </span>res = ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), <span class="number">40</span>)
+                .with_social_factor(social);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`ParticleSwarm`: &quot;</span>,
-                    <span class="string">&quot;social factor must be &gt;=0.\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;social factor must be &gt;=0.\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_initialize_positions_and_velocities</span>() {
-        <span class="kw">let</span> <span class="ident">lower_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">upper_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">num_particles</span> <span class="op">=</span> <span class="number">100</span>;
-        <span class="kw">let</span> <span class="ident">pso</span>: <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>, <span class="ident">upper_bound</span>), <span class="ident">num_particles</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_initialize_positions_and_velocities() {
+        <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
+        <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>num_particles = <span class="number">100</span>;
+        <span class="kw">let </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; =
+            ParticleSwarm::new((lower_bound, upper_bound), num_particles);
 
-        <span class="kw">let</span> (<span class="ident">positions</span>, <span class="ident">velocities</span>) <span class="op">=</span> <span class="ident">pso</span>.<span class="ident">initialize_positions_and_velocities</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">positions</span>.<span class="ident">len</span>(), <span class="ident">num_particles</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">velocities</span>.<span class="ident">len</span>(), <span class="ident">num_particles</span>);
+        <span class="kw">let </span>(positions, velocities) = pso.initialize_positions_and_velocities();
+        <span class="macro">assert_eq!</span>(positions.len(), num_particles);
+        <span class="macro">assert_eq!</span>(velocities.len(), num_particles);
 
-        <span class="kw">for</span> <span class="ident">pos</span> <span class="kw">in</span> <span class="ident">positions</span> {
-            <span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">pos</span> {
-                <span class="macro">assert!</span>(<span class="ident">elem</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1.0f64</span>);
-                <span class="macro">assert!</span>(<span class="ident">elem</span> <span class="op">&gt;</span><span class="op">=</span> <span class="op">-</span><span class="number">1.0f64</span>);
+        <span class="kw">for </span>pos <span class="kw">in </span>positions {
+            <span class="kw">for </span>elem <span class="kw">in </span>pos {
+                <span class="macro">assert!</span>(elem &lt;= <span class="number">1.0f64</span>);
+                <span class="macro">assert!</span>(elem &gt;= -<span class="number">1.0f64</span>);
             }
         }
 
-        <span class="kw">for</span> <span class="ident">velo</span> <span class="kw">in</span> <span class="ident">velocities</span> {
-            <span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">velo</span> {
-                <span class="macro">assert!</span>(<span class="ident">elem</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">2.0f64</span>);
-                <span class="macro">assert!</span>(<span class="ident">elem</span> <span class="op">&gt;</span><span class="op">=</span> <span class="op">-</span><span class="number">2.0f64</span>);
+        <span class="kw">for </span>velo <span class="kw">in </span>velocities {
+            <span class="kw">for </span>elem <span class="kw">in </span>velo {
+                <span class="macro">assert!</span>(elem &lt;= <span class="number">2.0f64</span>);
+                <span class="macro">assert!</span>(elem &gt;= -<span class="number">2.0f64</span>);
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_initialize_particles</span>() {
-        <span class="kw">let</span> <span class="ident">lower_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">upper_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">num_particles</span> <span class="op">=</span> <span class="number">10</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pso</span>: <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>, <span class="ident">upper_bound</span>), <span class="ident">num_particles</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_initialize_particles() {
+        <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
+        <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>num_particles = <span class="number">10</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; =
+            ParticleSwarm::new((lower_bound, upper_bound), num_particles);
 
-        <span class="kw">struct</span> <span class="ident">PsoProblem</span> {
-            <span class="ident">counter</span>: <span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="ident">std::sync::Mutex</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-            <span class="ident">values</span>: [<span class="ident">f64</span>; <span class="number">10</span>],
+        <span class="kw">struct </span>PsoProblem {
+            counter: std::sync::Arc&lt;std::sync::Mutex&lt;usize&gt;&gt;,
+            values: [f64; <span class="number">10</span>],
         }
 
-        <span class="kw">impl</span> <span class="ident">CostFunction</span> <span class="kw">for</span> <span class="ident">PsoProblem</span> {
-            <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
+        <span class="kw">impl </span>CostFunction <span class="kw">for </span>PsoProblem {
+            <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+            <span class="kw">type </span>Output = f64;
 
-            <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">counter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">values</span>[<span class="kw-2">*</span><span class="ident">counter</span>];
-                <span class="kw-2">*</span><span class="ident">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">cost</span>)
+            <span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, _param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>counter = <span class="self">self</span>.counter.lock().unwrap();
+                <span class="kw">let </span>cost = <span class="self">self</span>.values[<span class="kw-2">*</span>counter];
+                <span class="kw-2">*</span>counter += <span class="number">1</span>;
+                <span class="prelude-val">Ok</span>(cost)
             }
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> [<span class="number">1.0</span>, <span class="number">4.0</span>, <span class="number">10.0</span>, <span class="number">2.0</span>, <span class="op">-</span><span class="number">3.0</span>, <span class="number">8.0</span>, <span class="number">4.4</span>, <span class="number">8.1</span>, <span class="number">6.4</span>, <span class="number">4.5</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>values = [<span class="number">1.0</span>, <span class="number">4.0</span>, <span class="number">10.0</span>, <span class="number">2.0</span>, -<span class="number">3.0</span>, <span class="number">8.0</span>, <span class="number">4.4</span>, <span class="number">8.1</span>, <span class="number">6.4</span>, <span class="number">4.5</span>];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">PsoProblem</span> {
-            <span class="ident">counter</span>: <span class="ident">std::sync::Arc::new</span>(<span class="ident">std::sync::Mutex::new</span>(<span class="number">0</span>)),
-            <span class="ident">values</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(PsoProblem {
+            counter: std::sync::Arc::new(std::sync::Mutex::new(<span class="number">0</span>)),
+            values,
         });
 
-        <span class="ident">values</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">partial_cmp</span>(<span class="ident">b</span>).<span class="ident">unwrap_or</span>(<span class="ident">std::cmp::Ordering::Equal</span>));
+        values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
 
-        <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">pso</span>.<span class="ident">initialize_particles</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">particles</span>.<span class="ident">len</span>(), <span class="ident">num_particles</span>);
+        <span class="kw">let </span>particles = pso.initialize_particles(<span class="kw-2">&amp;mut </span>problem).unwrap();
+        <span class="macro">assert_eq!</span>(particles.len(), num_particles);
 
-        <span class="comment">// at least assure that they are ordered correctly and have the correct cost.</span>
-        <span class="kw">for</span> (<span class="ident">particle</span>, <span class="ident">cost</span>) <span class="kw">in</span> <span class="ident">particles</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">values</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">particle</span>.<span class="ident">cost</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">cost</span>.<span class="ident">to_ne_bytes</span>());
+        <span class="comment">// at least assure that they are ordered correctly and have the correct cost.
+        </span><span class="kw">for </span>(particle, cost) <span class="kw">in </span>particles.iter().zip(values.iter()) {
+            <span class="macro">assert_eq!</span>(particle.cost.to_ne_bytes(), cost.to_ne_bytes());
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_particle_new</span>() {
-        <span class="kw">let</span> <span class="ident">init_position</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0.2</span>, <span class="number">3.0</span>];
-        <span class="kw">let</span> <span class="ident">init_cost</span> <span class="op">=</span> <span class="number">12.0</span>;
-        <span class="kw">let</span> <span class="ident">init_velocity</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.2</span>, <span class="op">-</span><span class="number">1.3</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_particle_new() {
+        <span class="kw">let </span>init_position = <span class="macro">vec!</span>[<span class="number">0.2</span>, <span class="number">3.0</span>];
+        <span class="kw">let </span>init_cost = <span class="number">12.0</span>;
+        <span class="kw">let </span>init_velocity = <span class="macro">vec!</span>[<span class="number">1.2</span>, -<span class="number">1.3</span>];
 
-        <span class="kw">let</span> <span class="ident">particle</span>: <span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">Particle::new</span>(<span class="ident">init_position</span>.<span class="ident">clone</span>(), <span class="ident">init_cost</span>, <span class="ident">init_velocity</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">Particle</span> {
-            <span class="ident">position</span>,
-            <span class="ident">velocity</span>,
-            <span class="ident">cost</span>,
-            <span class="ident">best_position</span>,
-            <span class="ident">best_cost</span>,
-        } <span class="op">=</span> <span class="ident">particle</span>;
+        <span class="kw">let </span>particle: Particle&lt;Vec&lt;f64&gt;, f64&gt; =
+            Particle::new(init_position.clone(), init_cost, init_velocity.clone());
+        <span class="kw">let </span>Particle {
+            position,
+            velocity,
+            cost,
+            best_position,
+            best_cost,
+        } = particle;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">init_position</span>, <span class="ident">position</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">init_position</span>, <span class="ident">best_position</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">init_cost</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">cost</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">init_cost</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">best_cost</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">init_velocity</span>, <span class="ident">velocity</span>);
+        <span class="macro">assert_eq!</span>(init_position, position);
+        <span class="macro">assert_eq!</span>(init_position, best_position);
+        <span class="macro">assert_eq!</span>(init_cost.to_ne_bytes(), cost.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(init_cost.to_ne_bytes(), best_cost.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(init_velocity, velocity);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_provided_population_wrong_size</span>() {
-        <span class="kw">let</span> <span class="ident">lower_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">upper_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pso</span>: <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>, <span class="ident">upper_bound</span>), <span class="number">40</span>);
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">PopulationState</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">PopulationState::new</span>()
-            .<span class="ident">population</span>(<span class="macro">vec!</span>[<span class="ident">Particle::new</span>(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="number">12.0</span>, <span class="macro">vec!</span>[<span class="number">0.1</span>, <span class="number">0.3</span>])]);
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">pso</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">state</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_provided_population_wrong_size() {
+        <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
+        <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">40</span>);
+        <span class="kw">let </span>state: PopulationState&lt;Particle&lt;Vec&lt;f64&gt;, f64&gt;, f64&gt; = PopulationState::new()
+            .population(<span class="macro">vec!</span>[Particle::new(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="number">12.0</span>, <span class="macro">vec!</span>[<span class="number">0.1</span>, <span class="number">0.3</span>])]);
+        <span class="kw">let </span>res = pso.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Invalid parameter: \&quot;`ParticleSwarm`: &quot;</span>,
                 <span class="string">&quot;Provided list of particles is of length 1, expected 40\&quot;&quot;</span>,
@@ -1378,89 +1378,89 @@
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_provided_population_correct_size</span>() {
-        <span class="kw">let</span> <span class="ident">lower_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">upper_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">particle_a</span> <span class="op">=</span> <span class="ident">Particle::new</span>(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="number">12.0</span>, <span class="macro">vec!</span>[<span class="number">0.1</span>, <span class="number">0.3</span>]);
-        <span class="kw">let</span> <span class="ident">particle_b</span> <span class="op">=</span> <span class="ident">Particle::new</span>(<span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">3.0</span>], <span class="number">10.0</span>, <span class="macro">vec!</span>[<span class="number">0.2</span>, <span class="number">0.4</span>]);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pso</span>: <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>, <span class="ident">upper_bound</span>), <span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">PopulationState</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">PopulationState::new</span>().<span class="ident">population</span>(<span class="macro">vec!</span>[<span class="ident">particle_a</span>.<span class="ident">clone</span>(), <span class="ident">particle_b</span>.<span class="ident">clone</span>()]);
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">pso</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">state</span>);
-        <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">unwrap</span>(), <span class="ident">particle_b</span>);
-        <span class="kw">let</span> <span class="ident">population</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_population</span>().<span class="ident">unwrap</span>();
-        <span class="comment">// assert that it was sorted!</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">population</span>[<span class="number">0</span>], <span class="ident">particle_b</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">population</span>[<span class="number">1</span>], <span class="ident">particle_a</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_provided_population_correct_size() {
+        <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
+        <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span>particle_a = Particle::new(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="number">12.0</span>, <span class="macro">vec!</span>[<span class="number">0.1</span>, <span class="number">0.3</span>]);
+        <span class="kw">let </span>particle_b = Particle::new(<span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">3.0</span>], <span class="number">10.0</span>, <span class="macro">vec!</span>[<span class="number">0.2</span>, <span class="number">0.4</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">2</span>);
+        <span class="kw">let </span>state: PopulationState&lt;Particle&lt;Vec&lt;f64&gt;, f64&gt;, f64&gt; =
+            PopulationState::new().population(<span class="macro">vec!</span>[particle_a.clone(), particle_b.clone()]);
+        <span class="kw">let </span>res = pso.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
+        <span class="macro">assert!</span>(res.is_ok());
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state, kv) = res.unwrap();
+        <span class="macro">assert!</span>(kv.is_none());
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>state.get_param().unwrap(), particle_b);
+        <span class="kw">let </span>population = state.take_population().unwrap();
+        <span class="comment">// assert that it was sorted!
+        </span><span class="macro">assert_eq!</span>(population[<span class="number">0</span>], particle_b);
+        <span class="macro">assert_eq!</span>(population[<span class="number">1</span>], particle_a);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_random_population</span>() {
-        <span class="kw">let</span> <span class="ident">lower_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">upper_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pso</span>: <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>, <span class="ident">upper_bound</span>), <span class="number">40</span>);
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">PopulationState</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">PopulationState::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">pso</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">state</span>);
-        <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">is_some</span>());
-        <span class="kw">let</span> <span class="ident">population</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_population</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">population</span>.<span class="ident">len</span>(), <span class="number">40</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_random_population() {
+        <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
+        <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">40</span>);
+        <span class="kw">let </span>state: PopulationState&lt;Particle&lt;Vec&lt;f64&gt;, f64&gt;, f64&gt; = PopulationState::new();
+        <span class="kw">let </span>res = pso.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
+        <span class="macro">assert!</span>(res.is_ok());
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state, kv) = res.unwrap();
+        <span class="macro">assert!</span>(kv.is_none());
+        <span class="macro">assert!</span>(state.get_param().is_some());
+        <span class="kw">let </span>population = state.take_population().unwrap();
+        <span class="macro">assert_eq!</span>(population.len(), <span class="number">40</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter</span>() {
-        <span class="kw">struct</span> <span class="ident">PsoProblem</span> {
-            <span class="ident">counter</span>: <span class="ident">std::sync::Mutex</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-            <span class="ident">values</span>: [<span class="ident">f64</span>; <span class="number">10</span>],
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter() {
+        <span class="kw">struct </span>PsoProblem {
+            counter: std::sync::Mutex&lt;usize&gt;,
+            values: [f64; <span class="number">10</span>],
         }
 
-        <span class="kw">impl</span> <span class="ident">CostFunction</span> <span class="kw">for</span> <span class="ident">PsoProblem</span> {
-            <span class="kw">type</span> <span class="ident">Param</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">f64</span>;
+        <span class="kw">impl </span>CostFunction <span class="kw">for </span>PsoProblem {
+            <span class="kw">type </span>Param = Vec&lt;f64&gt;;
+            <span class="kw">type </span>Output = f64;
 
-            <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">values</span>[<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() <span class="op">%</span> <span class="number">10</span>];
-                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">counter</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">cost</span>)
+            <span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, _param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
+                <span class="kw">let </span>cost = <span class="self">self</span>.values[<span class="kw-2">*</span><span class="self">self</span>.counter.lock().unwrap() % <span class="number">10</span>];
+                <span class="kw-2">*</span><span class="self">self</span>.counter.lock().unwrap() += <span class="number">1</span>;
+                <span class="prelude-val">Ok</span>(cost)
             }
         }
 
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> [<span class="number">1.0</span>, <span class="number">4.0</span>, <span class="number">10.0</span>, <span class="number">2.0</span>, <span class="op">-</span><span class="number">3.0</span>, <span class="number">8.0</span>, <span class="number">4.4</span>, <span class="number">8.1</span>, <span class="number">6.4</span>, <span class="number">4.4</span>];
+        <span class="kw">let </span>values = [<span class="number">1.0</span>, <span class="number">4.0</span>, <span class="number">10.0</span>, <span class="number">2.0</span>, -<span class="number">3.0</span>, <span class="number">8.0</span>, <span class="number">4.4</span>, <span class="number">8.1</span>, <span class="number">6.4</span>, <span class="number">4.4</span>];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">PsoProblem</span> {
-            <span class="ident">counter</span>: <span class="ident">std::sync::Mutex::new</span>(<span class="number">0</span>),
-            <span class="ident">values</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(PsoProblem {
+            counter: std::sync::Mutex::new(<span class="number">0</span>),
+            values,
         });
 
-        <span class="comment">// setup</span>
-        <span class="kw">let</span> <span class="ident">lower_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="ident">upper_bound</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pso</span>: <span class="ident">ParticleSwarm</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ParticleSwarm::new</span>((<span class="ident">lower_bound</span>, <span class="ident">upper_bound</span>), <span class="number">100</span>);
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">PopulationState</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">PopulationState::new</span>();
+        <span class="comment">// setup
+        </span><span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
+        <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">100</span>);
+        <span class="kw">let </span>state: PopulationState&lt;Particle&lt;Vec&lt;f64&gt;, f64&gt;, f64&gt; = PopulationState::new();
 
-        <span class="comment">// init</span>
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">pso</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// init
+        </span><span class="kw">let </span>(<span class="kw-2">mut </span>state, <span class="kw">_</span>) = pso.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
-        <span class="comment">// next_iter</span>
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">200</span> {
-            (<span class="ident">state</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">pso</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">population</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_population</span>().<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">population</span>.<span class="ident">len</span>(), <span class="number">100</span>);
-            <span class="kw">for</span> <span class="ident">particle</span> <span class="kw">in</span> <span class="ident">population</span> {
-                <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="ident">particle</span>.<span class="ident">position</span>.<span class="ident">iter</span>() {
-                    <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1.0</span>);
-                    <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="op">-</span><span class="number">1.0</span>);
+        <span class="comment">// next_iter
+        </span><span class="kw">for _ in </span><span class="number">0</span>..<span class="number">200 </span>{
+            (state, <span class="kw">_</span>) = pso.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
+            <span class="kw">let </span>population = state.get_population().unwrap();
+            <span class="macro">assert_eq!</span>(population.len(), <span class="number">100</span>);
+            <span class="kw">for </span>particle <span class="kw">in </span>population {
+                <span class="kw">for </span>x <span class="kw">in </span>particle.position.iter() {
+                    <span class="macro">assert!</span>(<span class="kw-2">*</span>x &lt;= <span class="number">1.0</span>);
+                    <span class="macro">assert!</span>(<span class="kw-2">*</span>x &gt;= -<span class="number">1.0</span>);
                 }
             }
-            <span class="macro">assert_eq!</span>(<span class="ident">state</span>.<span class="ident">get_cost</span>().<span class="ident">to_ne_bytes</span>(), (<span class="op">-</span><span class="number">3.0f64</span>).<span class="ident">to_ne_bytes</span>());
+            <span class="macro">assert_eq!</span>(state.get_cost().to_ne_bytes(), (-<span class="number">3.0f64</span>).to_ne_bytes());
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

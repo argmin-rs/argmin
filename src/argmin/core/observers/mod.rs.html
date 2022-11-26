@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/observers/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/observers/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -450,457 +450,457 @@
 <span id="450">450</span>
 <span id="451">451</span>
 <span id="452">452</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # Observers</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Argmin offers an interface to observe the state of the solver at initialization as well as</span>
-<span class="doccomment">//! after every iteration. This includes the parameter vector, gradient, Jacobian, Hessian,</span>
-<span class="doccomment">//! iteration number, cost values and many more as well as solver-specific metrics. This interface</span>
-<span class="doccomment">//! can be used to implement loggers, send the information to a storage or to plot metrics.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The observer [`WriteToFile`](`crate::core::observers::WriteToFile`) saves the parameter vector</span>
-<span class="doccomment">//! to disk and as such requires the parameter vector to be serializable. Hence this feature is</span>
-<span class="doccomment">//! only available with the `serde1` feature.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The observer [`SlogLogger`](`crate::core::observers::SlogLogger`) logs the progress of the</span>
-<span class="doccomment">//! optimization to screen or to disk. This requires the `slog-logger` feature. Writing to disk</span>
-<span class="doccomment">//! in addition requires the `serde1` feature.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For each observer it can be defined how often it will observe the progress of the solver. This</span>
-<span class="doccomment">//! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`</span>
-<span class="doccomment">//! (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Custom observers can be used as well by implementing the [`crate::core::observers::Observe`]</span>
-<span class="doccomment">//! trait.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Example</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # #![allow(unused_imports)]</span>
-<span class="doccomment">//! # extern crate argmin;</span>
-<span class="doccomment">//! # extern crate argmin_testfunctions;</span>
-<span class="doccomment">//! # use argmin::core::{Error, Executor, CostFunction, Gradient, observers::ObserverMode};</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-<span class="doccomment">//! # use argmin::core::observers::SlogLogger;</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
-<span class="doccomment">//! # use argmin::core::observers::{WriteToFile, WriteToFileSerializer};</span>
-<span class="doccomment">//! # use argmin::solver::gradientdescent::SteepestDescent;</span>
-<span class="doccomment">//! # use argmin::solver::linesearch::MoreThuenteLineSearch;</span>
-<span class="doccomment">//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # struct Rosenbrock {</span>
-<span class="doccomment">//! #     a: f64,</span>
-<span class="doccomment">//! #     b: f64,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # /// Implement `CostFunction` for `Rosenbrock`</span>
-<span class="doccomment">//! # impl CostFunction for Rosenbrock {</span>
-<span class="doccomment">//! #     /// Type of the parameter vector</span>
-<span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
-<span class="doccomment">//! #     type Output = f64;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     /// Apply the cost function to a parameter `p`</span>
-<span class="doccomment">//! #     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-<span class="doccomment">//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # /// Implement `Gradient` for `Rosenbrock`</span>
-<span class="doccomment">//! # impl Gradient for Rosenbrock {</span>
-<span class="doccomment">//! #     /// Type of the parameter vector</span>
-<span class="doccomment">//! #     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">//! #     /// Type of the return value computed by the cost function</span>
-<span class="doccomment">//! #     type Gradient = Vec&lt;f64&gt;;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     /// Compute the gradient at parameter `p`.</span>
-<span class="doccomment">//! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {</span>
-<span class="doccomment">//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # fn run() -&gt; Result&lt;(), Error&gt; {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # // Define cost function (must implement `CostFunction` and `Gradient`)</span>
-<span class="doccomment">//! # let problem = Rosenbrock { a: 1.0, b: 100.0 };</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # // Define initial parameter vector</span>
-<span class="doccomment">//! # let init_param: Vec&lt;f64&gt; = vec![-1.2, 1.0];</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # // Set up line search</span>
-<span class="doccomment">//! # let linesearch = MoreThuenteLineSearch::new();</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # // Set up solver</span>
-<span class="doccomment">//! # let solver = SteepestDescent::new(linesearch);</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! // [...]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let res = Executor::new(problem, solver)</span>
-<span class="doccomment">//!     .configure(|config| config.param(init_param).max_iters(2))</span>
-<span class="doccomment">//! # ;</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-<span class="doccomment">//! # let res = res</span>
-<span class="doccomment">//!     // Add an observer which will log all iterations to the terminal (without blocking)</span>
-<span class="doccomment">//!     .add_observer(SlogLogger::term_noblock(), ObserverMode::Always)</span>
-<span class="doccomment">//! # ;</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;serde1&quot;)]</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-<span class="doccomment">//! # let res = res</span>
-<span class="doccomment">//!     // Log to file whenever a new best solution is found</span>
-<span class="doccomment">//!     .add_observer(SlogLogger::file(&quot;solver.log&quot;, false)?, ObserverMode::NewBest)</span>
-<span class="doccomment">//!     // Write parameter vector to `params/param.arg` every 20th iteration</span>
-<span class="doccomment">//!     .add_observer(</span>
-<span class="doccomment">//!         WriteToFile::new(&quot;params&quot;, &quot;param&quot;, WriteToFileSerializer::JSON),</span>
-<span class="doccomment">//!         ObserverMode::Every(20)</span>
-<span class="doccomment">//!     )</span>
-<span class="doccomment">//! # ;</span>
-<span class="doccomment">//! # let res = res</span>
-<span class="doccomment">//!     // run the solver on the defined problem</span>
-<span class="doccomment">//!     .run()?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // [...]</span>
-<span class="doccomment">//! #     Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # fn main() {</span>
-<span class="doccomment">//! #     if let Err(ref e) = run() {</span>
-<span class="doccomment">//! #         println!(&quot;{}&quot;, e);</span>
-<span class="doccomment">//! #         std::process::exit(1);</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
+</span><span class="doccomment">//! # Observers
+//!
+//! Argmin offers an interface to observe the state of the solver at initialization as well as
+//! after every iteration. This includes the parameter vector, gradient, Jacobian, Hessian,
+//! iteration number, cost values and many more as well as solver-specific metrics. This interface
+//! can be used to implement loggers, send the information to a storage or to plot metrics.
+//!
+//! The observer [`WriteToFile`](`crate::core::observers::WriteToFile`) saves the parameter vector
+//! to disk and as such requires the parameter vector to be serializable. Hence this feature is
+//! only available with the `serde1` feature.
+//!
+//! The observer [`SlogLogger`](`crate::core::observers::SlogLogger`) logs the progress of the
+//! optimization to screen or to disk. This requires the `slog-logger` feature. Writing to disk
+//! in addition requires the `serde1` feature.
+//!
+//! For each observer it can be defined how often it will observe the progress of the solver. This
+//! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`
+//! (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.
+//!
+//! Custom observers can be used as well by implementing the [`crate::core::observers::Observe`]
+//! trait.
+//!
+//! ## Example
+//!
+//! ```rust
+//! # #![allow(unused_imports)]
+//! # extern crate argmin;
+//! # extern crate argmin_testfunctions;
+//! # use argmin::core::{Error, Executor, CostFunction, Gradient, observers::ObserverMode};
+//! # #[cfg(feature = &quot;slog-logger&quot;)]
+//! # use argmin::core::observers::SlogLogger;
+//! # #[cfg(feature = &quot;serde1&quot;)]
+//! # use argmin::core::observers::{WriteToFile, WriteToFileSerializer};
+//! # use argmin::solver::gradientdescent::SteepestDescent;
+//! # use argmin::solver::linesearch::MoreThuenteLineSearch;
+//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! #
+//! # struct Rosenbrock {
+//! #     a: f64,
+//! #     b: f64,
+//! # }
+//! #
+//! # /// Implement `CostFunction` for `Rosenbrock`
+//! # impl CostFunction for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec&lt;f64&gt;;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Output = f64;
+//! #
+//! #     /// Apply the cost function to a parameter `p`
+//! #     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {
+//! #         Ok(rosenbrock_2d(p, 1.0, 100.0))
+//! #     }
+//! # }
+//! #
+//! # /// Implement `Gradient` for `Rosenbrock`
+//! # impl Gradient for Rosenbrock {
+//! #     /// Type of the parameter vector
+//! #     type Param = Vec&lt;f64&gt;;
+//! #     /// Type of the return value computed by the cost function
+//! #     type Gradient = Vec&lt;f64&gt;;
+//! #
+//! #     /// Compute the gradient at parameter `p`.
+//! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {
+//! #         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+//! #     }
+//! # }
+//! #
+//! # fn run() -&gt; Result&lt;(), Error&gt; {
+//! #
+//! # // Define cost function (must implement `CostFunction` and `Gradient`)
+//! # let problem = Rosenbrock { a: 1.0, b: 100.0 };
+//! #
+//! # // Define initial parameter vector
+//! # let init_param: Vec&lt;f64&gt; = vec![-1.2, 1.0];
+//! #
+//! # // Set up line search
+//! # let linesearch = MoreThuenteLineSearch::new();
+//! #
+//! # // Set up solver
+//! # let solver = SteepestDescent::new(linesearch);
+//! #
+//! // [...]
+//!
+//! let res = Executor::new(problem, solver)
+//!     .configure(|config| config.param(init_param).max_iters(2))
+//! # ;
+//! # #[cfg(feature = &quot;slog-logger&quot;)]
+//! # let res = res
+//!     // Add an observer which will log all iterations to the terminal (without blocking)
+//!     .add_observer(SlogLogger::term_noblock(), ObserverMode::Always)
+//! # ;
+//! # #[cfg(feature = &quot;serde1&quot;)]
+//! # #[cfg(feature = &quot;slog-logger&quot;)]
+//! # let res = res
+//!     // Log to file whenever a new best solution is found
+//!     .add_observer(SlogLogger::file(&quot;solver.log&quot;, false)?, ObserverMode::NewBest)
+//!     // Write parameter vector to `params/param.arg` every 20th iteration
+//!     .add_observer(
+//!         WriteToFile::new(&quot;params&quot;, &quot;param&quot;, WriteToFileSerializer::JSON),
+//!         ObserverMode::Every(20)
+//!     )
+//! # ;
+//! # let res = res
+//!     // run the solver on the defined problem
+//!     .run()?;
+//!
+//! // [...]
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     if let Err(ref e) = run() {
+//! #         println!(&quot;{}&quot;, e);
+//! #         std::process::exit(1);
+//! #     }
+//! # }
+//! ```
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">file</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;slog-logger&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">slog_logger</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">pub mod </span>file;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;slog-logger&quot;</span>)]
+</span><span class="kw">pub mod </span>slog_logger;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">file</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;slog-logger&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">slog_logger</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">pub use </span>file::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;slog-logger&quot;</span>)]
+</span><span class="kw">pub use </span>slog_logger::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">Error</span>, <span class="ident">State</span>, <span class="ident">KV</span>};
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
+<span class="kw">use </span><span class="kw">crate</span>::core::{Error, State, KV};
+<span class="kw">use </span>std::default::Default;
+<span class="kw">use </span>std::sync::{Arc, Mutex};
 
-<span class="doccomment">/// An interface which every observer is required to implement</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::core::{Error, KV, State};</span>
-<span class="doccomment">/// use argmin::core::observers::Observe;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct MyObserver {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl&lt;I&gt; Observe&lt;I&gt; for MyObserver</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///     // Optional constraint on `I`. The `State` trait, which every state used in argmin needs to</span>
-<span class="doccomment">///     // implement, offers a range of methods which can be useful.</span>
-<span class="doccomment">///     I: State,</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     fn observe_init(&amp;mut self, name: &amp;str, kv: &amp;KV) -&gt; Result&lt;(), Error&gt; {</span>
-<span class="doccomment">///         // Do something with `name` and/or `kv`</span>
-<span class="doccomment">///         // Is executed after initialization of a solver</span>
-<span class="doccomment">///         Ok(())</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     fn observe_iter(&amp;mut self, state: &amp;I, kv: &amp;KV) -&gt; Result&lt;(), Error&gt; {</span>
-<span class="doccomment">///         // Do something with `state` and/or `kv`</span>
-<span class="doccomment">///         // Is executed after each iteration of a solver</span>
-<span class="doccomment">///         Ok(())</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Called once after initialization of the solver.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Has access to the name of the solver via `name` and to a key-value store `kv` with entries</span>
-    <span class="doccomment">/// specific for each solver.</span>
-    <span class="kw">fn</span> <span class="ident">observe_init</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_kv</span>: <span class="kw-2">&amp;</span><span class="ident">KV</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="doccomment">/// An interface which every observer is required to implement
+///
+/// # Example
+///
+/// ```
+/// use argmin::core::{Error, KV, State};
+/// use argmin::core::observers::Observe;
+///
+/// struct MyObserver {}
+///
+/// impl&lt;I&gt; Observe&lt;I&gt; for MyObserver
+/// where
+///     // Optional constraint on `I`. The `State` trait, which every state used in argmin needs to
+///     // implement, offers a range of methods which can be useful.
+///     I: State,
+/// {
+///     fn observe_init(&amp;mut self, name: &amp;str, kv: &amp;KV) -&gt; Result&lt;(), Error&gt; {
+///         // Do something with `name` and/or `kv`
+///         // Is executed after initialization of a solver
+///         Ok(())
+///     }
+///
+///     fn observe_iter(&amp;mut self, state: &amp;I, kv: &amp;KV) -&gt; Result&lt;(), Error&gt; {
+///         // Do something with `state` and/or `kv`
+///         // Is executed after each iteration of a solver
+///         Ok(())
+///     }
+/// }
+/// ```
+</span><span class="kw">pub trait </span>Observe&lt;I&gt; {
+    <span class="doccomment">/// Called once after initialization of the solver.
+    ///
+    /// Has access to the name of the solver via `name` and to a key-value store `kv` with entries
+    /// specific for each solver.
+    </span><span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _name: <span class="kw-2">&amp;</span>str, _kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Called at every iteration of the solver</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Has access to the current `state` of the solver (which always implements</span>
-    <span class="doccomment">/// [`State`](`crate::core::State`)) and to a key-value store `kv` with entries specific for</span>
-    <span class="doccomment">/// each solver.</span>
-    <span class="kw">fn</span> <span class="ident">observe_iter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">I</span>, <span class="ident">_kv</span>: <span class="kw-2">&amp;</span><span class="ident">KV</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Called at every iteration of the solver
+    ///
+    /// Has access to the current `state` of the solver (which always implements
+    /// [`State`](`crate::core::State`)) and to a key-value store `kv` with entries specific for
+    /// each solver.
+    </span><span class="kw">fn </span>observe_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>I, _kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">type</span> <span class="ident">ObserversVec</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ObserverMode</span>)<span class="op">&gt;</span>;
+<span class="kw">type </span>ObserversVec&lt;I&gt; = Vec&lt;(Arc&lt;Mutex&lt;<span class="kw">dyn </span>Observe&lt;I&gt;&gt;&gt;, ObserverMode)&gt;;
 
-<span class="doccomment">/// Container for observers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type also implements [`Observe`] and therefore can be used like a single observer.</span>
-<span class="doccomment">/// Each observer has an [`ObserverMode`] attached which indicates when the observer will be</span>
-<span class="doccomment">/// called.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Observers</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Vector of `Observe`rs with the corresponding `ObserverMode`</span>
-    <span class="ident">observers</span>: <span class="ident">ObserversVec</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Container for observers.
+///
+/// This type also implements [`Observe`] and therefore can be used like a single observer.
+/// Each observer has an [`ObserverMode`] attached which indicates when the observer will be
+/// called.
+</span><span class="attribute">#[derive(Clone, Default)]
+</span><span class="kw">pub struct </span>Observers&lt;I&gt; {
+    <span class="doccomment">/// Vector of `Observe`rs with the corresponding `ObserverMode`
+    </span>observers: ObserversVec&lt;I&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Observers</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct a new empty `Observers` instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::observers::Observers;</span>
-    <span class="doccomment">/// use argmin::core::IterState;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; = Observers::new();</span>
-    <span class="doccomment">/// # assert!(observers.is_empty());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Observers</span> { <span class="ident">observers</span>: <span class="macro">vec!</span>[] }
+<span class="kw">impl</span>&lt;I&gt; Observers&lt;I&gt; {
+    <span class="doccomment">/// Construct a new empty `Observers` instance.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::Observers;
+    /// use argmin::core::IterState;
+    ///
+    /// let observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; = Observers::new();
+    /// # assert!(observers.is_empty());
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Observers { observers: <span class="macro">vec!</span>[] }
     }
 
-    <span class="doccomment">/// Add another observer with a corresponding [`ObserverMode`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::observers::{Observers, ObserverMode};</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-    <span class="doccomment">/// use argmin::core::observers::SlogLogger;</span>
-    <span class="doccomment">/// use argmin::core::IterState;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; = Observers::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-    <span class="doccomment">/// let logger = SlogLogger::term();</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-    <span class="doccomment">/// observers.push(logger, ObserverMode::Always);</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;slog-logger&quot;)]</span>
-    <span class="doccomment">/// # assert!(!observers.is_empty());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span><span class="op">&lt;</span><span class="ident">OBS</span>: <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">observer</span>: <span class="ident">OBS</span>,
-        <span class="ident">mode</span>: <span class="ident">ObserverMode</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">push</span>((<span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">observer</span>)), <span class="ident">mode</span>));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Add another observer with a corresponding [`ObserverMode`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::{Observers, ObserverMode};
+    /// # #[cfg(feature = &quot;slog-logger&quot;)]
+    /// use argmin::core::observers::SlogLogger;
+    /// use argmin::core::IterState;
+    ///
+    /// let mut observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; = Observers::new();
+    ///
+    /// # #[cfg(feature = &quot;slog-logger&quot;)]
+    /// let logger = SlogLogger::term();
+    /// # #[cfg(feature = &quot;slog-logger&quot;)]
+    /// observers.push(logger, ObserverMode::Always);
+    /// # #[cfg(feature = &quot;slog-logger&quot;)]
+    /// # assert!(!observers.is_empty());
+    /// ```
+    </span><span class="kw">pub fn </span>push&lt;OBS: Observe&lt;I&gt; + <span class="lifetime">&#39;static</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        observer: OBS,
+        mode: ObserverMode,
+    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.observers.push((Arc::new(Mutex::new(observer)), mode));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Returns true if there are no observers stored.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::core::observers::Observers;</span>
-    <span class="doccomment">/// use argmin::core::IterState;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; = Observers::new();</span>
-    <span class="doccomment">/// assert!(observers.is_empty());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Returns true if there are no observers stored.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::Observers;
+    /// use argmin::core::IterState;
+    ///
+    /// let observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; = Observers::new();
+    /// assert!(observers.is_empty());
+    /// ```
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.observers.is_empty()
     }
 }
 
-<span class="doccomment">/// Implementing [`Observe`] for [`Observers`] allows to use it like a single observer. In its</span>
-<span class="doccomment">/// implementation it will loop over all stored observers, checks if the conditions for observing</span>
-<span class="doccomment">/// are met and calls the actual observers if required.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Observers</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// After initialization of the solver, this loops over all stored observers and calls them.</span>
-    <span class="kw">fn</span> <span class="ident">observe_init</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">kv</span>: <span class="kw-2">&amp;</span><span class="ident">KV</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">iter</span>() {
-            <span class="ident">l</span>.<span class="number">0</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">observe_init</span>(<span class="ident">name</span>, <span class="ident">kv</span>)<span class="question-mark">?</span>
+<span class="doccomment">/// Implementing [`Observe`] for [`Observers`] allows to use it like a single observer. In its
+/// implementation it will loop over all stored observers, checks if the conditions for observing
+/// are met and calls the actual observers if required.
+</span><span class="kw">impl</span>&lt;I: State&gt; Observe&lt;I&gt; <span class="kw">for </span>Observers&lt;I&gt; {
+    <span class="doccomment">/// After initialization of the solver, this loops over all stored observers and calls them.
+    </span><span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">for </span>l <span class="kw">in </span><span class="self">self</span>.observers.iter() {
+            l.<span class="number">0</span>.lock().unwrap().observe_init(name, kv)<span class="question-mark">?
+        </span>}
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Called after each iteration.
+    ///
+    /// Loops over all observers, and based on whether the condition for calling the observers are
+    /// met, calls them.
+    </span><span class="kw">fn </span>observe_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>I, kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">for </span>l <span class="kw">in </span><span class="self">self</span>.observers.iter_mut() {
+            <span class="kw">let </span>iter = state.get_iter();
+            <span class="kw">let </span>observer = <span class="kw-2">&amp;mut </span>l.<span class="number">0</span>.lock().unwrap();
+            <span class="kw">match </span>l.<span class="number">1 </span>{
+                ObserverMode::Always =&gt; observer.observe_iter(state, kv),
+                ObserverMode::Every(i) <span class="kw">if </span>iter % i == <span class="number">0 </span>=&gt; observer.observe_iter(state, kv),
+                ObserverMode::NewBest <span class="kw">if </span>state.is_best() =&gt; observer.observe_iter(state, kv),
+                ObserverMode::Never | ObserverMode::Every(<span class="kw">_</span>) | ObserverMode::NewBest =&gt; <span class="prelude-val">Ok</span>(()),
+            }<span class="question-mark">?
+        </span>}
+        <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="doccomment">/// Indicates when to call an observer.
+///
+/// `Always` calls the observer in every iteration, `Every(X)` calls the observer every X
+/// iterations, `NewBest` calls the observer only when a new best parameter vector is found and
+/// `Never` deactivates the observer.
+</span><span class="attribute">#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>ObserverMode {
+    <span class="doccomment">/// Never call the observer
+    </span>Never,
+    <span class="doccomment">/// Call observer in every iteration
+    </span>Always,
+    <span class="doccomment">/// Call observer every N iterations
+    </span>Every(u64),
+    <span class="doccomment">/// Call observer when new best is found
+    </span>NewBest,
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>ObserverMode {
+    <span class="doccomment">/// The default for `ObserverMode` is `Always`
+    </span><span class="kw">fn </span>default() -&gt; ObserverMode {
+        ObserverMode::Always
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="macro">send_sync_test!</span>(observermode, ObserverMode);
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_observers() {
+        <span class="kw">use </span><span class="kw">crate</span>::core::observers::Observe;
+        <span class="kw">use </span><span class="kw">crate</span>::core::{Error, IterState, KV};
+
+        <span class="kw">struct </span>TestStor {
+            <span class="kw">pub </span>solver_name: String,
+            <span class="kw">pub </span>init_called: usize,
+            <span class="kw">pub </span>iter_called: usize,
         }
-        <span class="prelude-val">Ok</span>(())
-    }
 
-    <span class="doccomment">/// Called after each iteration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Loops over all observers, and based on whether the condition for calling the observers are</span>
-    <span class="doccomment">/// met, calls them.</span>
-    <span class="kw">fn</span> <span class="ident">observe_iter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">I</span>, <span class="ident">kv</span>: <span class="kw-2">&amp;</span><span class="ident">KV</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">observers</span>.<span class="ident">iter_mut</span>() {
-            <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_iter</span>();
-            <span class="kw">let</span> <span class="ident">observer</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">l</span>.<span class="number">0</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-            <span class="kw">match</span> <span class="ident">l</span>.<span class="number">1</span> {
-                <span class="ident">ObserverMode::Always</span> =&gt; <span class="ident">observer</span>.<span class="ident">observe_iter</span>(<span class="ident">state</span>, <span class="ident">kv</span>),
-                <span class="ident">ObserverMode::Every</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">iter</span> <span class="op">%</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">observer</span>.<span class="ident">observe_iter</span>(<span class="ident">state</span>, <span class="ident">kv</span>),
-                <span class="ident">ObserverMode::NewBest</span> <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_best</span>() =&gt; <span class="ident">observer</span>.<span class="ident">observe_iter</span>(<span class="ident">state</span>, <span class="ident">kv</span>),
-                <span class="ident">ObserverMode::Never</span> <span class="op">|</span> <span class="ident">ObserverMode::Every</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">ObserverMode::NewBest</span> =&gt; <span class="prelude-val">Ok</span>(()),
-            }<span class="question-mark">?</span>
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-}
-
-<span class="doccomment">/// Indicates when to call an observer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Always` calls the observer in every iteration, `Every(X)` calls the observer every X</span>
-<span class="doccomment">/// iterations, `NewBest` calls the observer only when a new best parameter vector is found and</span>
-<span class="doccomment">/// `Never` deactivates the observer.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ObserverMode</span> {
-    <span class="doccomment">/// Never call the observer</span>
-    <span class="ident">Never</span>,
-    <span class="doccomment">/// Call observer in every iteration</span>
-    <span class="ident">Always</span>,
-    <span class="doccomment">/// Call observer every N iterations</span>
-    <span class="ident">Every</span>(<span class="ident">u64</span>),
-    <span class="doccomment">/// Call observer when new best is found</span>
-    <span class="ident">NewBest</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ObserverMode</span> {
-    <span class="doccomment">/// The default for `ObserverMode` is `Always`</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">ObserverMode</span> {
-        <span class="ident">ObserverMode::Always</span>
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-    <span class="macro">send_sync_test!</span>(<span class="ident">observermode</span>, <span class="ident">ObserverMode</span>);
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_observers</span>() {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::observers::Observe</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">KV</span>};
-
-        <span class="kw">struct</span> <span class="ident">TestStor</span> {
-            <span class="kw">pub</span> <span class="ident">solver_name</span>: <span class="ident">String</span>,
-            <span class="kw">pub</span> <span class="ident">init_called</span>: <span class="ident">usize</span>,
-            <span class="kw">pub</span> <span class="ident">iter_called</span>: <span class="ident">usize</span>,
-        }
-
-        <span class="kw">impl</span> <span class="ident">TestStor</span> {
-            <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">TestStor</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-                <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">TestStor</span> {
-                    <span class="ident">solver_name</span>: <span class="ident">String::new</span>(),
-                    <span class="ident">init_called</span>: <span class="number">0</span>,
-                    <span class="ident">iter_called</span>: <span class="number">0</span>,
+        <span class="kw">impl </span>TestStor {
+            <span class="kw">fn </span>new() -&gt; Arc&lt;Mutex&lt;TestStor&gt;&gt; {
+                Arc::new(Mutex::new(TestStor {
+                    solver_name: String::new(),
+                    init_called: <span class="number">0</span>,
+                    iter_called: <span class="number">0</span>,
                 }))
             }
         }
 
-        <span class="kw">struct</span> <span class="ident">TestObs</span> {
-            <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">TestStor</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="kw">struct </span>TestObs {
+            data: Arc&lt;Mutex&lt;TestStor&gt;&gt;,
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TestObs</span> {
-            <span class="kw">fn</span> <span class="ident">observe_init</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_kv</span>: <span class="kw-2">&amp;</span><span class="ident">KV</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">solver_name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">impl</span>&lt;I&gt; Observe&lt;I&gt; <span class="kw">for </span>TestObs {
+            <span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, _kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+                <span class="self">self</span>.data.lock().unwrap().solver_name = name.into();
+                <span class="self">self</span>.data.lock().unwrap().init_called += <span class="number">1</span>;
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">observe_iter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">I</span>, <span class="ident">_kv</span>: <span class="kw-2">&amp;</span><span class="ident">KV</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">fn </span>observe_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>I, _kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+                <span class="self">self</span>.data.lock().unwrap().iter_called += <span class="number">1</span>;
                 <span class="prelude-val">Ok</span>(())
             }
         }
 
-        <span class="kw">let</span> <span class="ident">test_stor_1</span> <span class="op">=</span> <span class="ident">TestStor::new</span>();
-        <span class="kw">let</span> <span class="ident">test_obs_1</span> <span class="op">=</span> <span class="ident">TestObs</span> {
-            <span class="ident">data</span>: <span class="ident">test_stor_1</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span>test_stor_1 = TestStor::new();
+        <span class="kw">let </span>test_obs_1 = TestObs {
+            data: test_stor_1.clone(),
         };
 
-        <span class="kw">let</span> <span class="ident">test_stor_2</span> <span class="op">=</span> <span class="ident">TestStor::new</span>();
-        <span class="kw">let</span> <span class="ident">test_obs_2</span> <span class="op">=</span> <span class="ident">TestObs</span> {
-            <span class="ident">data</span>: <span class="ident">test_stor_2</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span>test_stor_2 = TestStor::new();
+        <span class="kw">let </span>test_obs_2 = TestObs {
+            data: test_stor_2.clone(),
         };
 
-        <span class="kw">let</span> <span class="ident">test_stor_3</span> <span class="op">=</span> <span class="ident">TestStor::new</span>();
-        <span class="kw">let</span> <span class="ident">test_obs_3</span> <span class="op">=</span> <span class="ident">TestObs</span> {
-            <span class="ident">data</span>: <span class="ident">test_stor_3</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span>test_stor_3 = TestStor::new();
+        <span class="kw">let </span>test_obs_3 = TestObs {
+            data: test_stor_3.clone(),
         };
 
-        <span class="kw">let</span> <span class="ident">test_stor_4</span> <span class="op">=</span> <span class="ident">TestStor::new</span>();
-        <span class="kw">let</span> <span class="ident">test_obs_4</span> <span class="op">=</span> <span class="ident">TestObs</span> {
-            <span class="ident">data</span>: <span class="ident">test_stor_4</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span>test_stor_4 = TestStor::new();
+        <span class="kw">let </span>test_obs_4 = TestObs {
+            data: test_stor_4.clone(),
         };
 
-        <span class="kw">let</span> <span class="ident">storages</span> <span class="op">=</span> [<span class="ident">test_stor_1</span>, <span class="ident">test_stor_2</span>, <span class="ident">test_stor_3</span>, <span class="ident">test_stor_4</span>];
+        <span class="kw">let </span>storages = [test_stor_1, test_stor_2, test_stor_3, test_stor_4];
 
-        <span class="kw">type</span> <span class="ident">TState</span> <span class="op">=</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), (), <span class="ident">f64</span><span class="op">&gt;</span>;
+        <span class="kw">type </span>TState = IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obs</span>: <span class="ident">Observers</span><span class="op">&lt;</span><span class="ident">TState</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Observers::new</span>();
-        <span class="ident">obs</span>.<span class="ident">push</span>(<span class="ident">test_obs_1</span>, <span class="ident">ObserverMode::Never</span>)
-            .<span class="ident">push</span>(<span class="ident">test_obs_2</span>, <span class="ident">ObserverMode::Always</span>)
-            .<span class="ident">push</span>(<span class="ident">test_obs_3</span>, <span class="ident">ObserverMode::Every</span>(<span class="number">3</span>))
-            .<span class="ident">push</span>(<span class="ident">test_obs_4</span>, <span class="ident">ObserverMode::NewBest</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>obs: Observers&lt;TState&gt; = Observers::new();
+        obs.push(test_obs_1, ObserverMode::Never)
+            .push(test_obs_2, ObserverMode::Always)
+            .push(test_obs_3, ObserverMode::Every(<span class="number">3</span>))
+            .push(test_obs_4, ObserverMode::NewBest);
 
-        <span class="ident">obs</span>.<span class="ident">observe_init</span>(<span class="string">&quot;test_solver&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).<span class="ident">unwrap</span>();
+        obs.observe_init(<span class="string">&quot;test_solver&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).unwrap();
 
-        <span class="comment">// all `init_called` should be 1, all `iter_called` 0</span>
-        <span class="kw">for</span> <span class="ident">s</span> <span class="kw">in</span> <span class="ident">storages</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">observer</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">observer</span>.<span class="ident">solver_name</span>, <span class="string">&quot;test_solver&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">observer</span>.<span class="ident">init_called</span>, <span class="number">1</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">observer</span>.<span class="ident">iter_called</span>, <span class="number">0</span>);
+        <span class="comment">// all `init_called` should be 1, all `iter_called` 0
+        </span><span class="kw">for </span>s <span class="kw">in </span>storages.iter() {
+            <span class="kw">let </span>observer = s.lock().unwrap();
+            <span class="macro">assert_eq!</span>(observer.solver_name, <span class="string">&quot;test_solver&quot;</span>);
+            <span class="macro">assert_eq!</span>(observer.init_called, <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(observer.iter_called, <span class="number">0</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">TState</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="ident">obs</span>.<span class="ident">observe_iter</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>state: TState = IterState::new();
+        obs.observe_iter(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">0</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">0</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">1</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">1</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">2</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">2</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">3</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">3</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">0</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">0</span>].lock().unwrap().iter_called, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">1</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">1</span>].lock().unwrap().iter_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">2</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">2</span>].lock().unwrap().iter_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">3</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">3</span>].lock().unwrap().iter_called, <span class="number">1</span>);
 
-        <span class="ident">state</span>.<span class="ident">increment_iter</span>();
-        <span class="ident">obs</span>.<span class="ident">observe_iter</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).<span class="ident">unwrap</span>();
+        state.increment_iter();
+        obs.observe_iter(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">0</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">0</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">1</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">1</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">2</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">2</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">3</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">3</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">0</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">0</span>].lock().unwrap().iter_called, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">1</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">1</span>].lock().unwrap().iter_called, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">2</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">2</span>].lock().unwrap().iter_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">3</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">3</span>].lock().unwrap().iter_called, <span class="number">1</span>);
 
-        <span class="ident">state</span>.<span class="ident">increment_iter</span>();
-        <span class="ident">state</span>.<span class="ident">increment_iter</span>();
-        <span class="ident">obs</span>.<span class="ident">observe_iter</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).<span class="ident">unwrap</span>();
+        state.increment_iter();
+        state.increment_iter();
+        obs.observe_iter(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">0</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">0</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">1</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">1</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">2</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">2</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">3</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">3</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">0</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">0</span>].lock().unwrap().iter_called, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">1</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">1</span>].lock().unwrap().iter_called, <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">2</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">2</span>].lock().unwrap().iter_called, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">3</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">3</span>].lock().unwrap().iter_called, <span class="number">1</span>);
 
-        <span class="ident">state</span>.<span class="ident">increment_iter</span>();
-        <span class="comment">// &quot;new best found&quot;</span>
-        <span class="ident">state</span>.<span class="ident">last_best_iter</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">iter</span>;
-        <span class="ident">obs</span>.<span class="ident">observe_iter</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).<span class="ident">unwrap</span>();
+        state.increment_iter();
+        <span class="comment">// &quot;new best found&quot;
+        </span>state.last_best_iter = state.iter;
+        obs.observe_iter(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">0</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">0</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">1</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">1</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">2</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">2</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">3</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">init_called</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">storages</span>[<span class="number">3</span>].<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter_called</span>, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">0</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">0</span>].lock().unwrap().iter_called, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">1</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">1</span>].lock().unwrap().iter_called, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">2</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">2</span>].lock().unwrap().iter_called, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">3</span>].lock().unwrap().init_called, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(storages[<span class="number">3</span>].lock().unwrap().iter_called, <span class="number">2</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

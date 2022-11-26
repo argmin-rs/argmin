@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/hagerzhang.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hagerzhang.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/linesearch/hagerzhang.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hagerzhang.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -930,937 +930,937 @@
 <span id="930">930</span>
 <span id="931">931</span>
 <span id="932">932</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">Error</span>, <span class="ident">Gradient</span>, <span class="ident">IterState</span>, <span class="ident">LineSearch</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>,
-    <span class="ident">Solver</span>, <span class="ident">TerminationReason</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
+    Solver, TerminationReason, KV,
 };
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminDot</span>, <span class="ident">ArgminScaledAdd</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>argmin_math::{ArgminDot, ArgminScaledAdd};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">type</span> <span class="ident">Triplet</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="ident">F</span>, <span class="ident">F</span>, <span class="ident">F</span>);
+<span class="kw">type </span>Triplet&lt;F&gt; = (F, F, F);
 
-<span class="doccomment">/// # Hager-Zhang line search</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The Hager-Zhang line search is a method to find a step length which obeys the strong Wolfe</span>
-<span class="doccomment">/// conditions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Reference</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// William W. Hager and Hongchao Zhang. &quot;A new conjugate gradient method with guaranteed</span>
-<span class="doccomment">/// descent and an efficient line search.&quot; SIAM J. Optim. 16(1), 2006, 170-192.</span>
-<span class="doccomment">/// DOI: &lt;https://doi.org/10.1137/030601880&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// delta: (0, 0.5), used in the Wolfe conditions</span>
-    <span class="ident">delta</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// sigma: [delta, 1), used in the Wolfe conditions</span>
-    <span class="ident">sigma</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// epsilon: [0, infinity), used in the approximate Wolfe termination</span>
-    <span class="ident">epsilon</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// epsilon_k</span>
-    <span class="ident">epsilon_k</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// theta: (0, 1), used in the update rules when the potential intervals [a, c] or [c, b]</span>
-    <span class="doccomment">/// violate the opposite slope condition</span>
-    <span class="ident">theta</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// gamma: (0, 1), determines when a bisection step is performed</span>
-    <span class="ident">gamma</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// eta: (0, infinity), used in the lower bound for beta_k^N</span>
-    <span class="ident">eta</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// initial a</span>
-    <span class="ident">a_x_init</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// a</span>
-    <span class="ident">a_x</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// phi(a)</span>
-    <span class="ident">a_f</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// phi&#39;(a)</span>
-    <span class="ident">a_g</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// initial b</span>
-    <span class="ident">b_x_init</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// b</span>
-    <span class="ident">b_x</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// phi(b)</span>
-    <span class="ident">b_f</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// phi&#39;(b)</span>
-    <span class="ident">b_g</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// initial c</span>
-    <span class="ident">c_x_init</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// c</span>
-    <span class="ident">c_x</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// phi(c)</span>
-    <span class="ident">c_f</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// phi&#39;(c)</span>
-    <span class="ident">c_g</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// best x</span>
-    <span class="ident">best_x</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// best function value</span>
-    <span class="ident">best_f</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// best slope</span>
-    <span class="ident">best_g</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// initial parameter vector</span>
-    <span class="ident">init_param</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// initial cost</span>
-    <span class="ident">finit</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// initial gradient (builder)</span>
-    <span class="ident">init_grad</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Search direction (builder)</span>
-    <span class="ident">search_direction</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Search direction in 1D</span>
-    <span class="ident">dginit</span>: <span class="ident">F</span>,
+<span class="doccomment">/// # Hager-Zhang line search
+///
+/// The Hager-Zhang line search is a method to find a step length which obeys the strong Wolfe
+/// conditions.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
+/// ## Reference
+///
+/// William W. Hager and Hongchao Zhang. &quot;A new conjugate gradient method with guaranteed
+/// descent and an efficient line search.&quot; SIAM J. Optim. 16(1), 2006, 170-192.
+/// DOI: &lt;https://doi.org/10.1137/030601880&gt;
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>HagerZhangLineSearch&lt;P, G, F&gt; {
+    <span class="doccomment">/// delta: (0, 0.5), used in the Wolfe conditions
+    </span>delta: F,
+    <span class="doccomment">/// sigma: [delta, 1), used in the Wolfe conditions
+    </span>sigma: F,
+    <span class="doccomment">/// epsilon: [0, infinity), used in the approximate Wolfe termination
+    </span>epsilon: F,
+    <span class="doccomment">/// epsilon_k
+    </span>epsilon_k: F,
+    <span class="doccomment">/// theta: (0, 1), used in the update rules when the potential intervals [a, c] or [c, b]
+    /// violate the opposite slope condition
+    </span>theta: F,
+    <span class="doccomment">/// gamma: (0, 1), determines when a bisection step is performed
+    </span>gamma: F,
+    <span class="doccomment">/// eta: (0, infinity), used in the lower bound for beta_k^N
+    </span>eta: F,
+    <span class="doccomment">/// initial a
+    </span>a_x_init: F,
+    <span class="doccomment">/// a
+    </span>a_x: F,
+    <span class="doccomment">/// phi(a)
+    </span>a_f: F,
+    <span class="doccomment">/// phi&#39;(a)
+    </span>a_g: F,
+    <span class="doccomment">/// initial b
+    </span>b_x_init: F,
+    <span class="doccomment">/// b
+    </span>b_x: F,
+    <span class="doccomment">/// phi(b)
+    </span>b_f: F,
+    <span class="doccomment">/// phi&#39;(b)
+    </span>b_g: F,
+    <span class="doccomment">/// initial c
+    </span>c_x_init: F,
+    <span class="doccomment">/// c
+    </span>c_x: F,
+    <span class="doccomment">/// phi(c)
+    </span>c_f: F,
+    <span class="doccomment">/// phi&#39;(c)
+    </span>c_g: F,
+    <span class="doccomment">/// best x
+    </span>best_x: F,
+    <span class="doccomment">/// best function value
+    </span>best_f: F,
+    <span class="doccomment">/// best slope
+    </span>best_g: F,
+    <span class="doccomment">/// initial parameter vector
+    </span>init_param: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// initial cost
+    </span>finit: F,
+    <span class="doccomment">/// initial gradient (builder)
+    </span>init_grad: <span class="prelude-ty">Option</span>&lt;G&gt;,
+    <span class="doccomment">/// Search direction (builder)
+    </span>search_direction: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// Search direction in 1D
+    </span>dginit: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, G, F&gt; HagerZhangLineSearch&lt;P, G, F&gt;
+<span class="kw">where
+    </span>P: ArgminScaledAdd&lt;P, F, P&gt; + ArgminDot&lt;G, F&gt;,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`HagerZhangLineSearch`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::HagerZhangLineSearch;</span>
-    <span class="doccomment">/// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">HagerZhangLineSearch</span> {
-            <span class="ident">delta</span>: <span class="macro">float!</span>(<span class="number">0.1</span>),
-            <span class="ident">sigma</span>: <span class="macro">float!</span>(<span class="number">0.9</span>),
-            <span class="ident">epsilon</span>: <span class="macro">float!</span>(<span class="number">1e-6</span>),
-            <span class="ident">epsilon_k</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">theta</span>: <span class="macro">float!</span>(<span class="number">0.5</span>),
-            <span class="ident">gamma</span>: <span class="macro">float!</span>(<span class="number">0.66</span>),
-            <span class="ident">eta</span>: <span class="macro">float!</span>(<span class="number">0.01</span>),
-            <span class="ident">a_x_init</span>: <span class="ident">F::epsilon</span>(),
-            <span class="ident">a_x</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">a_f</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">a_g</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">b_x_init</span>: <span class="macro">float!</span>(<span class="number">1e5</span>),
-            <span class="ident">b_x</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">b_f</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">b_g</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">c_x_init</span>: <span class="macro">float!</span>(<span class="number">1.0</span>),
-            <span class="ident">c_x</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">c_f</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">c_g</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">best_x</span>: <span class="macro">float!</span>(<span class="number">0.0</span>),
-            <span class="ident">best_f</span>: <span class="ident">F::infinity</span>(),
-            <span class="ident">best_g</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">init_param</span>: <span class="prelude-val">None</span>,
-            <span class="ident">init_grad</span>: <span class="prelude-val">None</span>,
-            <span class="ident">search_direction</span>: <span class="prelude-val">None</span>,
-            <span class="ident">dginit</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">finit</span>: <span class="ident">F::infinity</span>(),
+    <span class="doccomment">/// Construct a new instance of [`HagerZhangLineSearch`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        HagerZhangLineSearch {
+            delta: <span class="macro">float!</span>(<span class="number">0.1</span>),
+            sigma: <span class="macro">float!</span>(<span class="number">0.9</span>),
+            epsilon: <span class="macro">float!</span>(<span class="number">1e-6</span>),
+            epsilon_k: F::nan(),
+            theta: <span class="macro">float!</span>(<span class="number">0.5</span>),
+            gamma: <span class="macro">float!</span>(<span class="number">0.66</span>),
+            eta: <span class="macro">float!</span>(<span class="number">0.01</span>),
+            a_x_init: F::epsilon(),
+            a_x: F::nan(),
+            a_f: F::nan(),
+            a_g: F::nan(),
+            b_x_init: <span class="macro">float!</span>(<span class="number">1e5</span>),
+            b_x: F::nan(),
+            b_f: F::nan(),
+            b_g: F::nan(),
+            c_x_init: <span class="macro">float!</span>(<span class="number">1.0</span>),
+            c_x: F::nan(),
+            c_f: F::nan(),
+            c_g: F::nan(),
+            best_x: <span class="macro">float!</span>(<span class="number">0.0</span>),
+            best_f: F::infinity(),
+            best_g: F::nan(),
+            init_param: <span class="prelude-val">None</span>,
+            init_grad: <span class="prelude-val">None</span>,
+            search_direction: <span class="prelude-val">None</span>,
+            dginit: F::nan(),
+            finit: F::infinity(),
         }
     }
 
-    <span class="doccomment">/// Set delta and sigma.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Delta defaults to `0.1` and must be in `(0, 1)`.</span>
-    <span class="doccomment">/// Sigma defaults to `0.9` and must be in `[delta, 1)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Delta and Sigma correspond to the constants `c1` and `c2` of the strong Wolfe conditions,</span>
-    <span class="doccomment">/// respectively.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::HagerZhangLineSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     HagerZhangLineSearch::new().with_delta_sigma(0.2, 0.8)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_delta_sigma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delta</span>: <span class="ident">F</span>, <span class="ident">sigma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">delta</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">sigma</span> <span class="op">&lt;</span> <span class="ident">delta</span> <span class="op">|</span><span class="op">|</span> <span class="ident">sigma</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`HagerZhangLineSearch`: delta must be in (0, 1) and sigma must be in [delta, 1).&quot;</span>
-            ));
+    <span class="doccomment">/// Set delta and sigma.
+    ///
+    /// Delta defaults to `0.1` and must be in `(0, 1)`.
+    /// Sigma defaults to `0.9` and must be in `[delta, 1)`.
+    ///
+    /// Delta and Sigma correspond to the constants `c1` and `c2` of the strong Wolfe conditions,
+    /// respectively.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =
+    ///     HagerZhangLineSearch::new().with_delta_sigma(0.2, 0.8)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_delta_sigma(<span class="kw-2">mut </span><span class="self">self</span>, delta: F, sigma: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>delta &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || delta &gt;= <span class="macro">float!</span>(<span class="number">1.0</span>) || sigma &lt; delta || sigma &gt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`HagerZhangLineSearch`: delta must be in (0, 1) and sigma must be in [delta, 1).&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">delta</span> <span class="op">=</span> <span class="ident">delta</span>;
-        <span class="self">self</span>.<span class="ident">sigma</span> <span class="op">=</span> <span class="ident">sigma</span>;
+        <span class="self">self</span>.delta = delta;
+        <span class="self">self</span>.sigma = sigma;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set epsilon</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Used in the approximate strong Wolfe condition.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be non-negative and defaults to `1e-6`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::HagerZhangLineSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     HagerZhangLineSearch::new().with_epsilon(1e-8)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_epsilon</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">epsilon</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">epsilon</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`HagerZhangLineSearch`: epsilon must be &gt;= 0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set epsilon
+    ///
+    /// Used in the approximate strong Wolfe condition.
+    ///
+    /// Must be non-negative and defaults to `1e-6`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =
+    ///     HagerZhangLineSearch::new().with_epsilon(1e-8)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_epsilon(<span class="kw-2">mut </span><span class="self">self</span>, epsilon: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>epsilon &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`HagerZhangLineSearch`: epsilon must be &gt;= 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">epsilon</span>;
+        <span class="self">self</span>.epsilon = epsilon;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set theta</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Used in the update rules when the potential intervals [a, c] or [c, b] violate the opposite</span>
-    <span class="doccomment">/// slope condition.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be in `(0, 1)` and defaults to `0.5`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::HagerZhangLineSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     HagerZhangLineSearch::new().with_theta(0.4)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_theta</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">theta</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">theta</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">theta</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`HagerZhangLineSearch`: theta must be in (0, 1).&quot;</span>
-            ));
+    <span class="doccomment">/// Set theta
+    ///
+    /// Used in the update rules when the potential intervals [a, c] or [c, b] violate the opposite
+    /// slope condition.
+    ///
+    /// Must be in `(0, 1)` and defaults to `0.5`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =
+    ///     HagerZhangLineSearch::new().with_theta(0.4)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_theta(<span class="kw-2">mut </span><span class="self">self</span>, theta: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>theta &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || theta &gt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`HagerZhangLineSearch`: theta must be in (0, 1).&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">theta</span> <span class="op">=</span> <span class="ident">theta</span>;
+        <span class="self">self</span>.theta = theta;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set gamma</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Determines when a bisection step is performed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be in `(0, 1)` and defaults to `0.66`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::HagerZhangLineSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     HagerZhangLineSearch::new().with_gamma(0.7)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gamma</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">gamma</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">1.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`HagerZhangLineSearch`: gamma must be in (0, 1).&quot;</span>
-            ));
+    <span class="doccomment">/// Set gamma
+    ///
+    /// Determines when a bisection step is performed.
+    ///
+    /// Must be in `(0, 1)` and defaults to `0.66`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =
+    ///     HagerZhangLineSearch::new().with_gamma(0.7)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_gamma(<span class="kw-2">mut </span><span class="self">self</span>, gamma: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>gamma &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || gamma &gt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`HagerZhangLineSearch`: gamma must be in (0, 1).&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span>;
+        <span class="self">self</span>.gamma = gamma;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set eta</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Used in the lower bound for `beta_k^N`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be larger than zero and defaults to `0.01`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::HagerZhangLineSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     HagerZhangLineSearch::new().with_eta(0.02)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_eta</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eta</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">eta</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`HagerZhangLineSearch`: eta must be &gt; 0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set eta
+    ///
+    /// Used in the lower bound for `beta_k^N`.
+    ///
+    /// Must be larger than zero and defaults to `0.01`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =
+    ///     HagerZhangLineSearch::new().with_eta(0.02)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_eta(<span class="kw-2">mut </span><span class="self">self</span>, eta: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>eta &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`HagerZhangLineSearch`: eta must be &gt; 0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">eta</span> <span class="op">=</span> <span class="ident">eta</span>;
+        <span class="self">self</span>.eta = eta;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set lower and upper bound of step</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to a minimum step length of `EPSILON` and a maximum step length of `1e5`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The chosen values must satisfy `0 &lt;= step_min &lt; step_max`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::linesearch::HagerZhangLineSearch;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =</span>
-    <span class="doccomment">///     HagerZhangLineSearch::new().with_bounds(1e-3, 1.0)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_bounds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">step_min</span>: <span class="ident">F</span>, <span class="ident">step_max</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">step_min</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">step_max</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">step_min</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
+    <span class="doccomment">/// Set lower and upper bound of step
+    ///
+    /// Defaults to a minimum step length of `EPSILON` and a maximum step length of `1e5`.
+    ///
+    /// The chosen values must satisfy `0 &lt;= step_min &lt; step_max`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::linesearch::HagerZhangLineSearch;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; =
+    ///     HagerZhangLineSearch::new().with_bounds(1e-3, 1.0)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_bounds(<span class="kw-2">mut </span><span class="self">self</span>, step_min: F, step_max: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>step_min &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) || step_max &lt;= step_min {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;`HagerZhangLineSearch`: minimum and maximum step length must be chosen &quot;</span>,
-                    <span class="string">&quot;such that 0 &lt;= step_min &lt; step_max.&quot;</span>
-                )
+                    <span class="string">&quot;such that 0 &lt;= step_min &lt; step_max.&quot;
+                </span>)
             ));
         }
-        <span class="self">self</span>.<span class="ident">a_x_init</span> <span class="op">=</span> <span class="ident">step_min</span>;
-        <span class="self">self</span>.<span class="ident">b_x_init</span> <span class="op">=</span> <span class="ident">step_max</span>;
+        <span class="self">self</span>.a_x_init = step_min;
+        <span class="self">self</span>.b_x_init = step_max;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        (<span class="ident">a_x</span>, <span class="ident">a_f</span>, <span class="ident">a_g</span>): <span class="ident">Triplet</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-        (<span class="ident">b_x</span>, <span class="ident">b_f</span>, <span class="ident">b_g</span>): <span class="ident">Triplet</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-        (<span class="ident">c_x</span>, <span class="ident">c_f</span>, <span class="ident">c_g</span>): <span class="ident">Triplet</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Triplet</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">Triplet</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>update&lt;O&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        (a_x, a_f, a_g): Triplet&lt;F&gt;,
+        (b_x, b_f, b_g): Triplet&lt;F&gt;,
+        (c_x, c_f, c_g): Triplet&lt;F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(Triplet&lt;F&gt;, Triplet&lt;F&gt;), Error&gt;
+    <span class="kw">where
+        </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
     {
-        <span class="comment">// U0</span>
-        <span class="kw">if</span> <span class="ident">c_x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">a_x</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c_x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">b_x</span> {
-            <span class="comment">// nothing changes.</span>
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(((<span class="ident">a_x</span>, <span class="ident">a_f</span>, <span class="ident">a_g</span>), (<span class="ident">b_x</span>, <span class="ident">b_f</span>, <span class="ident">b_g</span>)));
+        <span class="comment">// U0
+        </span><span class="kw">if </span>c_x &lt;= a_x || c_x &gt;= b_x {
+            <span class="comment">// nothing changes.
+            </span><span class="kw">return </span><span class="prelude-val">Ok</span>(((a_x, a_f, a_g), (b_x, b_f, b_g)));
         }
 
-        <span class="comment">// U1</span>
-        <span class="kw">if</span> <span class="ident">c_g</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(((<span class="ident">a_x</span>, <span class="ident">a_f</span>, <span class="ident">a_g</span>), (<span class="ident">c_x</span>, <span class="ident">c_f</span>, <span class="ident">c_g</span>)));
+        <span class="comment">// U1
+        </span><span class="kw">if </span>c_g &gt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(((a_x, a_f, a_g), (c_x, c_f, c_g)));
         }
 
-        <span class="comment">// U2</span>
-        <span class="kw">if</span> <span class="ident">c_g</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">&amp;&amp;</span> <span class="ident">c_f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">epsilon_k</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(((<span class="ident">c_x</span>, <span class="ident">c_f</span>, <span class="ident">c_g</span>), (<span class="ident">b_x</span>, <span class="ident">b_f</span>, <span class="ident">b_g</span>)));
+        <span class="comment">// U2
+        </span><span class="kw">if </span>c_g &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) &amp;&amp; c_f &lt;= <span class="self">self</span>.finit + <span class="self">self</span>.epsilon_k {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(((c_x, c_f, c_g), (b_x, b_f, b_g)));
         }
 
-        <span class="comment">// U3</span>
-        <span class="kw">if</span> <span class="ident">c_g</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">&amp;&amp;</span> <span class="ident">c_f</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">epsilon_k</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ah_x</span> <span class="op">=</span> <span class="ident">a_x</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ah_f</span> <span class="op">=</span> <span class="ident">a_f</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ah_g</span> <span class="op">=</span> <span class="ident">a_g</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bh_x</span> <span class="op">=</span> <span class="ident">c_x</span>;
-            <span class="kw">loop</span> {
-                <span class="kw">let</span> <span class="ident">d_x</span> <span class="op">=</span> (<span class="macro">float!</span>(<span class="number">1.0</span>) <span class="op">-</span> <span class="self">self</span>.<span class="ident">theta</span>) <span class="op">*</span> <span class="ident">ah_x</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">theta</span> <span class="op">*</span> <span class="ident">bh_x</span>;
-                <span class="kw">let</span> <span class="ident">d_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">problem</span>, <span class="ident">d_x</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">d_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">problem</span>, <span class="ident">d_x</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">d_g</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(((<span class="ident">ah_x</span>, <span class="ident">ah_f</span>, <span class="ident">ah_g</span>), (<span class="ident">d_x</span>, <span class="ident">d_f</span>, <span class="ident">d_g</span>)));
+        <span class="comment">// U3
+        </span><span class="kw">if </span>c_g &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) &amp;&amp; c_f &gt; <span class="self">self</span>.finit + <span class="self">self</span>.epsilon_k {
+            <span class="kw">let </span><span class="kw-2">mut </span>ah_x = a_x;
+            <span class="kw">let </span><span class="kw-2">mut </span>ah_f = a_f;
+            <span class="kw">let </span><span class="kw-2">mut </span>ah_g = a_g;
+            <span class="kw">let </span><span class="kw-2">mut </span>bh_x = c_x;
+            <span class="kw">loop </span>{
+                <span class="kw">let </span>d_x = (<span class="macro">float!</span>(<span class="number">1.0</span>) - <span class="self">self</span>.theta) * ah_x + <span class="self">self</span>.theta * bh_x;
+                <span class="kw">let </span>d_f = <span class="self">self</span>.calc(problem, d_x)<span class="question-mark">?</span>;
+                <span class="kw">let </span>d_g = <span class="self">self</span>.calc_grad(problem, d_x)<span class="question-mark">?</span>;
+                <span class="kw">if </span>d_g &gt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(((ah_x, ah_f, ah_g), (d_x, d_f, d_g)));
                 }
-                <span class="kw">if</span> <span class="ident">d_g</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">&amp;&amp;</span> <span class="ident">d_f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">epsilon_k</span> {
-                    <span class="ident">ah_x</span> <span class="op">=</span> <span class="ident">d_x</span>;
-                    <span class="ident">ah_f</span> <span class="op">=</span> <span class="ident">d_f</span>;
-                    <span class="ident">ah_g</span> <span class="op">=</span> <span class="ident">d_g</span>;
+                <span class="kw">if </span>d_g &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) &amp;&amp; d_f &lt;= <span class="self">self</span>.finit + <span class="self">self</span>.epsilon_k {
+                    ah_x = d_x;
+                    ah_f = d_f;
+                    ah_g = d_g;
                 }
-                <span class="kw">if</span> <span class="ident">d_g</span> <span class="op">&lt;</span> <span class="macro">float!</span>(<span class="number">0.0</span>) <span class="op">&amp;&amp;</span> <span class="ident">d_f</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">epsilon_k</span> {
-                    <span class="ident">bh_x</span> <span class="op">=</span> <span class="ident">d_x</span>;
+                <span class="kw">if </span>d_g &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) &amp;&amp; d_f &gt; <span class="self">self</span>.finit + <span class="self">self</span>.epsilon_k {
+                    bh_x = d_x;
                 }
             }
         }
 
-        <span class="comment">// return Ok(((a_x, a_f, a_g), (b_x, b_f, b_g)));</span>
-        <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`HagerZhangLineSearch`: Reached unreachable point in `update` method.&quot;</span>
-        ))
+        <span class="comment">// return Ok(((a_x, a_f, a_g), (b_x, b_f, b_g)));
+        </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+            PotentialBug,
+            <span class="string">&quot;`HagerZhangLineSearch`: Reached unreachable point in `update` method.&quot;
+        </span>))
     }
 
-    <span class="doccomment">/// secant step</span>
-    <span class="kw">fn</span> <span class="ident">secant</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a_x</span>: <span class="ident">F</span>, <span class="ident">a_g</span>: <span class="ident">F</span>, <span class="ident">b_x</span>: <span class="ident">F</span>, <span class="ident">b_g</span>: <span class="ident">F</span>) -&gt; <span class="ident">F</span> {
-        (<span class="ident">a_x</span> <span class="op">*</span> <span class="ident">b_g</span> <span class="op">-</span> <span class="ident">b_x</span> <span class="op">*</span> <span class="ident">a_g</span>) <span class="op">/</span> (<span class="ident">b_g</span> <span class="op">-</span> <span class="ident">a_g</span>)
+    <span class="doccomment">/// secant step
+    </span><span class="kw">fn </span>secant(<span class="kw-2">&amp;</span><span class="self">self</span>, a_x: F, a_g: F, b_x: F, b_g: F) -&gt; F {
+        (a_x * b_g - b_x * a_g) / (b_g - a_g)
     }
 
-    <span class="doccomment">/// double secant step</span>
-    <span class="kw">fn</span> <span class="ident">secant2</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        (<span class="ident">a_x</span>, <span class="ident">a_f</span>, <span class="ident">a_g</span>): <span class="ident">Triplet</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-        (<span class="ident">b_x</span>, <span class="ident">b_f</span>, <span class="ident">b_g</span>): <span class="ident">Triplet</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Triplet</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">Triplet</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// double secant step
+    </span><span class="kw">fn </span>secant2&lt;O&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        (a_x, a_f, a_g): Triplet&lt;F&gt;,
+        (b_x, b_f, b_g): Triplet&lt;F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(Triplet&lt;F&gt;, Triplet&lt;F&gt;), Error&gt;
+    <span class="kw">where
+        </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
     {
-        <span class="comment">// S1</span>
-        <span class="kw">let</span> <span class="ident">c_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">secant</span>(<span class="ident">a_x</span>, <span class="ident">a_g</span>, <span class="ident">b_x</span>, <span class="ident">b_g</span>);
-        <span class="kw">let</span> <span class="ident">c_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">problem</span>, <span class="ident">c_x</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">c_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">problem</span>, <span class="ident">c_x</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c_bar_x</span>: <span class="ident">F</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>);
+        <span class="comment">// S1
+        </span><span class="kw">let </span>c_x = <span class="self">self</span>.secant(a_x, a_g, b_x, b_g);
+        <span class="kw">let </span>c_f = <span class="self">self</span>.calc(problem, c_x)<span class="question-mark">?</span>;
+        <span class="kw">let </span>c_g = <span class="self">self</span>.calc_grad(problem, c_x)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>c_bar_x: F = <span class="macro">float!</span>(<span class="number">0.0</span>);
 
-        <span class="kw">let</span> ((<span class="ident">aa_x</span>, <span class="ident">aa_f</span>, <span class="ident">aa_g</span>), (<span class="ident">bb_x</span>, <span class="ident">bb_f</span>, <span class="ident">bb_g</span>)) <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">update</span>(<span class="ident">problem</span>, (<span class="ident">a_x</span>, <span class="ident">a_f</span>, <span class="ident">a_g</span>), (<span class="ident">b_x</span>, <span class="ident">b_f</span>, <span class="ident">b_g</span>), (<span class="ident">c_x</span>, <span class="ident">c_f</span>, <span class="ident">c_g</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>((aa_x, aa_f, aa_g), (bb_x, bb_f, bb_g)) =
+            <span class="self">self</span>.update(problem, (a_x, a_f, a_g), (b_x, b_f, b_g), (c_x, c_f, c_g))<span class="question-mark">?</span>;
 
-        <span class="comment">// S2</span>
-        <span class="kw">if</span> (<span class="ident">c_x</span> <span class="op">-</span> <span class="ident">bb_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">F::epsilon</span>() {
-            <span class="ident">c_bar_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">secant</span>(<span class="ident">b_x</span>, <span class="ident">b_g</span>, <span class="ident">bb_x</span>, <span class="ident">bb_g</span>);
+        <span class="comment">// S2
+        </span><span class="kw">if </span>(c_x - bb_x).abs() &lt; F::epsilon() {
+            c_bar_x = <span class="self">self</span>.secant(b_x, b_g, bb_x, bb_g);
         }
 
-        <span class="comment">// S3</span>
-        <span class="kw">if</span> (<span class="ident">c_x</span> <span class="op">-</span> <span class="ident">aa_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">F::epsilon</span>() {
-            <span class="ident">c_bar_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">secant</span>(<span class="ident">a_x</span>, <span class="ident">a_g</span>, <span class="ident">aa_x</span>, <span class="ident">aa_g</span>);
+        <span class="comment">// S3
+        </span><span class="kw">if </span>(c_x - aa_x).abs() &lt; F::epsilon() {
+            c_bar_x = <span class="self">self</span>.secant(a_x, a_g, aa_x, aa_g);
         }
 
-        <span class="comment">// S4</span>
-        <span class="kw">if</span> (<span class="ident">c_x</span> <span class="op">-</span> <span class="ident">aa_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">F::epsilon</span>() <span class="op">|</span><span class="op">|</span> (<span class="ident">c_x</span> <span class="op">-</span> <span class="ident">bb_x</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">F::epsilon</span>() {
-            <span class="kw">let</span> <span class="ident">c_bar_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">problem</span>, <span class="ident">c_bar_x</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">c_bar_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">problem</span>, <span class="ident">c_bar_x</span>)<span class="question-mark">?</span>;
+        <span class="comment">// S4
+        </span><span class="kw">if </span>(c_x - aa_x).abs() &lt; F::epsilon() || (c_x - bb_x).abs() &lt; F::epsilon() {
+            <span class="kw">let </span>c_bar_f = <span class="self">self</span>.calc(problem, c_bar_x)<span class="question-mark">?</span>;
+            <span class="kw">let </span>c_bar_g = <span class="self">self</span>.calc_grad(problem, c_bar_x)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> (<span class="ident">a_bar</span>, <span class="ident">b_bar</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">update</span>(
-                <span class="ident">problem</span>,
-                (<span class="ident">aa_x</span>, <span class="ident">aa_f</span>, <span class="ident">aa_g</span>),
-                (<span class="ident">bb_x</span>, <span class="ident">bb_f</span>, <span class="ident">bb_g</span>),
-                (<span class="ident">c_bar_x</span>, <span class="ident">c_bar_f</span>, <span class="ident">c_bar_g</span>),
+            <span class="kw">let </span>(a_bar, b_bar) = <span class="self">self</span>.update(
+                problem,
+                (aa_x, aa_f, aa_g),
+                (bb_x, bb_f, bb_g),
+                (c_bar_x, c_bar_f, c_bar_g),
             )<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>((<span class="ident">a_bar</span>, <span class="ident">b_bar</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(((<span class="ident">aa_x</span>, <span class="ident">aa_f</span>, <span class="ident">aa_g</span>), (<span class="ident">bb_x</span>, <span class="ident">bb_f</span>, <span class="ident">bb_g</span>)))
+            <span class="prelude-val">Ok</span>((a_bar, b_bar))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(((aa_x, aa_f, aa_g), (bb_x, bb_f, bb_g)))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">calc</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">alpha</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>calc&lt;O&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;, alpha: F) -&gt; <span class="prelude-ty">Result</span>&lt;F, Error&gt;
+    <span class="kw">where
+        </span>O: CostFunction&lt;Param = P, Output = F&gt;,
     {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">init_param</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-                <span class="ident">PotentialBug</span>,
-                <span class="string">&quot;`HagerZhangLineSearch`: `init_param` is `None` in `calc`.&quot;</span>
-            ))<span class="question-mark">?</span>
-            .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="ident">alpha</span>, <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
-        <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)
+        <span class="kw">let </span>tmp = <span class="self">self
+            </span>.init_param
+            .as_ref()
+            .ok_or_else(<span class="macro">argmin_error_closure!</span>(
+                PotentialBug,
+                <span class="string">&quot;`HagerZhangLineSearch`: `init_param` is `None` in `calc`.&quot;
+            </span>))<span class="question-mark">?
+            </span>.scaled_add(<span class="kw-2">&amp;</span>alpha, <span class="self">self</span>.search_direction.as_ref().unwrap());
+        problem.cost(<span class="kw-2">&amp;</span>tmp)
     }
 
-    <span class="kw">fn</span> <span class="ident">calc_grad</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">alpha</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">O</span>: <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>calc_grad&lt;O&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;, alpha: F) -&gt; <span class="prelude-ty">Result</span>&lt;F, Error&gt;
+    <span class="kw">where
+        </span>O: Gradient&lt;Param = P, Gradient = G&gt;,
     {
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">init_param</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-                <span class="ident">PotentialBug</span>,
-                <span class="string">&quot;`HagerZhangLineSearch`: `init_param` is `None` in `calc_grad`.&quot;</span>
-            ))<span class="question-mark">?</span>
-            .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="ident">alpha</span>, <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>))
+        <span class="kw">let </span>tmp = <span class="self">self
+            </span>.init_param
+            .as_ref()
+            .ok_or_else(<span class="macro">argmin_error_closure!</span>(
+                PotentialBug,
+                <span class="string">&quot;`HagerZhangLineSearch`: `init_param` is `None` in `calc_grad`.&quot;
+            </span>))<span class="question-mark">?
+            </span>.scaled_add(<span class="kw-2">&amp;</span>alpha, <span class="self">self</span>.search_direction.as_ref().unwrap());
+        <span class="kw">let </span>grad = problem.gradient(<span class="kw-2">&amp;</span>tmp)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.search_direction.as_ref().unwrap().dot(<span class="kw-2">&amp;</span>grad))
     }
 
-    <span class="kw">fn</span> <span class="ident">set_best</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">a_f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">b_f</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">a_f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">c_f</span> {
-            <span class="self">self</span>.<span class="ident">best_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a_x</span>;
-            <span class="self">self</span>.<span class="ident">best_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a_f</span>;
-            <span class="self">self</span>.<span class="ident">best_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a_g</span>;
+    <span class="kw">fn </span>set_best(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.a_f &lt;= <span class="self">self</span>.b_f &amp;&amp; <span class="self">self</span>.a_f &lt;= <span class="self">self</span>.c_f {
+            <span class="self">self</span>.best_x = <span class="self">self</span>.a_x;
+            <span class="self">self</span>.best_f = <span class="self">self</span>.a_f;
+            <span class="self">self</span>.best_g = <span class="self">self</span>.a_g;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">b_f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">a_f</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">b_f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">c_f</span> {
-            <span class="self">self</span>.<span class="ident">best_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b_x</span>;
-            <span class="self">self</span>.<span class="ident">best_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b_f</span>;
-            <span class="self">self</span>.<span class="ident">best_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b_g</span>;
+        <span class="kw">if </span><span class="self">self</span>.b_f &lt;= <span class="self">self</span>.a_f &amp;&amp; <span class="self">self</span>.b_f &lt;= <span class="self">self</span>.c_f {
+            <span class="self">self</span>.best_x = <span class="self">self</span>.b_x;
+            <span class="self">self</span>.best_f = <span class="self">self</span>.b_f;
+            <span class="self">self</span>.best_g = <span class="self">self</span>.b_g;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">c_f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">a_f</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">c_f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">b_f</span> {
-            <span class="self">self</span>.<span class="ident">best_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c_x</span>;
-            <span class="self">self</span>.<span class="ident">best_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c_f</span>;
-            <span class="self">self</span>.<span class="ident">best_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c_g</span>;
+        <span class="kw">if </span><span class="self">self</span>.c_f &lt;= <span class="self">self</span>.a_f &amp;&amp; <span class="self">self</span>.c_f &lt;= <span class="self">self</span>.b_f {
+            <span class="self">self</span>.best_x = <span class="self">self</span>.c_x;
+            <span class="self">self</span>.best_f = <span class="self">self</span>.c_f;
+            <span class="self">self</span>.best_g = <span class="self">self</span>.c_g;
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, G, F&gt; Default <span class="kw">for </span>HagerZhangLineSearch&lt;P, G, F&gt;
+<span class="kw">where
+    </span>P: ArgminScaledAdd&lt;P, F, P&gt; + ArgminDot&lt;G, F&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">HagerZhangLineSearch::new</span>()
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        HagerZhangLineSearch::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">LineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Set search direction</span>
-    <span class="kw">fn</span> <span class="ident">search_direction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">search_direction</span>: <span class="ident">P</span>) {
-        <span class="self">self</span>.<span class="ident">search_direction</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">search_direction</span>);
+<span class="kw">impl</span>&lt;P, G, F&gt; LineSearch&lt;P, F&gt; <span class="kw">for </span>HagerZhangLineSearch&lt;P, G, F&gt; {
+    <span class="doccomment">/// Set search direction
+    </span><span class="kw">fn </span>search_direction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, search_direction: P) {
+        <span class="self">self</span>.search_direction = <span class="prelude-val">Some</span>(search_direction);
     }
 
-    <span class="doccomment">/// Set initial alpha value</span>
-    <span class="kw">fn</span> <span class="ident">initial_step_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">c_x_init</span> <span class="op">=</span> <span class="ident">alpha</span>;
+    <span class="doccomment">/// Set initial alpha value
+    </span><span class="kw">fn </span>initial_step_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alpha: F) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="self">self</span>.c_x_init = alpha;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminScaledAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">G</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, G, O, F&gt; Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt; <span class="kw">for </span>HagerZhangLineSearch&lt;P, G, F&gt;
+<span class="kw">where
+    </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
+    P: Clone + SerializeAlias + ArgminDot&lt;G, F&gt; + ArgminScaledAdd&lt;P, F, P&gt;,
+    G: Clone + SerializeAlias + ArgminDot&lt;P, F&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Hager-Zhang line search&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Hager-Zhang line search&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="macro">check_param!</span>(
-            <span class="self">self</span>.<span class="ident">search_direction</span>,
+            <span class="self">self</span>.search_direction,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`HagerZhangLineSearch`: Search direction not initialized. &quot;</span>,
-                <span class="string">&quot;Call `search_direction` before executing the solver.&quot;</span>
-            )
+                <span class="string">&quot;Call `search_direction` before executing the solver.&quot;
+            </span>)
         );
 
-        <span class="self">self</span>.<span class="ident">init_param</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+        <span class="self">self</span>.init_param = <span class="prelude-val">Some</span>(state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`HagerZhangLineSearch` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>);
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_cost</span>();
-        <span class="self">self</span>.<span class="ident">finit</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cost</span>.<span class="ident">is_infinite</span>() {
-            <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">init_param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())<span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">cost</span>
+        <span class="kw">let </span>cost = state.get_cost();
+        <span class="self">self</span>.finit = <span class="kw">if </span>cost.is_infinite() {
+            problem.cost(<span class="self">self</span>.init_param.as_ref().unwrap())<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            cost
         };
 
-        <span class="self">self</span>.<span class="ident">init_grad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
-            <span class="ident">state</span>
-                .<span class="ident">take_gradient</span>()
-                .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="self">self</span>.<span class="ident">init_param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()))<span class="question-mark">?</span>,
+        <span class="self">self</span>.init_grad = <span class="prelude-val">Some</span>(
+            state
+                .take_gradient()
+                .map(Result::Ok)
+                .unwrap_or_else(|| problem.gradient(<span class="self">self</span>.init_param.as_ref().unwrap()))<span class="question-mark">?</span>,
         );
 
-        <span class="self">self</span>.<span class="ident">a_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a_x_init</span>;
-        <span class="self">self</span>.<span class="ident">b_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b_x_init</span>;
-        <span class="self">self</span>.<span class="ident">c_x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">c_x_init</span>;
+        <span class="self">self</span>.a_x = <span class="self">self</span>.a_x_init;
+        <span class="self">self</span>.b_x = <span class="self">self</span>.b_x_init;
+        <span class="self">self</span>.c_x = <span class="self">self</span>.c_x_init;
 
-        <span class="self">self</span>.<span class="ident">a_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">problem</span>, <span class="self">self</span>.<span class="ident">a_x</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">a_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">problem</span>, <span class="self">self</span>.<span class="ident">a_x</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">b_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">problem</span>, <span class="self">self</span>.<span class="ident">b_x</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">b_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">problem</span>, <span class="self">self</span>.<span class="ident">b_x</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">c_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc</span>(<span class="ident">problem</span>, <span class="self">self</span>.<span class="ident">c_x</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">c_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calc_grad</span>(<span class="ident">problem</span>, <span class="self">self</span>.<span class="ident">c_x</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.a_f = <span class="self">self</span>.calc(problem, <span class="self">self</span>.a_x)<span class="question-mark">?</span>;
+        <span class="self">self</span>.a_g = <span class="self">self</span>.calc_grad(problem, <span class="self">self</span>.a_x)<span class="question-mark">?</span>;
+        <span class="self">self</span>.b_f = <span class="self">self</span>.calc(problem, <span class="self">self</span>.b_x)<span class="question-mark">?</span>;
+        <span class="self">self</span>.b_g = <span class="self">self</span>.calc_grad(problem, <span class="self">self</span>.b_x)<span class="question-mark">?</span>;
+        <span class="self">self</span>.c_f = <span class="self">self</span>.calc(problem, <span class="self">self</span>.c_x)<span class="question-mark">?</span>;
+        <span class="self">self</span>.c_g = <span class="self">self</span>.calc_grad(problem, <span class="self">self</span>.c_x)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">epsilon_k</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">epsilon</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">finit</span>.<span class="ident">abs</span>();
+        <span class="self">self</span>.epsilon_k = <span class="self">self</span>.epsilon * <span class="self">self</span>.finit.abs();
 
-        <span class="self">self</span>.<span class="ident">dginit</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">init_grad</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">dot</span>(<span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
+        <span class="self">self</span>.dginit = <span class="self">self
+            </span>.init_grad
+            .as_ref()
+            .unwrap()
+            .dot(<span class="self">self</span>.search_direction.as_ref().unwrap());
 
-        <span class="self">self</span>.<span class="ident">set_best</span>();
-        <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">init_param</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">best_x</span>, <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
-        <span class="kw">let</span> <span class="ident">best_f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">best_f</span>;
+        <span class="self">self</span>.set_best();
+        <span class="kw">let </span>new_param = <span class="self">self
+            </span>.init_param
+            .as_ref()
+            .unwrap()
+            .scaled_add(<span class="kw-2">&amp;</span><span class="self">self</span>.best_x, <span class="self">self</span>.search_direction.as_ref().unwrap());
+        <span class="kw">let </span>best_f = <span class="self">self</span>.best_f;
 
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">new_param</span>).<span class="ident">cost</span>(<span class="ident">best_f</span>), <span class="prelude-val">None</span>))
+        <span class="prelude-val">Ok</span>((state.param(new_param).cost(best_f), <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// L1</span>
-        <span class="kw">let</span> <span class="ident">aa</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">a_x</span>, <span class="self">self</span>.<span class="ident">a_f</span>, <span class="self">self</span>.<span class="ident">a_g</span>);
-        <span class="kw">let</span> <span class="ident">bb</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">b_x</span>, <span class="self">self</span>.<span class="ident">b_f</span>, <span class="self">self</span>.<span class="ident">b_g</span>);
-        <span class="kw">let</span> ((<span class="kw-2">mut</span> <span class="ident">at_x</span>, <span class="kw-2">mut</span> <span class="ident">at_f</span>, <span class="kw-2">mut</span> <span class="ident">at_g</span>), (<span class="kw-2">mut</span> <span class="ident">bt_x</span>, <span class="kw-2">mut</span> <span class="ident">bt_f</span>, <span class="kw-2">mut</span> <span class="ident">bt_g</span>)) <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">secant2</span>(<span class="ident">problem</span>, <span class="ident">aa</span>, <span class="ident">bb</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        state: IterState&lt;P, G, (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="comment">// L1
+        </span><span class="kw">let </span>aa = (<span class="self">self</span>.a_x, <span class="self">self</span>.a_f, <span class="self">self</span>.a_g);
+        <span class="kw">let </span>bb = (<span class="self">self</span>.b_x, <span class="self">self</span>.b_f, <span class="self">self</span>.b_g);
+        <span class="kw">let </span>((<span class="kw-2">mut </span>at_x, <span class="kw-2">mut </span>at_f, <span class="kw-2">mut </span>at_g), (<span class="kw-2">mut </span>bt_x, <span class="kw-2">mut </span>bt_f, <span class="kw-2">mut </span>bt_g)) =
+            <span class="self">self</span>.secant2(problem, aa, bb)<span class="question-mark">?</span>;
 
-        <span class="comment">// L2</span>
-        <span class="kw">if</span> <span class="ident">bt_x</span> <span class="op">-</span> <span class="ident">at_x</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">b_x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">a_x</span>) {
-            <span class="kw">let</span> <span class="ident">c_x</span> <span class="op">=</span> (<span class="ident">at_x</span> <span class="op">+</span> <span class="ident">bt_x</span>) <span class="op">/</span> <span class="macro">float!</span>(<span class="number">2.0</span>);
-            <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">init_param</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="ident">c_x</span>, <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
-            <span class="kw">let</span> <span class="ident">c_f</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">c_g</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>);
-            <span class="kw">let</span> ((<span class="ident">an_x</span>, <span class="ident">an_f</span>, <span class="ident">an_g</span>), (<span class="ident">bn_x</span>, <span class="ident">bn_f</span>, <span class="ident">bn_g</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">update</span>(
-                <span class="ident">problem</span>,
-                (<span class="ident">at_x</span>, <span class="ident">at_f</span>, <span class="ident">at_g</span>),
-                (<span class="ident">bt_x</span>, <span class="ident">bt_f</span>, <span class="ident">bt_g</span>),
-                (<span class="ident">c_x</span>, <span class="ident">c_f</span>, <span class="ident">c_g</span>),
+        <span class="comment">// L2
+        </span><span class="kw">if </span>bt_x - at_x &gt; <span class="self">self</span>.gamma * (<span class="self">self</span>.b_x - <span class="self">self</span>.a_x) {
+            <span class="kw">let </span>c_x = (at_x + bt_x) / <span class="macro">float!</span>(<span class="number">2.0</span>);
+            <span class="kw">let </span>tmp = <span class="self">self
+                </span>.init_param
+                .as_ref()
+                .unwrap()
+                .scaled_add(<span class="kw-2">&amp;</span>c_x, <span class="self">self</span>.search_direction.as_ref().unwrap());
+            <span class="kw">let </span>c_f = problem.cost(<span class="kw-2">&amp;</span>tmp)<span class="question-mark">?</span>;
+            <span class="kw">let </span>grad = problem.gradient(<span class="kw-2">&amp;</span>tmp)<span class="question-mark">?</span>;
+            <span class="kw">let </span>c_g = <span class="self">self</span>.search_direction.as_ref().unwrap().dot(<span class="kw-2">&amp;</span>grad);
+            <span class="kw">let </span>((an_x, an_f, an_g), (bn_x, bn_f, bn_g)) = <span class="self">self</span>.update(
+                problem,
+                (at_x, at_f, at_g),
+                (bt_x, bt_f, bt_g),
+                (c_x, c_f, c_g),
             )<span class="question-mark">?</span>;
-            <span class="ident">at_x</span> <span class="op">=</span> <span class="ident">an_x</span>;
-            <span class="ident">at_f</span> <span class="op">=</span> <span class="ident">an_f</span>;
-            <span class="ident">at_g</span> <span class="op">=</span> <span class="ident">an_g</span>;
-            <span class="ident">bt_x</span> <span class="op">=</span> <span class="ident">bn_x</span>;
-            <span class="ident">bt_f</span> <span class="op">=</span> <span class="ident">bn_f</span>;
-            <span class="ident">bt_g</span> <span class="op">=</span> <span class="ident">bn_g</span>;
+            at_x = an_x;
+            at_f = an_f;
+            at_g = an_g;
+            bt_x = bn_x;
+            bt_f = bn_f;
+            bt_g = bn_g;
         }
 
-        <span class="comment">// L3</span>
-        <span class="self">self</span>.<span class="ident">a_x</span> <span class="op">=</span> <span class="ident">at_x</span>;
-        <span class="self">self</span>.<span class="ident">a_f</span> <span class="op">=</span> <span class="ident">at_f</span>;
-        <span class="self">self</span>.<span class="ident">a_g</span> <span class="op">=</span> <span class="ident">at_g</span>;
-        <span class="self">self</span>.<span class="ident">b_x</span> <span class="op">=</span> <span class="ident">bt_x</span>;
-        <span class="self">self</span>.<span class="ident">b_f</span> <span class="op">=</span> <span class="ident">bt_f</span>;
-        <span class="self">self</span>.<span class="ident">b_g</span> <span class="op">=</span> <span class="ident">bt_g</span>;
+        <span class="comment">// L3
+        </span><span class="self">self</span>.a_x = at_x;
+        <span class="self">self</span>.a_f = at_f;
+        <span class="self">self</span>.a_g = at_g;
+        <span class="self">self</span>.b_x = bt_x;
+        <span class="self">self</span>.b_f = bt_f;
+        <span class="self">self</span>.b_g = bt_g;
 
-        <span class="self">self</span>.<span class="ident">set_best</span>();
-        <span class="kw">let</span> <span class="ident">new_param</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">init_param</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">scaled_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">best_x</span>, <span class="self">self</span>.<span class="ident">search_direction</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">new_param</span>).<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">best_f</span>), <span class="prelude-val">None</span>))
+        <span class="self">self</span>.set_best();
+        <span class="kw">let </span>new_param = <span class="self">self
+            </span>.init_param
+            .as_ref()
+            .unwrap()
+            .scaled_add(<span class="kw-2">&amp;</span><span class="self">self</span>.best_x, <span class="self">self</span>.search_direction.as_ref().unwrap());
+        <span class="prelude-val">Ok</span>((state.param(new_param).cost(<span class="self">self</span>.best_f), <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">best_f</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">delta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">best_x</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">best_g</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">sigma</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span>
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), (), F&gt;) -&gt; TerminationReason {
+        <span class="kw">if </span><span class="self">self</span>.best_f - <span class="self">self</span>.finit &lt;= <span class="self">self</span>.delta * <span class="self">self</span>.best_x * <span class="self">self</span>.dginit
+            &amp;&amp; <span class="self">self</span>.best_g &gt;= <span class="self">self</span>.sigma * <span class="self">self</span>.dginit
         {
-            <span class="kw">return</span> <span class="ident">TerminationReason::LineSearchConditionMet</span>;
+            <span class="kw">return </span>TerminationReason::LineSearchConditionMet;
         }
-        <span class="kw">if</span> (<span class="macro">float!</span>(<span class="number">2.0</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">delta</span> <span class="op">-</span> <span class="macro">float!</span>(<span class="number">1.0</span>)) <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">best_g</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">best_g</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">sigma</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dginit</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">best_f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">finit</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">epsilon_k</span>
+        <span class="kw">if </span>(<span class="macro">float!</span>(<span class="number">2.0</span>) * <span class="self">self</span>.delta - <span class="macro">float!</span>(<span class="number">1.0</span>)) * <span class="self">self</span>.dginit &gt;= <span class="self">self</span>.best_g
+            &amp;&amp; <span class="self">self</span>.best_g &gt;= <span class="self">self</span>.sigma * <span class="self">self</span>.dginit
+            &amp;&amp; <span class="self">self</span>.best_f &lt;= <span class="self">self</span>.finit + <span class="self">self</span>.epsilon_k
         {
-            <span class="kw">return</span> <span class="ident">TerminationReason::LineSearchConditionMet</span>;
+            <span class="kw">return </span>TerminationReason::LineSearchConditionMet;
         }
-        <span class="ident">TerminationReason::NotTerminated</span>
+        TerminationReason::NotTerminated
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">test_utils::TestProblem</span>, <span class="ident">ArgminError</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">State</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::{test_utils::TestProblem, ArgminError, IterState, Problem, State};
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">hagerzhang</span>, <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(hagerzhang, HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">HagerZhangLineSearch</span> {
-            <span class="ident">delta</span>,
-            <span class="ident">sigma</span>,
-            <span class="ident">epsilon</span>,
-            <span class="ident">epsilon_k</span>,
-            <span class="ident">theta</span>,
-            <span class="ident">gamma</span>,
-            <span class="ident">eta</span>,
-            <span class="ident">a_x_init</span>,
-            <span class="ident">a_x</span>,
-            <span class="ident">a_f</span>,
-            <span class="ident">a_g</span>,
-            <span class="ident">b_x_init</span>,
-            <span class="ident">b_x</span>,
-            <span class="ident">b_f</span>,
-            <span class="ident">b_g</span>,
-            <span class="ident">c_x_init</span>,
-            <span class="ident">c_x</span>,
-            <span class="ident">c_f</span>,
-            <span class="ident">c_g</span>,
-            <span class="ident">best_x</span>,
-            <span class="ident">best_f</span>,
-            <span class="ident">best_g</span>,
-            <span class="ident">init_param</span>,
-            <span class="ident">init_grad</span>,
-            <span class="ident">search_direction</span>,
-            <span class="ident">dginit</span>,
-            <span class="ident">finit</span>,
-        } <span class="op">=</span> <span class="ident">hzls</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+        <span class="kw">let </span>HagerZhangLineSearch {
+            delta,
+            sigma,
+            epsilon,
+            epsilon_k,
+            theta,
+            gamma,
+            eta,
+            a_x_init,
+            a_x,
+            a_f,
+            a_g,
+            b_x_init,
+            b_x,
+            b_f,
+            b_g,
+            c_x_init,
+            c_x,
+            c_f,
+            c_g,
+            best_x,
+            best_f,
+            best_g,
+            init_param,
+            init_grad,
+            search_direction,
+            dginit,
+            finit,
+        } = hzls;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">delta</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.1f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">sigma</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.9f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">epsilon</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1e-6f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert!</span>(<span class="ident">epsilon_k</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">theta</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.5f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">gamma</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.66f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">eta</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.01f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">a_x_init</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::EPSILON</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert!</span>(<span class="ident">a_x</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert!</span>(<span class="ident">a_f</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert!</span>(<span class="ident">a_g</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">b_x_init</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1e5f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert!</span>(<span class="ident">b_x</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert!</span>(<span class="ident">b_f</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert!</span>(<span class="ident">b_g</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">c_x_init</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert!</span>(<span class="ident">c_x</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert!</span>(<span class="ident">c_f</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert!</span>(<span class="ident">c_g</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">best_x</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">0.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert!</span>(<span class="ident">best_f</span>.<span class="ident">is_infinite</span>());
-        <span class="macro">assert!</span>(<span class="ident">best_f</span>.<span class="ident">is_sign_positive</span>());
-        <span class="macro">assert!</span>(<span class="ident">best_g</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert!</span>(<span class="ident">init_param</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">init_grad</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">search_direction</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">dginit</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert!</span>(<span class="ident">finit</span>.<span class="ident">is_infinite</span>());
-        <span class="macro">assert!</span>(<span class="ident">finit</span>.<span class="ident">is_sign_positive</span>());
+        <span class="macro">assert_eq!</span>(delta.to_ne_bytes(), <span class="number">0.1f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(sigma.to_ne_bytes(), <span class="number">0.9f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(epsilon.to_ne_bytes(), <span class="number">1e-6f64</span>.to_ne_bytes());
+        <span class="macro">assert!</span>(epsilon_k.is_nan());
+        <span class="macro">assert_eq!</span>(theta.to_ne_bytes(), <span class="number">0.5f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(gamma.to_ne_bytes(), <span class="number">0.66f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(eta.to_ne_bytes(), <span class="number">0.01f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(a_x_init.to_ne_bytes(), f64::EPSILON.to_ne_bytes());
+        <span class="macro">assert!</span>(a_x.is_nan());
+        <span class="macro">assert!</span>(a_f.is_nan());
+        <span class="macro">assert!</span>(a_g.is_nan());
+        <span class="macro">assert_eq!</span>(b_x_init.to_ne_bytes(), <span class="number">1e5f64</span>.to_ne_bytes());
+        <span class="macro">assert!</span>(b_x.is_nan());
+        <span class="macro">assert!</span>(b_f.is_nan());
+        <span class="macro">assert!</span>(b_g.is_nan());
+        <span class="macro">assert_eq!</span>(c_x_init.to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
+        <span class="macro">assert!</span>(c_x.is_nan());
+        <span class="macro">assert!</span>(c_f.is_nan());
+        <span class="macro">assert!</span>(c_g.is_nan());
+        <span class="macro">assert_eq!</span>(best_x.to_ne_bytes(), <span class="number">0.0f64</span>.to_ne_bytes());
+        <span class="macro">assert!</span>(best_f.is_infinite());
+        <span class="macro">assert!</span>(best_f.is_sign_positive());
+        <span class="macro">assert!</span>(best_g.is_nan());
+        <span class="macro">assert!</span>(init_param.is_none());
+        <span class="macro">assert!</span>(init_grad.is_none());
+        <span class="macro">assert!</span>(search_direction.is_none());
+        <span class="macro">assert!</span>(dginit.is_nan());
+        <span class="macro">assert!</span>(finit.is_infinite());
+        <span class="macro">assert!</span>(finit.is_sign_positive());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_delta_sigma</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> (<span class="ident">delta</span>, <span class="ident">sigma</span>) <span class="kw">in</span> [
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_delta_sigma() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>(delta, sigma) <span class="kw">in </span>[
             (<span class="number">0.2</span>, <span class="number">0.8</span>),
             (<span class="number">0.5</span>, <span class="number">0.5</span>),
-            (<span class="number">0.0</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="number">0.5</span>),
-            (<span class="number">0.2</span>, <span class="number">1.0</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>),
+            (<span class="number">0.0 </span>+ f64::EPSILON, <span class="number">0.5</span>),
+            (<span class="number">0.2</span>, <span class="number">1.0 </span>- f64::EPSILON),
             (<span class="number">0.5</span>, <span class="number">0.5</span>),
         ] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_delta_sigma</span>(<span class="ident">delta</span>, <span class="ident">sigma</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_delta_sigma(delta, sigma);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">hzls</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">hzls</span>.<span class="ident">delta</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">delta</span>.<span class="ident">to_ne_bytes</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">hzls</span>.<span class="ident">sigma</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">sigma</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>hzls = res.unwrap();
+            <span class="macro">assert_eq!</span>(hzls.delta.to_ne_bytes(), delta.to_ne_bytes());
+            <span class="macro">assert_eq!</span>(hzls.sigma.to_ne_bytes(), sigma.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> (<span class="ident">delta</span>, <span class="ident">sigma</span>) <span class="kw">in</span> [
-            (<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.5</span>),
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>(delta, sigma) <span class="kw">in </span>[
+            (-<span class="number">1.0</span>, <span class="number">0.5</span>),
             (<span class="number">0.0</span>, <span class="number">0.5</span>),
             (<span class="number">1.0</span>, <span class="number">0.5</span>),
             (<span class="number">2.0</span>, <span class="number">0.5</span>),
-            (<span class="number">0.5</span>, <span class="number">0.5</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>),
+            (<span class="number">0.5</span>, <span class="number">0.5 </span>- f64::EPSILON),
             (<span class="number">0.5</span>, <span class="number">0.0</span>),
             (<span class="number">0.5</span>, <span class="number">1.0</span>),
             (<span class="number">0.5</span>, <span class="number">2.0</span>),
             (<span class="number">0.6</span>, <span class="number">0.2</span>),
         ] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_delta_sigma</span>(<span class="ident">delta</span>, <span class="ident">sigma</span>);
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_delta_sigma(delta, sigma);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`HagerZhangLineSearch`: &quot;</span>,
-                    <span class="string">&quot;delta must be in (0, 1) and sigma must be in [delta, 1).\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;delta must be in (0, 1) and sigma must be in [delta, 1).\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_epsilon</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">epsilon</span> <span class="kw">in</span> [<span class="number">1e-6</span>, <span class="number">0.0</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_epsilon</span>(<span class="ident">epsilon</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_epsilon() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>epsilon <span class="kw">in </span>[<span class="number">1e-6</span>, <span class="number">0.0</span>, <span class="number">1e-2</span>, <span class="number">1.0</span>, <span class="number">2.0</span>] {
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_epsilon(epsilon);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">hzls</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">hzls</span>.<span class="ident">epsilon</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">epsilon</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>hzls = res.unwrap();
+            <span class="macro">assert_eq!</span>(hzls.epsilon.to_ne_bytes(), epsilon.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">epsilon</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">100.0</span>, <span class="op">-</span><span class="number">42.0</span>] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_epsilon</span>(<span class="ident">epsilon</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>epsilon <span class="kw">in </span>[-f64::EPSILON, -<span class="number">1.0</span>, -<span class="number">100.0</span>, -<span class="number">42.0</span>] {
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_epsilon(epsilon);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`HagerZhangLineSearch`: &quot;</span>,
-                    <span class="string">&quot;epsilon must be &gt;= 0.\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;epsilon must be &gt;= 0.\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_theta</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">theta</span> <span class="kw">in</span> [<span class="number">0.0</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="number">1e-2</span>, <span class="number">0.5</span>, <span class="number">0.6</span>, <span class="number">1.0</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_theta</span>(<span class="ident">theta</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_theta() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>theta <span class="kw">in </span>[<span class="number">0.0 </span>+ f64::EPSILON, <span class="number">1e-2</span>, <span class="number">0.5</span>, <span class="number">0.6</span>, <span class="number">1.0 </span>- f64::EPSILON] {
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_theta(theta);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">hzls</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">hzls</span>.<span class="ident">theta</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">theta</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>hzls = res.unwrap();
+            <span class="macro">assert_eq!</span>(hzls.theta.to_ne_bytes(), theta.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">theta</span> <span class="kw">in</span> [<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="op">-</span><span class="number">100.0</span>, <span class="number">42.0</span>] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_theta</span>(<span class="ident">theta</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>theta <span class="kw">in </span>[<span class="number">0.0</span>, <span class="number">1.0</span>, -<span class="number">100.0</span>, <span class="number">42.0</span>] {
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_theta(theta);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`HagerZhangLineSearch`: &quot;</span>,
-                    <span class="string">&quot;theta must be in (0, 1).\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;theta must be in (0, 1).\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_gamma</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">gamma</span> <span class="kw">in</span> [<span class="number">0.0</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="number">1e-2</span>, <span class="number">0.5</span>, <span class="number">0.6</span>, <span class="number">1.0</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_gamma</span>(<span class="ident">gamma</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_gamma() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>gamma <span class="kw">in </span>[<span class="number">0.0 </span>+ f64::EPSILON, <span class="number">1e-2</span>, <span class="number">0.5</span>, <span class="number">0.6</span>, <span class="number">1.0 </span>- f64::EPSILON] {
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_gamma(gamma);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">hzls</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">hzls</span>.<span class="ident">gamma</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">gamma</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>hzls = res.unwrap();
+            <span class="macro">assert_eq!</span>(hzls.gamma.to_ne_bytes(), gamma.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">gamma</span> <span class="kw">in</span> [<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="op">-</span><span class="number">100.0</span>, <span class="number">42.0</span>] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_gamma</span>(<span class="ident">gamma</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>gamma <span class="kw">in </span>[<span class="number">0.0</span>, <span class="number">1.0</span>, -<span class="number">100.0</span>, <span class="number">42.0</span>] {
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_gamma(gamma);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`HagerZhangLineSearch`: &quot;</span>,
-                    <span class="string">&quot;gamma must be in (0, 1).\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;gamma must be in (0, 1).\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_eta</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> <span class="ident">eta</span> <span class="kw">in</span> [<span class="number">0.0</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="number">1e-2</span>, <span class="number">0.5</span>, <span class="number">1.0</span>, <span class="number">10.0</span>] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_eta</span>(<span class="ident">eta</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_eta() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>eta <span class="kw">in </span>[<span class="number">0.0 </span>+ f64::EPSILON, <span class="number">1e-2</span>, <span class="number">0.5</span>, <span class="number">1.0</span>, <span class="number">10.0</span>] {
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_eta(eta);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">hzls</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">hzls</span>.<span class="ident">eta</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">eta</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>hzls = res.unwrap();
+            <span class="macro">assert_eq!</span>(hzls.eta.to_ne_bytes(), eta.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> <span class="ident">eta</span> <span class="kw">in</span> [<span class="number">0.0</span>, <span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="op">-</span><span class="number">100.0</span>, <span class="op">-</span><span class="number">42.0</span>] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_eta</span>(<span class="ident">eta</span>);
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>eta <span class="kw">in </span>[<span class="number">0.0</span>, -f64::EPSILON, -<span class="number">100.0</span>, -<span class="number">42.0</span>] {
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_eta(eta);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`HagerZhangLineSearch`: &quot;</span>,
-                    <span class="string">&quot;eta must be &gt; 0.\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;eta must be &gt; 0.\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_bounds</span>() {
-        <span class="comment">// correct parameters</span>
-        <span class="kw">for</span> (<span class="ident">min</span>, <span class="ident">max</span>) <span class="kw">in</span> [
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_bounds() {
+        <span class="comment">// correct parameters
+        </span><span class="kw">for </span>(min, max) <span class="kw">in </span>[
             (<span class="number">0.2</span>, <span class="number">0.8</span>),
-            (<span class="number">0.5</span> <span class="op">-</span> <span class="ident">f64::EPSILON</span>, <span class="number">0.5</span>),
-            (<span class="number">0.5</span>, <span class="number">0.5</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>),
+            (<span class="number">0.5 </span>- f64::EPSILON, <span class="number">0.5</span>),
+            (<span class="number">0.5</span>, <span class="number">0.5 </span>+ f64::EPSILON),
             (<span class="number">0.0</span>, <span class="number">0.5</span>),
-            (<span class="number">0.0</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="number">0.5</span>),
+            (<span class="number">0.0 </span>+ f64::EPSILON, <span class="number">0.5</span>),
             (<span class="number">50.0</span>, <span class="number">100.0</span>),
         ] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_bounds</span>(<span class="ident">min</span>, <span class="ident">max</span>);
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_bounds(min, max);
+            <span class="macro">assert!</span>(res.is_ok());
 
-            <span class="kw">let</span> <span class="ident">hzls</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">hzls</span>.<span class="ident">a_x_init</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">min</span>.<span class="ident">to_ne_bytes</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">hzls</span>.<span class="ident">b_x_init</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">max</span>.<span class="ident">to_ne_bytes</span>());
+            <span class="kw">let </span>hzls = res.unwrap();
+            <span class="macro">assert_eq!</span>(hzls.a_x_init.to_ne_bytes(), min.to_ne_bytes());
+            <span class="macro">assert_eq!</span>(hzls.b_x_init.to_ne_bytes(), max.to_ne_bytes());
         }
 
-        <span class="comment">// incorrect parameters</span>
-        <span class="kw">for</span> (<span class="ident">min</span>, <span class="ident">max</span>) <span class="kw">in</span> [
-            (<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.5</span>),
+        <span class="comment">// incorrect parameters
+        </span><span class="kw">for </span>(min, max) <span class="kw">in </span>[
+            (-<span class="number">1.0</span>, <span class="number">0.5</span>),
             (<span class="number">0.5</span>, <span class="number">0.5</span>),
-            (<span class="number">0.5</span> <span class="op">+</span> <span class="ident">f64::EPSILON</span>, <span class="number">0.5</span>),
+            (<span class="number">0.5 </span>+ f64::EPSILON, <span class="number">0.5</span>),
             (<span class="number">0.5</span>, <span class="number">0.0</span>),
-            (<span class="op">-</span><span class="number">1000.0</span>, <span class="op">-</span><span class="number">100.0</span>),
+            (-<span class="number">1000.0</span>, -<span class="number">100.0</span>),
         ] {
-            <span class="kw">let</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">with_bounds</span>(<span class="ident">min</span>, <span class="ident">max</span>);
+            <span class="kw">let </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+            <span class="kw">let </span>res = hzls.with_bounds(min, max);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
+                res,
+                ArgminError,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;Invalid parameter: \&quot;`HagerZhangLineSearch`: minimum and maximum step length &quot;</span>,
-                    <span class="string">&quot;must be chosen such that 0 &lt;= step_min &lt; step_max.\&quot;&quot;</span>
-                )
+                    <span class="string">&quot;must be chosen such that 0 &lt;= step_min &lt; step_max.\&quot;&quot;
+                </span>)
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_search_direction_not_set</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">IterState::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_search_direction_not_set() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+        <span class="kw">let </span>res = hzls.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), IterState::new());
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`HagerZhangLineSearch`: Search direction not initialized. &quot;</span>,
-                <span class="string">&quot;Call `search_direction` before executing the solver.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Call `search_direction` before executing the solver.\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_param_not_set</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hzls</span>: <span class="ident">HagerZhangLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HagerZhangLineSearch::new</span>();
-        <span class="ident">hzls</span>.<span class="ident">search_direction</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>]);
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hzls</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">IterState::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_param_not_set() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hzls: HagerZhangLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = HagerZhangLineSearch::new();
+        hzls.search_direction(<span class="macro">vec!</span>[<span class="number">1.0f64</span>]);
+        <span class="kw">let </span>res = hzls.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), IterState::new());
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`HagerZhangLineSearch` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

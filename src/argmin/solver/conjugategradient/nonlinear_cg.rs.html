@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/conjugategradient/nonlinear_cg.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>nonlinear_cg.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/conjugategradient/nonlinear_cg.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>nonlinear_cg.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -489,496 +489,496 @@
 <span id="489">489</span>
 <span id="490">490</span>
 <span id="491">491</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">CostFunction</span>, <span class="ident">DeserializeOwnedAlias</span>, <span class="ident">Error</span>, <span class="ident">Executor</span>, <span class="ident">Gradient</span>, <span class="ident">IterState</span>,
-    <span class="ident">LineSearch</span>, <span class="ident">NLCGBetaUpdate</span>, <span class="ident">OptimizationResult</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">State</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
+    LineSearch, NLCGBetaUpdate, OptimizationResult, Problem, SerializeAlias, Solver, State, KV,
 };
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{<span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminL2Norm</span>, <span class="ident">ArgminMul</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// # Non-linear Conjugate Gradient method</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A generalization of the conjugate gradient method for nonlinear optimization problems.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires an initial parameter vector.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Requirements on the optimization problem</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Reference</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">L</span>, <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// p</span>
-    <span class="ident">p</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// beta</span>
-    <span class="ident">beta</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// line search</span>
-    <span class="ident">linesearch</span>: <span class="ident">L</span>,
-    <span class="doccomment">/// beta update method</span>
-    <span class="ident">beta_method</span>: <span class="ident">B</span>,
-    <span class="doccomment">/// Number of iterations after which a restart is performed</span>
-    <span class="ident">restart_iter</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Restart based on orthogonality</span>
-    <span class="ident">restart_orthogonality</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+<span class="doccomment">/// # Non-linear Conjugate Gradient method
+///
+/// A generalization of the conjugate gradient method for nonlinear optimization problems.
+///
+/// Requires an initial parameter vector.
+///
+/// ## Requirements on the optimization problem
+///
+/// The optimization problem is required to implement [`CostFunction`] and [`Gradient`].
+///
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>NonlinearConjugateGradient&lt;P, L, B, F&gt; {
+    <span class="doccomment">/// p
+    </span>p: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// beta
+    </span>beta: F,
+    <span class="doccomment">/// line search
+    </span>linesearch: L,
+    <span class="doccomment">/// beta update method
+    </span>beta_method: B,
+    <span class="doccomment">/// Number of iterations after which a restart is performed
+    </span>restart_iter: u64,
+    <span class="doccomment">/// Restart based on orthogonality
+    </span>restart_orthogonality: <span class="prelude-ty">Option</span>&lt;F&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">L</span>, <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">L</span>, <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, L, B, F&gt; NonlinearConjugateGradient&lt;P, L, B, F&gt;
+<span class="kw">where
+    </span>F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of `NonlinearConjugateGradient`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Takes a [`LineSearch`] and a [`NLCGBetaUpdate`] as input.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::NonlinearConjugateGradient;</span>
-    <span class="doccomment">/// # let linesearch = ();</span>
-    <span class="doccomment">/// # let beta_method = ();</span>
-    <span class="doccomment">/// let nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, _, _, f64&gt; =</span>
-    <span class="doccomment">///     NonlinearConjugateGradient::new(linesearch, beta_method);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">linesearch</span>: <span class="ident">L</span>, <span class="ident">beta_method</span>: <span class="ident">B</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">NonlinearConjugateGradient</span> {
-            <span class="ident">p</span>: <span class="prelude-val">None</span>,
-            <span class="ident">beta</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">linesearch</span>,
-            <span class="ident">beta_method</span>,
-            <span class="ident">restart_iter</span>: <span class="ident">std::u64::MAX</span>,
-            <span class="ident">restart_orthogonality</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Construct a new instance of `NonlinearConjugateGradient`.
+    ///
+    /// Takes a [`LineSearch`] and a [`NLCGBetaUpdate`] as input.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::conjugategradient::NonlinearConjugateGradient;
+    /// # let linesearch = ();
+    /// # let beta_method = ();
+    /// let nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, _, _, f64&gt; =
+    ///     NonlinearConjugateGradient::new(linesearch, beta_method);
+    /// ```
+    </span><span class="kw">pub fn </span>new(linesearch: L, beta_method: B) -&gt; <span class="self">Self </span>{
+        NonlinearConjugateGradient {
+            p: <span class="prelude-val">None</span>,
+            beta: F::nan(),
+            linesearch,
+            beta_method,
+            restart_iter: std::u64::MAX,
+            restart_orthogonality: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Specify the number of iterations after which a restart should be performed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This allows the algorithm to &quot;forget&quot; previous information which may not be helpful</span>
-    <span class="doccomment">/// anymore.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::NonlinearConjugateGradient;</span>
-    <span class="doccomment">/// # let linesearch = ();</span>
-    <span class="doccomment">/// # let beta_method = ();</span>
-    <span class="doccomment">/// # let nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, _, _, f64&gt; = NonlinearConjugateGradient::new(linesearch, beta_method);</span>
-    <span class="doccomment">/// let nlcg = nlcg.restart_iters(100);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart_iters</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iters</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">restart_iter</span> <span class="op">=</span> <span class="ident">iters</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specify the number of iterations after which a restart should be performed.
+    ///
+    /// This allows the algorithm to &quot;forget&quot; previous information which may not be helpful
+    /// anymore.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::conjugategradient::NonlinearConjugateGradient;
+    /// # let linesearch = ();
+    /// # let beta_method = ();
+    /// # let nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, _, _, f64&gt; = NonlinearConjugateGradient::new(linesearch, beta_method);
+    /// let nlcg = nlcg.restart_iters(100);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>restart_iters(<span class="kw-2">mut </span><span class="self">self</span>, iters: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.restart_iter = iters;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the value for the orthogonality measure.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting this parameter leads to a restart of the algorithm (setting beta = 0) after</span>
-    <span class="doccomment">/// consecutive search directions stop being orthogonal. In other words, if this condition</span>
-    <span class="doccomment">/// is met:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `|\nabla f_k^T * \nabla f_{k-1}| / | \nabla f_k |^2 &gt;= v`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A typical value for `v` is 0.1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::conjugategradient::NonlinearConjugateGradient;</span>
-    <span class="doccomment">/// # let linesearch = ();</span>
-    <span class="doccomment">/// # let beta_method = ();</span>
-    <span class="doccomment">/// # let nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, _, _, f64&gt; = NonlinearConjugateGradient::new(linesearch, beta_method);</span>
-    <span class="doccomment">/// let nlcg = nlcg.restart_orthogonality(0.1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart_orthogonality</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">restart_orthogonality</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the value for the orthogonality measure.
+    ///
+    /// Setting this parameter leads to a restart of the algorithm (setting beta = 0) after
+    /// consecutive search directions stop being orthogonal. In other words, if this condition
+    /// is met:
+    ///
+    /// `|\nabla f_k^T * \nabla f_{k-1}| / | \nabla f_k |^2 &gt;= v`
+    ///
+    /// A typical value for `v` is 0.1.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::conjugategradient::NonlinearConjugateGradient;
+    /// # let linesearch = ();
+    /// # let beta_method = ();
+    /// # let nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, _, _, f64&gt; = NonlinearConjugateGradient::new(linesearch, beta_method);
+    /// let nlcg = nlcg.restart_orthogonality(0.1);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>restart_orthogonality(<span class="kw-2">mut </span><span class="self">self</span>, v: F) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.restart_orthogonality = <span class="prelude-val">Some</span>(v);
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">P</span>, <span class="ident">G</span>, <span class="ident">L</span>, <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">for</span> <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">L</span>, <span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Gradient</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="ident">P</span>, <span class="ident">Gradient</span> <span class="op">=</span> <span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">SerializeAlias</span> <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span> <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">G</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">DeserializeOwnedAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">L</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">LineSearch</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">NLCGBetaUpdate</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;O, P, G, L, B, F&gt; Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt;
+    <span class="kw">for </span>NonlinearConjugateGradient&lt;P, L, B, F&gt;
+<span class="kw">where
+    </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
+    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminAdd&lt;P, P&gt; + ArgminMul&lt;F, P&gt;,
+    G: Clone
+        + SerializeAlias
+        + DeserializeOwnedAlias
+        + ArgminMul&lt;F, P&gt;
+        + ArgminDot&lt;G, F&gt;
+        + ArgminL2Norm&lt;F&gt;,
+    L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt;,
+    B: NLCGBetaUpdate&lt;G, P, F&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Nonlinear Conjugate Gradient&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Nonlinear Conjugate Gradient&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">NotInitialized</span>,
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        state: IterState&lt;P, G, (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>param = state.get_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            NotInitialized,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;`NonlinearConjugateGradient` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+            </span>)
         ))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="ident">param</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="ident">param</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">grad</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>))));
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">cost</span>(<span class="ident">cost</span>).<span class="ident">gradient</span>(<span class="ident">grad</span>), <span class="prelude-val">None</span>))
+        <span class="kw">let </span>cost = problem.cost(param)<span class="question-mark">?</span>;
+        <span class="kw">let </span>grad = problem.gradient(param)<span class="question-mark">?</span>;
+        <span class="self">self</span>.p = <span class="prelude-val">Some</span>(grad.mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(-<span class="number">1.0</span>))));
+        <span class="prelude-val">Ok</span>((state.cost(cost).gradient(grad), <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">G</span>, (), (), <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`NonlinearConjugateGradient`: Field `p` not set&quot;</span>
-        ))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">xk</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`NonlinearConjugateGradient`: No `param` in `state`&quot;</span>
-        ))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">state</span>
-            .<span class="ident">take_gradient</span>()
-            .<span class="ident">map</span>(<span class="ident">Result::Ok</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">cur_cost</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">cost</span>;
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>p = <span class="self">self</span>.p.as_ref().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`NonlinearConjugateGradient`: Field `p` not set&quot;
+        </span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>xk = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`NonlinearConjugateGradient`: No `param` in `state`&quot;
+        </span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>grad = state
+            .take_gradient()
+            .map(Result::Ok)
+            .unwrap_or_else(|| problem.gradient(<span class="kw-2">&amp;</span>xk))<span class="question-mark">?</span>;
+        <span class="kw">let </span>cur_cost = state.cost;
 
-        <span class="comment">// Linesearch</span>
-        <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">search_direction</span>(<span class="ident">p</span>.<span class="ident">clone</span>());
+        <span class="comment">// Linesearch
+        </span><span class="self">self</span>.linesearch.search_direction(p.clone());
 
-        <span class="comment">// Run solver</span>
-        <span class="kw">let</span> <span class="ident">OptimizationResult</span> {
-            <span class="ident">problem</span>: <span class="ident">line_problem</span>,
-            <span class="ident">state</span>: <span class="kw-2">mut</span> <span class="ident">line_state</span>,
+        <span class="comment">// Run solver
+        </span><span class="kw">let </span>OptimizationResult {
+            problem: line_problem,
+            state: <span class="kw-2">mut </span>line_state,
             ..
-        } <span class="op">=</span> <span class="ident">Executor::new</span>(
-            <span class="ident">problem</span>.<span class="ident">take_problem</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-                <span class="ident">PotentialBug</span>,
-                <span class="string">&quot;`NonlinearConjugateGradient`: Failed to take `problem` for line search&quot;</span>
-            ))<span class="question-mark">?</span>,
-            <span class="self">self</span>.<span class="ident">linesearch</span>.<span class="ident">clone</span>(),
+        } = Executor::new(
+            problem.take_problem().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+                PotentialBug,
+                <span class="string">&quot;`NonlinearConjugateGradient`: Failed to take `problem` for line search&quot;
+            </span>))<span class="question-mark">?</span>,
+            <span class="self">self</span>.linesearch.clone(),
         )
-        .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">state</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">xk</span>).<span class="ident">gradient</span>(<span class="ident">grad</span>.<span class="ident">clone</span>()).<span class="ident">cost</span>(<span class="ident">cur_cost</span>))
-        .<span class="ident">ctrlc</span>(<span class="bool-val">false</span>)
-        .<span class="ident">run</span>()<span class="question-mark">?</span>;
+        .configure(|state| state.param(xk).gradient(grad.clone()).cost(cur_cost))
+        .ctrlc(<span class="bool-val">false</span>)
+        .run()<span class="question-mark">?</span>;
 
-        <span class="comment">// takes care of the counts of function evaluations</span>
-        <span class="ident">problem</span>.<span class="ident">consume_problem</span>(<span class="ident">line_problem</span>);
+        <span class="comment">// takes care of the counts of function evaluations
+        </span>problem.consume_problem(line_problem);
 
-        <span class="kw">let</span> <span class="ident">xk1</span> <span class="op">=</span> <span class="ident">line_state</span>.<span class="ident">take_param</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`NonlinearConjugateGradient`: No `param` returned by line search&quot;</span>
-        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>xk1 = line_state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`NonlinearConjugateGradient`: No `param` returned by line search&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="comment">// Update of beta</span>
-        <span class="kw">let</span> <span class="ident">new_grad</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="ident">xk1</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Update of beta
+        </span><span class="kw">let </span>new_grad = problem.gradient(<span class="kw-2">&amp;</span>xk1)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">restart_orthogonality</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">restart_orthogonality</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">new_grad</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>).<span class="ident">abs</span>() <span class="op">/</span> <span class="ident">new_grad</span>.<span class="ident">l2_norm</span>().<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">v</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+        <span class="kw">let </span>restart_orthogonality = <span class="kw">match </span><span class="self">self</span>.restart_orthogonality {
+            <span class="prelude-val">Some</span>(v) =&gt; new_grad.dot(<span class="kw-2">&amp;</span>grad).abs() / new_grad.l2_norm().powi(<span class="number">2</span>) &gt;= v,
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">restart_iter</span>: <span class="ident">bool</span> <span class="op">=</span>
-            (<span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">%</span> <span class="self">self</span>.<span class="ident">restart_iter</span> <span class="op">==</span> <span class="number">0</span>) <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let </span>restart_iter: bool =
+            (state.get_iter() % <span class="self">self</span>.restart_iter == <span class="number">0</span>) &amp;&amp; state.get_iter() != <span class="number">0</span>;
 
-        <span class="kw">if</span> <span class="ident">restart_iter</span> <span class="op">|</span><span class="op">|</span> <span class="ident">restart_orthogonality</span> {
-            <span class="self">self</span>.<span class="ident">beta</span> <span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_method</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">new_grad</span>, <span class="ident">p</span>);
+        <span class="kw">if </span>restart_iter || restart_orthogonality {
+            <span class="self">self</span>.beta = <span class="macro">float!</span>(<span class="number">0.0</span>);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.beta = <span class="self">self</span>.beta_method.update(<span class="kw-2">&amp;</span>grad, <span class="kw-2">&amp;</span>new_grad, p);
         }
 
-        <span class="comment">// Update of p</span>
-        <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">new_grad</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>))).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">beta</span>)));
+        <span class="comment">// Update of p
+        </span><span class="self">self</span>.p = <span class="prelude-val">Some</span>(new_grad.mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(-<span class="number">1.0</span>))).add(<span class="kw-2">&amp;</span>p.mul(<span class="kw-2">&amp;</span><span class="self">self</span>.beta)));
 
-        <span class="comment">// Housekeeping</span>
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="ident">xk1</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Housekeeping
+        </span><span class="kw">let </span>cost = problem.cost(<span class="kw-2">&amp;</span>xk1)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">xk1</span>).<span class="ident">cost</span>(<span class="ident">cost</span>).<span class="ident">gradient</span>(<span class="ident">new_grad</span>),
-            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">&quot;beta&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">beta</span>;
-             <span class="string">&quot;restart_iter&quot;</span> =&gt; <span class="ident">restart_iter</span>;
-             <span class="string">&quot;restart_orthogonality&quot;</span> =&gt; <span class="ident">restart_orthogonality</span>;
+            state.param(xk1).cost(cost).gradient(new_grad),
+            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">&quot;beta&quot; </span>=&gt; <span class="self">self</span>.beta;
+             <span class="string">&quot;restart_iter&quot; </span>=&gt; restart_iter;
+             <span class="string">&quot;restart_orthogonality&quot; </span>=&gt; restart_orthogonality;
             )),
         ))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::let_unit_value</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::let_unit_value)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::test_utils::TestProblem</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::ArgminError</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::conjugategradient::beta::PolakRibiere</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::solver::linesearch</span>::{
-        <span class="ident">condition::ArmijoCondition</span>, <span class="ident">BacktrackingLineSearch</span>, <span class="ident">MoreThuenteLineSearch</span>,
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::test_utils::TestProblem;
+    <span class="kw">use </span><span class="kw">crate</span>::core::ArgminError;
+    <span class="kw">use </span><span class="kw">crate</span>::solver::conjugategradient::beta::PolakRibiere;
+    <span class="kw">use </span><span class="kw">crate</span>::solver::linesearch::{
+        condition::ArmijoCondition, BacktrackingLineSearch, MoreThuenteLineSearch,
     };
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
-    <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
+    <span class="kw">use </span>approx::assert_relative_eq;
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">Linesearch</span> {}
+    <span class="attribute">#[derive(Eq, PartialEq, Clone, Copy, Debug)]
+    </span><span class="kw">struct </span>Linesearch {}
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">BetaUpdate</span> {}
+    <span class="attribute">#[derive(Eq, PartialEq, Clone, Copy, Debug)]
+    </span><span class="kw">struct </span>BetaUpdate {}
 
     <span class="macro">test_trait_impl!</span>(
-        <span class="ident">nonlinear_cg</span>,
-        <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span>
-            <span class="ident">TestProblem</span>,
-            <span class="ident">MoreThuenteLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
-            <span class="ident">PolakRibiere</span>,
-            <span class="ident">f64</span>
-        <span class="op">&gt;</span>
+        nonlinear_cg,
+        NonlinearConjugateGradient&lt;
+            TestProblem,
+            MoreThuenteLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt;,
+            PolakRibiere,
+            f64
+        &gt;
     );
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> <span class="ident">Linesearch</span> {};
-        <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">BetaUpdate</span> {};
-        <span class="kw">let</span> <span class="ident">nlcg</span>: <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">NonlinearConjugateGradient::new</span>(<span class="ident">linesearch</span>, <span class="ident">beta_method</span>);
-        <span class="kw">let</span> <span class="ident">NonlinearConjugateGradient</span> {
-            <span class="ident">p</span>,
-            <span class="ident">beta</span>,
-            <span class="ident">linesearch</span>,
-            <span class="ident">beta_method</span>,
-            <span class="ident">restart_iter</span>,
-            <span class="ident">restart_orthogonality</span>,
-        } <span class="op">=</span> <span class="ident">nlcg</span>;
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">beta</span>.<span class="ident">is_nan</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">linesearch</span>, <span class="ident">linesearch</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">beta_method</span>, <span class="ident">beta_method</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">restart_iter</span>, <span class="ident">std::u64::MAX</span>);
-        <span class="macro">assert!</span>(<span class="ident">restart_orthogonality</span>.<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>linesearch = Linesearch {};
+        <span class="kw">let </span>beta_method = BetaUpdate {};
+        <span class="kw">let </span>nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, <span class="kw">_</span>, <span class="kw">_</span>, f64&gt; =
+            NonlinearConjugateGradient::new(linesearch, beta_method);
+        <span class="kw">let </span>NonlinearConjugateGradient {
+            p,
+            beta,
+            linesearch,
+            beta_method,
+            restart_iter,
+            restart_orthogonality,
+        } = nlcg;
+        <span class="macro">assert!</span>(p.is_none());
+        <span class="macro">assert!</span>(beta.is_nan());
+        <span class="macro">assert_eq!</span>(linesearch, linesearch);
+        <span class="macro">assert_eq!</span>(beta_method, beta_method);
+        <span class="macro">assert_eq!</span>(restart_iter, std::u64::MAX);
+        <span class="macro">assert!</span>(restart_orthogonality.is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_restart_iters</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> ();
-        <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> ();
-        <span class="kw">let</span> <span class="ident">nlcg</span>: <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">NonlinearConjugateGradient::new</span>(<span class="ident">linesearch</span>, <span class="ident">beta_method</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">nlcg</span>.<span class="ident">restart_iter</span>, <span class="ident">std::u64::MAX</span>);
-        <span class="kw">let</span> <span class="ident">nlcg</span> <span class="op">=</span> <span class="ident">nlcg</span>.<span class="ident">restart_iters</span>(<span class="number">100</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">nlcg</span>.<span class="ident">restart_iter</span>, <span class="number">100</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_restart_iters() {
+        <span class="kw">let </span>linesearch = ();
+        <span class="kw">let </span>beta_method = ();
+        <span class="kw">let </span>nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, <span class="kw">_</span>, <span class="kw">_</span>, f64&gt; =
+            NonlinearConjugateGradient::new(linesearch, beta_method);
+        <span class="macro">assert_eq!</span>(nlcg.restart_iter, std::u64::MAX);
+        <span class="kw">let </span>nlcg = nlcg.restart_iters(<span class="number">100</span>);
+        <span class="macro">assert_eq!</span>(nlcg.restart_iter, <span class="number">100</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_restart_orthogonality</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span> <span class="op">=</span> ();
-        <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> ();
-        <span class="kw">let</span> <span class="ident">nlcg</span>: <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">NonlinearConjugateGradient::new</span>(<span class="ident">linesearch</span>, <span class="ident">beta_method</span>);
-        <span class="macro">assert!</span>(<span class="ident">nlcg</span>.<span class="ident">restart_orthogonality</span>.<span class="ident">is_none</span>());
-        <span class="kw">let</span> <span class="ident">nlcg</span> <span class="op">=</span> <span class="ident">nlcg</span>.<span class="ident">restart_orthogonality</span>(<span class="number">0.1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_restart_orthogonality() {
+        <span class="kw">let </span>linesearch = ();
+        <span class="kw">let </span>beta_method = ();
+        <span class="kw">let </span>nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, <span class="kw">_</span>, <span class="kw">_</span>, f64&gt; =
+            NonlinearConjugateGradient::new(linesearch, beta_method);
+        <span class="macro">assert!</span>(nlcg.restart_orthogonality.is_none());
+        <span class="kw">let </span>nlcg = nlcg.restart_orthogonality(<span class="number">0.1</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">nlcg</span>.<span class="ident">restart_orthogonality</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">to_ne_bytes</span>(),
-            <span class="number">0.1f64</span>.<span class="ident">to_ne_bytes</span>()
+            nlcg.restart_orthogonality.as_ref().unwrap().to_ne_bytes(),
+            <span class="number">0.1f64</span>.to_ne_bytes()
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init_param_not_initialized</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">ArmijoCondition::new</span>(<span class="number">0.2</span>).<span class="ident">unwrap</span>());
-        <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">PolakRibiere::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nlcg</span>: <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">NonlinearConjugateGradient::new</span>(<span class="ident">linesearch</span>, <span class="ident">beta_method</span>);
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nlcg</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">IterState::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init_param_not_initialized() {
+        <span class="kw">let </span>linesearch: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(ArmijoCondition::new(<span class="number">0.2</span>).unwrap());
+        <span class="kw">let </span>beta_method = PolakRibiere::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, <span class="kw">_</span>, <span class="kw">_</span>, f64&gt; =
+            NonlinearConjugateGradient::new(linesearch, beta_method);
+        <span class="kw">let </span>res = nlcg.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), IterState::new());
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`NonlinearConjugateGradient` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">ArmijoCondition::new</span>(<span class="number">0.2</span>).<span class="ident">unwrap</span>());
-        <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">PolakRibiere::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nlcg</span>: <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">NonlinearConjugateGradient::new</span>(<span class="ident">linesearch</span>, <span class="ident">beta_method</span>);
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), (), <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]);
-        <span class="kw">let</span> (<span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">nlcg</span>
-            .<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">state</span>.<span class="ident">clone</span>())
-            .<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert_ne!</span>(<span class="ident">state_out</span>, <span class="ident">state</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">state_out</span>.<span class="ident">cost</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1f64</span>.<span class="ident">to_ne_bytes</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init() {
+        <span class="kw">let </span>linesearch: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(ArmijoCondition::new(<span class="number">0.2</span>).unwrap());
+        <span class="kw">let </span>beta_method = PolakRibiere::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, <span class="kw">_</span>, <span class="kw">_</span>, f64&gt; =
+            NonlinearConjugateGradient::new(linesearch, beta_method);
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt; =
+            IterState::new().param(<span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]);
+        <span class="kw">let </span>(state_out, kv) = nlcg
+            .init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state.clone())
+            .unwrap();
+        <span class="macro">assert!</span>(kv.is_none());
+        <span class="macro">assert_ne!</span>(state_out, state);
+        <span class="macro">assert_eq!</span>(state_out.cost.to_ne_bytes(), <span class="number">1f64</span>.to_ne_bytes());
         <span class="macro">assert_eq!</span>(
-            <span class="ident">state_out</span>.<span class="ident">grad</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(),
-            <span class="number">3f64</span>.<span class="ident">to_ne_bytes</span>()
+            state_out.grad.as_ref().unwrap()[<span class="number">0</span>].to_ne_bytes(),
+            <span class="number">3f64</span>.to_ne_bytes()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">state_out</span>.<span class="ident">grad</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>(),
-            <span class="number">4f64</span>.<span class="ident">to_ne_bytes</span>()
+            state_out.grad.as_ref().unwrap()[<span class="number">1</span>].to_ne_bytes(),
+            <span class="number">4f64</span>.to_ne_bytes()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">state_out</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(),
-            <span class="number">3f64</span>.<span class="ident">to_ne_bytes</span>()
+            state_out.param.as_ref().unwrap()[<span class="number">0</span>].to_ne_bytes(),
+            <span class="number">3f64</span>.to_ne_bytes()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">state_out</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>(),
-            <span class="number">4f64</span>.<span class="ident">to_ne_bytes</span>()
+            state_out.param.as_ref().unwrap()[<span class="number">1</span>].to_ne_bytes(),
+            <span class="number">4f64</span>.to_ne_bytes()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">nlcg</span>.<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">0</span>].<span class="ident">to_ne_bytes</span>(),
-            (<span class="op">-</span><span class="number">3f64</span>).<span class="ident">to_ne_bytes</span>()
+            nlcg.p.as_ref().unwrap()[<span class="number">0</span>].to_ne_bytes(),
+            (-<span class="number">3f64</span>).to_ne_bytes()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">nlcg</span>.<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">1</span>].<span class="ident">to_ne_bytes</span>(),
-            (<span class="op">-</span><span class="number">4f64</span>).<span class="ident">to_ne_bytes</span>()
+            nlcg.p.as_ref().unwrap()[<span class="number">1</span>].to_ne_bytes(),
+            (-<span class="number">4f64</span>).to_ne_bytes()
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter_p_not_set</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">ArmijoCondition::new</span>(<span class="number">0.2</span>).<span class="ident">unwrap</span>());
-        <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">PolakRibiere::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nlcg</span>: <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">NonlinearConjugateGradient::new</span>(<span class="ident">linesearch</span>, <span class="ident">beta_method</span>);
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">IterState::new</span>().<span class="ident">param</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0f64</span>]);
-        <span class="macro">assert!</span>(<span class="ident">nlcg</span>.<span class="ident">p</span>.<span class="ident">is_none</span>());
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nlcg</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">state</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter_p_not_set() {
+        <span class="kw">let </span>linesearch: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(ArmijoCondition::new(<span class="number">0.2</span>).unwrap());
+        <span class="kw">let </span>beta_method = PolakRibiere::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, <span class="kw">_</span>, <span class="kw">_</span>, f64&gt; =
+            NonlinearConjugateGradient::new(linesearch, beta_method);
+        <span class="kw">let </span>state = IterState::new().param(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0f64</span>]);
+        <span class="macro">assert!</span>(nlcg.p.is_none());
+        <span class="kw">let </span>res = nlcg.next_iter(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Potential bug: \&quot;`NonlinearConjugateGradient`: &quot;</span>,
                 <span class="string">&quot;Field `p` not set\&quot;. This is potentially a bug. &quot;</span>,
-                <span class="string">&quot;Please file a report on https://github.com/argmin-rs/argmin/issues&quot;</span>
-            )
+                <span class="string">&quot;Please file a report on https://github.com/argmin-rs/argmin/issues&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter_state_param_not_set</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">ArmijoCondition::new</span>(<span class="number">0.2</span>).<span class="ident">unwrap</span>());
-        <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">PolakRibiere::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nlcg</span>: <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">NonlinearConjugateGradient::new</span>(<span class="ident">linesearch</span>, <span class="ident">beta_method</span>);
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="ident">nlcg</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]);
-        <span class="macro">assert!</span>(<span class="ident">nlcg</span>.<span class="ident">p</span>.<span class="ident">is_some</span>());
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nlcg</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>()), <span class="ident">state</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter_state_param_not_set() {
+        <span class="kw">let </span>linesearch: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(ArmijoCondition::new(<span class="number">0.2</span>).unwrap());
+        <span class="kw">let </span>beta_method = PolakRibiere::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, <span class="kw">_</span>, <span class="kw">_</span>, f64&gt; =
+            NonlinearConjugateGradient::new(linesearch, beta_method);
+        <span class="kw">let </span>state = IterState::new();
+        nlcg.p = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]);
+        <span class="macro">assert!</span>(nlcg.p.is_some());
+        <span class="kw">let </span>res = nlcg.next_iter(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Potential bug: \&quot;`NonlinearConjugateGradient`: &quot;</span>,
                 <span class="string">&quot;No `param` in `state`\&quot;. This is potentially a bug. &quot;</span>,
-                <span class="string">&quot;Please file a report on https://github.com/argmin-rs/argmin/issues&quot;</span>
-            )
+                <span class="string">&quot;Please file a report on https://github.com/argmin-rs/argmin/issues&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter_problem_missing</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">ArmijoCondition::new</span>(<span class="number">0.2</span>).<span class="ident">unwrap</span>());
-        <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">PolakRibiere::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nlcg</span>: <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">NonlinearConjugateGradient::new</span>(<span class="ident">linesearch</span>, <span class="ident">beta_method</span>);
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">IterState::new</span>()
-            .<span class="ident">param</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>])
-            .<span class="ident">gradient</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>]);
-        <span class="ident">nlcg</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]);
-        <span class="macro">assert!</span>(<span class="ident">nlcg</span>.<span class="ident">p</span>.<span class="ident">is_some</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>());
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">problem</span>.<span class="ident">take_problem</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">nlcg</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter_problem_missing() {
+        <span class="kw">let </span>linesearch: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(ArmijoCondition::new(<span class="number">0.2</span>).unwrap());
+        <span class="kw">let </span>beta_method = PolakRibiere::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, <span class="kw">_</span>, <span class="kw">_</span>, f64&gt; =
+            NonlinearConjugateGradient::new(linesearch, beta_method);
+        <span class="kw">let </span>state = IterState::new()
+            .param(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>])
+            .gradient(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>]);
+        nlcg.p = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]);
+        <span class="macro">assert!</span>(nlcg.p.is_some());
+        <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(TestProblem::new());
+        <span class="kw">let _ </span>= problem.take_problem().unwrap();
+        <span class="kw">let </span>res = nlcg.next_iter(<span class="kw-2">&amp;mut </span>problem, state);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Potential bug: \&quot;`NonlinearConjugateGradient`: &quot;</span>,
                 <span class="string">&quot;Failed to take `problem` for line search\&quot;. This is potentially a bug. &quot;</span>,
-                <span class="string">&quot;Please file a report on https://github.com/argmin-rs/argmin/issues&quot;</span>
-            )
+                <span class="string">&quot;Please file a report on https://github.com/argmin-rs/argmin/issues&quot;
+            </span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next_iter</span>() {
-        <span class="kw">let</span> <span class="ident">linesearch</span>: <span class="ident">BacktrackingLineSearch</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ArmijoCondition</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">BacktrackingLineSearch::new</span>(<span class="ident">ArmijoCondition::new</span>(<span class="number">0.2</span>).<span class="ident">unwrap</span>());
-        <span class="kw">let</span> <span class="ident">beta_method</span> <span class="op">=</span> <span class="ident">PolakRibiere::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nlcg</span>: <span class="ident">NonlinearConjugateGradient</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">NonlinearConjugateGradient::new</span>(<span class="ident">linesearch</span>, <span class="ident">beta_method</span>);
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">IterState::new</span>()
-            .<span class="ident">param</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>])
-            .<span class="ident">gradient</span>(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>]);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">Problem::new</span>(<span class="ident">TestProblem::new</span>());
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">nlcg</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">nlcg</span>.<span class="ident">next_iter</span>(<span class="kw-2">&amp;mut</span> <span class="ident">problem</span>, <span class="ident">state</span>).<span class="ident">unwrap</span>();
-        <span class="ident">state</span>.<span class="ident">update</span>();
-        <span class="kw">let</span> <span class="ident">kv2</span> <span class="op">=</span> <span class="macro">kv!</span>(<span class="string">&quot;beta&quot;</span> =&gt; <span class="number">0.0</span>; <span class="string">&quot;restart_iter&quot;</span> =&gt; <span class="bool-val">false</span>; <span class="string">&quot;restart_orthogonality&quot;</span> =&gt; <span class="bool-val">false</span>;);
-        <span class="macro">assert_eq!</span>(<span class="ident">kv</span>.<span class="ident">unwrap</span>(), <span class="ident">kv2</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next_iter() {
+        <span class="kw">let </span>linesearch: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(ArmijoCondition::new(<span class="number">0.2</span>).unwrap());
+        <span class="kw">let </span>beta_method = PolakRibiere::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>nlcg: NonlinearConjugateGradient&lt;Vec&lt;f64&gt;, <span class="kw">_</span>, <span class="kw">_</span>, f64&gt; =
+            NonlinearConjugateGradient::new(linesearch, beta_method);
+        <span class="kw">let </span>state = IterState::new()
+            .param(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>])
+            .gradient(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(TestProblem::new());
+        <span class="kw">let </span>(state, kv) = nlcg.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
+        <span class="macro">assert!</span>(kv.is_none());
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state, kv) = nlcg.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
+        state.update();
+        <span class="kw">let </span>kv2 = <span class="macro">kv!</span>(<span class="string">&quot;beta&quot; </span>=&gt; <span class="number">0.0</span>; <span class="string">&quot;restart_iter&quot; </span>=&gt; <span class="bool-val">false</span>; <span class="string">&quot;restart_orthogonality&quot; </span>=&gt; <span class="bool-val">false</span>;);
+        <span class="macro">assert_eq!</span>(kv.unwrap(), kv2);
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">state</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">0</span>],
+            state.param.as_ref().unwrap()[<span class="number">0</span>],
             <span class="number">1.0f64</span>,
-            <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+            epsilon = f64::EPSILON
         );
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">state</span>.<span class="ident">param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">1</span>],
+            state.param.as_ref().unwrap()[<span class="number">1</span>],
             <span class="number">2.0f64</span>,
-            <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+            epsilon = f64::EPSILON
         );
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">state</span>.<span class="ident">best_param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">0</span>],
+            state.best_param.as_ref().unwrap()[<span class="number">0</span>],
             <span class="number">1.0f64</span>,
-            <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+            epsilon = f64::EPSILON
         );
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">state</span>.<span class="ident">best_param</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">1</span>],
+            state.best_param.as_ref().unwrap()[<span class="number">1</span>],
             <span class="number">2.0f64</span>,
-            <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+            epsilon = f64::EPSILON
         );
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">state</span>.<span class="ident">cost</span>, <span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">state</span>.<span class="ident">prev_cost</span>, <span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">state</span>.<span class="ident">best_cost</span>, <span class="number">1.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(state.cost, <span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(state.prev_cost, <span class="number">1.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(state.best_cost, <span class="number">1.0f64</span>, epsilon = f64::EPSILON);
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">state</span>.<span class="ident">grad</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">0</span>],
+            state.grad.as_ref().unwrap()[<span class="number">0</span>],
             <span class="number">1.0f64</span>,
-            <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+            epsilon = f64::EPSILON
         );
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">state</span>.<span class="ident">grad</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">1</span>],
+            state.grad.as_ref().unwrap()[<span class="number">1</span>],
             <span class="number">2.0f64</span>,
-            <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>
+            epsilon = f64::EPSILON
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

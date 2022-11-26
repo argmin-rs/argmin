@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/trustregion/steihaug.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>steihaug.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/solver/trustregion/steihaug.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>steihaug.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../argmin/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -467,474 +467,474 @@
 <span id="467">467</span>
 <span id="468">468</span>
 <span id="469">469</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{
-    <span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">IterState</span>, <span class="ident">Problem</span>, <span class="ident">SerializeAlias</span>, <span class="ident">Solver</span>, <span class="ident">State</span>, <span class="ident">TerminationReason</span>,
-    <span class="ident">TrustRegionRadius</span>, <span class="ident">KV</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{
+    ArgminFloat, Error, IterState, Problem, SerializeAlias, Solver, State, TerminationReason,
+    TrustRegionRadius, KV,
 };
-<span class="kw">use</span> <span class="ident">argmin_math</span>::{
-    <span class="ident">ArgminAdd</span>, <span class="ident">ArgminDot</span>, <span class="ident">ArgminL2Norm</span>, <span class="ident">ArgminMul</span>, <span class="ident">ArgminWeightedDot</span>, <span class="ident">ArgminZeroLike</span>,
+<span class="kw">use </span>argmin_math::{
+    ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminWeightedDot, ArgminZeroLike,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// # Steihaug method</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The Steihaug method is a conjugate gradients based approach for finding an approximate solution</span>
-<span class="doccomment">/// to the second order approximation of the cost function within the trust region.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Reference</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.</span>
-<span class="doccomment">/// Springer. ISBN 0-387-30303-0.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Radius</span>
-    <span class="ident">radius</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// epsilon</span>
-    <span class="ident">epsilon</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// p</span>
-    <span class="ident">p</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// residual</span>
-    <span class="ident">r</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// r^Tr</span>
-    <span class="ident">rtr</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// initial residual</span>
-    <span class="ident">r_0_norm</span>: <span class="ident">F</span>,
-    <span class="doccomment">/// direction</span>
-    <span class="ident">d</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// max iters</span>
-    <span class="ident">max_iters</span>: <span class="ident">u64</span>,
+<span class="doccomment">/// # Steihaug method
+///
+/// The Steihaug method is a conjugate gradients based approach for finding an approximate solution
+/// to the second order approximation of the cost function within the trust region.
+///
+/// ## Reference
+///
+/// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+/// Springer. ISBN 0-387-30303-0.
+</span><span class="attribute">#[derive(Clone, Default)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub struct </span>Steihaug&lt;P, F&gt; {
+    <span class="doccomment">/// Radius
+    </span>radius: F,
+    <span class="doccomment">/// epsilon
+    </span>epsilon: F,
+    <span class="doccomment">/// p
+    </span>p: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// residual
+    </span>r: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// r^Tr
+    </span>rtr: F,
+    <span class="doccomment">/// initial residual
+    </span>r_0_norm: F,
+    <span class="doccomment">/// direction
+    </span>d: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    <span class="doccomment">/// max iters
+    </span>max_iters: u64,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, F&gt; Steihaug&lt;P, F&gt;
+<span class="kw">where
+    </span>P: ArgminMul&lt;F, P&gt; + ArgminDot&lt;P, F&gt; + ArgminAdd&lt;P, P&gt;,
+    F: ArgminFloat,
 {
-    <span class="doccomment">/// Construct a new instance of [`Steihaug`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::trustregion::Steihaug;</span>
-    <span class="doccomment">/// let sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Steihaug</span> {
-            <span class="ident">radius</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">epsilon</span>: <span class="macro">float!</span>(<span class="number">10e-10</span>),
-            <span class="ident">p</span>: <span class="prelude-val">None</span>,
-            <span class="ident">r</span>: <span class="prelude-val">None</span>,
-            <span class="ident">rtr</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">r_0_norm</span>: <span class="ident">F::nan</span>(),
-            <span class="ident">d</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_iters</span>: <span class="ident">std::u64::MAX</span>,
+    <span class="doccomment">/// Construct a new instance of [`Steihaug`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::trustregion::Steihaug;
+    /// let sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new();
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Steihaug {
+            radius: F::nan(),
+            epsilon: <span class="macro">float!</span>(<span class="number">10e-10</span>),
+            p: <span class="prelude-val">None</span>,
+            r: <span class="prelude-val">None</span>,
+            rtr: F::nan(),
+            r_0_norm: F::nan(),
+            d: <span class="prelude-val">None</span>,
+            max_iters: std::u64::MAX,
         }
     }
 
-    <span class="doccomment">/// Set epsilon</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The algorithm stops when the residual is smaller than `epsilon`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be larger than 0 and defaults to 10^-10.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::trustregion::Steihaug;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">/// let sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new().with_epsilon(10e-9)?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_epsilon</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">epsilon</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">epsilon</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">InvalidParameter</span>,
-                <span class="string">&quot;`Steihaug`: epsilon must be &gt; 0.0.&quot;</span>
-            ));
+    <span class="doccomment">/// Set epsilon
+    ///
+    /// The algorithm stops when the residual is smaller than `epsilon`.
+    ///
+    /// Must be larger than 0 and defaults to 10^-10.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::trustregion::Steihaug;
+    /// # use argmin::core::Error;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// let sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new().with_epsilon(10e-9)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_epsilon(<span class="kw-2">mut </span><span class="self">self</span>, epsilon: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>epsilon &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                InvalidParameter,
+                <span class="string">&quot;`Steihaug`: epsilon must be &gt; 0.0.&quot;
+            </span>));
         }
-        <span class="self">self</span>.<span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">epsilon</span>;
+        <span class="self">self</span>.epsilon = epsilon;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set maximum number of iterations</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The algorithm stops after `iter` iterations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `u64::MAX`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::solver::trustregion::Steihaug;</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// let sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new().with_max_iters(100);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_iters</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iters</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_iters</span> <span class="op">=</span> <span class="ident">iters</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Set maximum number of iterations
+    ///
+    /// The algorithm stops after `iter` iterations.
+    ///
+    /// Defaults to `u64::MAX`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::solver::trustregion::Steihaug;
+    /// # use argmin::core::Error;
+    /// let sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new().with_max_iters(100);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>with_max_iters(<span class="kw-2">mut </span><span class="self">self</span>, iters: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.max_iters = iters;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// evaluate m(p) (without considering f_init because it is not available)
+    </span><span class="kw">fn </span>eval_m&lt;H&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span>P, g: <span class="kw-2">&amp;</span>P, h: <span class="kw-2">&amp;</span>H) -&gt; F
+    <span class="kw">where
+        </span>P: ArgminWeightedDot&lt;P, F, H&gt;,
+    {
+        g.dot(p) + <span class="macro">float!</span>(<span class="number">0.5</span>) * p.weighted_dot(h, p)
     }
 
-    <span class="doccomment">/// evaluate m(p) (without considering f_init because it is not available)</span>
-    <span class="kw">fn</span> <span class="ident">eval_m</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="ident">H</span>) -&gt; <span class="ident">F</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">H</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// calculate all possible step lengths
+    </span><span class="attribute">#[allow(clippy::many_single_char_names)]
+    </span><span class="kw">fn </span>tau&lt;G, H&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter_func: G, eval: bool, g: <span class="kw-2">&amp;</span>P, h: <span class="kw-2">&amp;</span>H) -&gt; F
+    <span class="kw">where
+        </span>G: Fn(F) -&gt; bool,
+        P: ArgminWeightedDot&lt;P, F, H&gt;,
     {
-        <span class="ident">g</span>.<span class="ident">dot</span>(<span class="ident">p</span>) <span class="op">+</span> <span class="macro">float!</span>(<span class="number">0.5</span>) <span class="op">*</span> <span class="ident">p</span>.<span class="ident">weighted_dot</span>(<span class="ident">h</span>, <span class="ident">p</span>)
-    }
-
-    <span class="doccomment">/// calculate all possible step lengths</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">tau</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter_func</span>: <span class="ident">G</span>, <span class="ident">eval</span>: <span class="ident">bool</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="ident">H</span>) -&gt; <span class="ident">F</span>
-    <span class="kw">where</span>
-        <span class="ident">G</span>: <span class="ident">Fn</span>(<span class="ident">F</span>) -&gt; <span class="ident">bool</span>,
-        <span class="ident">P</span>: <span class="ident">ArgminWeightedDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">H</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">dot</span>(<span class="ident">p</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">dot</span>(<span class="ident">d</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">dot</span>(<span class="ident">d</span>);
-        <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">radius</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">t1</span> <span class="op">=</span> (<span class="op">-</span><span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">delta</span> <span class="op">+</span> <span class="ident">c</span>.<span class="ident">powi</span>(<span class="number">2</span>)).<span class="ident">sqrt</span>();
-        <span class="kw">let</span> <span class="ident">tau1</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">t1</span> <span class="op">+</span> <span class="ident">c</span>) <span class="op">/</span> <span class="ident">b</span>;
-        <span class="kw">let</span> <span class="ident">tau2</span> <span class="op">=</span> (<span class="ident">t1</span> <span class="op">-</span> <span class="ident">c</span>) <span class="op">/</span> <span class="ident">b</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">tau1</span>, <span class="ident">tau2</span>];
-        <span class="comment">// Maybe calculating tau3 should only be done if b is close to zero?</span>
-        <span class="kw">if</span> <span class="ident">tau1</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tau2</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tau1</span>.<span class="ident">is_infinite</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tau2</span>.<span class="ident">is_infinite</span>() {
-            <span class="kw">let</span> <span class="ident">tau3</span> <span class="op">=</span> (<span class="ident">delta</span> <span class="op">-</span> <span class="ident">a</span>) <span class="op">/</span> (<span class="macro">float!</span>(<span class="number">2.0</span>) <span class="op">*</span> <span class="ident">c</span>);
-            <span class="ident">t</span>.<span class="ident">push</span>(<span class="ident">tau3</span>);
+        <span class="kw">let </span>p = <span class="self">self</span>.p.as_ref().unwrap();
+        <span class="kw">let </span>d = <span class="self">self</span>.d.as_ref().unwrap();
+        <span class="kw">let </span>a = p.dot(p);
+        <span class="kw">let </span>b = d.dot(d);
+        <span class="kw">let </span>c = p.dot(d);
+        <span class="kw">let </span>delta = <span class="self">self</span>.radius.powi(<span class="number">2</span>);
+        <span class="kw">let </span>t1 = (-a * b + b * delta + c.powi(<span class="number">2</span>)).sqrt();
+        <span class="kw">let </span>tau1 = -(t1 + c) / b;
+        <span class="kw">let </span>tau2 = (t1 - c) / b;
+        <span class="kw">let </span><span class="kw-2">mut </span>t = <span class="macro">vec!</span>[tau1, tau2];
+        <span class="comment">// Maybe calculating tau3 should only be done if b is close to zero?
+        </span><span class="kw">if </span>tau1.is_nan() || tau2.is_nan() || tau1.is_infinite() || tau2.is_infinite() {
+            <span class="kw">let </span>tau3 = (delta - a) / (<span class="macro">float!</span>(<span class="number">2.0</span>) * c);
+            t.push(tau3);
         }
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">eval</span> {
-            <span class="comment">// remove NAN taus and calculate m (without f_init) for all taus, then sort them based</span>
-            <span class="comment">// on their result and return the tau which corresponds to the lowest m</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">t</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">cloned</span>()
-                .<span class="ident">enumerate</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">tau</span>)<span class="op">|</span> (<span class="op">!</span><span class="ident">tau</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">tau</span>.<span class="ident">is_infinite</span>()) <span class="op">&amp;&amp;</span> <span class="ident">filter_func</span>(<span class="kw-2">*</span><span class="ident">tau</span>))
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">tau</span>)<span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">p_local</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">tau</span>));
-                    (<span class="ident">i</span>, <span class="self">self</span>.<span class="ident">eval_m</span>(<span class="kw-2">&amp;</span><span class="ident">p_local</span>, <span class="ident">g</span>, <span class="ident">h</span>))
+        <span class="kw">let </span>v = <span class="kw">if </span>eval {
+            <span class="comment">// remove NAN taus and calculate m (without f_init) for all taus, then sort them based
+            // on their result and return the tau which corresponds to the lowest m
+            </span><span class="kw">let </span><span class="kw-2">mut </span>v = t
+                .iter()
+                .cloned()
+                .enumerate()
+                .filter(|(<span class="kw">_</span>, tau)| (!tau.is_nan() || !tau.is_infinite()) &amp;&amp; filter_func(<span class="kw-2">*</span>tau))
+                .map(|(i, tau)| {
+                    <span class="kw">let </span>p_local = p.add(<span class="kw-2">&amp;</span>d.mul(<span class="kw-2">&amp;</span>tau));
+                    (i, <span class="self">self</span>.eval_m(<span class="kw-2">&amp;</span>p_local, g, h))
                 })
-                .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">m</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">m</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">m</span>.<span class="ident">is_infinite</span>())
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">F</span>)<span class="op">&gt;</span><span class="op">&gt;</span>();
-            <span class="ident">v</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="number">1</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">1</span>).<span class="ident">unwrap</span>());
-            <span class="ident">v</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">t</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">cloned</span>()
-                .<span class="ident">enumerate</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">tau</span>)<span class="op">|</span> (<span class="op">!</span><span class="ident">tau</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">tau</span>.<span class="ident">is_infinite</span>()) <span class="op">&amp;&amp;</span> <span class="ident">filter_func</span>(<span class="kw-2">*</span><span class="ident">tau</span>))
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">F</span>)<span class="op">&gt;</span><span class="op">&gt;</span>();
-            <span class="ident">v</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="number">1</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="number">1</span>).<span class="ident">unwrap</span>());
-            <span class="ident">v</span>
+                .filter(|(<span class="kw">_</span>, m)| !m.is_nan() || !m.is_infinite())
+                .collect::&lt;Vec&lt;(usize, F)&gt;&gt;();
+            v.sort_by(|a, b| a.<span class="number">1</span>.partial_cmp(<span class="kw-2">&amp;</span>b.<span class="number">1</span>).unwrap());
+            v
+        } <span class="kw">else </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>v = t
+                .iter()
+                .cloned()
+                .enumerate()
+                .filter(|(<span class="kw">_</span>, tau)| (!tau.is_nan() || !tau.is_infinite()) &amp;&amp; filter_func(<span class="kw-2">*</span>tau))
+                .collect::&lt;Vec&lt;(usize, F)&gt;&gt;();
+            v.sort_by(|a, b| b.<span class="number">1</span>.partial_cmp(<span class="kw-2">&amp;</span>a.<span class="number">1</span>).unwrap());
+            v
         };
 
-        <span class="ident">t</span>[<span class="ident">v</span>[<span class="number">0</span>].<span class="number">0</span>]
+        t[v[<span class="number">0</span>].<span class="number">0</span>]
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">O</span>, <span class="ident">F</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">SerializeAlias</span>
-        <span class="op">+</span> <span class="ident">ArgminMul</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminL2Norm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminAdd</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">ArgminZeroLike</span>,
-    <span class="ident">H</span>: <span class="ident">ArgminDot</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">ArgminFloat</span>,
+<span class="kw">impl</span>&lt;P, O, F, H&gt; Solver&lt;O, IterState&lt;P, P, (), H, F&gt;&gt; <span class="kw">for </span>Steihaug&lt;P, F&gt;
+<span class="kw">where
+    </span>P: Clone
+        + SerializeAlias
+        + ArgminMul&lt;F, P&gt;
+        + ArgminL2Norm&lt;F&gt;
+        + ArgminDot&lt;P, F&gt;
+        + ArgminAdd&lt;P, P&gt;
+        + ArgminZeroLike,
+    H: ArgminDot&lt;P, P&gt;,
+    F: ArgminFloat,
 {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Steihaug&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Steihaug&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">init</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">state</span>
-            .<span class="ident">get_gradient</span>()
-            .<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-                <span class="ident">NotInitialized</span>,
+    <span class="kw">fn </span>init(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        state: IterState&lt;P, P, (), H, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, P, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>r = state
+            .get_gradient()
+            .ok_or_else(<span class="macro">argmin_error_closure!</span>(
+                NotInitialized,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;`Steihaug` requires an initial gradient. &quot;</span>,
-                    <span class="string">&quot;Please provide an initial gradient via `Executor`s `configure` method.&quot;</span>
-                )
-            ))<span class="question-mark">?</span>
-            .<span class="ident">clone</span>();
+                    <span class="string">&quot;Please provide an initial gradient via `Executor`s `configure` method.&quot;
+                </span>)
+            ))<span class="question-mark">?
+            </span>.clone();
 
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_hessian</span>().<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-                <span class="ident">NotInitialized</span>,
+        <span class="kw">if </span>state.get_hessian().is_none() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
+                NotInitialized,
                 <span class="macro">concat!</span>(
                     <span class="string">&quot;`Steihaug` requires an initial Hessian. &quot;</span>,
-                    <span class="string">&quot;Please provide an initial Hessian via `Executor`s `configure` method.&quot;</span>
-                )
+                    <span class="string">&quot;Please provide an initial Hessian via `Executor`s `configure` method.&quot;
+                </span>)
             ));
         }
 
-        <span class="self">self</span>.<span class="ident">r_0_norm</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">l2_norm</span>();
-        <span class="self">self</span>.<span class="ident">rtr</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>);
-        <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>)));
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">zero_like</span>();
-        <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>.<span class="ident">clone</span>());
+        <span class="self">self</span>.r_0_norm = r.l2_norm();
+        <span class="self">self</span>.rtr = r.dot(<span class="kw-2">&amp;</span>r);
+        <span class="self">self</span>.d = <span class="prelude-val">Some</span>(r.mul(<span class="kw-2">&amp;</span><span class="macro">float!</span>(-<span class="number">1.0</span>)));
+        <span class="kw">let </span>p = r.zero_like();
+        <span class="self">self</span>.p = <span class="prelude-val">Some</span>(p.clone());
 
-        <span class="self">self</span>.<span class="ident">r</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>);
+        <span class="self">self</span>.r = <span class="prelude-val">Some</span>(r);
 
-        <span class="prelude-val">Ok</span>((<span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">p</span>), <span class="prelude-val">None</span>))
+        <span class="prelude-val">Ok</span>((state.param(p), <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_problem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KV</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">grad</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_gradient</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`Steihaug`: Gradient in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
+    <span class="kw">fn </span>next_iter(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
+        <span class="kw-2">mut </span>state: IterState&lt;P, P, (), H, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, P, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw">let </span>grad = state.take_gradient().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`Steihaug`: Gradient in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take_hessian</span>().<span class="ident">ok_or_else</span>(<span class="macro">argmin_error_closure!</span>(
-            <span class="ident">PotentialBug</span>,
-            <span class="string">&quot;`Steihaug`: Hessian in state not set.&quot;</span>
-        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>h = state.take_hessian().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+            PotentialBug,
+            <span class="string">&quot;`Steihaug`: Hessian in state not set.&quot;
+        </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">dhd</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">weighted_dot</span>(<span class="kw-2">&amp;</span><span class="ident">h</span>, <span class="ident">d</span>);
+        <span class="kw">let </span>d = <span class="self">self</span>.d.as_ref().unwrap();
+        <span class="kw">let </span>dhd = d.weighted_dot(<span class="kw-2">&amp;</span>h, d);
 
-        <span class="comment">// Current search direction d is a direction of zero curvature or negative curvature</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-        <span class="kw">if</span> <span class="ident">dhd</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>) {
-            <span class="kw">let</span> <span class="ident">tau</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tau</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>((
-                <span class="ident">state</span>
-                    .<span class="ident">param</span>(<span class="ident">p</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">tau</span>)))
-                    .<span class="ident">terminate_with</span>(<span class="ident">TerminationReason::TargetPrecisionReached</span>),
+        <span class="comment">// Current search direction d is a direction of zero curvature or negative curvature
+        </span><span class="kw">let </span>p = <span class="self">self</span>.p.as_ref().unwrap();
+        <span class="kw">if </span>dhd &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
+            <span class="kw">let </span>tau = <span class="self">self</span>.tau(|<span class="kw">_</span>| <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw-2">&amp;</span>grad, <span class="kw-2">&amp;</span>h);
+            <span class="kw">return </span><span class="prelude-val">Ok</span>((
+                state
+                    .param(p.add(<span class="kw-2">&amp;</span>d.mul(<span class="kw-2">&amp;</span>tau)))
+                    .terminate_with(TerminationReason::TargetPrecisionReached),
                 <span class="prelude-val">None</span>,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">alpha</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rtr</span> <span class="op">/</span> <span class="ident">dhd</span>;
-        <span class="kw">let</span> <span class="ident">p_n</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">alpha</span>));
+        <span class="kw">let </span>alpha = <span class="self">self</span>.rtr / dhd;
+        <span class="kw">let </span>p_n = p.add(<span class="kw-2">&amp;</span>d.mul(<span class="kw-2">&amp;</span>alpha));
 
-        <span class="comment">// new p violates trust region bound</span>
-        <span class="kw">if</span> <span class="ident">p_n</span>.<span class="ident">l2_norm</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">radius</span> {
-            <span class="kw">let</span> <span class="ident">tau</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tau</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro">float!</span>(<span class="number">0.0</span>), <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">grad</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>((
-                <span class="ident">state</span>
-                    .<span class="ident">param</span>(<span class="ident">p</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">tau</span>)))
-                    .<span class="ident">terminate_with</span>(<span class="ident">TerminationReason::TargetPrecisionReached</span>),
+        <span class="comment">// new p violates trust region bound
+        </span><span class="kw">if </span>p_n.l2_norm() &gt;= <span class="self">self</span>.radius {
+            <span class="kw">let </span>tau = <span class="self">self</span>.tau(|x| x &gt;= <span class="macro">float!</span>(<span class="number">0.0</span>), <span class="bool-val">false</span>, <span class="kw-2">&amp;</span>grad, <span class="kw-2">&amp;</span>h);
+            <span class="kw">return </span><span class="prelude-val">Ok</span>((
+                state
+                    .param(p.add(<span class="kw-2">&amp;</span>d.mul(<span class="kw-2">&amp;</span>tau)))
+                    .terminate_with(TerminationReason::TargetPrecisionReached),
                 <span class="prelude-val">None</span>,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">r_n</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">h</span>.<span class="ident">dot</span>(<span class="ident">d</span>).<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">alpha</span>));
+        <span class="kw">let </span>r = <span class="self">self</span>.r.as_ref().unwrap();
+        <span class="kw">let </span>r_n = r.add(<span class="kw-2">&amp;</span>h.dot(d).mul(<span class="kw-2">&amp;</span>alpha));
 
-        <span class="kw">if</span> <span class="ident">r_n</span>.<span class="ident">l2_norm</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">epsilon</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">r_0_norm</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>((
-                <span class="ident">state</span>
-                    .<span class="ident">param</span>(<span class="ident">p_n</span>)
-                    .<span class="ident">terminate_with</span>(<span class="ident">TerminationReason::TargetPrecisionReached</span>),
+        <span class="kw">if </span>r_n.l2_norm() &lt; <span class="self">self</span>.epsilon * <span class="self">self</span>.r_0_norm {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>((
+                state
+                    .param(p_n)
+                    .terminate_with(TerminationReason::TargetPrecisionReached),
                 <span class="prelude-val">None</span>,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">rjtrj</span> <span class="op">=</span> <span class="ident">r_n</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">r_n</span>);
-        <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="ident">rjtrj</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">rtr</span>;
-        <span class="self">self</span>.<span class="ident">d</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r_n</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="macro">float!</span>(<span class="op">-</span><span class="number">1.0</span>)).<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">beta</span>)));
-        <span class="self">self</span>.<span class="ident">r</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r_n</span>);
-        <span class="self">self</span>.<span class="ident">p</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">p_n</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">rtr</span> <span class="op">=</span> <span class="ident">rjtrj</span>;
+        <span class="kw">let </span>rjtrj = r_n.dot(<span class="kw-2">&amp;</span>r_n);
+        <span class="kw">let </span>beta = rjtrj / <span class="self">self</span>.rtr;
+        <span class="self">self</span>.d = <span class="prelude-val">Some</span>(r_n.mul(<span class="kw-2">&amp;</span><span class="macro">float!</span>(-<span class="number">1.0</span>)).add(<span class="kw-2">&amp;</span>d.mul(<span class="kw-2">&amp;</span>beta)));
+        <span class="self">self</span>.r = <span class="prelude-val">Some</span>(r_n);
+        <span class="self">self</span>.p = <span class="prelude-val">Some</span>(p_n.clone());
+        <span class="self">self</span>.rtr = rjtrj;
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">state</span>.<span class="ident">param</span>(<span class="ident">p_n</span>).<span class="ident">cost</span>(<span class="self">self</span>.<span class="ident">rtr</span>).<span class="ident">gradient</span>(<span class="ident">grad</span>).<span class="ident">hessian</span>(<span class="ident">h</span>),
+            state.param(p_n).cost(<span class="self">self</span>.rtr).gradient(grad).hessian(h),
             <span class="prelude-val">None</span>,
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">P</span>, (), <span class="ident">H</span>, <span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">TerminationReason</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">r_0_norm</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">epsilon</span> {
-            <span class="kw">return</span> <span class="ident">TerminationReason::TargetPrecisionReached</span>;
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, P, (), H, F&gt;) -&gt; TerminationReason {
+        <span class="kw">if </span><span class="self">self</span>.r_0_norm &lt; <span class="self">self</span>.epsilon {
+            <span class="kw">return </span>TerminationReason::TargetPrecisionReached;
         }
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">get_iter</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">max_iters</span> {
-            <span class="kw">return</span> <span class="ident">TerminationReason::MaxItersReached</span>;
+        <span class="kw">if </span>state.get_iter() &gt;= <span class="self">self</span>.max_iters {
+            <span class="kw">return </span>TerminationReason::MaxItersReached;
         }
-        <span class="ident">TerminationReason::NotTerminated</span>
+        TerminationReason::NotTerminated
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>: <span class="ident">ArgminFloat</span><span class="op">&gt;</span> <span class="ident">TrustRegionRadius</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Set current radius.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Needed by [`TrustRegion`](`crate::solver::trustregion::TrustRegion`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use argmin::solver::trustregion::{Steihaug, TrustRegionRadius};</span>
-    <span class="doccomment">/// let mut sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new();</span>
-    <span class="doccomment">/// sh.set_radius(0.8);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">set_radius</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">F</span>) {
-        <span class="self">self</span>.<span class="ident">radius</span> <span class="op">=</span> <span class="ident">radius</span>;
+<span class="kw">impl</span>&lt;P, F: ArgminFloat&gt; TrustRegionRadius&lt;F&gt; <span class="kw">for </span>Steihaug&lt;P, F&gt; {
+    <span class="doccomment">/// Set current radius.
+    ///
+    /// Needed by [`TrustRegion`](`crate::solver::trustregion::TrustRegion`).
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::solver::trustregion::{Steihaug, TrustRegionRadius};
+    /// let mut sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new();
+    /// sh.set_radius(0.8);
+    /// ```
+    </span><span class="kw">fn </span>set_radius(<span class="kw-2">&amp;mut </span><span class="self">self</span>, radius: F) {
+        <span class="self">self</span>.radius = radius;
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::test_utils::TestProblem</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core::ArgminError</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_trait_impl</span>;
-    <span class="kw">use</span> <span class="ident">approx::assert_relative_eq</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::core::test_utils::TestProblem;
+    <span class="kw">use </span><span class="kw">crate</span>::core::ArgminError;
+    <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
+    <span class="kw">use </span>approx::assert_relative_eq;
 
-    <span class="macro">test_trait_impl!</span>(<span class="ident">steihaug</span>, <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">TestProblem</span>, <span class="ident">f64</span><span class="op">&gt;</span>);
+    <span class="macro">test_trait_impl!</span>(steihaug, Steihaug&lt;TestProblem, f64&gt;);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_new</span>() {
-        <span class="kw">let</span> <span class="ident">sh</span>: <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Steihaug::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new();
 
-        <span class="kw">let</span> <span class="ident">Steihaug</span> {
-            <span class="ident">radius</span>,
-            <span class="ident">epsilon</span>,
-            <span class="ident">p</span>,
-            <span class="ident">r</span>,
-            <span class="ident">rtr</span>,
-            <span class="ident">r_0_norm</span>,
-            <span class="ident">d</span>,
-            <span class="ident">max_iters</span>,
-        } <span class="op">=</span> <span class="ident">sh</span>;
+        <span class="kw">let </span>Steihaug {
+            radius,
+            epsilon,
+            p,
+            r,
+            rtr,
+            r_0_norm,
+            d,
+            max_iters,
+        } = sh;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">radius</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::NAN</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">epsilon</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">10e-10f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert!</span>(<span class="ident">p</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">rtr</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::NAN</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">r_0_norm</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">f64::NAN</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">max_iters</span>, <span class="ident">u64::MAX</span>);
+        <span class="macro">assert_eq!</span>(radius.to_ne_bytes(), f64::NAN.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(epsilon.to_ne_bytes(), <span class="number">10e-10f64</span>.to_ne_bytes());
+        <span class="macro">assert!</span>(p.is_none());
+        <span class="macro">assert!</span>(r.is_none());
+        <span class="macro">assert_eq!</span>(rtr.to_ne_bytes(), f64::NAN.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(r_0_norm.to_ne_bytes(), f64::NAN.to_ne_bytes());
+        <span class="macro">assert!</span>(d.is_none());
+        <span class="macro">assert_eq!</span>(max_iters, u64::MAX);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_with_tolerance</span>() {
-        <span class="kw">for</span> <span class="ident">tolerance</span> <span class="kw">in</span> [<span class="ident">f64::EPSILON</span>, <span class="number">1e-10</span>, <span class="number">1e-12</span>, <span class="number">1e-6</span>, <span class="number">1.0</span>, <span class="number">10.0</span>, <span class="number">100.0</span>] {
-            <span class="kw">let</span> <span class="ident">sh</span>: <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Steihaug::new</span>().<span class="ident">with_epsilon</span>(<span class="ident">tolerance</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">sh</span>.<span class="ident">epsilon</span>.<span class="ident">to_ne_bytes</span>(), <span class="ident">tolerance</span>.<span class="ident">to_ne_bytes</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_with_tolerance() {
+        <span class="kw">for </span>tolerance <span class="kw">in </span>[f64::EPSILON, <span class="number">1e-10</span>, <span class="number">1e-12</span>, <span class="number">1e-6</span>, <span class="number">1.0</span>, <span class="number">10.0</span>, <span class="number">100.0</span>] {
+            <span class="kw">let </span>sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new().with_epsilon(tolerance).unwrap();
+            <span class="macro">assert_eq!</span>(sh.epsilon.to_ne_bytes(), tolerance.to_ne_bytes());
         }
 
-        <span class="kw">for</span> <span class="ident">tolerance</span> <span class="kw">in</span> [<span class="op">-</span><span class="ident">f64::EPSILON</span>, <span class="number">0.0</span>, <span class="op">-</span><span class="number">1.0</span>] {
-            <span class="kw">let</span> <span class="ident">res</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Steihaug::new</span>().<span class="ident">with_epsilon</span>(<span class="ident">tolerance</span>);
+        <span class="kw">for </span>tolerance <span class="kw">in </span>[-f64::EPSILON, <span class="number">0.0</span>, -<span class="number">1.0</span>] {
+            <span class="kw">let </span>res: <span class="prelude-ty">Result</span>&lt;Steihaug&lt;Vec&lt;f64&gt;, f64&gt;, <span class="kw">_</span>&gt; = Steihaug::new().with_epsilon(tolerance);
             <span class="macro">assert_error!</span>(
-                <span class="ident">res</span>,
-                <span class="ident">ArgminError</span>,
-                <span class="string">&quot;Invalid parameter: \&quot;`Steihaug`: epsilon must be &gt; 0.0.\&quot;&quot;</span>
-            );
+                res,
+                ArgminError,
+                <span class="string">&quot;Invalid parameter: \&quot;`Steihaug`: epsilon must be &gt; 0.0.\&quot;&quot;
+            </span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_max_iters</span>() {
-        <span class="kw">let</span> <span class="ident">sh</span>: <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Steihaug::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_max_iters() {
+        <span class="kw">let </span>sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new();
 
-        <span class="kw">let</span> <span class="ident">Steihaug</span> { <span class="ident">max_iters</span>, .. } <span class="op">=</span> <span class="ident">sh</span>;
+        <span class="kw">let </span>Steihaug { max_iters, .. } = sh;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">max_iters</span>, <span class="ident">u64::MAX</span>);
+        <span class="macro">assert_eq!</span>(max_iters, u64::MAX);
 
-        <span class="kw">for</span> <span class="ident">iters</span> <span class="kw">in</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">13</span>, <span class="number">21</span>, <span class="number">34</span>, <span class="number">55</span>, <span class="number">89</span>, <span class="number">144</span>] {
-            <span class="kw">let</span> <span class="ident">sh</span>: <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Steihaug::new</span>().<span class="ident">with_max_iters</span>(<span class="ident">iters</span>);
+        <span class="kw">for </span>iters <span class="kw">in </span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">13</span>, <span class="number">21</span>, <span class="number">34</span>, <span class="number">55</span>, <span class="number">89</span>, <span class="number">144</span>] {
+            <span class="kw">let </span>sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new().with_max_iters(iters);
 
-            <span class="kw">let</span> <span class="ident">Steihaug</span> { <span class="ident">max_iters</span>, .. } <span class="op">=</span> <span class="ident">sh</span>;
+            <span class="kw">let </span>Steihaug { max_iters, .. } = sh;
 
-            <span class="macro">assert_eq!</span>(<span class="ident">max_iters</span>, <span class="ident">iters</span>);
+            <span class="macro">assert_eq!</span>(max_iters, iters);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_init</span>() {
-        <span class="kw">let</span> <span class="ident">grad</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>];
-        <span class="kw">let</span> <span class="ident">hessian</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">4.0</span>, <span class="number">3.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">1.0</span>]];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_init() {
+        <span class="kw">let </span>grad: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>];
+        <span class="kw">let </span>hessian: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="number">4.0</span>, <span class="number">3.0</span>], <span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">1.0</span>]];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sh</span>: <span class="ident">Steihaug</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Steihaug::new</span>();
-        <span class="ident">sh</span>.<span class="ident">set_radius</span>(<span class="number">1.0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>sh: Steihaug&lt;Vec&lt;f64&gt;, f64&gt; = Steihaug::new();
+        sh.set_radius(<span class="number">1.0</span>);
 
-        <span class="comment">// Forgot to initialize gradient</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IterState::new</span>();
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">sh</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>);
+        <span class="comment">// Forgot to initialize gradient
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>res = sh.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`Steihaug` requires an initial gradient. Please &quot;</span>,
-                <span class="string">&quot;provide an initial gradient via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;provide an initial gradient via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
 
-        <span class="comment">// Forgot to initialize Hessian</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">IterState::new</span>().<span class="ident">gradient</span>(<span class="ident">grad</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">sh</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>);
+        <span class="comment">// Forgot to initialize Hessian
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; =
+            IterState::new().gradient(grad.clone());
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>res = sh.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
         <span class="macro">assert_error!</span>(
-            <span class="ident">res</span>,
-            <span class="ident">ArgminError</span>,
+            res,
+            ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Not initialized: \&quot;`Steihaug` requires an initial Hessian. Please &quot;</span>,
-                <span class="string">&quot;provide an initial Hessian via `Executor`s `configure` method.\&quot;&quot;</span>
-            )
+                <span class="string">&quot;provide an initial Hessian via `Executor`s `configure` method.\&quot;&quot;
+            </span>)
         );
 
-        <span class="comment">// All good.</span>
-        <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, (), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">IterState::new</span>().<span class="ident">gradient</span>(<span class="ident">grad</span>.<span class="ident">clone</span>()).<span class="ident">hessian</span>(<span class="ident">hessian</span>);
-        <span class="kw">let</span> <span class="ident">problem</span> <span class="op">=</span> <span class="ident">TestProblem::new</span>();
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state_out</span>, <span class="ident">kv</span>) <span class="op">=</span> <span class="ident">sh</span>.<span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Problem::new</span>(<span class="ident">problem</span>), <span class="ident">state</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// All good.
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; =
+            IterState::new().gradient(grad.clone()).hessian(hessian);
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = sh.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">kv</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(kv.is_none());
 
-        <span class="kw">let</span> <span class="ident">s_param</span> <span class="op">=</span> <span class="ident">state_out</span>.<span class="ident">take_param</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>s_param = state_out.take_param().unwrap();
 
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">s_param</span>[<span class="number">0</span>], <span class="number">0.0f64</span>.<span class="ident">sqrt</span>(), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">s_param</span>[<span class="number">1</span>], <span class="number">0.0f64</span>.<span class="ident">sqrt</span>(), <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
+        <span class="macro">assert_relative_eq!</span>(s_param[<span class="number">0</span>], <span class="number">0.0f64</span>.sqrt(), epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(s_param[<span class="number">1</span>], <span class="number">0.0f64</span>.sqrt(), epsilon = f64::EPSILON);
 
-        <span class="kw">let</span> <span class="ident">Steihaug</span> {
-            <span class="ident">radius</span>,
-            <span class="ident">epsilon</span>,
-            <span class="ident">p</span>,
-            <span class="ident">r</span>,
-            <span class="ident">rtr</span>,
-            <span class="ident">r_0_norm</span>,
-            <span class="ident">d</span>,
-            <span class="ident">max_iters</span>,
-        } <span class="op">=</span> <span class="ident">sh</span>;
+        <span class="kw">let </span>Steihaug {
+            radius,
+            epsilon,
+            p,
+            r,
+            rtr,
+            r_0_norm,
+            d,
+            max_iters,
+        } = sh;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">radius</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">1.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">epsilon</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">10e-10f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">0</span>], <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">p</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">1</span>], <span class="number">0.0f64</span>, <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">r</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">0</span>], <span class="ident">grad</span>[<span class="number">0</span>], <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">r</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">1</span>], <span class="ident">grad</span>[<span class="number">1</span>], <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">rtr</span>.<span class="ident">to_ne_bytes</span>(), <span class="number">5.0f64</span>.<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">r_0_norm</span>.<span class="ident">to_ne_bytes</span>(), (<span class="number">5.0f64</span>).<span class="ident">sqrt</span>().<span class="ident">to_ne_bytes</span>());
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">d</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">0</span>], <span class="op">-</span><span class="ident">grad</span>[<span class="number">0</span>], <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">d</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()[<span class="number">1</span>], <span class="op">-</span><span class="ident">grad</span>[<span class="number">1</span>], <span class="ident">epsilon</span> <span class="op">=</span> <span class="ident">f64::EPSILON</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">max_iters</span>, <span class="ident">u64::MAX</span>);
+        <span class="macro">assert_eq!</span>(radius.to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(epsilon.to_ne_bytes(), <span class="number">10e-10f64</span>.to_ne_bytes());
+        <span class="macro">assert_relative_eq!</span>(p.as_ref().unwrap()[<span class="number">0</span>], <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(p.as_ref().unwrap()[<span class="number">1</span>], <span class="number">0.0f64</span>, epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(r.as_ref().unwrap()[<span class="number">0</span>], grad[<span class="number">0</span>], epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(r.as_ref().unwrap()[<span class="number">1</span>], grad[<span class="number">1</span>], epsilon = f64::EPSILON);
+        <span class="macro">assert_eq!</span>(rtr.to_ne_bytes(), <span class="number">5.0f64</span>.to_ne_bytes());
+        <span class="macro">assert_eq!</span>(r_0_norm.to_ne_bytes(), (<span class="number">5.0f64</span>).sqrt().to_ne_bytes());
+        <span class="macro">assert_relative_eq!</span>(d.as_ref().unwrap()[<span class="number">0</span>], -grad[<span class="number">0</span>], epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(d.as_ref().unwrap()[<span class="number">1</span>], -grad[<span class="number">1</span>], epsilon = f64::EPSILON);
+        <span class="macro">assert_eq!</span>(max_iters, u64::MAX);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

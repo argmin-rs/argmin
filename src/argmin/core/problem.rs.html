@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/problem.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>problem.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../argmin/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `argmin/src/core/problem.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>problem.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../argmin/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../argmin/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1054,1061 +1054,1061 @@
 <span id="1054">1054</span>
 <span id="1055">1055</span>
 <span id="1056">1056</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::core</span>::{<span class="ident">ArgminFloat</span>, <span class="ident">Error</span>, <span class="ident">SendAlias</span>, <span class="ident">SyncAlias</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rayon&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">rayon::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Error, SendAlias, SyncAlias};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;rayon&quot;</span>)]
+</span><span class="kw">use </span>rayon::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="doccomment">/// Wrapper around problems defined by users.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Keeps track of how many times methods such as `apply`, `cost`, `gradient`, `jacobian`,</span>
-<span class="doccomment">/// `hessian`, `anneal` and so on are called. It is used to pass the problem from one iteration of</span>
-<span class="doccomment">/// a solver to the next.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Problem defined by user</span>
-    <span class="kw">pub</span> <span class="ident">problem</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Keeps track of how often methods of `problem` have been called.</span>
-    <span class="kw">pub</span> <span class="ident">counts</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">u64</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Wrapper around problems defined by users.
+///
+/// Keeps track of how many times methods such as `apply`, `cost`, `gradient`, `jacobian`,
+/// `hessian`, `anneal` and so on are called. It is used to pass the problem from one iteration of
+/// a solver to the next.
+</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="kw">pub struct </span>Problem&lt;O&gt; {
+    <span class="doccomment">/// Problem defined by user
+    </span><span class="kw">pub </span>problem: <span class="prelude-ty">Option</span>&lt;O&gt;,
+    <span class="doccomment">/// Keeps track of how often methods of `problem` have been called.
+    </span><span class="kw">pub </span>counts: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, u64&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Wraps a problem into an instance of `Problem`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::Problem;</span>
-    <span class="doccomment">/// # use std::collections::HashMap;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let wrapped_problem = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # assert_eq!(wrapped_problem.problem.unwrap(), UserDefinedProblem {});</span>
-    <span class="doccomment">/// # assert_eq!(wrapped_problem.counts, HashMap::new());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">problem</span>: <span class="ident">O</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Problem</span> {
-            <span class="ident">problem</span>: <span class="prelude-val">Some</span>(<span class="ident">problem</span>),
-            <span class="ident">counts</span>: <span class="ident">HashMap::new</span>(),
+<span class="kw">impl</span>&lt;O&gt; Problem&lt;O&gt; {
+    <span class="doccomment">/// Wraps a problem into an instance of `Problem`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::Problem;
+    /// # use std::collections::HashMap;
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// let wrapped_problem = Problem::new(UserDefinedProblem {});
+    /// #
+    /// # assert_eq!(wrapped_problem.problem.unwrap(), UserDefinedProblem {});
+    /// # assert_eq!(wrapped_problem.counts, HashMap::new());
+    /// ```
+    </span><span class="kw">pub fn </span>new(problem: O) -&gt; <span class="self">Self </span>{
+        Problem {
+            problem: <span class="prelude-val">Some</span>(problem),
+            counts: HashMap::new(),
         }
     }
 
-    <span class="doccomment">/// Gives access to the stored `problem` via the closure `func` and keeps track of how many</span>
-    <span class="doccomment">/// times the function has been called. The function counts will be passed to observers labeled</span>
-    <span class="doccomment">/// with `counts_string`. Per convention, `counts_string` is chosen as `&lt;something&gt;_count`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{test_utils::TestProblem, Problem, CostFunction};</span>
-    <span class="doccomment">/// # let mut problem = Problem::new(TestProblem::new());</span>
-    <span class="doccomment">/// # let param = vec![1.0f64, 0.0];</span>
-    <span class="doccomment">/// let cost = problem.problem(&quot;cost_count&quot;, |problem| problem.cost(&amp;param));</span>
-    <span class="doccomment">/// # assert_eq!(problem.counts[&quot;cost_count&quot;], 1)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is typically used when designing a trait which optimization problems need to implement</span>
-    <span class="doccomment">/// for certain solvers. For instance, for a trait `Anneal` used in Simulated Annealing, one</span>
-    <span class="doccomment">/// would write the following to enable the solver to call `.anneal(...)` on an `Problem`</span>
-    <span class="doccomment">/// directly:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # // needs to reimplement Problem because doctests run in dedicated crate where it is not</span>
-    <span class="doccomment">/// # // possible to `impl` a type from another crate.</span>
-    <span class="doccomment">/// # // Probably somewhat related to https://github.com/rust-lang/rust/issues/50784</span>
-    <span class="doccomment">/// # use argmin::core::Error;</span>
-    <span class="doccomment">/// # use std::collections::HashMap;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # pub struct Problem&lt;O&gt; {</span>
-    <span class="doccomment">/// #     pub problem: Option&lt;O&gt;,</span>
-    <span class="doccomment">/// #     pub counts: HashMap&lt;&amp;&#39;static str, u64&gt;,</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # impl&lt;O&gt; Problem&lt;O&gt; {</span>
-    <span class="doccomment">/// #     pub fn problem&lt;T, F: FnOnce(&amp;O) -&gt; Result&lt;T, Error&gt;&gt;(</span>
-    <span class="doccomment">/// #         &amp;mut self,</span>
-    <span class="doccomment">/// #         counts_string: &amp;&#39;static str,</span>
-    <span class="doccomment">/// #         func: F,</span>
-    <span class="doccomment">/// #     ) -&gt; Result&lt;T, Error&gt; {</span>
-    <span class="doccomment">/// #         let count = self.counts.entry(counts_string).or_insert(0);</span>
-    <span class="doccomment">/// #         *count += 1;</span>
-    <span class="doccomment">/// #         func(self.problem.as_ref().unwrap())</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// pub trait Anneal {</span>
-    <span class="doccomment">///     type Param;</span>
-    <span class="doccomment">///     type Output;</span>
-    <span class="doccomment">///     type Float;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     fn anneal(&amp;self, param: &amp;Self::Param, extent: Self::Float) -&gt; Result&lt;Self::Output, Error&gt;;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl&lt;O: Anneal&gt; Problem&lt;O&gt; {</span>
-    <span class="doccomment">///     pub fn anneal(&amp;mut self, param: &amp;O::Param, extent: O::Float) -&gt; Result&lt;O::Output, Error&gt; {</span>
-    <span class="doccomment">///         self.problem(&quot;anneal_count&quot;, |problem| problem.anneal(param, extent))</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // ...</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # struct TestProblem {}</span>
-    <span class="doccomment">/// # impl Anneal for TestProblem {</span>
-    <span class="doccomment">/// #     type Param = ();</span>
-    <span class="doccomment">/// #     type Output = ();</span>
-    <span class="doccomment">/// #     type Float = f64;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn anneal(&amp;self, param: &amp;Self::Param, _extent: Self::Float) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(())</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # let mut problem = Problem { problem: Some(TestProblem {}), counts: HashMap::new() };</span>
-    <span class="doccomment">/// # let param = ();</span>
-    <span class="doccomment">/// let new_param = problem.anneal(&amp;param, 1.0f64);</span>
-    <span class="doccomment">/// # assert_eq!(problem.counts[&quot;anneal_count&quot;], 1)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this will unfortunately only work inside the `argmin` crate itself due to the fact</span>
-    <span class="doccomment">/// that it is not possible to `impl` a type from another crate. Therefore if one implements a</span>
-    <span class="doccomment">/// solver outside of argmin, `.problem(...)` has to be called directly as shown in the first</span>
-    <span class="doccomment">/// example.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">problem</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">O</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">counts_string</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">func</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">counts</span>.<span class="ident">entry</span>(<span class="ident">counts_string</span>).<span class="ident">or_insert</span>(<span class="number">0</span>);
-        <span class="kw-2">*</span><span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">func</span>(<span class="self">self</span>.<span class="ident">problem</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())
+    <span class="doccomment">/// Gives access to the stored `problem` via the closure `func` and keeps track of how many
+    /// times the function has been called. The function counts will be passed to observers labeled
+    /// with `counts_string`. Per convention, `counts_string` is chosen as `&lt;something&gt;_count`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{test_utils::TestProblem, Problem, CostFunction};
+    /// # let mut problem = Problem::new(TestProblem::new());
+    /// # let param = vec![1.0f64, 0.0];
+    /// let cost = problem.problem(&quot;cost_count&quot;, |problem| problem.cost(&amp;param));
+    /// # assert_eq!(problem.counts[&quot;cost_count&quot;], 1)
+    /// ```
+    ///
+    /// This is typically used when designing a trait which optimization problems need to implement
+    /// for certain solvers. For instance, for a trait `Anneal` used in Simulated Annealing, one
+    /// would write the following to enable the solver to call `.anneal(...)` on an `Problem`
+    /// directly:
+    ///
+    /// ```
+    /// # // needs to reimplement Problem because doctests run in dedicated crate where it is not
+    /// # // possible to `impl` a type from another crate.
+    /// # // Probably somewhat related to https://github.com/rust-lang/rust/issues/50784
+    /// # use argmin::core::Error;
+    /// # use std::collections::HashMap;
+    /// #
+    /// # pub struct Problem&lt;O&gt; {
+    /// #     pub problem: Option&lt;O&gt;,
+    /// #     pub counts: HashMap&lt;&amp;&#39;static str, u64&gt;,
+    /// # }
+    /// # impl&lt;O&gt; Problem&lt;O&gt; {
+    /// #     pub fn problem&lt;T, F: FnOnce(&amp;O) -&gt; Result&lt;T, Error&gt;&gt;(
+    /// #         &amp;mut self,
+    /// #         counts_string: &amp;&#39;static str,
+    /// #         func: F,
+    /// #     ) -&gt; Result&lt;T, Error&gt; {
+    /// #         let count = self.counts.entry(counts_string).or_insert(0);
+    /// #         *count += 1;
+    /// #         func(self.problem.as_ref().unwrap())
+    /// #     }
+    /// # }
+    /// pub trait Anneal {
+    ///     type Param;
+    ///     type Output;
+    ///     type Float;
+    ///
+    ///     fn anneal(&amp;self, param: &amp;Self::Param, extent: Self::Float) -&gt; Result&lt;Self::Output, Error&gt;;
+    /// }
+    ///
+    /// impl&lt;O: Anneal&gt; Problem&lt;O&gt; {
+    ///     pub fn anneal(&amp;mut self, param: &amp;O::Param, extent: O::Float) -&gt; Result&lt;O::Output, Error&gt; {
+    ///         self.problem(&quot;anneal_count&quot;, |problem| problem.anneal(param, extent))
+    ///     }
+    /// }
+    ///
+    /// // ...
+    ///
+    /// # struct TestProblem {}
+    /// # impl Anneal for TestProblem {
+    /// #     type Param = ();
+    /// #     type Output = ();
+    /// #     type Float = f64;
+    /// #
+    /// #     fn anneal(&amp;self, param: &amp;Self::Param, _extent: Self::Float) -&gt; Result&lt;Self::Output, Error&gt; {
+    /// #         Ok(())
+    /// #     }
+    /// # }
+    /// # let mut problem = Problem { problem: Some(TestProblem {}), counts: HashMap::new() };
+    /// # let param = ();
+    /// let new_param = problem.anneal(&amp;param, 1.0f64);
+    /// # assert_eq!(problem.counts[&quot;anneal_count&quot;], 1)
+    /// ```
+    ///
+    /// Note that this will unfortunately only work inside the `argmin` crate itself due to the fact
+    /// that it is not possible to `impl` a type from another crate. Therefore if one implements a
+    /// solver outside of argmin, `.problem(...)` has to be called directly as shown in the first
+    /// example.
+    </span><span class="kw">pub fn </span>problem&lt;T, F: FnOnce(<span class="kw-2">&amp;</span>O) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        counts_string: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        func: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt; {
+        <span class="kw">let </span>count = <span class="self">self</span>.counts.entry(counts_string).or_insert(<span class="number">0</span>);
+        <span class="kw-2">*</span>count += <span class="number">1</span>;
+        func(<span class="self">self</span>.problem.as_ref().unwrap())
     }
 
-    <span class="doccomment">/// Gives access to the stored `problem` via the closure `func` and keeps track of how many</span>
-    <span class="doccomment">/// times the function has been called. In contrast to the `problem` method, this also allows</span>
-    <span class="doccomment">/// to pass the number of parameter vectors which will be processed by the underlying problem.</span>
-    <span class="doccomment">/// This is used by the `bulk_*` methods, which process multiple parameters at once.</span>
-    <span class="doccomment">/// The function counts will be passed to observers labeled with `counts_string`.</span>
-    <span class="doccomment">/// Per convention, `counts_string` is chosen as `&lt;something&gt;_count`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bulk_problem</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">O</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">counts_string</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">num_param_vecs</span>: <span class="ident">usize</span>,
-        <span class="ident">func</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">counts</span>.<span class="ident">entry</span>(<span class="ident">counts_string</span>).<span class="ident">or_insert</span>(<span class="number">0</span>);
-        <span class="kw-2">*</span><span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">num_param_vecs</span> <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="ident">func</span>(<span class="self">self</span>.<span class="ident">problem</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())
+    <span class="doccomment">/// Gives access to the stored `problem` via the closure `func` and keeps track of how many
+    /// times the function has been called. In contrast to the `problem` method, this also allows
+    /// to pass the number of parameter vectors which will be processed by the underlying problem.
+    /// This is used by the `bulk_*` methods, which process multiple parameters at once.
+    /// The function counts will be passed to observers labeled with `counts_string`.
+    /// Per convention, `counts_string` is chosen as `&lt;something&gt;_count`.
+    </span><span class="kw">pub fn </span>bulk_problem&lt;T, F: FnOnce(<span class="kw-2">&amp;</span>O) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        counts_string: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        num_param_vecs: usize,
+        func: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt; {
+        <span class="kw">let </span>count = <span class="self">self</span>.counts.entry(counts_string).or_insert(<span class="number">0</span>);
+        <span class="kw-2">*</span>count += num_param_vecs <span class="kw">as </span>u64;
+        func(<span class="self">self</span>.problem.as_ref().unwrap())
     }
 
-    <span class="doccomment">/// Returns the internally stored problem and replaces it with `None`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::Problem;</span>
-    <span class="doccomment">/// # use std::collections::HashMap;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let mut problem = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">/// let user_problem: Option&lt;UserDefinedProblem&gt; = problem.take_problem();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(user_problem.unwrap(), UserDefinedProblem {});</span>
-    <span class="doccomment">/// assert!(problem.problem.is_none());</span>
-    <span class="doccomment">/// # assert_eq!(problem.counts, HashMap::new());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_problem</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>.<span class="ident">take</span>()
+    <span class="doccomment">/// Returns the internally stored problem and replaces it with `None`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::Problem;
+    /// # use std::collections::HashMap;
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// let mut problem = Problem::new(UserDefinedProblem {});
+    /// let user_problem: Option&lt;UserDefinedProblem&gt; = problem.take_problem();
+    ///
+    /// assert_eq!(user_problem.unwrap(), UserDefinedProblem {});
+    /// assert!(problem.problem.is_none());
+    /// # assert_eq!(problem.counts, HashMap::new());
+    /// ```
+    </span><span class="kw">pub fn </span>take_problem(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;O&gt; {
+        <span class="self">self</span>.problem.take()
     }
 
-    <span class="doccomment">/// Consumes another instance of `Problem`. The internally stored user defined problem of the</span>
-    <span class="doccomment">/// passed `Problem` instance is moved to `Self`. The function evaluation counts are</span>
-    <span class="doccomment">/// merged/summed up.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::Problem;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Simulate function evaluation counts in `problem1`</span>
-    <span class="doccomment">/// problem1.counts.insert(&quot;cost_count&quot;, 2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Take the internally stored problem such that `None` remains in its place.</span>
-    <span class="doccomment">/// let _ = problem1.take_problem();</span>
-    <span class="doccomment">/// assert!(problem1.problem.is_none());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut problem2 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Simulate function evaluation counts in `problem2`</span>
-    <span class="doccomment">/// problem2.counts.insert(&quot;cost_count&quot;, 1);</span>
-    <span class="doccomment">/// problem2.counts.insert(&quot;gradient_count&quot;, 4);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // `problem1` consumes `problem2` by moving its internally stored user defined problem and</span>
-    <span class="doccomment">/// // by merging the function evaluation counts</span>
-    <span class="doccomment">/// problem1.consume_problem(problem2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // `problem1` now holds a problem of type `UserDefinedProblem` (taken from `problem2`)</span>
-    <span class="doccomment">/// assert_eq!(problem1.problem.unwrap(), UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The function evaluation counts have been merged</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;cost_count&quot;], 3);</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 4);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_problem</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">problem</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">other</span>.<span class="ident">take_problem</span>().<span class="ident">unwrap</span>());
-        <span class="self">self</span>.<span class="ident">consume_func_counts</span>(<span class="ident">other</span>);
+    <span class="doccomment">/// Consumes another instance of `Problem`. The internally stored user defined problem of the
+    /// passed `Problem` instance is moved to `Self`. The function evaluation counts are
+    /// merged/summed up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::Problem;
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// // Simulate function evaluation counts in `problem1`
+    /// problem1.counts.insert(&quot;cost_count&quot;, 2);
+    ///
+    /// // Take the internally stored problem such that `None` remains in its place.
+    /// let _ = problem1.take_problem();
+    /// assert!(problem1.problem.is_none());
+    ///
+    /// let mut problem2 = Problem::new(UserDefinedProblem {});
+    ///
+    /// // Simulate function evaluation counts in `problem2`
+    /// problem2.counts.insert(&quot;cost_count&quot;, 1);
+    /// problem2.counts.insert(&quot;gradient_count&quot;, 4);
+    ///
+    /// // `problem1` consumes `problem2` by moving its internally stored user defined problem and
+    /// // by merging the function evaluation counts
+    /// problem1.consume_problem(problem2);
+    ///
+    /// // `problem1` now holds a problem of type `UserDefinedProblem` (taken from `problem2`)
+    /// assert_eq!(problem1.problem.unwrap(), UserDefinedProblem {});
+    ///
+    /// // The function evaluation counts have been merged
+    /// assert_eq!(problem1.counts[&quot;cost_count&quot;], 3);
+    /// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 4);
+    /// ```
+    </span><span class="kw">pub fn </span>consume_problem(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>other: Problem&lt;O&gt;) {
+        <span class="self">self</span>.problem = <span class="prelude-val">Some</span>(other.take_problem().unwrap());
+        <span class="self">self</span>.consume_func_counts(other);
     }
 
-    <span class="doccomment">/// Consumes another instance of `Problem` by summing ob the function evaluation counts.</span>
-    <span class="doccomment">/// In contrast to `consume_problem`, the internally stored `problem` remains untouched.</span>
-    <span class="doccomment">/// Therefore the two internally stored problems do not need to be of the same type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::Problem;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem1 {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem2 {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem1 {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Simulate function evaluation counts in `problem1`.</span>
-    <span class="doccomment">/// problem1.counts.insert(&quot;cost_count&quot;, 2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Take the internally stored problem such that `None` remains in its place.</span>
-    <span class="doccomment">/// let _ = problem1.take_problem();</span>
-    <span class="doccomment">/// assert!(problem1.problem.is_none());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut problem2 = Problem::new(UserDefinedProblem2 {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Simulate function evaluation counts in `problem2`</span>
-    <span class="doccomment">/// problem2.counts.insert(&quot;cost_count&quot;, 1);</span>
-    <span class="doccomment">/// problem2.counts.insert(&quot;gradient_count&quot;, 4);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // `problem1` consumes `problem2` by merging the function evaluation counts.</span>
-    <span class="doccomment">/// problem1.consume_func_counts(problem2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The internally stored problem remains being `None` (in contrast to `consume_problem`).</span>
-    <span class="doccomment">/// assert!(problem1.problem.is_none());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The function evaluation counts have been merged.</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;cost_count&quot;], 3);</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 4);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_func_counts</span><span class="op">&lt;</span><span class="ident">O2</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O2</span><span class="op">&gt;</span>) {
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">other</span>.<span class="ident">counts</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">counts</span>.<span class="ident">entry</span>(<span class="ident">k</span>).<span class="ident">or_insert</span>(<span class="number">0</span>);
-            <span class="kw-2">*</span><span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">v</span>
+    <span class="doccomment">/// Consumes another instance of `Problem` by summing ob the function evaluation counts.
+    /// In contrast to `consume_problem`, the internally stored `problem` remains untouched.
+    /// Therefore the two internally stored problems do not need to be of the same type.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::Problem;
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem1 {};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem2 {};
+    /// #
+    /// let mut problem1 = Problem::new(UserDefinedProblem1 {});
+    ///
+    /// // Simulate function evaluation counts in `problem1`.
+    /// problem1.counts.insert(&quot;cost_count&quot;, 2);
+    ///
+    /// // Take the internally stored problem such that `None` remains in its place.
+    /// let _ = problem1.take_problem();
+    /// assert!(problem1.problem.is_none());
+    ///
+    /// let mut problem2 = Problem::new(UserDefinedProblem2 {});
+    ///
+    /// // Simulate function evaluation counts in `problem2`
+    /// problem2.counts.insert(&quot;cost_count&quot;, 1);
+    /// problem2.counts.insert(&quot;gradient_count&quot;, 4);
+    ///
+    /// // `problem1` consumes `problem2` by merging the function evaluation counts.
+    /// problem1.consume_func_counts(problem2);
+    ///
+    /// // The internally stored problem remains being `None` (in contrast to `consume_problem`).
+    /// assert!(problem1.problem.is_none());
+    ///
+    /// // The function evaluation counts have been merged.
+    /// assert_eq!(problem1.counts[&quot;cost_count&quot;], 3);
+    /// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 4);
+    /// ```
+    </span><span class="kw">pub fn </span>consume_func_counts&lt;O2&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Problem&lt;O2&gt;) {
+        <span class="kw">for </span>(k, v) <span class="kw">in </span>other.counts.iter() {
+            <span class="kw">let </span>count = <span class="self">self</span>.counts.entry(k).or_insert(<span class="number">0</span>);
+            <span class="kw-2">*</span>count += v
         }
     }
 
-    <span class="doccomment">/// Resets the function evaluation counts to zero.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::Problem;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let mut problem = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Simulate function evaluation counts in `problem1`.</span>
-    <span class="doccomment">/// problem.counts.insert(&quot;cost_count&quot;, 2);</span>
-    <span class="doccomment">/// problem.counts.insert(&quot;gradient_count&quot;, 4);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem.counts[&quot;cost_count&quot;], 2);</span>
-    <span class="doccomment">/// assert_eq!(problem.counts[&quot;gradient_count&quot;], 4);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Set function evaluation counts to 0</span>
-    <span class="doccomment">/// problem.reset();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem.counts[&quot;cost_count&quot;], 0);</span>
-    <span class="doccomment">/// assert_eq!(problem.counts[&quot;gradient_count&quot;], 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">counts</span>.<span class="ident">iter_mut</span>() {
-            <span class="kw-2">*</span><span class="ident">v</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="doccomment">/// Resets the function evaluation counts to zero.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::Problem;
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// let mut problem = Problem::new(UserDefinedProblem {});
+    ///
+    /// // Simulate function evaluation counts in `problem1`.
+    /// problem.counts.insert(&quot;cost_count&quot;, 2);
+    /// problem.counts.insert(&quot;gradient_count&quot;, 4);
+    ///
+    /// assert_eq!(problem.counts[&quot;cost_count&quot;], 2);
+    /// assert_eq!(problem.counts[&quot;gradient_count&quot;], 4);
+    ///
+    /// // Set function evaluation counts to 0
+    /// problem.reset();
+    ///
+    /// assert_eq!(problem.counts[&quot;cost_count&quot;], 0);
+    /// assert_eq!(problem.counts[&quot;gradient_count&quot;], 0);
+    /// ```
+    </span><span class="kw">pub fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">for </span>(<span class="kw">_</span>, v) <span class="kw">in </span><span class="self">self</span>.counts.iter_mut() {
+            <span class="kw-2">*</span>v = <span class="number">0</span>;
         }
     }
 
-    <span class="doccomment">/// Returns the internally stored user defined problem by consuming `Self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::Problem;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let problem = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let user_problem = problem.get_problem();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(user_problem.unwrap(), UserDefinedProblem {});</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_problem</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>
+    <span class="doccomment">/// Returns the internally stored user defined problem by consuming `Self`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::Problem;
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// let problem = Problem::new(UserDefinedProblem {});
+    ///
+    /// let user_problem = problem.get_problem();
+    ///
+    /// assert_eq!(user_problem.unwrap(), UserDefinedProblem {});
+    /// ```
+    </span><span class="kw">pub fn </span>get_problem(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;O&gt; {
+        <span class="self">self</span>.problem
     }
 }
 
-<span class="doccomment">/// Defines the application of an operator to a parameter vector.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::core::{Operator, Error};</span>
-<span class="doccomment">/// use argmin_math::ArgminDot;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct Model {</span>
-<span class="doccomment">///     matrix: Vec&lt;Vec&lt;f64&gt;&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl Operator for Model {</span>
-<span class="doccomment">///     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">///     type Output = Vec&lt;f64&gt;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     /// Multiply matrix `self.matrix` with vector `param`</span>
-<span class="doccomment">///     fn apply(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-<span class="doccomment">///         Ok(self.matrix.dot(param))</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Operator</span> {
-    <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span>;
-    <span class="doccomment">/// Type of the return value of the operator</span>
-    <span class="kw">type</span> <span class="ident">Output</span>;
+<span class="doccomment">/// Defines the application of an operator to a parameter vector.
+///
+/// # Example
+///
+/// ```
+/// use argmin::core::{Operator, Error};
+/// use argmin_math::ArgminDot;
+///
+/// struct Model {
+///     matrix: Vec&lt;Vec&lt;f64&gt;&gt;,
+/// }
+///
+/// impl Operator for Model {
+///     type Param = Vec&lt;f64&gt;;
+///     type Output = Vec&lt;f64&gt;;
+///
+///     /// Multiply matrix `self.matrix` with vector `param`
+///     fn apply(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {
+///         Ok(self.matrix.dot(param))
+///     }
+/// }
+/// ```
+</span><span class="kw">pub trait </span>Operator {
+    <span class="doccomment">/// Type of the parameter vector
+    </span><span class="kw">type </span>Param;
+    <span class="doccomment">/// Type of the return value of the operator
+    </span><span class="kw">type </span>Output;
 
-    <span class="doccomment">/// Applies the operator to parameters</span>
-    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Applies the operator to parameters
+    </span><span class="kw">fn </span>apply(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt;;
 
-    <span class="macro">bulk!</span>(<span class="ident">apply</span>, <span class="ident"><span class="self">Self</span>::Param</span>, <span class="ident"><span class="self">Self</span>::Output</span>);
+    <span class="macro">bulk!</span>(apply, <span class="self">Self</span>::Param, <span class="self">Self</span>::Output);
 }
 
-<span class="doccomment">/// Defines computation of a cost function value</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::core::{CostFunction, Error};</span>
-<span class="doccomment">/// use argmin_testfunctions::rosenbrock;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct Rosenbrock {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl CostFunction for Rosenbrock {</span>
-<span class="doccomment">///     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">///     type Output = f64;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     /// Compute Rosenbrock function</span>
-<span class="doccomment">///     fn cost(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-<span class="doccomment">///         Ok(rosenbrock(param, 1.0, 100.0))</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CostFunction</span> {
-    <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span>;
-    <span class="doccomment">/// Type of the return value of the cost function</span>
-    <span class="kw">type</span> <span class="ident">Output</span>;
+<span class="doccomment">/// Defines computation of a cost function value
+///
+/// # Example
+///
+/// ```
+/// use argmin::core::{CostFunction, Error};
+/// use argmin_testfunctions::rosenbrock;
+///
+/// struct Rosenbrock {}
+///
+/// impl CostFunction for Rosenbrock {
+///     type Param = Vec&lt;f64&gt;;
+///     type Output = f64;
+///
+///     /// Compute Rosenbrock function
+///     fn cost(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {
+///         Ok(rosenbrock(param, 1.0, 100.0))
+///     }
+/// }
+/// ```
+</span><span class="kw">pub trait </span>CostFunction {
+    <span class="doccomment">/// Type of the parameter vector
+    </span><span class="kw">type </span>Param;
+    <span class="doccomment">/// Type of the return value of the cost function
+    </span><span class="kw">type </span>Output;
 
-    <span class="doccomment">/// Compute cost function</span>
-    <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Compute cost function
+    </span><span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt;;
 
-    <span class="macro">bulk!</span>(<span class="ident">cost</span>, <span class="ident"><span class="self">Self</span>::Param</span>, <span class="ident"><span class="self">Self</span>::Output</span>);
+    <span class="macro">bulk!</span>(cost, <span class="self">Self</span>::Param, <span class="self">Self</span>::Output);
 }
 
-<span class="doccomment">/// Defines the computation of the gradient.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::core::{Gradient, Error};</span>
-<span class="doccomment">/// use argmin_testfunctions::rosenbrock_2d_derivative;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct Rosenbrock {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl Gradient for Rosenbrock {</span>
-<span class="doccomment">///     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">///     type Gradient = Vec&lt;f64&gt;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     /// Compute gradient of rosenbrock function</span>
-<span class="doccomment">///     fn gradient(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {</span>
-<span class="doccomment">///         Ok(rosenbrock_2d_derivative(param, 1.0, 100.0))</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Gradient</span> {
-    <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span>;
-    <span class="doccomment">/// Type of the gradient</span>
-    <span class="kw">type</span> <span class="ident">Gradient</span>;
+<span class="doccomment">/// Defines the computation of the gradient.
+///
+/// # Example
+///
+/// ```
+/// use argmin::core::{Gradient, Error};
+/// use argmin_testfunctions::rosenbrock_2d_derivative;
+///
+/// struct Rosenbrock {}
+///
+/// impl Gradient for Rosenbrock {
+///     type Param = Vec&lt;f64&gt;;
+///     type Gradient = Vec&lt;f64&gt;;
+///
+///     /// Compute gradient of rosenbrock function
+///     fn gradient(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {
+///         Ok(rosenbrock_2d_derivative(param, 1.0, 100.0))
+///     }
+/// }
+/// ```
+</span><span class="kw">pub trait </span>Gradient {
+    <span class="doccomment">/// Type of the parameter vector
+    </span><span class="kw">type </span>Param;
+    <span class="doccomment">/// Type of the gradient
+    </span><span class="kw">type </span>Gradient;
 
-    <span class="doccomment">/// Compute gradient</span>
-    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Gradient</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Compute gradient
+    </span><span class="kw">fn </span>gradient(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Gradient, Error&gt;;
 
-    <span class="macro">bulk!</span>(<span class="ident">gradient</span>, <span class="ident"><span class="self">Self</span>::Param</span>, <span class="ident"><span class="self">Self</span>::Gradient</span>);
+    <span class="macro">bulk!</span>(gradient, <span class="self">Self</span>::Param, <span class="self">Self</span>::Gradient);
 }
 
-<span class="doccomment">/// Defines the computation of the Hessian.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::core::{Hessian, Error};</span>
-<span class="doccomment">/// use argmin_testfunctions::rosenbrock_2d_hessian;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct Rosenbrock {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl Hessian for Rosenbrock {</span>
-<span class="doccomment">///     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">///     type Hessian = Vec&lt;f64&gt;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     /// Compute gradient of rosenbrock function</span>
-<span class="doccomment">///     fn hessian(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt; {</span>
-<span class="doccomment">///         Ok(rosenbrock_2d_hessian(param, 1.0, 100.0))</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Hessian</span> {
-    <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span>;
-    <span class="doccomment">/// Type of the Hessian</span>
-    <span class="kw">type</span> <span class="ident">Hessian</span>;
+<span class="doccomment">/// Defines the computation of the Hessian.
+///
+/// # Example
+///
+/// ```
+/// use argmin::core::{Hessian, Error};
+/// use argmin_testfunctions::rosenbrock_2d_hessian;
+///
+/// struct Rosenbrock {}
+///
+/// impl Hessian for Rosenbrock {
+///     type Param = Vec&lt;f64&gt;;
+///     type Hessian = Vec&lt;f64&gt;;
+///
+///     /// Compute gradient of rosenbrock function
+///     fn hessian(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt; {
+///         Ok(rosenbrock_2d_hessian(param, 1.0, 100.0))
+///     }
+/// }
+</span><span class="kw">pub trait </span>Hessian {
+    <span class="doccomment">/// Type of the parameter vector
+    </span><span class="kw">type </span>Param;
+    <span class="doccomment">/// Type of the Hessian
+    </span><span class="kw">type </span>Hessian;
 
-    <span class="doccomment">/// Compute Hessian</span>
-    <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Compute Hessian
+    </span><span class="kw">fn </span>hessian(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Hessian, Error&gt;;
 
-    <span class="macro">bulk!</span>(<span class="ident">hessian</span>, <span class="ident"><span class="self">Self</span>::Param</span>, <span class="ident"><span class="self">Self</span>::Hessian</span>);
+    <span class="macro">bulk!</span>(hessian, <span class="self">Self</span>::Param, <span class="self">Self</span>::Hessian);
 }
 
-<span class="doccomment">/// Defines the computation of the Jacobian.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::core::{Jacobian, Error};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct Problem {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # fn problem_jacobian(p: &amp;[f64]) -&gt; Vec&lt;Vec&lt;f64&gt;&gt; {</span>
-<span class="doccomment">/// #     vec![vec![1.0f64, 2.0f64], vec![1.0f64, 2.0f64]]</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// impl Jacobian for Problem {</span>
-<span class="doccomment">///     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">///     type Jacobian = Vec&lt;Vec&lt;f64&gt;&gt;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     fn jacobian(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Jacobian, Error&gt; {</span>
-<span class="doccomment">///         Ok(problem_jacobian(p))</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Jacobian</span> {
-    <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span>;
-    <span class="doccomment">/// Type of the Jacobian</span>
-    <span class="kw">type</span> <span class="ident">Jacobian</span>;
+<span class="doccomment">/// Defines the computation of the Jacobian.
+///
+/// # Example
+///
+/// ```
+/// use argmin::core::{Jacobian, Error};
+///
+/// struct Problem {}
+///
+/// # fn problem_jacobian(p: &amp;[f64]) -&gt; Vec&lt;Vec&lt;f64&gt;&gt; {
+/// #     vec![vec![1.0f64, 2.0f64], vec![1.0f64, 2.0f64]]
+/// # }
+/// #
+/// impl Jacobian for Problem {
+///     type Param = Vec&lt;f64&gt;;
+///     type Jacobian = Vec&lt;Vec&lt;f64&gt;&gt;;
+///
+///     fn jacobian(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Jacobian, Error&gt; {
+///         Ok(problem_jacobian(p))
+///     }
+/// }
+/// ```
+</span><span class="kw">pub trait </span>Jacobian {
+    <span class="doccomment">/// Type of the parameter vector
+    </span><span class="kw">type </span>Param;
+    <span class="doccomment">/// Type of the Jacobian
+    </span><span class="kw">type </span>Jacobian;
 
-    <span class="doccomment">/// Compute Jacobian</span>
-    <span class="kw">fn</span> <span class="ident">jacobian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Jacobian</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Compute Jacobian
+    </span><span class="kw">fn </span>jacobian(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Jacobian, Error&gt;;
 
-    <span class="macro">bulk!</span>(<span class="ident">jacobian</span>, <span class="ident"><span class="self">Self</span>::Param</span>, <span class="ident"><span class="self">Self</span>::Jacobian</span>);
+    <span class="macro">bulk!</span>(jacobian, <span class="self">Self</span>::Param, <span class="self">Self</span>::Jacobian);
 }
 
-<span class="doccomment">/// Defines a linear Program</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use argmin::core::{LinearProgram, Error};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct Problem {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl LinearProgram for Problem {</span>
-<span class="doccomment">///     type Param = Vec&lt;f64&gt;;</span>
-<span class="doccomment">///     type Float = f64;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     fn c(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {</span>
-<span class="doccomment">///         Ok(vec![1.0, 2.0])</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     fn b(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {</span>
-<span class="doccomment">///         Ok(vec![3.0, 4.0])</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     fn A(&amp;self) -&gt; Result&lt;Vec&lt;Vec&lt;Self::Float&gt;&gt;, Error&gt; {</span>
-<span class="doccomment">///         Ok(vec![vec![5.0, 6.0], vec![7.0, 8.0]])</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LinearProgram</span> {
-    <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Param</span>;
-    <span class="doccomment">/// Precision of floats</span>
-    <span class="kw">type</span> <span class="ident">Float</span>: <span class="ident">ArgminFloat</span>;
+<span class="doccomment">/// Defines a linear Program
+///
+/// # Example
+///
+/// ```
+/// use argmin::core::{LinearProgram, Error};
+///
+/// struct Problem {}
+///
+/// impl LinearProgram for Problem {
+///     type Param = Vec&lt;f64&gt;;
+///     type Float = f64;
+///
+///     fn c(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {
+///         Ok(vec![1.0, 2.0])
+///     }
+///
+///     fn b(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {
+///         Ok(vec![3.0, 4.0])
+///     }
+///
+///     fn A(&amp;self) -&gt; Result&lt;Vec&lt;Vec&lt;Self::Float&gt;&gt;, Error&gt; {
+///         Ok(vec![vec![5.0, 6.0], vec![7.0, 8.0]])
+///     }
+/// }
+/// ```
+</span><span class="kw">pub trait </span>LinearProgram {
+    <span class="doccomment">/// Type of the parameter vector
+    </span><span class="kw">type </span>Param;
+    <span class="doccomment">/// Precision of floats
+    </span><span class="kw">type </span>Float: ArgminFloat;
 
-    <span class="doccomment">/// TODO c for linear programs</span>
-    <span class="doccomment">/// Those three could maybe be merged into a single function; name unclear</span>
-    <span class="kw">fn</span> <span class="ident">c</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Float</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// TODO c for linear programs
+    /// Those three could maybe be merged into a single function; name unclear
+    </span><span class="kw">fn </span>c(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="self">Self</span>::Float&gt;, Error&gt; {
         <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-            <span class="ident">NotImplemented</span>,
-            <span class="string">&quot;Method `c` of LinearProgram trait not implemented!&quot;</span>
-        ))
+            NotImplemented,
+            <span class="string">&quot;Method `c` of LinearProgram trait not implemented!&quot;
+        </span>))
     }
 
-    <span class="doccomment">/// TODO b for linear programs</span>
-    <span class="kw">fn</span> <span class="ident">b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Float</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// TODO b for linear programs
+    </span><span class="kw">fn </span>b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="self">Self</span>::Float&gt;, Error&gt; {
         <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-            <span class="ident">NotImplemented</span>,
-            <span class="string">&quot;Method `b` of LinearProgram trait not implemented!&quot;</span>
-        ))
+            NotImplemented,
+            <span class="string">&quot;Method `b` of LinearProgram trait not implemented!&quot;
+        </span>))
     }
 
-    <span class="doccomment">/// TODO A for linear programs</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">A</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Float</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// TODO A for linear programs
+    </span><span class="attribute">#[allow(non_snake_case)]
+    </span><span class="kw">fn </span>A(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;<span class="self">Self</span>::Float&gt;&gt;, Error&gt; {
         <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
-            <span class="ident">NotImplemented</span>,
-            <span class="string">&quot;Method `A` of LinearProgram trait not implemented!&quot;</span>
-        ))
+            NotImplemented,
+            <span class="string">&quot;Method `A` of LinearProgram trait not implemented!&quot;
+        </span>))
     }
 }
 
-<span class="doccomment">/// Wraps a call to `apply` defined in the `Operator` trait and as such allows to call `apply` on</span>
-<span class="doccomment">/// an instance of `Problem`. Internally, the number of evaluations of `apply` is counted.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Operator</span><span class="op">&gt;</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Calls `apply` defined in the `Operator` trait and keeps track of the number of evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, Operator, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Operator for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Output = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn apply(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![1.0f64, 1.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `Operator`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![2.0f64, 1.0f64];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.apply(&amp;param);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;operator_count&quot;], 1);</span>
-    <span class="doccomment">/// # assert_eq!(res.unwrap(), vec![1.0f64, 1.0f64]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident">O::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>(<span class="string">&quot;operator_count&quot;</span>, <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">apply</span>(<span class="ident">param</span>))
+<span class="doccomment">/// Wraps a call to `apply` defined in the `Operator` trait and as such allows to call `apply` on
+/// an instance of `Problem`. Internally, the number of evaluations of `apply` is counted.
+</span><span class="kw">impl</span>&lt;O: Operator&gt; Problem&lt;O&gt; {
+    <span class="doccomment">/// Calls `apply` defined in the `Operator` trait and keeps track of the number of evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Operator, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Operator for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Output = Vec&lt;f64&gt;;
+    /// #
+    /// #     fn apply(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {
+    /// #         Ok(vec![1.0f64, 1.0f64])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Operator`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param = vec![2.0f64, 1.0f64];
+    ///
+    /// let res = problem1.apply(&amp;param);
+    ///
+    /// assert_eq!(problem1.counts[&quot;operator_count&quot;], 1);
+    /// # assert_eq!(res.unwrap(), vec![1.0f64, 1.0f64]);
+    /// ```
+    </span><span class="kw">pub fn </span>apply(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param) -&gt; <span class="prelude-ty">Result</span>&lt;O::Output, Error&gt; {
+        <span class="self">self</span>.problem(<span class="string">&quot;operator_count&quot;</span>, |problem| problem.apply(param))
     }
 
-    <span class="doccomment">/// Calls `bulk_apply` defined in the `Operator` trait and keeps track of the number of</span>
-    <span class="doccomment">/// evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, Operator, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Operator for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Output = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn apply(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![1.0f64, 1.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `Operator`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param1 = vec![2.0f64, 1.0f64];</span>
-    <span class="doccomment">/// let param2 = vec![3.0f64, 5.0f64];</span>
-    <span class="doccomment">/// let params = vec![&amp;param1, &amp;param2];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.bulk_apply(&amp;params);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;operator_count&quot;], 2);</span>
-    <span class="doccomment">/// # let res = res.unwrap();</span>
-    <span class="doccomment">/// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);</span>
-    <span class="doccomment">/// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bulk_apply</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">O::Output</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">std::borrow::Borrow</span><span class="op">&lt;</span><span class="ident">O::Param</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SyncAlias</span>,
-        <span class="ident">O::Output</span>: <span class="ident">SendAlias</span>,
-        <span class="ident">O</span>: <span class="ident">SyncAlias</span>,
+    <span class="doccomment">/// Calls `bulk_apply` defined in the `Operator` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Operator, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Operator for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Output = Vec&lt;f64&gt;;
+    /// #
+    /// #     fn apply(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {
+    /// #         Ok(vec![1.0f64, 1.0f64])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Operator`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param1 = vec![2.0f64, 1.0f64];
+    /// let param2 = vec![3.0f64, 5.0f64];
+    /// let params = vec![&amp;param1, &amp;param2];
+    ///
+    /// let res = problem1.bulk_apply(&amp;params);
+    ///
+    /// assert_eq!(problem1.counts[&quot;operator_count&quot;], 2);
+    /// # let res = res.unwrap();
+    /// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);
+    /// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);
+    /// ```
+    </span><span class="kw">pub fn </span>bulk_apply&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Vec&lt;P&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Output&gt;, Error&gt;
+    <span class="kw">where
+        </span>P: std::borrow::Borrow&lt;O::Param&gt; + SyncAlias,
+        O::Output: SendAlias,
+        O: SyncAlias,
     {
-        <span class="self">self</span>.<span class="ident">bulk_problem</span>(<span class="string">&quot;operator_count&quot;</span>, <span class="ident">params</span>.<span class="ident">len</span>(), <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> {
-            <span class="ident">problem</span>.<span class="ident">bulk_apply</span>(<span class="ident">params</span>)
+        <span class="self">self</span>.bulk_problem(<span class="string">&quot;operator_count&quot;</span>, params.len(), |problem| {
+            problem.bulk_apply(params)
         })
     }
 }
 
-<span class="doccomment">/// Wraps a call to `cost` defined in the `CostFunction` trait and as such allows to call `cost` on</span>
-<span class="doccomment">/// an instance of `Problem`. Internally, the number of evaluations of `cost` is counted.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">CostFunction</span><span class="op">&gt;</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Calls `cost` defined in the `CostFunction` trait and keeps track of the number of</span>
-    <span class="doccomment">/// evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, CostFunction, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl CostFunction for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Output = f64;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn cost(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(4.0f64)</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `CostFunction`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![2.0f64, 1.0f64];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.cost(&amp;param);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;cost_count&quot;], 1);</span>
-    <span class="doccomment">/// # assert_eq!(res.unwrap(), 4.0f64);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cost</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident">O::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O::Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>(<span class="string">&quot;cost_count&quot;</span>, <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">cost</span>(<span class="ident">param</span>))
+<span class="doccomment">/// Wraps a call to `cost` defined in the `CostFunction` trait and as such allows to call `cost` on
+/// an instance of `Problem`. Internally, the number of evaluations of `cost` is counted.
+</span><span class="kw">impl</span>&lt;O: CostFunction&gt; Problem&lt;O&gt; {
+    <span class="doccomment">/// Calls `cost` defined in the `CostFunction` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, CostFunction, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl CostFunction for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Output = f64;
+    /// #
+    /// #     fn cost(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {
+    /// #         Ok(4.0f64)
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `CostFunction`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param = vec![2.0f64, 1.0f64];
+    ///
+    /// let res = problem1.cost(&amp;param);
+    ///
+    /// assert_eq!(problem1.counts[&quot;cost_count&quot;], 1);
+    /// # assert_eq!(res.unwrap(), 4.0f64);
+    /// ```
+    </span><span class="kw">pub fn </span>cost(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param) -&gt; <span class="prelude-ty">Result</span>&lt;O::Output, Error&gt; {
+        <span class="self">self</span>.problem(<span class="string">&quot;cost_count&quot;</span>, |problem| problem.cost(param))
     }
 
-    <span class="doccomment">/// Calls `bulk_cost` defined in the `CostFunction` trait and keeps track of the number of</span>
-    <span class="doccomment">/// evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, CostFunction, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl CostFunction for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Output = f64;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn cost(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(4.0f64)</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `CostFunction`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param1 = vec![2.0f64, 1.0f64];</span>
-    <span class="doccomment">/// let param2 = vec![3.0f64, 5.0f64];</span>
-    <span class="doccomment">/// let params = vec![&amp;param1, &amp;param2];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.bulk_cost(&amp;params);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;cost_count&quot;], 2);</span>
-    <span class="doccomment">/// # let res = res.unwrap();</span>
-    <span class="doccomment">/// # assert_eq!(res[0], 4.0f64);</span>
-    <span class="doccomment">/// # assert_eq!(res[1], 4.0f64);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bulk_cost</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">O::Output</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">std::borrow::Borrow</span><span class="op">&lt;</span><span class="ident">O::Param</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SyncAlias</span>,
-        <span class="ident">O::Output</span>: <span class="ident">SendAlias</span>,
-        <span class="ident">O</span>: <span class="ident">SyncAlias</span>,
+    <span class="doccomment">/// Calls `bulk_cost` defined in the `CostFunction` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, CostFunction, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl CostFunction for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Output = f64;
+    /// #
+    /// #     fn cost(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {
+    /// #         Ok(4.0f64)
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `CostFunction`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param1 = vec![2.0f64, 1.0f64];
+    /// let param2 = vec![3.0f64, 5.0f64];
+    /// let params = vec![&amp;param1, &amp;param2];
+    ///
+    /// let res = problem1.bulk_cost(&amp;params);
+    ///
+    /// assert_eq!(problem1.counts[&quot;cost_count&quot;], 2);
+    /// # let res = res.unwrap();
+    /// # assert_eq!(res[0], 4.0f64);
+    /// # assert_eq!(res[1], 4.0f64);
+    /// ```
+    </span><span class="kw">pub fn </span>bulk_cost&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Vec&lt;P&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Output&gt;, Error&gt;
+    <span class="kw">where
+        </span>P: std::borrow::Borrow&lt;O::Param&gt; + SyncAlias,
+        O::Output: SendAlias,
+        O: SyncAlias,
     {
-        <span class="self">self</span>.<span class="ident">bulk_problem</span>(<span class="string">&quot;cost_count&quot;</span>, <span class="ident">params</span>.<span class="ident">len</span>(), <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> {
-            <span class="ident">problem</span>.<span class="ident">bulk_cost</span>(<span class="ident">params</span>)
+        <span class="self">self</span>.bulk_problem(<span class="string">&quot;cost_count&quot;</span>, params.len(), |problem| {
+            problem.bulk_cost(params)
         })
     }
 }
 
-<span class="doccomment">/// Wraps a call to `gradient` defined in the `Gradient` trait and as such allows to call `gradient` on</span>
-<span class="doccomment">/// an instance of `Problem`. Internally, the number of evaluations of `gradient` is counted.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Gradient</span><span class="op">&gt;</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Calls `gradient` defined in the `Gradient` trait and keeps track of the number of</span>
-    <span class="doccomment">/// evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, Gradient, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Gradient for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Gradient = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn gradient(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![1.0f64, 1.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `Gradient`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![2.0f64, 1.0f64];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.gradient(&amp;param);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 1);</span>
-    <span class="doccomment">/// # assert_eq!(res.unwrap(), vec![1.0f64, 1.0f64]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident">O::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O::Gradient</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>(<span class="string">&quot;gradient_count&quot;</span>, <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">gradient</span>(<span class="ident">param</span>))
+<span class="doccomment">/// Wraps a call to `gradient` defined in the `Gradient` trait and as such allows to call `gradient` on
+/// an instance of `Problem`. Internally, the number of evaluations of `gradient` is counted.
+</span><span class="kw">impl</span>&lt;O: Gradient&gt; Problem&lt;O&gt; {
+    <span class="doccomment">/// Calls `gradient` defined in the `Gradient` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Gradient, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Gradient for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Gradient = Vec&lt;f64&gt;;
+    /// #
+    /// #     fn gradient(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {
+    /// #         Ok(vec![1.0f64, 1.0f64])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Gradient`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param = vec![2.0f64, 1.0f64];
+    ///
+    /// let res = problem1.gradient(&amp;param);
+    ///
+    /// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 1);
+    /// # assert_eq!(res.unwrap(), vec![1.0f64, 1.0f64]);
+    /// ```
+    </span><span class="kw">pub fn </span>gradient(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param) -&gt; <span class="prelude-ty">Result</span>&lt;O::Gradient, Error&gt; {
+        <span class="self">self</span>.problem(<span class="string">&quot;gradient_count&quot;</span>, |problem| problem.gradient(param))
     }
 
-    <span class="doccomment">/// Calls `bulk_gradient` defined in the `Gradient` trait and keeps track of the number of</span>
-    <span class="doccomment">/// evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, Gradient, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Gradient for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Gradient = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn gradient(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![1.0f64, 1.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `Gradient`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param1 = vec![2.0f64, 1.0f64];</span>
-    <span class="doccomment">/// let param2 = vec![3.0f64, 5.0f64];</span>
-    <span class="doccomment">/// let params = vec![&amp;param1, &amp;param2];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.bulk_gradient(&amp;params);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 2);</span>
-    <span class="doccomment">/// # let res = res.unwrap();</span>
-    <span class="doccomment">/// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);</span>
-    <span class="doccomment">/// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bulk_gradient</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">O::Gradient</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">std::borrow::Borrow</span><span class="op">&lt;</span><span class="ident">O::Param</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SyncAlias</span>,
-        <span class="ident">O::Gradient</span>: <span class="ident">SendAlias</span>,
-        <span class="ident">O</span>: <span class="ident">SyncAlias</span>,
+    <span class="doccomment">/// Calls `bulk_gradient` defined in the `Gradient` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Gradient, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Gradient for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Gradient = Vec&lt;f64&gt;;
+    /// #
+    /// #     fn gradient(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {
+    /// #         Ok(vec![1.0f64, 1.0f64])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Gradient`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param1 = vec![2.0f64, 1.0f64];
+    /// let param2 = vec![3.0f64, 5.0f64];
+    /// let params = vec![&amp;param1, &amp;param2];
+    ///
+    /// let res = problem1.bulk_gradient(&amp;params);
+    ///
+    /// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 2);
+    /// # let res = res.unwrap();
+    /// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);
+    /// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);
+    /// ```
+    </span><span class="kw">pub fn </span>bulk_gradient&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Vec&lt;P&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Gradient&gt;, Error&gt;
+    <span class="kw">where
+        </span>P: std::borrow::Borrow&lt;O::Param&gt; + SyncAlias,
+        O::Gradient: SendAlias,
+        O: SyncAlias,
     {
-        <span class="self">self</span>.<span class="ident">bulk_problem</span>(<span class="string">&quot;gradient_count&quot;</span>, <span class="ident">params</span>.<span class="ident">len</span>(), <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> {
-            <span class="ident">problem</span>.<span class="ident">bulk_gradient</span>(<span class="ident">params</span>)
+        <span class="self">self</span>.bulk_problem(<span class="string">&quot;gradient_count&quot;</span>, params.len(), |problem| {
+            problem.bulk_gradient(params)
         })
     }
 }
 
-<span class="doccomment">/// Wraps a call to `hessian` defined in the `Hessian` trait and as such allows to call `hessian` on</span>
-<span class="doccomment">/// an instance of `Problem`. Internally, the number of evaluations of `hessian` is counted.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Hessian</span><span class="op">&gt;</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Calls `hessian` defined in the `Hessian` trait and keeps track of the number of evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, Hessian, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Hessian for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Hessian = Vec&lt;Vec&lt;f64&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn hessian(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `Hessian`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![2.0f64, 1.0f64];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.hessian(&amp;param);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;hessian_count&quot;], 1);</span>
-    <span class="doccomment">/// # assert_eq!(res.unwrap(), vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident">O::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O::Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>(<span class="string">&quot;hessian_count&quot;</span>, <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">hessian</span>(<span class="ident">param</span>))
+<span class="doccomment">/// Wraps a call to `hessian` defined in the `Hessian` trait and as such allows to call `hessian` on
+/// an instance of `Problem`. Internally, the number of evaluations of `hessian` is counted.
+</span><span class="kw">impl</span>&lt;O: Hessian&gt; Problem&lt;O&gt; {
+    <span class="doccomment">/// Calls `hessian` defined in the `Hessian` trait and keeps track of the number of evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Hessian, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Hessian for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Hessian = Vec&lt;Vec&lt;f64&gt;&gt;;
+    /// #
+    /// #     fn hessian(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt; {
+    /// #         Ok(vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Hessian`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param = vec![2.0f64, 1.0f64];
+    ///
+    /// let res = problem1.hessian(&amp;param);
+    ///
+    /// assert_eq!(problem1.counts[&quot;hessian_count&quot;], 1);
+    /// # assert_eq!(res.unwrap(), vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
+    /// ```
+    </span><span class="kw">pub fn </span>hessian(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param) -&gt; <span class="prelude-ty">Result</span>&lt;O::Hessian, Error&gt; {
+        <span class="self">self</span>.problem(<span class="string">&quot;hessian_count&quot;</span>, |problem| problem.hessian(param))
     }
 
-    <span class="doccomment">/// Calls `bulk_hessian` defined in the `Hessian` trait and keeps track of the number of</span>
-    <span class="doccomment">/// evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, Hessian, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Hessian for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Hessian = Vec&lt;Vec&lt;f64&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn hessian(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `Hessian`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param1 = vec![2.0f64, 1.0f64];</span>
-    <span class="doccomment">/// let param2 = vec![3.0f64, 5.0f64];</span>
-    <span class="doccomment">/// let params = vec![&amp;param1, &amp;param2];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.bulk_hessian(&amp;params);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;hessian_count&quot;], 2);</span>
-    <span class="doccomment">/// # let res = res.unwrap();</span>
-    <span class="doccomment">/// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);</span>
-    <span class="doccomment">/// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bulk_hessian</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">O::Hessian</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">std::borrow::Borrow</span><span class="op">&lt;</span><span class="ident">O::Param</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SyncAlias</span>,
-        <span class="ident">O::Hessian</span>: <span class="ident">SendAlias</span>,
-        <span class="ident">O</span>: <span class="ident">SyncAlias</span>,
+    <span class="doccomment">/// Calls `bulk_hessian` defined in the `Hessian` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Hessian, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Hessian for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Hessian = Vec&lt;Vec&lt;f64&gt;&gt;;
+    /// #
+    /// #     fn hessian(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Hessian, Error&gt; {
+    /// #         Ok(vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Hessian`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param1 = vec![2.0f64, 1.0f64];
+    /// let param2 = vec![3.0f64, 5.0f64];
+    /// let params = vec![&amp;param1, &amp;param2];
+    ///
+    /// let res = problem1.bulk_hessian(&amp;params);
+    ///
+    /// assert_eq!(problem1.counts[&quot;hessian_count&quot;], 2);
+    /// # let res = res.unwrap();
+    /// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
+    /// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
+    /// ```
+    </span><span class="kw">pub fn </span>bulk_hessian&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Vec&lt;P&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Hessian&gt;, Error&gt;
+    <span class="kw">where
+        </span>P: std::borrow::Borrow&lt;O::Param&gt; + SyncAlias,
+        O::Hessian: SendAlias,
+        O: SyncAlias,
     {
-        <span class="self">self</span>.<span class="ident">bulk_problem</span>(<span class="string">&quot;hessian_count&quot;</span>, <span class="ident">params</span>.<span class="ident">len</span>(), <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> {
-            <span class="ident">problem</span>.<span class="ident">bulk_hessian</span>(<span class="ident">params</span>)
+        <span class="self">self</span>.bulk_problem(<span class="string">&quot;hessian_count&quot;</span>, params.len(), |problem| {
+            problem.bulk_hessian(params)
         })
     }
 }
 
-<span class="doccomment">/// Wraps a call to `jacobian` defined in the `Jacobian` trait and as such allows to call `jacobian`</span>
-<span class="doccomment">/// on an instance of `Problem`. Internally, the number of evaluations of `jacobian` is counted.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Jacobian</span><span class="op">&gt;</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Calls `jacobian` defined in the `Jacobian` trait and keeps track of the number of</span>
-    <span class="doccomment">/// evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, Jacobian, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Jacobian for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Jacobian = Vec&lt;Vec&lt;f64&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn jacobian(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Jacobian, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `Jacobian`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let param = vec![2.0f64, 1.0f64];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.jacobian(&amp;param);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;jacobian_count&quot;], 1);</span>
-    <span class="doccomment">/// # assert_eq!(res.unwrap(), vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">jacobian</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident">O::Param</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O::Jacobian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>(<span class="string">&quot;jacobian_count&quot;</span>, <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> <span class="ident">problem</span>.<span class="ident">jacobian</span>(<span class="ident">param</span>))
+<span class="doccomment">/// Wraps a call to `jacobian` defined in the `Jacobian` trait and as such allows to call `jacobian`
+/// on an instance of `Problem`. Internally, the number of evaluations of `jacobian` is counted.
+</span><span class="kw">impl</span>&lt;O: Jacobian&gt; Problem&lt;O&gt; {
+    <span class="doccomment">/// Calls `jacobian` defined in the `Jacobian` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Jacobian, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Jacobian for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Jacobian = Vec&lt;Vec&lt;f64&gt;&gt;;
+    /// #
+    /// #     fn jacobian(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Jacobian, Error&gt; {
+    /// #         Ok(vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Jacobian`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let param = vec![2.0f64, 1.0f64];
+    ///
+    /// let res = problem1.jacobian(&amp;param);
+    ///
+    /// assert_eq!(problem1.counts[&quot;jacobian_count&quot;], 1);
+    /// # assert_eq!(res.unwrap(), vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
+    /// ```
+    </span><span class="kw">pub fn </span>jacobian(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param) -&gt; <span class="prelude-ty">Result</span>&lt;O::Jacobian, Error&gt; {
+        <span class="self">self</span>.problem(<span class="string">&quot;jacobian_count&quot;</span>, |problem| problem.jacobian(param))
     }
 
-    <span class="doccomment">/// Calls `bulk_jacobian` defined in the `Jacobian` trait and keeps track of the number of</span>
-    <span class="doccomment">/// evaluations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, Jacobian, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Jacobian for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Jacobian = Vec&lt;Vec&lt;f64&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn jacobian(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Jacobian, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `Jacobian`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let params = vec![vec![2.0f64, 1.0f64], vec![3.0f64, 5.0f64]];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let res = problem1.bulk_jacobian(&amp;params);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(problem1.counts[&quot;jacobian_count&quot;], 2);</span>
-    <span class="doccomment">/// # let res = res.unwrap();</span>
-    <span class="doccomment">/// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);</span>
-    <span class="doccomment">/// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bulk_jacobian</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">O::Jacobian</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">std::borrow::Borrow</span><span class="op">&lt;</span><span class="ident">O::Param</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SyncAlias</span>,
-        <span class="ident">O::Jacobian</span>: <span class="ident">SendAlias</span>,
-        <span class="ident">O</span>: <span class="ident">SyncAlias</span>,
+    <span class="doccomment">/// Calls `bulk_jacobian` defined in the `Jacobian` trait and keeps track of the number of
+    /// evaluations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, Jacobian, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl Jacobian for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Jacobian = Vec&lt;Vec&lt;f64&gt;&gt;;
+    /// #
+    /// #     fn jacobian(&amp;self, param: &amp;Self::Param) -&gt; Result&lt;Self::Jacobian, Error&gt; {
+    /// #         Ok(vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `Jacobian`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let params = vec![vec![2.0f64, 1.0f64], vec![3.0f64, 5.0f64]];
+    ///
+    /// let res = problem1.bulk_jacobian(&amp;params);
+    ///
+    /// assert_eq!(problem1.counts[&quot;jacobian_count&quot;], 2);
+    /// # let res = res.unwrap();
+    /// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
+    /// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
+    /// ```
+    </span><span class="kw">pub fn </span>bulk_jacobian&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Vec&lt;P&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Jacobian&gt;, Error&gt;
+    <span class="kw">where
+        </span>P: std::borrow::Borrow&lt;O::Param&gt; + SyncAlias,
+        O::Jacobian: SendAlias,
+        O: SyncAlias,
     {
-        <span class="self">self</span>.<span class="ident">bulk_problem</span>(<span class="string">&quot;jacobian_count&quot;</span>, <span class="ident">params</span>.<span class="ident">len</span>(), <span class="op">|</span><span class="ident">problem</span><span class="op">|</span> {
-            <span class="ident">problem</span>.<span class="ident">bulk_jacobian</span>(<span class="ident">params</span>)
+        <span class="self">self</span>.bulk_problem(<span class="string">&quot;jacobian_count&quot;</span>, params.len(), |problem| {
+            problem.bulk_jacobian(params)
         })
     }
 }
 
-<span class="doccomment">/// Wraps a calls to `c`, `b` and `A` defined in the `LinearProgram` trait and as such allows to</span>
-<span class="doccomment">/// call those methods on an instance of `Problem`.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">LinearProgram</span><span class="op">&gt;</span> <span class="ident">Problem</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Calls `c` defined in the `LinearProgram` trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, LinearProgram, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl LinearProgram for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Float = f64;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn c(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![4.0f64, 3.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn b(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![3.0f64, 2.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn A(&amp;self) -&gt; Result&lt;Vec&lt;Vec&lt;Self::Float&gt;&gt;, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![vec![1.0f64, 2.0f64], vec![3.0f64, 2.0f64]])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `LinearProgram`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let c = problem1.c();</span>
-    <span class="doccomment">/// let b = problem1.b();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # assert_eq!(c.unwrap(), vec![4.0f64, 3.0f64]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">c</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">O::Float</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">c</span>()
+<span class="doccomment">/// Wraps a calls to `c`, `b` and `A` defined in the `LinearProgram` trait and as such allows to
+/// call those methods on an instance of `Problem`.
+</span><span class="kw">impl</span>&lt;O: LinearProgram&gt; Problem&lt;O&gt; {
+    <span class="doccomment">/// Calls `c` defined in the `LinearProgram` trait.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, LinearProgram, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl LinearProgram for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Float = f64;
+    /// #
+    /// #     fn c(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {
+    /// #         Ok(vec![4.0f64, 3.0f64])
+    /// #     }
+    /// #
+    /// #     fn b(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {
+    /// #         Ok(vec![3.0f64, 2.0f64])
+    /// #     }
+    /// #
+    /// #     fn A(&amp;self) -&gt; Result&lt;Vec&lt;Vec&lt;Self::Float&gt;&gt;, Error&gt; {
+    /// #         Ok(vec![vec![1.0f64, 2.0f64], vec![3.0f64, 2.0f64]])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `LinearProgram`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let c = problem1.c();
+    /// let b = problem1.b();
+    ///
+    /// # assert_eq!(c.unwrap(), vec![4.0f64, 3.0f64]);
+    /// ```
+    </span><span class="kw">pub fn </span>c(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Float&gt;, Error&gt; {
+        <span class="self">self</span>.problem.as_ref().unwrap().c()
     }
 
-    <span class="doccomment">/// Calls `b` defined in the `LinearProgram` trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, LinearProgram, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl LinearProgram for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Float = f64;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn c(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![4.0f64, 3.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn b(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![3.0f64, 2.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn A(&amp;self) -&gt; Result&lt;Vec&lt;Vec&lt;Self::Float&gt;&gt;, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![vec![1.0f64, 2.0f64], vec![3.0f64, 2.0f64]])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `LinearProgram`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let b = problem1.b();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # assert_eq!(b.unwrap(), vec![3.0f64, 2.0f64]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">O::Float</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">b</span>()
+    <span class="doccomment">/// Calls `b` defined in the `LinearProgram` trait.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, LinearProgram, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl LinearProgram for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Float = f64;
+    /// #
+    /// #     fn c(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {
+    /// #         Ok(vec![4.0f64, 3.0f64])
+    /// #     }
+    /// #
+    /// #     fn b(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {
+    /// #         Ok(vec![3.0f64, 2.0f64])
+    /// #     }
+    /// #
+    /// #     fn A(&amp;self) -&gt; Result&lt;Vec&lt;Vec&lt;Self::Float&gt;&gt;, Error&gt; {
+    /// #         Ok(vec![vec![1.0f64, 2.0f64], vec![3.0f64, 2.0f64]])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `LinearProgram`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let b = problem1.b();
+    ///
+    /// # assert_eq!(b.unwrap(), vec![3.0f64, 2.0f64]);
+    /// ```
+    </span><span class="kw">pub fn </span>b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Float&gt;, Error&gt; {
+        <span class="self">self</span>.problem.as_ref().unwrap().b()
     }
 
-    <span class="doccomment">/// Calls `A` defined in the `LinearProgram` trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use argmin::core::{Problem, LinearProgram, Error};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug, Clone)]</span>
-    <span class="doccomment">/// # struct UserDefinedProblem {};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl LinearProgram for UserDefinedProblem {</span>
-    <span class="doccomment">/// #     type Param = Vec&lt;f64&gt;;</span>
-    <span class="doccomment">/// #     type Float = f64;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn c(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![4.0f64, 3.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn b(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![3.0f64, 2.0f64])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     fn A(&amp;self) -&gt; Result&lt;Vec&lt;Vec&lt;Self::Float&gt;&gt;, Error&gt; {</span>
-    <span class="doccomment">/// #         Ok(vec![vec![1.0f64, 2.0f64], vec![3.0f64, 2.0f64]])</span>
-    <span class="doccomment">/// #     }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// // `UserDefinedProblem` implements `LinearProgram`.</span>
-    <span class="doccomment">/// let mut problem1 = Problem::new(UserDefinedProblem {});</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let a = problem1.A();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # assert_eq!(a.unwrap(), vec![vec![1.0f64, 2.0f64], vec![3.0f64, 2.0f64]]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">A</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">O::Float</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">problem</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">A</span>()
+    <span class="doccomment">/// Calls `A` defined in the `LinearProgram` trait.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Problem, LinearProgram, Error};
+    /// #
+    /// # #[derive(Eq, PartialEq, Debug, Clone)]
+    /// # struct UserDefinedProblem {};
+    /// #
+    /// # impl LinearProgram for UserDefinedProblem {
+    /// #     type Param = Vec&lt;f64&gt;;
+    /// #     type Float = f64;
+    /// #
+    /// #     fn c(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {
+    /// #         Ok(vec![4.0f64, 3.0f64])
+    /// #     }
+    /// #
+    /// #     fn b(&amp;self) -&gt; Result&lt;Vec&lt;Self::Float&gt;, Error&gt; {
+    /// #         Ok(vec![3.0f64, 2.0f64])
+    /// #     }
+    /// #
+    /// #     fn A(&amp;self) -&gt; Result&lt;Vec&lt;Vec&lt;Self::Float&gt;&gt;, Error&gt; {
+    /// #         Ok(vec![vec![1.0f64, 2.0f64], vec![3.0f64, 2.0f64]])
+    /// #     }
+    /// # }
+    /// // `UserDefinedProblem` implements `LinearProgram`.
+    /// let mut problem1 = Problem::new(UserDefinedProblem {});
+    ///
+    /// let a = problem1.A();
+    ///
+    /// # assert_eq!(a.unwrap(), vec![vec![1.0f64, 2.0f64], vec![3.0f64, 2.0f64]]);
+    /// ```
+    </span><span class="attribute">#[allow(non_snake_case)]
+    </span><span class="kw">pub fn </span>A(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;O::Float&gt;&gt;, Error&gt; {
+        <span class="self">self</span>.problem.as_ref().unwrap().A()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
