@@ -8,7 +8,7 @@
 //! argmin is a numerical optimization library written entirely in Rust.
 //!
 //! Its goal is to offer a wide range of optimization algorithms with a consistent interface.
-//! It is type-agnostic by the design, meaning that any type and/or math backend, such as
+//! It is type-agnostic by design, meaning that any type and/or math backend, such as
 //! `nalgebra` or `ndarray` can be used -- even your own.
 //!
 //! Observers allow one to track the progress of iterations, either by using one of the provided
