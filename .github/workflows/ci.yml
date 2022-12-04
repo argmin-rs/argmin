@@ -14,11 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      - uses: dtolnay/rust-toolchain@stable
       - name: Test (default features)
         run: cargo test -p argmin --verbose
       - name: Test (all features)
@@ -29,11 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      - uses: dtolnay/rust-toolchain@stable
       - name: Test (no default features)
         run: cargo test -p argmin --verbose --no-default-features
       - name: Test with serde1 feature
@@ -76,11 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      - uses: dtolnay/rust-toolchain@stable
       # - name: Test 
       #   run: cargo test -p argmin-math --no-default-features --features "${{ matrix.feature }}"
       # Default features
@@ -148,11 +136,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@beta
         with:
-          profile: minimal
-          toolchain: beta
-          override: true
           components: clippy
       - name: Clippy (argmin-math)
         run: cargo clippy -p argmin-math --all-targets --features "primitives,vec,nalgebra_latest-serde,ndarray_latest-serde" -- -D warnings
@@ -170,27 +155,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@beta
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
           components: rustfmt
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - run: cargo fmt --all -- --check
 
   docs-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      - uses: dtolnay/rust-toolchain@stable
       - name: argmin docs
         run: cargo rustdoc -p argmin --all-features -- -D warnings
       - name: argmin-math docs
@@ -201,16 +176,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - name: Install toolchains
-        run: |
-          rustup target add wasm32-unknown-unknown
-          rustup target add wasm32-unknown-emscripten
-          rustup target add wasm32-wasi
+          targets: wasm32-unknown-unknown,wasm32-unknown-emscripten,wasm32-wasi
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh 
       - name: Build target wasm32-unknown-unknown

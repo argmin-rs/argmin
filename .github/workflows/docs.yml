@@ -14,12 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-          components: rustfmt, rust-src
+          components: rustfmt,rust-src
 
       - name: Build documentation
         run: cargo doc --features "argmin-math/latest_all" --no-deps
