@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{Error, Problem, SerializeAlias, State, TerminationReason, KV};
+use crate::core::{Error, Problem, State, TerminationReason, KV};
 
 /// The interface all solvers are required to implement.
 ///
@@ -65,7 +65,7 @@ use crate::core::{Error, Problem, SerializeAlias, State, TerminationReason, KV};
 ///     }
 /// }
 /// ```
-pub trait Solver<O, I: State>: SerializeAlias {
+pub trait Solver<O, I: State> {
     /// Name of the solver. Mainly used in [Observers](`crate::core::observers::Observe`).
     const NAME: &'static str;
 
