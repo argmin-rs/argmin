@@ -125,7 +125,7 @@
 // http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::core::{Error, Problem, SerializeAlias, State, TerminationReason, KV};
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{Error, Problem, State, TerminationReason, KV};
 
 <span class="doccomment">/// The interface all solvers are required to implement.
 ///
@@ -185,7 +185,7 @@
 ///     }
 /// }
 /// ```
-</span><span class="kw">pub trait </span>Solver&lt;O, I: State&gt;: SerializeAlias {
+</span><span class="kw">pub trait </span>Solver&lt;O, I: State&gt; {
     <span class="doccomment">/// Name of the solver. Mainly used in [Observers](`crate::core::observers::Observe`).
     </span><span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
 
