@@ -1,0 +1,29 @@
+[package]
+name = "argmin-observer-egui"
+version = "0.1.0"
+authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "egui observer for argmin"
+documentation = "https://docs.rs/argmin_observer_egui/"
+homepage = "https://argmin-rs.org"
+repository = "https://github.com/argmin-rs/argmin"
+readme = "README.md"
+keywords = ["optimization", "math", "science"]
+categories = ["science"]
+exclude = []
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0"
+argmin = { version = "0.8.0", path = "../../argmin", default-features = false, features = ["serde1"] }
+eframe = { version = "0.20", features = ["ron", "persistence"] }
+egui_extras = "0.20.0"
+ipc-channel = "0.16.0"
+procspawn = "0.10.2"
+
+[dev-dependencies]
+argmin_testfunctions = "0.1.1"
+rand = "0.8.5"
+rand_xoshiro = "0.6.0"

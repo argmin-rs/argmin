@@ -27,7 +27,7 @@
 #[macro_export]
 macro_rules! kv {
     ($($k:expr =>  $v:expr;)*) => {
-        $crate::core::KV { kv: std::collections::HashMap::from([ $(($k, $v.into())),* ]) }
+        $crate::core::KV { kv: std::collections::HashMap::from([ $(($k.into(), $v.into())),* ]) }
     };
 }
 
