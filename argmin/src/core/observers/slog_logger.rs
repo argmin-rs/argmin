@@ -147,7 +147,7 @@ impl SlogLogger {
 impl slog::KV for KV {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
         for idx in self.kv.iter() {
-            serializer.emit_str(Key::from(*idx.0), &idx.1.to_string())?;
+            serializer.emit_str(Key::from(idx.0.to_string()), &idx.1.to_string())?;
         }
         Ok(())
     }

@@ -9,6 +9,9 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::{Debug, Display};
 
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
+
 /// Types available for use in [`KV`](KV).
 ///
 /// `Float`, `Int` and `Uint` are all 64bit. The corresponding 32bit variants must be
@@ -44,6 +47,7 @@ use std::fmt::{Debug, Display};
 /// assert_eq!(x, KvValue::Str("a String".to_string()));
 /// ```
 #[derive(Clone, PartialEq, Debug)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub enum KvValue {
     /// Floating point values
     Float(f64),
@@ -82,23 +86,31 @@ impl KvValue {
 
     /// Extract float from `KvValue`
     ///
-    /// Returns `Some(<float>)` if `KvValue` is of kind `Float` and `None` otherwise.
+    /// Returns `Some(<float>)` if `KvValue` is of kind `Float`.
+    ///
+    /// For `KvValue::Int` and `KvValue::Uint`integer values are first cast to their 32bit
+    /// representations and then converted into `f64`.
+    ///
+    /// `KvValue::Bool` is turned into `1.0` if true and `0.0` if false.
     ///
     /// # Example
     ///
     /// ```
     /// # use argmin::core::KvValue;
     /// assert_eq!(KvValue::Float(1.0).get_float(), Some(1.0));
-    /// assert_eq!(KvValue::Int(1).get_float(), None);
-    /// assert_eq!(KvValue::Uint(1).get_float(), None);
-    /// assert_eq!(KvValue::Bool(true).get_float(), None);
-    /// assert_eq!(KvValue::Str("not a float".to_string()).get_float(), None);
+    /// assert_eq!(KvValue::Int(1).get_float(), Some(1.0));
+    /// assert_eq!(KvValue::Uint(1).get_float(), Some(1.0));
+    /// assert_eq!(KvValue::Bool(true).get_float(), Some(1.0));
+    /// assert_eq!(KvValue::Str("not a number".to_string()).get_float(), None);
     /// ```
     pub fn get_float(&self) -> Option<f64> {
-        if let KvValue::Float(x) = *self {
-            Some(x)
-        } else {
-            None
+        match self {
+            KvValue::Float(x) => Some(*x),
+            KvValue::Int(x) => Some(f64::from(*x as i32)),
+            KvValue::Uint(x) => Some(f64::from(*x as u32)),
+            KvValue::Bool(true) => Some(1.0),
+            KvValue::Bool(false) => Some(0.0),
+            _ => None,
         }
     }
 
@@ -280,9 +292,10 @@ impl Display for KvValue {
 /// # assert_eq!(format!("{}", kv.get("key3").unwrap()), "1234");
 /// ```
 #[derive(Clone, Default, PartialEq)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct KV {
     /// The actual key value storage
-    pub kv: HashMap<&'static str, KvValue>,
+    pub kv: HashMap<String, KvValue>,
 }
 
 impl Debug for KV {
@@ -329,8 +342,8 @@ impl KV {
     /// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value");
     /// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "1234");
     /// ```
-    pub fn insert(&mut self, key: &'static str, val: KvValue) -> &mut Self {
-        self.kv.insert(key, val);
+    pub fn insert<T: AsRef<str>>(&mut self, key: T, val: KvValue) -> &mut Self {
+        self.kv.insert(key.as_ref().into(), val);
         self
     }
 
@@ -348,8 +361,8 @@ impl KV {
     /// assert_eq!(kv1.get("key1"), Some(&KvValue::Float(12.0)));
     /// assert_eq!(kv1.get("non_existing"), None);
     /// ```
-    pub fn get(&self, key: &'static str) -> Option<&KvValue> {
-        self.kv.get(key)
+    pub fn get<T: AsRef<str>>(&self, key: T) -> Option<&KvValue> {
+        self.kv.get(key.as_ref())
     }
 
     /// Returns all available keys and their `KvValue` kind
@@ -361,10 +374,10 @@ impl KV {
     /// let mut kv1 = KV::new();
     /// kv1.insert("key1", KvValue::Str("value1".to_string()));
     ///
-    /// assert_eq!(kv1.keys(), vec![("key1", "Str")]);
+    /// assert_eq!(kv1.keys(), vec![("key1".to_string(), "Str")]);
     /// ```
-    pub fn keys(&self) -> Vec<(&'static str, &'static str)> {
-        self.kv.iter().map(|(&k, v)| (k, v.kind())).collect()
+    pub fn keys(&self) -> Vec<(String, &'static str)> {
+        self.kv.iter().map(|(k, v)| (k.clone(), v.kind())).collect()
     }
 
     /// Merge with another `KV`
