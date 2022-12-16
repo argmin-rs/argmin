@@ -5,7 +5,7 @@ In order to use argmin, one needs to add both `argmin` and `argmin-math` to `Car
 ```toml
 [dependencies]
 argmin = { version = "0.7" }
-argmin-math = { version = "0.2", features = ["ndarray_latest-serde,nalgebra_latest-serde"] }
+argmin-math = { version = "0.2", features = ["ndarray_latest-serde", "nalgebra_latest-serde"] }
 ```
 
 or, for the current development version:
@@ -13,7 +13,7 @@ or, for the current development version:
 ```toml
 [dependencies]
 argmin = { git = "https://github.com/argmin-rs/argmin" }
-argmin-math = { git = "https://github.com/argmin-rs/argmin", features = ["ndarray_latest-serde,nalgebra_latest-serde"] }
+argmin-math = { git = "https://github.com/argmin-rs/argmin", features = ["ndarray_latest-serde", "nalgebra_latest-serde"] }
 ```
 
 Via adding `argmin-math` one can choose which math backend should be available (and whether `serde`-support is enabled or not).
