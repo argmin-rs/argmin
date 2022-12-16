@@ -235,7 +235,7 @@ where
                 if self.timer {
                     let duration = duration.unwrap();
                     let tmp = kv!(
-                        "time" => duration.as_secs() as f64 + f64::from(duration.subsec_nanos()) * 1e-9;
+                        "time" => duration.as_secs_f64();
                     );
                     log = log.merge(tmp);
                 }
