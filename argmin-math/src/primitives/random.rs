@@ -6,14 +6,14 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::ArgminRandom;
-use num_complex::Complex;
+use rand::Rng;
 
 macro_rules! make_random {
     ($t:ty) => {
         impl ArgminRandom for $t {
             #[inline]
-            fn random(min: &Self, max: &Self) -> $t {
-                rand::thread_rng().gen_range(min, max) as $t
+            fn rand_from_range(min: &Self, max: &Self) -> $t {
+                rand::thread_rng().gen_range(*min..*max)
             }
         }
     };
@@ -31,17 +31,37 @@ make_random!(u32);
 make_random!(u64);
 make_random!(isize);
 make_random!(usize);
-make_random!(Complex<f32>);
-make_random!(Complex<f64>);
-make_random!(Complex<i8>);
-make_random!(Complex<i16>);
-make_random!(Complex<i32>);
-make_random!(Complex<i64>);
-make_random!(Complex<u8>);
-make_random!(Complex<u16>);
-make_random!(Complex<u32>);
-make_random!(Complex<u64>);
-make_random!(Complex<isize>);
-make_random!(Complex<usize>);
 
-// TODO:  tests!!!
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::item;
+
+    macro_rules! make_test {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_random_vec_ $t>]() {
+                    let a = 1 as $t;
+                    let b = 2 as $t;
+                    let random = $t::rand_from_range(&a, &b);
+                    assert!(random >= a);
+                    assert!(random <= b);
+                }
+            }
+        };
+    }
+
+    make_test!(f32);
+    make_test!(f64);
+    make_test!(i8);
+    make_test!(u8);
+    make_test!(i16);
+    make_test!(u16);
+    make_test!(i32);
+    make_test!(u32);
+    make_test!(i64);
+    make_test!(u64);
+    make_test!(isize);
+    make_test!(usize);
+}
