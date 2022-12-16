@@ -129,7 +129,7 @@ where
             f,
             "    param (best):  {}",
             if let Some(best_param) = self.state.get_best_param() {
-                format!("{:?}", best_param)
+                format!("{best_param:?}")
             } else {
                 String::from("None")
             }
@@ -143,7 +143,7 @@ where
             self.state.get_termination_reason()
         )?;
         if let Some(time) = self.state.get_time() {
-            writeln!(f, "    time:          {:?}", time)?;
+            writeln!(f, "    time:          {time:?}")?;
         }
         Ok(())
     }

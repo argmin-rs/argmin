@@ -227,7 +227,7 @@ impl Display for CheckpointingFrequency {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             CheckpointingFrequency::Never => write!(f, "Never"),
-            CheckpointingFrequency::Every(i) => write!(f, "Every({})", i),
+            CheckpointingFrequency::Every(i) => write!(f, "Every({i})"),
             CheckpointingFrequency::Always => write!(f, "Always"),
         }
     }

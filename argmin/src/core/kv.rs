@@ -248,11 +248,11 @@ impl<'a> From<&'a str> for KVType {
 impl Display for KVType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            KVType::Float(x) => write!(f, "{}", x)?,
-            KVType::Int(x) => write!(f, "{}", x)?,
-            KVType::Uint(x) => write!(f, "{}", x)?,
-            KVType::Bool(x) => write!(f, "{}", x)?,
-            KVType::Str(x) => write!(f, "{}", x)?,
+            KVType::Float(x) => write!(f, "{x}")?,
+            KVType::Int(x) => write!(f, "{x}")?,
+            KVType::Uint(x) => write!(f, "{x}")?,
+            KVType::Bool(x) => write!(f, "{x}")?,
+            KVType::Str(x) => write!(f, "{x}")?,
         };
         Ok(())
     }
@@ -287,7 +287,7 @@ pub struct KV {
 
 impl Debug for KV {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "{}", self)?;
+        writeln!(f, "{self}")?;
         Ok(())
     }
 }
@@ -295,7 +295,7 @@ impl Display for KV {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "KV")?;
         for (key, val) in self.kv.iter() {
-            writeln!(f, "   {}: {}", key, val)?;
+            writeln!(f, "   {key}: {val}")?;
         }
         Ok(())
     }
