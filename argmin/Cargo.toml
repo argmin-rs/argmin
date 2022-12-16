@@ -158,6 +158,10 @@ name = "particleswarm"
 required-features = []
 
 [[example]]
+name = "particleswarm_nalgebra"
+required-features = ["argmin-math/nalgebra_latest-serde"]
+
+[[example]]
 name = "simulatedannealing"
 required-features = ["slog-logger"]
 
