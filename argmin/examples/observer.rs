@@ -245,7 +245,7 @@ fn run() -> Result<(), Error> {
         std::thread::sleep(std::time::Duration::from_secs(1));
 
         // Print Result
-        println!("{}", res);
+        println!("{res}");
     }
 
     Ok(())
@@ -253,6 +253,6 @@ fn run() -> Result<(), Error> {
 
 fn main() {
     if let Err(ref e) = run() {
-        println!("{}", e);
+        println!("{e}");
     }
 }

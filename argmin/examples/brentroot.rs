@@ -38,5 +38,9 @@ fn main() {
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()
         .unwrap();
-    println!("Result of brent:\n{}", res);
+
+    // Wait a second (lets the logger flush everything before printing again)
+    std::thread::sleep(std::time::Duration::from_secs(1));
+
+    println!("Result of brent:\n{res}");
 }

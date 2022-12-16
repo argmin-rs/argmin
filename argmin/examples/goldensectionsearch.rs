@@ -35,6 +35,7 @@ fn main() -> Result<(), Error> {
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()
         .unwrap();
-    println!("Result of golden section search:\n{}", res);
+
+    println!("Result of golden section search:\n{res}");
     Ok(())
 }

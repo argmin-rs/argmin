@@ -36,12 +36,12 @@ fn run() -> Result<(), Error> {
 
     // Wait a second (lets the logger flush everything before printing to screen again)
     std::thread::sleep(std::time::Duration::from_secs(1));
-    println!("{}", res);
+    println!("{res}");
     Ok(())
 }
 
 fn main() {
     if let Err(ref e) = run() {
-        println!("{}", e);
+        println!("{e}");
     }
 }
