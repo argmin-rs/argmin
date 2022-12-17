@@ -903,7 +903,7 @@
                 <span class="kw">if </span><span class="self">self</span>.timer {
                     <span class="kw">let </span>duration = duration.unwrap();
                     <span class="kw">let </span>tmp = <span class="macro">kv!</span>(
-                        <span class="string">&quot;time&quot; </span>=&gt; duration.as_secs() <span class="kw">as </span>f64 + f64::from(duration.subsec_nanos()) * <span class="number">1e-9</span>;
+                        <span class="string">&quot;time&quot; </span>=&gt; duration.as_secs_f64();
                     );
                     log = log.merge(tmp);
                 }
