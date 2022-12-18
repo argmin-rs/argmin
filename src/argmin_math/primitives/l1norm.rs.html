@@ -108,6 +108,73 @@
 <span id="108">108</span>
 <span id="109">109</span>
 <span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -151,20 +218,41 @@
     };
 }
 
+<span class="macro">macro_rules! </span>make_l1norm_complex_unsigned {
+    (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
+        <span class="kw">impl </span>ArgminL1Norm&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span>Complex&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>l1_norm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$t </span>{
+                <span class="self">self</span>.re + <span class="self">self</span>.im
+            }
+        }
+    };
+}
+
 <span class="macro">make_l1norm!</span>(isize);
-<span class="macro">make_l1norm_unsigned!</span>(usize);
 <span class="macro">make_l1norm!</span>(i8);
 <span class="macro">make_l1norm!</span>(i16);
 <span class="macro">make_l1norm!</span>(i32);
 <span class="macro">make_l1norm!</span>(i64);
+<span class="macro">make_l1norm_unsigned!</span>(usize);
 <span class="macro">make_l1norm_unsigned!</span>(u8);
 <span class="macro">make_l1norm_unsigned!</span>(u16);
 <span class="macro">make_l1norm_unsigned!</span>(u32);
 <span class="macro">make_l1norm_unsigned!</span>(u64);
 <span class="macro">make_l1norm!</span>(f32);
 <span class="macro">make_l1norm!</span>(f64);
+<span class="macro">make_l1norm_complex!</span>(isize);
+<span class="macro">make_l1norm_complex!</span>(i8);
+<span class="macro">make_l1norm_complex!</span>(i16);
+<span class="macro">make_l1norm_complex!</span>(i32);
+<span class="macro">make_l1norm_complex!</span>(i64);
 <span class="macro">make_l1norm_complex!</span>(f32);
 <span class="macro">make_l1norm_complex!</span>(f64);
+<span class="macro">make_l1norm_complex_unsigned!</span>(usize);
+<span class="macro">make_l1norm_complex_unsigned!</span>(u8);
+<span class="macro">make_l1norm_complex_unsigned!</span>(u16);
+<span class="macro">make_l1norm_complex_unsigned!</span>(u32);
+<span class="macro">make_l1norm_complex_unsigned!</span>(u64);
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
@@ -197,6 +285,32 @@
         };
     }
 
+    <span class="macro">macro_rules! </span>make_test_complex_signed {
+        (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
+            <span class="macro">item! </span>{
+                <span class="attribute">#[test]
+                </span><span class="kw">fn </span>[&lt;test_norm_complex_signed_ <span class="macro-nonterminal">$t</span>&gt;]() {
+                    <span class="kw">let </span>a = Complex::new(-<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, -<span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
+                    <span class="kw">let </span>res = &lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminL1Norm&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;::l1_norm(<span class="kw-2">&amp;</span>a);
+                    <span class="macro">assert!</span>((((<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t </span>+ <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>) - res) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                }
+            }
+        };
+    }
+
+    <span class="macro">macro_rules! </span>make_test_complex {
+        (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
+            <span class="macro">item! </span>{
+                <span class="attribute">#[test]
+                </span><span class="kw">fn </span>[&lt;test_norm_complex_ <span class="macro-nonterminal">$t</span>&gt;]() {
+                    <span class="kw">let </span>a = Complex::new(<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
+                    <span class="kw">let </span>res = &lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminL1Norm&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;::l1_norm(<span class="kw-2">&amp;</span>a);
+                    <span class="macro">assert!</span>((((<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t </span>+ <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>) - res) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                }
+            }
+        };
+    }
+
     <span class="macro">make_test!</span>(isize);
     <span class="macro">make_test!</span>(usize);
     <span class="macro">make_test!</span>(i8);
@@ -217,6 +331,26 @@
     <span class="macro">make_test_signed!</span>(i64);
     <span class="macro">make_test_signed!</span>(f32);
     <span class="macro">make_test_signed!</span>(f64);
+
+    <span class="macro">make_test_complex_signed!</span>(isize);
+    <span class="macro">make_test_complex_signed!</span>(i8);
+    <span class="macro">make_test_complex_signed!</span>(i16);
+    <span class="macro">make_test_complex_signed!</span>(i32);
+    <span class="macro">make_test_complex_signed!</span>(i64);
+    <span class="macro">make_test_complex_signed!</span>(f32);
+    <span class="macro">make_test_complex_signed!</span>(f64);
+    <span class="macro">make_test_complex!</span>(usize);
+    <span class="macro">make_test_complex!</span>(u8);
+    <span class="macro">make_test_complex!</span>(u16);
+    <span class="macro">make_test_complex!</span>(u32);
+    <span class="macro">make_test_complex!</span>(u64);
+    <span class="macro">make_test_complex!</span>(isize);
+    <span class="macro">make_test_complex!</span>(i8);
+    <span class="macro">make_test_complex!</span>(i16);
+    <span class="macro">make_test_complex!</span>(i32);
+    <span class="macro">make_test_complex!</span>(i64);
+    <span class="macro">make_test_complex!</span>(f32);
+    <span class="macro">make_test_complex!</span>(f64);
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="argmin_math" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0 (69f9c33d7 2022-12-12)" ></div></body></html>
