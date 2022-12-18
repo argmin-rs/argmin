@@ -138,6 +138,26 @@ mod tests {
 
             item! {
                 #[test]
+                fn [<test_vec_vec_complex_ $t>]() {
+                    let a = vec![
+                        Complex::new(2 as $t, 2 as $t),
+                        Complex::new(5 as $t, 2 as $t),
+                        Complex::new(3 as $t, 2 as $t),
+                    ];
+                    let b = vec![
+                        Complex::new(5 as $t, 3 as $t),
+                        Complex::new(2 as $t, 4 as $t),
+                        Complex::new(8 as $t, 4 as $t),
+                    ];
+                    let res: Complex<$t> = a.dot(&b);
+                    let target = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+                    assert!((((res - target).re as f64).abs()) < std::f64::EPSILON);
+                    assert!((((res - target).im as f64).abs()) < std::f64::EPSILON);
+                }
+            }
+
+            item! {
+                #[test]
                 fn [<test_vec_scalar_ $t>]() {
                     let a = vec![1 as $t, 2 as $t, 3 as $t];
                     let b = 2 as $t;
@@ -151,6 +171,24 @@ mod tests {
 
             item! {
                 #[test]
+                fn [<test_vec_scalar_complex_ $t>]() {
+                    let a = vec![
+                        Complex::new(2 as $t, 2 as $t),
+                        Complex::new(5 as $t, 2 as $t),
+                        Complex::new(3 as $t, 2 as $t),
+                    ];
+                    let b = Complex::new(4 as $t, 2 as $t);
+                    let product = a.dot(&b);
+                    let res = vec![a[0]*b, a[1]*b, a[2]*b];
+                    for i in 0..3 {
+                        assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
+                        assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
                 fn [<test_scalar_vec_ $t>]() {
                     let a = vec![1 as $t, 2 as $t, 3 as $t];
                     let b = 2 as $t;
@@ -158,6 +196,24 @@ mod tests {
                     let res = vec![2 as $t, 4 as $t, 6 as $t];
                     for i in 0..3 {
                         assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_scalar_vec_complex_ $t>]() {
+                    let a = vec![
+                        Complex::new(2 as $t, 2 as $t),
+                        Complex::new(5 as $t, 2 as $t),
+                        Complex::new(3 as $t, 2 as $t),
+                    ];
+                    let b = Complex::new(4 as $t, 2 as $t);
+                    let product = b.dot(&a);
+                    let res = vec![a[0]*b, a[1]*b, a[2]*b];
+                    for i in 0..3 {
+                        assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
+                        assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
                     }
                 }
             }
@@ -183,6 +239,31 @@ mod tests {
 
             item! {
                 #[test]
+                fn [<test_mat_vec_complex_ $t>]() {
+                    let a = vec![
+                        Complex::new(2 as $t, 2 as $t),
+                        Complex::new(5 as $t, 2 as $t),
+                    ];
+                    let b = vec![
+                        Complex::new(5 as $t, 1 as $t),
+                        Complex::new(2 as $t, 1 as $t),
+                    ];
+                    let res = vec![
+                        vec![a[0]*b[0], a[0]*b[1]],
+                        vec![a[1]*b[0], a[1]*b[1]],
+                    ];
+                    let product: Vec<Vec<Complex<$t>>> = a.dot(&b);
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!(((res[i][j].re as f64 - product[i][j].re as f64).abs()) < std::f64::EPSILON);
+                            assert!(((res[i][j].im as f64 - product[i][j].im as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
                 fn [<test_mat_vec_2_ $t>]() {
                     let a = vec![
                         vec![1 as $t, 2 as $t, 3 as $t],
@@ -194,6 +275,29 @@ mod tests {
                     let product = a.dot(&b);
                     for i in 0..3 {
                         assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_vec_2_complex $t>]() {
+                    let a = vec![
+                        vec![Complex::new(2 as $t, 2 as $t), Complex::new(5 as $t, 2 as $t)],
+                        vec![Complex::new(2 as $t, 2 as $t), Complex::new(5 as $t, 2 as $t)],
+                    ];
+                    let b = vec![
+                        Complex::new(5 as $t, 1 as $t),
+                        Complex::new(2 as $t, 1 as $t),
+                    ];
+                    let res = vec![
+                        a[0][0] * b[0] + a[0][1] * b[1],
+                        a[1][0] * b[0] + a[1][1] * b[1],
+                    ];
+                    let product = a.dot(&b);
+                    for i in 0..2 {
+                            assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
+                            assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
                     }
                 }
             }
@@ -220,6 +324,37 @@ mod tests {
                     for i in 0..3 {
                         for j in 0..3 {
                             assert!((((res[i][j] - product[i][j]) as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_mat_complex $t>]() {
+                    let a = vec![
+                        vec![Complex::new(2 as $t, 1 as $t), Complex::new(5 as $t, 2 as $t)],
+                        vec![Complex::new(4 as $t, 2 as $t), Complex::new(7 as $t, 1 as $t)],
+                    ];
+                    let b = vec![
+                        vec![Complex::new(2 as $t, 2 as $t), Complex::new(5 as $t, 1 as $t)],
+                        vec![Complex::new(3 as $t, 1 as $t), Complex::new(4 as $t, 2 as $t)],
+                    ];
+                    let res = vec![
+                        vec![
+                            a[0][0] * b[0][0] + a[0][1] * b[1][0],
+                            a[0][0] * b[0][1] + a[0][1] * b[1][1]
+                        ],
+                        vec![
+                            a[1][0] * b[0][0] + a[1][1] * b[1][0],
+                            a[1][0] * b[0][1] + a[1][1] * b[1][1]
+                        ],
+                    ];
+                    let product = a.dot(&b);
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!(((res[i][j].re as f64 - product[i][j].re as f64).abs()) < std::f64::EPSILON);
+                            assert!(((res[i][j].im as f64 - product[i][j].im as f64).abs()) < std::f64::EPSILON);
                         }
                     }
                 }
@@ -349,6 +484,28 @@ mod tests {
 
             item! {
                 #[test]
+                fn [<test_mat_primitive_complex_ $t>]() {
+                    let a = vec![
+                        vec![Complex::new(2 as $t, 1 as $t), Complex::new(5 as $t, 2 as $t)],
+                        vec![Complex::new(4 as $t, 2 as $t), Complex::new(7 as $t, 1 as $t)],
+                    ];
+                    let b = Complex::new(4 as $t, 1 as $t);
+                    let res = vec![
+                        vec![a[0][0] * b, a[0][1] * b],
+                        vec![a[1][0] * b, a[1][1] * b],
+                    ];
+                    let product = a.dot(&b);
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!(((res[i][j].re as f64 - product[i][j].re as f64).abs()) < std::f64::EPSILON);
+                            assert!(((res[i][j].im as f64 - product[i][j].im as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
                 fn [<test_primitive_mat_ $t>]() {
                     let a = vec![
                         vec![1 as $t, 2 as $t, 3 as $t],
@@ -364,6 +521,28 @@ mod tests {
                     for i in 0..3 {
                         for j in 0..3 {
                             assert!((((res[i][j] - product[i][j]) as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_primitive_mat_complex_ $t>]() {
+                    let a = vec![
+                        vec![Complex::new(2 as $t, 1 as $t), Complex::new(5 as $t, 2 as $t)],
+                        vec![Complex::new(4 as $t, 2 as $t), Complex::new(7 as $t, 1 as $t)],
+                    ];
+                    let b = Complex::new(4 as $t, 1 as $t);
+                    let res = vec![
+                        vec![a[0][0] * b, a[0][1] * b],
+                        vec![a[1][0] * b, a[1][1] * b],
+                    ];
+                    let product = b.dot(&a);
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!(((res[i][j].re as f64 - product[i][j].re as f64).abs()) < std::f64::EPSILON);
+                            assert!(((res[i][j].im as f64 - product[i][j].im as f64).abs()) < std::f64::EPSILON);
                         }
                     }
                 }
