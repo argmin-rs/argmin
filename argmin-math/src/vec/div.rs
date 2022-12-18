@@ -30,7 +30,6 @@ macro_rules! make_div {
                 let n1 = self.len();
                 let n2 = other.len();
                 assert!(n1 > 0);
-                assert!(n2 > 0);
                 assert_eq!(n1, n2);
                 self.iter().zip(other.iter()).map(|(a, b)| a / b).collect()
             }
@@ -105,6 +104,24 @@ mod tests {
 
             item! {
                 #[test]
+                fn [<test_div_vec_scalar_complex_ $t>]() {
+                    let a = vec![
+                        Complex::new(2 as $t, 4 as $t),
+                        Complex::new(4 as $t, 8 as $t),
+                        Complex::new(3 as $t, 9 as $t),
+                    ];
+                    let b = Complex::new(2 as $t, 4 as $t);
+                    let target = vec![a[0]/b, a[1]/b, a[2]/b];
+                    let res = <Vec<Complex<$t>> as ArgminDiv<Complex<$t>, Vec<Complex<$t>>>>::div(&a, &b);
+                    for i in 0..3 {
+                        assert!(((target[i].re as f64) - (res[i].re as f64)).abs() < std::f64::EPSILON);
+                        assert!(((target[i].im as f64) - (res[i].im as f64)).abs() < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
                 fn [<test_div_scalar_vec_ $t>]() {
                     let a = vec![2 as $t, 4 as $t, 8 as $t];
                     let b = 64 as $t;
@@ -118,6 +135,24 @@ mod tests {
 
             item! {
                 #[test]
+                fn [<test_div_scalar_vec_complex_ $t>]() {
+                    let a = vec![
+                        Complex::new(2 as $t, 1 as $t),
+                        Complex::new(2 as $t, 2 as $t),
+                        Complex::new(3 as $t, 2 as $t),
+                    ];
+                    let b = Complex::new(10 as $t, 12 as $t);
+                    let target = vec![b/a[0], b/a[1], b/a[2]];
+                    let res = <Complex<$t> as ArgminDiv<Vec<Complex<$t>>, Vec<Complex<$t>>>>::div(&b, &a);
+                    for i in 0..3 {
+                        assert!(((target[i].re as f64) - (res[i].re as f64)).abs() < std::f64::EPSILON);
+                        assert!(((target[i].im as f64) - (res[i].im as f64)).abs() < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
                 fn [<test_div_vec_vec_ $t>]() {
                     let a = vec![4 as $t, 9 as $t, 8 as $t];
                     let b = vec![2 as $t, 3 as $t, 4 as $t];
@@ -125,6 +160,28 @@ mod tests {
                     let res = <Vec<$t> as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&a, &b);
                     for i in 0..3 {
                         assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_div_vec_vec_complex_ $t>]() {
+                    let a = vec![
+                        Complex::new(8 as $t, 7 as $t),
+                        Complex::new(7 as $t, 6 as $t),
+                        Complex::new(6 as $t, 5 as $t),
+                    ];
+                    let b = vec![
+                        Complex::new(4 as $t, 2 as $t),
+                        Complex::new(4 as $t, 3 as $t),
+                        Complex::new(3 as $t, 2 as $t),
+                    ];
+                    let target = vec![a[0]/b[0], a[1]/b[1], a[2]/b[2]];
+                    let res = <Vec<Complex<$t>> as ArgminDiv<Vec<Complex<$t>>, Vec<Complex<$t>>>>::div(&a, &b);
+                    for i in 0..3 {
+                        assert!(((target[i].re as f64) - (res[i].re as f64)).abs() < std::f64::EPSILON);
+                        assert!(((target[i].im as f64) - (res[i].im as f64)).abs() < std::f64::EPSILON);
                     }
                 }
             }
@@ -178,6 +235,47 @@ mod tests {
                     for i in 0..3 {
                         for j in 0..2 {
                         assert!(((target[j][i] - res[j][i]) as f64).abs() < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_div_mat_mat_complex_ $t>]() {
+                    let a = vec![
+                        vec![
+                            Complex::new(8 as $t, 7 as $t),
+                            Complex::new(7 as $t, 6 as $t),
+                            Complex::new(6 as $t, 5 as $t)
+                        ],
+                        vec![
+                            Complex::new(9 as $t, 6 as $t),
+                            Complex::new(7 as $t, 6 as $t),
+                            Complex::new(6 as $t, 4 as $t)
+                        ],
+                    ];
+                    let b = vec![
+                        vec![
+                            Complex::new(4 as $t, 2 as $t),
+                            Complex::new(4 as $t, 3 as $t),
+                            Complex::new(3 as $t, 2 as $t),
+                        ],
+                        vec![
+                            Complex::new(3 as $t, 2 as $t),
+                            Complex::new(4 as $t, 3 as $t),
+                            Complex::new(3 as $t, 1 as $t),
+                        ],
+                    ];
+                    let target = vec![
+                        vec![a[0][0]/b[0][0], a[0][1]/b[0][1], a[0][2]/b[0][2]],
+                        vec![a[1][0]/b[1][0], a[1][1]/b[1][1], a[1][2]/b[1][2]]
+                    ];
+                    let res = <Vec<Vec<Complex<$t>>> as ArgminDiv<Vec<Vec<Complex<$t>>>, Vec<Vec<Complex<$t>>>>>::div(&a, &b);
+                    for i in 0..3 {
+                        for j in 0..2 {
+                        assert!((target[j][i].re as f64 - res[j][i].re as f64).abs() < std::f64::EPSILON);
+                        assert!((target[j][i].im as f64 - res[j][i].im as f64).abs() < std::f64::EPSILON);
                         }
                     }
                 }
