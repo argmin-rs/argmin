@@ -88,6 +88,32 @@ mod tests {
         };
     }
 
+    macro_rules! make_test_complex {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_norm_complex_ $t>]() {
+                    let a = Complex::new(8 as $t, 4 as $t);
+                    let res = <Complex<$t> as ArgminL2Norm<$t>>::l2_norm(&a);
+                    assert!((((a.re.powi(2)+a.im.powi(2)).sqrt() - res) as f64).abs() < std::f64::EPSILON);
+                }
+            }
+        };
+    }
+
+    macro_rules! make_test_complex_signed {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_norm_complex_signed_ $t>]() {
+                    let a = Complex::new(-8 as $t, -4 as $t);
+                    let res = <Complex<$t> as ArgminL2Norm<$t>>::l2_norm(&a);
+                    assert!((((a.re.powi(2)+a.im.powi(2)).sqrt() - res) as f64).abs() < std::f64::EPSILON);
+                }
+            }
+        };
+    }
+
     make_test!(isize);
     make_test!(usize);
     make_test!(i8);
@@ -108,4 +134,10 @@ mod tests {
     make_test_signed!(i64);
     make_test_signed!(f32);
     make_test_signed!(f64);
+
+    make_test_complex!(f32);
+    make_test_complex!(f64);
+
+    make_test_complex_signed!(f32);
+    make_test_complex_signed!(f64);
 }
