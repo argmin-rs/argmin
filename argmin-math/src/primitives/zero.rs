@@ -88,9 +88,27 @@ mod tests {
 
             item! {
                 #[test]
+                fn [<test_zero_complex_ $t>]() {
+                    let a = <Complex<$t> as ArgminZero>::zero();
+                    assert!(((0 as $t - a.re) as f64).abs() < std::f64::EPSILON);
+                    assert!(((0 as $t - a.im) as f64).abs() < std::f64::EPSILON);
+                }
+            }
+
+            item! {
+                #[test]
                 fn [<test_zero_like_ $t>]() {
                     let a = (42 as $t).zero_like();
                     assert!(((0 as $t - a) as f64).abs() < std::f64::EPSILON);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_zero_like_complex_ $t>]() {
+                    let a = Complex::new(42 as $t, 12 as $t).zero_like();
+                    assert!(((0 as $t - a.re) as f64).abs() < std::f64::EPSILON);
+                    assert!(((0 as $t - a.im) as f64).abs() < std::f64::EPSILON);
                 }
             }
         };
