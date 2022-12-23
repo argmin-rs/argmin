@@ -21,27 +21,21 @@ macro_rules! make_dot_ndarray {
         impl ArgminDot<$t, Array1<$t>> for Array1<$t> {
             #[inline]
             fn dot(&self, other: &$t) -> Array1<$t> {
-                *other * self
+                self.iter().cloned().map(|s| s * *other).collect()
             }
         }
 
         impl ArgminDot<Array1<$t>, Array1<$t>> for $t {
             #[inline]
             fn dot(&self, other: &Array1<$t>) -> Array1<$t> {
-                other * *self
+                other.iter().cloned().map(|o| o * *self).collect()
             }
         }
 
         impl ArgminDot<Array1<$t>, Array2<$t>> for Array1<$t> {
             #[inline]
             fn dot(&self, other: &Array1<$t>) -> Array2<$t> {
-                let mut out = Array2::zeros((self.len(), other.len()));
-                for i in 0..self.len() {
-                    for j in 0..other.len() {
-                        out[(i, j)] = self[i] * other[j];
-                    }
-                }
-                out
+                Array2::from_shape_fn((self.len(), other.len()), |(i, j)| self[i] * other[j])
             }
         }
 
@@ -62,21 +56,19 @@ macro_rules! make_dot_ndarray {
         impl ArgminDot<$t, Array2<$t>> for Array2<$t> {
             #[inline]
             fn dot(&self, other: &$t) -> Array2<$t> {
-                *other * self
+                Array2::from_shape_fn((self.nrows(), self.ncols()), |(i, j)| *other * self[(i, j)])
             }
         }
 
         impl ArgminDot<Array2<$t>, Array2<$t>> for $t {
             #[inline]
             fn dot(&self, other: &Array2<$t>) -> Array2<$t> {
-                other * *self
+                Array2::from_shape_fn((other.nrows(), other.ncols()), |(i, j)| {
+                    *self * other[(i, j)]
+                })
             }
         }
-    };
-}
 
-macro_rules! make_dot_complex_ndarray {
-    ($t:ty) => {
         impl ArgminDot<Array1<Complex<$t>>, Complex<$t>> for Array1<Complex<$t>> {
             #[inline]
             fn dot(&self, other: &Array1<Complex<$t>>) -> Complex<$t> {
@@ -87,27 +79,21 @@ macro_rules! make_dot_complex_ndarray {
         impl ArgminDot<Complex<$t>, Array1<Complex<$t>>> for Array1<Complex<$t>> {
             #[inline]
             fn dot(&self, other: &Complex<$t>) -> Array1<Complex<$t>> {
-                *other * self
+                self.iter().cloned().map(|s| s * *other).collect()
             }
         }
 
         impl ArgminDot<Array1<Complex<$t>>, Array1<Complex<$t>>> for Complex<$t> {
             #[inline]
             fn dot(&self, other: &Array1<Complex<$t>>) -> Array1<Complex<$t>> {
-                other * *self
+                other.iter().cloned().map(|o| o * *self).collect()
             }
         }
 
         impl ArgminDot<Array1<Complex<$t>>, Array2<Complex<$t>>> for Array1<Complex<$t>> {
             #[inline]
             fn dot(&self, other: &Array1<Complex<$t>>) -> Array2<Complex<$t>> {
-                let mut out = Array2::zeros((self.len(), other.len()));
-                for i in 0..self.len() {
-                    for j in 0..other.len() {
-                        out[(i, j)] = self[i] * other[j];
-                    }
-                }
-                out
+                Array2::from_shape_fn((self.len(), other.len()), |(i, j)| self[i] * other[j])
             }
         }
 
@@ -128,31 +114,33 @@ macro_rules! make_dot_complex_ndarray {
         impl ArgminDot<Complex<$t>, Array2<Complex<$t>>> for Array2<Complex<$t>> {
             #[inline]
             fn dot(&self, other: &Complex<$t>) -> Array2<Complex<$t>> {
-                *other * self
+                Array2::from_shape_fn((self.nrows(), self.ncols()), |(i, j)| *other * self[(i, j)])
             }
         }
 
         impl ArgminDot<Array2<Complex<$t>>, Array2<Complex<$t>>> for Complex<$t> {
             #[inline]
             fn dot(&self, other: &Array2<Complex<$t>>) -> Array2<Complex<$t>> {
-                other * *self
+                Array2::from_shape_fn((other.nrows(), other.ncols()), |(i, j)| {
+                    *self * other[(i, j)]
+                })
             }
         }
     };
 }
 
-make_dot_ndarray!(f32);
-make_dot_ndarray!(f64);
-make_dot_complex_ndarray!(f32);
-make_dot_complex_ndarray!(f64);
 make_dot_ndarray!(i8);
 make_dot_ndarray!(i16);
 make_dot_ndarray!(i32);
 make_dot_ndarray!(i64);
+make_dot_ndarray!(isize);
 make_dot_ndarray!(u8);
 make_dot_ndarray!(u16);
 make_dot_ndarray!(u32);
 make_dot_ndarray!(u64);
+make_dot_ndarray!(usize);
+make_dot_ndarray!(f32);
+make_dot_ndarray!(f64);
 
 #[cfg(test)]
 mod tests {
@@ -311,6 +299,192 @@ mod tests {
                     }
                 }
             }
+
+            item! {
+                #[test]
+                fn [<test_vec_vec_complex_ $t>]() {
+                    let a = array![
+                        Complex::new(2 as $t, 2 as $t),
+                        Complex::new(5 as $t, 2 as $t),
+                        Complex::new(3 as $t, 2 as $t),
+                    ];
+                    let b = array![
+                        Complex::new(5 as $t, 3 as $t),
+                        Complex::new(2 as $t, 4 as $t),
+                        Complex::new(8 as $t, 4 as $t),
+                    ];
+                    let res: Complex<$t> = a.dot(&b);
+                    let target = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+                    assert!((((res - target).re as f64).abs()) < std::f64::EPSILON);
+                    assert!((((res - target).im as f64).abs()) < std::f64::EPSILON);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_vec_scalar_complex_ $t>]() {
+                    let a = array![
+                        Complex::new(2 as $t, 2 as $t),
+                        Complex::new(5 as $t, 2 as $t),
+                        Complex::new(3 as $t, 2 as $t),
+                    ];
+                    let b = Complex::new(4 as $t, 2 as $t);
+                    let product: Array1<Complex<$t>> =
+                        <Array1<Complex<$t>> as ArgminDot<Complex<$t>, Array1<Complex<$t>>>>::dot(&a, &b);
+                    let res = array![a[0]*b, a[1]*b, a[2]*b];
+                    for i in 0..3 {
+                        assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
+                        assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_scalar_vec_complex_ $t>]() {
+                    let a = array![
+                        Complex::new(2 as $t, 2 as $t),
+                        Complex::new(5 as $t, 2 as $t),
+                        Complex::new(3 as $t, 2 as $t),
+                    ];
+                    let b = Complex::new(4 as $t, 2 as $t);
+                    let product: Array1<Complex<$t>> =
+                        <Complex<$t> as ArgminDot<Array1<Complex<$t>>, Array1<Complex<$t>>>>::dot(&b, &a);
+                    let res = array![a[0]*b, a[1]*b, a[2]*b];
+                    for i in 0..3 {
+                        assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
+                        assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_vec_complex_ $t>]() {
+                    let a = array![
+                        Complex::new(2 as $t, 2 as $t),
+                        Complex::new(5 as $t, 2 as $t),
+                    ];
+                    let b = array![
+                        Complex::new(5 as $t, 1 as $t),
+                        Complex::new(2 as $t, 1 as $t),
+                    ];
+                    let res = array![
+                        [a[0]*b[0], a[0]*b[1]],
+                        [a[1]*b[0], a[1]*b[1]],
+                    ];
+                    let product: Array2<Complex<$t>> =
+                        <Array1<Complex<$t>> as ArgminDot<Array1<Complex<$t>>, Array2<Complex<$t>>>>::dot(&a, &b);
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!(((res[(i, j)].re as f64 - product[(i, j)].re as f64).abs()) < std::f64::EPSILON);
+                            assert!(((res[(i, j)].im as f64 - product[(i, j)].im as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_vec_2_complex $t>]() {
+                    let a = array![
+                        [Complex::new(2 as $t, 2 as $t), Complex::new(5 as $t, 2 as $t)],
+                        [Complex::new(2 as $t, 2 as $t), Complex::new(5 as $t, 2 as $t)],
+                    ];
+                    let b = array![
+                        Complex::new(5 as $t, 1 as $t),
+                        Complex::new(2 as $t, 1 as $t),
+                    ];
+                    let res = array![
+                        a[(0, 0)] * b[0] + a[(0, 1)] * b[1],
+                        a[(1, 0)] * b[0] + a[(1, 1)] * b[1],
+                    ];
+                    let product: Array1<Complex<$t>> =
+                        <Array2<Complex<$t>> as ArgminDot<Array1<Complex<$t>>, Array1<Complex<$t>>>>::dot(&a, &b);
+                    for i in 0..2 {
+                            assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
+                            assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_mat_complex $t>]() {
+                    let a = array![
+                        [Complex::new(2 as $t, 1 as $t), Complex::new(5 as $t, 2 as $t)],
+                        [Complex::new(4 as $t, 2 as $t), Complex::new(7 as $t, 1 as $t)],
+                    ];
+                    let b = array![
+                        [Complex::new(2 as $t, 2 as $t), Complex::new(5 as $t, 1 as $t)],
+                        [Complex::new(3 as $t, 1 as $t), Complex::new(4 as $t, 2 as $t)],
+                    ];
+                    let res = array![
+                        [
+                            a[(0, 0)] * b[(0, 0)] + a[(0, 1)] * b[(1, 0)],
+                            a[(0, 0)] * b[(0, 1)] + a[(0, 1)] * b[(1, 1)]
+                        ],
+                        [
+                            a[(1, 0)] * b[(0, 0)] + a[(1, 1)] * b[(1, 0)],
+                            a[(1, 0)] * b[(0, 1)] + a[(1, 1)] * b[(1, 1)]
+                        ],
+                    ];
+                    let product: Array2<Complex<$t>> =
+                        <Array2<Complex<$t>> as ArgminDot<Array2<Complex<$t>>, Array2<Complex<$t>>>>::dot(&a, &b);
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!(((res[(i, j)].re as f64 - product[(i, j)].re as f64).abs()) < std::f64::EPSILON);
+                            assert!(((res[(i, j)].im as f64 - product[(i, j)].im as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mat_primitive_complex_ $t>]() {
+                    let a = array![
+                        [Complex::new(2 as $t, 1 as $t), Complex::new(5 as $t, 2 as $t)],
+                        [Complex::new(4 as $t, 2 as $t), Complex::new(7 as $t, 1 as $t)],
+                    ];
+                    let b = Complex::new(4 as $t, 1 as $t);
+                    let res = array![
+                        [a[(0, 0)] * b, a[(0, 1)] * b],
+                        [a[(1, 0)] * b, a[(1, 1)] * b]
+                    ];
+                    let product: Array2<Complex<$t>> =
+                        <Array2<Complex<$t>> as ArgminDot<Complex<$t>, Array2<Complex<$t>>>>::dot(&a, &b);
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!(((res[(i, j)].re as f64 - product[(i, j)].re as f64).abs()) < std::f64::EPSILON);
+                            assert!(((res[(i, j)].im as f64 - product[(i, j)].im as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_primitive_mat_complex_ $t>]() {
+                    let a = array![
+                        [Complex::new(2 as $t, 1 as $t), Complex::new(5 as $t, 2 as $t)],
+                        [Complex::new(4 as $t, 2 as $t), Complex::new(7 as $t, 1 as $t)],
+                    ];
+                    let b = Complex::new(4 as $t, 1 as $t);
+                    let res = array![
+                        [a[(0, 0)] * b, a[(0, 1)] * b],
+                        [a[(1, 0)] * b, a[(1, 1)] * b],
+                    ];
+                    let product: Array2<Complex<$t>> =
+                        <Complex<$t> as ArgminDot<Array2<Complex<$t>>, Array2<Complex<$t>>>>::dot(&b, &a);
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!(((res[(i, j)].re as f64 - product[(i, j)].re as f64).abs()) < std::f64::EPSILON);
+                            assert!(((res[(i, j)].im as f64 - product[(i, j)].im as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
         };
     }
 
@@ -322,6 +496,8 @@ mod tests {
     make_test!(u32);
     make_test!(i64);
     make_test!(u64);
+    make_test!(isize);
+    make_test!(usize);
     make_test!(f32);
     make_test!(f64);
 }
