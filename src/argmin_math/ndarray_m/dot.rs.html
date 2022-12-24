@@ -816,7 +816,7 @@
                         Complex::new(<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>),
                         Complex::new(<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>),
                     ];
-                    <span class="kw">let </span>res: Complex&lt;<span class="macro-nonterminal">$t</span>&gt; = a.dot(<span class="kw-2">&amp;</span>b);
+                    <span class="kw">let </span>res: Complex&lt;<span class="macro-nonterminal">$t</span>&gt; = &lt;Array1&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; <span class="kw">as </span>ArgminDot&lt;Array1&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;, Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::dot(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">let </span>target = a[<span class="number">0</span>]<span class="kw-2">*</span>b[<span class="number">0</span>] + a[<span class="number">1</span>]<span class="kw-2">*</span>b[<span class="number">1</span>] + a[<span class="number">2</span>]<span class="kw-2">*</span>b[<span class="number">2</span>];
                     <span class="macro">assert!</span>((((res - target).re <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
                     <span class="macro">assert!</span>((((res - target).im <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
