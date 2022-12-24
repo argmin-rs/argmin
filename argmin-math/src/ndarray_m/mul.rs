@@ -14,21 +14,51 @@ macro_rules! make_mul {
         impl ArgminMul<$t, Array1<$t>> for Array1<$t> {
             #[inline]
             fn mul(&self, other: &$t) -> Array1<$t> {
-                self * *other
+                cfg_if::cfg_if! {
+                    if #[cfg(feature = "ndarray_0_14")] {
+                        self.iter().map(|s| s * other).collect()
+                    } else if #[cfg(feature = "ndarray_0_13")]  {
+                        self.iter().map(|s| s * other).collect()
+                    } else {
+                        self * *other
+                    }
+                }
             }
         }
 
         impl ArgminMul<Array1<$t>, Array1<$t>> for $t {
             #[inline]
             fn mul(&self, other: &Array1<$t>) -> Array1<$t> {
-                *self * other
+                cfg_if::cfg_if! {
+                    if #[cfg(feature = "ndarray_0_14")] {
+                        other.iter().map(|o| o * *self).collect()
+                    } else if #[cfg(feature = "ndarray_0_13")]  {
+                        other.iter().map(|o| o * *self).collect()
+                    } else {
+                        *self * other
+                    }
+                }
             }
         }
 
         impl ArgminMul<Array1<$t>, Array1<$t>> for Array1<$t> {
             #[inline]
             fn mul(&self, other: &Array1<$t>) -> Array1<$t> {
-                self * other
+                cfg_if::cfg_if! {
+                    if #[cfg(feature = "ndarray_0_14")] {
+                        // Need to assert that the shapes are the same here because the iterators
+                        // will silently truncate.
+                        assert_eq!(self.shape(), other.shape());
+                        self.iter().zip(other.iter()).map(|(s, o)| s * o).collect()
+                    } else if #[cfg(feature = "ndarray_0_13")]  {
+                        // Need to assert that the shapes are the same here because the iterators
+                        // will silently truncate.
+                        assert_eq!(self.shape(), other.shape());
+                        self.iter().zip(other.iter()).map(|(s, o)| s * o).collect()
+                    } else {
+                        self * other
+                    }
+                }
             }
         }
 
@@ -49,7 +79,7 @@ macro_rules! make_mul {
         impl ArgminMul<Array2<$t>, Array2<$t>> for $t {
             #[inline]
             fn mul(&self, other: &Array2<$t>) -> Array2<$t> {
-                *self * other
+                other * *self
             }
         }
     };
