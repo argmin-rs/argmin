@@ -313,7 +313,7 @@ mod tests {
                         Complex::new(2 as $t, 4 as $t),
                         Complex::new(8 as $t, 4 as $t),
                     ];
-                    let res: Complex<$t> = a.dot(&b);
+                    let res: Complex<$t> = <Array1<Complex<$t>> as ArgminDot<Array1<Complex<$t>>, Complex<$t>>>::dot(&a, &b);
                     let target = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
                     assert!((((res - target).re as f64).abs()) < std::f64::EPSILON);
                     assert!((((res - target).im as f64).abs()) < std::f64::EPSILON);
