@@ -70,6 +70,20 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -84,7 +98,7 @@
 };
 <span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[derive(Debug, Clone, thiserror::Error)]
+<span class="attribute">#[derive(Debug, thiserror::Error, PartialEq)]
 </span><span class="kw">struct </span>InverseError;
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>InverseError {
@@ -134,6 +148,20 @@
                             <span class="macro">assert!</span>((((res[(i, j)] - target[(i, j)]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
                         }
                     }
+                }
+            }
+
+            <span class="macro">item! </span>{
+                <span class="attribute">#[test]
+                </span><span class="kw">fn </span>[&lt;test_inv_error <span class="macro-nonterminal">$t</span>&gt;]() {
+                    <span class="kw">let </span>a = Matrix2::new(
+                        <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">5 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>,
+                        <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">10 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>,
+                    );
+                    <span class="kw">let </span>err = &lt;Matrix2&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminInv&lt;Matrix2&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::inv(<span class="kw-2">&amp;</span>a).unwrap_err().downcast::&lt;InverseError&gt;().unwrap();
+                    <span class="macro">assert_eq!</span>(err, InverseError {});
+                    <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, err), <span class="string">&quot;Non-invertible matrix&quot;</span>);
+                    <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, err), <span class="string">&quot;InverseError&quot;</span>);
                 }
             }
         };
