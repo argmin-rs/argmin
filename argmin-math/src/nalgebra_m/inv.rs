@@ -12,7 +12,7 @@ use nalgebra::{
 };
 use std::fmt;
 
-#[derive(Debug, Clone, thiserror::Error)]
+#[derive(Debug, thiserror::Error, PartialEq)]
 struct InverseError;
 
 impl fmt::Display for InverseError {
@@ -62,6 +62,20 @@ mod tests {
                             assert!((((res[(i, j)] - target[(i, j)]) as f64).abs()) < std::f64::EPSILON);
                         }
                     }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_inv_error $t>]() {
+                    let a = Matrix2::new(
+                        2 as $t, 5 as $t,
+                        4 as $t, 10 as $t,
+                    );
+                    let err = <Matrix2<$t> as ArgminInv<Matrix2<$t>>>::inv(&a).unwrap_err().downcast::<InverseError>().unwrap();
+                    assert_eq!(err, InverseError {});
+                    assert_eq!(format!("{}", err), "Non-invertible matrix");
+                    assert_eq!(format!("{:?}", err), "InverseError");
                 }
             }
         };
