@@ -71,6 +71,32 @@ mod tests {
 
             item! {
                 #[test]
+                fn [<test_random_vec_equal $t>]() {
+                    let a = Vector3::new(1 as $t, 2 as $t, 3 as $t);
+                    let b = Vector3::new(1 as $t, 2 as $t, 3 as $t);
+                    let random = Vector3::<$t>::rand_from_range(&a, &b);
+                    for i in 0..3 {
+                        assert!((random[i] as f64 - a[i] as f64).abs() < std::f64::EPSILON);
+                        assert!((random[i] as f64 - b[i] as f64).abs() < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_random_vec_reverse_ $t>]() {
+                    let b = Vector3::new(1 as $t, 2 as $t, 3 as $t);
+                    let a = Vector3::new(2 as $t, 3 as $t, 4 as $t);
+                    let random = Vector3::<$t>::rand_from_range(&a, &b);
+                    for i in 0..3 {
+                        assert!(random[i] >= b[i]);
+                        assert!(random[i] <= a[i]);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
                 fn [<test_random_mat_ $t>]() {
                     let a = Matrix2x3::new(
                         1 as $t, 3 as $t, 5 as $t,
