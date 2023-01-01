@@ -92,7 +92,7 @@ pub trait Solver<O, I: State> {
     ///
     /// 1) algorithm was terminated somewhere else in the Executor
     /// 2) iteration count exceeds maximum number of iterations
-    /// 3) cost is lower than or equal to the target cost
+    /// 3) best cost is lower than or equal to the target cost
     ///
     /// This can be overwritten; however it is not advised. It is recommended to implement other
     /// stopping criteria via ([`terminate`](`Solver::terminate`).
@@ -104,7 +104,7 @@ pub trait Solver<O, I: State> {
         if state.get_iter() >= state.get_max_iters() {
             return TerminationReason::MaxItersReached;
         }
-        if state.get_cost() <= state.get_target_cost() {
+        if state.get_best_cost() <= state.get_target_cost() {
             return TerminationReason::TargetCostReached;
         }
         TerminationReason::NotTerminated
