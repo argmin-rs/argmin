@@ -16,7 +16,7 @@ The `Solver` trait consists of several methods; however, not all of them need to
 * `init(...)`: Run before the the actual iterations and initializes the solver. Does nothing by default.
 * `next_iter(...)`: One iteration of the solver. Will be executed by the `Executor` until a stopping critereon is met.
 * `terminate(...)`: Solver specific stopping criteria. This method is run after every iteration. Note that one can also terminate from within `next_iter` if necessary.
-* `terminate_internal(...)`: By default calls `terminate` and in addition checks if the maximum number of iterations was reached or if the current cost function value is below the target cost function value. Should only be overwritten if absolutely necessary. 
+* `terminate_internal(...)`: By default calls `terminate` and in addition checks if the maximum number of iterations was reached or if the cost function best value is below the target cost value. Should only be overwritten if absolutely necessary. 
 
 Both `init` and `next_iter` have access to the optimization problem (`problem`) as well as the internal state (`state`).
 The methods `terminate` and `terminate_interal` only have access to `state`. 
