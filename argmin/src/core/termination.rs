@@ -30,6 +30,8 @@ pub enum TerminationReason {
     LineSearchConditionMet,
     /// Reached target tolerance
     TargetToleranceReached,
+    /// Algorithm manually interrupted with Ctrl+C
+    KeyboardInterrupt,
     /// Algorithm aborted
     Aborted,
 }
@@ -50,6 +52,7 @@ impl TerminationReason {
     /// assert!(TerminationReason::BestStallIterExceeded.terminated());
     /// assert!(TerminationReason::LineSearchConditionMet.terminated());
     /// assert!(TerminationReason::TargetToleranceReached.terminated());
+    /// assert!(TerminationReason::KeyboardInterrupt.terminated());
     /// assert!(TerminationReason::Aborted.terminated());
     /// assert!(!TerminationReason::NotTerminated.terminated());
     /// ```
@@ -97,6 +100,10 @@ impl TerminationReason {
     ///     "Target tolerance reached"
     /// );
     /// assert_eq!(
+    ///     TerminationReason::KeyboardInterrupt.text(),
+    ///     "Keyboard interrupt"
+    /// );
+    /// assert_eq!(
     ///     TerminationReason::Aborted.text(),
     ///     "Optimization aborted"
     /// );
@@ -116,6 +123,7 @@ impl TerminationReason {
             TerminationReason::BestStallIterExceeded => "Best stall iterations exceeded",
             TerminationReason::LineSearchConditionMet => "Line search condition met",
             TerminationReason::TargetToleranceReached => "Target tolerance reached",
+            TerminationReason::KeyboardInterrupt => "Keyboard interrupt",
             TerminationReason::Aborted => "Optimization aborted",
         }
     }
