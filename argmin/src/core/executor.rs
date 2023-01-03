@@ -259,7 +259,15 @@ where
             }
         }
 
-        // in case it stopped prematurely and `termination_reason` is still `NotTerminated`,
+        if running.load(Ordering::SeqCst) {
+            // Solver execution has finished
+            running.store(false, Ordering::SeqCst);
+        } else {
+            // Solver execution has been interrupted manually
+            state = state.terminate_with(TerminationReason::KeyboardInterrupt);
+        }
+
+        // In case it stopped prematurely and `termination_reason` is still `NotTerminated`,
         // someone must have pulled the handbrake
         if state.get_iter() < state.get_max_iters() && !state.terminated() {
             state = state.terminate_with(TerminationReason::Aborted);
