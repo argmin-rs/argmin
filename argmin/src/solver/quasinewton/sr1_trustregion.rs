@@ -8,7 +8,7 @@
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
     IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
-    TrustRegionRadius, KV,
+    TerminationStatus, TrustRegionRadius, KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
@@ -351,11 +351,11 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), B, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, (), B, F>) -> TerminationStatus {
         if state.get_gradient().unwrap().l2_norm() < self.tol_grad {
-            return TerminationReason::TargetPrecisionReached;
+            return TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 

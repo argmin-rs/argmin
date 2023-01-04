@@ -20,7 +20,7 @@
 
 use crate::core::{
     ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
-    TerminationReason, KV,
+    TerminationReason, TerminationStatus, KV,
 };
 use argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -413,7 +413,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationStatus {
         let n = float!(self.params.len() as f64);
         let c0: F = self.params.iter().map(|(_, c)| *c).sum::<F>() / n;
         let s: F = (float!(1.0) / (n - float!(1.0))
@@ -424,9 +424,9 @@ where
                 .sum::<F>())
         .sqrt();
         if s < self.sd_tolerance {
-            return TerminationReason::TargetToleranceReached;
+            return TerminationStatus::Terminated(TerminationReason::TargetToleranceReached);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 

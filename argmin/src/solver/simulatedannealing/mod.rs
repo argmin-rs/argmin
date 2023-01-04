@@ -20,7 +20,7 @@
 
 use crate::core::{
     ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
-    TerminationReason, KV,
+    TerminationReason, TerminationStatus, KV,
 };
 use rand::prelude::*;
 use rand_xoshiro::Xoshiro256PlusPlus;
@@ -557,14 +557,14 @@ where
         ))
     }
 
-    fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationStatus {
         if self.stall_iter_accepted > self.stall_iter_accepted_limit {
-            return TerminationReason::AcceptedStallIterExceeded;
+            return TerminationStatus::Terminated(TerminationReason::AcceptedStallIterExceeded);
         }
         if self.stall_iter_best > self.stall_iter_best_limit {
-            return TerminationReason::BestStallIterExceeded;
+            return TerminationStatus::Terminated(TerminationReason::BestStallIterExceeded);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 

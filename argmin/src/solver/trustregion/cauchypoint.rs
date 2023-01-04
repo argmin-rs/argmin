@@ -7,7 +7,7 @@
 
 use crate::core::{
     ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, State, TerminationReason,
-    TrustRegionRadius, KV,
+    TerminationStatus, TrustRegionRadius, KV,
 };
 use argmin_math::{ArgminL2Norm, ArgminMul, ArgminWeightedDot};
 #[cfg(feature = "serde1")]
@@ -97,12 +97,12 @@ where
         Ok((state.param(new_param), None))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationStatus {
         // Not an iterative algorithm
         if state.get_iter() >= 1 {
-            TerminationReason::MaxItersReached
+            TerminationStatus::Terminated(TerminationReason::MaxItersReached)
         } else {
-            TerminationReason::NotTerminated
+            TerminationStatus::NotTerminated
         }
     }
 }

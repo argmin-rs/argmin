@@ -7,7 +7,7 @@
 
 use crate::core::{
     ArgminFloat, Error, IterState, Problem, SerializeAlias, Solver, State, TerminationReason,
-    TrustRegionRadius, KV,
+    TerminationStatus, TrustRegionRadius, KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminWeightedDot, ArgminZeroLike,
@@ -298,14 +298,14 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, P, (), H, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, P, (), H, F>) -> TerminationStatus {
         if self.r_0_norm < self.epsilon {
-            return TerminationReason::TargetPrecisionReached;
+            return TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached);
         }
         if state.get_iter() >= self.max_iters {
-            return TerminationReason::MaxItersReached;
+            return TerminationStatus::Terminated(TerminationReason::MaxItersReached);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 

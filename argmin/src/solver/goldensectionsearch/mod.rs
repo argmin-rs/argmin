@@ -17,7 +17,8 @@
 //! <https://en.wikipedia.org/wiki/Golden-section_search>
 
 use crate::core::{
-    ArgminFloat, CostFunction, Error, IterState, Problem, Solver, TerminationReason, KV,
+    ArgminFloat, CostFunction, Error, IterState, Problem, Solver, TerminationReason,
+    TerminationStatus, KV,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -202,11 +203,11 @@ where
         }
     }
 
-    fn terminate(&mut self, _state: &IterState<F, (), (), (), F>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<F, (), (), (), F>) -> TerminationStatus {
         if self.tolerance * (self.x1.abs() + self.x2.abs()) >= (self.x3 - self.x0).abs() {
-            return TerminationReason::TargetToleranceReached;
+            return TerminationStatus::Terminated(TerminationReason::TargetToleranceReached);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 
