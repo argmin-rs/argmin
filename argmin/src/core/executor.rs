@@ -267,11 +267,6 @@ where
             state = state.terminate_with(TerminationReason::KeyboardInterrupt);
         }
 
-        // In case it stopped prematurely and `termination_reason` is still `NotTerminated`,
-        // someone must have pulled the handbrake
-        if state.get_iter() < state.get_max_iters() && !state.terminated() {
-            state = state.terminate_with(TerminationReason::Aborted);
-        }
         Ok(OptimizationResult::new(self.problem, self.solver, state))
     }
 
