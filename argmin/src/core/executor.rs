@@ -143,13 +143,13 @@ where
 
         let state = self.state.take().unwrap();
 
-        let running = Arc::new(AtomicBool::new(true));
+        let interrupt = Arc::new(AtomicBool::new(false));
 
         if self.ctrlc {
             #[cfg(feature = "ctrlc")]
             {
                 // Set up the Ctrl-C handler
-                let r = running.clone();
+                let interp = interrupt.clone();
                 // This is currently a hack to allow checkpoints to be run again within the
                 // same program (usually not really a use case anyway). Unfortunately, this
                 // means that any subsequent run started afterwards will have not Ctrl-C
@@ -158,10 +158,10 @@ where
                 // (channels and such) which may solve this problem. So far, we have to live
                 // with this.
                 match ctrlc::set_handler(move || {
-                    r.store(false, Ordering::SeqCst);
+                    interp.store(true, Ordering::SeqCst);
                 }) {
                     Err(ctrlc::Error::MultipleHandlers) => Ok(()),
-                    r => r,
+                    interp => interp,
                 }?;
             }
         }
@@ -190,7 +190,7 @@ where
             state
         };
 
-        while running.load(Ordering::SeqCst) {
+        while !interrupt.load(Ordering::SeqCst) {
             // check first if it has already terminated
             // This should probably be solved better.
             // First, check if it isn't already terminated. If it isn't, evaluate the
@@ -259,10 +259,7 @@ where
             }
         }
 
-        if running.load(Ordering::SeqCst) {
-            // Solver execution has finished
-            running.store(false, Ordering::SeqCst);
-        } else {
+        if interrupt.load(Ordering::SeqCst) {
             // Solver execution has been interrupted manually
             state = state.terminate_with(TerminationReason::KeyboardInterrupt);
         }
