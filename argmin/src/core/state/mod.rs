@@ -13,7 +13,7 @@ pub use iterstate::IterState;
 pub use linearprogramstate::LinearProgramState;
 pub use populationstate::PopulationState;
 
-use crate::core::{ArgminFloat, Problem, TerminationReason};
+use crate::core::{ArgminFloat, Problem, TerminationReason, TerminationStatus};
 use std::collections::HashMap;
 
 /// Minimal interface which struct used for managing state in solvers have to implement.
@@ -34,7 +34,7 @@ use std::collections::HashMap;
 /// * the current number of iterations
 /// * how often each function of the problem has been called
 /// * the time required since the beginning of the optimization until the current point in time
-/// * the reason why it terminated ([`TerminationReason`])
+/// * the status of optimization execution ([`TerminationStatus`])
 ///
 /// Since the state in general changes for each iteration, "current" refers to the current
 /// iteration.
@@ -103,15 +103,18 @@ pub trait State {
     /// far.
     fn is_best(&self) -> bool;
 
-    /// Set termination reason
+    /// Set termination status to terminated with given reason
     #[must_use]
     fn terminate_with(self, termination_reason: TerminationReason) -> Self;
 
     /// Returns termination reason. Returns [`TerminationReason::NotTerminated`] if not terminated.
-    fn get_termination_reason(&self) -> TerminationReason;
+    fn get_termination_status(&self) -> TerminationStatus;
 
     /// Return whether the algorithm has terminated or not
     fn terminated(&self) -> bool {
-        self.get_termination_reason().terminated()
+        matches!(
+            self.get_termination_status(),
+            TerminationStatus::Terminated(_)
+        )
     }
 }

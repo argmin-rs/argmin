@@ -8,12 +8,59 @@
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
+/// Status of optimization execution
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+pub enum TerminationStatus {
+    /// Execution is terminated
+    Terminated(TerminationReason),
+    /// Execution is running
+    NotTerminated,
+}
+
+impl TerminationStatus {
+    /// Returns `true` if a solver terminated and `false` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::{TerminationStatus, TerminationReason};
+    ///
+    /// assert!(TerminationStatus::Terminated(TerminationReason::MaxItersReached).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::TargetCostReached).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::NoChangeInCost).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::AcceptedStallIterExceeded).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::BestStallIterExceeded).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::TargetToleranceReached).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::KeyboardInterrupt).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::Aborted).terminated());
+    /// ```
+    pub fn terminated(self) -> bool {
+        !matches!(self, TerminationStatus::NotTerminated)
+    }
+}
+
+impl std::fmt::Display for TerminationStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            TerminationStatus::Terminated(reason) => f.write_str(reason.text()),
+            TerminationStatus::NotTerminated => f.write_str("Running"),
+        }
+    }
+}
+
+impl Default for TerminationStatus {
+    fn default() -> Self {
+        TerminationStatus::NotTerminated
+    }
+}
+
 /// Reasons for optimization algorithms to stop
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub enum TerminationReason {
-    /// The optimization algorithm is not terminated
-    NotTerminated,
     /// Reached maximum number of iterations
     MaxItersReached,
     /// Reached target cost function value
@@ -37,29 +84,6 @@ pub enum TerminationReason {
 }
 
 impl TerminationReason {
-    /// Returns `true` if a solver terminated and `false` otherwise.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use argmin::core::TerminationReason;
-    ///
-    /// assert!(TerminationReason::MaxItersReached.terminated());
-    /// assert!(TerminationReason::TargetCostReached.terminated());
-    /// assert!(TerminationReason::TargetPrecisionReached.terminated());
-    /// assert!(TerminationReason::NoChangeInCost.terminated());
-    /// assert!(TerminationReason::AcceptedStallIterExceeded.terminated());
-    /// assert!(TerminationReason::BestStallIterExceeded.terminated());
-    /// assert!(TerminationReason::LineSearchConditionMet.terminated());
-    /// assert!(TerminationReason::TargetToleranceReached.terminated());
-    /// assert!(TerminationReason::KeyboardInterrupt.terminated());
-    /// assert!(TerminationReason::Aborted.terminated());
-    /// assert!(!TerminationReason::NotTerminated.terminated());
-    /// ```
-    pub fn terminated(self) -> bool {
-        !matches!(self, TerminationReason::NotTerminated)
-    }
-
     /// Returns a textual representation of what happened.
     ///
     /// # Example
@@ -107,14 +131,9 @@ impl TerminationReason {
     ///     TerminationReason::Aborted.text(),
     ///     "Optimization aborted"
     /// );
-    /// assert_eq!(
-    ///     TerminationReason::NotTerminated.text(),
-    ///     "Not terminated"
-    /// );
     /// ```
     pub fn text(&self) -> &str {
         match *self {
-            TerminationReason::NotTerminated => "Not terminated",
             TerminationReason::MaxItersReached => "Maximum number of iterations reached",
             TerminationReason::TargetCostReached => "Target cost value reached",
             TerminationReason::TargetPrecisionReached => "Target precision reached",
@@ -137,7 +156,7 @@ impl std::fmt::Display for TerminationReason {
 
 impl Default for TerminationReason {
     fn default() -> Self {
-        TerminationReason::NotTerminated
+        TerminationReason::Aborted
     }
 }
 
