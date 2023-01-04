@@ -209,7 +209,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::Executor;
+    use crate::core::{Executor, TerminationStatus};
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
 
@@ -234,8 +234,8 @@ mod tests {
             .run()
             .unwrap();
         assert_eq!(
-            res.state().termination_reason,
-            TerminationReason::TargetPrecisionReached
+            res.state().termination_status,
+            TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached)
         );
         assert_relative_eq!(
             res.state().param.unwrap(),

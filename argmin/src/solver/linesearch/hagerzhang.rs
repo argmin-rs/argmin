@@ -7,7 +7,7 @@
 
 use crate::core::{
     ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
-    Solver, TerminationReason, KV,
+    Solver, TerminationReason, TerminationStatus, KV,
 };
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
@@ -620,19 +620,19 @@ where
         Ok((state.param(new_param).cost(self.best_f), None))
     }
 
-    fn terminate(&mut self, _state: &IterState<P, G, (), (), F>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<P, G, (), (), F>) -> TerminationStatus {
         if self.best_f - self.finit <= self.delta * self.best_x * self.dginit
             && self.best_g >= self.sigma * self.dginit
         {
-            return TerminationReason::LineSearchConditionMet;
+            return TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet);
         }
         if (float!(2.0) * self.delta - float!(1.0)) * self.dginit >= self.best_g
             && self.best_g >= self.sigma * self.dginit
             && self.best_f <= self.finit + self.epsilon_k
         {
-            return TerminationReason::LineSearchConditionMet;
+            return TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 

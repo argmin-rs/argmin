@@ -7,7 +7,7 @@
 
 use crate::core::{
     ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
-    Solver, State, TerminationReason, KV,
+    Solver, State, TerminationReason, TerminationStatus, KV,
 };
 use crate::solver::linesearch::condition::*;
 use argmin_math::ArgminScaledAdd;
@@ -233,7 +233,7 @@ where
         Ok((state, None))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), (), F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, (), (), F>) -> TerminationStatus {
         if self.condition.evaluate_condition(
             state.cost,
             state.get_gradient(),
@@ -242,9 +242,9 @@ where
             self.search_direction.as_ref().unwrap(),
             self.alpha,
         ) {
-            TerminationReason::LineSearchConditionMet
+            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
         } else {
-            TerminationReason::NotTerminated
+            TerminationStatus::NotTerminated
         }
     }
 }
@@ -595,7 +595,7 @@ mod tests {
                 &mut ls,
                 &IterState::<Vec<f64>, Vec<f64>, (), (), f64>::new().param(init_param)
             ),
-            TerminationReason::LineSearchConditionMet
+            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
         );
 
         ls.init_cost = 0.0f64;
@@ -609,7 +609,7 @@ mod tests {
                 &mut ls,
                 &IterState::<Vec<f64>, Vec<f64>, (), (), f64>::new().param(init_param)
             ),
-            TerminationReason::NotTerminated
+            TerminationStatus::NotTerminated
         );
     }
 
@@ -654,8 +654,8 @@ mod tests {
         assert_eq!(func_counts["cost_count"], 2);
         assert_eq!(func_counts["gradient_count"], 1);
         assert_eq!(
-            data.termination_reason,
-            TerminationReason::LineSearchConditionMet
+            data.termination_status,
+            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
         );
 
         assert!(data.get_gradient().is_none());
@@ -703,8 +703,8 @@ mod tests {
         assert_eq!(func_counts["cost_count"], 3);
         assert_eq!(func_counts["gradient_count"], 1);
         assert_eq!(
-            data.termination_reason,
-            TerminationReason::LineSearchConditionMet
+            data.termination_status,
+            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
         );
         assert!(data.get_gradient().is_none());
     }

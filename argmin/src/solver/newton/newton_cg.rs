@@ -7,7 +7,8 @@
 
 use crate::core::{
     ArgminFloat, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState, LineSearch,
-    Operator, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason, KV,
+    Operator, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason,
+    TerminationStatus, KV,
 };
 use crate::solver::conjugategradient::ConjugateGradient;
 use argmin_math::{
@@ -208,11 +209,11 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationStatus {
         if (state.get_cost() - state.get_prev_cost()).abs() < self.tol {
-            TerminationReason::TargetToleranceReached
+            TerminationStatus::Terminated(TerminationReason::TargetToleranceReached)
         } else {
-            TerminationReason::NotTerminated
+            TerminationStatus::NotTerminated
         }
     }
 }

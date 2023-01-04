@@ -7,7 +7,7 @@
 
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
-    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
+    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationStatus,
     TrustRegionRadius, KV,
 };
 use crate::solver::trustregion::reduction_ratio;
@@ -300,8 +300,8 @@ where
         ))
     }
 
-    fn terminate(&mut self, _state: &IterState<P, G, (), H, F>) -> TerminationReason {
-        TerminationReason::NotTerminated
+    fn terminate(&mut self, _state: &IterState<P, G, (), H, F>) -> TerminationStatus {
+        TerminationStatus::NotTerminated
     }
 }
 

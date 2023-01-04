@@ -8,7 +8,7 @@
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
     Jacobian, LineSearch, Operator, OptimizationResult, Problem, SerializeAlias, Solver,
-    TerminationReason, KV,
+    TerminationReason, TerminationStatus, KV,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminL2Norm, ArgminMul, ArgminTranspose};
 #[cfg(feature = "serde1")]
@@ -166,11 +166,11 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, J, (), F>) -> TerminationReason {
+    fn terminate(&mut self, state: &IterState<P, G, J, (), F>) -> TerminationStatus {
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
-            return TerminationReason::NoChangeInCost;
+            return TerminationStatus::Terminated(TerminationReason::NoChangeInCost);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 
