@@ -9,7 +9,7 @@ use crate::core::checkpointing::Checkpoint;
 use crate::core::observers::{Observe, ObserverMode, Observers};
 use crate::core::{
     DeserializeOwnedAlias, Error, OptimizationResult, Problem, SerializeAlias, Solver, State,
-    TerminationReason, KV,
+    TerminationReason, TerminationStatus, KV,
 };
 use instant;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -199,7 +199,11 @@ where
             // within `next_iter()`!
             state = if !state.terminated() {
                 let term = self.solver.terminate_internal(&state);
-                state.terminate_with(term)
+                if let TerminationStatus::Terminated(reason) = term {
+                    state.terminate_with(reason)
+                } else {
+                    state
+                }
             } else {
                 state
             };
@@ -610,19 +614,19 @@ mod tests {
             }
 
             // Avoid terminating early because param does not change
-            fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationReason {
-                TerminationReason::NotTerminated
+            fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationStatus {
+                TerminationStatus::NotTerminated
             }
 
             // Avoid terminating early because param does not change
             fn terminate_internal(
                 &mut self,
                 state: &IterState<P, (), (), (), F>,
-            ) -> TerminationReason {
+            ) -> TerminationStatus {
                 if state.get_iter() >= state.get_max_iters() {
-                    TerminationReason::MaxItersReached
+                    TerminationStatus::Terminated(TerminationReason::MaxItersReached)
                 } else {
-                    TerminationReason::NotTerminated
+                    TerminationStatus::NotTerminated
                 }
             }
         }

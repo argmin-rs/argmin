@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminFloat, Problem, State, TerminationReason};
+use crate::core::{ArgminFloat, Problem, State, TerminationReason, TerminationStatus};
 use instant;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -27,7 +27,7 @@ use std::collections::HashMap;
 /// * maximum number of iterations that will be executed
 /// * problem function evaluation counts (cost function, gradient, jacobian, hessian,
 /// * elapsed time
-/// * termination reason (set to [`TerminationReason::NotTerminated`] if not terminated yet)
+/// * termination status
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct LinearProgramState<P, F> {
@@ -59,8 +59,8 @@ pub struct LinearProgramState<P, F> {
     pub counts: HashMap<String, u64>,
     /// Time required so far
     pub time: Option<instant::Duration>,
-    /// Reason of termination
-    pub termination_reason: TerminationReason,
+    /// Status of optimization execution
+    pub termination_status: TerminationStatus,
 }
 
 impl<P, F> LinearProgramState<P, F> {
@@ -171,7 +171,7 @@ where
     /// # extern crate instant;
     /// # use instant;
     /// # use std::collections::HashMap;
-    /// # use argmin::core::TerminationReason;
+    /// # use argmin::core::TerminationStatus;
     /// use argmin::core::{LinearProgramState, State};
     /// let state: LinearProgramState<Vec<f64>, f64> = LinearProgramState::new();
     ///
@@ -189,7 +189,7 @@ where
     /// # assert_eq!(state.max_iters, std::u64::MAX);
     /// # assert_eq!(state.counts, HashMap::new());
     /// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 0));
-    /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
+    /// # assert_eq!(state.termination_status, TerminationStatus::NotTerminated);
     /// ```
     fn new() -> Self {
         LinearProgramState {
@@ -207,7 +207,7 @@ where
             max_iters: std::u64::MAX,
             counts: HashMap::new(),
             time: Some(instant::Duration::new(0, 0)),
-            termination_reason: TerminationReason::NotTerminated,
+            termination_status: TerminationStatus::NotTerminated,
         }
     }
 
@@ -319,14 +319,14 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason, TerminationStatus};
     /// # let mut state: LinearProgramState<Vec<f64>, f64> = LinearProgramState::new();
-    /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
+    /// # assert_eq!(state.termination_status, TerminationStatus::NotTerminated);
     /// let state = state.terminate_with(TerminationReason::MaxItersReached);
-    /// # assert_eq!(state.termination_reason, TerminationReason::MaxItersReached);
+    /// # assert_eq!(state.termination_status, TerminationStatus::Terminated(TerminationReason::MaxItersReached));
     /// ```
     fn terminate_with(mut self, reason: TerminationReason) -> Self {
-        self.termination_reason = reason;
+        self.termination_status = TerminationStatus::Terminated(reason);
         self
     }
 
@@ -437,18 +437,18 @@ where
         self.max_iters
     }
 
-    /// Returns the termination reason.
+    /// Returns the termination status.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationStatus};
     /// # let mut state: LinearProgramState<Vec<f64>, f64> = LinearProgramState::new();
-    /// let termination_reason = state.get_termination_reason();
-    /// # assert_eq!(termination_reason, TerminationReason::NotTerminated);
+    /// let termination_status = state.get_termination_status();
+    /// # assert_eq!(termination_status, TerminationStatus::NotTerminated);
     /// ```
-    fn get_termination_reason(&self) -> TerminationReason {
-        self.termination_reason
+    fn get_termination_status(&self) -> TerminationStatus {
+        self.termination_status
     }
 
     /// Returns the time elapsed since the start of the optimization.

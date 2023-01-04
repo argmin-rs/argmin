@@ -54,4 +54,4 @@ pub use result::OptimizationResult;
 pub use serialization::{DeserializeOwnedAlias, SerializeAlias};
 pub use solver::Solver;
 pub use state::{IterState, LinearProgramState, PopulationState, State};
-pub use termination::TerminationReason;
+pub use termination::{TerminationReason, TerminationStatus};

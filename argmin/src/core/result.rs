@@ -140,7 +140,7 @@ where
         writeln!(
             f,
             "    termination:   {}",
-            self.state.get_termination_reason()
+            self.state.get_termination_status()
         )?;
         if let Some(time) = self.state.get_time() {
             writeln!(f, "    time:          {time:?}")?;

@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{Error, Problem, State, TerminationReason, KV};
+use crate::core::{Error, Problem, State, TerminationReason, TerminationStatus, KV};
 
 /// The interface all solvers are required to implement.
 ///
@@ -21,7 +21,7 @@ use crate::core::{Error, Problem, State, TerminationReason, KV};
 ///
 /// ```
 /// use argmin::core::{
-///     ArgminFloat, Solver, IterState, CostFunction, Error, KV, Problem, TerminationReason
+///     ArgminFloat, Solver, IterState, CostFunction, Error, KV, Problem, TerminationReason, TerminationStatus
 /// };
 /// #[cfg(feature = "serde1")]
 /// use serde::{Deserialize, Serialize};
@@ -58,10 +58,10 @@ use crate::core::{Error, Problem, State, TerminationReason, KV};
 ///         Ok((state, None))
 ///     }
 ///     
-///     fn terminate(&mut self, state: &IterState<P, G, J, H, F>) -> TerminationReason {
+///     fn terminate(&mut self, state: &IterState<P, G, J, H, F>) -> TerminationStatus {
 ///         // Check if stopping criteria are met.
 ///         // Implementing this method is optional.
-///         TerminationReason::NotTerminated
+///         TerminationStatus::NotTerminated
 ///     }
 /// }
 /// ```
@@ -96,25 +96,25 @@ pub trait Solver<O, I: State> {
     ///
     /// This can be overwritten; however it is not advised. It is recommended to implement other
     /// stopping criteria via ([`terminate`](`Solver::terminate`).
-    fn terminate_internal(&mut self, state: &I) -> TerminationReason {
-        let solver_terminate = self.terminate(state);
-        if solver_terminate.terminated() {
-            return solver_terminate;
+    fn terminate_internal(&mut self, state: &I) -> TerminationStatus {
+        let solver_status = self.terminate(state);
+        if solver_status.terminated() {
+            return solver_status;
         }
         if state.get_iter() >= state.get_max_iters() {
-            return TerminationReason::MaxItersReached;
+            return TerminationStatus::Terminated(TerminationReason::MaxItersReached);
         }
         if state.get_best_cost() <= state.get_target_cost() {
-            return TerminationReason::TargetCostReached;
+            return TerminationStatus::Terminated(TerminationReason::TargetCostReached);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 
     /// Used to implement stopping criteria, in particular criteria which are not covered by
     /// ([`terminate_internal`](`Solver::terminate_internal`).
     ///
     /// This method has access to the internal state and returns an `TerminationReason`.
-    fn terminate(&mut self, _state: &I) -> TerminationReason {
-        TerminationReason::NotTerminated
+    fn terminate(&mut self, _state: &I) -> TerminationStatus {
+        TerminationStatus::NotTerminated
     }
 }

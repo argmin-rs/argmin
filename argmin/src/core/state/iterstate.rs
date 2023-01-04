@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::{ArgminFloat, Problem, State, TerminationReason};
+use crate::core::{ArgminFloat, Problem, State, TerminationReason, TerminationStatus};
 use instant;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -32,7 +32,7 @@ use std::collections::HashMap;
 /// * problem function evaluation counts (cost function, gradient, jacobian, hessian,
 ///   annealing,...)
 /// * elapsed time
-/// * termination reason (set to [`TerminationReason::NotTerminated`] if not terminated yet)
+/// * termination status
 #[derive(Clone, Default, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct IterState<P, G, J, H, F> {
@@ -80,8 +80,8 @@ pub struct IterState<P, G, J, H, F> {
     pub counts: HashMap<String, u64>,
     /// Time required so far
     pub time: Option<instant::Duration>,
-    /// Reason of termination
-    pub termination_reason: TerminationReason,
+    /// Status of optimization execution
+    pub termination_status: TerminationStatus,
 }
 
 impl<P, G, J, H, F> IterState<P, G, J, H, F>
@@ -879,7 +879,7 @@ where
     /// ```
     /// # extern crate instant;
     /// # use instant;
-    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationReason};
+    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationStatus};
     /// let state: IterState<Vec<f64>, Vec<f64>, Vec<Vec<f64>>, Vec<Vec<f64>>, f64> = IterState::new();
     /// # assert!(state.param.is_none());
     /// # assert!(state.prev_param.is_none());
@@ -903,7 +903,7 @@ where
     /// # assert_eq!(state.max_iters, std::u64::MAX);
     /// # assert_eq!(state.counts.len(), 0);
     /// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 0));
-    /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
+    /// # assert_eq!(state.termination_status, TerminationStatus::NotTerminated);
     /// ```
     fn new() -> Self {
         IterState {
@@ -929,7 +929,7 @@ where
             max_iters: std::u64::MAX,
             counts: HashMap::new(),
             time: Some(instant::Duration::new(0, 0)),
-            termination_reason: TerminationReason::NotTerminated,
+            termination_status: TerminationStatus::NotTerminated,
         }
     }
 
@@ -1037,19 +1037,19 @@ where
         self.best_param.as_ref()
     }
 
-    /// Sets the termination reason (default: [`TerminationReason::NotTerminated`])
+    /// Sets the termination status (default: [`TerminationStatus::NotTerminated`])
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationReason};
+    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationReason, TerminationStatus};
     /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
-    /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
+    /// # assert_eq!(state.termination_status, TerminationStatus::NotTerminated);
     /// let state = state.terminate_with(TerminationReason::MaxItersReached);
-    /// # assert_eq!(state.termination_reason, TerminationReason::MaxItersReached);
+    /// # assert_eq!(state.termination_status, TerminationStatus::Terminated(TerminationReason::MaxItersReached));
     /// ```
     fn terminate_with(mut self, reason: TerminationReason) -> Self {
-        self.termination_reason = reason;
+        self.termination_status = TerminationStatus::Terminated(reason);
         self
     }
 
@@ -1165,13 +1165,13 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationReason};
+    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationStatus};
     /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
-    /// let termination_reason = state.get_termination_reason();
-    /// # assert_eq!(termination_reason, TerminationReason::NotTerminated);
+    /// let termination_status = state.get_termination_status();
+    /// # assert_eq!(termination_status, TerminationStatus::NotTerminated);
     /// ```
-    fn get_termination_reason(&self) -> TerminationReason {
-        self.termination_reason
+    fn get_termination_status(&self) -> TerminationStatus {
+        self.termination_status
     }
 
     /// Returns the time elapsed since the start of the optimization.
