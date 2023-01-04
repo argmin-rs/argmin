@@ -811,13 +811,13 @@
 
         <span class="kw">let </span>state = <span class="self">self</span>.state.take().unwrap();
 
-        <span class="kw">let </span>running = Arc::new(AtomicBool::new(<span class="bool-val">true</span>));
+        <span class="kw">let </span>interrupt = Arc::new(AtomicBool::new(<span class="bool-val">false</span>));
 
         <span class="kw">if </span><span class="self">self</span>.ctrlc {
             <span class="attribute">#[cfg(feature = <span class="string">&quot;ctrlc&quot;</span>)]
             </span>{
                 <span class="comment">// Set up the Ctrl-C handler
-                </span><span class="kw">let </span>r = running.clone();
+                </span><span class="kw">let </span>interp = interrupt.clone();
                 <span class="comment">// This is currently a hack to allow checkpoints to be run again within the
                 // same program (usually not really a use case anyway). Unfortunately, this
                 // means that any subsequent run started afterwards will have not Ctrl-C
@@ -826,10 +826,10 @@
                 // (channels and such) which may solve this problem. So far, we have to live
                 // with this.
                 </span><span class="kw">match </span>ctrlc::set_handler(<span class="kw">move </span>|| {
-                    r.store(<span class="bool-val">false</span>, Ordering::SeqCst);
+                    interp.store(<span class="bool-val">true</span>, Ordering::SeqCst);
                 }) {
                     <span class="prelude-val">Err</span>(ctrlc::Error::MultipleHandlers) =&gt; <span class="prelude-val">Ok</span>(()),
-                    r =&gt; r,
+                    interp =&gt; interp,
                 }<span class="question-mark">?</span>;
             }
         }
@@ -858,7 +858,7 @@
             state
         };
 
-        <span class="kw">while </span>running.load(Ordering::SeqCst) {
+        <span class="kw">while </span>!interrupt.load(Ordering::SeqCst) {
             <span class="comment">// check first if it has already terminated
             // This should probably be solved better.
             // First, check if it isn&#39;t already terminated. If it isn&#39;t, evaluate the
@@ -927,11 +927,11 @@
             }
         }
 
-        <span class="comment">// in case it stopped prematurely and `termination_reason` is still `NotTerminated`,
-        // someone must have pulled the handbrake
-        </span><span class="kw">if </span>state.get_iter() &lt; state.get_max_iters() &amp;&amp; !state.terminated() {
-            state = state.terminate_with(TerminationReason::Aborted);
+        <span class="kw">if </span>interrupt.load(Ordering::SeqCst) {
+            <span class="comment">// Solver execution has been interrupted manually
+            </span>state = state.terminate_with(TerminationReason::KeyboardInterrupt);
         }
+
         <span class="prelude-val">Ok</span>(OptimizationResult::new(<span class="self">self</span>.problem, <span class="self">self</span>.solver, state))
     }
 

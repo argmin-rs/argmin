@@ -139,6 +139,14 @@
 <span id="139">139</span>
 <span id="140">140</span>
 <span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -171,6 +179,8 @@
     </span>LineSearchConditionMet,
     <span class="doccomment">/// Reached target tolerance
     </span>TargetToleranceReached,
+    <span class="doccomment">/// Algorithm manually interrupted with Ctrl+C
+    </span>KeyboardInterrupt,
     <span class="doccomment">/// Algorithm aborted
     </span>Aborted,
 }
@@ -191,6 +201,7 @@
     /// assert!(TerminationReason::BestStallIterExceeded.terminated());
     /// assert!(TerminationReason::LineSearchConditionMet.terminated());
     /// assert!(TerminationReason::TargetToleranceReached.terminated());
+    /// assert!(TerminationReason::KeyboardInterrupt.terminated());
     /// assert!(TerminationReason::Aborted.terminated());
     /// assert!(!TerminationReason::NotTerminated.terminated());
     /// ```
@@ -238,6 +249,10 @@
     ///     &quot;Target tolerance reached&quot;
     /// );
     /// assert_eq!(
+    ///     TerminationReason::KeyboardInterrupt.text(),
+    ///     &quot;Keyboard interrupt&quot;
+    /// );
+    /// assert_eq!(
     ///     TerminationReason::Aborted.text(),
     ///     &quot;Optimization aborted&quot;
     /// );
@@ -257,6 +272,7 @@
             TerminationReason::BestStallIterExceeded =&gt; <span class="string">&quot;Best stall iterations exceeded&quot;</span>,
             TerminationReason::LineSearchConditionMet =&gt; <span class="string">&quot;Line search condition met&quot;</span>,
             TerminationReason::TargetToleranceReached =&gt; <span class="string">&quot;Target tolerance reached&quot;</span>,
+            TerminationReason::KeyboardInterrupt =&gt; <span class="string">&quot;Keyboard interrupt&quot;</span>,
             TerminationReason::Aborted =&gt; <span class="string">&quot;Optimization aborted&quot;</span>,
         }
     }
