@@ -103,7 +103,7 @@ pub trait State {
     /// far.
     fn is_best(&self) -> bool;
 
-    /// Set termination status to terminated with given reason
+    /// Sets the termination status to [`Terminated`](`TerminationStatus::Terminated`) with the given reason
     #[must_use]
     fn terminate_with(self, termination_reason: TerminationReason) -> Self;
 

@@ -593,7 +593,7 @@ where
         self.best_individual.as_ref()
     }
 
-    /// Sets the termination status to terminated with the given reason
+    /// Sets the termination status to [`Terminated`](`TerminationStatus::Terminated`) with the given reason
     ///
     /// # Example
     ///
