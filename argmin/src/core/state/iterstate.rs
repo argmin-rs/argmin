@@ -1037,7 +1037,7 @@ where
         self.best_param.as_ref()
     }
 
-    /// Sets the termination status (default: [`TerminationStatus::NotTerminated`])
+    /// Sets the termination status to [`Terminated`](`TerminationStatus::Terminated`) with the given reason
     ///
     /// # Example
     ///
