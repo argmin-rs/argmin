@@ -107,8 +107,11 @@ pub trait State {
     #[must_use]
     fn terminate_with(self, termination_reason: TerminationReason) -> Self;
 
-    /// Returns termination reason. Returns [`TerminationReason::NotTerminated`] if not terminated.
+    /// Returns termination status.
     fn get_termination_status(&self) -> TerminationStatus;
+
+    /// Returns the termination reason if terminated, otherwise None.
+    fn get_termination_reason(&self) -> Option<TerminationReason>;
 
     /// Return whether the algorithm has terminated or not
     fn terminated(&self) -> bool {
