@@ -730,6 +730,23 @@ where
         self.termination_status
     }
 
+    /// Returns the termination reason if terminated, otherwise None.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationReason};
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// let termination_reason = state.get_termination_reason();
+    /// # assert_eq!(termination_reason, None);
+    /// ```
+    fn get_termination_reason(&self) -> Option<TerminationReason> {
+        match self.termination_status {
+            TerminationStatus::Terminated(reason) => Some(reason),
+            TerminationStatus::NotTerminated => None,
+        }
+    }
+
     /// Returns the time elapsed since the start of the optimization.
     ///
     /// # Example

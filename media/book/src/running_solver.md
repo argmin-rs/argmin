@@ -99,7 +99,10 @@ let best = res.state().get_best_param().unwrap();
 // Cost function value associated with best parameter vector
 let best_cost = res.state().get_best_cost();
 
-// Reason why the optimizer terminated
+// Check the execution status
+let termination_status = res.state().get_termination_status();
+
+// Optionally, check why the optimizer terminated (if status is terminated) 
 let termination_reason = res.state().get_termination_reason();
 
 // Time needed for optimization
