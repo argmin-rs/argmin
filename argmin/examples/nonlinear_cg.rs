@@ -35,7 +35,7 @@ fn run() -> Result<(), Error> {
     // Set up cost function
     let operator = Rosenbrock {};
 
-    // define inital parameter vector
+    // define initial parameter vector
     let init_param: Vec<f64> = vec![1.2, 1.2];
 
     // set up line search

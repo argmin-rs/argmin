@@ -7,7 +7,7 @@ Depending on the requirements of the solver that is to be used, the optimization
 - [`Jacobian`](https://docs.rs/argmin/latest/argmin/core/trait.Jacobian.html): Computes the Jacobian for a parameter vector `p`
 - [`Hessian`](https://docs.rs/argmin/latest/argmin/core/trait.Hessian.html): Computes the Hessian for a parameter vector `p`
 - [`Operator`](https://docs.rs/argmin/latest/argmin/core/trait.Operator.html): Applies an operator to the parameter vector `p`
-- [`Anneal`](https://docs.rs/argmin/latest/argmin/solver/simulatedannealing/trait.Anneal.html): Create a new parameter vector by "annealing" of the curent parameter vector `p` (needed for SimulatedAnnealing).
+- [`Anneal`](https://docs.rs/argmin/latest/argmin/solver/simulatedannealing/trait.Anneal.html): Create a new parameter vector by "annealing" of the current parameter vector `p` (needed for SimulatedAnnealing).
 
 Which subset is needed is given in the documentation of each solver.
 
@@ -118,7 +118,7 @@ impl Operator for MyProblem {
 > **NOTE**
 >
 > So far only Particle Swarm Optimization allows parallel evaluations of parameter vectors.
-> Therefore no increse in performance should be expected for other solvers. 
+> Therefore no increase in performance should be expected for other solvers. 
 
 All of the above mentioned traits come with additional methods which enable processing several parameter vectors at once.
 These methods require the `rayon` feature to be enabled. Without this feature, the methods resort to sequental processing of all inputs.

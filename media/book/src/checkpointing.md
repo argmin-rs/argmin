@@ -56,7 +56,7 @@ If the run crashes and a checkpoint is found on disk, then it will resume from t
 # }
 #
 # fn run() -> Result<(), Error> {
-#     // define inital parameter vector
+#     // define initial parameter vector
 #     let init_param: Vec<f64> = vec![1.2, 1.2];
 #     let my_optimization_problem = Rosenbrock {};
 #

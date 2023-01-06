@@ -44,7 +44,7 @@ WASM support is still experimental. Please report any issues you encounter when 
 ## Which math backend to use
 
 argmin offers abstractions over basic `Vec`s, `ndarray` and `nalgebra` types.
-For performance reasons, the latter two should be prefered. Which one to use is a matter of taste and may depend on what you are already using. 
+For performance reasons, the latter two should be preferred. Which one to use is a matter of taste and may depend on what you are already using. 
 
 `Vec`s on the other hand do not have very efficient implementations for the different mathematical operations and therefore are not well suited for solvers which heavily rely on matrix operations.
 However, `Vec`s are suitable for solvers such as Simulated Annealing and Particle Swarm Optimization, which mainly operate on the parameter vectors themselves. 

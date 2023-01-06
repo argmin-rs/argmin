@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `ArgminL1Norm` trait was added by @vbkaisetsu for the L1 regularization in L-BFGS. In order to make the L2 norm more consistent, the corresponding trait was renamed from `ArgminNorm` to `ArgminL2Norm` and the `norm` method was renamed to `l2_norm`. (#253, @stefan-k)
 
 ### Fixed
-- Version 0.6 accidentially removed the possibility to deactivate the `ndarray-linalg` dependency in `argmin-math`. This leads to problems in downstream crates which do not need the functionality of `ndarray-linalg` and want to avoid linking angainst a BLAS. In this version, this functionality was added again. Please consult the documentation of `argmin-math` for details on the available backends and their configuration. (#243, #249, @stefan-k)
+- Version 0.6 accidentally removed the possibility to deactivate the `ndarray-linalg` dependency in `argmin-math`. This leads to problems in downstream crates which do not need the functionality of `ndarray-linalg` and want to avoid linking angainst a BLAS. In this version, this functionality was added again. Please consult the documentation of `argmin-math` for details on the available backends and their configuration. (#243, #249, @stefan-k)
 - Fixed type alias names in examples (#245, Thanks to @vbkaisetsu)
 - Fixed a bug in dogleg method (#246, #247, @stefan-k, Thanks to @renato145 for reporting!)
 
@@ -33,9 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This is a rather large release with many (breaking) changes.
 
 - Code related to the abstraction of math backends was split of into the `argmin-math` crate. This crate offers now the traits related to math operations as well as their implementations for various backends (vec, ndarray, nalgebra). The backends can be turned on and off as needed. It also supports different versions of the backends.
-- The `serde` depenency is now optional and feature-gated via `serde1`. Disabling the `serde1` feature disables checkpointing and some logging.
+- The `serde` dependency is now optional and feature-gated via `serde1`. Disabling the `serde1` feature disables checkpointing and some logging.
 - The `ArgminOp` trait was removed and replaced with more specialized traits such as `Operator`, `CostFunction`, `Gradient`, `Jacobian`, `Hessian`, `Anneal`. 
-  All of the above mentioned traits come with `bulk_*` methods wich allow one to compute cost function, gradients,... in parallel as long as the `rayon` feature is enabled. This is so far used in Particle Swarm Optimization.
+  All of the above mentioned traits come with `bulk_*` methods which allow one to compute cost function, gradients,... in parallel as long as the `rayon` feature is enabled. This is so far used in Particle Swarm Optimization.
 - The handling of solver-internal state was redesigned completely to allow for various kinds of state, depending on the solver. There is a `State` trait now which defines the basic functionality that a state must offer. 
 - Many aspects were redesigned to avoid unnecessary cloning
 - `ArgminResult` was renamed to `OptimizationResult` and also has a more useful API now. It returns the solver, the problem and the final internal state.
@@ -142,7 +142,7 @@ This is a rather large release with many (breaking) changes.
 ## argmin 0.4.0
 
 - nalgebra support (#68, @Maher4Ever)
-- remove unecessary Default bound on NelderMead (#73, @vadixidav)
+- remove unnecessary Default bound on NelderMead (#73, @vadixidav)
 - Various updated dependencies
 
 ## argmin 0.3.1
@@ -180,7 +180,7 @@ This is a rather large release with many (breaking) changes.
 
 ## argmin 0.2.4
 
-- CG improvments (@stefan-k)
+- CG improvements (@stefan-k)
 
 ## older versions
 

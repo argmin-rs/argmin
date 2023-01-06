@@ -9,7 +9,7 @@ Hence this feature is only available with the `serde1` feature.
 
 The observer [`SlogLogger`](https://docs.rs/argmin/latest/argmin/core/observers/slog_logger/struct.SlogLogger.html) logs the progress of the optimization to screen or to disk.
 This requires the `slog-logger` feature.
-Writing to disk in addtion requires the `serde1` feature.
+Writing to disk in addition requires the `serde1` feature.
 
 For each observer it can be defined how often it will observe the progress of the solver.
 This is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest` (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.

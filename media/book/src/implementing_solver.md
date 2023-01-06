@@ -14,12 +14,12 @@ The `Solver` trait consists of several methods; however, not all of them need to
 
 * `NAME`: a `&'static str` which holds the solvers name (mainly needed for the observers).
 * `init(...)`: Run before the the actual iterations and initializes the solver. Does nothing by default.
-* `next_iter(...)`: One iteration of the solver. Will be executed by the `Executor` until a stopping critereon is met.
+* `next_iter(...)`: One iteration of the solver. Will be executed by the `Executor` until a stopping criterion is met.
 * `terminate(...)`: Solver specific stopping criteria. This method is run after every iteration. Note that one can also terminate from within `next_iter` if necessary.
 * `terminate_internal(...)`: By default calls `terminate` and in addition checks if the maximum number of iterations was reached or if the best cost function value is below the target cost value. Should only be overwritten if absolutely necessary. 
 
 Both `init` and `next_iter` have access to the optimization problem (`problem`) as well as the internal state (`state`).
-The methods `terminate` and `terminate_interal` only have access to `state`. 
+The methods `terminate` and `terminate_internal` only have access to `state`. 
 
 The function parameter `problem` is a wrapped version of the optimization problem and as such gives access to the cost function, gradient, Hessian, Jacobian,...).
 It also keeps track of how often each of these is called.
@@ -45,7 +45,7 @@ For instance, the Landweber iteration requires the problem `O` to implement `Gra
 From the Landweber update formula, we know that a scaled subtraction of two vectors is required.
 This must be represented in form of a trait bound as well: `P: ArgminScaledSub<G, F, P>`.
 `ArgminScaledSub` is a trait from `argmin-math` which represents a scaled subtraction. 
-With this trait bound, we require that it must be possible to substract a value of type `G` scaled with a value of type `F` from a value of type `P`, resulting in a value of type `P`.
+With this trait bound, we require that it must be possible to subtract a value of type `G` scaled with a value of type `F` from a value of type `P`, resulting in a value of type `P`.
 
 The generic type `F` represents floating point value and therefore allows users to choose which precision they want.
 
@@ -71,7 +71,7 @@ use argmin_math::ArgminScaledSub;
 // Define a struct which holds any parameters/data which are needed during the
 // execution of the solver. Note that this does not include parameter vectors,
 // gradients, Hessians, cost function values and so on, as those will be
-// handled by the `Executor` and its interal state.
+// handled by the `Executor` and its internal state.
 #[derive(Serialize, Deserialize)]
 pub struct Landweber<F> {
     /// Step length

@@ -17,7 +17,7 @@ authors = ["Stefan Kroboth"]
 Due to other commitments <b>argmin</b> didn't get as much attention as it should have in previous months and years, until the end of 2021.
 Having been unhappy with certain design choices for quite some time, I decided to redesign several aspects of the library.
 These changes have accumulated in `argmin` version 0.6.0 and a new crate called `argmin-math`.
-This blog post is an attempt to summarize what has happend; however this is by no means exhaustive. 
+This blog post is an attempt to summarize what has happened; however this is by no means exhaustive. 
 
 These changes had quite a substantial impact on the API and as such are very likely to affect you as a user.
 For users of the optimization algorithms, adapting your code to the new version should be a fairly easy task with an occasional look at the documentation or the current [examples](https://github.com/argmin-rs/argmin/tree/main/argmin/examples) in the Github repository.
@@ -81,8 +81,8 @@ This comes with the caveat that some observers and checkpointing are not availab
 
 Solvers have access to an internal state which is carried from one iteration to the next. 
 This state keeps track of current and best-so-far parameter vectors, cost function values, gradients, and so on as well as function evaluation counts and the number of iterations.
-In previous versions only `IterState` was available which tried to accomodate the needs of all solvers.
-However, the demands of the solvers on this interal state can vary quite a lot, which lead to a somewhat awkward and potentially confusing API.
+In previous versions only `IterState` was available which tried to accommodate the needs of all solvers.
+However, the demands of the solvers on this internal state can vary quite a lot, which lead to a somewhat awkward and potentially confusing API.
 
 By being generic over the states, the particular kind of state can now be chosen for each solver individually.
 `IterState` is still general enough to serve most solvers, but for population based methods the more appropriate `PopulationState` was introduced.
@@ -94,7 +94,7 @@ This change will typically only affect you if you use argmin to implement your o
 ## Initialization of solvers
 
 The latter point also affects how solvers are initialized by a user.
-While each solver is configured via its constructor and the associated methods, setting problem-related parameters such as initial parameter vectors, gradients and the like is done by initializing the interal state.
+While each solver is configured via its constructor and the associated methods, setting problem-related parameters such as initial parameter vectors, gradients and the like is done by initializing the internal state.
 In previous versions, the `Executor` required one to provide an initial guess for the parameter vector in its constructor, which was awkward for solvers which do not require (or even accept) an initial guess.
 
 Therefore the `Executor`s constructor was changed to only accept the solver and the optimization problem.
@@ -102,7 +102,7 @@ Configuration of the internal state is done via the `configure` method of `Execu
 The type of state offered by `configure` depends on the type of state used by the chosen solver. 
 
 The following small example illustrates the changes.
-Setting up an executor in a verison prior to 0.6.0 looked like this:
+Setting up an executor in a version prior to 0.6.0 looked like this:
 
 ```rust
 let result = Executor::new(problem, solver, initial_param)
@@ -158,7 +158,7 @@ In the course of this the previously implemented Brent's method (the root findin
 
 Adding missing documentation after years of development really teaches you a lesson.
 I've spent countless hours adding (hopefully useful) documentation and doctests to every struct, method, function, module and trait. 
-The documentation on [docs.rs](https://docs.rs/argmin) now covers the API and the newly created [argmin book](http://www.argmin-rs.org/book/) is a set of loosly coupled tutorials on how to use different aspects of the library.
+The documentation on [docs.rs](https://docs.rs/argmin) now covers the API and the newly created [argmin book](http://www.argmin-rs.org/book/) is a set of loosely coupled tutorials on how to use different aspects of the library.
 I plan to continuously improve and add to the book such that it eventually becomes a valuable resource for anyone using argmin.
 
 While the situation has improved a lot in terms of documentation, there are still corners which could use a bit more love.
@@ -175,7 +175,7 @@ I've also updated the website, which still isn't great design-wise, but time is 
 * Removed the `prelude` module. Alternatively `argmin::core::*` can be used, although it is not recommended.
 * Some interfaces were redesigned to avoid cloning.
 * `ArgminResult` was renamed to `OptimizationResult` and contains the solver, the problem and the final state of the optimization run.
-* The `Solver` trait was redesigned to accomodate for the new handling of (generic) internal state.
+* The `Solver` trait was redesigned to accommodate for the new handling of (generic) internal state.
 * `KV` does not store `String`s anymore, but instead elements which are `dyn Display`. Conversion into strings is done by the observer, which has the advantage that there are no computational costs for conversion when no observer is used. This will likely be further improved in the future, where the `KV` will be able to store any type.
 * Improved the API surface to be more consistent in terms of naming.
 * Particle Swarm Optimization was redesigned and uses `PopulationState` internally. Also, it is now able to compute the cost function for all individuals in the population in parallel using the above mentioned bulk processing methods.

@@ -1,0 +1,13 @@
+[default.extend-identifiers]
+
+[default.extend-words]
+nd = "nd"
+Leary = "Leary"
+
+[files]
+extend-exclude = [
+    "media/website/sass",
+    "media/website/public",
+    "media/website/static",
+    "media/website/templates",
+]
