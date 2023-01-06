@@ -259,7 +259,7 @@
         SlogLogger::term_internal(OverflowStrategy::Drop)
     }
 
-    <span class="doccomment">/// Create terminal logger with a given `OverflowStragegy`.
+    <span class="doccomment">/// Create terminal logger with a given `OverflowStrategy`.
     </span><span class="kw">fn </span>term_internal(overflow_strategy: OverflowStrategy) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>decorator = slog_term::TermDecorator::new().build();
         <span class="kw">let </span>drain = slog_term::FullFormat::new(decorator)

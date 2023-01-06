@@ -8,7 +8,7 @@
 <p>Handles saving of a checkpoint. The methods <a href="trait.Checkpoint.html#tymethod.save"><code>save</code></a> (saving the
 checkpoint), <a href="trait.Checkpoint.html#tymethod.load"><code>load</code></a> (loading a checkpoint) are mandatory to implement.
 The method <a href="trait.Checkpoint.html#method.save_cond"><code>save_cond</code></a> determines if the conditions for calling
-<code>save</code> are met, and if yes, calls <code>save</code>. <a href="trait.Checkpoint.html#tymethod.frequency"><code>freqency</code></a> returns the
+<code>save</code> are met, and if yes, calls <code>save</code>. <a href="trait.Checkpoint.html#tymethod.frequency"><code>frequency</code></a> returns the
 conditions in form of a <a href="enum.CheckpointingFrequency.html" title="CheckpointingFrequency"><code>CheckpointingFrequency</code></a>.</p>
 <h2 id="example"><a href="#example">Example</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>argmin::core::Error;
