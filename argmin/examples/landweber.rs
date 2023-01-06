@@ -22,7 +22,7 @@ impl Gradient for Rosenbrock {
 }
 
 fn run() -> Result<(), Error> {
-    // define inital parameter vector
+    // define initial parameter vector
     let init_param: Vec<f64> = vec![1.2, 1.2];
     let operator = Rosenbrock {};
 

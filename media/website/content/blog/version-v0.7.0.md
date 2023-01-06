@@ -14,7 +14,7 @@ authors = ["Stefan Kroboth"]
 
 > <b>argmin</b> offers a range of numerical optimization methods in Rust.
 
-In the previous release I unfortunately accidentially removed the possibility to turn off building without the `ndarray-linalg` dependency when using the `ndarray` backend in argmin-math.
+In the previous release I unfortunately accidentally removed the possibility to turn off building without the `ndarray-linalg` dependency when using the `ndarray` backend in argmin-math.
 `ndarray-linalg` is essentially only needed for the matrix inverse, which only a few solvers require.
 However, it links against a BLAS which can cause problems that are particularly frustrating when it is not even needed.
 

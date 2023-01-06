@@ -53,7 +53,7 @@ fn run() -> Result<(), Error> {
     // Define cost function
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
-    // Define inital parameter vector
+    // Define initial parameter vector
     // easy case
     // let init_param: Array1<f64> = Array1::from_vec(vec![1.2, 1.2]);
     // tough case

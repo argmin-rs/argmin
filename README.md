@@ -44,7 +44,7 @@
   <a href="https://docs.rs/argmin"
     ><img
       src="https://img.shields.io/docsrs/argmin?style=flat-square&label=docs.rs"
-      alt="Documentation of lates release"
+      alt="Documentation of latest release"
   /></a>
   <a href="https://argmin-rs.github.io/argmin/argmin/"
     ><img

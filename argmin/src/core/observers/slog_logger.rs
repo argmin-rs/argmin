@@ -64,7 +64,7 @@ impl SlogLogger {
         SlogLogger::term_internal(OverflowStrategy::Drop)
     }
 
-    /// Create terminal logger with a given `OverflowStragegy`.
+    /// Create terminal logger with a given `OverflowStrategy`.
     fn term_internal(overflow_strategy: OverflowStrategy) -> Self {
         let decorator = slog_term::TermDecorator::new().build();
         let drain = slog_term::FullFormat::new(decorator)

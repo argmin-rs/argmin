@@ -31,7 +31,7 @@ impl Gradient for Sphere {
 }
 
 fn run() -> Result<(), Error> {
-    // Define inital parameter vector
+    // Define initial parameter vector
     let init_param: Vec<f64> = vec![1.0, 0.0];
 
     // Problem definition

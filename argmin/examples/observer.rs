@@ -172,7 +172,7 @@ impl Observe<PopulationState<Particle<Vec<f64>, f64>, f64>> for Visualizer3d {
 
 /// Helper class for visualized surface
 pub struct Surface {
-    /// Window dimenstions
+    /// Window dimensions
     window: (f64, f64, f64, f64),
     /// Width of surface
     width: usize,

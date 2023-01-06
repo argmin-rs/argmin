@@ -21,7 +21,7 @@ impl Operator for MyProblem {
 }
 
 fn run() -> Result<(), Error> {
-    // Define inital parameter vector
+    // Define initial parameter vector
     let init_param: Vec<f64> = vec![2.0, 1.0];
 
     // Define the right hand side `b` of `A * x = b`
