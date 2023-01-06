@@ -903,7 +903,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
     ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
-    TerminationReason, KV,
+    TerminationReason, TerminationStatus, KV,
 };
 <span class="kw">use </span>rand::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>rand_xoshiro::Xoshiro256PlusPlus;
@@ -1440,14 +1440,14 @@
         ))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationReason {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span><span class="self">self</span>.stall_iter_accepted &gt; <span class="self">self</span>.stall_iter_accepted_limit {
-            <span class="kw">return </span>TerminationReason::AcceptedStallIterExceeded;
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::AcceptedStallIterExceeded);
         }
         <span class="kw">if </span><span class="self">self</span>.stall_iter_best &gt; <span class="self">self</span>.stall_iter_best_limit {
-            <span class="kw">return </span>TerminationReason::BestStallIterExceeded;
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::BestStallIterExceeded);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 

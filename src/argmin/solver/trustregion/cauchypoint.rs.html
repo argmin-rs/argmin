@@ -188,7 +188,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
     ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, State, TerminationReason,
-    TrustRegionRadius, KV,
+    TerminationStatus, TrustRegionRadius, KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminL2Norm, ArgminMul, ArgminWeightedDot};
 <span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
@@ -278,12 +278,12 @@
         <span class="prelude-val">Ok</span>((state.param(new_param), <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationReason {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationStatus {
         <span class="comment">// Not an iterative algorithm
         </span><span class="kw">if </span>state.get_iter() &gt;= <span class="number">1 </span>{
-            TerminationReason::MaxItersReached
+            TerminationStatus::Terminated(TerminationReason::MaxItersReached)
         } <span class="kw">else </span>{
-            TerminationReason::NotTerminated
+            TerminationStatus::NotTerminated
         }
     }
 }

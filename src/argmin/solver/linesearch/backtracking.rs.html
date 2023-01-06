@@ -718,7 +718,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
     ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
-    Solver, State, TerminationReason, KV,
+    Solver, State, TerminationReason, TerminationStatus, KV,
 };
 <span class="kw">use </span><span class="kw">crate</span>::solver::linesearch::condition::<span class="kw-2">*</span>;
 <span class="kw">use </span>argmin_math::ArgminScaledAdd;
@@ -944,7 +944,7 @@
         <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), (), F&gt;) -&gt; TerminationReason {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span><span class="self">self</span>.condition.evaluate_condition(
             state.cost,
             state.get_gradient(),
@@ -953,9 +953,9 @@
             <span class="self">self</span>.search_direction.as_ref().unwrap(),
             <span class="self">self</span>.alpha,
         ) {
-            TerminationReason::LineSearchConditionMet
+            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
         } <span class="kw">else </span>{
-            TerminationReason::NotTerminated
+            TerminationStatus::NotTerminated
         }
     }
 }
@@ -1306,7 +1306,7 @@
                 <span class="kw-2">&amp;mut </span>ls,
                 <span class="kw-2">&amp;</span>IterState::&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;::new().param(init_param)
             ),
-            TerminationReason::LineSearchConditionMet
+            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
         );
 
         ls.init_cost = <span class="number">0.0f64</span>;
@@ -1320,7 +1320,7 @@
                 <span class="kw-2">&amp;mut </span>ls,
                 <span class="kw-2">&amp;</span>IterState::&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;::new().param(init_param)
             ),
-            TerminationReason::NotTerminated
+            TerminationStatus::NotTerminated
         );
     }
 
@@ -1365,8 +1365,8 @@
         <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;cost_count&quot;</span>], <span class="number">2</span>);
         <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;gradient_count&quot;</span>], <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
-            data.termination_reason,
-            TerminationReason::LineSearchConditionMet
+            data.termination_status,
+            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
         );
 
         <span class="macro">assert!</span>(data.get_gradient().is_none());
@@ -1414,8 +1414,8 @@
         <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;cost_count&quot;</span>], <span class="number">3</span>);
         <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;gradient_count&quot;</span>], <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
-            data.termination_reason,
-            TerminationReason::LineSearchConditionMet
+            data.termination_status,
+            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
         );
         <span class="macro">assert!</span>(data.get_gradient().is_none());
     }

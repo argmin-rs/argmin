@@ -666,6 +666,10 @@
 <span id="666">666</span>
 <span id="667">667</span>
 <span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -677,7 +681,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::core::observers::{Observe, ObserverMode, Observers};
 <span class="kw">use </span><span class="kw">crate</span>::core::{
     DeserializeOwnedAlias, Error, OptimizationResult, Problem, SerializeAlias, Solver, State,
-    TerminationReason, KV,
+    TerminationReason, TerminationStatus, KV,
 };
 <span class="kw">use </span>instant;
 <span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
@@ -867,7 +871,11 @@
             // within `next_iter()`!
             </span>state = <span class="kw">if </span>!state.terminated() {
                 <span class="kw">let </span>term = <span class="self">self</span>.solver.terminate_internal(<span class="kw-2">&amp;</span>state);
-                state.terminate_with(term)
+                <span class="kw">if let </span>TerminationStatus::Terminated(reason) = term {
+                    state.terminate_with(reason)
+                } <span class="kw">else </span>{
+                    state
+                }
             } <span class="kw">else </span>{
                 state
             };
@@ -1278,19 +1286,19 @@
             }
 
             <span class="comment">// Avoid terminating early because param does not change
-            </span><span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationReason {
-                TerminationReason::NotTerminated
+            </span><span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationStatus {
+                TerminationStatus::NotTerminated
             }
 
             <span class="comment">// Avoid terminating early because param does not change
             </span><span class="kw">fn </span>terminate_internal(
                 <span class="kw-2">&amp;mut </span><span class="self">self</span>,
                 state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;,
-            ) -&gt; TerminationReason {
+            ) -&gt; TerminationStatus {
                 <span class="kw">if </span>state.get_iter() &gt;= state.get_max_iters() {
-                    TerminationReason::MaxItersReached
+                    TerminationStatus::Terminated(TerminationReason::MaxItersReached)
                 } <span class="kw">else </span>{
-                    TerminationReason::NotTerminated
+                    TerminationStatus::NotTerminated
                 }
             }
         }

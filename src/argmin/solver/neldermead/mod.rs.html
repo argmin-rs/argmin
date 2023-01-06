@@ -890,7 +890,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
     ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
-    TerminationReason, KV,
+    TerminationReason, TerminationStatus, KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
 <span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
@@ -1283,7 +1283,7 @@
         ))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationReason {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">let </span>n = <span class="macro">float!</span>(<span class="self">self</span>.params.len() <span class="kw">as </span>f64);
         <span class="kw">let </span>c0: F = <span class="self">self</span>.params.iter().map(|(<span class="kw">_</span>, c)| <span class="kw-2">*</span>c).sum::&lt;F&gt;() / n;
         <span class="kw">let </span>s: F = (<span class="macro">float!</span>(<span class="number">1.0</span>) / (n - <span class="macro">float!</span>(<span class="number">1.0</span>))
@@ -1294,9 +1294,9 @@
                 .sum::&lt;F&gt;())
         .sqrt();
         <span class="kw">if </span>s &lt; <span class="self">self</span>.sd_tolerance {
-            <span class="kw">return </span>TerminationReason::TargetToleranceReached;
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::TargetToleranceReached);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 

@@ -476,7 +476,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
     ArgminFloat, Error, IterState, Problem, SerializeAlias, Solver, State, TerminationReason,
-    TrustRegionRadius, KV,
+    TerminationStatus, TrustRegionRadius, KV,
 };
 <span class="kw">use </span>argmin_math::{
     ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminWeightedDot, ArgminZeroLike,
@@ -767,14 +767,14 @@
         ))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, P, (), H, F&gt;) -&gt; TerminationReason {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, P, (), H, F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span><span class="self">self</span>.r_0_norm &lt; <span class="self">self</span>.epsilon {
-            <span class="kw">return </span>TerminationReason::TargetPrecisionReached;
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached);
         }
         <span class="kw">if </span>state.get_iter() &gt;= <span class="self">self</span>.max_iters {
-            <span class="kw">return </span>TerminationReason::MaxItersReached;
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::MaxItersReached);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 

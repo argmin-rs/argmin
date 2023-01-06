@@ -389,7 +389,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
     ArgminFloat, Error, IterState, Jacobian, Operator, Problem, Solver, State, TerminationReason,
-    KV,
+    TerminationStatus, KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminDot, ArgminInv, ArgminL2Norm, ArgminMul, ArgminSub, ArgminTranspose};
 <span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
@@ -533,11 +533,11 @@
         <span class="prelude-val">Ok</span>((state.param(new_param).cost(residuals.l2_norm()), <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, (), J, (), F&gt;) -&gt; TerminationReason {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, (), J, (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span>(state.get_prev_cost() - state.get_cost()).abs() &lt; <span class="self">self</span>.tol {
-            <span class="kw">return </span>TerminationReason::NoChangeInCost;
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::NoChangeInCost);
         }
-        TerminationReason::NotTerminated
+        TerminationStatus::NotTerminated
     }
 }
 

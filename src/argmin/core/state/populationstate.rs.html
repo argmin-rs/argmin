@@ -831,6 +831,23 @@
 <span id="831">831</span>
 <span id="832">832</span>
 <span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -838,7 +855,7 @@
 // http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Problem, State, TerminationReason};
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Problem, State, TerminationReason, TerminationStatus};
 <span class="kw">use </span>instant;
 <span class="attribute">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -860,7 +877,7 @@
 /// * maximum number of iterations that will be executed
 /// * problem function evaluation counts
 /// * elapsed time
-/// * termination reason (set to [`TerminationReason::NotTerminated`] if not terminated yet)
+/// * termination status
 </span><span class="attribute">#[derive(Clone, Default, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub struct </span>PopulationState&lt;P, F&gt; {
@@ -894,8 +911,8 @@
     </span><span class="kw">pub </span>counts: HashMap&lt;String, u64&gt;,
     <span class="doccomment">/// Time required so far
     </span><span class="kw">pub </span>time: <span class="prelude-ty">Option</span>&lt;instant::Duration&gt;,
-    <span class="doccomment">/// Reason of termination
-    </span><span class="kw">pub </span>termination_reason: TerminationReason,
+    <span class="doccomment">/// Status of optimization execution
+    </span><span class="kw">pub </span>termination_status: TerminationStatus,
 }
 
 <span class="kw">impl</span>&lt;P, F&gt; PopulationState&lt;P, F&gt;
@@ -1282,7 +1299,7 @@
     /// ```
     /// # extern crate instant;
     /// # use instant;
-    /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationReason};
+    /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationStatus};
     /// let state: PopulationState&lt;Vec&lt;f64&gt;, f64&gt; = PopulationState::new();
     /// # assert!(state.individual.is_none());
     /// # assert!(state.prev_individual.is_none());
@@ -1299,7 +1316,7 @@
     /// # assert_eq!(state.max_iters, std::u64::MAX);
     /// # assert_eq!(state.counts.len(), 0);
     /// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 0));
-    /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
+    /// # assert_eq!(state.termination_status, TerminationStatus::NotTerminated);
     /// ```
     </span><span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
         PopulationState {
@@ -1318,7 +1335,7 @@
             max_iters: std::u64::MAX,
             counts: HashMap::new(),
             time: <span class="prelude-val">Some</span>(instant::Duration::new(<span class="number">0</span>, <span class="number">0</span>)),
-            termination_reason: TerminationReason::NotTerminated,
+            termination_status: TerminationStatus::NotTerminated,
         }
     }
 
@@ -1426,19 +1443,19 @@
         <span class="self">self</span>.best_individual.as_ref()
     }
 
-    <span class="doccomment">/// Sets the termination reason (default: [`TerminationReason::NotTerminated`])
+    <span class="doccomment">/// Sets the termination status to [`Terminated`](`TerminationStatus::Terminated`) with the given reason
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationReason};
+    /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationReason, TerminationStatus};
     /// # let mut state: PopulationState&lt;Vec&lt;f64&gt;, f64&gt; = PopulationState::new();
-    /// # assert_eq!(state.termination_reason, TerminationReason::NotTerminated);
+    /// # assert_eq!(state.termination_status, TerminationStatus::NotTerminated);
     /// let state = state.terminate_with(TerminationReason::MaxItersReached);
-    /// # assert_eq!(state.termination_reason, TerminationReason::MaxItersReached);
+    /// # assert_eq!(state.termination_status, TerminationStatus::Terminated(TerminationReason::MaxItersReached));
     /// ```
     </span><span class="kw">fn </span>terminate_with(<span class="kw-2">mut </span><span class="self">self</span>, reason: TerminationReason) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.termination_reason = reason;
+        <span class="self">self</span>.termination_status = TerminationStatus::Terminated(reason);
         <span class="self">self
     </span>}
 
@@ -1554,13 +1571,30 @@
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationReason};
+    /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationStatus};
     /// # let mut state: PopulationState&lt;Vec&lt;f64&gt;, f64&gt; = PopulationState::new();
-    /// let termination_reason = state.get_termination_reason();
-    /// # assert_eq!(termination_reason, TerminationReason::NotTerminated);
+    /// let termination_status = state.get_termination_status();
+    /// # assert_eq!(termination_status, TerminationStatus::NotTerminated);
     /// ```
-    </span><span class="kw">fn </span>get_termination_reason(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TerminationReason {
-        <span class="self">self</span>.termination_reason
+    </span><span class="kw">fn </span>get_termination_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TerminationStatus {
+        <span class="self">self</span>.termination_status
+    }
+
+    <span class="doccomment">/// Returns the termination reason if terminated, otherwise None.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationReason};
+    /// # let mut state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+    /// let termination_reason = state.get_termination_reason();
+    /// # assert_eq!(termination_reason, None);
+    /// ```
+    </span><span class="kw">fn </span>get_termination_reason(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TerminationReason&gt; {
+        <span class="kw">match </span><span class="self">self</span>.termination_status {
+            TerminationStatus::Terminated(reason) =&gt; <span class="prelude-val">Some</span>(reason),
+            TerminationStatus::NotTerminated =&gt; <span class="prelude-val">None</span>,
+        }
     }
 
     <span class="doccomment">/// Returns the time elapsed since the start of the optimization.

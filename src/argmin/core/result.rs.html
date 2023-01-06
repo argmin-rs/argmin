@@ -346,7 +346,7 @@
         <span class="macro">writeln!</span>(
             f,
             <span class="string">&quot;    termination:   {}&quot;</span>,
-            <span class="self">self</span>.state.get_termination_reason()
+            <span class="self">self</span>.state.get_termination_status()
         )<span class="question-mark">?</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(time) = <span class="self">self</span>.state.get_time() {
             <span class="macro">writeln!</span>(f, <span class="string">&quot;    time:          {time:?}&quot;</span>)<span class="question-mark">?</span>;

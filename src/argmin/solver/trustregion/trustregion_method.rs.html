@@ -452,7 +452,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
-    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
+    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationStatus,
     TrustRegionRadius, KV,
 };
 <span class="kw">use </span><span class="kw">crate</span>::solver::trustregion::reduction_ratio;
@@ -745,8 +745,8 @@
         ))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationReason {
-        TerminationReason::NotTerminated
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationStatus {
+        TerminationStatus::NotTerminated
     }
 }
 

@@ -247,7 +247,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
     ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, State, TerminationReason,
-    TrustRegionRadius, KV,
+    TerminationStatus, TrustRegionRadius, KV,
 };
 <span class="kw">use </span>argmin_math::{
     ArgminAdd, ArgminDot, ArgminInv, ArgminL2Norm, ArgminMul, ArgminSub, ArgminWeightedDot,
@@ -376,11 +376,11 @@
         <span class="prelude-val">Ok</span>((state.param(pstar).gradient(g).hessian(h), <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, P, (), H, F&gt;) -&gt; TerminationReason {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, P, (), H, F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span>state.get_iter() &gt;= <span class="number">1 </span>{
-            TerminationReason::MaxItersReached
+            TerminationStatus::Terminated(TerminationReason::MaxItersReached)
         } <span class="kw">else </span>{
-            TerminationReason::NotTerminated
+            TerminationStatus::NotTerminated
         }
     }
 }

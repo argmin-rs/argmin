@@ -115,6 +115,12 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -130,7 +136,7 @@
 <span class="kw">pub use </span>linearprogramstate::LinearProgramState;
 <span class="kw">pub use </span>populationstate::PopulationState;
 
-<span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Problem, TerminationReason};
+<span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Problem, TerminationReason, TerminationStatus};
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="doccomment">/// Minimal interface which struct used for managing state in solvers have to implement.
@@ -151,7 +157,7 @@
 /// * the current number of iterations
 /// * how often each function of the problem has been called
 /// * the time required since the beginning of the optimization until the current point in time
-/// * the reason why it terminated ([`TerminationReason`])
+/// * the status of optimization execution ([`TerminationStatus`])
 ///
 /// Since the state in general changes for each iteration, &quot;current&quot; refers to the current
 /// iteration.
@@ -220,16 +226,22 @@
     /// far.
     </span><span class="kw">fn </span>is_best(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Set termination reason
+    <span class="doccomment">/// Sets the termination status to [`Terminated`](`TerminationStatus::Terminated`) with the given reason
     </span><span class="attribute">#[must_use]
     </span><span class="kw">fn </span>terminate_with(<span class="self">self</span>, termination_reason: TerminationReason) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Returns termination reason. Returns [`TerminationReason::NotTerminated`] if not terminated.
-    </span><span class="kw">fn </span>get_termination_reason(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TerminationReason;
+    <span class="doccomment">/// Returns termination status.
+    </span><span class="kw">fn </span>get_termination_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TerminationStatus;
+
+    <span class="doccomment">/// Returns the termination reason if terminated, otherwise None.
+    </span><span class="kw">fn </span>get_termination_reason(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TerminationReason&gt;;
 
     <span class="doccomment">/// Return whether the algorithm has terminated or not
     </span><span class="kw">fn </span>terminated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.get_termination_reason().terminated()
+        <span class="macro">matches!</span>(
+            <span class="self">self</span>.get_termination_status(),
+            TerminationStatus::Terminated(<span class="kw">_</span>)
+        )
     }
 }
 </code></pre></div>

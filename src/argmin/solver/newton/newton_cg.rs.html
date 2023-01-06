@@ -342,6 +342,7 @@
 <span id="342">342</span>
 <span id="343">343</span>
 <span id="344">344</span>
+<span id="345">345</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -351,7 +352,8 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
     ArgminFloat, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState, LineSearch,
-    Operator, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason, KV,
+    Operator, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason,
+    TerminationStatus, KV,
 };
 <span class="kw">use </span><span class="kw">crate</span>::solver::conjugategradient::ConjugateGradient;
 <span class="kw">use </span>argmin_math::{
@@ -552,11 +554,11 @@
         ))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationReason {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span>(state.get_cost() - state.get_prev_cost()).abs() &lt; <span class="self">self</span>.tol {
-            TerminationReason::TargetToleranceReached
+            TerminationStatus::Terminated(TerminationReason::TargetToleranceReached)
         } <span class="kw">else </span>{
-            TerminationReason::NotTerminated
+            TerminationStatus::NotTerminated
         }
     }
 }
