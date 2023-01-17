@@ -205,7 +205,7 @@ where
 
     fn terminate(&mut self, _state: &IterState<F, (), (), (), F>) -> TerminationStatus {
         if self.tolerance * (self.x1.abs() + self.x2.abs()) >= (self.x3 - self.x0).abs() {
-            return TerminationStatus::Terminated(TerminationReason::TargetToleranceReached);
+            return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         TerminationStatus::NotTerminated
     }

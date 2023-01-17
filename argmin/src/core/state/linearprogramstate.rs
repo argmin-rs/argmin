@@ -445,10 +445,10 @@ where
     /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationStatus};
     /// # let mut state: LinearProgramState<Vec<f64>, f64> = LinearProgramState::new();
     /// let termination_status = state.get_termination_status();
-    /// # assert_eq!(termination_status, TerminationStatus::NotTerminated);
+    /// # assert_eq!(*termination_status, TerminationStatus::NotTerminated);
     /// ```
-    fn get_termination_status(&self) -> TerminationStatus {
-        self.termination_status
+    fn get_termination_status(&self) -> &TerminationStatus {
+        &self.termination_status
     }
 
     /// Returns the termination reason if terminated, otherwise None.
@@ -461,8 +461,8 @@ where
     /// let termination_reason = state.get_termination_reason();
     /// # assert_eq!(termination_reason, None);
     /// ```
-    fn get_termination_reason(&self) -> Option<TerminationReason> {
-        match self.termination_status {
+    fn get_termination_reason(&self) -> Option<&TerminationReason> {
+        match &self.termination_status {
             TerminationStatus::Terminated(reason) => Some(reason),
             TerminationStatus::NotTerminated => None,
         }

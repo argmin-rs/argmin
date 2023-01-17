@@ -99,7 +99,7 @@ pub trait Solver<O, I: State> {
     fn terminate_internal(&mut self, state: &I) -> TerminationStatus {
         let solver_status = self.terminate(state);
         if solver_status.terminated() {
-            return solver_status;
+            return solver_status.clone();
         }
         if state.get_iter() >= state.get_max_iters() {
             return TerminationStatus::Terminated(TerminationReason::MaxItersReached);

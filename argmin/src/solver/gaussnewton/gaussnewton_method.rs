@@ -153,7 +153,7 @@ where
 
     fn terminate(&mut self, state: &IterState<P, (), J, (), F>) -> TerminationStatus {
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
-            return TerminationStatus::Terminated(TerminationReason::NoChangeInCost);
+            return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         TerminationStatus::NotTerminated
     }

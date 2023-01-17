@@ -242,7 +242,7 @@ where
             self.search_direction.as_ref().unwrap(),
             self.alpha,
         ) {
-            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         } else {
             TerminationStatus::NotTerminated
         }
@@ -595,7 +595,7 @@ mod tests {
                 &mut ls,
                 &IterState::<Vec<f64>, Vec<f64>, (), (), f64>::new().param(init_param)
             ),
-            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         );
 
         ls.init_cost = 0.0f64;
@@ -655,7 +655,7 @@ mod tests {
         assert_eq!(func_counts["gradient_count"], 1);
         assert_eq!(
             data.termination_status,
-            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         );
 
         assert!(data.get_gradient().is_none());
@@ -704,7 +704,7 @@ mod tests {
         assert_eq!(func_counts["gradient_count"], 1);
         assert_eq!(
             data.termination_status,
-            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         );
         assert!(data.get_gradient().is_none());
     }

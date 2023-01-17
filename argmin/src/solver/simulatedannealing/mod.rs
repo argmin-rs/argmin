@@ -559,10 +559,14 @@ where
 
     fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationStatus {
         if self.stall_iter_accepted > self.stall_iter_accepted_limit {
-            return TerminationStatus::Terminated(TerminationReason::AcceptedStallIterExceeded);
+            return TerminationStatus::Terminated(TerminationReason::SolverExit(
+                "AcceptedStallIterExceeded".to_string(),
+            ));
         }
         if self.stall_iter_best > self.stall_iter_best_limit {
-            return TerminationStatus::Terminated(TerminationReason::BestStallIterExceeded);
+            return TerminationStatus::Terminated(TerminationReason::SolverExit(
+                "BestStallIterExceeded".to_string(),
+            ));
         }
         TerminationStatus::NotTerminated
     }

@@ -9,7 +9,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Status of optimization execution
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub enum TerminationStatus {
     /// Execution is terminated
@@ -28,23 +28,18 @@ impl TerminationStatus {
     ///
     /// assert!(TerminationStatus::Terminated(TerminationReason::MaxItersReached).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::TargetCostReached).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::NoChangeInCost).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::AcceptedStallIterExceeded).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::BestStallIterExceeded).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::TargetToleranceReached).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::SolverConverged).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::KeyboardInterrupt).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::Aborted).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::SolverExit("Exit reason".to_string())).terminated());
     /// ```
-    pub fn terminated(self) -> bool {
-        !matches!(self, TerminationStatus::NotTerminated)
+    pub fn terminated(&self) -> bool {
+        matches!(self, TerminationStatus::Terminated(_))
     }
 }
 
 impl std::fmt::Display for TerminationStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match *self {
+        match self {
             TerminationStatus::Terminated(reason) => f.write_str(reason.text()),
             TerminationStatus::NotTerminated => f.write_str("Running"),
         }
@@ -58,29 +53,19 @@ impl Default for TerminationStatus {
 }
 
 /// Reasons for optimization algorithms to stop
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub enum TerminationReason {
     /// Reached maximum number of iterations
     MaxItersReached,
     /// Reached target cost function value
     TargetCostReached,
-    /// Reached target precision
-    TargetPrecisionReached,
-    /// No change in cost function value
-    NoChangeInCost,
-    /// Accepted stall iter exceeded (Simulated Annealing)
-    AcceptedStallIterExceeded,
-    /// Best stall iter exceeded (Simulated Annealing)
-    BestStallIterExceeded,
-    /// Condition for line search met
-    LineSearchConditionMet,
-    /// Reached target tolerance
-    TargetToleranceReached,
     /// Algorithm manually interrupted with Ctrl+C
     KeyboardInterrupt,
-    /// Algorithm aborted
-    Aborted,
+    /// Converged
+    SolverConverged,
+    /// Solver exit with given reason
+    SolverExit(String),
 }
 
 impl TerminationReason {
@@ -100,50 +85,25 @@ impl TerminationReason {
     ///     "Target cost value reached"
     /// );
     /// assert_eq!(
-    ///     TerminationReason::TargetPrecisionReached.text(),
-    ///     "Target precision reached"
-    /// );
-    /// assert_eq!(
-    ///     TerminationReason::NoChangeInCost.text(),
-    ///     "No change in cost function value"
-    /// );
-    /// assert_eq!(
-    ///     TerminationReason::AcceptedStallIterExceeded.text(),
-    ///     "Accepted stall iterations exceeded"
-    /// );
-    /// assert_eq!(
-    ///     TerminationReason::BestStallIterExceeded.text(),
-    ///     "Best stall iterations exceeded"
-    /// );
-    /// assert_eq!(
-    ///     TerminationReason::LineSearchConditionMet.text(),
-    ///     "Line search condition met"
-    /// );
-    /// assert_eq!(
-    ///     TerminationReason::TargetToleranceReached.text(),
-    ///     "Target tolerance reached"
-    /// );
-    /// assert_eq!(
     ///     TerminationReason::KeyboardInterrupt.text(),
     ///     "Keyboard interrupt"
     /// );
     /// assert_eq!(
-    ///     TerminationReason::Aborted.text(),
-    ///     "Optimization aborted"
+    ///     TerminationReason::SolverConverged.text(),
+    ///     "Solver converged"
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::SolverExit("Aborted".to_string()).text(),
+    ///     "Aborted"
     /// );
     /// ```
     pub fn text(&self) -> &str {
-        match *self {
+        match self {
             TerminationReason::MaxItersReached => "Maximum number of iterations reached",
             TerminationReason::TargetCostReached => "Target cost value reached",
-            TerminationReason::TargetPrecisionReached => "Target precision reached",
-            TerminationReason::NoChangeInCost => "No change in cost function value",
-            TerminationReason::AcceptedStallIterExceeded => "Accepted stall iterations exceeded",
-            TerminationReason::BestStallIterExceeded => "Best stall iterations exceeded",
-            TerminationReason::LineSearchConditionMet => "Line search condition met",
-            TerminationReason::TargetToleranceReached => "Target tolerance reached",
             TerminationReason::KeyboardInterrupt => "Keyboard interrupt",
-            TerminationReason::Aborted => "Optimization aborted",
+            TerminationReason::SolverConverged => "Solver converged",
+            TerminationReason::SolverExit(reason) => reason.as_ref(),
         }
     }
 }
@@ -156,7 +116,7 @@ impl std::fmt::Display for TerminationReason {
 
 impl Default for TerminationReason {
     fn default() -> Self {
-        TerminationReason::Aborted
+        TerminationReason::SolverExit("Undefined".to_string())
     }
 }
 

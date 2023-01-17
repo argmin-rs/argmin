@@ -125,7 +125,7 @@ where
         if mid.abs() <= eff_tol || self.fb == float!(0.0) {
             return Ok((
                 state
-                    .terminate_with(TerminationReason::TargetPrecisionReached)
+                    .terminate_with(TerminationReason::SolverConverged)
                     .param(self.b)
                     .cost(self.fb.abs()),
                 None,
