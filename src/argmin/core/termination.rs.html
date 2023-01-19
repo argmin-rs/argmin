@@ -126,46 +126,6 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -177,7 +137,7 @@
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="doccomment">/// Status of optimization execution
-</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub enum </span>TerminationStatus {
     <span class="doccomment">/// Execution is terminated
@@ -196,23 +156,18 @@
     ///
     /// assert!(TerminationStatus::Terminated(TerminationReason::MaxItersReached).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::TargetCostReached).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::NoChangeInCost).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::AcceptedStallIterExceeded).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::BestStallIterExceeded).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::TargetToleranceReached).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::SolverConverged).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::KeyboardInterrupt).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::Aborted).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::SolverExit(&quot;Exit reason&quot;.to_string())).terminated());
     /// ```
-    </span><span class="kw">pub fn </span>terminated(<span class="self">self</span>) -&gt; bool {
-        !<span class="macro">matches!</span>(<span class="self">self</span>, TerminationStatus::NotTerminated)
+    </span><span class="kw">pub fn </span>terminated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, TerminationStatus::Terminated(<span class="kw">_</span>))
     }
 }
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>TerminationStatus {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+        <span class="kw">match </span><span class="self">self </span>{
             TerminationStatus::Terminated(reason) =&gt; f.write_str(reason.text()),
             TerminationStatus::NotTerminated =&gt; f.write_str(<span class="string">&quot;Running&quot;</span>),
         }
@@ -226,29 +181,19 @@
 }
 
 <span class="doccomment">/// Reasons for optimization algorithms to stop
-</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub enum </span>TerminationReason {
     <span class="doccomment">/// Reached maximum number of iterations
     </span>MaxItersReached,
     <span class="doccomment">/// Reached target cost function value
     </span>TargetCostReached,
-    <span class="doccomment">/// Reached target precision
-    </span>TargetPrecisionReached,
-    <span class="doccomment">/// No change in cost function value
-    </span>NoChangeInCost,
-    <span class="doccomment">/// Accepted stall iter exceeded (Simulated Annealing)
-    </span>AcceptedStallIterExceeded,
-    <span class="doccomment">/// Best stall iter exceeded (Simulated Annealing)
-    </span>BestStallIterExceeded,
-    <span class="doccomment">/// Condition for line search met
-    </span>LineSearchConditionMet,
-    <span class="doccomment">/// Reached target tolerance
-    </span>TargetToleranceReached,
     <span class="doccomment">/// Algorithm manually interrupted with Ctrl+C
     </span>KeyboardInterrupt,
-    <span class="doccomment">/// Algorithm aborted
-    </span>Aborted,
+    <span class="doccomment">/// Converged
+    </span>SolverConverged,
+    <span class="doccomment">/// Solver exit with given reason
+    </span>SolverExit(String),
 }
 
 <span class="kw">impl </span>TerminationReason {
@@ -268,50 +213,25 @@
     ///     &quot;Target cost value reached&quot;
     /// );
     /// assert_eq!(
-    ///     TerminationReason::TargetPrecisionReached.text(),
-    ///     &quot;Target precision reached&quot;
-    /// );
-    /// assert_eq!(
-    ///     TerminationReason::NoChangeInCost.text(),
-    ///     &quot;No change in cost function value&quot;
-    /// );
-    /// assert_eq!(
-    ///     TerminationReason::AcceptedStallIterExceeded.text(),
-    ///     &quot;Accepted stall iterations exceeded&quot;
-    /// );
-    /// assert_eq!(
-    ///     TerminationReason::BestStallIterExceeded.text(),
-    ///     &quot;Best stall iterations exceeded&quot;
-    /// );
-    /// assert_eq!(
-    ///     TerminationReason::LineSearchConditionMet.text(),
-    ///     &quot;Line search condition met&quot;
-    /// );
-    /// assert_eq!(
-    ///     TerminationReason::TargetToleranceReached.text(),
-    ///     &quot;Target tolerance reached&quot;
-    /// );
-    /// assert_eq!(
     ///     TerminationReason::KeyboardInterrupt.text(),
     ///     &quot;Keyboard interrupt&quot;
     /// );
     /// assert_eq!(
-    ///     TerminationReason::Aborted.text(),
-    ///     &quot;Optimization aborted&quot;
+    ///     TerminationReason::SolverConverged.text(),
+    ///     &quot;Solver converged&quot;
+    /// );
+    /// assert_eq!(
+    ///     TerminationReason::SolverExit(&quot;Aborted&quot;.to_string()).text(),
+    ///     &quot;Aborted&quot;
     /// );
     /// ```
     </span><span class="kw">pub fn </span>text(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+        <span class="kw">match </span><span class="self">self </span>{
             TerminationReason::MaxItersReached =&gt; <span class="string">&quot;Maximum number of iterations reached&quot;</span>,
             TerminationReason::TargetCostReached =&gt; <span class="string">&quot;Target cost value reached&quot;</span>,
-            TerminationReason::TargetPrecisionReached =&gt; <span class="string">&quot;Target precision reached&quot;</span>,
-            TerminationReason::NoChangeInCost =&gt; <span class="string">&quot;No change in cost function value&quot;</span>,
-            TerminationReason::AcceptedStallIterExceeded =&gt; <span class="string">&quot;Accepted stall iterations exceeded&quot;</span>,
-            TerminationReason::BestStallIterExceeded =&gt; <span class="string">&quot;Best stall iterations exceeded&quot;</span>,
-            TerminationReason::LineSearchConditionMet =&gt; <span class="string">&quot;Line search condition met&quot;</span>,
-            TerminationReason::TargetToleranceReached =&gt; <span class="string">&quot;Target tolerance reached&quot;</span>,
             TerminationReason::KeyboardInterrupt =&gt; <span class="string">&quot;Keyboard interrupt&quot;</span>,
-            TerminationReason::Aborted =&gt; <span class="string">&quot;Optimization aborted&quot;</span>,
+            TerminationReason::SolverConverged =&gt; <span class="string">&quot;Solver converged&quot;</span>,
+            TerminationReason::SolverExit(reason) =&gt; reason.as_ref(),
         }
     }
 }
@@ -324,7 +244,7 @@
 
 <span class="kw">impl </span>Default <span class="kw">for </span>TerminationReason {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        TerminationReason::Aborted
+        TerminationReason::SolverExit(<span class="string">&quot;Undefined&quot;</span>.to_string())
     }
 }
 

@@ -881,6 +881,10 @@
 <span id="881">881</span>
 <span id="882">882</span>
 <span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -1442,10 +1446,14 @@
 
     <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span><span class="self">self</span>.stall_iter_accepted &gt; <span class="self">self</span>.stall_iter_accepted_limit {
-            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::AcceptedStallIterExceeded);
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverExit(
+                <span class="string">&quot;AcceptedStallIterExceeded&quot;</span>.to_string(),
+            ));
         }
         <span class="kw">if </span><span class="self">self</span>.stall_iter_best &gt; <span class="self">self</span>.stall_iter_best_limit {
-            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::BestStallIterExceeded);
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverExit(
+                <span class="string">&quot;BestStallIterExceeded&quot;</span>.to_string(),
+            ));
         }
         TerminationStatus::NotTerminated
     }

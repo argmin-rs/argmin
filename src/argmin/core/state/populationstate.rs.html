@@ -1574,10 +1574,10 @@
     /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationStatus};
     /// # let mut state: PopulationState&lt;Vec&lt;f64&gt;, f64&gt; = PopulationState::new();
     /// let termination_status = state.get_termination_status();
-    /// # assert_eq!(termination_status, TerminationStatus::NotTerminated);
+    /// # assert_eq!(*termination_status, TerminationStatus::NotTerminated);
     /// ```
-    </span><span class="kw">fn </span>get_termination_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TerminationStatus {
-        <span class="self">self</span>.termination_status
+    </span><span class="kw">fn </span>get_termination_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>TerminationStatus {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.termination_status
     }
 
     <span class="doccomment">/// Returns the termination reason if terminated, otherwise None.
@@ -1590,8 +1590,8 @@
     /// let termination_reason = state.get_termination_reason();
     /// # assert_eq!(termination_reason, None);
     /// ```
-    </span><span class="kw">fn </span>get_termination_reason(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TerminationReason&gt; {
-        <span class="kw">match </span><span class="self">self</span>.termination_status {
+    </span><span class="kw">fn </span>get_termination_reason(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>TerminationReason&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.termination_status {
             TerminationStatus::Terminated(reason) =&gt; <span class="prelude-val">Some</span>(reason),
             TerminationStatus::NotTerminated =&gt; <span class="prelude-val">None</span>,
         }

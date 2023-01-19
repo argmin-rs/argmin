@@ -556,7 +556,7 @@
 
     <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span>(state.get_cost() - state.get_prev_cost()).abs() &lt; <span class="self">self</span>.tol {
-            TerminationStatus::Terminated(TerminationReason::TargetToleranceReached)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         } <span class="kw">else </span>{
             TerminationStatus::NotTerminated
         }

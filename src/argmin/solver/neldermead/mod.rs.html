@@ -1294,7 +1294,7 @@
                 .sum::&lt;F&gt;())
         .sqrt();
         <span class="kw">if </span>s &lt; <span class="self">self</span>.sd_tolerance {
-            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::TargetToleranceReached);
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         TerminationStatus::NotTerminated
     }

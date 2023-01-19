@@ -416,7 +416,7 @@
         <span class="kw">if </span>(<span class="self">self</span>.x - m).abs() &lt;= two * tol - (<span class="self">self</span>.b - <span class="self">self</span>.a) / two {
             <span class="kw">return </span><span class="prelude-val">Ok</span>((
                 state
-                    .terminate_with(TerminationReason::TargetPrecisionReached)
+                    .terminate_with(TerminationReason::SolverConverged)
                     .param(<span class="self">self</span>.x)
                     .cost(<span class="self">self</span>.fx),
                 <span class="prelude-val">None</span>,
@@ -518,7 +518,7 @@
             .unwrap();
         <span class="macro">assert_eq!</span>(
             res.state().termination_status,
-            TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         );
         <span class="macro">assert_relative_eq!</span>(
             res.state().param.unwrap(),

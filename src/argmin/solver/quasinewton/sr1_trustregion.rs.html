@@ -914,7 +914,7 @@
 
     <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), B, F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span>state.get_gradient().unwrap().l2_norm() &lt; <span class="self">self</span>.tol_grad {
-            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached);
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         TerminationStatus::NotTerminated
     }

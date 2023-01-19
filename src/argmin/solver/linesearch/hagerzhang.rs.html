@@ -1556,13 +1556,13 @@
         <span class="kw">if </span><span class="self">self</span>.best_f - <span class="self">self</span>.finit &lt;= <span class="self">self</span>.delta * <span class="self">self</span>.best_x * <span class="self">self</span>.dginit
             &amp;&amp; <span class="self">self</span>.best_g &gt;= <span class="self">self</span>.sigma * <span class="self">self</span>.dginit
         {
-            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet);
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         <span class="kw">if </span>(<span class="macro">float!</span>(<span class="number">2.0</span>) * <span class="self">self</span>.delta - <span class="macro">float!</span>(<span class="number">1.0</span>)) * <span class="self">self</span>.dginit &gt;= <span class="self">self</span>.best_g
             &amp;&amp; <span class="self">self</span>.best_g &gt;= <span class="self">self</span>.sigma * <span class="self">self</span>.dginit
             &amp;&amp; <span class="self">self</span>.best_f &lt;= <span class="self">self</span>.finit + <span class="self">self</span>.epsilon_k
         {
-            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet);
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         TerminationStatus::NotTerminated
     }

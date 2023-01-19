@@ -312,7 +312,7 @@
         <span class="kw">if </span>mid.abs() &lt;= eff_tol || <span class="self">self</span>.fb == <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">return </span><span class="prelude-val">Ok</span>((
                 state
-                    .terminate_with(TerminationReason::TargetPrecisionReached)
+                    .terminate_with(TerminationReason::SolverConverged)
                     .param(<span class="self">self</span>.b)
                     .cost(<span class="self">self</span>.fb.abs()),
                 <span class="prelude-val">None</span>,

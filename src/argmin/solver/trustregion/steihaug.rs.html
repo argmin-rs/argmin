@@ -723,7 +723,7 @@
             <span class="kw">return </span><span class="prelude-val">Ok</span>((
                 state
                     .param(p.add(<span class="kw-2">&amp;</span>d.mul(<span class="kw-2">&amp;</span>tau)))
-                    .terminate_with(TerminationReason::TargetPrecisionReached),
+                    .terminate_with(TerminationReason::SolverConverged),
                 <span class="prelude-val">None</span>,
             ));
         }
@@ -737,7 +737,7 @@
             <span class="kw">return </span><span class="prelude-val">Ok</span>((
                 state
                     .param(p.add(<span class="kw-2">&amp;</span>d.mul(<span class="kw-2">&amp;</span>tau)))
-                    .terminate_with(TerminationReason::TargetPrecisionReached),
+                    .terminate_with(TerminationReason::SolverConverged),
                 <span class="prelude-val">None</span>,
             ));
         }
@@ -749,7 +749,7 @@
             <span class="kw">return </span><span class="prelude-val">Ok</span>((
                 state
                     .param(p_n)
-                    .terminate_with(TerminationReason::TargetPrecisionReached),
+                    .terminate_with(TerminationReason::SolverConverged),
                 <span class="prelude-val">None</span>,
             ));
         }
@@ -769,7 +769,7 @@
 
     <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, P, (), H, F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span><span class="self">self</span>.r_0_norm &lt; <span class="self">self</span>.epsilon {
-            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached);
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         <span class="kw">if </span>state.get_iter() &gt;= <span class="self">self</span>.max_iters {
             <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::MaxItersReached);

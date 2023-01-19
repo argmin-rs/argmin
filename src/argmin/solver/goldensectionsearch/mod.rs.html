@@ -705,7 +705,7 @@
 
     <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;F, (), (), (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span><span class="self">self</span>.tolerance * (<span class="self">self</span>.x1.abs() + <span class="self">self</span>.x2.abs()) &gt;= (<span class="self">self</span>.x3 - <span class="self">self</span>.x0).abs() {
-            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::TargetToleranceReached);
+            <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         TerminationStatus::NotTerminated
     }

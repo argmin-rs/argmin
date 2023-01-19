@@ -953,7 +953,7 @@
             <span class="self">self</span>.search_direction.as_ref().unwrap(),
             <span class="self">self</span>.alpha,
         ) {
-            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         } <span class="kw">else </span>{
             TerminationStatus::NotTerminated
         }
@@ -1306,7 +1306,7 @@
                 <span class="kw-2">&amp;mut </span>ls,
                 <span class="kw-2">&amp;</span>IterState::&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;::new().param(init_param)
             ),
-            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         );
 
         ls.init_cost = <span class="number">0.0f64</span>;
@@ -1366,7 +1366,7 @@
         <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;gradient_count&quot;</span>], <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
             data.termination_status,
-            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         );
 
         <span class="macro">assert!</span>(data.get_gradient().is_none());
@@ -1415,7 +1415,7 @@
         <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;gradient_count&quot;</span>], <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
             data.termination_status,
-            TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         );
         <span class="macro">assert!</span>(data.get_gradient().is_none());
     }
