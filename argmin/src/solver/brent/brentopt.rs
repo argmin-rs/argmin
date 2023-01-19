@@ -133,7 +133,7 @@ where
         if (self.x - m).abs() <= two * tol - (self.b - self.a) / two {
             return Ok((
                 state
-                    .terminate_with(TerminationReason::TargetPrecisionReached)
+                    .terminate_with(TerminationReason::SolverConverged)
                     .param(self.x)
                     .cost(self.fx),
                 None,
@@ -235,7 +235,7 @@ mod tests {
             .unwrap();
         assert_eq!(
             res.state().termination_status,
-            TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached)
+            TerminationStatus::Terminated(TerminationReason::SolverConverged)
         );
         assert_relative_eq!(
             res.state().param.unwrap(),

@@ -624,13 +624,13 @@ where
         if self.best_f - self.finit <= self.delta * self.best_x * self.dginit
             && self.best_g >= self.sigma * self.dginit
         {
-            return TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet);
+            return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         if (float!(2.0) * self.delta - float!(1.0)) * self.dginit >= self.best_g
             && self.best_g >= self.sigma * self.dginit
             && self.best_f <= self.finit + self.epsilon_k
         {
-            return TerminationStatus::Terminated(TerminationReason::LineSearchConditionMet);
+            return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         TerminationStatus::NotTerminated
     }

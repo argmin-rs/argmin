@@ -424,7 +424,7 @@ where
                 .sum::<F>())
         .sqrt();
         if s < self.sd_tolerance {
-            return TerminationStatus::Terminated(TerminationReason::TargetToleranceReached);
+            return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         TerminationStatus::NotTerminated
     }

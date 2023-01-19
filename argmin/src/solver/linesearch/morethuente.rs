@@ -443,7 +443,7 @@ where
                     .param(cur_param)
                     .cost(cur_cost)
                     .gradient(cur_grad)
-                    .terminate_with(TerminationReason::LineSearchConditionMet),
+                    .terminate_with(TerminationReason::SolverConverged),
                 None,
             ));
         }

@@ -246,7 +246,7 @@ where
 
     fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationStatus {
         if state.get_gradient().unwrap().l2_norm() < self.tol_grad {
-            return TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached);
+            return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         TerminationStatus::NotTerminated
     }

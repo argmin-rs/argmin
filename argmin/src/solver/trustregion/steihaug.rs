@@ -254,7 +254,7 @@ where
             return Ok((
                 state
                     .param(p.add(&d.mul(&tau)))
-                    .terminate_with(TerminationReason::TargetPrecisionReached),
+                    .terminate_with(TerminationReason::SolverConverged),
                 None,
             ));
         }
@@ -268,7 +268,7 @@ where
             return Ok((
                 state
                     .param(p.add(&d.mul(&tau)))
-                    .terminate_with(TerminationReason::TargetPrecisionReached),
+                    .terminate_with(TerminationReason::SolverConverged),
                 None,
             ));
         }
@@ -280,7 +280,7 @@ where
             return Ok((
                 state
                     .param(p_n)
-                    .terminate_with(TerminationReason::TargetPrecisionReached),
+                    .terminate_with(TerminationReason::SolverConverged),
                 None,
             ));
         }
@@ -300,7 +300,7 @@ where
 
     fn terminate(&mut self, state: &IterState<P, P, (), H, F>) -> TerminationStatus {
         if self.r_0_norm < self.epsilon {
-            return TerminationStatus::Terminated(TerminationReason::TargetPrecisionReached);
+            return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
         if state.get_iter() >= self.max_iters {
             return TerminationStatus::Terminated(TerminationReason::MaxItersReached);
