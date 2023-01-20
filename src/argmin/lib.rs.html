@@ -114,6 +114,13 @@
 <span id="114">114</span>
 <span id="115">115</span>
 <span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -196,6 +203,13 @@
 //! - [Simulated Annealing](`crate::solver::simulatedannealing::SimulatedAnnealing`)
 //!
 //! - [Particle Swarm Optimization](`crate::solver::particleswarm::ParticleSwarm`)
+//!
+//! ## External solvers compatible with argmin
+//!
+//! External solvers which implement the `Solver` trait are compatible with argmins `Executor`,
+//! and as such can leverage features like checkpointing and observers.
+//!
+//! - [egobox](https://crates.io/crates/egobox-ego)
 //!
 //! # License
 //!
