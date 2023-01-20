@@ -426,39 +426,39 @@
 <span class="doccomment">/// Types available for use in [`KV`](KV).
 ///
 /// `Float`, `Int` and `Uint` are all 64bit. The corresponding 32bit variants must be
-/// be converted to 64 bit. Preferably the `From` impls are used to create a `KVType`:
+/// be converted to 64 bit. Preferably the `From` impls are used to create a `KvValue`:
 ///
 /// ```
-/// # use argmin::core::KVType;
-/// let x: KVType = 1u64.into();
-/// assert_eq!(x, KVType::Uint(1u64));
+/// # use argmin::core::KvValue;
+/// let x: KvValue = 1u64.into();
+/// assert_eq!(x, KvValue::Uint(1u64));
 ///
-/// let x: KVType = 2u32.into();
-/// assert_eq!(x, KVType::Uint(2u64));
+/// let x: KvValue = 2u32.into();
+/// assert_eq!(x, KvValue::Uint(2u64));
 ///
-/// let x: KVType = 2i64.into();
-/// assert_eq!(x, KVType::Int(2i64));
+/// let x: KvValue = 2i64.into();
+/// assert_eq!(x, KvValue::Int(2i64));
 ///
-/// let x: KVType = 2i32.into();
-/// assert_eq!(x, KVType::Int(2i64));
+/// let x: KvValue = 2i32.into();
+/// assert_eq!(x, KvValue::Int(2i64));
 ///
-/// let x: KVType = 1.0f64.into();
-/// assert_eq!(x, KVType::Float(1f64));
+/// let x: KvValue = 1.0f64.into();
+/// assert_eq!(x, KvValue::Float(1f64));
 ///
-/// let x: KVType = 1.0f32.into();
-/// assert_eq!(x, KVType::Float(1f64));
+/// let x: KvValue = 1.0f32.into();
+/// assert_eq!(x, KvValue::Float(1f64));
 ///
-/// let x: KVType = true.into();
-/// assert_eq!(x, KVType::Bool(true));
+/// let x: KvValue = true.into();
+/// assert_eq!(x, KvValue::Bool(true));
 ///
-/// let x: KVType = &quot;a str&quot;.into();
-/// assert_eq!(x, KVType::Str(&quot;a str&quot;.to_string()));
+/// let x: KvValue = &quot;a str&quot;.into();
+/// assert_eq!(x, KvValue::Str(&quot;a str&quot;.to_string()));
 ///
-/// let x: KVType = &quot;a String&quot;.to_string().into();
-/// assert_eq!(x, KVType::Str(&quot;a String&quot;.to_string()));
+/// let x: KvValue = &quot;a String&quot;.to_string().into();
+/// assert_eq!(x, KvValue::Str(&quot;a String&quot;.to_string()));
 /// ```
 </span><span class="attribute">#[derive(Clone, PartialEq, Debug)]
-</span><span class="kw">pub enum </span>KVType {
+</span><span class="kw">pub enum </span>KvValue {
     <span class="doccomment">/// Floating point values
     </span>Float(f64),
     <span class="doccomment">/// Signed integers
@@ -471,133 +471,133 @@
     </span>Str(String),
 }
 
-<span class="kw">impl </span>KVType {
-    <span class="doccomment">/// Returns the kind of the `KVType`
+<span class="kw">impl </span>KvValue {
+    <span class="doccomment">/// Returns the kind of the `KvValue`
     ///
     /// # Examples
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Float(1.0).kind(), &quot;Float&quot;);
-    /// assert_eq!(KVType::Int(1).kind(), &quot;Int&quot;);
-    /// assert_eq!(KVType::Uint(1).kind(), &quot;Uint&quot;);
-    /// assert_eq!(KVType::Bool(true).kind(), &quot;Bool&quot;);
-    /// assert_eq!(KVType::Str(&quot;string&quot;.to_string()).kind(), &quot;Str&quot;);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Float(1.0).kind(), &quot;Float&quot;);
+    /// assert_eq!(KvValue::Int(1).kind(), &quot;Int&quot;);
+    /// assert_eq!(KvValue::Uint(1).kind(), &quot;Uint&quot;);
+    /// assert_eq!(KvValue::Bool(true).kind(), &quot;Bool&quot;);
+    /// assert_eq!(KvValue::Str(&quot;string&quot;.to_string()).kind(), &quot;Str&quot;);
     /// ```
     </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="kw">match </span><span class="self">self </span>{
-            KVType::Float(<span class="kw">_</span>) =&gt; <span class="string">&quot;Float&quot;</span>,
-            KVType::Int(<span class="kw">_</span>) =&gt; <span class="string">&quot;Int&quot;</span>,
-            KVType::Uint(<span class="kw">_</span>) =&gt; <span class="string">&quot;Uint&quot;</span>,
-            KVType::Bool(<span class="kw">_</span>) =&gt; <span class="string">&quot;Bool&quot;</span>,
-            KVType::Str(<span class="kw">_</span>) =&gt; <span class="string">&quot;Str&quot;</span>,
+            KvValue::Float(<span class="kw">_</span>) =&gt; <span class="string">&quot;Float&quot;</span>,
+            KvValue::Int(<span class="kw">_</span>) =&gt; <span class="string">&quot;Int&quot;</span>,
+            KvValue::Uint(<span class="kw">_</span>) =&gt; <span class="string">&quot;Uint&quot;</span>,
+            KvValue::Bool(<span class="kw">_</span>) =&gt; <span class="string">&quot;Bool&quot;</span>,
+            KvValue::Str(<span class="kw">_</span>) =&gt; <span class="string">&quot;Str&quot;</span>,
         }
     }
 
-    <span class="doccomment">/// Extract float from `KVType`
+    <span class="doccomment">/// Extract float from `KvValue`
     ///
-    /// Returns `Some(&lt;float&gt;)` if `KVType` is of kind `Float` and `None` otherwise.
+    /// Returns `Some(&lt;float&gt;)` if `KvValue` is of kind `Float` and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Float(1.0).get_float(), Some(1.0));
-    /// assert_eq!(KVType::Int(1).get_float(), None);
-    /// assert_eq!(KVType::Uint(1).get_float(), None);
-    /// assert_eq!(KVType::Bool(true).get_float(), None);
-    /// assert_eq!(KVType::Str(&quot;not a float&quot;.to_string()).get_float(), None);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Float(1.0).get_float(), Some(1.0));
+    /// assert_eq!(KvValue::Int(1).get_float(), None);
+    /// assert_eq!(KvValue::Uint(1).get_float(), None);
+    /// assert_eq!(KvValue::Bool(true).get_float(), None);
+    /// assert_eq!(KvValue::Str(&quot;not a float&quot;.to_string()).get_float(), None);
     /// ```
     </span><span class="kw">pub fn </span>get_float(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
-        <span class="kw">if let </span>KVType::Float(x) = <span class="kw-2">*</span><span class="self">self </span>{
+        <span class="kw">if let </span>KvValue::Float(x) = <span class="kw-2">*</span><span class="self">self </span>{
             <span class="prelude-val">Some</span>(x)
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
     }
 
-    <span class="doccomment">/// Extract int from `KVType`
+    <span class="doccomment">/// Extract int from `KvValue`
     ///
-    /// Returns `Some(&lt;int&gt;)` if `KVType` is of kind `Int` and `None` otherwise.
+    /// Returns `Some(&lt;int&gt;)` if `KvValue` is of kind `Int` and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Int(1).get_int(), Some(1i64));
-    /// assert_eq!(KVType::Float(1.0).get_int(), None);
-    /// assert_eq!(KVType::Uint(1).get_int(), None);
-    /// assert_eq!(KVType::Bool(true).get_int(), None);
-    /// assert_eq!(KVType::Str(&quot;not an int&quot;.to_string()).get_int(), None);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Int(1).get_int(), Some(1i64));
+    /// assert_eq!(KvValue::Float(1.0).get_int(), None);
+    /// assert_eq!(KvValue::Uint(1).get_int(), None);
+    /// assert_eq!(KvValue::Bool(true).get_int(), None);
+    /// assert_eq!(KvValue::Str(&quot;not an int&quot;.to_string()).get_int(), None);
     /// ```
     </span><span class="kw">pub fn </span>get_int(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
-        <span class="kw">if let </span>KVType::Int(x) = <span class="kw-2">*</span><span class="self">self </span>{
+        <span class="kw">if let </span>KvValue::Int(x) = <span class="kw-2">*</span><span class="self">self </span>{
             <span class="prelude-val">Some</span>(x)
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
     }
 
-    <span class="doccomment">/// Extract unsigned int from `KVType`
+    <span class="doccomment">/// Extract unsigned int from `KvValue`
     ///
-    /// Returns `Some(&lt;unsigned int&gt;)` if `KVType` is of kind `Uint` and `None` otherwise.
+    /// Returns `Some(&lt;unsigned int&gt;)` if `KvValue` is of kind `Uint` and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Uint(1).get_uint(), Some(1u64));
-    /// assert_eq!(KVType::Int(1).get_uint(), None);
-    /// assert_eq!(KVType::Float(1.0).get_uint(), None);
-    /// assert_eq!(KVType::Bool(true).get_uint(), None);
-    /// assert_eq!(KVType::Str(&quot;not an uint&quot;.to_string()).get_uint(), None);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Uint(1).get_uint(), Some(1u64));
+    /// assert_eq!(KvValue::Int(1).get_uint(), None);
+    /// assert_eq!(KvValue::Float(1.0).get_uint(), None);
+    /// assert_eq!(KvValue::Bool(true).get_uint(), None);
+    /// assert_eq!(KvValue::Str(&quot;not an uint&quot;.to_string()).get_uint(), None);
     /// ```
     </span><span class="kw">pub fn </span>get_uint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
-        <span class="kw">if let </span>KVType::Uint(x) = <span class="kw-2">*</span><span class="self">self </span>{
+        <span class="kw">if let </span>KvValue::Uint(x) = <span class="kw-2">*</span><span class="self">self </span>{
             <span class="prelude-val">Some</span>(x)
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
     }
 
-    <span class="doccomment">/// Extract bool from `KVType`
+    <span class="doccomment">/// Extract bool from `KvValue`
     ///
-    /// Returns `Some(&lt;bool&gt;)` if `KVType` is of kind `Bool` and `None` otherwise.
+    /// Returns `Some(&lt;bool&gt;)` if `KvValue` is of kind `Bool` and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Bool(true).get_bool(), Some(true));
-    /// assert_eq!(KVType::Float(1.0).get_bool(), None);
-    /// assert_eq!(KVType::Int(1).get_bool(), None);
-    /// assert_eq!(KVType::Uint(1).get_bool(), None);
-    /// assert_eq!(KVType::Str(&quot;not a bool&quot;.to_string()).get_bool(), None);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Bool(true).get_bool(), Some(true));
+    /// assert_eq!(KvValue::Float(1.0).get_bool(), None);
+    /// assert_eq!(KvValue::Int(1).get_bool(), None);
+    /// assert_eq!(KvValue::Uint(1).get_bool(), None);
+    /// assert_eq!(KvValue::Str(&quot;not a bool&quot;.to_string()).get_bool(), None);
     /// ```
     </span><span class="kw">pub fn </span>get_bool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
-        <span class="kw">if let </span>KVType::Bool(x) = <span class="kw-2">*</span><span class="self">self </span>{
+        <span class="kw">if let </span>KvValue::Bool(x) = <span class="kw-2">*</span><span class="self">self </span>{
             <span class="prelude-val">Some</span>(x)
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
     }
 
-    <span class="doccomment">/// Extract String from `KVType`
+    <span class="doccomment">/// Extract String from `KvValue`
     ///
-    /// Returns `Some(&lt;string&gt;)` if `KVType` is of kind `Str` and `None` otherwise.
+    /// Returns `Some(&lt;string&gt;)` if `KvValue` is of kind `Str` and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Str(&quot;a string&quot;.to_string()).get_string(), Some(&quot;a string&quot;.to_string()));
-    /// assert_eq!(KVType::Float(1.0).get_string(), None);
-    /// assert_eq!(KVType::Int(1).get_string(), None);
-    /// assert_eq!(KVType::Uint(1).get_string(), None);
-    /// assert_eq!(KVType::Bool(true).get_string(), None);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Str(&quot;a string&quot;.to_string()).get_string(), Some(&quot;a string&quot;.to_string()));
+    /// assert_eq!(KvValue::Float(1.0).get_string(), None);
+    /// assert_eq!(KvValue::Int(1).get_string(), None);
+    /// assert_eq!(KvValue::Uint(1).get_string(), None);
+    /// assert_eq!(KvValue::Bool(true).get_string(), None);
     /// ```
     </span><span class="kw">pub fn </span>get_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="kw">if let </span>KVType::Str(x) = <span class="self">self </span>{
+        <span class="kw">if let </span>KvValue::Str(x) = <span class="self">self </span>{
             <span class="prelude-val">Some</span>(x.clone())
         } <span class="kw">else </span>{
             <span class="prelude-val">None
@@ -605,68 +605,68 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;f64&gt; <span class="kw">for </span>KVType {
-    <span class="kw">fn </span>from(x: f64) -&gt; KVType {
-        KVType::Float(x)
+<span class="kw">impl </span>From&lt;f64&gt; <span class="kw">for </span>KvValue {
+    <span class="kw">fn </span>from(x: f64) -&gt; KvValue {
+        KvValue::Float(x)
     }
 }
 
-<span class="kw">impl </span>From&lt;f32&gt; <span class="kw">for </span>KVType {
-    <span class="kw">fn </span>from(x: f32) -&gt; KVType {
-        KVType::Float(f64::from(x))
+<span class="kw">impl </span>From&lt;f32&gt; <span class="kw">for </span>KvValue {
+    <span class="kw">fn </span>from(x: f32) -&gt; KvValue {
+        KvValue::Float(f64::from(x))
     }
 }
 
-<span class="kw">impl </span>From&lt;i64&gt; <span class="kw">for </span>KVType {
-    <span class="kw">fn </span>from(x: i64) -&gt; KVType {
-        KVType::Int(x)
+<span class="kw">impl </span>From&lt;i64&gt; <span class="kw">for </span>KvValue {
+    <span class="kw">fn </span>from(x: i64) -&gt; KvValue {
+        KvValue::Int(x)
     }
 }
 
-<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>KVType {
-    <span class="kw">fn </span>from(x: u64) -&gt; KVType {
-        KVType::Uint(x)
+<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>KvValue {
+    <span class="kw">fn </span>from(x: u64) -&gt; KvValue {
+        KvValue::Uint(x)
     }
 }
 
-<span class="kw">impl </span>From&lt;i32&gt; <span class="kw">for </span>KVType {
-    <span class="kw">fn </span>from(x: i32) -&gt; KVType {
-        KVType::Int(i64::from(x))
+<span class="kw">impl </span>From&lt;i32&gt; <span class="kw">for </span>KvValue {
+    <span class="kw">fn </span>from(x: i32) -&gt; KvValue {
+        KvValue::Int(i64::from(x))
     }
 }
 
-<span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>KVType {
-    <span class="kw">fn </span>from(x: u32) -&gt; KVType {
-        KVType::Uint(u64::from(x))
+<span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>KvValue {
+    <span class="kw">fn </span>from(x: u32) -&gt; KvValue {
+        KvValue::Uint(u64::from(x))
     }
 }
 
-<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>KVType {
-    <span class="kw">fn </span>from(x: bool) -&gt; KVType {
-        KVType::Bool(x)
+<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>KvValue {
+    <span class="kw">fn </span>from(x: bool) -&gt; KvValue {
+        KvValue::Bool(x)
     }
 }
 
-<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>KVType {
-    <span class="kw">fn </span>from(x: String) -&gt; KVType {
-        KVType::Str(x)
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>KvValue {
+    <span class="kw">fn </span>from(x: String) -&gt; KvValue {
+        KvValue::Str(x)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>KVType {
-    <span class="kw">fn </span>from(x: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; KVType {
-        KVType::Str(x.to_string())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>KvValue {
+    <span class="kw">fn </span>from(x: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; KvValue {
+        KvValue::Str(x.to_string())
     }
 }
 
-<span class="kw">impl </span>Display <span class="kw">for </span>KVType {
+<span class="kw">impl </span>Display <span class="kw">for </span>KvValue {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            KVType::Float(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
-            KVType::Int(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
-            KVType::Uint(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
-            KVType::Bool(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
-            KVType::Str(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
+            KvValue::Float(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
+            KvValue::Int(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
+            KvValue::Uint(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
+            KvValue::Bool(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
+            KvValue::Str(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
         };
         <span class="prelude-val">Ok</span>(())
     }
@@ -674,7 +674,7 @@
 
 <span class="doccomment">/// A simple key-value storage
 ///
-/// Keeps pairs of `(&amp;&#39;static str, KVType)` and is used to pass key-value pairs to
+/// Keeps pairs of `(&amp;&#39;static str, KvValue)` and is used to pass key-value pairs to
 /// [`Observers`](`crate::core::observers`) in each iteration of an optimization algorithm.
 /// Typically constructed using the [`kv!`](`crate::kv`) macro.
 ///
@@ -696,7 +696,7 @@
 </span><span class="attribute">#[derive(Clone, Default, PartialEq)]
 </span><span class="kw">pub struct </span>KV {
     <span class="doccomment">/// The actual key value storage
-    </span><span class="kw">pub </span>kv: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KVType&gt;,
+    </span><span class="kw">pub </span>kv: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KvValue&gt;,
 }
 
 <span class="kw">impl </span>Debug <span class="kw">for </span>KV {
@@ -735,45 +735,45 @@
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{KV, KVType};
+    /// # use argmin::core::{KV, KvValue};
     /// let mut kv = KV::new();
-    /// kv.insert(&quot;key1&quot;, KVType::Str(&quot;value&quot;.to_string()));
-    /// kv.insert(&quot;key2&quot;, KVType::Int(1234));
+    /// kv.insert(&quot;key1&quot;, KvValue::Str(&quot;value&quot;.to_string()));
+    /// kv.insert(&quot;key2&quot;, KvValue::Int(1234));
     /// # assert_eq!(kv.kv.len(), 2);
     /// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key1&quot;).unwrap()), &quot;value&quot;);
     /// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key2&quot;).unwrap()), &quot;1234&quot;);
     /// ```
-    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, val: KVType) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, val: KvValue) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.kv.insert(key, val);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Retrieve an element from the KV by key
     ///
-    /// Returns `Some(&lt;reference to KVType&gt;)` if `key` is present and `None` otherwise.
+    /// Returns `Some(&lt;reference to KvValue&gt;)` if `key` is present and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{KV, KVType};
+    /// # use argmin::core::{KV, KvValue};
     /// let mut kv1 = KV::new();
-    /// kv1.insert(&quot;key1&quot;, KVType::Float(12.0));
+    /// kv1.insert(&quot;key1&quot;, KvValue::Float(12.0));
     ///
-    /// assert_eq!(kv1.get(&quot;key1&quot;), Some(&amp;KVType::Float(12.0)));
+    /// assert_eq!(kv1.get(&quot;key1&quot;), Some(&amp;KvValue::Float(12.0)));
     /// assert_eq!(kv1.get(&quot;non_existing&quot;), None);
     /// ```
-    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>KVType&gt; {
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>KvValue&gt; {
         <span class="self">self</span>.kv.get(key)
     }
 
-    <span class="doccomment">/// Returns all available keys and their `KVType` kind
+    <span class="doccomment">/// Returns all available keys and their `KvValue` kind
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{KV, KVType};
+    /// # use argmin::core::{KV, KvValue};
     /// let mut kv1 = KV::new();
-    /// kv1.insert(&quot;key1&quot;, KVType::Str(&quot;value1&quot;.to_string()));
+    /// kv1.insert(&quot;key1&quot;, KvValue::Str(&quot;value1&quot;.to_string()));
     ///
     /// assert_eq!(kv1.keys(), vec![(&quot;key1&quot;, &quot;Str&quot;)]);
     /// ```
@@ -786,14 +786,14 @@
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{KV, KVType};
+    /// # use argmin::core::{KV, KvValue};
     /// let mut kv1 = KV::new();
-    /// kv1.insert(&quot;key1&quot;, KVType::Str(&quot;value1&quot;.to_string()));
+    /// kv1.insert(&quot;key1&quot;, KvValue::Str(&quot;value1&quot;.to_string()));
     /// # assert_eq!(kv1.kv.len(), 1);
     /// # assert_eq!(format!(&quot;{}&quot;, kv1.get(&quot;key1&quot;).unwrap()), &quot;value1&quot;);
     ///
     /// let mut kv2 = KV::new();
-    /// kv2.insert(&quot;key2&quot;, KVType::Str(&quot;value2&quot;.to_string()));
+    /// kv2.insert(&quot;key2&quot;, KvValue::Str(&quot;value2&quot;.to_string()));
     /// # assert_eq!(kv2.kv.len(), 1);
     /// # assert_eq!(format!(&quot;{}&quot;, kv2.get(&quot;key2&quot;).unwrap()), &quot;value2&quot;);
     ///
@@ -809,8 +809,8 @@
     </span>}
 }
 
-<span class="kw">impl </span>std::iter::FromIterator&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KVType)&gt; <span class="kw">for </span>KV {
-    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KVType)&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>std::iter::FromIterator&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KvValue)&gt; <span class="kw">for </span>KV {
+    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KvValue)&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>c = KV::new();
         <span class="kw">for </span>i <span class="kw">in </span>iter {
             c.insert(i.<span class="number">0</span>, i.<span class="number">1</span>);
@@ -819,8 +819,8 @@
     }
 }
 
-<span class="kw">impl </span>std::iter::Extend&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KVType)&gt; <span class="kw">for </span>KV {
-    <span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KVType)&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
+<span class="kw">impl </span>std::iter::Extend&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KvValue)&gt; <span class="kw">for </span>KV {
+    <span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KvValue)&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
         <span class="kw">for </span>i <span class="kw">in </span>iter {
             <span class="self">self</span>.insert(i.<span class="number">0</span>, i.<span class="number">1</span>);
         }

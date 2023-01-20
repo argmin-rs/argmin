@@ -50,7 +50,7 @@
 // http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::core::{kv::KVType, DeserializeOwnedAlias, SendAlias, SerializeAlias};
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{kv::KvValue, DeserializeOwnedAlias, SendAlias, SerializeAlias};
 <span class="kw">use </span>num_traits::{Float, FloatConst, FromPrimitive, ToPrimitive};
 <span class="kw">use </span>std::fmt::{Debug, Display};
 
@@ -69,7 +69,7 @@
     + SerializeAlias
     + DeserializeOwnedAlias
     + SendAlias
-    + Into&lt;KVType&gt;
+    + Into&lt;KvValue&gt;
 {
 }
 
@@ -85,7 +85,7 @@
         + SerializeAlias
         + DeserializeOwnedAlias
         + SendAlias
-        + Into&lt;KVType&gt;
+        + Into&lt;KvValue&gt;
 {
 }
 </code></pre></div>
