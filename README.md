@@ -119,6 +119,13 @@ argmin is designed to simplify the implementation of optimization algorithms and
 - Simulated Annealing
 - Particle Swarm Optimization
 
+### External solvers compatible with argmin
+
+External solvers which implement the `Solver` trait are compatible with argmins `Executor`, 
+and as such can leverage features like checkpointing and observers. 
+
+- [egobox](https://crates.io/crates/egobox-ego)
+
 
 ## License
 
