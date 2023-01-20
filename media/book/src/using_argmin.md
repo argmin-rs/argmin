@@ -18,7 +18,7 @@ argmin-math = { git = "https://github.com/argmin-rs/argmin", features = ["ndarra
 
 Via adding `argmin-math` one can choose which math backend should be available (and whether `serde`-support is enabled or not).
 The examples above use both the `ndarray_latest-serde` and `nalgebra_latest-serde` features of `argmin-math`.
-For details on which options are available in `argmin-math`, please refer to the [documentation](https://docs.rs/argmin/latest/argmin-math/).
+For details on which options are available in `argmin-math`, please refer to the [documentation](https://docs.rs/argmin-math/latest/argmin_math/).
 
 
 ## Crate features
