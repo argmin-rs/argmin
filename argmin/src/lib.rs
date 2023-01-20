@@ -81,6 +81,13 @@
 //!
 //! - [Particle Swarm Optimization](`crate::solver::particleswarm::ParticleSwarm`)
 //!
+//! ## External solvers compatible with argmin
+//!
+//! External solvers which implement the `Solver` trait are compatible with argmins `Executor`,
+//! and as such can leverage features like checkpointing and observers.
+//!
+//! - [egobox](https://crates.io/crates/egobox-ego)
+//!
 //! # License
 //!
 //! Licensed under either of
