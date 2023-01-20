@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="http://argmin-rs.org">Website</a>
+  <a href="https://argmin-rs.org">Website</a>
   |
-  <a href="http://argmin-rs.org/book/">Book</a>
+  <a href="https://argmin-rs.org/book/">Book</a>
   |
   <a href="https://docs.rs/argmin-math">Docs (latest release)</a>
   |
@@ -41,7 +41,7 @@
 </p>
 
 
-This create provides a abstractions for mathematical operations needed in [argmin](http://argmin-rs.org).
+This create provides a abstractions for mathematical operations needed in [argmin](https://argmin-rs.org).
 The supported math backends so far are basic `Vec`s, `ndarray` and `nalgebra`.
 Please consult the documentation for details.
 

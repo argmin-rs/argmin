@@ -1,12 +1,12 @@
 [package]
 name = "argmin-math"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "argmin math abstractions"
 documentation = "https://docs.rs/argmin-math/"
-homepage = "http://argmin-rs.org"
+homepage = "https://argmin-rs.org"
 repository = "https://github.com/argmin-rs/argmin"
 readme = "README.md"
 keywords = ["optimization", "math", "science"]

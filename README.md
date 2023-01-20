@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="http://argmin-rs.org">Website</a>
+  <a href="https://argmin-rs.org">Website</a>
   |
-  <a href="http://argmin-rs.org/book/">Book</a>
+  <a href="https://argmin-rs.org/book/">Book</a>
   |
   <a href="https://docs.rs/argmin">Docs (latest release)</a>
   |
@@ -24,12 +24,12 @@
 
 <p align="center">
 <!--
-  <a href="http://argmin-rs.org"
+  <a href="https://argmin-rs.org"
     ><img
       src="https://img.shields.io/website?down_message=offline&style=flat-square&up_message=argmin-rs.org&url=http%3A%2F%2Fargmin-rs.org"
       alt="Website"
   /></a>
-  <a href="http://argmin-rs.org/book/"
+  <a href="https://argmin-rs.org/book/"
     ><img
       src="https://img.shields.io/website?label=book&style=flat-square&url=http%3A%2F%2Fargmin-rs.org%2Fbook%2F"
       alt="Website"
