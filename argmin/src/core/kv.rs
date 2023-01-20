@@ -12,39 +12,39 @@ use std::fmt::{Debug, Display};
 /// Types available for use in [`KV`](KV).
 ///
 /// `Float`, `Int` and `Uint` are all 64bit. The corresponding 32bit variants must be
-/// be converted to 64 bit. Preferably the `From` impls are used to create a `KVType`:
+/// be converted to 64 bit. Preferably the `From` impls are used to create a `KvValue`:
 ///
 /// ```
-/// # use argmin::core::KVType;
-/// let x: KVType = 1u64.into();
-/// assert_eq!(x, KVType::Uint(1u64));
+/// # use argmin::core::KvValue;
+/// let x: KvValue = 1u64.into();
+/// assert_eq!(x, KvValue::Uint(1u64));
 ///
-/// let x: KVType = 2u32.into();
-/// assert_eq!(x, KVType::Uint(2u64));
+/// let x: KvValue = 2u32.into();
+/// assert_eq!(x, KvValue::Uint(2u64));
 ///
-/// let x: KVType = 2i64.into();
-/// assert_eq!(x, KVType::Int(2i64));
+/// let x: KvValue = 2i64.into();
+/// assert_eq!(x, KvValue::Int(2i64));
 ///
-/// let x: KVType = 2i32.into();
-/// assert_eq!(x, KVType::Int(2i64));
+/// let x: KvValue = 2i32.into();
+/// assert_eq!(x, KvValue::Int(2i64));
 ///
-/// let x: KVType = 1.0f64.into();
-/// assert_eq!(x, KVType::Float(1f64));
+/// let x: KvValue = 1.0f64.into();
+/// assert_eq!(x, KvValue::Float(1f64));
 ///
-/// let x: KVType = 1.0f32.into();
-/// assert_eq!(x, KVType::Float(1f64));
+/// let x: KvValue = 1.0f32.into();
+/// assert_eq!(x, KvValue::Float(1f64));
 ///
-/// let x: KVType = true.into();
-/// assert_eq!(x, KVType::Bool(true));
+/// let x: KvValue = true.into();
+/// assert_eq!(x, KvValue::Bool(true));
 ///
-/// let x: KVType = "a str".into();
-/// assert_eq!(x, KVType::Str("a str".to_string()));
+/// let x: KvValue = "a str".into();
+/// assert_eq!(x, KvValue::Str("a str".to_string()));
 ///
-/// let x: KVType = "a String".to_string().into();
-/// assert_eq!(x, KVType::Str("a String".to_string()));
+/// let x: KvValue = "a String".to_string().into();
+/// assert_eq!(x, KvValue::Str("a String".to_string()));
 /// ```
 #[derive(Clone, PartialEq, Debug)]
-pub enum KVType {
+pub enum KvValue {
     /// Floating point values
     Float(f64),
     /// Signed integers
@@ -57,133 +57,133 @@ pub enum KVType {
     Str(String),
 }
 
-impl KVType {
-    /// Returns the kind of the `KVType`
+impl KvValue {
+    /// Returns the kind of the `KvValue`
     ///
     /// # Examples
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Float(1.0).kind(), "Float");
-    /// assert_eq!(KVType::Int(1).kind(), "Int");
-    /// assert_eq!(KVType::Uint(1).kind(), "Uint");
-    /// assert_eq!(KVType::Bool(true).kind(), "Bool");
-    /// assert_eq!(KVType::Str("string".to_string()).kind(), "Str");
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Float(1.0).kind(), "Float");
+    /// assert_eq!(KvValue::Int(1).kind(), "Int");
+    /// assert_eq!(KvValue::Uint(1).kind(), "Uint");
+    /// assert_eq!(KvValue::Bool(true).kind(), "Bool");
+    /// assert_eq!(KvValue::Str("string".to_string()).kind(), "Str");
     /// ```
     pub fn kind(&self) -> &'static str {
         match self {
-            KVType::Float(_) => "Float",
-            KVType::Int(_) => "Int",
-            KVType::Uint(_) => "Uint",
-            KVType::Bool(_) => "Bool",
-            KVType::Str(_) => "Str",
+            KvValue::Float(_) => "Float",
+            KvValue::Int(_) => "Int",
+            KvValue::Uint(_) => "Uint",
+            KvValue::Bool(_) => "Bool",
+            KvValue::Str(_) => "Str",
         }
     }
 
-    /// Extract float from `KVType`
+    /// Extract float from `KvValue`
     ///
-    /// Returns `Some(<float>)` if `KVType` is of kind `Float` and `None` otherwise.
+    /// Returns `Some(<float>)` if `KvValue` is of kind `Float` and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Float(1.0).get_float(), Some(1.0));
-    /// assert_eq!(KVType::Int(1).get_float(), None);
-    /// assert_eq!(KVType::Uint(1).get_float(), None);
-    /// assert_eq!(KVType::Bool(true).get_float(), None);
-    /// assert_eq!(KVType::Str("not a float".to_string()).get_float(), None);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Float(1.0).get_float(), Some(1.0));
+    /// assert_eq!(KvValue::Int(1).get_float(), None);
+    /// assert_eq!(KvValue::Uint(1).get_float(), None);
+    /// assert_eq!(KvValue::Bool(true).get_float(), None);
+    /// assert_eq!(KvValue::Str("not a float".to_string()).get_float(), None);
     /// ```
     pub fn get_float(&self) -> Option<f64> {
-        if let KVType::Float(x) = *self {
+        if let KvValue::Float(x) = *self {
             Some(x)
         } else {
             None
         }
     }
 
-    /// Extract int from `KVType`
+    /// Extract int from `KvValue`
     ///
-    /// Returns `Some(<int>)` if `KVType` is of kind `Int` and `None` otherwise.
+    /// Returns `Some(<int>)` if `KvValue` is of kind `Int` and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Int(1).get_int(), Some(1i64));
-    /// assert_eq!(KVType::Float(1.0).get_int(), None);
-    /// assert_eq!(KVType::Uint(1).get_int(), None);
-    /// assert_eq!(KVType::Bool(true).get_int(), None);
-    /// assert_eq!(KVType::Str("not an int".to_string()).get_int(), None);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Int(1).get_int(), Some(1i64));
+    /// assert_eq!(KvValue::Float(1.0).get_int(), None);
+    /// assert_eq!(KvValue::Uint(1).get_int(), None);
+    /// assert_eq!(KvValue::Bool(true).get_int(), None);
+    /// assert_eq!(KvValue::Str("not an int".to_string()).get_int(), None);
     /// ```
     pub fn get_int(&self) -> Option<i64> {
-        if let KVType::Int(x) = *self {
+        if let KvValue::Int(x) = *self {
             Some(x)
         } else {
             None
         }
     }
 
-    /// Extract unsigned int from `KVType`
+    /// Extract unsigned int from `KvValue`
     ///
-    /// Returns `Some(<unsigned int>)` if `KVType` is of kind `Uint` and `None` otherwise.
+    /// Returns `Some(<unsigned int>)` if `KvValue` is of kind `Uint` and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Uint(1).get_uint(), Some(1u64));
-    /// assert_eq!(KVType::Int(1).get_uint(), None);
-    /// assert_eq!(KVType::Float(1.0).get_uint(), None);
-    /// assert_eq!(KVType::Bool(true).get_uint(), None);
-    /// assert_eq!(KVType::Str("not an uint".to_string()).get_uint(), None);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Uint(1).get_uint(), Some(1u64));
+    /// assert_eq!(KvValue::Int(1).get_uint(), None);
+    /// assert_eq!(KvValue::Float(1.0).get_uint(), None);
+    /// assert_eq!(KvValue::Bool(true).get_uint(), None);
+    /// assert_eq!(KvValue::Str("not an uint".to_string()).get_uint(), None);
     /// ```
     pub fn get_uint(&self) -> Option<u64> {
-        if let KVType::Uint(x) = *self {
+        if let KvValue::Uint(x) = *self {
             Some(x)
         } else {
             None
         }
     }
 
-    /// Extract bool from `KVType`
+    /// Extract bool from `KvValue`
     ///
-    /// Returns `Some(<bool>)` if `KVType` is of kind `Bool` and `None` otherwise.
+    /// Returns `Some(<bool>)` if `KvValue` is of kind `Bool` and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Bool(true).get_bool(), Some(true));
-    /// assert_eq!(KVType::Float(1.0).get_bool(), None);
-    /// assert_eq!(KVType::Int(1).get_bool(), None);
-    /// assert_eq!(KVType::Uint(1).get_bool(), None);
-    /// assert_eq!(KVType::Str("not a bool".to_string()).get_bool(), None);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Bool(true).get_bool(), Some(true));
+    /// assert_eq!(KvValue::Float(1.0).get_bool(), None);
+    /// assert_eq!(KvValue::Int(1).get_bool(), None);
+    /// assert_eq!(KvValue::Uint(1).get_bool(), None);
+    /// assert_eq!(KvValue::Str("not a bool".to_string()).get_bool(), None);
     /// ```
     pub fn get_bool(&self) -> Option<bool> {
-        if let KVType::Bool(x) = *self {
+        if let KvValue::Bool(x) = *self {
             Some(x)
         } else {
             None
         }
     }
 
-    /// Extract String from `KVType`
+    /// Extract String from `KvValue`
     ///
-    /// Returns `Some(<string>)` if `KVType` is of kind `Str` and `None` otherwise.
+    /// Returns `Some(<string>)` if `KvValue` is of kind `Str` and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::KVType;
-    /// assert_eq!(KVType::Str("a string".to_string()).get_string(), Some("a string".to_string()));
-    /// assert_eq!(KVType::Float(1.0).get_string(), None);
-    /// assert_eq!(KVType::Int(1).get_string(), None);
-    /// assert_eq!(KVType::Uint(1).get_string(), None);
-    /// assert_eq!(KVType::Bool(true).get_string(), None);
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Str("a string".to_string()).get_string(), Some("a string".to_string()));
+    /// assert_eq!(KvValue::Float(1.0).get_string(), None);
+    /// assert_eq!(KvValue::Int(1).get_string(), None);
+    /// assert_eq!(KvValue::Uint(1).get_string(), None);
+    /// assert_eq!(KvValue::Bool(true).get_string(), None);
     /// ```
     pub fn get_string(&self) -> Option<String> {
-        if let KVType::Str(x) = self {
+        if let KvValue::Str(x) = self {
             Some(x.clone())
         } else {
             None
@@ -191,68 +191,68 @@ impl KVType {
     }
 }
 
-impl From<f64> for KVType {
-    fn from(x: f64) -> KVType {
-        KVType::Float(x)
+impl From<f64> for KvValue {
+    fn from(x: f64) -> KvValue {
+        KvValue::Float(x)
     }
 }
 
-impl From<f32> for KVType {
-    fn from(x: f32) -> KVType {
-        KVType::Float(f64::from(x))
+impl From<f32> for KvValue {
+    fn from(x: f32) -> KvValue {
+        KvValue::Float(f64::from(x))
     }
 }
 
-impl From<i64> for KVType {
-    fn from(x: i64) -> KVType {
-        KVType::Int(x)
+impl From<i64> for KvValue {
+    fn from(x: i64) -> KvValue {
+        KvValue::Int(x)
     }
 }
 
-impl From<u64> for KVType {
-    fn from(x: u64) -> KVType {
-        KVType::Uint(x)
+impl From<u64> for KvValue {
+    fn from(x: u64) -> KvValue {
+        KvValue::Uint(x)
     }
 }
 
-impl From<i32> for KVType {
-    fn from(x: i32) -> KVType {
-        KVType::Int(i64::from(x))
+impl From<i32> for KvValue {
+    fn from(x: i32) -> KvValue {
+        KvValue::Int(i64::from(x))
     }
 }
 
-impl From<u32> for KVType {
-    fn from(x: u32) -> KVType {
-        KVType::Uint(u64::from(x))
+impl From<u32> for KvValue {
+    fn from(x: u32) -> KvValue {
+        KvValue::Uint(u64::from(x))
     }
 }
 
-impl From<bool> for KVType {
-    fn from(x: bool) -> KVType {
-        KVType::Bool(x)
+impl From<bool> for KvValue {
+    fn from(x: bool) -> KvValue {
+        KvValue::Bool(x)
     }
 }
 
-impl From<String> for KVType {
-    fn from(x: String) -> KVType {
-        KVType::Str(x)
+impl From<String> for KvValue {
+    fn from(x: String) -> KvValue {
+        KvValue::Str(x)
     }
 }
 
-impl<'a> From<&'a str> for KVType {
-    fn from(x: &'a str) -> KVType {
-        KVType::Str(x.to_string())
+impl<'a> From<&'a str> for KvValue {
+    fn from(x: &'a str) -> KvValue {
+        KvValue::Str(x.to_string())
     }
 }
 
-impl Display for KVType {
+impl Display for KvValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            KVType::Float(x) => write!(f, "{x}")?,
-            KVType::Int(x) => write!(f, "{x}")?,
-            KVType::Uint(x) => write!(f, "{x}")?,
-            KVType::Bool(x) => write!(f, "{x}")?,
-            KVType::Str(x) => write!(f, "{x}")?,
+            KvValue::Float(x) => write!(f, "{x}")?,
+            KvValue::Int(x) => write!(f, "{x}")?,
+            KvValue::Uint(x) => write!(f, "{x}")?,
+            KvValue::Bool(x) => write!(f, "{x}")?,
+            KvValue::Str(x) => write!(f, "{x}")?,
         };
         Ok(())
     }
@@ -260,7 +260,7 @@ impl Display for KVType {
 
 /// A simple key-value storage
 ///
-/// Keeps pairs of `(&'static str, KVType)` and is used to pass key-value pairs to
+/// Keeps pairs of `(&'static str, KvValue)` and is used to pass key-value pairs to
 /// [`Observers`](`crate::core::observers`) in each iteration of an optimization algorithm.
 /// Typically constructed using the [`kv!`](`crate::kv`) macro.
 ///
@@ -282,7 +282,7 @@ impl Display for KVType {
 #[derive(Clone, Default, PartialEq)]
 pub struct KV {
     /// The actual key value storage
-    pub kv: HashMap<&'static str, KVType>,
+    pub kv: HashMap<&'static str, KvValue>,
 }
 
 impl Debug for KV {
@@ -321,45 +321,45 @@ impl KV {
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{KV, KVType};
+    /// # use argmin::core::{KV, KvValue};
     /// let mut kv = KV::new();
-    /// kv.insert("key1", KVType::Str("value".to_string()));
-    /// kv.insert("key2", KVType::Int(1234));
+    /// kv.insert("key1", KvValue::Str("value".to_string()));
+    /// kv.insert("key2", KvValue::Int(1234));
     /// # assert_eq!(kv.kv.len(), 2);
     /// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value");
     /// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "1234");
     /// ```
-    pub fn insert(&mut self, key: &'static str, val: KVType) -> &mut Self {
+    pub fn insert(&mut self, key: &'static str, val: KvValue) -> &mut Self {
         self.kv.insert(key, val);
         self
     }
 
     /// Retrieve an element from the KV by key
     ///
-    /// Returns `Some(<reference to KVType>)` if `key` is present and `None` otherwise.
+    /// Returns `Some(<reference to KvValue>)` if `key` is present and `None` otherwise.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{KV, KVType};
+    /// # use argmin::core::{KV, KvValue};
     /// let mut kv1 = KV::new();
-    /// kv1.insert("key1", KVType::Float(12.0));
+    /// kv1.insert("key1", KvValue::Float(12.0));
     ///
-    /// assert_eq!(kv1.get("key1"), Some(&KVType::Float(12.0)));
+    /// assert_eq!(kv1.get("key1"), Some(&KvValue::Float(12.0)));
     /// assert_eq!(kv1.get("non_existing"), None);
     /// ```
-    pub fn get(&self, key: &'static str) -> Option<&KVType> {
+    pub fn get(&self, key: &'static str) -> Option<&KvValue> {
         self.kv.get(key)
     }
 
-    /// Returns all available keys and their `KVType` kind
+    /// Returns all available keys and their `KvValue` kind
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{KV, KVType};
+    /// # use argmin::core::{KV, KvValue};
     /// let mut kv1 = KV::new();
-    /// kv1.insert("key1", KVType::Str("value1".to_string()));
+    /// kv1.insert("key1", KvValue::Str("value1".to_string()));
     ///
     /// assert_eq!(kv1.keys(), vec![("key1", "Str")]);
     /// ```
@@ -372,14 +372,14 @@ impl KV {
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{KV, KVType};
+    /// # use argmin::core::{KV, KvValue};
     /// let mut kv1 = KV::new();
-    /// kv1.insert("key1", KVType::Str("value1".to_string()));
+    /// kv1.insert("key1", KvValue::Str("value1".to_string()));
     /// # assert_eq!(kv1.kv.len(), 1);
     /// # assert_eq!(format!("{}", kv1.get("key1").unwrap()), "value1");
     ///
     /// let mut kv2 = KV::new();
-    /// kv2.insert("key2", KVType::Str("value2".to_string()));
+    /// kv2.insert("key2", KvValue::Str("value2".to_string()));
     /// # assert_eq!(kv2.kv.len(), 1);
     /// # assert_eq!(format!("{}", kv2.get("key2").unwrap()), "value2");
     ///
@@ -395,8 +395,8 @@ impl KV {
     }
 }
 
-impl std::iter::FromIterator<(&'static str, KVType)> for KV {
-    fn from_iter<I: IntoIterator<Item = (&'static str, KVType)>>(iter: I) -> Self {
+impl std::iter::FromIterator<(&'static str, KvValue)> for KV {
+    fn from_iter<I: IntoIterator<Item = (&'static str, KvValue)>>(iter: I) -> Self {
         let mut c = KV::new();
         for i in iter {
             c.insert(i.0, i.1);
@@ -405,8 +405,8 @@ impl std::iter::FromIterator<(&'static str, KVType)> for KV {
     }
 }
 
-impl std::iter::Extend<(&'static str, KVType)> for KV {
-    fn extend<I: IntoIterator<Item = (&'static str, KVType)>>(&mut self, iter: I) {
+impl std::iter::Extend<(&'static str, KvValue)> for KV {
+    fn extend<I: IntoIterator<Item = (&'static str, KvValue)>>(&mut self, iter: I) {
         for i in iter {
             self.insert(i.0, i.1);
         }

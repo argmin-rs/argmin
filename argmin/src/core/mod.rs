@@ -47,7 +47,7 @@ pub use anyhow::Error;
 pub use errors::ArgminError;
 pub use executor::Executor;
 pub use float::ArgminFloat;
-pub use kv::{KVType, KV};
+pub use kv::{KvValue, KV};
 pub use parallelization::{SendAlias, SyncAlias};
 pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator, Problem};
 pub use result::OptimizationResult;
