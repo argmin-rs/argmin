@@ -7,7 +7,7 @@ title = "argmin{}"
 lead = 'Mathematical optimization in pure Rust.'
 url = "/docs/getting-started/introduction/"
 url_button = "Get started"
-crates_url = "http://www.argmin-rs.org/book/"
+crates_url = "https://www.argmin-rs.org/book/"
 crates_url_button = "Book"
 docs_url = "https://docs.rs/argmin"
 docs_url_button = "Docs"
@@ -35,7 +35,7 @@ repo_url = "https://github.com/argmin-rs/argmin"
 # [[extra.menu.main]]
 # name = "docs.rs"
 # section = "docs"
-# url = "http://docs.rs/argmin"
+# url = "https://docs.rs/argmin"
 # weight = 10
 
 [[extra.menu.main]]

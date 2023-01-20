@@ -158,7 +158,7 @@ In the course of this the previously implemented Brent's method (the root findin
 
 Adding missing documentation after years of development really teaches you a lesson.
 I've spent countless hours adding (hopefully useful) documentation and doctests to every struct, method, function, module and trait. 
-The documentation on [docs.rs](https://docs.rs/argmin) now covers the API and the newly created [argmin book](http://www.argmin-rs.org/book/) is a set of loosely coupled tutorials on how to use different aspects of the library.
+The documentation on [docs.rs](https://docs.rs/argmin) now covers the API and the newly created [argmin book](https://www.argmin-rs.org/book/) is a set of loosely coupled tutorials on how to use different aspects of the library.
 I plan to continuously improve and add to the book such that it eventually becomes a valuable resource for anyone using argmin.
 
 While the situation has improved a lot in terms of documentation, there are still corners which could use a bit more love.
