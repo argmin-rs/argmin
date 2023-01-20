@@ -9,6 +9,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## argmin-math [Unreleased]
 
+## argmin [argmin v0.8.0] 2023-01-28
+
+### Added
+
+* Added a `full` feature which enables all features (@stefan-k)
+* Added a particle swarm optimization example using the `nalgebra` math backend (@stefan-k)
+* Added a L-BFGS example using the `nalgebra` math backend (@stefan-k)
+
+### Changed
+
+* Improved termination handling (@relf, #305)
+  - Introduced `TerminationStatus` which can either be `Terminated(TerminationReason)` or `NotTerminated`
+  - The fields of the `TerminationReason` enum were reduced to cases potentially relevant to any solver. Solver-specific cases can be handled with `SolverExit(String)`.
+  - Added new `TerminationReason::KeyboardInterrupt` and `TerminationReason::Converged`
+* Changes to KV store used to get values from the solver to observers (@stefan-k)
+  - KV store is  now typed (via `KvValue`), which means that observers can now use the actual numbers (in the past those values were only `dyn Display` and as such could only be printed)
+  - `make_kv!` renamed to `kv!`
+* Solver does not need to be `Serialize` anymore when `serde1` feature is enabled. This was an oversight reported by @relf and fixed by @stefan-k
+* Better calculation of elapsed time inside `Executor` (@TheIronBorn)
+* The check whether the target cost is reached is now based on the current best cost function value rather than the current cost function value (@relf)
+
+
+## argmin-math [argmin-math v0.3.0] 2023-01-28
+
+### Added
+
+* Added support for `nalgebra` 0.32
+
+### Changed
+
+* All math backends now implement all math related traits (apart from the `Vec` backend which does not implement `ArgminInv`). Therefore (almost) all solvers work with all backends. (@hypotrochoid, @stefan-k)
+* More primitive and complex types are now covered as well (@stefan-k)
+* Reached 100% test coverage (@stefan-k)
+* `InverseError` is not `Clone` anymore (@stefan-k)
+* Upgraded `ndarray-linalg` to version 0.16 for the `ndarray` 0.15 backend
+
+
 ## [argmin-math v0.2.1] 2022-09-09
 
 ### Added
@@ -186,9 +223,11 @@ This is a rather large release with many (breaking) changes.
 
 For older versions please see the Git history.
 
-[Unreleased]: https://github.com/argmin-rs/argmin/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.0...HEAD
+[argmin v0.8.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.7.0...argmin-v0.8.0
+[argmin v0.7.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.6.0...argmin-v0.7.0
 [argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin-v0.6.0
-[argmin-math v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin-v0.6.0
-[argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.6.0...argmin-v0.7.0
-[argmin-math v0.2.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.6.0...argmin-v0.7.0
-[argmin-math v0.2.1]: https://github.com/argmin-rs/argmin/compare/argmin-v0.7.0...argmin-math-v0.2.1
+[argmin-math v0.3.0]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.2.1...argmin-math-v0.3.0
+[argmin-math v0.2.1]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.2.0...argmin-math-v0.2.1
+[argmin-math v0.2.0]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.1.0...argmin-math-v0.2.0
+[argmin-math v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin-math-v0.1.0

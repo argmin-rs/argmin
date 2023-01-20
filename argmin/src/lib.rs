@@ -26,7 +26,7 @@
 //! and Hessians is taken care of by the library.
 //!
 //! For an introduction on how to use argmin, please also have a look at the
-//! [book](http://www.argmin-rs.org/book/).
+//! [book](https://www.argmin-rs.org/book/).
 //!
 //! # Highlights
 //!
