@@ -348,6 +348,10 @@
 <span id="348">348</span>
 <span id="349">349</span>
 <span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -429,6 +433,8 @@
 //! |------------------------|---------|------------------------------------------|
 //! | `nalgebra_latest`      | no      | latest supported version                 |
 //! | `nalgebra_latest-serde`| no      | latest supported version + serde support |
+//! | `nalgebra_v0_32`       | no      | version 0.32                             |
+//! | `nalgebra_v0_32-serde` | no      | version 0.32 + serde support             |
 //! | `nalgebra_v0_31`       | no      | version 0.31                             |
 //! | `nalgebra_v0_31-serde` | no      | version 0.31 + serde support             |
 //! | `nalgebra_v0_30`       | no      | version 0.30                             |
@@ -516,7 +522,9 @@
 </span><span class="attribute">#![deny(clippy::float_cmp)]
 
 </span><span class="macro">cfg_if::cfg_if! </span>{
-    <span class="kw">if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;nalgebra_0_31&quot;</span>)] </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;nalgebra_0_32&quot;</span>)] </span>{
+        <span class="kw">extern crate </span>nalgebra_0_32 <span class="kw">as </span>nalgebra;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;nalgebra_0_31&quot;</span>)] </span>{
         <span class="kw">extern crate </span>nalgebra_0_31 <span class="kw">as </span>nalgebra;
     } <span class="kw">else if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;nalgebra_0_30&quot;</span>)] </span>{
         <span class="kw">extern crate </span>nalgebra_0_30 <span class="kw">as </span>nalgebra;
