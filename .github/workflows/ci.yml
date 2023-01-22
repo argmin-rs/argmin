@@ -115,6 +115,8 @@ jobs:
       # nalgebra without serde
       - name: argmin-math (nalgebra_latest)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_latest"
+      - name: argmin-math (nalgebra_v0_32)
+        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_32"
       - name: argmin-math (nalgebra_v0_31)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_31"
       - name: argmin-math (nalgebra_v0_30)
@@ -124,6 +126,8 @@ jobs:
       # nalgebra with serde
       - name: argmin-math (nalgebra_latest-serde)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_latest-serde"
+      - name: argmin-math (nalgebra_v0_32-serde)
+        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_32-serde"
       - name: argmin-math (nalgebra_v0_31-serde)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_31-serde"
       - name: argmin-math (nalgebra_v0_30-serde)
