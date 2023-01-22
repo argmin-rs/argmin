@@ -42,7 +42,7 @@ finitediff = { version = "0.1.4", features = ["ndarray"] }
 argmin_testfunctions = "0.1.1"
 nalgebra = { version = "0.31", features = ["serde-serialize"] }
 ndarray = { version = "0.15", features = ["serde-1"] }
-ndarray-linalg = { version = "0.14", features = ["netlib"] }
+ndarray-linalg = { version = "0.16", features = ["netlib"] }
 argmin-math = { path = "../argmin-math" }
 serde = { version = "1.0", features = ["derive", "rc"] }
 
