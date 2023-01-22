@@ -79,6 +79,8 @@
 //! |------------------------|---------|------------------------------------------|
 //! | `nalgebra_latest`      | no      | latest supported version                 |
 //! | `nalgebra_latest-serde`| no      | latest supported version + serde support |
+//! | `nalgebra_v0_32`       | no      | version 0.32                             |
+//! | `nalgebra_v0_32-serde` | no      | version 0.32 + serde support             |
 //! | `nalgebra_v0_31`       | no      | version 0.31                             |
 //! | `nalgebra_v0_31-serde` | no      | version 0.31 + serde support             |
 //! | `nalgebra_v0_30`       | no      | version 0.30                             |
@@ -166,7 +168,9 @@
 #![deny(clippy::float_cmp)]
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "nalgebra_0_31")] {
+    if #[cfg(feature = "nalgebra_0_32")] {
+        extern crate nalgebra_0_32 as nalgebra;
+    } else if #[cfg(feature = "nalgebra_0_31")] {
         extern crate nalgebra_0_31 as nalgebra;
     } else if #[cfg(feature = "nalgebra_0_30")] {
         extern crate nalgebra_0_30 as nalgebra;
