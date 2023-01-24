@@ -87,6 +87,7 @@ mod tests {
     use crate::assert_error;
     use crate::core::ArgminError;
     use crate::test_trait_impl;
+    use approx::assert_relative_eq;
 
     test_trait_impl!(strongwolfe, StrongWolfeCondition<f64>);
 
@@ -98,8 +99,8 @@ mod tests {
             c1: c1_wolfe,
             c2: c2_wolfe,
         } = StrongWolfeCondition::new(c1, c2).unwrap();
-        assert_eq!(c1.to_ne_bytes(), c1_wolfe.to_ne_bytes());
-        assert_eq!(c2.to_ne_bytes(), c2_wolfe.to_ne_bytes());
+        assert_relative_eq!(c1, c1_wolfe, epsilon = f64::EPSILON);
+        assert_relative_eq!(c2, c2_wolfe, epsilon = f64::EPSILON);
 
         // c1
         assert_error!(

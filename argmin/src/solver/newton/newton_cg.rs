@@ -250,6 +250,8 @@ where
 mod tests {
     #![allow(clippy::let_unit_value)]
 
+    use approx::assert_relative_eq;
+
     use super::*;
     use crate::core::{test_utils::TestProblem, ArgminError};
     use crate::solver::linesearch::MoreThuenteLineSearch;
@@ -287,8 +289,8 @@ mod tests {
             tol,
         } = ncg;
         assert_eq!(linesearch, ls);
-        assert_eq!(curvature_threshold.to_ne_bytes(), 0.0f64.to_ne_bytes());
-        assert_eq!(tol.to_ne_bytes(), f64::EPSILON.to_ne_bytes());
+        assert_relative_eq!(curvature_threshold, 0.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(tol, f64::EPSILON, epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -303,8 +305,8 @@ mod tests {
             tol,
         } = ncg;
         assert_eq!(linesearch, ls);
-        assert_eq!(curvature_threshold.to_ne_bytes(), 1e-6f64.to_ne_bytes());
-        assert_eq!(tol.to_ne_bytes(), f64::EPSILON.to_ne_bytes());
+        assert_relative_eq!(curvature_threshold, 1e-6f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(tol, f64::EPSILON, epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -312,7 +314,7 @@ mod tests {
         let ls = ();
         for tolerance in [f64::EPSILON, 1.0, 10.0, 100.0] {
             let ncg: NewtonCG<_, f64> = NewtonCG::new(ls).with_tolerance(tolerance).unwrap();
-            assert_eq!(ncg.tol.to_ne_bytes(), tolerance.to_ne_bytes());
+            assert_relative_eq!(ncg.tol, tolerance);
         }
 
         for tolerance in [-f64::EPSILON, 0.0, -1.0] {

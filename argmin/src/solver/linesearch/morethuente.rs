@@ -720,6 +720,8 @@ fn cstep<F: ArgminFloat>(
 
 #[cfg(test)]
 mod tests {
+    use approx::assert_relative_eq;
+
     use super::*;
     use crate::core::{test_utils::TestProblem, ArgminError, IterState, Problem};
     use crate::test_trait_impl;
@@ -759,16 +761,16 @@ mod tests {
         assert!(finit.is_infinite());
         assert!(finit.is_sign_positive());
         assert!(init_grad.is_none());
-        assert_eq!(dginit.to_ne_bytes(), 0.0f64.to_ne_bytes());
-        assert_eq!(dgtest.to_ne_bytes(), 0.0f64.to_ne_bytes());
-        assert_eq!(ftol.to_ne_bytes(), 1e-4f64.to_ne_bytes());
-        assert_eq!(gtol.to_ne_bytes(), 0.9f64.to_ne_bytes());
-        assert_eq!(xtrapf.to_ne_bytes(), 4.0f64.to_ne_bytes());
+        assert_relative_eq!(dginit, 0.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(dgtest, 0.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(ftol, 1e-4f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(gtol, 0.9f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(xtrapf, 4.0f64, epsilon = f64::EPSILON);
         assert!(width.is_nan());
         assert!(width1.is_nan());
-        assert_eq!(xtol.to_ne_bytes(), 1e-10f64.to_ne_bytes());
-        assert_eq!(alpha.to_ne_bytes(), 1.0f64.to_ne_bytes());
-        assert_eq!(stpmin.to_ne_bytes(), f64::EPSILON.sqrt().to_ne_bytes());
+        assert_relative_eq!(xtol, 1e-10f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(alpha, 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(stpmin, f64::EPSILON.sqrt(), epsilon = f64::EPSILON);
         assert!(stpmax.is_infinite());
         assert!(stpmax.is_sign_positive());
         assert_eq!(stp, Step::default());
@@ -787,8 +789,8 @@ mod tests {
         assert!(res.is_ok());
 
         let mtls = res.unwrap();
-        assert_eq!(mtls.ftol.to_ne_bytes(), 0.1f64.to_ne_bytes());
-        assert_eq!(mtls.gtol.to_ne_bytes(), 0.9f64.to_ne_bytes());
+        assert_relative_eq!(mtls.ftol, 0.1f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(mtls.gtol, 0.9f64, epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -840,8 +842,8 @@ mod tests {
         assert!(res.is_ok());
 
         let mtls = res.unwrap();
-        assert_eq!(mtls.stpmin.to_ne_bytes(), 0.1f64.to_ne_bytes());
-        assert_eq!(mtls.stpmax.to_ne_bytes(), 0.9f64.to_ne_bytes());
+        assert_relative_eq!(mtls.stpmin, 0.1f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(mtls.stpmax, 0.9f64, epsilon = f64::EPSILON);
     }
 
     #[test]

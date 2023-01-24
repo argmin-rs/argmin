@@ -603,7 +603,7 @@ mod tests {
             rng: _rng,
         } = sa;
 
-        assert_eq!(init_temp.to_ne_bytes(), 100.0f64.to_ne_bytes());
+        assert_relative_eq!(init_temp, 100.0f64, epsilon = f64::EPSILON);
         assert_eq!(temp_func, SATempFunc::TemperatureFast);
         assert_eq!(temp_iter, 0);
         assert_eq!(stall_iter_accepted, 0);
@@ -616,7 +616,7 @@ mod tests {
         assert_eq!(reanneal_iter_accepted, 0);
         assert_eq!(reanneal_best, u64::MAX);
         assert_eq!(reanneal_iter_best, 0);
-        assert_eq!(cur_temp.to_ne_bytes(), 100.0f64.to_ne_bytes());
+        assert_relative_eq!(cur_temp, 100.0f64, epsilon = f64::EPSILON);
 
         for temp in [0.0, -1.0, -std::f64::EPSILON, -100.0] {
             let res = SimulatedAnnealing::new(temp);
@@ -653,7 +653,7 @@ mod tests {
             rng,
         } = sa;
 
-        assert_eq!(init_temp.to_ne_bytes(), 100.0f64.to_ne_bytes());
+        assert_relative_eq!(init_temp, 100.0f64, epsilon = f64::EPSILON);
         assert_eq!(temp_func, SATempFunc::TemperatureFast);
         assert_eq!(temp_iter, 0);
         assert_eq!(stall_iter_accepted, 0);
@@ -666,7 +666,7 @@ mod tests {
         assert_eq!(reanneal_iter_accepted, 0);
         assert_eq!(reanneal_best, u64::MAX);
         assert_eq!(reanneal_iter_best, 0);
-        assert_eq!(cur_temp.to_ne_bytes(), 100.0f64.to_ne_bytes());
+        assert_relative_eq!(cur_temp, 100.0f64, epsilon = f64::EPSILON);
         // important part
         assert_eq!(rng, MyRng {});
 
@@ -798,7 +798,7 @@ mod tests {
                 assert_eq!(sa.reanneal_iter_accepted, 0);
                 assert_eq!(sa.reanneal_iter_best, 0);
                 assert_eq!(sa.temp_iter, 0);
-                assert_eq!(sa.cur_temp.to_ne_bytes(), sa.init_temp.to_ne_bytes());
+                assert_relative_eq!(sa.cur_temp, sa.init_temp, epsilon = f64::EPSILON);
             }
         }
     }
@@ -879,9 +879,9 @@ mod tests {
         let s_param = state_out.take_param().unwrap();
 
         for (s, p) in s_param.iter().zip(param.iter()) {
-            assert_eq!(s.to_ne_bytes(), p.to_ne_bytes());
+            assert_relative_eq!(s, p, epsilon = f64::EPSILON);
         }
 
-        assert_eq!(state_out.get_cost().to_ne_bytes(), 1.0f64.to_ne_bytes())
+        assert_relative_eq!(state_out.get_cost(), 1.0f64, epsilon = f64::EPSILON)
     }
 }

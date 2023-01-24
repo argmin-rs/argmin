@@ -67,6 +67,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use approx::assert_relative_eq;
+
     use super::*;
     use crate::assert_error;
     use crate::core::ArgminError;
@@ -78,7 +80,7 @@ mod tests {
     fn test_armijo_new() {
         let c: f64 = 0.01;
         let ArmijoCondition { c: c_arm } = ArmijoCondition::new(c).unwrap();
-        assert_eq!(c.to_ne_bytes(), c_arm.to_ne_bytes());
+        assert_relative_eq!(c, c_arm, epsilon = f64::EPSILON);
 
         assert_error!(
             ArmijoCondition::new(1.0f64),

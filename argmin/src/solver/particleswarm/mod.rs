@@ -441,10 +441,10 @@ mod tests {
             (0.5f64 + 2.0f64.ln()),
             epsilon = f64::EPSILON
         );
-        assert_eq!(lower_bound[0].to_ne_bytes(), bounds.0[0].to_ne_bytes());
-        assert_eq!(lower_bound[1].to_ne_bytes(), bounds.0[1].to_ne_bytes());
-        assert_eq!(upper_bound[0].to_ne_bytes(), bounds.1[0].to_ne_bytes());
-        assert_eq!(upper_bound[1].to_ne_bytes(), bounds.1[1].to_ne_bytes());
+        assert_relative_eq!(lower_bound[0], bounds.0[0], epsilon = f64::EPSILON);
+        assert_relative_eq!(lower_bound[1], bounds.0[1], epsilon = f64::EPSILON);
+        assert_relative_eq!(upper_bound[0], bounds.1[0], epsilon = f64::EPSILON);
+        assert_relative_eq!(upper_bound[1], bounds.1[1], epsilon = f64::EPSILON);
         assert_eq!(num_particles, 40);
     }
 
@@ -457,9 +457,10 @@ mod tests {
             let res = ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), 40)
                 .with_inertia_factor(inertia);
             assert!(res.is_ok());
-            assert_eq!(
-                res.unwrap().weight_inertia.to_ne_bytes(),
-                inertia.to_ne_bytes()
+            assert_relative_eq!(
+                res.unwrap().weight_inertia,
+                inertia, 
+                epsilon = f64::EPSILON
             );
         }
 
@@ -486,9 +487,10 @@ mod tests {
             let res = ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), 40)
                 .with_cognitive_factor(cognitive);
             assert!(res.is_ok());
-            assert_eq!(
-                res.unwrap().weight_cognitive.to_ne_bytes(),
-                cognitive.to_ne_bytes()
+            assert_relative_eq!(
+                res.unwrap().weight_cognitive,
+                cognitive,
+                epsilon = f64::EPSILON
             );
         }
 
@@ -515,9 +517,10 @@ mod tests {
             let res = ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), 40)
                 .with_social_factor(social);
             assert!(res.is_ok());
-            assert_eq!(
-                res.unwrap().weight_social.to_ne_bytes(),
-                social.to_ne_bytes()
+            assert_relative_eq!(
+                res.unwrap().weight_social,
+                social,
+                epsilon = f64::EPSILON
             );
         }
 
@@ -601,7 +604,7 @@ mod tests {
 
         // at least assure that they are ordered correctly and have the correct cost.
         for (particle, cost) in particles.iter().zip(values.iter()) {
-            assert_eq!(particle.cost.to_ne_bytes(), cost.to_ne_bytes());
+            assert_relative_eq!(particle.cost, cost, epsilon = f64::EPSILON);
         }
     }
 
@@ -623,8 +626,8 @@ mod tests {
 
         assert_eq!(init_position, position);
         assert_eq!(init_position, best_position);
-        assert_eq!(init_cost.to_ne_bytes(), cost.to_ne_bytes());
-        assert_eq!(init_cost.to_ne_bytes(), best_cost.to_ne_bytes());
+        assert_relative_eq!(init_cost, cost, epsilon = f64::EPSILON);
+        assert_relative_eq!(init_cost, best_cost, epsilon = f64::EPSILON);
         assert_eq!(init_velocity, velocity);
     }
 
@@ -726,7 +729,7 @@ mod tests {
                     assert!(*x >= -1.0);
                 }
             }
-            assert_eq!(state.get_cost().to_ne_bytes(), (-3.0f64).to_ne_bytes());
+            assert_relative_eq!(state.get_cost(), -3.0f64, epsilon = f64::EPSILON);
         }
     }
 }

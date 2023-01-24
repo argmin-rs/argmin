@@ -303,9 +303,9 @@ mod tests {
             NonlinearConjugateGradient::new(linesearch, beta_method);
         assert!(nlcg.restart_orthogonality.is_none());
         let nlcg = nlcg.restart_orthogonality(0.1);
-        assert_eq!(
-            nlcg.restart_orthogonality.as_ref().unwrap().to_ne_bytes(),
-            0.1f64.to_ne_bytes()
+        assert_relative_eq!(
+            *nlcg.restart_orthogonality.as_ref().unwrap(),
+            0.1f64
         );
     }
 
@@ -341,30 +341,36 @@ mod tests {
             .unwrap();
         assert!(kv.is_none());
         assert_ne!(state_out, state);
-        assert_eq!(state_out.cost.to_ne_bytes(), 1f64.to_ne_bytes());
-        assert_eq!(
-            state_out.grad.as_ref().unwrap()[0].to_ne_bytes(),
-            3f64.to_ne_bytes()
+        assert_relative_eq!(state_out.cost, 1f64);
+        assert_relative_eq!(
+            state_out.grad.as_ref().unwrap()[0],
+            3f64,
+            epsilon = f64::EPSILON
         );
-        assert_eq!(
-            state_out.grad.as_ref().unwrap()[1].to_ne_bytes(),
-            4f64.to_ne_bytes()
+        assert_relative_eq!(
+            state_out.grad.as_ref().unwrap()[1],
+            4f64,
+            epsilon = f64::EPSILON
         );
-        assert_eq!(
-            state_out.param.as_ref().unwrap()[0].to_ne_bytes(),
-            3f64.to_ne_bytes()
+        assert_relative_eq!(
+            state_out.param.as_ref().unwrap()[0],
+            3f64,
+            epsilon = f64::EPSILON
         );
-        assert_eq!(
-            state_out.param.as_ref().unwrap()[1].to_ne_bytes(),
-            4f64.to_ne_bytes()
+        assert_relative_eq!(
+            state_out.param.as_ref().unwrap()[1],
+            4f64,
+            epsilon = f64::EPSILON
         );
-        assert_eq!(
-            nlcg.p.as_ref().unwrap()[0].to_ne_bytes(),
-            (-3f64).to_ne_bytes()
+        assert_relative_eq!(
+            nlcg.p.as_ref().unwrap()[0],
+            (-3f64),
+            epsilon = f64::EPSILON
         );
-        assert_eq!(
-            nlcg.p.as_ref().unwrap()[1].to_ne_bytes(),
-            (-4f64).to_ne_bytes()
+        assert_relative_eq!(
+            nlcg.p.as_ref().unwrap()[1],
+            (-4f64),
+            epsilon = f64::EPSILON
         );
     }
 

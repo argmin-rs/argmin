@@ -352,7 +352,7 @@ mod tests {
         } = sh;
 
         assert_eq!(radius.to_ne_bytes(), f64::NAN.to_ne_bytes());
-        assert_eq!(epsilon.to_ne_bytes(), 10e-10f64.to_ne_bytes());
+        assert_relative_eq!(epsilon, 10e-10f64, epsilon = f64::EPSILON);
         assert!(p.is_none());
         assert!(r.is_none());
         assert_eq!(rtr.to_ne_bytes(), f64::NAN.to_ne_bytes());
@@ -365,7 +365,7 @@ mod tests {
     fn test_with_tolerance() {
         for tolerance in [f64::EPSILON, 1e-10, 1e-12, 1e-6, 1.0, 10.0, 100.0] {
             let sh: Steihaug<Vec<f64>, f64> = Steihaug::new().with_epsilon(tolerance).unwrap();
-            assert_eq!(sh.epsilon.to_ne_bytes(), tolerance.to_ne_bytes());
+            assert_relative_eq!(sh.epsilon, tolerance, epsilon = f64::EPSILON);
         }
 
         for tolerance in [-f64::EPSILON, 0.0, -1.0] {
@@ -454,14 +454,14 @@ mod tests {
             max_iters,
         } = sh;
 
-        assert_eq!(radius.to_ne_bytes(), 1.0f64.to_ne_bytes());
-        assert_eq!(epsilon.to_ne_bytes(), 10e-10f64.to_ne_bytes());
+        assert_relative_eq!(radius, 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(epsilon, 10e-10f64, epsilon = f64::EPSILON);
         assert_relative_eq!(p.as_ref().unwrap()[0], 0.0f64, epsilon = f64::EPSILON);
         assert_relative_eq!(p.as_ref().unwrap()[1], 0.0f64, epsilon = f64::EPSILON);
         assert_relative_eq!(r.as_ref().unwrap()[0], grad[0], epsilon = f64::EPSILON);
         assert_relative_eq!(r.as_ref().unwrap()[1], grad[1], epsilon = f64::EPSILON);
-        assert_eq!(rtr.to_ne_bytes(), 5.0f64.to_ne_bytes());
-        assert_eq!(r_0_norm.to_ne_bytes(), (5.0f64).sqrt().to_ne_bytes());
+        assert_relative_eq!(rtr, 5.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(r_0_norm, (5.0f64).sqrt(), epsilon = f64::EPSILON);
         assert_relative_eq!(d.as_ref().unwrap()[0], -grad[0], epsilon = f64::EPSILON);
         assert_relative_eq!(d.as_ref().unwrap()[1], -grad[1], epsilon = f64::EPSILON);
         assert_eq!(max_iters, u64::MAX);

@@ -248,17 +248,17 @@ mod tests {
             f2,
         } = GoldenSectionSearch::new(-2.5f64, 3.0f64).unwrap();
 
-        assert_eq!(g1.to_ne_bytes(), G1.to_ne_bytes());
-        assert_eq!(g2.to_ne_bytes(), G2.to_ne_bytes());
-        assert_eq!(min_bound.to_ne_bytes(), (-2.5f64).to_ne_bytes());
-        assert_eq!(max_bound.to_ne_bytes(), 3.0f64.to_ne_bytes());
-        assert_eq!(tolerance.to_ne_bytes(), 0.01f64.to_ne_bytes());
-        assert_eq!(x0.to_ne_bytes(), min_bound.to_ne_bytes());
-        assert_eq!(x1.to_ne_bytes(), 0f64.to_ne_bytes());
-        assert_eq!(x2.to_ne_bytes(), 0f64.to_ne_bytes());
-        assert_eq!(x3.to_ne_bytes(), max_bound.to_ne_bytes());
-        assert_eq!(f1.to_ne_bytes(), 0f64.to_ne_bytes());
-        assert_eq!(f2.to_ne_bytes(), 0f64.to_ne_bytes());
+        assert_relative_eq!(g1, G1, epsilon = f64::EPSILON);
+        assert_relative_eq!(g2, G2, epsilon = f64::EPSILON);
+        assert_relative_eq!(min_bound, -2.5f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(max_bound, 3.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(tolerance, 0.01f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(x0, min_bound, epsilon = f64::EPSILON);
+        assert_relative_eq!(x1, 0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(x2, 0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(x3, max_bound, epsilon = f64::EPSILON);
+        assert_relative_eq!(f1, 0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(f2, 0f64, epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -293,7 +293,7 @@ mod tests {
             .with_tolerance(0.001)
             .unwrap();
 
-        assert_eq!(tolerance.to_ne_bytes(), 0.001f64.to_ne_bytes());
+        assert_relative_eq!(tolerance, 0.001f64, epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -386,13 +386,13 @@ mod tests {
             assert_relative_eq!(state.cost, f2, epsilon = f64::EPSILON);
         }
 
-        assert_eq!(g1.to_ne_bytes(), G1.to_ne_bytes());
-        assert_eq!(g2.to_ne_bytes(), G2.to_ne_bytes());
-        assert_eq!(min_bound.to_ne_bytes(), (-2.5f64).to_ne_bytes());
-        assert_eq!(max_bound.to_ne_bytes(), 3.0f64.to_ne_bytes());
-        assert_eq!(tolerance.to_ne_bytes(), 0.01f64.to_ne_bytes());
-        assert_eq!(x0.to_ne_bytes(), min_bound.to_ne_bytes());
-        assert_eq!(x3.to_ne_bytes(), max_bound.to_ne_bytes());
+        assert_relative_eq!(g1, G1, epsilon = f64::EPSILON);
+        assert_relative_eq!(g2, G2, epsilon = f64::EPSILON);
+        assert_relative_eq!(min_bound, -2.5f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(max_bound, 3.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(tolerance, 0.01f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(x0, min_bound, epsilon = f64::EPSILON);
+        assert_relative_eq!(x3, max_bound, epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -432,11 +432,11 @@ mod tests {
         assert_relative_eq!(x2, g1 * 2.0f64 + g2 * x3, epsilon = f64::EPSILON);
         assert_relative_eq!(f1, 5.0f64, epsilon = f64::EPSILON);
         assert_relative_eq!(f2, problem.cost(&x2).unwrap(), epsilon = f64::EPSILON);
-        assert_eq!(g1.to_ne_bytes(), G1.to_ne_bytes());
-        assert_eq!(g2.to_ne_bytes(), G2.to_ne_bytes());
-        assert_eq!(min_bound.to_ne_bytes(), (-2.5f64).to_ne_bytes());
-        assert_eq!(max_bound.to_ne_bytes(), 3.0f64.to_ne_bytes());
-        assert_eq!(tolerance.to_ne_bytes(), 0.01f64.to_ne_bytes());
+        assert_relative_eq!(g1, G1, epsilon = f64::EPSILON);
+        assert_relative_eq!(g2, G2, epsilon = f64::EPSILON);
+        assert_relative_eq!(min_bound, -2.5f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(max_bound, 3.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(tolerance, 0.01f64, epsilon = f64::EPSILON);
         if f1 < f2 {
             assert_relative_eq!(*state.param.as_ref().unwrap(), x1, epsilon = f64::EPSILON);
             assert_relative_eq!(state.cost, f1, epsilon = f64::EPSILON);
@@ -484,11 +484,11 @@ mod tests {
         assert_relative_eq!(x3, 2.0f64, epsilon = f64::EPSILON);
         assert_relative_eq!(f1, problem.cost(&x1).unwrap(), epsilon = f64::EPSILON);
         assert_relative_eq!(f2, 5.0f64, epsilon = f64::EPSILON);
-        assert_eq!(g1.to_ne_bytes(), G1.to_ne_bytes());
-        assert_eq!(g2.to_ne_bytes(), G2.to_ne_bytes());
-        assert_eq!(min_bound.to_ne_bytes(), (-2.5f64).to_ne_bytes());
-        assert_eq!(max_bound.to_ne_bytes(), 3.0f64.to_ne_bytes());
-        assert_eq!(tolerance.to_ne_bytes(), 0.01f64.to_ne_bytes());
+        assert_relative_eq!(g1, G1, epsilon = f64::EPSILON);
+        assert_relative_eq!(g2, G2, epsilon = f64::EPSILON);
+        assert_relative_eq!(min_bound, -2.5f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(max_bound, 3.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(tolerance, 0.01f64, epsilon = f64::EPSILON);
         if f1 < f2 {
             assert_relative_eq!(*state.param.as_ref().unwrap(), x1, epsilon = f64::EPSILON);
             assert_relative_eq!(state.cost, f1, epsilon = f64::EPSILON);

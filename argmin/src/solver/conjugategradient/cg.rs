@@ -182,8 +182,8 @@ mod tests {
             p_prev,
             rtr,
         } = cg;
-        assert_eq!(b[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
-        assert_eq!(b[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+        assert_relative_eq!(b[0], 1.0f64);
+        assert_relative_eq!(b[1], 2.0f64);
         assert!(r.is_none());
         assert!(p.is_none());
         assert!(p_prev.is_none());
@@ -208,8 +208,8 @@ mod tests {
         let res: Result<_, _> = cg.get_prev_p();
         assert!(res.is_ok());
         let p_prev = res.unwrap();
-        assert_eq!(p_prev[0].to_ne_bytes(), 3.0f64.to_ne_bytes());
-        assert_eq!(p_prev[1].to_ne_bytes(), 4.0f64.to_ne_bytes());
+        assert_relative_eq!(p_prev[0], 3.0f64);
+        assert_relative_eq!(p_prev[1], 4.0f64);
     }
 
     #[test]

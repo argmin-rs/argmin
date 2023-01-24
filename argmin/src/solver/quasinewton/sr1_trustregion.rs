@@ -361,6 +361,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use approx::assert_relative_eq;
+
     use super::*;
     use crate::core::{test_utils::TestProblem, ArgminError, IterState, State};
     use crate::solver::trustregion::CauchyPoint;
@@ -382,11 +384,11 @@ mod tests {
             tol_grad,
         } = sr1;
 
-        assert_eq!(denominator_factor.to_ne_bytes(), 1e-8f64.to_ne_bytes());
+        assert_relative_eq!(denominator_factor, 1e-8f64, epsilon = f64::EPSILON);
         assert_eq!(subproblem, MyFakeSubProblem {});
-        assert_eq!(radius.to_ne_bytes(), 1.0f64.to_ne_bytes());
-        assert_eq!(eta.to_ne_bytes(), (0.5f64 * 1e-3f64).to_ne_bytes());
-        assert_eq!(tol_grad.to_ne_bytes(), 1e-3f64.to_ne_bytes());
+        assert_relative_eq!(radius, 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(eta, 0.5f64 * 1e-3f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(tol_grad, 1e-3f64, epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -401,7 +403,7 @@ mod tests {
             assert!(res.is_ok());
 
             let nm = res.unwrap();
-            assert_eq!(nm.denominator_factor.to_ne_bytes(), tol.to_ne_bytes());
+            assert_relative_eq!(nm.denominator_factor, tol, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -428,7 +430,7 @@ mod tests {
             assert!(res.is_ok());
 
             let nm = res.unwrap();
-            assert_eq!(nm.tol_grad.to_ne_bytes(), tol.to_ne_bytes());
+            assert_relative_eq!(nm.tol_grad, tol, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -475,16 +477,16 @@ mod tests {
         let s_param = state_out.take_param().unwrap();
 
         for (s, p) in s_param.iter().zip(param.iter()) {
-            assert_eq!(s.to_ne_bytes(), p.to_ne_bytes());
+            assert_relative_eq!(s, p, epsilon = f64::EPSILON);
         }
 
         let s_grad = state_out.take_gradient().unwrap();
 
         for (s, p) in s_grad.iter().zip(param.iter()) {
-            assert_eq!(s.to_ne_bytes(), p.to_ne_bytes());
+            assert_relative_eq!(s, p, epsilon = f64::EPSILON);
         }
 
-        assert_eq!(state_out.get_cost().to_ne_bytes(), 1.0f64.to_ne_bytes())
+        assert_relative_eq!(state_out.get_cost(), 1.0f64, epsilon = f64::EPSILON)
     }
 
     #[test]
@@ -503,7 +505,7 @@ mod tests {
 
         assert!(kv.is_none());
 
-        assert_eq!(state_out.get_cost().to_ne_bytes(), 1234.0f64.to_ne_bytes())
+        assert_relative_eq!(state_out.get_cost(), 1234.0f64, epsilon = f64::EPSILON)
     }
 
     #[test]
@@ -526,7 +528,7 @@ mod tests {
         let s_grad = state_out.take_gradient().unwrap();
 
         for (s, g) in s_grad.iter().zip(gradient.iter()) {
-            assert_eq!(s.to_ne_bytes(), g.to_ne_bytes());
+            assert_relative_eq!(s, g, epsilon = f64::EPSILON);
         }
     }
 
@@ -554,7 +556,7 @@ mod tests {
 
         for (s1, g1) in s_hessian.iter().zip(hessian.iter()) {
             for (s, g) in s1.iter().zip(g1.iter()) {
-                assert_eq!(s.to_ne_bytes(), g.to_ne_bytes());
+                assert_relative_eq!(s, g, epsilon = f64::EPSILON);
             }
         }
     }

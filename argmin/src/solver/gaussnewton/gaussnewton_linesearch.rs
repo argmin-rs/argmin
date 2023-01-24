@@ -226,12 +226,11 @@ mod tests {
 
     use super::*;
     use crate::core::ArgminError;
+    use approx::assert_relative_eq;
     #[cfg(feature = "_ndarrayl")]
     use crate::core::{IterState, State};
     use crate::solver::linesearch::{condition::ArmijoCondition, BacktrackingLineSearch};
     use crate::{assert_error, test_trait_impl};
-    #[cfg(feature = "_ndarrayl")]
-    use approx::assert_relative_eq;
 
     test_trait_impl!(
         gauss_newton_linesearch_method,
@@ -249,7 +248,7 @@ mod tests {
         } = GaussNewtonLS::<_, f64>::new(MyLinesearch {});
 
         assert_eq!(ls, MyLinesearch {});
-        assert_eq!(t.to_ne_bytes(), f64::EPSILON.sqrt().to_ne_bytes());
+        assert_relative_eq!(t, f64::EPSILON.sqrt(), epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -260,7 +259,7 @@ mod tests {
         let GaussNewtonLS { tol: t1, .. } =
             GaussNewtonLS::new(linesearch).with_tolerance(tol1).unwrap();
 
-        assert_eq!(t1.to_ne_bytes(), tol1.to_ne_bytes());
+            assert_relative_eq!(t1, tol1, epsilon = f64::EPSILON);
     }
 
     #[test]

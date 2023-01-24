@@ -166,7 +166,6 @@ mod tests {
     #[cfg(feature = "_ndarrayl")]
     use crate::core::Executor;
     use crate::test_trait_impl;
-    #[cfg(feature = "_ndarrayl")]
     use approx::assert_relative_eq;
 
     test_trait_impl!(gauss_newton_method, GaussNewton<f64>);
@@ -175,8 +174,8 @@ mod tests {
     fn test_new() {
         let GaussNewton { tol: t, gamma: g } = GaussNewton::<f64>::new();
 
-        assert_eq!(g.to_ne_bytes(), (1.0f64).to_ne_bytes());
-        assert_eq!(t.to_ne_bytes(), f64::EPSILON.sqrt().to_ne_bytes());
+        assert_relative_eq!(g, 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(t, f64::EPSILON.sqrt(), epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -185,7 +184,7 @@ mod tests {
 
         let GaussNewton { tol: t, .. } = GaussNewton::new().with_tolerance(tol1).unwrap();
 
-        assert_eq!(t.to_ne_bytes(), tol1.to_ne_bytes());
+        assert_relative_eq!(t, tol1, epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -205,7 +204,7 @@ mod tests {
 
         let GaussNewton { gamma: g, .. } = GaussNewton::new().with_gamma(gamma).unwrap();
 
-        assert_eq!(g.to_ne_bytes(), gamma.to_ne_bytes());
+        assert_relative_eq!(g, gamma, epsilon = f64::EPSILON);
     }
 
     #[test]

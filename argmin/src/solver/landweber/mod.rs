@@ -102,7 +102,7 @@ mod tests {
     fn test_new() {
         let omega_in: f64 = 0.5;
         let Landweber { omega } = Landweber::new(omega_in);
-        assert_eq!(omega.to_ne_bytes(), omega_in.to_ne_bytes());
+        assert_relative_eq!(omega, omega_in, epsilon = f64::EPSILON);
     }
 
     #[test]

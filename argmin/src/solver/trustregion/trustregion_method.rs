@@ -307,6 +307,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use approx::assert_relative_eq;
+
     use super::*;
     use crate::core::test_utils::TestProblem;
     use crate::core::{ArgminError, State};
@@ -329,9 +331,9 @@ mod tests {
             mk0,
         } = tr;
 
-        assert_eq!(radius.to_ne_bytes(), 1.0f64.to_ne_bytes());
-        assert_eq!(max_radius.to_ne_bytes(), 100.0f64.to_ne_bytes());
-        assert_eq!(eta.to_ne_bytes(), 0.125f64.to_ne_bytes());
+        assert_relative_eq!(radius, 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(max_radius, 100.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(eta, 0.125f64, epsilon = f64::EPSILON);
         assert_eq!(fxk.to_ne_bytes(), f64::NAN.to_ne_bytes());
         assert_eq!(mk0.to_ne_bytes(), f64::NAN.to_ne_bytes());
     }
@@ -346,7 +348,7 @@ mod tests {
             assert!(res.is_ok());
 
             let nm = res.unwrap();
-            assert_eq!(nm.radius.to_ne_bytes(), radius.to_ne_bytes());
+            assert_relative_eq!(nm.radius, radius, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -378,7 +380,7 @@ mod tests {
             assert!(res.is_ok());
 
             let nm = res.unwrap();
-            assert_eq!(nm.eta.to_ne_bytes(), eta.to_ne_bytes());
+            assert_relative_eq!(nm.eta, eta, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -424,8 +426,8 @@ mod tests {
 
         let s_param = state_out.take_param().unwrap();
 
-        assert_eq!(s_param[0].to_ne_bytes(), param[0].to_ne_bytes());
-        assert_eq!(s_param[1].to_ne_bytes(), param[1].to_ne_bytes());
+        assert_relative_eq!(s_param[0], param[0], epsilon = f64::EPSILON);
+        assert_relative_eq!(s_param[1], param[1], epsilon = f64::EPSILON);
 
         let TrustRegion {
             radius,
@@ -436,10 +438,10 @@ mod tests {
             mk0,
         } = tr;
 
-        assert_eq!(radius.to_ne_bytes(), 1.0f64.to_ne_bytes());
-        assert_eq!(max_radius.to_ne_bytes(), 100.0f64.to_ne_bytes());
-        assert_eq!(eta.to_ne_bytes(), 0.125f64.to_ne_bytes());
-        assert_eq!(fxk.to_ne_bytes(), 1.0f64.sqrt().to_ne_bytes());
-        assert_eq!(mk0.to_ne_bytes(), 1.0f64.to_ne_bytes());
+        assert_relative_eq!(radius, 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(max_radius, 100.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(eta, 0.125f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(fxk, 1.0f64.sqrt(), epsilon = f64::EPSILON);
+        assert_relative_eq!(mk0, 1.0f64, epsilon = f64::EPSILON);
     }
 }

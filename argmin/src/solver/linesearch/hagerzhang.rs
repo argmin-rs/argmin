@@ -641,6 +641,7 @@ mod tests {
     use super::*;
     use crate::core::{test_utils::TestProblem, ArgminError, IterState, Problem, State};
     use crate::test_trait_impl;
+    use approx::assert_relative_eq;
 
     test_trait_impl!(hagerzhang, HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64>);
 
@@ -677,26 +678,26 @@ mod tests {
             finit,
         } = hzls;
 
-        assert_eq!(delta.to_ne_bytes(), 0.1f64.to_ne_bytes());
-        assert_eq!(sigma.to_ne_bytes(), 0.9f64.to_ne_bytes());
-        assert_eq!(epsilon.to_ne_bytes(), 1e-6f64.to_ne_bytes());
+        assert_relative_eq!(delta, 0.1f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(sigma, 0.9f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(epsilon, 1e-6f64, epsilon = f64::EPSILON);
         assert!(epsilon_k.is_nan());
-        assert_eq!(theta.to_ne_bytes(), 0.5f64.to_ne_bytes());
-        assert_eq!(gamma.to_ne_bytes(), 0.66f64.to_ne_bytes());
-        assert_eq!(eta.to_ne_bytes(), 0.01f64.to_ne_bytes());
-        assert_eq!(a_x_init.to_ne_bytes(), f64::EPSILON.to_ne_bytes());
+        assert_relative_eq!(theta, 0.5f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(gamma, 0.66f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(eta, 0.01f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(a_x_init, f64::EPSILON, epsilon = f64::EPSILON);
         assert!(a_x.is_nan());
         assert!(a_f.is_nan());
         assert!(a_g.is_nan());
-        assert_eq!(b_x_init.to_ne_bytes(), 1e5f64.to_ne_bytes());
+        assert_relative_eq!(b_x_init, 1e5f64, epsilon = f64::EPSILON);
         assert!(b_x.is_nan());
         assert!(b_f.is_nan());
         assert!(b_g.is_nan());
-        assert_eq!(c_x_init.to_ne_bytes(), 1.0f64.to_ne_bytes());
+        assert_relative_eq!(c_x_init, 1.0f64, epsilon = f64::EPSILON);
         assert!(c_x.is_nan());
         assert!(c_f.is_nan());
         assert!(c_g.is_nan());
-        assert_eq!(best_x.to_ne_bytes(), 0.0f64.to_ne_bytes());
+        assert_relative_eq!(best_x, 0.0f64, epsilon = f64::EPSILON);
         assert!(best_f.is_infinite());
         assert!(best_f.is_sign_positive());
         assert!(best_g.is_nan());
@@ -723,8 +724,8 @@ mod tests {
             assert!(res.is_ok());
 
             let hzls = res.unwrap();
-            assert_eq!(hzls.delta.to_ne_bytes(), delta.to_ne_bytes());
-            assert_eq!(hzls.sigma.to_ne_bytes(), sigma.to_ne_bytes());
+            assert_relative_eq!(hzls.delta, delta, epsilon = f64::EPSILON);
+            assert_relative_eq!(hzls.sigma, sigma, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -761,7 +762,7 @@ mod tests {
             assert!(res.is_ok());
 
             let hzls = res.unwrap();
-            assert_eq!(hzls.epsilon.to_ne_bytes(), epsilon.to_ne_bytes());
+            assert_relative_eq!(hzls.epsilon, epsilon, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -788,7 +789,7 @@ mod tests {
             assert!(res.is_ok());
 
             let hzls = res.unwrap();
-            assert_eq!(hzls.theta.to_ne_bytes(), theta.to_ne_bytes());
+            assert_relative_eq!(hzls.theta, theta, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -815,7 +816,7 @@ mod tests {
             assert!(res.is_ok());
 
             let hzls = res.unwrap();
-            assert_eq!(hzls.gamma.to_ne_bytes(), gamma.to_ne_bytes());
+            assert_relative_eq!(hzls.gamma, gamma, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -842,7 +843,7 @@ mod tests {
             assert!(res.is_ok());
 
             let hzls = res.unwrap();
-            assert_eq!(hzls.eta.to_ne_bytes(), eta.to_ne_bytes());
+            assert_relative_eq!(hzls.eta, eta);
         }
 
         // incorrect parameters
@@ -876,8 +877,8 @@ mod tests {
             assert!(res.is_ok());
 
             let hzls = res.unwrap();
-            assert_eq!(hzls.a_x_init.to_ne_bytes(), min.to_ne_bytes());
-            assert_eq!(hzls.b_x_init.to_ne_bytes(), max.to_ne_bytes());
+            assert_relative_eq!(hzls.a_x_init, min, epsilon = f64::EPSILON);
+            assert_relative_eq!(hzls.b_x_init, max, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters

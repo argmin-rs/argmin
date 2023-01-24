@@ -117,27 +117,27 @@ where
 mod tests {
     use super::*;
     use crate::core::ArgminError;
+    use approx::assert_relative_eq;
     #[cfg(feature = "_ndarrayl")]
     use crate::core::Executor;
     use crate::test_trait_impl;
-    #[cfg(feature = "_ndarrayl")]
-    use approx::assert_relative_eq;
 
     test_trait_impl!(newton_method, Newton<f64>);
 
     #[test]
     fn test_new() {
         let solver: Newton<f64> = Newton::new();
-        assert_eq!(solver.gamma.to_ne_bytes(), 1.0f64.to_ne_bytes());
+        assert_relative_eq!(solver.gamma, 1.0f64, epsilon = f64::EPSILON);
     }
 
     #[test]
     fn test_default() {
         let solver_new: Newton<f64> = Newton::new();
         let solver_def: Newton<f64> = Newton::default();
-        assert_eq!(
-            solver_new.gamma.to_ne_bytes(),
-            solver_def.gamma.to_ne_bytes()
+        assert_relative_eq!(
+            solver_new.gamma,
+            solver_def.gamma,
+            epsilon = f64::EPSILON
         );
     }
 
@@ -145,7 +145,7 @@ mod tests {
     fn test_with_gamma() {
         for new_gamma in [f64::EPSILON, 0.1, 0.5, 0.9, 1.0] {
             let solver: Newton<f64> = Newton::new().with_gamma(new_gamma).unwrap();
-            assert_eq!(solver.gamma.to_ne_bytes(), new_gamma.to_ne_bytes());
+            assert_relative_eq!(solver.gamma, new_gamma, epsilon = f64::EPSILON);
         }
 
         for new_gamma in [1.0 + f64::EPSILON, 2.0, 0.0, -1.0] {

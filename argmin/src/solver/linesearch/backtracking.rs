@@ -294,8 +294,8 @@ mod tests {
         assert!(ls.init_cost.is_sign_positive());
         assert_eq!(ls.init_grad, None);
         assert_eq!(ls.search_direction, None);
-        assert_eq!(ls.rho.to_ne_bytes(), 0.9f64.to_ne_bytes());
-        assert_eq!(ls.alpha.to_ne_bytes(), 1.0f64.to_ne_bytes());
+        assert_relative_eq!(ls.rho, 0.9f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(ls.alpha, 1.0f64, epsilon = f64::EPSILON);
     }
 
     #[test]

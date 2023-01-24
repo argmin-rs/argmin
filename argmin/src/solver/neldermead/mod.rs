@@ -464,15 +464,15 @@ mod tests {
             sd_tolerance,
         } = nm;
 
-        assert_eq!(alpha.to_ne_bytes(), 1.0f64.to_ne_bytes());
-        assert_eq!(gamma.to_ne_bytes(), 2.0f64.to_ne_bytes());
-        assert_eq!(rho.to_ne_bytes(), 0.5f64.to_ne_bytes());
-        assert_eq!(sigma.to_ne_bytes(), 0.5f64.to_ne_bytes());
-        assert_eq!(params[0].0[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
-        assert_eq!(params[1].0[0].to_ne_bytes(), 2.0f64.to_ne_bytes());
+        assert_relative_eq!(alpha, 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(gamma, 2.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(rho, 0.5f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(sigma, 0.5f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(params[0].0[0], 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(params[1].0[0], 2.0f64, epsilon = f64::EPSILON);
         assert_eq!(params[0].1.to_ne_bytes(), f64::NAN.to_ne_bytes());
         assert_eq!(params[1].1.to_ne_bytes(), f64::NAN.to_ne_bytes());
-        assert_eq!(sd_tolerance.to_ne_bytes(), f64::EPSILON.to_ne_bytes());
+        assert_relative_eq!(sd_tolerance, f64::EPSILON, epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -485,7 +485,7 @@ mod tests {
             assert!(res.is_ok());
 
             let nm = res.unwrap();
-            assert_eq!(nm.sd_tolerance.to_ne_bytes(), tol.to_ne_bytes());
+            assert_relative_eq!(nm.sd_tolerance, tol, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -514,7 +514,7 @@ mod tests {
             assert!(res.is_ok());
 
             let nm = res.unwrap();
-            assert_eq!(nm.alpha.to_ne_bytes(), alpha.to_ne_bytes());
+            assert_relative_eq!(nm.alpha, alpha, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -543,7 +543,7 @@ mod tests {
             assert!(res.is_ok());
 
             let nm = res.unwrap();
-            assert_eq!(nm.rho.to_ne_bytes(), rho.to_ne_bytes());
+            assert_relative_eq!(nm.rho, rho, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -572,7 +572,7 @@ mod tests {
             assert!(res.is_ok());
 
             let nm = res.unwrap();
-            assert_eq!(nm.sigma.to_ne_bytes(), sigma.to_ne_bytes());
+            assert_relative_eq!(nm.sigma, sigma, epsilon = f64::EPSILON);
         }
 
         // incorrect parameters
@@ -599,8 +599,8 @@ mod tests {
         nm.params.iter_mut().for_each(|(p, c)| *c = p[0]);
         nm.sort_param_vecs();
         for ((p, c), ps) in nm.params.iter().zip(params_sorted.iter()) {
-            assert_eq!(p[0].to_ne_bytes(), ps[0].to_ne_bytes());
-            assert_eq!(c.to_ne_bytes(), ps[0].to_ne_bytes());
+            assert_relative_eq!(p[0], ps[0], epsilon = f64::EPSILON);
+            assert_relative_eq!(*c, ps[0], epsilon = f64::EPSILON);
         }
     }
 
@@ -676,8 +676,8 @@ mod tests {
         nm.shrink(|_| Ok(1.0f64)).unwrap();
 
         for ((p, _), ps) in nm.params.iter().zip(params_shrunk.iter()) {
-            assert_eq!(p[0].to_ne_bytes(), ps[0].to_ne_bytes());
-            assert_eq!(p[1].to_ne_bytes(), ps[1].to_ne_bytes());
+            assert_relative_eq!(p[0], ps[0], epsilon = f64::EPSILON);
+            assert_relative_eq!(p[1], ps[1], epsilon = f64::EPSILON);
         }
     }
 
@@ -698,8 +698,8 @@ mod tests {
 
         for ((p, c), (ps, cs)) in nm.params.iter().zip(params_sorted.iter()) {
             assert_relative_eq!(c, cs, epsilon = f64::EPSILON);
-            assert_eq!(p[0].to_ne_bytes(), ps[0].to_ne_bytes());
-            assert_eq!(p[1].to_ne_bytes(), ps[1].to_ne_bytes());
+            assert_relative_eq!(p[0], ps[0], epsilon = f64::EPSILON);
+            assert_relative_eq!(p[1], ps[1], epsilon = f64::EPSILON);
         }
 
         for i in 0..2 {
