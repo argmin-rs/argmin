@@ -182,8 +182,8 @@ mod tests {
             p_prev,
             rtr,
         } = cg;
-        assert_relative_eq!(b[0], 1.0f64);
-        assert_relative_eq!(b[1], 2.0f64);
+        assert_relative_eq!(b[0], 1.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(b[1], 2.0f64, epsilon = f64::EPSILON);
         assert!(r.is_none());
         assert!(p.is_none());
         assert!(p_prev.is_none());
@@ -208,8 +208,8 @@ mod tests {
         let res: Result<_, _> = cg.get_prev_p();
         assert!(res.is_ok());
         let p_prev = res.unwrap();
-        assert_relative_eq!(p_prev[0], 3.0f64);
-        assert_relative_eq!(p_prev[1], 4.0f64);
+        assert_relative_eq!(p_prev[0], 3.0f64, epsilon = f64::EPSILON);
+        assert_relative_eq!(p_prev[1], 4.0f64, epsilon = f64::EPSILON);
     }
 
     #[test]
@@ -334,12 +334,12 @@ mod tests {
         let (state, kv) = cg.next_iter(&mut problem, state).unwrap();
         assert!(kv.is_some());
 
-        assert_relative_eq!(r, cg.r.as_ref().unwrap()[0]);
-        assert_relative_eq!(p_n, cg.p.as_ref().unwrap()[0]);
-        assert_relative_eq!(p, cg.p_prev.as_ref().unwrap()[0]);
+        assert_relative_eq!(r, cg.r.as_ref().unwrap()[0], epsilon = f64::EPSILON);
+        assert_relative_eq!(p_n, cg.p.as_ref().unwrap()[0], epsilon = f64::EPSILON);
+        assert_relative_eq!(p, cg.p_prev.as_ref().unwrap()[0], epsilon = f64::EPSILON);
         assert_relative_eq!(rtr_n, cg.rtr);
 
-        assert_relative_eq!(norm, state.get_cost());
-        assert_relative_eq!(new_param, state.get_param().unwrap()[0]);
+        assert_relative_eq!(norm, state.get_cost(), epsilon = f64::EPSILON);
+        assert_relative_eq!(new_param, state.get_param().unwrap()[0], epsilon = f64::EPSILON);
     }
 }

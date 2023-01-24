@@ -305,7 +305,8 @@ mod tests {
         let nlcg = nlcg.restart_orthogonality(0.1);
         assert_relative_eq!(
             *nlcg.restart_orthogonality.as_ref().unwrap(),
-            0.1f64
+            0.1f64,
+            epsilon = f64::EPSILON
         );
     }
 
