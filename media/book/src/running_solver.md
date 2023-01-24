@@ -78,12 +78,19 @@ let res = Executor::new(cost, solver)
     // In this particular case, the state exposed is of type `IterState`.
     // The documentation of `IterState` shows how this struct can be
     // manipulated.
+    // Population based solvers use `PopulationState` instead of 
+    // `IterState`.
     .configure(|state|
         state
-            // Set initial parameters
+            // Set initial parameters (depending on the solver,
+            // this may be required)
             .param(init_param)
             // Set maximum iterations to 10
+            // (optional, set to `std::u64::MAX` if not provided)
             .max_iters(10)
+            // Set target cost. The solver stops when this cost
+            // function value is reached (optional)
+            .target_cost(0.0)
     )
     // run the solver on the defined problem
     .run()?;

@@ -13,7 +13,7 @@ mod eye;
 #[cfg(any(
     feature = "ndarray-linalg_0_12",
     feature = "ndarray-linalg_0_13",
-    feature = "ndarray-linalg_0_14"
+    feature = "ndarray-linalg_0_16"
 ))]
 mod inv;
 mod l1norm;
@@ -36,7 +36,7 @@ pub use eye::*;
 #[cfg(any(
     feature = "ndarray-linalg_0_12",
     feature = "ndarray-linalg_0_13",
-    feature = "ndarray-linalg_0_14"
+    feature = "ndarray-linalg_0_16"
 ))]
 pub use inv::*;
 pub use l1norm::*;

@@ -45,17 +45,17 @@
 //! | `ndarray_latest-nolinalg`       | no      | latest supported version without `ndarray-linalg`                  |
 //! | `ndarray_latest-serde`          | no      | latest supported version + serde support                           |
 //! | `ndarray_latest-nolinalg-serde` | no      | latest supported version without `ndarray-linalg` + serde support  |
-//! | `ndarray_v0_15`                 | no      | version 0.15                                                       |
+//! | `ndarray_v0_15`                 | no      | version 0.15 with ndarray-linalg 0.16                              |
 //! | `ndarray_v0_15-nolinalg`        | no      | version 0.15 without `ndarray-linalg`                              |
-//! | `ndarray_v0_15-serde`           | no      | version 0.15 + serde support                                       |
+//! | `ndarray_v0_15-serde`           | no      | version 0.15 with ndarray-linalg 0.16 + serde support              |
 //! | `ndarray_v0_15-nolinalg-serde`  | no      | version 0.15 without `ndarray-linalg` + serde support              |
-//! | `ndarray_v0_14`                 | no      | version 0.14                                                       |
+//! | `ndarray_v0_14`                 | no      | version 0.14 with ndarray-linalg 0.13                              |
 //! | `ndarray_v0_14-nolinalg`        | no      | version 0.14 without `ndarray-linalg`                              |
-//! | `ndarray_v0_14-serde`           | no      | version 0.14 + serde support                                       |
+//! | `ndarray_v0_14-serde`           | no      | version 0.14 with ndarray-linalg 0.13 + serde support              |
 //! | `ndarray_v0_14-nolinalg-serde`  | no      | version 0.14 without `ndarray-linalg` + serde support              |
-//! | `ndarray_v0_13`                 | no      | version 0.13                                                       |
+//! | `ndarray_v0_13`                 | no      | version 0.13 with ndarray-linalg 0.12                              |
 //! | `ndarray_v0_13-nolinalg`        | no      | version 0.13 without `ndarray-linalg`                              |
-//! | `ndarray_v0_13-serde`           | no      | version 0.13 + serde support                                       |
+//! | `ndarray_v0_13-serde`           | no      | version 0.13 with ndarray-linalg 0.12 + serde support              |
 //! | `ndarray_v0_13-nolinalg-serde`  | no      | version 0.13 without `ndarray-linalg` + serde support              |
 //!
 //! Note that the `*-nolinalg*` features do NOT pull in `ndarray-linalg` as a dependency. This
@@ -79,6 +79,8 @@
 //! |------------------------|---------|------------------------------------------|
 //! | `nalgebra_latest`      | no      | latest supported version                 |
 //! | `nalgebra_latest-serde`| no      | latest supported version + serde support |
+//! | `nalgebra_v0_32`       | no      | version 0.32                             |
+//! | `nalgebra_v0_32-serde` | no      | version 0.32 + serde support             |
 //! | `nalgebra_v0_31`       | no      | version 0.31                             |
 //! | `nalgebra_v0_31-serde` | no      | version 0.31 + serde support             |
 //! | `nalgebra_v0_30`       | no      | version 0.30                             |
@@ -133,7 +135,7 @@
 //! | Development Feature   | Comment                                      |
 //! |-----------------------|----------------------------------------------|
 //! | `_dev_linalg_latest`  | latest `ndarray-linalg` for latest `ndarray` |
-//! | `_dev_linalg_0_14`    | `ndarray-linalg` v0.14 for `ndarray` v0.15   |
+//! | `_dev_linalg_0_16`    | `ndarray-linalg` v0.16 for `ndarray` v0.15   |
 //! | `_dev_linalg_0_13`    | `ndarray-linalg` v0.13 for `ndarray` v0.14   |
 //! | `_dev_linalg_0_12`    | `ndarray-linalg` v0.12 for `ndarray` v0.13   |
 //!
@@ -166,7 +168,9 @@
 #![deny(clippy::float_cmp)]
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "nalgebra_0_31")] {
+    if #[cfg(feature = "nalgebra_0_32")] {
+        extern crate nalgebra_0_32 as nalgebra;
+    } else if #[cfg(feature = "nalgebra_0_31")] {
         extern crate nalgebra_0_31 as nalgebra;
     } else if #[cfg(feature = "nalgebra_0_30")] {
         extern crate nalgebra_0_30 as nalgebra;
@@ -186,8 +190,8 @@ cfg_if::cfg_if! {
 }
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "ndarray-linalg_0_14")] {
-        extern crate ndarray_linalg_0_14 as ndarray_linalg;
+    if #[cfg(feature = "ndarray-linalg_0_16")] {
+        extern crate ndarray_linalg_0_16 as ndarray_linalg;
     } else if #[cfg(feature = "ndarray-linalg_0_13")] {
         extern crate ndarray_linalg_0_13 as ndarray_linalg;
     } else if #[cfg(feature = "ndarray-linalg_0_12")] {
