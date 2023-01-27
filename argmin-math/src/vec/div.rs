@@ -235,7 +235,7 @@ mod tests {
                     let res = <Vec<Vec<$t>> as ArgminDiv<Vec<Vec<$t>>, Vec<Vec<$t>>>>::div(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                        assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -275,8 +275,8 @@ mod tests {
                     let res = <Vec<Vec<Complex<$t>>> as ArgminDiv<Vec<Vec<Complex<$t>>>, Vec<Vec<Complex<$t>>>>>::div(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                        assert_relative_eq!(target[j][i].re as f64, res[j][i].re as f64, epsilon = std::f64::EPSILON);
-                        assert_relative_eq!(target[j][i].im as f64, res[j][i].im as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i].re as f64, res[j][i].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i].im as f64, res[j][i].im as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

@@ -246,7 +246,7 @@ mod tests {
                     let res = <Vec<Vec<$t>> as ArgminMul<Vec<Vec<$t>>, Vec<Vec<$t>>>>::mul(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                        assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -339,7 +339,7 @@ mod tests {
                     let res = <Vec<Vec<$t>> as ArgminMul<$t, Vec<Vec<$t>>>>::mul(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert!(((target[j][i] - res[j][i]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

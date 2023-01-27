@@ -180,7 +180,7 @@ mod tests {
                     let res = <Vec<Vec<$t>> as ArgminAdd<Vec<Vec<$t>>, Vec<Vec<$t>>>>::add(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                        assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -201,7 +201,7 @@ mod tests {
                     let res = <Vec<Vec<$t>> as ArgminAdd<$t, Vec<Vec<$t>>>>::add(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                        assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
