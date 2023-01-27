@@ -297,8 +297,8 @@ mod tests {
                     ];
                     let product = a.dot(&b);
                     for i in 0..2 {
-                            assert_relative_eq!(res[i].re as f64, product[i].re as f64, epsilon = std::f64::EPSILON);
-                            assert_relative_eq!(res[i].im as f64, product[i].im as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(res[i].re as f64, product[i].re as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(res[i].im as f64, product[i].im as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -521,7 +521,7 @@ mod tests {
                     let product = (2 as $t).dot(&a);
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[i][j] - product[i][j]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j] as f64, product[i][j] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
