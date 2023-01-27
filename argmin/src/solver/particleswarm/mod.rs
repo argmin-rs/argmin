@@ -221,11 +221,9 @@ where
 
         (
             (0..self.num_particles)
-                .into_iter()
                 .map(|_| P::rand_from_range(min, max))
                 .collect(),
             (0..self.num_particles)
-                .into_iter()
                 .map(|_| P::rand_from_range(&delta_neg, &delta))
                 .collect(),
         )
