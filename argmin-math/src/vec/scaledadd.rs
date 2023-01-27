@@ -8,8 +8,8 @@
 #[cfg(test)]
 mod tests {
     use crate::ArgminScaledAdd;
-    use paste::item;
     use approx::assert_relative_eq;
+    use paste::item;
 
     macro_rules! make_test {
         ($t:ty) => {
