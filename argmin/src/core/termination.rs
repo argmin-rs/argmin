@@ -9,12 +9,13 @@
 use serde::{Deserialize, Serialize};
 
 /// Status of optimization execution
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub enum TerminationStatus {
     /// Execution is terminated
     Terminated(TerminationReason),
     /// Execution is running
+    #[default]
     NotTerminated,
 }
 
@@ -43,12 +44,6 @@ impl std::fmt::Display for TerminationStatus {
             TerminationStatus::Terminated(reason) => f.write_str(reason.text()),
             TerminationStatus::NotTerminated => f.write_str("Running"),
         }
-    }
-}
-
-impl Default for TerminationStatus {
-    fn default() -> Self {
-        TerminationStatus::NotTerminated
     }
 }
 

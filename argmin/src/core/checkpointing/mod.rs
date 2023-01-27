@@ -207,20 +207,15 @@ pub trait Checkpoint<S, I> {
 /// // The default is `CheckpointingFrequency::Always`
 /// assert_eq!(CheckpointingFrequency::default(), CheckpointingFrequency::Always);
 /// ```
-#[derive(Clone, Eq, PartialEq, Debug, Hash, Copy)]
+#[derive(Clone, Eq, PartialEq, Debug, Hash, Copy, Default)]
 pub enum CheckpointingFrequency {
     /// Never create checkpoint
     Never,
     /// Create checkpoint every N iterations
     Every(u64),
     /// Create checkpoint in every iteration
+    #[default]
     Always,
-}
-
-impl Default for CheckpointingFrequency {
-    fn default() -> CheckpointingFrequency {
-        CheckpointingFrequency::Always
-    }
 }
 
 impl Display for CheckpointingFrequency {

@@ -87,24 +87,19 @@ impl<O: Anneal> Problem<O> {
 /// * `SATempFunc::TemperatureFast`: `t_i = t_init / i`
 /// * `SATempFunc::Boltzmann`: `t_i = t_init / ln(i)`
 /// * `SATempFunc::Exponential`: `t_i = t_init * 0.95^i`
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub enum SATempFunc<F> {
     /// `t_i = t_init / i`
     TemperatureFast,
     /// `t_i = t_init / ln(i)`
+    #[default]
     Boltzmann,
     /// `t_i = t_init * x^i`
     Exponential(F),
     // /// User-provided temperature function. The first parameter must be the current temperature and
     // /// the second parameter must be the iteration number.
     // Custom(Box<dyn Fn(f64, u64) -> f64 + 'static>),
-}
-
-impl<F> Default for SATempFunc<F> {
-    fn default() -> Self {
-        SATempFunc::Boltzmann
-    }
 }
 
 /// # Simulated Annealing
