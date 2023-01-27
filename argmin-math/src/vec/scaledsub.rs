@@ -9,6 +9,7 @@
 mod tests {
     use crate::ArgminScaledSub;
     use paste::item;
+    use approx::assert_relative_eq;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -21,7 +22,7 @@ mod tests {
                     let res = a.scaled_sub(&b, &c);
                     let target = vec![2 as $t, 10 as $t, 18 as $t];
                     for i in 0..3 {
-                        assert!((((res[i] - target[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, target[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -57,7 +58,7 @@ mod tests {
                     let res = a.scaled_sub(&b, &c);
                     let target = vec![3 as $t, 10 as $t, 24 as $t];
                     for i in 0..3 {
-                        assert!((((res[i] - target[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, target[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -117,7 +118,7 @@ mod tests {
                     ];
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!((((res[i][j] - target[i][j]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j] as f64, target[i][j] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -260,7 +261,7 @@ mod tests {
                     ];
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!((((res[i][j] - target[i][j]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j] as f64, target[i][j] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

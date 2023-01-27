@@ -47,6 +47,7 @@ make_add!(Complex<f64>);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use paste::item;
 
     macro_rules! make_test {
@@ -57,7 +58,7 @@ mod tests {
                     let a = 8 as $t;
                     let b = 34 as $t;
                     let res = <$t as ArgminAdd<$t, $t>>::add(&a, &b);
-                    assert!(((42 as $t - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(42 as f64, res as f64, epsilon = f64::EPSILON);
                 }
             }
         };

@@ -51,6 +51,7 @@ make_eye!(usize);
 mod tests {
     use super::*;
     use paste::item;
+    use approx::assert_relative_eq;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -65,7 +66,7 @@ mod tests {
                     ];
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[i][j] - e[i][j]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j] as f64, e[i][j] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -87,7 +88,7 @@ mod tests {
                     ];
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[i][j] - e[i][j]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j] as f64, e[i][j] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

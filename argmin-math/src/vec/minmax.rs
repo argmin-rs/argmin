@@ -72,6 +72,7 @@ make_minmax!(f64);
 mod tests {
     use super::*;
     use paste::item;
+    use approx::assert_relative_eq;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -85,8 +86,8 @@ mod tests {
                     let res_max = <Vec<$t> as ArgminMinMax>::max(&a, &b);
                     let res_min = <Vec<$t> as ArgminMinMax>::min(&a, &b);
                     for i in 0..3 {
-                        assert!(((target_max[i] - res_max[i]) as f64).abs() < std::f64::EPSILON);
-                        assert!(((target_min[i] - res_min[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target_max[i] as f64, res_max[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target_min[i] as f64, res_min[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -114,8 +115,8 @@ mod tests {
                     let res_min = <Vec<Vec<$t>> as ArgminMinMax>::min(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                        assert!(((target_max[j][i] - res_max[j][i]) as f64).abs() < std::f64::EPSILON);
-                        assert!(((target_min[j][i] - res_min[j][i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target_max[j][i] as f64, res_max[j][i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target_min[j][i] as f64, res_min[j][i] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

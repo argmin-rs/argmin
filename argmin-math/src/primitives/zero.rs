@@ -74,6 +74,7 @@ make_complex_zero!(usize);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use paste::item;
 
     macro_rules! make_test {
@@ -82,7 +83,7 @@ mod tests {
                 #[test]
                 fn [<test_zero_ $t>]() {
                     let a = <$t as ArgminZero>::zero();
-                    assert!(((0 as $t - a) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -90,8 +91,8 @@ mod tests {
                 #[test]
                 fn [<test_zero_complex_ $t>]() {
                     let a = <Complex<$t> as ArgminZero>::zero();
-                    assert!(((0 as $t - a.re) as f64).abs() < std::f64::EPSILON);
-                    assert!(((0 as $t - a.im) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a.re as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a.im as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -99,7 +100,7 @@ mod tests {
                 #[test]
                 fn [<test_zero_like_ $t>]() {
                     let a = (42 as $t).zero_like();
-                    assert!(((0 as $t - a) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -107,8 +108,8 @@ mod tests {
                 #[test]
                 fn [<test_zero_like_complex_ $t>]() {
                     let a = Complex::new(42 as $t, 12 as $t).zero_like();
-                    assert!(((0 as $t - a.re) as f64).abs() < std::f64::EPSILON);
-                    assert!(((0 as $t - a.im) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a.re as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a.im as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

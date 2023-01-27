@@ -25,6 +25,7 @@ where
 mod tests {
     use super::*;
     use paste::item;
+    use approx::assert_relative_eq;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -42,7 +43,7 @@ mod tests {
                 fn [<test_zero_like_2_ $t>]() {
                     let a = (vec![42 as $t; 4]).zero_like();
                     for i in 0..4 {
-                        assert!(((0 as $t - a[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(0 as f64, a[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -62,7 +63,7 @@ mod tests {
                     let a = (vec![vec![42 as $t; 2]; 2]).zero_like();
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((0 as $t - a[i][j]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(0 as f64, a[i][j] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

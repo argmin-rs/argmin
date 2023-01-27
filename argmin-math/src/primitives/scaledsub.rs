@@ -23,6 +23,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use paste::item;
 
     macro_rules! make_test {
@@ -34,7 +35,7 @@ mod tests {
                     let b = 2 as $t;
                     let c = 29 as $t;
                     let res = <$t as ArgminScaledSub<$t, $t, $t>>::scaled_sub(&a, &b, &c);
-                    assert!(((42 as $t - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(42 as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

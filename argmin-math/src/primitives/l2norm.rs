@@ -60,6 +60,7 @@ make_norm_complex!(f64);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use paste::item;
 
     macro_rules! make_test {
@@ -69,7 +70,7 @@ mod tests {
                 fn [<test_norm_ $t>]() {
                     let a = 8 as $t;
                     let res = <$t as ArgminL2Norm<$t>>::l2_norm(&a);
-                    assert!(((a - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(a as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
@@ -82,7 +83,7 @@ mod tests {
                 fn [<test_norm_signed_ $t>]() {
                     let a = -8 as $t;
                     let res = <$t as ArgminL2Norm<$t>>::l2_norm(&a);
-                    assert!(((8 as $t - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(8 as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
@@ -95,7 +96,7 @@ mod tests {
                 fn [<test_norm_complex_ $t>]() {
                     let a = Complex::new(8 as $t, 4 as $t);
                     let res = <Complex<$t> as ArgminL2Norm<$t>>::l2_norm(&a);
-                    assert!((((a.re.powi(2)+a.im.powi(2)).sqrt() - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!((a.re.powi(2) + a.im.powi(2)).sqrt() as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
@@ -108,7 +109,7 @@ mod tests {
                 fn [<test_norm_complex_signed_ $t>]() {
                     let a = Complex::new(-8 as $t, -4 as $t);
                     let res = <Complex<$t> as ArgminL2Norm<$t>>::l2_norm(&a);
-                    assert!((((a.re.powi(2)+a.im.powi(2)).sqrt() - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!((a.re.powi(2)+a.im.powi(2)).sqrt() as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

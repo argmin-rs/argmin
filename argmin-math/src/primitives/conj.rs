@@ -53,6 +53,7 @@ make_complex_conj!(Complex<f64>);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use paste::item;
 
     macro_rules! make_test_complex {
@@ -63,8 +64,8 @@ mod tests {
                     let a = 8 as $t;
                     let b = 34 as $t;
                     let res = <Complex<$t> as ArgminConj>::conj(&Complex::new(a, b));
-                    assert!(((a as $t - res.re) as f64).abs() < std::f64::EPSILON);
-                    assert!(((-b as $t - res.im) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(a as f64, res.re as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(-b as f64, res.im as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
@@ -77,7 +78,7 @@ mod tests {
                 fn [<test_conj_ $t>]() {
                     let a = 8 as $t;
                     let res = <$t as ArgminConj>::conj(&a);
-                    assert!(((a as $t - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(a as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

@@ -47,6 +47,7 @@ make_mul!(Complex<f64>);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use paste::item;
 
     macro_rules! make_test {
@@ -57,7 +58,7 @@ mod tests {
                     let a = 2 as $t;
                     let b = 21 as $t;
                     let res = <$t as ArgminMul<$t, $t>>::mul(&a, &b);
-                    assert!(((42 as $t - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(42 as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
