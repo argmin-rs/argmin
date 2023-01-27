@@ -45,6 +45,7 @@ cfg-if = "1"
 
 [dev-dependencies]
 paste = "1"
+approx = "0.5.0"
 
 [features]
 default = ["primitives", "vec"]

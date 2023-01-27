@@ -123,6 +123,7 @@ make_dot_vec!(Complex<usize>);
 mod tests {
     use super::*;
     use paste::item;
+    use approx::assert_relative_eq;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -132,7 +133,7 @@ mod tests {
                     let a = vec![1 as $t, 2 as $t, 3 as $t];
                     let b = vec![4 as $t, 5 as $t, 6 as $t];
                     let res: $t = a.dot(&b);
-                    assert!((((res - 32 as $t) as f64).abs()) < std::f64::EPSILON);
+                    assert_relative_eq!(32 as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -151,8 +152,8 @@ mod tests {
                     ];
                     let res: Complex<$t> = a.dot(&b);
                     let target = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-                    assert!((((res - target).re as f64).abs()) < std::f64::EPSILON);
-                    assert!((((res - target).im as f64).abs()) < std::f64::EPSILON);
+                    assert_relative_eq!(res.re as f64, target.re as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(res.im as f64, target.im as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -164,7 +165,7 @@ mod tests {
                     let product = a.dot(&b);
                     let res = vec![2 as $t, 4 as $t, 6 as $t];
                     for i in 0..3 {
-                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -181,8 +182,8 @@ mod tests {
                     let product = a.dot(&b);
                     let res = vec![a[0]*b, a[1]*b, a[2]*b];
                     for i in 0..3 {
-                        assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
-                        assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i].re as f64, product[i].re as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(res[i].im as f64, product[i].im as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -195,7 +196,7 @@ mod tests {
                     let product = b.dot(&a);
                     let res = vec![2 as $t, 4 as $t, 6 as $t];
                     for i in 0..3 {
-                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -212,8 +213,8 @@ mod tests {
                     let product = b.dot(&a);
                     let res = vec![a[0]*b, a[1]*b, a[2]*b];
                     for i in 0..3 {
-                        assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
-                        assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i].re as f64, product[i].re as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(res[i].im as f64, product[i].im as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -231,7 +232,7 @@ mod tests {
                     let product: Vec<Vec<$t>> = a.dot(&b);
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[i][j] - product[i][j]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j] as f64, product[i][j] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -255,8 +256,8 @@ mod tests {
                     let product: Vec<Vec<Complex<$t>>> = a.dot(&b);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((res[i][j].re as f64 - product[i][j].re as f64).abs()) < std::f64::EPSILON);
-                            assert!(((res[i][j].im as f64 - product[i][j].im as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j].re as f64, product[i][j].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j].im as f64, product[i][j].im as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -274,7 +275,7 @@ mod tests {
                     let res = vec![14 as $t, 32 as $t, 50 as $t];
                     let product = a.dot(&b);
                     for i in 0..3 {
-                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -296,8 +297,8 @@ mod tests {
                     ];
                     let product = a.dot(&b);
                     for i in 0..2 {
-                            assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
-                            assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i].re as f64, product[i].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[i].im as f64, product[i].im as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -353,8 +354,8 @@ mod tests {
                     let product = a.dot(&b);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((res[i][j].re as f64 - product[i][j].re as f64).abs()) < std::f64::EPSILON);
-                            assert!(((res[i][j].im as f64 - product[i][j].im as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j].re as f64, product[i][j].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j].im as f64, product[i][j].im as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -476,7 +477,7 @@ mod tests {
                     let product = a.dot(&(2 as $t));
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[i][j] - product[i][j]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j] as f64, product[i][j] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -497,8 +498,8 @@ mod tests {
                     let product = a.dot(&b);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((res[i][j].re as f64 - product[i][j].re as f64).abs()) < std::f64::EPSILON);
-                            assert!(((res[i][j].im as f64 - product[i][j].im as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j].re as f64, product[i][j].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j].im as f64, product[i][j].im as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -541,8 +542,8 @@ mod tests {
                     let product = b.dot(&a);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((res[i][j].re as f64 - product[i][j].re as f64).abs()) < std::f64::EPSILON);
-                            assert!(((res[i][j].im as f64 - product[i][j].im as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j].re as f64, product[i][j].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[i][j].im as f64, product[i][j].im as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

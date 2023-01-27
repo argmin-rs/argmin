@@ -88,6 +88,7 @@ make_add!(f64);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use paste::item;
 
     macro_rules! make_test {
@@ -100,7 +101,7 @@ mod tests {
                     let target = vec![35 as $t, 38 as $t, 42 as $t];
                     let res = <Vec<$t> as ArgminAdd<$t, Vec<$t>>>::add(&a, &b);
                     for i in 0..3 {
-                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON)
                     }
                 }
             }
@@ -113,7 +114,7 @@ mod tests {
                     let target = vec![35 as $t, 38 as $t, 42 as $t];
                     let res = <$t as ArgminAdd<Vec<$t>, Vec<$t>>>::add(&b, &a);
                     for i in 0..3 {
-                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON)
                     }
                 }
             }
@@ -126,7 +127,7 @@ mod tests {
                     let target = vec![42 as $t, 42 as $t, 42 as $t];
                     let res = <Vec<$t> as ArgminAdd<Vec<$t>, Vec<$t>>>::add(&a, &b);
                     for i in 0..3 {
-                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -179,7 +180,7 @@ mod tests {
                     let res = <Vec<Vec<$t>> as ArgminAdd<Vec<Vec<$t>>, Vec<Vec<$t>>>>::add(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                        assert!(((target[j][i] - res[j][i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -200,7 +201,7 @@ mod tests {
                     let res = <Vec<Vec<$t>> as ArgminAdd<$t, Vec<Vec<$t>>>>::add(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                        assert!(((target[j][i] - res[j][i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

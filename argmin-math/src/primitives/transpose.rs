@@ -47,6 +47,7 @@ make_transpose!(Complex<f64>);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use paste::item;
 
     macro_rules! make_test {
@@ -56,7 +57,7 @@ mod tests {
                 fn [<test_transpose_ $t>]() {
                     let a = 8 as $t;
                     let res = <$t as ArgminTranspose<$t>>::t(a);
-                    assert!(((8 as $t - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(8 as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

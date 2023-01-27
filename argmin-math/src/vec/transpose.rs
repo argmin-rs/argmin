@@ -59,6 +59,7 @@ make_transpose!(Complex<f64>);
 mod tests {
     use super::*;
     use paste::item;
+    use approx::assert_relative_eq;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -76,7 +77,7 @@ mod tests {
                     let res = a.t();
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((target[i][j] - res[i][j]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(target[i][j] as f64, res[i][j] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -97,7 +98,7 @@ mod tests {
                     let res = a.t();
                     for i in 0..2 {
                         for j in 0..3 {
-                            assert!(((target[i][j] - res[i][j]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(target[i][j] as f64, res[i][j] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
