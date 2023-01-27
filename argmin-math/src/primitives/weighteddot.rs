@@ -61,7 +61,6 @@ mod tests_vec {
 #[cfg(test)]
 mod tests_ndarray {
     use super::*;
-    use approx::assert_relative_eq;
     use ndarray::array;
     use paste::item;
 
@@ -78,7 +77,7 @@ mod tests_ndarray {
                         [4 as $t, 9 as $t, 2 as $t],
                     ];
                     let res: $t = a.weighted_dot(&w, &b);
-                    assert_relative_eq!(100 as f64, res as f64, epsilon = std::f64::EPSILON);
+                    assert!((((res - 100 as $t) as f64).abs()) < std::f64::EPSILON);
                 }
             }
         };
@@ -100,7 +99,6 @@ mod tests_ndarray {
 #[cfg(test)]
 mod tests_nalgebra {
     use super::*;
-    use approx::assert_relative_eq;
     use nalgebra::{Matrix3, Vector3};
     use paste::item;
 
@@ -117,7 +115,7 @@ mod tests_nalgebra {
                         4 as $t, 9 as $t, 2 as $t,
                     );
                     let res: $t = a.weighted_dot(&w, &b);
-                    assert_relative_eq!(100 as f64, res as f64, epsilon = std::f64::EPSILON);
+                    assert!((((res - 100 as $t) as f64).abs()) < std::f64::EPSILON);
                 }
             }
         };

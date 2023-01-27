@@ -85,8 +85,8 @@ make_div!(Complex<f64>);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use paste::item;
     use approx::assert_relative_eq;
+    use paste::item;
 
     macro_rules! make_test {
         ($t:ty) => {
