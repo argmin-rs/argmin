@@ -114,7 +114,7 @@ let sh = HarmonicsSet::new(degree, RealSHType::Spherical);
 
 ## Acknowledgements
 
-The implementation is inspired by Google's [spherical-harmonics](https://github.com/google/spherical-harmonics) library and follows the math outlined in [this document](https://theory.cpe.ku.ac.th/~pramook/files/spherical-harmonic-lighting.pdf).
+The implementation is inspired by Google's [spherical-harmonics](https://github.com/google/spherical-harmonics) library and follows the math outlined in [this document](https://basesandframes.files.wordpress.com/2016/05/spherical_harmonic_lighting_gritty_details_green_2003.pdf).
 
 ## Future steps
 
