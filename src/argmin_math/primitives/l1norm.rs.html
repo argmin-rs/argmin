@@ -175,6 +175,7 @@
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -257,6 +258,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>paste::item;
 
     <span class="macro">macro_rules! </span>make_test {
@@ -266,7 +268,7 @@
                 </span><span class="kw">fn </span>[&lt;test_norm_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>;
                     <span class="kw">let </span>res = &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span>ArgminL1Norm&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;::l1_norm(<span class="kw-2">&amp;</span>a);
-                    <span class="macro">assert!</span>(((a - res) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(a <span class="kw">as </span>f64, res <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
@@ -279,7 +281,7 @@
                 </span><span class="kw">fn </span>[&lt;test_norm_signed_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = -<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>;
                     <span class="kw">let </span>res = &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span>ArgminL1Norm&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;::l1_norm(<span class="kw-2">&amp;</span>a);
-                    <span class="macro">assert!</span>(((<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t </span>- res) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(<span class="number">8 </span><span class="kw">as </span>f64, res <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
@@ -292,7 +294,7 @@
                 </span><span class="kw">fn </span>[&lt;test_norm_complex_signed_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = Complex::new(-<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, -<span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">let </span>res = &lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminL1Norm&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;::l1_norm(<span class="kw-2">&amp;</span>a);
-                    <span class="macro">assert!</span>((((<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t </span>+ <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>) - res) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>((<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t </span>+ <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>) <span class="kw">as </span>f64, res <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
@@ -305,7 +307,7 @@
                 </span><span class="kw">fn </span>[&lt;test_norm_complex_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = Complex::new(<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">let </span>res = &lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminL1Norm&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;::l1_norm(<span class="kw-2">&amp;</span>a);
-                    <span class="macro">assert!</span>((((<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t </span>+ <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>) - res) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>((<span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t </span>+ <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>) <span class="kw">as </span>f64, res <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

@@ -428,6 +428,7 @@
 <a href="#428" id="428">428</a>
 <a href="#429" id="429">429</a>
 <a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -530,6 +531,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>paste::item;
 
     <span class="macro">macro_rules! </span>make_test {
@@ -542,7 +544,7 @@
                     <span class="kw">let </span>target = <span class="macro">vec!</span>[<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">16 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">let </span>res = &lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminMul&lt;<span class="macro-nonterminal">$t</span>, Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert!</span>(((target[i] - res[i]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target[i] <span class="kw">as </span>f64, res[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -558,8 +560,8 @@
                     <span class="kw">let </span>target = <span class="macro">vec!</span>[a[<span class="number">0</span>] * b, a[<span class="number">1</span>] * b];
                     <span class="kw">let </span>res = &lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; <span class="kw">as </span>ArgminMul&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;, Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                        <span class="macro">assert!</span>((target[i].re <span class="kw">as </span>f64 - res[i].re <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
-                        <span class="macro">assert!</span>((target[i].im <span class="kw">as </span>f64 - res[i].im <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target[i].re <span class="kw">as </span>f64, res[i].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target[i].im <span class="kw">as </span>f64, res[i].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -572,7 +574,7 @@
                     <span class="kw">let </span>target = <span class="macro">vec!</span>[<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">16 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">let </span>res = &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span>ArgminMul&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;, Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;</span>a);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert!</span>(((target[i] - res[i]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target[i] <span class="kw">as </span>f64, res[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -588,8 +590,8 @@
                     <span class="kw">let </span>target = <span class="macro">vec!</span>[a[<span class="number">0</span>] * b, a[<span class="number">1</span>] * b];
                     <span class="kw">let </span>res = &lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminMul&lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;, Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;</span>a);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                        <span class="macro">assert!</span>((target[i].re <span class="kw">as </span>f64 - res[i].re <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
-                        <span class="macro">assert!</span>((target[i].im <span class="kw">as </span>f64 - res[i].im <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target[i].re <span class="kw">as </span>f64, res[i].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target[i].im <span class="kw">as </span>f64, res[i].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -602,7 +604,7 @@
                     <span class="kw">let </span>target = <span class="macro">vec!</span>[<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">12 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">32 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">let </span>res = &lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminMul&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;, Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert!</span>(((target[i] - res[i]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target[i] <span class="kw">as </span>f64, res[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -621,8 +623,8 @@
                     <span class="kw">let </span>target = <span class="macro">vec!</span>[a[<span class="number">0</span>]<span class="kw-2">*</span>b[<span class="number">0</span>], a[<span class="number">1</span>]<span class="kw-2">*</span>b[<span class="number">1</span>]];
                     <span class="kw">let </span>res = &lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; <span class="kw">as </span>ArgminMul&lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;, Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                        <span class="macro">assert!</span>((target[i].re <span class="kw">as </span>f64 - res[i].re <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
-                        <span class="macro">assert!</span>((target[i].im <span class="kw">as </span>f64 - res[i].im <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target[i].re <span class="kw">as </span>f64, res[i].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target[i].im <span class="kw">as </span>f64, res[i].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -675,7 +677,7 @@
                     <span class="kw">let </span>res = &lt;Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; <span class="kw">as </span>ArgminMul&lt;Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;, Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                        <span class="macro">assert!</span>(((target[j][i] - res[j][i]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[j][i] <span class="kw">as </span>f64, res[j][i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -702,8 +704,8 @@
                     <span class="kw">let </span>res = &lt;Vec&lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt; <span class="kw">as </span>ArgminMul&lt;Vec&lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;, Vec&lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert!</span>((target[j][i].re <span class="kw">as </span>f64 - res[j][i].re <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
-                            <span class="macro">assert!</span>((target[j][i].im <span class="kw">as </span>f64 - res[j][i].im <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[j][i].re <span class="kw">as </span>f64, res[j][i].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[j][i].im <span class="kw">as </span>f64, res[j][i].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -768,7 +770,7 @@
                     <span class="kw">let </span>res = &lt;Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; <span class="kw">as </span>ArgminMul&lt;<span class="macro-nonterminal">$t</span>, Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                            <span class="macro">assert!</span>(((target[j][i] - res[j][i]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[j][i] <span class="kw">as </span>f64, res[j][i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -791,8 +793,8 @@
                     <span class="kw">let </span>res = &lt;Vec&lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt; <span class="kw">as </span>ArgminMul&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;, Vec&lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert!</span>((target[j][i].re <span class="kw">as </span>f64 - res[j][i].re <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
-                            <span class="macro">assert!</span>((target[j][i].im <span class="kw">as </span>f64 - res[j][i].im <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[j][i].re <span class="kw">as </span>f64, res[j][i].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[j][i].im <span class="kw">as </span>f64, res[j][i].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -813,7 +815,7 @@
                     <span class="kw">let </span>res = &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span>ArgminMul&lt;Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;, Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                            <span class="macro">assert!</span>(((target[j][i] - res[j][i]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[j][i] <span class="kw">as </span>f64, res[j][i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -836,8 +838,8 @@
                     <span class="kw">let </span>res = &lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminMul&lt;Vec&lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;, Vec&lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;&gt;&gt;::mul(<span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;</span>a);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert!</span>((target[j][i].re <span class="kw">as </span>f64 - res[j][i].re <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
-                            <span class="macro">assert!</span>((target[j][i].im <span class="kw">as </span>f64 - res[j][i].im <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[j][i].re <span class="kw">as </span>f64, res[j][i].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[j][i].im <span class="kw">as </span>f64, res[j][i].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

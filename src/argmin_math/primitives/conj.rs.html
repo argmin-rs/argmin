@@ -103,6 +103,7 @@
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -158,6 +159,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>paste::item;
 
     <span class="macro">macro_rules! </span>make_test_complex {
@@ -168,8 +170,8 @@
                     <span class="kw">let </span>a = <span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>;
                     <span class="kw">let </span>b = <span class="number">34 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>;
                     <span class="kw">let </span>res = &lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminConj&gt;::conj(<span class="kw-2">&amp;</span>Complex::new(a, b));
-                    <span class="macro">assert!</span>(((a <span class="kw">as </span><span class="macro-nonterminal">$t </span>- res.re) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
-                    <span class="macro">assert!</span>(((-b <span class="kw">as </span><span class="macro-nonterminal">$t </span>- res.im) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(a <span class="kw">as </span>f64, res.re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(-b <span class="kw">as </span>f64, res.im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
@@ -182,7 +184,7 @@
                 </span><span class="kw">fn </span>[&lt;test_conj_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>;
                     <span class="kw">let </span>res = &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span>ArgminConj&gt;::conj(<span class="kw-2">&amp;</span>a);
-                    <span class="macro">assert!</span>(((a <span class="kw">as </span><span class="macro-nonterminal">$t </span>- res) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(a <span class="kw">as </span>f64, res <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

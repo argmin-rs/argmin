@@ -131,6 +131,7 @@
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -156,6 +157,7 @@
 #[cfg(test)]
 </span><span class="kw">mod </span>tests_vec {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>paste::item;
 
     <span class="macro">macro_rules! </span>make_test {
@@ -171,7 +173,7 @@
                         <span class="macro">vec!</span>[<span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">9 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>],
                     ];
                     <span class="kw">let </span>res: <span class="macro-nonterminal">$t </span>= a.weighted_dot(<span class="kw-2">&amp;</span>w, <span class="kw-2">&amp;</span>b);
-                    <span class="macro">assert!</span>((((res - <span class="number">100 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(<span class="number">100 </span><span class="kw">as </span>f64, res <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

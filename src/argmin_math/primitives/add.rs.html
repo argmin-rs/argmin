@@ -76,6 +76,7 @@
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -125,6 +126,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>paste::item;
 
     <span class="macro">macro_rules! </span>make_test {
@@ -135,7 +137,7 @@
                     <span class="kw">let </span>a = <span class="number">8 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>;
                     <span class="kw">let </span>b = <span class="number">34 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>;
                     <span class="kw">let </span>res = &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span>ArgminAdd&lt;<span class="macro-nonterminal">$t</span>, <span class="macro-nonterminal">$t</span>&gt;&gt;::add(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
-                    <span class="macro">assert!</span>(((<span class="number">42 </span><span class="kw">as </span><span class="macro-nonterminal">$t </span>- res) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(<span class="number">42 </span><span class="kw">as </span>f64, res <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                 }
             }
         };

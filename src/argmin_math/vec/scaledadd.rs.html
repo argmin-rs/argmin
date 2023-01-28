@@ -281,6 +281,7 @@
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -291,6 +292,7 @@
 </span><span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span><span class="kw">crate</span>::ArgminScaledAdd;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>paste::item;
 
     <span class="macro">macro_rules! </span>make_test {
@@ -304,7 +306,7 @@
                     <span class="kw">let </span>res = a.scaled_add(<span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;</span>c);
                     <span class="kw">let </span>target = <span class="macro">vec!</span>[<span class="number">9 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">12 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">15 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert!</span>((((res[i] - target[i]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, target[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -340,7 +342,7 @@
                     <span class="kw">let </span>res = a.scaled_add(<span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;</span>c);
                     <span class="kw">let </span>target = <span class="macro">vec!</span>[<span class="number">13 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">12 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">9 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert!</span>((((res[i] - target[i]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, target[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -400,7 +402,7 @@
                     ];
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                            <span class="macro">assert!</span>((((res[i][j] - target[i][j]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j] <span class="kw">as </span>f64, target[i][j] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -543,7 +545,7 @@
                     ];
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                            <span class="macro">assert!</span>((((res[i][j] - target[i][j]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j] <span class="kw">as </span>f64, target[i][j] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
