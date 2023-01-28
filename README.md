@@ -125,6 +125,7 @@ External solvers which implement the `Solver` trait are compatible with argmins 
 and as such can leverage features like checkpointing and observers. 
 
 - [egobox](https://crates.io/crates/egobox-ego)
+- [cobyla](https://crates.io/crates/cobyla)
 
 
 ## License
