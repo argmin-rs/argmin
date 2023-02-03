@@ -5,10 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
-use argmin::core::{Error, Executor, Jacobian, Operator};
-use argmin::solver::gaussnewton::GaussNewtonLS;
-use argmin::solver::linesearch::MoreThuenteLineSearch;
+use argmin::{
+    core::{observers::ObserverMode, Error, Executor, Jacobian, Operator},
+    solver::{gaussnewton::GaussNewtonLS, linesearch::MoreThuenteLineSearch},
+};
+use argmin_observer_slog::SlogLogger;
 use ndarray::{Array1, Array2};
 
 type Rate = f64;

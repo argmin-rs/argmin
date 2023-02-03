@@ -5,9 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
-use argmin::core::{CostFunction, Error, Executor, Gradient, LineSearch};
-use argmin::solver::linesearch::HagerZhangLineSearch;
+use argmin::{
+    core::{observers::ObserverMode, CostFunction, Error, Executor, Gradient, LineSearch},
+    solver::linesearch::HagerZhangLineSearch,
+};
+use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::{sphere, sphere_derivative};
 
 struct Sphere {}

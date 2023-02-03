@@ -5,10 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::observers::{ObserverMode, SlogLogger, WriteToFile, WriteToFileSerializer};
-use argmin::core::{CostFunction, Error, Executor, Gradient};
-use argmin::solver::linesearch::MoreThuenteLineSearch;
-use argmin::solver::quasinewton::BFGS;
+use argmin::{
+    core::{
+        observers::{ObserverMode, WriteToFile, WriteToFileSerializer},
+        CostFunction, Error, Executor, Gradient,
+    },
+    solver::{linesearch::MoreThuenteLineSearch, quasinewton::BFGS},
+};
+use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::rosenbrock;
 use finitediff::FiniteDiff;
 use ndarray::{array, Array1, Array2};

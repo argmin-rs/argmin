@@ -27,7 +27,6 @@ argmin offers a number of features which can be enabled or disabled depending on
 
 ### Default
 
-- `slog-logger`: Support for logging observers based on [`slog`](https://crates.io/crates/slog).
 - `serde1`: Support for `serde`. Needed for checkpointing and writing parameters to disk as well as logging to disk. Deactivating this feature leads to fewer dependencies and can lower compilation time, but it will also disable checkpointing and logging to disk.
 
 ### Optional 

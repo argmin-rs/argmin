@@ -52,7 +52,7 @@ struct EguiApp {
 impl EguiApp {
     pub fn new(cc: &eframe::CreationContext<'_>, recv: ipc::IpcReceiver<KV>) -> Self {
         let selected = if let Some(storage) = cc.storage {
-            eframe::get_value(storage, eframe::APP_KEY).unwrap_or_else(|| HashMap::new())
+            eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default()
         } else {
             HashMap::new()
         };
@@ -72,25 +72,22 @@ impl eframe::App for EguiApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Not great!!
         ctx.request_repaint();
-        match self.recv.try_recv() {
-            Ok(res) => {
-                for k in res.keys() {
-                    let k = k.0;
-                    if let Some(val) = self.data.get_mut(&k) {
-                        // TODO: unwrap
-                        val.push(res.get(&k).unwrap().clone());
-                    } else {
-                        let mut arr = Vec::with_capacity(1000);
-                        // TODO: unwrap
-                        arr.push(res.get(&k).unwrap().clone());
-                        self.data.insert(k.clone(), arr);
-                        if !self.selected.contains_key(&k) {
-                            self.selected.insert(k.clone(), true);
-                        }
-                    };
-                }
+        if let Ok(res) = self.recv.try_recv() {
+            for k in res.keys() {
+                let k = k.0;
+                if let Some(val) = self.data.get_mut(&k) {
+                    // TODO: unwrap
+                    val.push(res.get(&k).unwrap().clone());
+                } else {
+                    let mut arr = Vec::with_capacity(1000);
+                    // TODO: unwrap
+                    arr.push(res.get(&k).unwrap().clone());
+                    self.data.insert(k.clone(), arr);
+                    if !self.selected.contains_key(&k) {
+                        self.selected.insert(k.clone(), true);
+                    }
+                };
             }
-            Err(_) => {}
         }
 
         egui::SidePanel::left("metric_selection").show(ctx, |ui| {
@@ -105,8 +102,8 @@ impl eframe::App for EguiApp {
                     body.row(30.0, |mut row| {
                         row.col(|ui| {
                             for key in self.data.keys() {
-                                if let Some(mut selected) = self.selected.get_mut(key) {
-                                    ui.checkbox(&mut selected, key);
+                                if let Some(selected) = self.selected.get_mut(key) {
+                                    ui.checkbox(selected, key);
                                 }
                             }
                         });

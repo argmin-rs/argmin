@@ -7,9 +7,9 @@ This interface can be used to implement loggers, send the information to a stora
 The observer [`WriteToFile`](https://docs.rs/argmin/latest/argmin/core/observers/file/struct.WriteToFile.html) saves the parameter vector to disk and as such requires the parameter vector to be serializable.
 Hence this feature is only available with the `serde1` feature.
 
-The observer [`SlogLogger`](https://docs.rs/argmin/latest/argmin/core/observers/slog_logger/struct.SlogLogger.html) logs the progress of the optimization to screen or to disk.
-This requires the `slog-logger` feature.
-Writing to disk in addition requires the `serde1` feature.
+The observer [`SlogLogger`](https://docs.rs/argmin-observer-slog/latest/argmin_observer_slog/struct.SlogLogger.html) logs the progress of the optimization to screen or to disk.
+This can be found in the `argmin-observer-slog` crate.
+Writing to disk requires the `serde1` feature to be enabled in said crate.
 
 For each observer it can be defined how often it will observe the progress of the solver.
 This is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest` (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.
@@ -25,7 +25,8 @@ Multiple observers can be added to a single `Executor`.
 # extern crate argmin;
 # extern crate argmin_testfunctions;
 # use argmin::core::{Error, Executor, CostFunction, Gradient};
-use argmin::core::observers::{SlogLogger, ObserverMode};
+use argmin::core::observers::ObserverMode;
+use argmin_observer_slog::SlogLogger;
 # use argmin::solver::gradientdescent::SteepestDescent;
 # use argmin::solver::linesearch::MoreThuenteLineSearch;
 # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};

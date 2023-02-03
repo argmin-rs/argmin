@@ -5,10 +5,12 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
-use argmin::core::{CostFunction, Error, Executor, Gradient, Hessian};
 #[allow(unused_imports)]
-use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};
+use argmin::{
+    core::{observers::ObserverMode, CostFunction, Error, Executor, Gradient, Hessian},
+    solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion},
+};
+use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
 use ndarray::{Array, Array1, Array2};
 

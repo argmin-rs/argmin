@@ -30,8 +30,7 @@
 //! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
 //! # #[cfg(feature = "serde1")]
 //! # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
-//! # #[cfg(feature = "slog-logger")]
-//! # use argmin::core::observers::SlogLogger;
+//! # use argmin_observer_slog::SlogLogger;
 //! # use argmin::solver::landweber::Landweber;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! #

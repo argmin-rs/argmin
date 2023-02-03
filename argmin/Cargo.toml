@@ -31,10 +31,6 @@ gnuplot = { version = "0.0.39", optional = true }
 rayon = { version = "1.6.0", optional = true }
 serde = { version = "1.0", features = ["derive", "rc"], optional = true }
 serde_json = { version = "1.0", optional = true }
-slog = { version = "2.7", optional = true, features = ["dynamic-keys"] }
-slog-term = { version = "2.9", optional = true }
-slog-async = { version = "2.7", optional = true }
-slog-json = { version = "2.6", optional = true }
 
 [dev-dependencies]
 approx = "0.5.0"
@@ -45,89 +41,89 @@ ndarray = { version = "0.15", features = ["serde-1"] }
 ndarray-linalg = { version = "0.16", features = ["netlib"] }
 argmin-math = { path = "../argmin-math" }
 serde = { version = "1.0", features = ["derive", "rc"] }
+argmin-observer-slog = { path = "../observers/slog" }
 
 [features]
-default = ["slog-logger", "serde1"]
+default = ["serde1"]
 wasm-bindgen = ["instant/wasm-bindgen", "getrandom/js"]
-slog-logger = ["slog", "slog-term", "slog-async"]
-serde1 = ["serde", "serde_json", "rand/serde1", "bincode", "slog-json", "rand_xoshiro/serde1"]
+serde1 = ["serde", "serde_json", "rand/serde1", "bincode", "rand_xoshiro/serde1", "argmin-observer-slog/serde1"]
 _ndarrayl = ["argmin-math/ndarray_latest-serde", "argmin-math/_dev_linalg_latest"]
 _nalgebral = ["argmin-math/nalgebra_latest-serde"]
 # When adding new features, please consider adding them to either `full` (for users)
-# or `_full_dev` (only for local development, testing and computing test coverage).
-full = ["default", "slog-logger", "serde1", "ctrlc"]
-_full_dev = ["full", "_ndarrayl", "_nalgebral"]
+# or `_full_dev` (only for local development, tesing and computing test coverage).
+full = ["default", "serde1", "ctrlc"]
+_full_dev = ["full", "_ndarrayl", "_nalgebral", "argmin-observer-slog/serde1"]
 
 [badges]
 maintenance = { status = "actively-developed" }
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
-features = ["slog-logger", "serde1"]
+features = ["serde1"]
 
 [[example]]
 name = "backtracking"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "bfgs"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[example]]
 name = "brentroot"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "brentopt"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "checkpoint"
-required-features = ["serde1", "slog-logger"]
+required-features = ["serde1"]
 
 [[example]]
 name = "conjugategradient"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "dfp"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[example]]
 name = "gaussnewton"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[example]]
 name = "gaussnewton_linesearch"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[example]]
 name = "gaussnewton_nalgebra"
-required-features = ["_nalgebral", "argmin-math/nalgebra_latest-serde", "slog-logger"]
+required-features = ["_nalgebral", "argmin-math/nalgebra_latest-serde"]
 
 [[example]]
 name = "goldensectionsearch"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "hagerzhang"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "landweber"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "lbfgs"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[example]]
 name = "lbfgs_nalgebra"
-required-features = ["argmin-math/nalgebra_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[example]]
 name = "morethuente"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "neldermead-cubic"
@@ -135,27 +131,27 @@ required-features = ["slog-logger"]
 
 [[example]]
 name = "neldermead"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[example]]
 name = "newton"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[example]]
 name = "newton_cg"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[example]]
 name = "nonlinear_cg"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "observer"
-required-features = ["slog-logger", "gnuplot"]
+required-features = ["gnuplot"]
 
 [[example]]
 name = "owl_qn"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[example]]
 name = "particleswarm"
@@ -167,19 +163,19 @@ required-features = ["argmin-math/nalgebra_latest-serde"]
 
 [[example]]
 name = "simulatedannealing"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "sr1"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/nalgebra_latest-serde"]
 
 [[example]]
 name = "sr1_trustregion"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/nalgebra_latest-serde"]
 
 [[example]]
 name = "steepestdescent"
-required-features = ["slog-logger"]
+required-features = []
 
 [[example]]
 name = "steepestdescent_manifold"
@@ -187,8 +183,8 @@ required-features = ["slog-logger"]
 
 [[example]]
 name = "trustregion_nd"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/nalgebra_latest-serde"]
 
 [[example]]
 name = "writers"
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger", "serde1"]
+required-features = ["argmin-math/ndarray_latest-serde", "serde1"]

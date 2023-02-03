@@ -5,12 +5,13 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
-use argmin::core::{CostFunction, Error, Executor};
-use argmin::solver::simulatedannealing::{Anneal, SATempFunc, SimulatedAnnealing};
+use argmin::{
+    core::{observers::ObserverMode, CostFunction, Error, Executor},
+    solver::simulatedannealing::{Anneal, SATempFunc, SimulatedAnnealing},
+};
+use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::rosenbrock;
-use rand::distributions::Uniform;
-use rand::prelude::*;
+use rand::{distributions::Uniform, prelude::*};
 use rand_xoshiro::Xoshiro256PlusPlus;
 use std::sync::{Arc, Mutex};
 

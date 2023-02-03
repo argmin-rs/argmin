@@ -30,8 +30,6 @@ jobs:
         run: cargo test -p argmin --verbose --no-default-features
       - name: Test with serde1 feature
         run: cargo test -p argmin --verbose --no-default-features --features "serde1"
-      - name: Test with slog-logger feature
-        run: cargo test -p argmin --verbose --no-default-features --features "slog-logger"
 
   tests-argmin-math:
     runs-on: ubuntu-latest
@@ -145,14 +143,16 @@ jobs:
           components: clippy
       - name: Clippy (argmin-math)
         run: cargo clippy -p argmin-math --all-targets --features "primitives,vec,nalgebra_latest-serde,ndarray_latest-serde" -- -D warnings
-      - name: Clippy (argmin) with default features
-        run: cargo clippy -p argmin --all-targets -- -D warnings
       - name: Clippy (argmin) without default features
         run: cargo clippy -p argmin --all-targets --no-default-features -- -D warnings
-      - name: Clippy (argmin) without serde1 feature
-        run: cargo clippy -p argmin --all-targets --no-default-features --features="slog-logger" -- -D warnings
+      - name: Clippy (argmin) with default features
+        run: cargo clippy -p argmin --all-targets -- -D warnings
       - name: Clippy (argmin) with all features
         run: cargo clippy -p argmin --all-targets --all-features -- -D warnings
+      - name: Clippy (argmin-observer-slog)
+        run: cargo clippy -p argmin-observer-slog --all-targets --features "serde1" -- -D warnings
+      - name: Clippy (argmin-observer-egui)
+        run: cargo clippy -p argmin-observer-egui --all-targets -- -D warnings
 
   rustfmt:
     runs-on: ubuntu-latest

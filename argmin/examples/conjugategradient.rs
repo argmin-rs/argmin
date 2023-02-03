@@ -5,9 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
-use argmin::core::{Error, Executor, Operator};
-use argmin::solver::conjugategradient::ConjugateGradient;
+use argmin::{
+    core::{observers::ObserverMode, Error, Executor, Operator},
+    solver::conjugategradient::ConjugateGradient,
+};
+use argmin_observer_slog::SlogLogger;
 
 struct MyProblem {}
 
