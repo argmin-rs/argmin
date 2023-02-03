@@ -31,10 +31,10 @@ gnuplot = { version = "0.0.37", optional = true }
 rayon = { version = "1.5.3", optional = true }
 serde = { version = "1.0", features = ["derive", "rc"], optional = true }
 serde_json = { version = "1.0", optional = true }
-slog = { version = "2.4.1", optional = true, features = ["dynamic-keys"] }
-slog-term = { version = "2.8.1", optional = true }
-slog-async = { version = "2.7.0", optional = true }
-slog-json = { version = "2.5.0", optional = true }
+slog = { version = "2.7", optional = true, features = ["dynamic-keys"] }
+slog-term = { version = "2.9", optional = true }
+slog-async = { version = "2.7", optional = true }
+slog-json = { version = "2.6", optional = true }
 
 [dev-dependencies]
 approx = "0.5.0"
