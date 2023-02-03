@@ -25,7 +25,7 @@ thiserror = "1.0"
 argmin-math = { path = "../argmin-math", version = "0.3", default-features = false, features = ["primitives"] }
 # optional
 bincode = { version = "1.3.3", optional = true }
-ctrlc = { version = "3.1.2", optional = true }
+ctrlc = { version = "3.2.4", optional = true }
 getrandom = { version = "0.2", features = ["js"], optional = true }
 gnuplot = { version = "0.0.37", optional = true }
 rayon = { version = "1.5.3", optional = true }
