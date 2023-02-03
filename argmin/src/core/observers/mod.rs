@@ -16,9 +16,8 @@
 //! to disk and as such requires the parameter vector to be serializable. Hence this feature is
 //! only available with the `serde1` feature.
 //!
-//! The observer [`SlogLogger`](`crate::core::observers::SlogLogger`) logs the progress of the
-//! optimization to screen or to disk. This requires the `slog-logger` feature. Writing to disk
-//! in addition requires the `serde1` feature.
+//! The observer `SlogLogger` logs the progress of the //! optimization to screen or to disk.
+//! It can be found in the `argmin-observer-slog` crate.
 //!
 //! For each observer it can be defined how often it will observe the progress of the solver. This
 //! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`
@@ -34,8 +33,7 @@
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
 //! # use argmin::core::{Error, Executor, CostFunction, Gradient, observers::ObserverMode};
-//! # #[cfg(feature = "slog-logger")]
-//! # use argmin::core::observers::SlogLogger;
+//! # use argmin_observer_slog::SlogLogger;
 //! # #[cfg(feature = "serde1")]
 //! # use argmin::core::observers::{WriteToFile, WriteToFileSerializer};
 //! # use argmin::solver::gradientdescent::SteepestDescent;
@@ -92,13 +90,11 @@
 //! let res = Executor::new(problem, solver)
 //!     .configure(|config| config.param(init_param).max_iters(2))
 //! # ;
-//! # #[cfg(feature = "slog-logger")]
 //! # let res = res
 //!     // Add an observer which will log all iterations to the terminal (without blocking)
 //!     .add_observer(SlogLogger::term_noblock(), ObserverMode::Always)
 //! # ;
 //! # #[cfg(feature = "serde1")]
-//! # #[cfg(feature = "slog-logger")]
 //! # let res = res
 //!     // Log to file whenever a new best solution is found
 //!     .add_observer(SlogLogger::file("solver.log", false)?, ObserverMode::NewBest)
@@ -126,15 +122,11 @@
 
 #[cfg(feature = "serde1")]
 pub mod file;
-#[cfg(feature = "slog-logger")]
-pub mod slog_logger;
 
 #[cfg(feature = "serde1")]
 pub use file::*;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "slog-logger")]
-pub use slog_logger::*;
 
 use crate::core::{Error, State, KV};
 use std::default::Default;
@@ -223,17 +215,13 @@ impl<I> Observers<I> {
     ///
     /// ```
     /// use argmin::core::observers::{Observers, ObserverMode};
-    /// # #[cfg(feature = "slog-logger")]
-    /// use argmin::core::observers::SlogLogger;
+    /// use argmin_observer_slog::SlogLogger;
     /// use argmin::core::IterState;
     ///
     /// let mut observers: Observers<IterState<Vec<f64>, (), (), (), f64>> = Observers::new();
     ///
-    /// # #[cfg(feature = "slog-logger")]
     /// let logger = SlogLogger::term();
-    /// # #[cfg(feature = "slog-logger")]
     /// observers.push(logger, ObserverMode::Always);
-    /// # #[cfg(feature = "slog-logger")]
     /// # assert!(!observers.is_empty());
     /// ```
     pub fn push<OBS: Observe<I> + 'static>(

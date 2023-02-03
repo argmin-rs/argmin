@@ -5,9 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
-use argmin::core::{CostFunction, Error, Executor};
-use argmin::solver::brent::BrentOpt;
+use argmin::{
+    core::{observers::ObserverMode, CostFunction, Error, Executor},
+    solver::brent::BrentOpt,
+};
+use argmin_observer_slog::SlogLogger;
 
 /// Test function: `f(x) = exp(-x) - exp(5-x/2)`
 /// xmin == 2 log(2 exp(-5))

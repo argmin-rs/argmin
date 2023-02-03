@@ -5,13 +5,15 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#![allow(unused_imports)]
-
-use argmin::core::observers::{ObserverMode, SlogLogger};
-use argmin::core::{CostFunction, Error, Executor, Gradient};
-use argmin::solver::gradientdescent::SteepestDescent;
-use argmin::solver::linesearch::HagerZhangLineSearch;
-use argmin::solver::linesearch::MoreThuenteLineSearch;
+#[allow(unused_imports)]
+use argmin::{
+    core::{observers::ObserverMode, CostFunction, Error, Executor, Gradient},
+    solver::{
+        gradientdescent::SteepestDescent,
+        linesearch::{HagerZhangLineSearch, MoreThuenteLineSearch},
+    },
+};
+use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 
 struct Rosenbrock {

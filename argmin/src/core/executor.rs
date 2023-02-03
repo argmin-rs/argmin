@@ -284,15 +284,13 @@ where
     /// ```
     /// # use argmin::core::{Error, Executor, observers::ObserverMode};
     /// # use argmin::core::test_utils::{TestSolver, TestProblem};
-    /// # #[cfg(feature = "slog-logger")]
-    /// # use argmin::core::observers::SlogLogger;
+    /// # use argmin_observer_slog::SlogLogger;
     /// #
     /// # fn main() -> Result<(), Error> {
     /// # let solver = TestSolver::new();
     /// # let problem = TestProblem::new();
     /// #
     /// // Create instance of `Executor` with `problem` and `solver`
-    /// # #[cfg(feature = "slog-logger")]
     /// let executor = Executor::new(problem, solver)
     ///     .add_observer(SlogLogger::term(), ObserverMode::Always);
     /// # Ok(())

@@ -5,11 +5,15 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
-use argmin::core::{CostFunction, Error, Executor, Gradient};
-// use argmin::solver::linesearch::HagerZhangLineSearch;
-use argmin::solver::linesearch::MoreThuenteLineSearch;
-use argmin::solver::quasinewton::SR1;
+#[allow(unused_imports)]
+use argmin::{
+    core::{observers::ObserverMode, CostFunction, Error, Executor, Gradient},
+    solver::{
+        linesearch::{HagerZhangLineSearch, MoreThuenteLineSearch},
+        quasinewton::SR1,
+    },
+};
+use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::styblinski_tang;
 use finitediff::FiniteDiff;
 use ndarray::{array, Array1, Array2};

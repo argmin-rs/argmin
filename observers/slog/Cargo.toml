@@ -1,0 +1,29 @@
+[package]
+name = "argmin-observer-slog"
+version = "0.1.0"
+authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "logging observer for argmin"
+documentation = "https://docs.rs/argmin_observer_slog/"
+homepage = "https://argmin-rs.org"
+repository = "https://github.com/argmin-rs/argmin"
+readme = "README.md"
+keywords = ["optimization", "math", "science"]
+categories = ["science"]
+exclude = []
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0"
+argmin = { version = "0.8.0", path = "../../argmin", default-features = false }
+serde = { version = "1.0", features = ["derive", "rc"], optional = true }
+serde_json = { version = "1.0", optional = true }
+slog = { version = "2.7", features = ["dynamic-keys"] }
+slog-term = "2.9"
+slog-async = "2.7"
+slog-json = { version = "2.6", optional = true }
+
+[features]
+serde1 = ["serde", "serde_json", "argmin/serde1", "slog-json"]

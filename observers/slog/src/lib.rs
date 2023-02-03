@@ -12,19 +12,10 @@
 //! JSON.
 //! See [`SlogLogger`] for details regarding usage.
 
-use crate::core::observers::Observe;
-use crate::core::{Error, State, KV};
-use slog;
+use argmin::core::observers::Observe;
+use argmin::core::{Error, State, KV};
 use slog::{info, o, Drain, Key, Record, Serializer};
-use slog_async;
 use slog_async::OverflowStrategy;
-#[cfg(feature = "serde1")]
-use slog_json;
-use slog_term;
-#[cfg(feature = "serde1")]
-use std::fs::OpenOptions;
-#[cfg(feature = "serde1")]
-use std::sync::Mutex;
 
 /// A logger using the [`slog`](https://crates.io/crates/slog) crate as backend.
 #[derive(Clone)]
@@ -41,7 +32,7 @@ impl SlogLogger {
     /// # Example
     ///
     /// ```
-    /// use argmin::core::observers::SlogLogger;
+    /// use argmin_observer_slog::SlogLogger;
     ///
     /// let terminal_logger = SlogLogger::term();
     /// ```
@@ -56,7 +47,7 @@ impl SlogLogger {
     /// # Example
     ///
     /// ```
-    /// use argmin::core::observers::SlogLogger;
+    /// use argmin_observer_slog::SlogLogger;
     ///
     /// let terminal_logger = SlogLogger::term_noblock();
     /// ```
@@ -89,7 +80,7 @@ impl SlogLogger {
     /// # Example
     ///
     /// ```
-    /// use argmin::core::observers::SlogLogger;
+    /// use argmin_observer_slog::SlogLogger;
     ///
     /// let file_logger = SlogLogger::file("logfile.log", true);
     /// ```
@@ -109,7 +100,7 @@ impl SlogLogger {
     /// # Example
     ///
     /// ```
-    /// use argmin::core::observers::SlogLogger;
+    /// use argmin_observer_slog::SlogLogger;
     ///
     /// let file_logger = SlogLogger::file_noblock("logfile.log", true);
     /// ```
@@ -128,12 +119,12 @@ impl SlogLogger {
         truncate: bool,
     ) -> Result<Self, Error> {
         // Logging to file
-        let file = OpenOptions::new()
+        let file = std::fs::OpenOptions::new()
             .create(true)
             .write(true)
             .truncate(truncate)
             .open(file.as_ref())?;
-        let drain = Mutex::new(slog_json::Json::new(file).build()).map(slog::Fuse);
+        let drain = std::sync::Mutex::new(slog_json::Json::new(file).build()).map(slog::Fuse);
         let drain = slog_async::Async::new(drain)
             .overflow_strategy(overflow_strategy)
             .build()
@@ -144,9 +135,11 @@ impl SlogLogger {
     }
 }
 
-impl slog::KV for KV {
+struct SlogKV<'a>(&'a KV);
+
+impl<'a> slog::KV for SlogKV<'a> {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
-        for idx in self.kv.iter() {
+        for idx in self.0.kv.iter() {
             serializer.emit_str(Key::from(idx.0.to_string()), &idx.1.to_string())?;
         }
         Ok(())
@@ -176,20 +169,20 @@ where
 {
     /// Log basic information about the optimization after initialization.
     fn observe_init(&mut self, msg: &str, kv: &KV) -> Result<(), Error> {
-        info!(self.logger, "{}", msg; kv);
+        info!(self.logger, "{}", msg; SlogKV(kv));
         Ok(())
     }
 
     /// Logs information about the progress of the optimization after every iteration.
     fn observe_iter(&mut self, state: &I, kv: &KV) -> Result<(), Error> {
-        info!(self.logger, ""; LogState(state), kv);
+        info!(self.logger, ""; LogState(state), SlogKV(kv));
         Ok(())
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    // use super::*;
 
-    send_sync_test!(argmin_slog_loggerv, SlogLogger);
+    // send_sync_test!(argmin_slog_loggerv, SlogLogger);
 }
