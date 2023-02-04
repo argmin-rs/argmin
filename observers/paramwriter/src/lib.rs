@@ -1,4 +1,4 @@
-// Copyright 2018-2022 argmin developers
+// Copyright 2018-2023 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
@@ -7,10 +7,10 @@
 
 //! # Write parameter vectors to a file during optimization.
 //!
-//! See documentation of [`WriteToFile`] and [`WriteToFileSerializer`] for details.
+//! See documentation of [`ParamWriter`] and [`ParamWriterFormat`] for details.
 
-use crate::core::observers::Observe;
-use crate::core::{Error, State, KV};
+use argmin::core::observers::Observe;
+use argmin::core::{Error, State, KV};
 use serde::Serialize;
 use std::default::Default;
 use std::fs::File;
@@ -22,48 +22,46 @@ use std::path::PathBuf;
 /// This observer requires a directory to save the files to and a file prefix. Files will be
 /// written to disk as `<directory>/<file_prefix>_<iteration_number>.arp`. For serialization
 /// either `JSON` or [`bincode`](https://crates.io/crates/bincode) can be chosen via the enum
-/// [`WriteToFileSerializer`].
-///
-/// This feature requires the `serde1` feature to be set.
+/// [`ParamWriterFormat`].
 ///
 /// # Example
 ///
 /// Create an observer for saving the parameter vector into a JSON file.
 ///
 /// ```
-/// use argmin::core::observers::{WriteToFile, WriteToFileSerializer};
+/// use argmin_observer_paramwriter::{ParamWriter, ParamWriterFormat};
 ///
-/// let observer = WriteToFile::new("directory", "file_prefix", WriteToFileSerializer::JSON);
+/// let observer = ParamWriter::new("directory", "file_prefix", ParamWriterFormat::JSON);
 /// ```
 ///
 /// Create an observer for saving the parameter vector into a binary file using
 /// [`bincode`](https://crates.io/crates/bincode).
 ///
 /// ```
-/// use argmin::core::observers::{WriteToFile, WriteToFileSerializer};
+/// use argmin_observer_paramwriter::{ParamWriter, ParamWriterFormat};
 ///
-/// let observer = WriteToFile::new("directory", "file_prefix", WriteToFileSerializer::Bincode);
+/// let observer = ParamWriter::new("directory", "file_prefix", ParamWriterFormat::Binary);
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct WriteToFile {
+pub struct ParamWriter {
     /// Directory where files are saved to
     dir: PathBuf,
     /// File prefix
     prefix: String,
     /// Chosen serializer
-    serializer: WriteToFileSerializer,
+    serializer: ParamWriterFormat,
 }
 
-impl WriteToFile {
-    /// Create a new instance of `WriteToFile`.
+impl ParamWriter {
+    /// Create a new instance of `ParamWriter`.
     ///
     /// # Example
     /// ```
-    /// # use argmin::core::observers::{WriteToFile, WriteToFileSerializer};
-    /// let observer = WriteToFile::new("directory", "file_prefix", WriteToFileSerializer::JSON);
+    /// # use argmin_observer_paramwriter::{ParamWriter, ParamWriterFormat};
+    /// let observer = ParamWriter::new("directory", "file_prefix", ParamWriterFormat::JSON);
     /// ```
-    pub fn new<N: AsRef<str>>(dir: N, prefix: N, serializer: WriteToFileSerializer) -> Self {
-        WriteToFile {
+    pub fn new<N: AsRef<str>>(dir: N, prefix: N, serializer: ParamWriterFormat) -> Self {
+        ParamWriter {
             dir: PathBuf::from(dir.as_ref()),
             prefix: String::from(prefix.as_ref()),
             serializer,
@@ -71,10 +69,10 @@ impl WriteToFile {
     }
 }
 
-/// `WriteToFile` only implements `observer_iter` and not `observe_init` to avoid saving the
+/// `ParamWriter` only implements `observer_iter` and not `observe_init` to avoid saving the
 /// initial parameter vector. It will only save if there is a parameter vector available in the
 /// state, otherwise it will skip saving silently.
-impl<I> Observe<I> for WriteToFile
+impl<I> Observe<I> for ParamWriter
 where
     I: State,
     <I as State>::Param: Serialize,
@@ -90,10 +88,10 @@ where
             let f = BufWriter::new(File::create(fname)?);
 
             match self.serializer {
-                WriteToFileSerializer::Bincode => {
+                ParamWriterFormat::Binary => {
                     bincode::serialize_into(f, param)?;
                 }
-                WriteToFileSerializer::JSON => {
+                ParamWriterFormat::JSON => {
                     serde_json::to_writer_pretty(f, param)?;
                 }
             }
@@ -102,42 +100,24 @@ where
     }
 }
 
-/// Available serializers for [`WriteToFile`].
+/// Available serializers for [`ParamWriter`].
 ///
 /// # Example
 ///
 /// ```
-/// use argmin::core::observers::WriteToFileSerializer;
+/// use argmin_observer_paramwriter::ParamWriterFormat;
 ///
-/// let bincode = WriteToFileSerializer::Bincode;
-/// let json = WriteToFileSerializer::JSON;
+/// let bincode = ParamWriterFormat::Binary;
+/// let json = ParamWriterFormat::JSON;
 /// ```
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum WriteToFileSerializer {
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Default)]
+pub enum ParamWriterFormat {
     /// Use [`bincode`](https://crates.io/crates/bincode) for creating binary files
-    Bincode,
+    #[default]
+    Binary,
     /// Use [`serde_json`](https://crates.io/crates/serde_json) for creating JSON files
     JSON,
 }
 
-impl Default for WriteToFileSerializer {
-    /// Defaults to `Bincode`
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use argmin::core::observers::WriteToFileSerializer;
-    /// let default = WriteToFileSerializer::default();
-    /// assert_eq!(default, WriteToFileSerializer::Bincode);
-    /// ```
-    fn default() -> Self {
-        WriteToFileSerializer::Bincode
-    }
-}
-
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    send_sync_test!(write_to_file, WriteToFile);
-}
+mod tests {}

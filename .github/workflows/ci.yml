@@ -38,9 +38,18 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: Test without default features
-        run: cargo test -p argmin-observer-slog  --no-default-features
+        run: cargo test -p argmin-observer-slog --no-default-features
       - name: Test with serde1 feature
         run: cargo test -p argmin-observer-slog --no-default-features --features "serde1"
+
+  tests-argmin-observer-paramwriter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test 
+        run: cargo test -p argmin-observer-paramwriter
 
   tests-argmin-observer-egui:
     runs-on: ubuntu-latest
@@ -176,11 +185,11 @@ jobs:
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh 
       - name: Build target wasm32-unknown-unknown
-        run: cargo build --workspace --exclude argmin-observer-egui --target wasm32-unknown-unknown --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-egui --exclude argmin-observer-paramwriter --target wasm32-unknown-unknown --features wasm-bindgen
       - name: Build target wasm32-wasi with feature wasm-bindgen
-        run: cargo build --workspace --exclude argmin-observer-egui --target wasm32-wasi --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-egui --exclude argmin-observer-paramwriter --target wasm32-wasi --features wasm-bindgen
       - name: Build target wasm32-unknown-emscripten
-        run: cargo build --workspace --exclude argmin-observer-egui --target wasm32-unknown-emscripten --no-default-features --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-egui --exclude argmin-observer-paramwriter --target wasm32-unknown-emscripten --no-default-features --features wasm-bindgen
 
   cargo-deny:
     runs-on: ubuntu-latest
