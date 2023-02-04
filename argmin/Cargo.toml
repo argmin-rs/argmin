@@ -184,7 +184,3 @@ required-features = ["slog-logger"]
 [[example]]
 name = "trustregion_nd"
 required-features = ["argmin-math/nalgebra_latest-serde"]
-
-[[example]]
-name = "writers"
-required-features = ["argmin-math/ndarray_latest-serde", "serde1"]
