@@ -12,11 +12,10 @@
 //! iteration number, cost values and many more as well as solver-specific metrics. This interface
 //! can be used to implement loggers, send the information to a storage or to plot metrics.
 //!
-//! The observer [`WriteToFile`](`crate::core::observers::WriteToFile`) saves the parameter vector
-//! to disk and as such requires the parameter vector to be serializable. Hence this feature is
-//! only available with the `serde1` feature.
+//! The observer `ParamWriter` saves the parameter vector to disk. It is distributed via the
+//! `argmin-observer-paramwriter` crate.
 //!
-//! The observer `SlogLogger` logs the progress of the //! optimization to screen or to disk.
+//! The observer `SlogLogger` logs the progress of the optimization to screen or to disk.
 //! It can be found in the `argmin-observer-slog` crate.
 //!
 //! For each observer it can be defined how often it will observe the progress of the solver. This
@@ -35,7 +34,7 @@
 //! # use argmin::core::{Error, Executor, CostFunction, Gradient, observers::ObserverMode};
 //! # use argmin_observer_slog::SlogLogger;
 //! # #[cfg(feature = "serde1")]
-//! # use argmin::core::observers::{WriteToFile, WriteToFileSerializer};
+//! # use argmin_observer_paramwriter::{ParamWriter, ParamWriterFormat};
 //! # use argmin::solver::gradientdescent::SteepestDescent;
 //! # use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -100,7 +99,7 @@
 //!     .add_observer(SlogLogger::file("solver.log", false)?, ObserverMode::NewBest)
 //!     // Write parameter vector to `params/param.arg` every 20th iteration
 //!     .add_observer(
-//!         WriteToFile::new("params", "param", WriteToFileSerializer::JSON),
+//!         ParamWriter::new("params", "param", ParamWriterFormat::JSON),
 //!         ObserverMode::Every(20)
 //!     )
 //! # ;
@@ -120,11 +119,6 @@
 //! # }
 //! ```
 
-#[cfg(feature = "serde1")]
-pub mod file;
-
-#[cfg(feature = "serde1")]
-pub use file::*;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 

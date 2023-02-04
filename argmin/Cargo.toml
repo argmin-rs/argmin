@@ -30,7 +30,6 @@ getrandom = { version = "0.2", features = ["js"], optional = true }
 gnuplot = { version = "0.0.39", optional = true }
 rayon = { version = "1.6.0", optional = true }
 serde = { version = "1.0", features = ["derive", "rc"], optional = true }
-serde_json = { version = "1.0", optional = true }
 
 [dev-dependencies]
 approx = "0.5.0"
@@ -42,11 +41,12 @@ ndarray-linalg = { version = "0.16", features = ["netlib"] }
 argmin-math = { path = "../argmin-math" }
 serde = { version = "1.0", features = ["derive", "rc"] }
 argmin-observer-slog = { path = "../observers/slog" }
+argmin-observer-paramwriter = { path = "../observers/paramwriter" }
 
 [features]
 default = ["serde1"]
 wasm-bindgen = ["instant/wasm-bindgen", "getrandom/js"]
-serde1 = ["serde", "serde_json", "rand/serde1", "bincode", "rand_xoshiro/serde1", "argmin-observer-slog/serde1"]
+serde1 = ["serde", "rand/serde1", "bincode", "rand_xoshiro/serde1", "argmin-observer-slog/serde1"]
 _ndarrayl = ["argmin-math/ndarray_latest-serde", "argmin-math/_dev_linalg_latest"]
 _nalgebral = ["argmin-math/nalgebra_latest-serde"]
 # When adding new features, please consider adding them to either `full` (for users)
