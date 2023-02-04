@@ -26,4 +26,5 @@ slog-async = "2.7"
 slog-json = { version = "2.6", optional = true }
 
 [features]
+default = []
 serde1 = ["serde", "serde_json", "argmin/serde1", "slog-json"]

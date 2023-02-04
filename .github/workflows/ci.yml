@@ -31,44 +31,34 @@ jobs:
       - name: Test with serde1 feature
         run: cargo test -p argmin --verbose --no-default-features --features "serde1"
 
-  tests-argmin-math:
+  tests-argmin-observer-slog:
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     feature:
-    #       - primitives
-    #       - vec
-    #       # ndarray with linalg, without serde
-    #       - ndarray_latest,_dev_linalg
-    #       - ndarray_v0_15,_dev_linalg
-    #       - ndarray_v0_14,_dev_linalg
-    #       - ndarray_v0_13,_dev_linalg
-    #       # ndarray without linalg, without serde
-    #       - ndarray_latest-nolinalg
-    #       - ndarray_v0_15-nolinalg
-    #       - ndarray_v0_14-nolinalg
-    #       - ndarray_v0_13-nolinalg
-    #       # ndarray with linalg, with serde
-    #       - ndarray_latest-serde,_dev_linalg
-    #       - ndarray_v0_15-serde,_dev_linalg
-    #       - ndarray_v0_14-serde,_dev_linalg
-    #       - ndarray_v0_13-serde,_dev_linalg
-    #       # ndarray without linalg, with serde
-    #       - ndarray_latest-nolinalg-serde
-    #       - ndarray_v0_15-nolinalg-serde
-    #       - ndarray_v0_14-nolinalg-serde
-    #       - ndarray_v0_13-nolinalg-serde
-    #       # nalgebra
-    #       - nalgebra_latest-serde
-    #       - nalgebra_v0_31-serde
-    #       - nalgebra_v0_30-serde
-    #       - nalgebra_v0_29-serde
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
-      # - name: Test 
-      #   run: cargo test -p argmin-math --no-default-features --features "${{ matrix.feature }}"
+      - name: Test without default features
+        run: cargo test -p argmin-observer-slog --verbose --no-default-features
+      - name: Test with serde1 feature
+        run: cargo test -p argmin-observer-slog --verbose --no-default-features --features "serde1"
+
+  tests-argmin-observer-egui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test
+        run: cargo test -p argmin-observer-egui --verbose 
+
+  tests-argmin-math:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      # NOTE: These are in series on purpose, in the hope that not everything
+      # has to be recompiled every time. 
       # Default features
       - name: argmin-math (primitives)
         run: cargo test -p argmin-math --no-default-features --features "primitives"
