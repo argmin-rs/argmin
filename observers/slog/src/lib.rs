@@ -75,7 +75,7 @@ impl SlogLogger {
     ///
     /// If `truncate` is set to `true`, the content of existing log files will be cleared.
     ///
-    /// Only available if the `serde1` feature is set.
+    /// Only available if the `serde1` feature is enabled.
     ///
     /// # Example
     ///
@@ -95,7 +95,7 @@ impl SlogLogger {
     ///
     /// If `truncate` is set to `true`, the content of existing log files will be cleared.
     ///
-    /// Only available if the `serde1` feature is set.
+    /// Only available if the `serde1` feature is enabled.
     ///
     /// # Example
     ///
@@ -111,7 +111,7 @@ impl SlogLogger {
 
     /// Create file logger with a given `OverflowStrategy`.
     ///
-    /// Only available if the `serde1` feature is set.
+    /// Only available if the `serde1` feature is enabled.
     #[cfg(feature = "serde1")]
     fn file_internal<N: AsRef<str>>(
         file: N,
