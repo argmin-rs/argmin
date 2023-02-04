@@ -16,9 +16,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: Test (default features)
-        run: cargo test -p argmin --verbose
+        run: cargo test -p argmin
       - name: Test (all features)
-        run: cargo test -p argmin --verbose --all-features
+        run: cargo test -p argmin --all-features
 
   tests-argmin-serde1-feature:
     runs-on: ubuntu-latest
@@ -27,9 +27,9 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: Test (no default features)
-        run: cargo test -p argmin --verbose --no-default-features
+        run: cargo test -p argmin --no-default-features
       - name: Test with serde1 feature
-        run: cargo test -p argmin --verbose --no-default-features --features "serde1"
+        run: cargo test -p argmin --no-default-features --features "serde1"
 
   tests-argmin-observer-slog:
     runs-on: ubuntu-latest
@@ -38,9 +38,9 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: Test without default features
-        run: cargo test -p argmin-observer-slog --verbose --no-default-features
+        run: cargo test -p argmin-observer-slog  --no-default-features
       - name: Test with serde1 feature
-        run: cargo test -p argmin-observer-slog --verbose --no-default-features --features "serde1"
+        run: cargo test -p argmin-observer-slog --no-default-features --features "serde1"
 
   tests-argmin-observer-egui:
     runs-on: ubuntu-latest
@@ -49,7 +49,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: Test
-        run: cargo test -p argmin-observer-egui --verbose 
+        run: cargo test -p argmin-observer-egui  
 
   tests-argmin-math:
     runs-on: ubuntu-latest
