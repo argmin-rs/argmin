@@ -17,6 +17,7 @@ use rand::{distributions::Uniform, prelude::*};
 use rand_xoshiro::Xoshiro256PlusPlus;
 use std::sync::{Arc, Mutex};
 
+#[derive(Clone)]
 struct Rosenbrock {
     /// Parameter a, usually 1.0
     a: f64,
@@ -50,7 +51,6 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
-        std::thread::sleep(std::time::Duration::from_millis(5));
         Ok(rosenbrock(param, self.a, self.b))
     }
 }
@@ -72,7 +72,7 @@ impl Anneal for Rosenbrock {
             let idx = rng.sample(distr);
 
             // Compute random number in [0.1, 0.1].
-            let val = rng.sample(Uniform::new_inclusive(-0.001, 0.001));
+            let val = rng.sample(Uniform::new_inclusive(-0.1, 0.1));
 
             // modify previous parameter value at random position `idx` by `val`
             param_n[idx] += val;
@@ -85,16 +85,17 @@ impl Anneal for Rosenbrock {
 }
 
 fn run() -> Result<(), Error> {
-    let num = 3;
     // Define bounds
-    let lower_bound: Vec<f64> = vec![-50.0; num];
-    let upper_bound: Vec<f64> = vec![50.0; num];
+    // let lower_bound: Vec<f64> = vec![-50.0, -50.0];
+    // let upper_bound: Vec<f64> = vec![50.0, 50.0];
+    let lower_bound: Vec<f64> = vec![-50.0; 20];
+    let upper_bound: Vec<f64> = vec![50.0; 20];
 
     // Define cost function
     let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
 
     // Define initial parameter vector
-    let init_param: Vec<f64> = vec![-1.0; num];
+    let init_param: Vec<f64> = vec![3.0; 20];
 
     // Define initial temperature
     let temp = 1500.0;
@@ -125,6 +126,26 @@ fn run() -> Result<(), Error> {
     /////////////////////////
     // Run solver          //
     /////////////////////////
+    let observer = EguiObserver::new()?;
+    let res = Executor::new(operator.clone(), solver.clone())
+        .configure(|state| {
+            state
+                .param(init_param.clone())
+                // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
+                .max_iters(10_000)
+                // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
+                .target_cost(0.0)
+        })
+        .add_observer(observer, ObserverMode::Always)
+        .run()?;
+
+    // Wait a second (lets the logger flush everything before printing again)
+    std::thread::sleep(std::time::Duration::from_secs(1));
+
+    // Print result
+    println!("{res}");
+
+    let observer = EguiObserver::new()?;
     let res = Executor::new(operator, solver)
         .configure(|state| {
             state
@@ -134,11 +155,11 @@ fn run() -> Result<(), Error> {
                 // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
                 .target_cost(0.0)
         })
-        .add_observer(EguiObserver::new()?, ObserverMode::Always)
+        .add_observer(observer, ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)
-    std::thread::sleep(std::time::Duration::from_secs(10));
+    std::thread::sleep(std::time::Duration::from_secs(1));
 
     // Print result
     println!("{res}");
