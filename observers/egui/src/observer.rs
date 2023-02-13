@@ -110,6 +110,21 @@ where
             self.tx.send(message)?;
         }
 
+        if let Some(best_param) = state.get_best_param() {
+            let best_param = best_param
+                .clone()
+                .into_iter()
+                .map(f64::from)
+                .collect::<Vec<_>>();
+
+            let message = Message::BestParam {
+                name: self.name.clone(),
+                param: best_param,
+            };
+
+            self.tx.send(message)?;
+        }
+
         Ok(())
     }
 }

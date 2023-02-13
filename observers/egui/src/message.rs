@@ -14,6 +14,7 @@ pub enum Message {
     NewRun { name: String },
     Samples { name: String, kv: KV },
     Param { name: String, param: Vec<f64> },
+    BestParam { name: String, param: Vec<f64> },
 }
 
 impl Message {
