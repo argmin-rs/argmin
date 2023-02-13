@@ -72,7 +72,7 @@ impl Anneal for Rosenbrock {
             let idx = rng.sample(distr);
 
             // Compute random number in [0.1, 0.1].
-            let val = rng.sample(Uniform::new_inclusive(-0.001, 0.001));
+            let val = rng.sample(Uniform::new_inclusive(-0.1, 0.1));
 
             // modify previous parameter value at random position `idx` by `val`
             param_n[idx] += val;
@@ -85,10 +85,10 @@ impl Anneal for Rosenbrock {
 }
 
 fn run() -> Result<(), Error> {
-    let num = 3;
+    let num = 2;
     // Define bounds
-    let lower_bound: Vec<f64> = vec![-50.0; num];
-    let upper_bound: Vec<f64> = vec![50.0; num];
+    let lower_bound: Vec<f64> = vec![-5.0; num];
+    let upper_bound: Vec<f64> = vec![5.0; num];
 
     // Define cost function
     let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
@@ -97,7 +97,7 @@ fn run() -> Result<(), Error> {
     let init_param: Vec<f64> = vec![-1.0; num];
 
     // Define initial temperature
-    let temp = 1500.0;
+    let temp = 10.0;
 
     // Set up simulated annealing solver
     // An alternative random number generator (RNG) can be provided to `new_with_rng`:
@@ -109,18 +109,18 @@ fn run() -> Result<(), Error> {
         // Stopping criteria   //
         /////////////////////////
         // Optional: stop if there was no new best solution after 1000 iterations
-        .with_stall_best(1000)
+        // .with_stall_best(1000)
         // Optional: stop if there was no accepted solution after 1000 iterations
-        .with_stall_accepted(1000)
+        // .with_stall_accepted(1000)
         /////////////////////////
         // Reannealing         //
         /////////////////////////
         // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
-        .with_reannealing_fixed(1000)
+        // .with_reannealing_fixed(1000)
         // Optional: Reanneal after no accepted solution has been found for `iter` iterations
-        .with_reannealing_accepted(500)
+        // .with_reannealing_accepted(500)
         // Optional: Start reannealing after no new best solution has been found for 800 iterations
-        .with_reannealing_best(800);
+        .with_reannealing_best(1000);
 
     /////////////////////////
     // Run solver          //

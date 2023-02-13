@@ -34,10 +34,17 @@ use crate::{
 
 const NAME: &'static str = "argmin-plotter";
 
+#[derive(Clone, Debug)]
+enum View {
+    Metrics,
+    Params,
+}
+
 struct MyContext {
     pub style: Option<Style>,
     open_tabs: HashSet<String>,
     storage: Arc<Storage>,
+    views: HashMap<String, View>,
 }
 
 type Samples = HashMap<String, Vec<f64>>;
@@ -46,6 +53,7 @@ type Selected = HashMap<String, bool>;
 pub struct Storage {
     data: DashMap<String, Samples>,
     param: DashMap<String, Vec<f64>>,
+    best_param: DashMap<String, Vec<f64>>,
     selected: DashMap<String, Selected>,
     tree: Arc<Mutex<Tree<String>>>,
 }
@@ -55,6 +63,7 @@ impl Storage {
         Storage {
             data: DashMap::new(),
             param: DashMap::new(),
+            best_param: DashMap::new(),
             selected: DashMap::new(),
             tree,
         }
@@ -72,7 +81,6 @@ async fn server(storage: Arc<Storage>, ctx: egui::Context) -> Result<(), anyhow:
     loop {
         match listener.accept().await {
             Ok((stream, _)) => {
-                println!("new connection");
                 let storage = Arc::clone(&storage);
                 tokio::spawn(handle_connection(stream, storage, ctx.clone()));
             }
@@ -130,6 +138,15 @@ async fn handle_connection(
                                     *storage_param = param;
                                 } else {
                                     storage.param.insert(name, param);
+                                }
+                            }
+                            Message::BestParam { name, param } => {
+                                if let Some(mut storage_best_param) =
+                                    storage.best_param.get_mut(&name)
+                                {
+                                    *storage_best_param = param;
+                                } else {
+                                    storage.best_param.insert(name, param);
                                 }
                             }
                         }
@@ -194,6 +211,7 @@ impl PlotterApp {
             style: None,
             open_tabs,
             storage,
+            views: HashMap::new(),
         };
         Ok(Self { context, tree })
     }
@@ -224,7 +242,7 @@ impl TabViewer for MyContext {
 }
 
 impl MyContext {
-    fn show_plots(&mut self, name: &String, ui: &mut Ui) {
+    fn show_metrics(&mut self, name: &String, ui: &mut Ui) {
         let data = self.storage.data.get(name).unwrap();
         let mut selected = self.storage.selected.get_mut(name).unwrap();
         ui.horizontal_top(|ui| {
@@ -286,32 +304,95 @@ impl MyContext {
                                 });
                             }
                         }
-
-                        if let Some(param) = self.storage.param.get(name) {
-                            // ui.set_max_height(height / 3.0);
-                            let chart = BarChart::new(
-                                param
-                                    .iter()
-                                    .enumerate()
-                                    .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
-                                    .collect(),
-                            )
-                            .color(Color32::LIGHT_BLUE);
-                            // .name("Normal Distribution");
-                            // if !self.vertical {
-                            //     chart = chart.horizontal();
-                            // }
-
-                            Plot::new("Normal Distribution Demo")
-                                .legend(Legend::default())
-                                // .clamp_grid(true)
-                                .allow_scroll(false)
-                                .show(ui, |plot_ui| plot_ui.bar_chart(chart))
-                                .response;
-                        }
                     });
                 });
         });
+    }
+
+    fn show_params(&mut self, name: &String, ui: &mut Ui) {
+        // egui::ScrollArea::vertical()
+        //     .id_source("ufuf")
+        //     .show(ui, |ui| {
+        ui.vertical(|ui| {
+            let height = ui.available_height() * 0.95;
+
+            if let Some(param) = self.storage.param.get(name) {
+                ui.group(|ui| {
+                    ui.set_max_height(height / 2.0);
+                    // ui.label("Current parameter vector");
+                    let chart = BarChart::new(
+                        param
+                            .iter()
+                            .enumerate()
+                            .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
+                            .collect(),
+                    )
+                    .color(Color32::LIGHT_BLUE)
+                    .name("Current");
+
+                    Plot::new("Current Parameter Vector")
+                        .legend(Legend::default())
+                        // .clamp_grid(true)
+                        .allow_scroll(false)
+                        .allow_zoom(false)
+                        .allow_boxed_zoom(false)
+                        .allow_drag(false)
+                        .auto_bounds_x()
+                        .auto_bounds_y()
+                        .set_margin_fraction([0.1, 0.3].into())
+                        .reset()
+                        .show(ui, |plot_ui| plot_ui.bar_chart(chart))
+                        .response;
+                });
+            }
+
+            if let Some(best_param) = self.storage.best_param.get(name) {
+                // ui.label("Current best parameter vector");
+                ui.group(|ui| {
+                    ui.set_max_height(height / 2.0);
+                    let chart = BarChart::new(
+                        best_param
+                            .iter()
+                            .enumerate()
+                            .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
+                            .collect(),
+                    )
+                    .color(Color32::LIGHT_BLUE)
+                    .name("Best");
+
+                    Plot::new("Best Parameter Vector")
+                        .legend(Legend::default())
+                        // .clamp_grid(true)
+                        .allow_scroll(false)
+                        .allow_zoom(false)
+                        .allow_boxed_zoom(false)
+                        .allow_drag(false)
+                        .auto_bounds_x()
+                        .auto_bounds_y()
+                        .set_margin_fraction([0.1, 0.3].into())
+                        .reset()
+                        .show(ui, |plot_ui| plot_ui.bar_chart(chart))
+                        .response;
+                });
+            }
+        });
+        // });
+    }
+
+    fn show_plots(&mut self, name: &String, ui: &mut Ui) {
+        ui.horizontal_top(|ui| {
+            if ui.button("Metrics").clicked() {
+                self.views.insert(name.clone(), View::Metrics);
+            }
+            if ui.button("Parameters").clicked() {
+                self.views.insert(name.clone(), View::Params);
+            }
+        });
+        match self.views.get(name) {
+            Some(View::Metrics) => self.show_metrics(name, ui),
+            Some(View::Params) => self.show_params(name, ui),
+            None => self.show_metrics(name, ui),
+        }
     }
 }
 
