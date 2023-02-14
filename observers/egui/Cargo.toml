@@ -32,6 +32,7 @@ pot = "1.0.2"
 procspawn = "0.10.2"
 rmp-serde = "1.1.1"
 serde = { version = "1.0.152", features = ["derive"] }
+time = { version = "0.3.17", features = ["serde"] }
 tokio = { version = "1.25.0", features = ["full", "sync"] }
 tokio-stream = "0.1.11"
 tokio-util = { version = "0.7.5", features = ["codec"] }

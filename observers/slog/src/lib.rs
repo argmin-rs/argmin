@@ -168,7 +168,7 @@ where
     I: State,
 {
     /// Log basic information about the optimization after initialization.
-    fn observe_init(&mut self, msg: &str, kv: &KV) -> Result<(), Error> {
+    fn observe_init(&mut self, msg: &str, _state: &I, kv: &KV) -> Result<(), Error> {
         info!(self.logger, "{}", msg; SlogKV(kv));
         Ok(())
     }

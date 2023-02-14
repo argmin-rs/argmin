@@ -142,7 +142,7 @@ use std::sync::{Arc, Mutex};
 ///     // implement, offers a range of methods which can be useful.
 ///     I: State,
 /// {
-///     fn observe_init(&mut self, name: &str, kv: &KV) -> Result<(), Error> {
+///     fn observe_init(&mut self, name: &str, state: &I, kv: &KV) -> Result<(), Error> {
 ///         // Do something with `name` and/or `kv`
 ///         // Is executed after initialization of a solver
 ///         Ok(())
@@ -160,7 +160,7 @@ pub trait Observe<I> {
     ///
     /// Has access to the name of the solver via `name` and to a key-value store `kv` with entries
     /// specific for each solver.
-    fn observe_init(&mut self, _name: &str, _kv: &KV) -> Result<(), Error> {
+    fn observe_init(&mut self, _name: &str, _state: &I, _kv: &KV) -> Result<(), Error> {
         Ok(())
     }
 
@@ -248,9 +248,9 @@ impl<I> Observers<I> {
 /// are met and calls the actual observers if required.
 impl<I: State> Observe<I> for Observers<I> {
     /// After initialization of the solver, this loops over all stored observers and calls them.
-    fn observe_init(&mut self, name: &str, kv: &KV) -> Result<(), Error> {
+    fn observe_init(&mut self, name: &str, state: &I, kv: &KV) -> Result<(), Error> {
         for l in self.observers.iter() {
-            l.0.lock().unwrap().observe_init(name, kv)?
+            l.0.lock().unwrap().observe_init(name, state, kv)?
         }
         Ok(())
     }
@@ -373,7 +373,9 @@ mod tests {
             .push(test_obs_3, ObserverMode::Every(3))
             .push(test_obs_4, ObserverMode::NewBest);
 
-        obs.observe_init("test_solver", &kv!()).unwrap();
+        let mut state: TState = IterState::new();
+
+        obs.observe_init("test_solver", &state, &kv!()).unwrap();
 
         // all `init_called` should be 1, all `iter_called` 0
         for s in storages.iter() {
@@ -383,7 +385,6 @@ mod tests {
             assert_eq!(observer.iter_called, 0);
         }
 
-        let mut state: TState = IterState::new();
         obs.observe_iter(&state, &kv!()).unwrap();
 
         assert_eq!(storages[0].lock().unwrap().init_called, 1);
