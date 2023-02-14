@@ -85,7 +85,7 @@ impl Anneal for Rosenbrock {
 }
 
 fn run() -> Result<(), Error> {
-    let num = 2;
+    let num = 10;
     // Define bounds
     let lower_bound: Vec<f64> = vec![-5.0; num];
     let upper_bound: Vec<f64> = vec![5.0; num];
@@ -94,10 +94,10 @@ fn run() -> Result<(), Error> {
     let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
 
     // Define initial parameter vector
-    let init_param: Vec<f64> = vec![-1.0; num];
+    let init_param: Vec<f64> = vec![0.9; num];
 
     // Define initial temperature
-    let temp = 10.0;
+    let temp = 0.1;
 
     // Set up simulated annealing solver
     // An alternative random number generator (RNG) can be provided to `new_with_rng`:
@@ -118,7 +118,7 @@ fn run() -> Result<(), Error> {
         // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
         // .with_reannealing_fixed(1000)
         // Optional: Reanneal after no accepted solution has been found for `iter` iterations
-        // .with_reannealing_accepted(500)
+        .with_reannealing_accepted(1000)
         // Optional: Start reannealing after no new best solution has been found for 800 iterations
         .with_reannealing_best(1000);
 
@@ -130,7 +130,7 @@ fn run() -> Result<(), Error> {
             state
                 .param(init_param)
                 // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-                .max_iters(10_000)
+                .max_iters(1_000)
                 // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
                 .target_cost(0.0)
         })

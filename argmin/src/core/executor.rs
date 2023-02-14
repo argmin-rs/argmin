@@ -182,7 +182,7 @@ where
                 }
 
                 // Observe after init
-                self.observers.observe_init(S::NAME, &logs)?;
+                self.observers.observe_init(S::NAME, &state, &logs)?;
             }
 
             state.func_counts(&self.problem);

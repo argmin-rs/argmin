@@ -10,6 +10,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use argmin::core::TerminationStatus;
 use dashmap::DashMap;
 use eframe::{
     egui::{
@@ -22,6 +23,7 @@ use eframe::{
 use egui_dock::{DockArea, Node, Style, TabViewer, Tree};
 use egui_extras::{Column, TableBuilder};
 use itertools::Itertools;
+use time::Duration;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_stream::StreamExt;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
@@ -38,29 +40,45 @@ const NAME: &'static str = "argmin-plotter";
 enum View {
     Metrics,
     Params,
+    Overview,
 }
 
 struct MyContext {
     pub style: Option<Style>,
-    open_tabs: HashSet<String>,
+    open_tabs: HashSet<RunName>,
     storage: Arc<Storage>,
-    views: HashMap<String, View>,
+    views: HashMap<RunName, View>,
 }
 
-type Samples = HashMap<String, Vec<f64>>;
-type Selected = HashMap<String, bool>;
+type RunName = String;
+type MetricName = String;
+type Samples = HashMap<MetricName, Vec<(u64, f64)>>;
+type Selected = HashMap<MetricName, bool>;
+
+pub struct General {
+    max_iter: u64,
+    target_cost: f64,
+    curr_iter: u64,
+    best_iter: u64,
+    curr_cost: f64,
+    curr_best_cost: f64,
+    time: Duration,
+    termination_status: TerminationStatus,
+}
 
 pub struct Storage {
-    data: DashMap<String, Samples>,
-    param: DashMap<String, Vec<f64>>,
-    best_param: DashMap<String, Vec<f64>>,
-    selected: DashMap<String, Selected>,
-    tree: Arc<Mutex<Tree<String>>>,
+    general: DashMap<RunName, General>,
+    data: DashMap<RunName, Samples>,
+    param: DashMap<RunName, (u64, Vec<f64>)>,
+    best_param: DashMap<RunName, (u64, Vec<f64>)>,
+    selected: DashMap<RunName, Selected>,
+    tree: Arc<Mutex<Tree<RunName>>>,
 }
 
 impl Storage {
     fn new(tree: Arc<Mutex<Tree<String>>>) -> Self {
         Storage {
+            general: DashMap::new(),
             data: DashMap::new(),
             param: DashMap::new(),
             best_param: DashMap::new(),
@@ -106,25 +124,60 @@ async fn handle_connection(
                 match Message::unpack(&line) {
                     Ok(msg) => {
                         match msg {
-                            Message::NewRun { name } => {
+                            Message::NewRun {
+                                name,
+                                max_iter,
+                                target_cost,
+                            } => {
                                 let mut tree = storage.tree.lock().unwrap();
                                 tree.push_to_first_leaf(name.clone());
                                 drop(tree);
+                                storage.general.insert(
+                                    name.clone(),
+                                    General {
+                                        max_iter,
+                                        target_cost,
+                                        curr_iter: 0,
+                                        best_iter: 0,
+                                        curr_cost: std::f64::INFINITY,
+                                        curr_best_cost: std::f64::INFINITY,
+                                        time: Duration::new(0, 0),
+                                        termination_status: TerminationStatus::NotTerminated,
+                                    },
+                                );
                                 storage.data.insert(name.clone(), HashMap::new());
                                 storage.selected.insert(name, HashMap::new());
                             }
-                            Message::Samples { name, kv } => {
-                                if let (Some(mut data), Some(mut selected)) =
-                                    (storage.data.get_mut(&name), storage.selected.get_mut(&name))
-                                {
+                            Message::Samples {
+                                name,
+                                iter,
+                                time,
+                                termination_status,
+                                kv,
+                            } => {
+                                if let (Some(mut data), Some(mut selected), Some(mut general)) = (
+                                    storage.data.get_mut(&name),
+                                    storage.selected.get_mut(&name),
+                                    storage.general.get_mut(&name),
+                                ) {
+                                    general.curr_iter = iter;
+                                    general.time = time;
+                                    general.termination_status = termination_status;
                                     for (k, _) in kv.keys() {
+                                        let kv_val = kv.get(&k).unwrap().get_float().unwrap();
+                                        if k == "cost" {
+                                            general.curr_cost = kv_val;
+                                        }
+                                        if k == "best_cost" {
+                                            general.curr_best_cost = kv_val;
+                                        }
                                         if let Some(val) = data.get_mut(&k) {
                                             // TODO: unwrap
-                                            val.push(kv.get(&k).unwrap().get_float().unwrap());
+                                            val.push((iter, kv_val));
                                         } else {
                                             let mut arr = Vec::with_capacity(1000);
                                             // TODO: unwrap
-                                            arr.push(kv.get(&k).unwrap().get_float().unwrap());
+                                            arr.push((iter, kv_val));
                                             data.insert(k.clone(), arr);
                                             if !selected.contains_key(&k) {
                                                 selected.insert(k.clone(), true);
@@ -133,20 +186,23 @@ async fn handle_connection(
                                     }
                                 };
                             }
-                            Message::Param { name, param } => {
+                            Message::Param { name, iter, param } => {
                                 if let Some(mut storage_param) = storage.param.get_mut(&name) {
-                                    *storage_param = param;
+                                    *storage_param = (iter, param);
                                 } else {
-                                    storage.param.insert(name, param);
+                                    storage.param.insert(name, (iter, param));
                                 }
                             }
-                            Message::BestParam { name, param } => {
+                            Message::BestParam { name, iter, param } => {
+                                if let Some(mut general) = storage.general.get_mut(&name) {
+                                    general.best_iter = iter;
+                                }
                                 if let Some(mut storage_best_param) =
                                     storage.best_param.get_mut(&name)
                                 {
-                                    *storage_best_param = param;
+                                    *storage_best_param = (iter, param);
                                 } else {
-                                    storage.best_param.insert(name, param);
+                                    storage.best_param.insert(name, (iter, param));
                                 }
                             }
                         }
@@ -292,8 +348,7 @@ impl MyContext {
                                         .get(key)
                                         .unwrap()
                                         .iter()
-                                        .enumerate()
-                                        .map(|(i, t)| [f64::from(i as u32), *t])
+                                        .map(|(i, t)| [f64::from(*i as u32), *t])
                                         .collect();
                                     let line = Line::new(curve);
                                     Plot::new(key)
@@ -322,13 +377,14 @@ impl MyContext {
                     // ui.label("Current parameter vector");
                     let chart = BarChart::new(
                         param
+                            .1
                             .iter()
                             .enumerate()
                             .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
                             .collect(),
                     )
                     .color(Color32::LIGHT_BLUE)
-                    .name("Current");
+                    .name(format!("Current (iter: {})", param.0));
 
                     Plot::new("Current Parameter Vector")
                         .legend(Legend::default())
@@ -352,13 +408,14 @@ impl MyContext {
                     ui.set_max_height(height / 2.0);
                     let chart = BarChart::new(
                         best_param
+                            .1
                             .iter()
                             .enumerate()
                             .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
                             .collect(),
                     )
                     .color(Color32::LIGHT_BLUE)
-                    .name("Best");
+                    .name(format!("Best (iter: {})", best_param.0));
 
                     Plot::new("Best Parameter Vector")
                         .legend(Legend::default())
@@ -379,6 +436,32 @@ impl MyContext {
         // });
     }
 
+    fn show_overview(&mut self, name: &String, ui: &mut Ui) {
+        if let Some(general) = self.storage.general.get(name) {
+            ui.vertical(|ui| {
+                ui.label(format!(
+                    "Maximum number of iterations: {}",
+                    general.max_iter
+                ));
+                ui.label(format!(
+                    "Current iteration: {} ({:.2}%)",
+                    general.curr_iter,
+                    100.0 / (general.max_iter as f64) * (general.curr_iter as f64)
+                ));
+                ui.label(format!("Target cost: {}", general.target_cost));
+                ui.label(format!("Current cost: {}", general.curr_cost));
+                ui.label(format!(
+                    "Current best cost: {} (in iteration {})",
+                    general.curr_best_cost, general.best_iter
+                ));
+                ui.label(format!("Elapsed time: {}", general.time));
+                if let TerminationStatus::Terminated(reason) = &general.termination_status {
+                    ui.label(format!("Termination reason: {}", reason));
+                }
+            });
+        }
+    }
+
     fn show_plots(&mut self, name: &String, ui: &mut Ui) {
         ui.horizontal_top(|ui| {
             if ui.button("Metrics").clicked() {
@@ -387,10 +470,14 @@ impl MyContext {
             if ui.button("Parameters").clicked() {
                 self.views.insert(name.clone(), View::Params);
             }
+            if ui.button("Overview").clicked() {
+                self.views.insert(name.clone(), View::Overview);
+            }
         });
         match self.views.get(name) {
             Some(View::Metrics) => self.show_metrics(name, ui),
             Some(View::Params) => self.show_params(name, ui),
+            Some(View::Overview) => self.show_overview(name, ui),
             None => self.show_metrics(name, ui),
         }
     }

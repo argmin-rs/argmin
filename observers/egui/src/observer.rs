@@ -5,11 +5,15 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+// TODOS:
+// * observer init needs access to state as well!
+
 use std::marker::PhantomData;
 
 use anyhow::Error;
 use argmin::core::{observers::Observe, ArgminFloat, State, KV};
 use futures::SinkExt;
+use time::Duration;
 use tokio::net::TcpStream;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 use uuid::Uuid;
@@ -75,9 +79,11 @@ where
     f64: From<F>,
 {
     /// Log basic information about the optimization after initialization.
-    fn observe_init(&mut self, _msg: &str, _kv: &KV) -> Result<(), Error> {
+    fn observe_init(&mut self, _msg: &str, state: &I, _kv: &KV) -> Result<(), Error> {
         let message = Message::NewRun {
             name: self.name.clone(),
+            max_iter: state.get_max_iters(),
+            target_cost: f64::from(state.get_target_cost()),
         };
 
         self.tx.send(message)?;
@@ -88,12 +94,20 @@ where
     /// Logs information about the progress of the optimization after every iteration.
     fn observe_iter(&mut self, state: &I, kv: &KV) -> Result<(), Error> {
         let mut kv = kv.clone();
+        let iter = state.get_iter();
         kv.insert("best_cost", state.get_best_cost().into());
         kv.insert("cost", state.get_cost().into());
-        kv.insert("iter", state.get_iter().into());
+        kv.insert("iter", iter.into());
 
         let message = Message::Samples {
             name: self.name.clone(),
+            iter,
+            time: Duration::try_from(
+                state
+                    .get_time()
+                    .unwrap_or(std::time::Duration::from_secs(0)),
+            )?,
+            termination_status: state.get_termination_status().clone(),
             kv: kv.into(),
         };
 
@@ -104,25 +118,29 @@ where
 
             let message = Message::Param {
                 name: self.name.clone(),
+                iter,
                 param,
             };
 
             self.tx.send(message)?;
         }
 
-        if let Some(best_param) = state.get_best_param() {
-            let best_param = best_param
-                .clone()
-                .into_iter()
-                .map(f64::from)
-                .collect::<Vec<_>>();
+        if state.is_best() {
+            if let Some(best_param) = state.get_best_param() {
+                let best_param = best_param
+                    .clone()
+                    .into_iter()
+                    .map(f64::from)
+                    .collect::<Vec<_>>();
 
-            let message = Message::BestParam {
-                name: self.name.clone(),
-                param: best_param,
-            };
+                let message = Message::BestParam {
+                    name: self.name.clone(),
+                    iter,
+                    param: best_param,
+                };
 
-            self.tx.send(message)?;
+                self.tx.send(message)?;
+            }
         }
 
         Ok(())
