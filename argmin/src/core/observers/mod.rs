@@ -158,8 +158,8 @@ use std::sync::{Arc, Mutex};
 pub trait Observe<I> {
     /// Called once after initialization of the solver.
     ///
-    /// Has access to the name of the solver via `name` and to a key-value store `kv` with entries
-    /// specific for each solver.
+    /// Has access to the name of the solver via `name`, the initial `state` and to a key-value
+    /// store `kv` with settings of the solver.
     fn observe_init(&mut self, _name: &str, _state: &I, _kv: &KV) -> Result<(), Error> {
         Ok(())
     }
@@ -170,6 +170,14 @@ pub trait Observe<I> {
     /// [`State`](`crate::core::State`)) and to a key-value store `kv` with entries specific for
     /// each solver.
     fn observe_iter(&mut self, _state: &I, _kv: &KV) -> Result<(), Error> {
+        Ok(())
+    }
+
+    /// Called at the end of a solver run
+    ///
+    /// Has access to the final `state` of the solver (which always implements
+    /// [`State`](`crate::core::State`)).
+    fn observe_final(&mut self, _state: &I) -> Result<(), Error> {
         Ok(())
     }
 }
@@ -272,6 +280,14 @@ impl<I: State> Observe<I> for Observers<I> {
         }
         Ok(())
     }
+
+    /// Called at the end of a solver run. Loops over all stored observers and calls `observe_final`
+    fn observe_final(&mut self, state: &I) -> Result<(), Error> {
+        for l in self.observers.iter() {
+            l.0.lock().unwrap().observe_final(state)?
+        }
+        Ok(())
+    }
 }
 
 /// Indicates when to call an observer.
@@ -331,7 +347,7 @@ mod tests {
         }
 
         impl<I> Observe<I> for TestObs {
-            fn observe_init(&mut self, name: &str, _kv: &KV) -> Result<(), Error> {
+            fn observe_init(&mut self, name: &str, _state: &I, _kv: &KV) -> Result<(), Error> {
                 self.data.lock().unwrap().solver_name = name.into();
                 self.data.lock().unwrap().init_called += 1;
                 Ok(())

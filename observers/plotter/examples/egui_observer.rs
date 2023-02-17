@@ -5,13 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Egui Observer
-
 use argmin::{
     core::{observers::ObserverMode, CostFunction, Error, Executor},
     solver::simulatedannealing::{Anneal, SATempFunc, SimulatedAnnealing},
 };
-use argmin_observer_egui::EguiObserver;
+use argmin_observer_plotter::PlotterBuilder;
 use argmin_testfunctions::rosenbrock;
 use rand::{distributions::Uniform, prelude::*};
 use rand_xoshiro::Xoshiro256PlusPlus;
@@ -50,7 +48,7 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
-        std::thread::sleep(std::time::Duration::from_millis(5));
+        // std::thread::sleep(std::time::Duration::from_millis(5));
         Ok(rosenbrock(param, self.a, self.b))
     }
 }
@@ -94,10 +92,10 @@ fn run() -> Result<(), Error> {
     let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
 
     // Define initial parameter vector
-    let init_param: Vec<f64> = vec![0.9; num];
+    let init_param: Vec<f64> = vec![-0.9; num];
 
     // Define initial temperature
-    let temp = 0.1;
+    let temp = 0.0001;
 
     // Set up simulated annealing solver
     // An alternative random number generator (RNG) can be provided to `new_with_rng`:
@@ -122,6 +120,11 @@ fn run() -> Result<(), Error> {
         // Optional: Start reannealing after no new best solution has been found for 800 iterations
         .with_reannealing_best(1000);
 
+    let plotter = PlotterBuilder::new()
+        // .with_name("something")
+        .select(&["cost", "best_cost", "t"])
+        .build();
+
     /////////////////////////
     // Run solver          //
     /////////////////////////
@@ -130,11 +133,11 @@ fn run() -> Result<(), Error> {
             state
                 .param(init_param)
                 // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-                .max_iters(1_000)
+                .max_iters(10_000)
                 // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
                 .target_cost(0.0)
         })
-        .add_observer(EguiObserver::new()?, ObserverMode::Always)
+        .add_observer(plotter, ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)

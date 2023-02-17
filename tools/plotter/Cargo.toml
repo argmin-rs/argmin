@@ -1,0 +1,40 @@
+[package]
+name = "argmin-plotter"
+version = "0.1.0"
+authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Visualization tool for argmin"
+documentation = "https://docs.rs/argmin_plotter/"
+homepage = "https://argmin-rs.org"
+repository = "https://github.com/argmin-rs/argmin"
+readme = "README.md"
+keywords = ["optimization", "math", "science"]
+categories = ["science"]
+exclude = []
+
+
+[dependencies]
+anyhow = "1.0"
+argmin = { version = "0.8.0", path = "../../argmin", default-features = false, features = ["serde1"] }
+bytes = "1.4.0"
+dashmap = { version = "5.4", features = ["serde"], optional = true }
+eframe = { version = "0.21", features = ["ron", "persistence"], optional = true }
+egui_dock = { version = "0.4", optional = true }
+egui_extras = { version = "0.21", optional = true }
+itertools = { version = "0.10", optional = true }
+rmp-serde = "1.1.1"
+serde = { version = "1.0", features = ["derive"] }
+time = { version = "0.3", features = ["serde"] }
+tokio = { version = "1.25", features = ["rt-multi-thread", "net", "macros"], optional = true }
+tokio-stream = { version = "0.1", optional = true }
+tokio-util = { version = "0.7", features = ["codec"], optional = true }
+tracing = { version = "0.1", features = ["log"], optional = true }
+tracing-bunyan-formatter = { version = "0.3", optional = true }
+tracing-log = { version = "0.1", optional = true }
+tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"], optional = true }
+uuid = { version = "1.3.0", features = ["v4"], optional = true }
+
+[features]
+default = ["plotter"]
+plotter = ["dashmap", "tracing", "tracing-bunyan-formatter", "tracing-log", "tracing-subscriber", "eframe", "egui_dock", "egui_extras", "itertools", "tokio", "tokio-stream", "tokio-util", "uuid"]

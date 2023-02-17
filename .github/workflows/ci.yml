@@ -51,14 +51,16 @@ jobs:
       - name: Test 
         run: cargo test -p argmin-observer-paramwriter
 
-  tests-argmin-observer-egui:
+  tests-argmin-observer-plotter:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
-      - name: Test
-        run: cargo test -p argmin-observer-egui  
+      - name: Test (plotter observer)
+        run: cargo test -p argmin-observer-plotter
+      - name: Test (plotter)
+        run: cargo test -p argmin-plotter
 
   tests-argmin-math:
     runs-on: ubuntu-latest
@@ -150,8 +152,10 @@ jobs:
         run: cargo clippy -p argmin --all-targets --all-features -- -D warnings
       - name: Clippy (argmin-observer-slog)
         run: cargo clippy -p argmin-observer-slog --all-targets --features "serde1" -- -D warnings
-      - name: Clippy (argmin-observer-egui)
-        run: cargo clippy -p argmin-observer-egui --all-targets -- -D warnings
+      - name: Clippy (argmin-observer-plotter)
+        run: cargo clippy -p argmin-observer-plotter --all-targets -- -D warnings
+      - name: Clippy (argmin-plotter)
+        run: cargo clippy -p argmin-plotter --all-targets -- -D warnings
 
   rustfmt:
     runs-on: ubuntu-latest
@@ -185,11 +189,11 @@ jobs:
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh 
       - name: Build target wasm32-unknown-unknown
-        run: cargo build --workspace --exclude argmin-observer-egui --exclude argmin-observer-paramwriter --target wasm32-unknown-unknown --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-plotter --exclude argmin-plotter --exclude argmin-observer-paramwriter --target wasm32-unknown-unknown --features wasm-bindgen
       - name: Build target wasm32-wasi with feature wasm-bindgen
-        run: cargo build --workspace --exclude argmin-observer-egui --exclude argmin-observer-paramwriter --target wasm32-wasi --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-plotter --exclude argmin-plotter --exclude argmin-observer-paramwriter --target wasm32-wasi --features wasm-bindgen
       - name: Build target wasm32-unknown-emscripten
-        run: cargo build --workspace --exclude argmin-observer-egui --exclude argmin-observer-paramwriter --target wasm32-unknown-emscripten --no-default-features --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-plotter --exclude argmin-plotter --exclude argmin-observer-paramwriter --target wasm32-unknown-emscripten --no-default-features --features wasm-bindgen
 
   cargo-deny:
     runs-on: ubuntu-latest
