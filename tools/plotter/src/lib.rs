@@ -5,10 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-// mod eguiapp;
 mod message;
-mod observer;
-mod plotter;
-mod telemetry;
 
-pub use observer::EguiObserver;
+pub use message::Message;
+
+pub const DEFAULT_PORT: u16 = 5498;

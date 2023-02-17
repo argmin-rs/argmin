@@ -201,6 +201,28 @@ impl KvValue {
             None
         }
     }
+
+    /// Get String representation of `KvValue`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Str("a string".to_string()).as_string(), "a string".to_string());
+    /// assert_eq!(KvValue::Float(1.0).as_string(), "1".to_string());
+    /// assert_eq!(KvValue::Int(1).as_string(), "1".to_string());
+    /// assert_eq!(KvValue::Uint(1).as_string(), "1".to_string());
+    /// assert_eq!(KvValue::Bool(true).as_string(), "true".to_string());
+    /// ```
+    pub fn as_string(&self) -> String {
+        match self {
+            KvValue::Str(x) => x.clone(),
+            KvValue::Float(x) => format!("{x}"),
+            KvValue::Bool(x) => format!("{x}"),
+            KvValue::Int(x) => format!("{x}"),
+            KvValue::Uint(x) => format!("{x}"),
+        }
+    }
 }
 
 impl From<f64> for KvValue {

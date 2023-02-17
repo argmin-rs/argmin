@@ -175,14 +175,10 @@ where
             state.update();
 
             if !self.observers.is_empty() {
-                let mut logs = kv!("max_iters" => state.get_max_iters(););
-
-                if let Some(kv) = kv {
-                    logs = logs.merge(kv);
-                }
+                let kv = kv.unwrap_or(kv![]);
 
                 // Observe after init
-                self.observers.observe_init(S::NAME, &state, &logs)?;
+                self.observers.observe_init(S::NAME, &state, &kv)?;
             }
 
             state.func_counts(&self.problem);
@@ -267,6 +263,10 @@ where
         if interrupt.load(Ordering::SeqCst) {
             // Solver execution has been interrupted manually
             state = state.terminate_with(TerminationReason::KeyboardInterrupt);
+        }
+
+        if !self.observers.is_empty() {
+            self.observers.observe_final(&state)?;
         }
 
         Ok(OptimizationResult::new(self.problem, self.solver, state))

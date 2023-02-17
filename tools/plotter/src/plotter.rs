@@ -11,7 +11,6 @@ use std::{
 };
 
 use argmin::core::TerminationStatus;
-use dashmap::DashMap;
 use eframe::{
     egui::{
         self,
@@ -23,18 +22,11 @@ use eframe::{
 use egui_dock::{DockArea, Node, Style, TabViewer, Tree};
 use egui_extras::{Column, TableBuilder};
 use itertools::Itertools;
-use time::Duration;
-use tokio::net::{TcpListener, TcpStream};
-use tokio_stream::StreamExt;
-use tokio_util::codec::{Framed, LengthDelimitedCodec};
-use uuid::Uuid;
 
 use crate::{
-    message::Message,
-    telemetry::{get_subscriber, init_subscriber},
+    connection::server,
+    data::{RunName, Storage},
 };
-
-const NAME: &'static str = "argmin-plotter";
 
 #[derive(Clone, Debug)]
 enum View {
@@ -50,185 +42,13 @@ struct MyContext {
     views: HashMap<RunName, View>,
 }
 
-type RunName = String;
-type MetricName = String;
-type Samples = HashMap<MetricName, Vec<(u64, f64)>>;
-type Selected = HashMap<MetricName, bool>;
-
-pub struct General {
-    max_iter: u64,
-    target_cost: f64,
-    curr_iter: u64,
-    best_iter: u64,
-    curr_cost: f64,
-    curr_best_cost: f64,
-    time: Duration,
-    termination_status: TerminationStatus,
-}
-
-pub struct Storage {
-    general: DashMap<RunName, General>,
-    data: DashMap<RunName, Samples>,
-    param: DashMap<RunName, (u64, Vec<f64>)>,
-    best_param: DashMap<RunName, (u64, Vec<f64>)>,
-    selected: DashMap<RunName, Selected>,
-    tree: Arc<Mutex<Tree<RunName>>>,
-}
-
-impl Storage {
-    fn new(tree: Arc<Mutex<Tree<String>>>) -> Self {
-        Storage {
-            general: DashMap::new(),
-            data: DashMap::new(),
-            param: DashMap::new(),
-            best_param: DashMap::new(),
-            selected: DashMap::new(),
-            tree,
-        }
-    }
-}
-
 pub struct PlotterApp {
     context: MyContext,
     tree: Arc<Mutex<Tree<String>>>,
 }
 
-#[tokio::main]
-async fn server(storage: Arc<Storage>, ctx: egui::Context) -> Result<(), anyhow::Error> {
-    let listener = TcpListener::bind("127.0.0.1:5498").await?;
-    loop {
-        match listener.accept().await {
-            Ok((stream, _)) => {
-                let storage = Arc::clone(&storage);
-                tokio::spawn(handle_connection(stream, storage, ctx.clone()));
-            }
-            Err(e) => {
-                tracing::error!("error: {e:?}");
-            }
-        }
-    }
-}
-
-async fn handle_connection(
-    stream: TcpStream,
-    storage: Arc<Storage>,
-    ctx: egui::Context,
-) -> Result<(), anyhow::Error> {
-    let codec = LengthDelimitedCodec::new();
-    let mut lines = Framed::new(stream, codec);
-
-    while let Some(result) = lines.next().await {
-        ctx.request_repaint();
-        match result {
-            Ok(line) => {
-                match Message::unpack(&line) {
-                    Ok(msg) => {
-                        match msg {
-                            Message::NewRun {
-                                name,
-                                max_iter,
-                                target_cost,
-                            } => {
-                                let mut tree = storage.tree.lock().unwrap();
-                                tree.push_to_first_leaf(name.clone());
-                                drop(tree);
-                                storage.general.insert(
-                                    name.clone(),
-                                    General {
-                                        max_iter,
-                                        target_cost,
-                                        curr_iter: 0,
-                                        best_iter: 0,
-                                        curr_cost: std::f64::INFINITY,
-                                        curr_best_cost: std::f64::INFINITY,
-                                        time: Duration::new(0, 0),
-                                        termination_status: TerminationStatus::NotTerminated,
-                                    },
-                                );
-                                storage.data.insert(name.clone(), HashMap::new());
-                                storage.selected.insert(name, HashMap::new());
-                            }
-                            Message::Samples {
-                                name,
-                                iter,
-                                time,
-                                termination_status,
-                                kv,
-                            } => {
-                                if let (Some(mut data), Some(mut selected), Some(mut general)) = (
-                                    storage.data.get_mut(&name),
-                                    storage.selected.get_mut(&name),
-                                    storage.general.get_mut(&name),
-                                ) {
-                                    general.curr_iter = iter;
-                                    general.time = time;
-                                    general.termination_status = termination_status;
-                                    for (k, _) in kv.keys() {
-                                        let kv_val = kv.get(&k).unwrap().get_float().unwrap();
-                                        if k == "cost" {
-                                            general.curr_cost = kv_val;
-                                        }
-                                        if k == "best_cost" {
-                                            general.curr_best_cost = kv_val;
-                                        }
-                                        if let Some(val) = data.get_mut(&k) {
-                                            // TODO: unwrap
-                                            val.push((iter, kv_val));
-                                        } else {
-                                            let mut arr = Vec::with_capacity(1000);
-                                            // TODO: unwrap
-                                            arr.push((iter, kv_val));
-                                            data.insert(k.clone(), arr);
-                                            if !selected.contains_key(&k) {
-                                                selected.insert(k.clone(), true);
-                                            }
-                                        };
-                                    }
-                                };
-                            }
-                            Message::Param { name, iter, param } => {
-                                if let Some(mut storage_param) = storage.param.get_mut(&name) {
-                                    *storage_param = (iter, param);
-                                } else {
-                                    storage.param.insert(name, (iter, param));
-                                }
-                            }
-                            Message::BestParam { name, iter, param } => {
-                                if let Some(mut general) = storage.general.get_mut(&name) {
-                                    general.best_iter = iter;
-                                }
-                                if let Some(mut storage_best_param) =
-                                    storage.best_param.get_mut(&name)
-                                {
-                                    *storage_best_param = (iter, param);
-                                } else {
-                                    storage.best_param.insert(name, (iter, param));
-                                }
-                            }
-                        }
-                    }
-                    Err(e) => {
-                        tracing::error!("Error: {e:?}");
-                    }
-                }
-            }
-            Err(e) => {
-                tracing::error!("Error on decoding from socket: {:?}", e);
-            }
-        }
-    }
-    Ok(())
-}
-
 impl PlotterApp {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Result<Self, anyhow::Error> {
-        // Set up logging
-        let subscriber = get_subscriber(NAME.into(), "info".into(), std::io::stdout);
-        init_subscriber(subscriber);
-
-        let run_id = Uuid::new_v4();
-        let span = tracing::info_span!(NAME, %run_id);
-        let _span_guard = span.enter();
         let tree: Tree<String> = Tree::new(vec![]);
         // tree.push_to_first_leaf("Blah".to_owned());
         // let [a, b] = tree.split_left(NodeIndex::root(), 0.3, vec!["Inspector".to_owned()]);
@@ -339,18 +159,13 @@ impl MyContext {
                         let num_keys = keys.len() as f32;
 
                         for key in keys {
-                            if data.contains_key(key.as_str()) {
+                            if let Some(data) = data.get(key) {
                                 ui.group(|ui| {
                                     // dodgy
                                     ui.set_max_height(height / num_keys - 20.0);
                                     ui.label(key);
-                                    let curve: PlotPoints = data
-                                        .get(key)
-                                        .unwrap()
-                                        .iter()
-                                        .map(|(i, t)| [f64::from(*i as u32), *t])
-                                        .collect();
-                                    let line = Line::new(curve);
+                                    let curve: PlotPoints = data.clone().into();
+                                    let line = Line::new(curve).name(key);
                                     Plot::new(key)
                                         // .view_aspect(4.0)
                                         // .height(height / (num_keys + 1.0))
@@ -365,15 +180,42 @@ impl MyContext {
     }
 
     fn show_params(&mut self, name: &String, ui: &mut Ui) {
-        // egui::ScrollArea::vertical()
-        //     .id_source("ufuf")
-        //     .show(ui, |ui| {
         ui.vertical(|ui| {
             let height = ui.available_height() * 0.95;
 
+            if let Some(best_param) = self.storage.best_param.get(name) {
+                // ui.label("Current best parameter vector");
+                ui.group(|ui| {
+                    ui.set_max_height(height / 3.0);
+                    let chart = BarChart::new(
+                        best_param
+                            .1
+                            .iter()
+                            .enumerate()
+                            .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
+                            .collect(),
+                    )
+                    .color(Color32::LIGHT_GREEN)
+                    .name(format!("Best (iter: {})", best_param.0));
+
+                    Plot::new("Best Parameter Vector")
+                        .legend(Legend::default())
+                        // .clamp_grid(true)
+                        .allow_scroll(false)
+                        .allow_zoom(false)
+                        .allow_boxed_zoom(false)
+                        .allow_drag(false)
+                        .auto_bounds_x()
+                        .auto_bounds_y()
+                        .set_margin_fraction([0.1, 0.3].into())
+                        .reset()
+                        .show(ui, |plot_ui| plot_ui.bar_chart(chart));
+                });
+            }
+
             if let Some(param) = self.storage.param.get(name) {
                 ui.group(|ui| {
-                    ui.set_max_height(height / 2.0);
+                    ui.set_max_height(height / 3.0);
                     // ui.label("Current parameter vector");
                     let chart = BarChart::new(
                         param
@@ -397,48 +239,51 @@ impl MyContext {
                         .auto_bounds_y()
                         .set_margin_fraction([0.1, 0.3].into())
                         .reset()
-                        .show(ui, |plot_ui| plot_ui.bar_chart(chart))
-                        .response;
+                        .show(ui, |plot_ui| plot_ui.bar_chart(chart));
                 });
             }
 
-            if let Some(best_param) = self.storage.best_param.get(name) {
-                // ui.label("Current best parameter vector");
-                ui.group(|ui| {
-                    ui.set_max_height(height / 2.0);
-                    let chart = BarChart::new(
-                        best_param
-                            .1
-                            .iter()
-                            .enumerate()
-                            .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
-                            .collect(),
-                    )
-                    .color(Color32::LIGHT_BLUE)
-                    .name(format!("Best (iter: {})", best_param.0));
+            if let Some(general) = self.storage.general.get(name) {
+                if let Some(ref init_param) = general.init_param {
+                    ui.group(|ui| {
+                        ui.set_max_height(height / 3.0);
+                        let chart = BarChart::new(
+                            init_param
+                                .iter()
+                                .enumerate()
+                                .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
+                                .collect(),
+                        )
+                        .color(Color32::LIGHT_RED)
+                        .name("Initial");
 
-                    Plot::new("Best Parameter Vector")
-                        .legend(Legend::default())
-                        // .clamp_grid(true)
-                        .allow_scroll(false)
-                        .allow_zoom(false)
-                        .allow_boxed_zoom(false)
-                        .allow_drag(false)
-                        .auto_bounds_x()
-                        .auto_bounds_y()
-                        .set_margin_fraction([0.1, 0.3].into())
-                        .reset()
-                        .show(ui, |plot_ui| plot_ui.bar_chart(chart))
-                        .response;
-                });
+                        Plot::new("Initial Parameter Vector")
+                            .legend(Legend::default())
+                            // .clamp_grid(true)
+                            .allow_scroll(false)
+                            .allow_zoom(false)
+                            .allow_boxed_zoom(false)
+                            .allow_drag(false)
+                            .auto_bounds_x()
+                            .auto_bounds_y()
+                            .set_margin_fraction([0.1, 0.3].into())
+                            .reset()
+                            .show(ui, |plot_ui| plot_ui.bar_chart(chart));
+                    });
+                }
             }
         });
-        // });
     }
 
     fn show_overview(&mut self, name: &String, ui: &mut Ui) {
         if let Some(general) = self.storage.general.get(name) {
             ui.vertical(|ui| {
+                ui.label(format!("Solver: {}", general.solver));
+                general
+                    .settings
+                    .iter()
+                    .map(|(k, v)| ui.label(format!("{}: {}", k, v)))
+                    .count();
                 ui.label(format!(
                     "Maximum number of iterations: {}",
                     general.max_iter
@@ -526,7 +371,7 @@ impl eframe::App for PlotterApp {
                 .style
                 .get_or_insert(Style::from_egui(&ui.ctx().style()))
                 .clone();
-            style.show_close_buttons = false;
+            style.show_close_buttons = true;
             let mut tree = self.tree.lock().unwrap();
             DockArea::new(&mut tree)
                 .style(style)

@@ -5,13 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Egui Observer
-
 use argmin::{
     core::{observers::ObserverMode, CostFunction, Error, Executor},
     solver::simulatedannealing::{Anneal, SATempFunc, SimulatedAnnealing},
 };
-use argmin_observer_egui::EguiObserver;
+use argmin_observer_plotter::PlotterBuilder;
 use argmin_testfunctions::rosenbrock;
 use rand::{distributions::Uniform, prelude::*};
 use rand_xoshiro::Xoshiro256PlusPlus;
@@ -126,7 +124,7 @@ fn run() -> Result<(), Error> {
     /////////////////////////
     // Run solver          //
     /////////////////////////
-    let observer = EguiObserver::new()?;
+    let observer = PlotterBuilder::new().build();
     let res = Executor::new(operator.clone(), solver.clone())
         .configure(|state| {
             state
@@ -145,7 +143,7 @@ fn run() -> Result<(), Error> {
     // Print result
     println!("{res}");
 
-    let observer = EguiObserver::new()?;
+    let observer = PlotterBuilder::new().build();
     let res = Executor::new(operator, solver)
         .configure(|state| {
             state
