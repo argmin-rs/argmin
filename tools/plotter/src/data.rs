@@ -13,15 +13,43 @@ use std::{
 use argmin::core::TerminationStatus;
 use dashmap::DashMap;
 use egui_dock::Tree;
+use itertools::Itertools;
 use time::Duration;
 
 pub type RunName = String;
 type MetricName = String;
 type SettingName = String;
-type Samples = HashMap<MetricName, Vec<[f64; 2]>>;
-type Selected = HashMap<MetricName, bool>;
 
-pub struct General {
+pub struct Metric {
+    data: Vec<[f64; 2]>,
+    selected: bool,
+}
+
+impl Metric {
+    pub fn new() -> Self {
+        Self {
+            data: Vec::with_capacity(1_000_000),
+            selected: true,
+        }
+    }
+
+    pub fn push(&mut self, val: [f64; 2]) -> &mut Self {
+        self.data.push(val);
+        self
+    }
+
+    pub fn selected(&mut self, selected: bool) -> &mut Self {
+        self.selected = selected;
+        self
+    }
+
+    pub fn get_data(&self) -> &Vec<[f64; 2]> {
+        &self.data
+    }
+}
+
+pub struct Run {
+    pub name: String,
     pub solver: String,
     pub settings: HashMap<SettingName, String>,
     pub selected: HashSet<String>,
@@ -34,25 +62,44 @@ pub struct General {
     pub curr_best_cost: f64,
     pub time: Duration,
     pub termination_status: TerminationStatus,
+    pub metrics: HashMap<MetricName, Metric>,
+    pub param: Option<(u64, Vec<f64>)>,
+    pub best_param: Option<(u64, Vec<f64>)>,
+}
+
+impl Run {
+    pub fn add_metric<T: AsRef<str>>(&mut self, name: T, metric: Metric) -> &mut Self {
+        self.metrics.insert(name.as_ref().to_string(), metric);
+        self
+    }
+
+    pub fn get_metrics(&mut self) -> Vec<(String, &mut bool)> {
+        self.metrics
+            .iter_mut()
+            .map(|(k, m)| (k.clone(), &mut m.selected))
+            .sorted()
+            .collect()
+    }
+
+    pub fn get_selected_metrics(&self) -> Vec<String> {
+        self.metrics
+            .iter()
+            .filter(|(_, m)| m.selected)
+            .map(|(k, _)| k.clone())
+            .sorted()
+            .collect()
+    }
 }
 
 pub struct Storage {
-    pub general: DashMap<RunName, General>,
-    pub data: DashMap<RunName, Samples>,
-    pub param: DashMap<RunName, (u64, Vec<f64>)>,
-    pub best_param: DashMap<RunName, (u64, Vec<f64>)>,
-    pub selected: DashMap<RunName, Selected>,
+    pub runs: DashMap<RunName, Run>,
     pub tree: Arc<Mutex<Tree<RunName>>>,
 }
 
 impl Storage {
     pub fn new(tree: Arc<Mutex<Tree<String>>>) -> Self {
         Storage {
-            general: DashMap::new(),
-            data: DashMap::new(),
-            param: DashMap::new(),
-            best_param: DashMap::new(),
-            selected: DashMap::new(),
+            runs: DashMap::new(),
             tree,
         }
     }

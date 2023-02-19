@@ -62,7 +62,7 @@ impl PlotterBuilder {
             tx,
             name: Uuid::new_v4().to_string(),
             sending: true,
-            selected: HashSet::new(),
+            selected: self.selected,
         }
     }
 }
