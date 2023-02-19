@@ -21,7 +21,6 @@ use eframe::{
 };
 use egui_dock::{DockArea, Node, Style, TabViewer, Tree};
 use egui_extras::{Column, TableBuilder};
-use itertools::Itertools;
 
 use crate::{
     connection::server,
@@ -98,13 +97,6 @@ impl TabViewer for MyContext {
 
     fn ui(&mut self, ui: &mut Ui, tab: &mut Self::Tab) {
         self.show_plots(tab, ui);
-        // match tab.as_str() {
-        //     "Simple Demo" => self.show_plots(ui),
-        //     // "Style Editor" => self.style_editor(ui),
-        //     _ => {
-        //         ui.label(tab.as_str());
-        //     }
-        // }
     }
 
     fn title(&mut self, tab: &mut Self::Tab) -> WidgetText {
@@ -119,132 +111,122 @@ impl TabViewer for MyContext {
 
 impl MyContext {
     fn show_metrics(&mut self, name: &String, ui: &mut Ui) {
-        let data = self.storage.data.get(name).unwrap();
-        let mut selected = self.storage.selected.get_mut(name).unwrap();
-        ui.horizontal_top(|ui| {
-            ui.vertical(|ui| {
-                TableBuilder::new(ui)
-                    .column(Column::auto().at_least(120.0))
-                    // .resizable(true)
-                    .header(20.0, |mut header| {
-                        header.col(|ui| {
-                            ui.heading("Metrics");
-                        });
-                    })
-                    .body(|mut body| {
-                        body.row(30.0, |mut row| {
-                            row.col(|ui| {
-                                for key in data.keys().sorted() {
-                                    if let Some(selected) = selected.get_mut(key) {
-                                        ui.checkbox(selected, key);
-                                    }
-                                }
+        if let Some(mut run) = self.storage.runs.get_mut(name) {
+            ui.horizontal_top(|ui| {
+                ui.vertical(|ui| {
+                    TableBuilder::new(ui)
+                        .column(Column::auto().at_least(120.0))
+                        // .resizable(true)
+                        .header(20.0, |mut header| {
+                            header.col(|ui| {
+                                ui.heading("Metrics");
                             });
+                        })
+                        .body(|mut body| {
+                            body.row(30.0, |mut row| {
+                                row.col(|ui| {
+                                    for (metric_name, selected) in run.get_metrics() {
+                                        ui.checkbox(selected, metric_name);
+                                    }
+                                });
+                            });
+                        });
+                });
+                egui::ScrollArea::vertical()
+                    .id_source("fufu")
+                    .show(ui, |ui| {
+                        ui.vertical(|ui| {
+                            let height = ui.available_height();
+
+                            let metric_names = run.get_selected_metrics();
+                            let num_metrics = metric_names.len() as f32;
+
+                            for name in metric_names {
+                                if let Some(metric) = run.metrics.get(&name) {
+                                    ui.group(|ui| {
+                                        // dodgy
+                                        ui.set_max_height(height / num_metrics - 20.0);
+                                        ui.label(&name);
+                                        let curve: PlotPoints = metric.get_data().clone().into();
+                                        let line = Line::new(curve).name(&name);
+                                        Plot::new(&name)
+                                            // .view_aspect(4.0)
+                                            // .height(height / (num_keys + 1.0))
+                                            .allow_scroll(false)
+                                            .show(ui, |plot_ui| plot_ui.line(line));
+                                    });
+                                }
+                            }
                         });
                     });
             });
-            egui::ScrollArea::vertical()
-                .id_source("fufu")
-                .show(ui, |ui| {
-                    ui.vertical(|ui| {
-                        let height = ui.available_height();
-
-                        let keys = selected
-                            .iter()
-                            .filter(|(_, &v)| v)
-                            .map(|(k, _)| k)
-                            .sorted()
-                            .collect::<Vec<_>>();
-
-                        let num_keys = keys.len() as f32;
-
-                        for key in keys {
-                            if let Some(data) = data.get(key) {
-                                ui.group(|ui| {
-                                    // dodgy
-                                    ui.set_max_height(height / num_keys - 20.0);
-                                    ui.label(key);
-                                    let curve: PlotPoints = data.clone().into();
-                                    let line = Line::new(curve).name(key);
-                                    Plot::new(key)
-                                        // .view_aspect(4.0)
-                                        // .height(height / (num_keys + 1.0))
-                                        .allow_scroll(false)
-                                        .show(ui, |plot_ui| plot_ui.line(line));
-                                });
-                            }
-                        }
-                    });
-                });
-        });
+        }
     }
 
     fn show_params(&mut self, name: &String, ui: &mut Ui) {
-        ui.vertical(|ui| {
-            let height = ui.available_height() * 0.95;
+        if let Some(run) = self.storage.runs.get(name) {
+            ui.vertical(|ui| {
+                let height = ui.available_height() * 0.95;
 
-            if let Some(best_param) = self.storage.best_param.get(name) {
-                // ui.label("Current best parameter vector");
-                ui.group(|ui| {
-                    ui.set_max_height(height / 3.0);
-                    let chart = BarChart::new(
-                        best_param
-                            .1
-                            .iter()
-                            .enumerate()
-                            .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
-                            .collect(),
-                    )
-                    .color(Color32::LIGHT_GREEN)
-                    .name(format!("Best (iter: {})", best_param.0));
+                if let Some((iter, ref best_param)) = run.best_param {
+                    // ui.label("Current best parameter vector");
+                    ui.group(|ui| {
+                        ui.set_max_height(height / 3.0);
+                        let chart = BarChart::new(
+                            best_param
+                                .iter()
+                                .enumerate()
+                                .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
+                                .collect(),
+                        )
+                        .color(Color32::LIGHT_GREEN)
+                        .name(format!("Best (iter: {})", iter));
 
-                    Plot::new("Best Parameter Vector")
-                        .legend(Legend::default())
-                        // .clamp_grid(true)
-                        .allow_scroll(false)
-                        .allow_zoom(false)
-                        .allow_boxed_zoom(false)
-                        .allow_drag(false)
-                        .auto_bounds_x()
-                        .auto_bounds_y()
-                        .set_margin_fraction([0.1, 0.3].into())
-                        .reset()
-                        .show(ui, |plot_ui| plot_ui.bar_chart(chart));
-                });
-            }
+                        Plot::new("Best Parameter Vector")
+                            .legend(Legend::default())
+                            // .clamp_grid(true)
+                            .allow_scroll(false)
+                            .allow_zoom(false)
+                            .allow_boxed_zoom(false)
+                            .allow_drag(false)
+                            .auto_bounds_x()
+                            .auto_bounds_y()
+                            .set_margin_fraction([0.1, 0.3].into())
+                            .reset()
+                            .show(ui, |plot_ui| plot_ui.bar_chart(chart));
+                    });
+                }
 
-            if let Some(param) = self.storage.param.get(name) {
-                ui.group(|ui| {
-                    ui.set_max_height(height / 3.0);
-                    // ui.label("Current parameter vector");
-                    let chart = BarChart::new(
-                        param
-                            .1
-                            .iter()
-                            .enumerate()
-                            .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
-                            .collect(),
-                    )
-                    .color(Color32::LIGHT_BLUE)
-                    .name(format!("Current (iter: {})", param.0));
+                if let Some((iter, ref param)) = run.param {
+                    ui.group(|ui| {
+                        ui.set_max_height(height / 3.0);
+                        // ui.label("Current parameter vector");
+                        let chart = BarChart::new(
+                            param
+                                .iter()
+                                .enumerate()
+                                .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
+                                .collect(),
+                        )
+                        .color(Color32::LIGHT_BLUE)
+                        .name(format!("Current (iter: {})", iter));
 
-                    Plot::new("Current Parameter Vector")
-                        .legend(Legend::default())
-                        // .clamp_grid(true)
-                        .allow_scroll(false)
-                        .allow_zoom(false)
-                        .allow_boxed_zoom(false)
-                        .allow_drag(false)
-                        .auto_bounds_x()
-                        .auto_bounds_y()
-                        .set_margin_fraction([0.1, 0.3].into())
-                        .reset()
-                        .show(ui, |plot_ui| plot_ui.bar_chart(chart));
-                });
-            }
+                        Plot::new("Current Parameter Vector")
+                            .legend(Legend::default())
+                            // .clamp_grid(true)
+                            .allow_scroll(false)
+                            .allow_zoom(false)
+                            .allow_boxed_zoom(false)
+                            .allow_drag(false)
+                            .auto_bounds_x()
+                            .auto_bounds_y()
+                            .set_margin_fraction([0.1, 0.3].into())
+                            .reset()
+                            .show(ui, |plot_ui| plot_ui.bar_chart(chart));
+                    });
+                }
 
-            if let Some(general) = self.storage.general.get(name) {
-                if let Some(ref init_param) = general.init_param {
+                if let Some(ref init_param) = run.init_param {
                     ui.group(|ui| {
                         ui.set_max_height(height / 3.0);
                         let chart = BarChart::new(
@@ -271,36 +253,32 @@ impl MyContext {
                             .show(ui, |plot_ui| plot_ui.bar_chart(chart));
                     });
                 }
-            }
-        });
+            });
+        }
     }
 
     fn show_overview(&mut self, name: &String, ui: &mut Ui) {
-        if let Some(general) = self.storage.general.get(name) {
+        if let Some(run) = self.storage.runs.get(name) {
             ui.vertical(|ui| {
-                ui.label(format!("Solver: {}", general.solver));
-                general
-                    .settings
+                ui.label(format!("Solver: {}", run.solver));
+                run.settings
                     .iter()
                     .map(|(k, v)| ui.label(format!("{}: {}", k, v)))
                     .count();
-                ui.label(format!(
-                    "Maximum number of iterations: {}",
-                    general.max_iter
-                ));
+                ui.label(format!("Maximum number of iterations: {}", run.max_iter));
                 ui.label(format!(
                     "Current iteration: {} ({:.2}%)",
-                    general.curr_iter,
-                    100.0 / (general.max_iter as f64) * (general.curr_iter as f64)
+                    run.curr_iter,
+                    100.0 / (run.max_iter as f64) * (run.curr_iter as f64)
                 ));
-                ui.label(format!("Target cost: {}", general.target_cost));
-                ui.label(format!("Current cost: {}", general.curr_cost));
+                ui.label(format!("Target cost: {}", run.target_cost));
+                ui.label(format!("Current cost: {}", run.curr_cost));
                 ui.label(format!(
                     "Current best cost: {} (in iteration {})",
-                    general.curr_best_cost, general.best_iter
+                    run.curr_best_cost, run.best_iter
                 ));
-                ui.label(format!("Elapsed time: {}", general.time));
-                if let TerminationStatus::Terminated(reason) = &general.termination_status {
+                ui.label(format!("Elapsed time: {}", run.time));
+                if let TerminationStatus::Terminated(reason) = &run.termination_status {
                     ui.label(format!("Termination reason: {}", reason));
                 }
             });
@@ -329,8 +307,8 @@ impl MyContext {
 }
 
 impl eframe::App for PlotterApp {
-    fn save(&mut self, storage: &mut dyn eframe::Storage) {
-        eframe::set_value(storage, eframe::APP_KEY, &self.context.storage.selected);
+    fn save(&mut self, _storage: &mut dyn eframe::Storage) {
+        // eframe::set_value(storage, eframe::APP_KEY, &self.context.storage.selected);
     }
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
@@ -340,16 +318,17 @@ impl eframe::App for PlotterApp {
         //     egui::menu::bar(ui, |ui| {
         //         ui.menu_button("View", |ui| {
         //             // allow certain tabs to be toggled
-        //             for tab in &["File Browser", "Asset Manager"] {
+        //             for tab in self.context.open_tabs.iter() {
         //                 if ui
-        //                     .selectable_label(self.context.open_tabs.contains(*tab), *tab)
+        //                     .selectable_label(self.context.open_tabs.contains(tab), tab)
         //                     .clicked()
         //                 {
-        //                     if let Some(index) = self.tree.find_tab(&tab.to_string()) {
-        //                         self.tree.remove_tab(index);
-        //                         self.context.open_tabs.remove(*tab);
+        //                     let mut tree = self.tree.lock().unwrap();
+        //                     if let Some(index) = tree.find_tab(&tab) {
+        //                         tree.remove_tab(index);
+        //                         // self.context.open_tabs.remove(&tab);
         //                     } else {
-        //                         self.tree.push_to_focused_leaf(tab.to_string());
+        //                         tree.push_to_focused_leaf(tab.to_string());
         //                     }
 
         //                     ui.close_menu();

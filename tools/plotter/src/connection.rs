@@ -15,10 +15,11 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio_stream::StreamExt;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 
-use crate::message::Message;
+use crate::data::Metric;
 use crate::DEFAULT_HOST;
+use crate::{data::Run, message::Message};
 
-use super::data::{General, Storage};
+use super::data::Storage;
 
 #[tokio::main]
 pub async fn server(storage: Arc<Storage>, ctx: egui::Context) -> Result<(), anyhow::Error> {
@@ -63,18 +64,21 @@ async fn handle_connection(
                                 let mut tree = storage.tree.lock().unwrap();
                                 tree.push_to_first_leaf(name.clone());
                                 drop(tree);
+
                                 let settings = settings
                                     .kv
                                     .into_iter()
                                     .map(|(k, v)| (k, v.as_string()))
                                     .collect();
-                                storage.general.insert(
+
+                                storage.runs.insert(
                                     name.clone(),
-                                    General {
+                                    Run {
+                                        name: name.clone(),
                                         solver,
                                         settings,
                                         selected,
-                                        init_param,
+                                        init_param: init_param.clone(),
                                         max_iter,
                                         target_cost,
                                         curr_iter: 0,
@@ -83,10 +87,11 @@ async fn handle_connection(
                                         curr_best_cost: std::f64::INFINITY,
                                         time: Duration::new(0, 0),
                                         termination_status: TerminationStatus::NotTerminated,
+                                        metrics: HashMap::new(),
+                                        param: init_param.clone().map(|ip| (0, ip)),
+                                        best_param: init_param.map(|ip| (0, ip)),
                                     },
                                 );
-                                storage.data.insert(name.clone(), HashMap::new());
-                                storage.selected.insert(name, HashMap::new());
                             }
                             Message::Samples {
                                 name,
@@ -95,70 +100,52 @@ async fn handle_connection(
                                 termination_status,
                                 kv,
                             } => {
-                                if let (Some(mut data), Some(mut selected), Some(mut general)) = (
-                                    storage.data.get_mut(&name),
-                                    storage.selected.get_mut(&name),
-                                    storage.general.get_mut(&name),
-                                ) {
-                                    general.curr_iter = iter;
-                                    general.time = time;
-                                    general.termination_status = termination_status;
+                                if let Some(mut run) = storage.runs.get_mut(&name) {
+                                    run.curr_iter = iter;
+                                    run.time = time;
+                                    run.termination_status = termination_status;
                                     for (k, _) in kv.keys() {
                                         let kv_val = kv.get(&k).unwrap().get_float().unwrap();
                                         // for easier access in overview window
                                         if k == "cost" {
-                                            general.curr_cost = kv_val;
+                                            run.curr_cost = kv_val;
                                         }
                                         if k == "best_cost" {
-                                            general.curr_best_cost = kv_val;
+                                            run.curr_best_cost = kv_val;
                                         }
-                                        if let Some(val) = data.get_mut(&k) {
+                                        if let Some(val) = run.metrics.get_mut(&k) {
                                             val.push([f64::from(iter as u32), kv_val]);
                                         } else {
-                                            // maybe allocate depending on max_iter (but with an
-                                            // upper limit of say 1M)
-                                            let mut arr = Vec::with_capacity(1_000_000);
-                                            arr.push([f64::from(iter as u32), kv_val]);
-                                            data.insert(k.clone(), arr);
-                                            if !selected.contains_key(&k) {
-                                                if general.selected.is_empty() {
-                                                    selected.insert(k.clone(), true);
-                                                } else {
-                                                    selected.insert(
-                                                        k.clone(),
-                                                        general.selected.contains(&k),
-                                                    );
-                                                }
-                                            }
-                                        };
+                                            let mut metric = Metric::new();
+
+                                            metric.selected(
+                                                run.selected.is_empty()
+                                                    || run.selected.contains(&k),
+                                            );
+
+                                            metric.push([f64::from(iter as u32), kv_val]);
+                                            run.add_metric(&k, metric);
+                                        }
                                     }
-                                };
+                                }
                             }
                             Message::Param { name, iter, param } => {
-                                if let Some(mut storage_param) = storage.param.get_mut(&name) {
-                                    *storage_param = (iter, param);
-                                } else {
-                                    storage.param.insert(name, (iter, param));
+                                if let Some(mut run) = storage.runs.get_mut(&name) {
+                                    run.param = Some((iter, param));
                                 }
                             }
                             Message::BestParam { name, iter, param } => {
-                                if let Some(mut general) = storage.general.get_mut(&name) {
-                                    general.best_iter = iter;
-                                }
-                                if let Some(mut storage_best_param) =
-                                    storage.best_param.get_mut(&name)
-                                {
-                                    *storage_best_param = (iter, param);
-                                } else {
-                                    storage.best_param.insert(name, (iter, param));
+                                if let Some(mut run) = storage.runs.get_mut(&name) {
+                                    run.best_iter = iter;
+                                    run.best_param = Some((iter, param));
                                 }
                             }
                             Message::Termination {
                                 name,
                                 termination_status,
                             } => {
-                                if let Some(mut general) = storage.general.get_mut(&name) {
-                                    general.termination_status = termination_status;
+                                if let Some(mut run) = storage.runs.get_mut(&name) {
+                                    run.termination_status = termination_status;
                                 }
                             }
                         }
