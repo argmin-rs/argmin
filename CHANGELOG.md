@@ -5,9 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) (since argmin version 0.6.0),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (since argmin version 0.5.0).
 
-## argmin [Unreleased]
+## argmin [argmin unreleased]
 
-## argmin-math [Unreleased]
+## argmin-math [argmin-math unreleased]
+
+## argmin [argmin v0.8.1] 2023-02-20
+
+### Added
+
+* Mentioned `cobyla` in docs and README (@relf)
+
+### Fixed
+
+* Restored Serialize/Deserialize derives for ObserverMode (@maoe)
+
+### Changed
+
+* Updated ctrlc to 3.2.4 (@stefan-k)
+* Updated rayon to 1.6 (@stefan-k)
+* Updated slog to 2.7 (@stefan-k)
+* Updated slog-term to 2.9 (@stefan-k)
+* Updated slog-json to 2.6 (@stefan-k)
 
 ## argmin [argmin v0.8.0] 2023-01-28
 
@@ -223,7 +241,9 @@ This is a rather large release with many (breaking) changes.
 
 For older versions please see the Git history.
 
-[Unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.0...HEAD
+[argmin unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.1...HEAD
+[argmin-math unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.3.0...HEAD
+[argmin v0.8.1]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.0...argmin-v0.8.1
 [argmin v0.8.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.7.0...argmin-v0.8.0
 [argmin v0.7.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.6.0...argmin-v0.7.0
 [argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin-v0.6.0
