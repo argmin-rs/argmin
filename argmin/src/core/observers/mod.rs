@@ -131,6 +131,8 @@ pub mod slog_logger;
 
 #[cfg(feature = "serde1")]
 pub use file::*;
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "slog-logger")]
 pub use slog_logger::*;
 
@@ -296,6 +298,7 @@ impl<I: State> Observe<I> for Observers<I> {
 /// iterations, `NewBest` calls the observer only when a new best parameter vector is found and
 /// `Never` deactivates the observer.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub enum ObserverMode {
     /// Never call the observer
     Never,
