@@ -32,6 +32,7 @@ enum View {
     Metrics,
     Params,
     Overview,
+    FuncCounts,
 }
 
 struct MyContext {
@@ -257,6 +258,41 @@ impl MyContext {
         }
     }
 
+    fn show_func_counts(&mut self, name: &String, ui: &mut Ui) {
+        if let Some(run) = self.storage.runs.get_mut(name) {
+            ui.horizontal_top(|ui| {
+                egui::ScrollArea::vertical()
+                    .id_source("func_counts")
+                    .show(ui, |ui| {
+                        ui.vertical(|ui| {
+                            let height = ui.available_height();
+
+                            let metric_names = run.func_counts.keys();
+
+                            let num_metrics = metric_names.len() as f32;
+
+                            for name in metric_names {
+                                if let Some(counts) = run.func_counts.get(name) {
+                                    ui.group(|ui| {
+                                        // dodgy
+                                        ui.set_max_height(height / num_metrics - 20.0);
+                                        ui.label(name);
+                                        let curve: PlotPoints = counts.get_data().clone().into();
+                                        let line = Line::new(curve).name(&name);
+                                        Plot::new(&name)
+                                            // .view_aspect(4.0)
+                                            // .height(height / (num_keys + 1.0))
+                                            .allow_scroll(false)
+                                            .show(ui, |plot_ui| plot_ui.line(line));
+                                    });
+                                }
+                            }
+                        });
+                    });
+            });
+        }
+    }
+
     fn show_overview(&mut self, name: &String, ui: &mut Ui) {
         if let Some(run) = self.storage.runs.get(name) {
             ui.vertical(|ui| {
@@ -293,13 +329,18 @@ impl MyContext {
             if ui.button("Parameters").clicked() {
                 self.views.insert(name.clone(), View::Params);
             }
+            if ui.button("Function evaluation counts").clicked() {
+                self.views.insert(name.clone(), View::FuncCounts);
+            }
             if ui.button("Overview").clicked() {
                 self.views.insert(name.clone(), View::Overview);
             }
         });
+
         match self.views.get(name) {
             Some(View::Metrics) => self.show_metrics(name, ui),
             Some(View::Params) => self.show_params(name, ui),
+            Some(View::FuncCounts) => self.show_func_counts(name, ui),
             Some(View::Overview) => self.show_overview(name, ui),
             None => self.show_metrics(name, ui),
         }

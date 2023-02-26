@@ -18,6 +18,7 @@ use time::Duration;
 
 pub type RunName = String;
 type MetricName = String;
+type CountName = String;
 type SettingName = String;
 
 pub struct Metric {
@@ -48,6 +49,27 @@ impl Metric {
     }
 }
 
+pub struct FuncCount {
+    data: Vec<[f64; 2]>,
+}
+
+impl FuncCount {
+    pub fn new() -> Self {
+        Self {
+            data: Vec::with_capacity(1_000_000),
+        }
+    }
+
+    pub fn push(&mut self, val: [f64; 2]) -> &mut Self {
+        self.data.push(val);
+        self
+    }
+
+    pub fn get_data(&self) -> &Vec<[f64; 2]> {
+        &self.data
+    }
+}
+
 pub struct Run {
     pub name: String,
     pub solver: String,
@@ -63,6 +85,7 @@ pub struct Run {
     pub time: Duration,
     pub termination_status: TerminationStatus,
     pub metrics: HashMap<MetricName, Metric>,
+    pub func_counts: HashMap<CountName, FuncCount>,
     pub param: Option<(u64, Vec<f64>)>,
     pub best_param: Option<(u64, Vec<f64>)>,
 }
@@ -88,6 +111,11 @@ impl Run {
             .map(|(k, _)| k.clone())
             .sorted()
             .collect()
+    }
+
+    pub fn add_func_counts<T: AsRef<str>>(&mut self, name: T, count: FuncCount) -> &mut Self {
+        self.func_counts.insert(name.as_ref().to_string(), count);
+        self
     }
 }
 
