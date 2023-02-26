@@ -89,6 +89,7 @@ async fn handle_connection(
                                         termination_status: TerminationStatus::NotTerminated,
                                         metrics: HashMap::new(),
                                         func_counts: HashMap::new(),
+                                        func_cumulative: true,
                                         param: init_param.clone().map(|ip| (0, ip)),
                                         best_param: init_param.map(|ip| (0, ip)),
                                     },
@@ -146,7 +147,7 @@ async fn handle_connection(
                                                 f64::from(iter as u32),
                                                 f64::from(*counts as u32),
                                             ]);
-                                            run.add_func_counts(&k, count);
+                                            run.add_func_counts(k, count);
                                         }
                                     }
                                 }
