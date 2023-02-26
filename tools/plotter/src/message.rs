@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use time::Duration;
 
@@ -31,6 +31,11 @@ pub enum Message {
         time: Duration,
         termination_status: TerminationStatus,
         kv: KV,
+    },
+    FuncCounts {
+        name: String,
+        iter: u64,
+        kv: HashMap<String, u64>,
     },
     Param {
         name: String,

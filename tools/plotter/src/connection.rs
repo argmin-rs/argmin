@@ -15,7 +15,7 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio_stream::StreamExt;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 
-use crate::data::Metric;
+use crate::data::{FuncCount, Metric};
 use crate::DEFAULT_HOST;
 use crate::{data::Run, message::Message};
 
@@ -88,6 +88,7 @@ async fn handle_connection(
                                         time: Duration::new(0, 0),
                                         termination_status: TerminationStatus::NotTerminated,
                                         metrics: HashMap::new(),
+                                        func_counts: HashMap::new(),
                                         param: init_param.clone().map(|ip| (0, ip)),
                                         best_param: init_param.map(|ip| (0, ip)),
                                     },
@@ -125,6 +126,27 @@ async fn handle_connection(
 
                                             metric.push([f64::from(iter as u32), kv_val]);
                                             run.add_metric(&k, metric);
+                                        }
+                                    }
+                                }
+                            }
+                            Message::FuncCounts { name, iter, kv } => {
+                                if let Some(mut run) = storage.runs.get_mut(&name) {
+                                    for k in kv.keys() {
+                                        let counts = kv.get(k).unwrap();
+                                        if let Some(val) = run.func_counts.get_mut(k) {
+                                            val.push([
+                                                f64::from(iter as u32),
+                                                f64::from(*counts as u32),
+                                            ]);
+                                        } else {
+                                            let mut count = FuncCount::new();
+
+                                            count.push([
+                                                f64::from(iter as u32),
+                                                f64::from(*counts as u32),
+                                            ]);
+                                            run.add_func_counts(&k, count);
                                         }
                                     }
                                 }

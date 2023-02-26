@@ -145,7 +145,7 @@ where
         kv.insert("cost", state.get_cost().into());
         kv.insert("iter", iter.into());
 
-        let message = Message::Samples {
+        let message_samples = Message::Samples {
             name: self.name.clone(),
             iter,
             time: Duration::try_from(
@@ -157,18 +157,26 @@ where
             kv,
         };
 
-        self.send_msg(message);
+        self.send_msg(message_samples);
+
+        let message_func_counts = Message::FuncCounts {
+            name: self.name.clone(),
+            iter,
+            kv: state.get_func_counts().clone(),
+        };
+
+        self.send_msg(message_func_counts);
 
         if let Some(param) = state.get_param() {
             let param = param.clone().into_iter().map(f64::from).collect::<Vec<_>>();
 
-            let message = Message::Param {
+            let message_param = Message::Param {
                 name: self.name.clone(),
                 iter,
                 param,
             };
 
-            self.send_msg(message);
+            self.send_msg(message_param);
         }
 
         if state.is_best() {
@@ -179,13 +187,13 @@ where
                     .map(f64::from)
                     .collect::<Vec<_>>();
 
-                let message = Message::BestParam {
+                let message_best_param = Message::BestParam {
                     name: self.name.clone(),
                     iter,
                     param: best_param,
                 };
 
-                self.send_msg(message);
+                self.send_msg(message_best_param);
             }
         }
 
