@@ -272,7 +272,7 @@ impl MyContext {
                                     for name in run.func_counts.keys() {
                                         if let Some(counts) = run.func_counts.get(name) {
                                             let curve: PlotPoints =
-                                                counts.get_data(run.func_cumulative).clone().into();
+                                                counts.get_data(run.func_cumulative).into();
                                             let line = Line::new(curve).name(name);
                                             plot_ui.line(line)
                                         }
