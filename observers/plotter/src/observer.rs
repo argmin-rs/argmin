@@ -10,15 +10,34 @@ use std::collections::HashSet;
 use anyhow::Error;
 use argmin::core::{observers::Observe, ArgminFloat, State, KV};
 use argmin_plotter::{Message, DEFAULT_PORT};
-use futures::SinkExt;
 use time::Duration;
-use tokio::net::TcpStream;
-use tokio_util::codec::{Framed, LengthDelimitedCodec};
 use uuid::Uuid;
+
+use crate::sender::sender;
 
 const DEFAULT_HOST: &str = "127.0.0.1";
 
-#[derive(Clone)]
+/// Builder for the Plotter observer
+///
+/// # Example
+///
+/// ```
+/// use argmin_observer_plotter::PlotterBuilder;
+///
+/// let plotter = PlotterBuilder::new()
+///     // Optional: Name the optimization run
+///     // Default: random uuid.
+///     .with_name("optimization_run_1")
+///     // Optional, defaults to 127.0.0.1
+///     .with_host("127.0.0.1")
+///     // Optional, defaults to 5498
+///     .with_port(5498)
+///     // Choose which metrics should automatically be selected.
+///     // If omitted, all metrics will be selected.
+///     .select(&["cost", "best_cost"])
+///     // Build Plotter observer
+///     .build();
+/// ```
 pub struct PlotterBuilder {
     name: String,
     selected: HashSet<String>,
@@ -34,6 +53,7 @@ impl Default for PlotterBuilder {
 }
 
 impl PlotterBuilder {
+    /// Creates a new `PlotterBuilder`
     pub fn new() -> Self {
         PlotterBuilder {
             name: Uuid::new_v4().to_string(),
@@ -44,30 +64,189 @@ impl PlotterBuilder {
         }
     }
 
+    /// Set a name the optimization run will be identified with
+    ///
+    /// Defaults to a random UUID.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// let builder = PlotterBuilder::new().with_name("optimization_run_1");
+    /// # assert_eq!(builder.name().clone(), "optimization_run_1".to_string());
+    /// ```
     pub fn with_name<T: AsRef<str>>(mut self, name: T) -> Self {
         self.name = name.as_ref().to_string();
         self
     }
 
+    /// Set the host argmin plotter is running on.
+    ///
+    /// Defaults to 127.0.0.1.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// let builder = PlotterBuilder::new().with_host("192.168.0.1");
+    /// # assert_eq!(builder.host().clone(), "192.168.0.1".to_string());
+    /// ```
+    pub fn with_host<T: AsRef<str>>(mut self, host: T) -> Self {
+        self.host = host.as_ref().to_string();
+        self
+    }
+
+    /// Set the port argmin plotter is running on.
+    ///
+    /// Defaults to 5498.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// let builder = PlotterBuilder::new().with_port(1234);
+    /// # assert_eq!(builder.port(), 1234);
+    /// ```
+    pub fn with_port(mut self, port: u16) -> Self {
+        self.port = port;
+        self
+    }
+
+    /// Set the channel capacity
+    ///
+    /// A channel is used to queue messages for sending to the argmin plotter. If the channel
+    /// capacity is reached backpressure will be applied, effectively blocking the optimization.
+    /// Defaults to 10000. Decrease this value in case memory consumption is too high and increase
+    /// the value in case blocking causes negative effects.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// let builder = PlotterBuilder::new().with_channel_capacity(1000);
+    /// # assert_eq!(builder.channel_capacity(), 1000);
+    /// ```
+    pub fn with_channel_capacity(mut self, capacity: usize) -> Self {
+        self.capacity = capacity;
+        self
+    }
+
+    /// Define which metrics will be selected in argmin plotter by default
+    ///
+    /// If none are set, all metrics will be selected and shown. Providing zero or more metrics
+    /// via `select` disables all apart from the provided ones. Note that all data will be sent, and
+    /// metrics can be selected and deselected using the GUI.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// # use std::collections::HashSet;
+    /// let builder = PlotterBuilder::new().select(&["cost", "best_cost"]);
+    /// # assert_eq!(builder.selected(), &HashSet::from(["cost".to_string(), "best_cost".to_string()]));
+    /// ```
     pub fn select<T: AsRef<str>>(mut self, metrics: &[T]) -> Self {
         self.selected = metrics.iter().map(|s| s.as_ref().to_string()).collect();
         self
     }
 
+    /// Returns the name of the optimization run
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// # let builder = PlotterBuilder::new().with_name("test");
+    /// let name = builder.name();
+    /// # assert_eq!(name, &"test".to_string());
+    /// ```
+    pub fn name(&self) -> &String {
+        &self.name
+    }
+
+    /// Returns the host this observer will connect to
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// # let builder = PlotterBuilder::new();
+    /// let host = builder.host();
+    /// # assert_eq!(host, &"127.0.0.1".to_string());
+    /// ```
+    pub fn host(&self) -> &String {
+        &self.host
+    }
+
+    /// Returns the port this observer will connect to
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// # let builder = PlotterBuilder::new();
+    /// let port = builder.port();
+    /// # assert_eq!(port, 5498);
+    /// ```
+    pub fn port(&self) -> u16 {
+        self.port
+    }
+
+    /// Returns the channel capacity
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// # let builder = PlotterBuilder::new();
+    /// let capacity = builder.channel_capacity();
+    /// # assert_eq!(capacity, 10000);
+    /// ```
+    pub fn channel_capacity(&self) -> usize {
+        self.capacity
+    }
+
+    /// Returns the selected metrics
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// # use std::collections::HashSet;
+    /// # let builder = PlotterBuilder::new().select(&["cost", "best_cost"]);
+    /// let selected = builder.selected();
+    /// # assert_eq!(selected, &HashSet::from(["cost".to_string(), "best_cost".to_string()]));
+    /// ```
+    pub fn selected(&self) -> &HashSet<String> {
+        &self.selected
+    }
+
+    /// Build a Plotter instance from the builder
+    ///
+    /// This initiates the connection to the plotter instance.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// let plotter = PlotterBuilder::new().build();
+    /// ```
     pub fn build(self) -> Plotter {
         let (tx, rx) = tokio::sync::mpsc::channel(self.capacity);
         std::thread::spawn(move || sender(rx, self.host, self.port));
 
         Plotter {
             tx,
-            name: Uuid::new_v4().to_string(),
+            name: self.name,
             sending: true,
             selected: self.selected,
         }
     }
 }
 
-/// todo
+/// Observer which sends data to argmin-plotter
+// No #[derive(Clone)] on purpose: A clone will only overwrite information already present in the
+// Plotter since the name cannot be changed.
 pub struct Plotter {
     tx: tokio::sync::mpsc::Sender<Message>,
     name: String,
@@ -75,26 +254,8 @@ pub struct Plotter {
     selected: HashSet<String>,
 }
 
-#[tokio::main(flavor = "current_thread")]
-async fn sender(
-    mut rx: tokio::sync::mpsc::Receiver<Message>,
-    host: String,
-    port: u16,
-) -> Result<(), anyhow::Error> {
-    let codec = LengthDelimitedCodec::new();
-    if let Ok(stream) = TcpStream::connect(format!("{host}:{port}")).await {
-        let mut stream = Framed::new(stream, codec);
-        while let Some(msg) = rx.recv().await {
-            let msg = msg.pack()?;
-            stream.send(msg).await?;
-        }
-    } else {
-        eprintln!("Can't connect to argmin-plotter on {host}:{port}");
-    }
-    Ok(())
-}
-
 impl Plotter {
+    /// Places a `Message` on the sending queue
     fn send_msg(&mut self, message: Message) {
         if self.sending {
             if let Err(e) = self.tx.blocking_send(message) {
@@ -102,6 +263,21 @@ impl Plotter {
                 self.sending = false;
             }
         }
+    }
+
+    /// Returns the name of the Plotter instance
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin_observer_plotter::PlotterBuilder;
+    ///
+    /// # let plotter = PlotterBuilder::new().with_name("flup").build();
+    /// let name = plotter.name();
+    /// # assert_eq!(name, &"flup".to_string());
+    /// ```
+    pub fn name(&self) -> &String {
+        &self.name
     }
 }
 
