@@ -147,13 +147,11 @@ impl MyContext {
                                     ui.group(|ui| {
                                         // dodgy
                                         ui.set_max_height(height / num_metrics - 20.0);
-                                        ui.label(&name);
                                         let curve: PlotPoints = metric.get_data().clone().into();
                                         let line = Line::new(curve).name(&name);
                                         Plot::new(&name)
-                                            // .view_aspect(4.0)
-                                            // .height(height / (num_keys + 1.0))
                                             .allow_scroll(false)
+                                            .legend(Legend::default())
                                             .show(ui, |plot_ui| plot_ui.line(line));
                                     });
                                 }
@@ -170,7 +168,6 @@ impl MyContext {
                 let height = ui.available_height() * 0.95;
 
                 if let Some((iter, ref best_param)) = run.best_param {
-                    // ui.label("Current best parameter vector");
                     ui.group(|ui| {
                         ui.set_max_height(height / 3.0);
                         let chart = BarChart::new(
@@ -201,7 +198,6 @@ impl MyContext {
                 if let Some((iter, ref param)) = run.param {
                     ui.group(|ui| {
                         ui.set_max_height(height / 3.0);
-                        // ui.label("Current parameter vector");
                         let chart = BarChart::new(
                             param
                                 .iter()
@@ -259,34 +255,29 @@ impl MyContext {
     }
 
     fn show_func_counts(&mut self, name: &String, ui: &mut Ui) {
-        if let Some(run) = self.storage.runs.get_mut(name) {
+        if let Some(mut run) = self.storage.runs.get_mut(name) {
             ui.horizontal_top(|ui| {
+                ui.checkbox(&mut run.func_cumulative, "Cumulative");
                 egui::ScrollArea::vertical()
                     .id_source("func_counts")
                     .show(ui, |ui| {
                         ui.vertical(|ui| {
-                            let height = ui.available_height();
-
-                            let metric_names = run.func_counts.keys();
-
-                            let num_metrics = metric_names.len() as f32;
-
-                            for name in metric_names {
-                                if let Some(counts) = run.func_counts.get(name) {
-                                    ui.group(|ui| {
-                                        // dodgy
-                                        ui.set_max_height(height / num_metrics - 20.0);
-                                        ui.label(name);
-                                        let curve: PlotPoints = counts.get_data().clone().into();
-                                        let line = Line::new(curve).name(&name);
-                                        Plot::new(&name)
-                                            // .view_aspect(4.0)
-                                            // .height(height / (num_keys + 1.0))
-                                            .allow_scroll(false)
-                                            .show(ui, |plot_ui| plot_ui.line(line));
-                                    });
-                                }
-                            }
+                            ui.set_max_height(ui.available_height());
+                            Plot::new(name)
+                                .allow_scroll(false)
+                                .include_x(0.0)
+                                .include_y(0.0)
+                                .legend(Legend::default())
+                                .show(ui, |plot_ui| {
+                                    for name in run.func_counts.keys() {
+                                        if let Some(counts) = run.func_counts.get(name) {
+                                            let curve: PlotPoints =
+                                                counts.get_data(run.func_cumulative).clone().into();
+                                            let line = Line::new(curve).name(name);
+                                            plot_ui.line(line)
+                                        }
+                                    }
+                                });
                         });
                     });
             });
@@ -329,7 +320,7 @@ impl MyContext {
             if ui.button("Parameters").clicked() {
                 self.views.insert(name.clone(), View::Params);
             }
-            if ui.button("Function evaluation counts").clicked() {
+            if ui.button("Function evaluations").clicked() {
                 self.views.insert(name.clone(), View::FuncCounts);
             }
             if ui.button("Overview").clicked() {

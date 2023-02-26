@@ -65,8 +65,16 @@ impl FuncCount {
         self
     }
 
-    pub fn get_data(&self) -> &Vec<[f64; 2]> {
-        &self.data
+    pub fn get_data(&self, cumulative: bool) -> Vec<[f64; 2]> {
+        if cumulative {
+            self.data.clone()
+        } else {
+            self.data
+                .iter()
+                .zip(std::iter::once(&[0.0, 0.0]).chain(self.data.iter()))
+                .map(|(a, b)| [a[0], a[1] - b[1]])
+                .collect()
+        }
     }
 }
 
@@ -86,6 +94,7 @@ pub struct Run {
     pub termination_status: TerminationStatus,
     pub metrics: HashMap<MetricName, Metric>,
     pub func_counts: HashMap<CountName, FuncCount>,
+    pub func_cumulative: bool,
     pub param: Option<(u64, Vec<f64>)>,
     pub best_param: Option<(u64, Vec<f64>)>,
 }
