@@ -7,12 +7,11 @@
 
 use std::collections::{HashMap, HashSet};
 
-use time::Duration;
-
 use anyhow::Error;
 use argmin::core::{TerminationStatus, KV};
 use bytes::{Bytes, BytesMut};
 use serde::{Deserialize, Serialize};
+use time::Duration;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum Message {

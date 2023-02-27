@@ -48,7 +48,11 @@ pub struct PlotterApp {
 }
 
 impl PlotterApp {
-    pub fn new(cc: &eframe::CreationContext<'_>) -> Result<Self, anyhow::Error> {
+    pub fn new(
+        cc: &eframe::CreationContext<'_>,
+        host: String,
+        port: u16,
+    ) -> Result<Self, anyhow::Error> {
         let tree: Tree<String> = Tree::new(vec![]);
         // tree.push_to_first_leaf("Blah".to_owned());
         // let [a, b] = tree.split_left(NodeIndex::root(), 0.3, vec!["Inspector".to_owned()]);
@@ -81,7 +85,7 @@ impl PlotterApp {
         let storage = Arc::new(Storage::new(Arc::clone(&tree)));
         let db2 = Arc::clone(&storage);
         let egui_ctx = cc.egui_ctx.clone();
-        std::thread::spawn(move || server(db2, egui_ctx));
+        std::thread::spawn(move || server(db2, egui_ctx, host, port));
 
         let context = MyContext {
             style: None,

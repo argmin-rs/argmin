@@ -9,4 +9,5 @@ mod message;
 
 pub use message::Message;
 
+/// Default port used by plotter
 pub const DEFAULT_PORT: u16 = 5498;
