@@ -8,7 +8,6 @@
 use std::{collections::HashMap, sync::Arc};
 
 use argmin::core::TerminationStatus;
-use argmin_plotter::DEFAULT_PORT;
 use eframe::egui;
 use time::Duration;
 use tokio::net::{TcpListener, TcpStream};
@@ -16,14 +15,18 @@ use tokio_stream::StreamExt;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 
 use crate::data::{FuncCount, Metric};
-use crate::DEFAULT_HOST;
 use crate::{data::Run, message::Message};
 
 use super::data::Storage;
 
 #[tokio::main]
-pub async fn server(storage: Arc<Storage>, ctx: egui::Context) -> Result<(), anyhow::Error> {
-    let listener = TcpListener::bind(format!("{DEFAULT_HOST}:{DEFAULT_PORT}")).await?;
+pub async fn server(
+    storage: Arc<Storage>,
+    ctx: egui::Context,
+    host: String,
+    port: u16,
+) -> Result<(), anyhow::Error> {
+    let listener = TcpListener::bind(format!("{host}:{port}")).await?;
     loop {
         match listener.accept().await {
             Ok((stream, _)) => {

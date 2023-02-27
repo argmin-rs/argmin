@@ -14,13 +14,30 @@ mod telemetry;
 use anyhow::Error;
 use uuid::Uuid;
 
+use clap::Parser;
 use plotter::PlotterApp;
 use telemetry::{get_subscriber, init_subscriber};
+
+use argmin_plotter::DEFAULT_PORT;
 
 const NAME: &str = "argmin-plotter";
 const DEFAULT_HOST: &str = "0.0.0.0";
 
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Host address to bind to
+    #[arg(short, long, default_value_t = DEFAULT_HOST.to_string())]
+    host: String,
+
+    /// Port to bind to
+    #[arg(short, long, default_value_t = DEFAULT_PORT)]
+    port: u16,
+}
+
 fn run() -> Result<(), Error> {
+    let Args { host, port } = Args::parse();
+
     // Set up logging
     let subscriber = get_subscriber(NAME.into(), "info".into(), std::io::stdout);
     init_subscriber(subscriber);
@@ -32,7 +49,7 @@ fn run() -> Result<(), Error> {
     eframe::run_native(
         NAME,
         options,
-        Box::new(|cc| Box::new(PlotterApp::new(cc).expect("Failed to start GUI"))),
+        Box::new(move |cc| Box::new(PlotterApp::new(cc, host, port).expect("Failed to start GUI"))),
     )
     .expect("Failed to start GUI.");
     Ok(())
