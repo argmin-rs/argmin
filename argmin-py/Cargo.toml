@@ -1,0 +1,18 @@
+[package]
+name = "argmin-py"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "argmin"
+crate-type = ["cdylib"]
+
+[dependencies]
+anyhow = "1.0.70"
+argmin_testfunctions = "0.1.1"
+argmin = {path="../argmin", default-features=false, features=[]}
+argmin-math = {path="../argmin-math", features=["ndarray_latest-serde"]}
+ndarray-linalg = { version = "0.16", features = ["netlib"] }
+ndarray = { version = "0.15", features = ["serde-1"] }
+numpy = "0.18.0"
+pyo3 = {version="0.18.1", features=["extension-module", "anyhow"]}

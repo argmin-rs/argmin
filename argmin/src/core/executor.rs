@@ -26,7 +26,7 @@ pub struct Executor<O, S, I> {
     /// Storage for observers
     observers: Observers<I>,
     /// Checkpoint
-    checkpoint: Option<Box<dyn Checkpoint<S, I>>>,
+    checkpoint: Option<Box<dyn Checkpoint<S, I> + Send>>,
     /// Indicates whether Ctrl-C functionality should be active or not
     ctrlc: bool,
     /// Indicates whether to time execution or not
@@ -298,7 +298,7 @@ where
     /// # }
     /// ```
     #[must_use]
-    pub fn add_observer<OBS: Observe<I> + 'static>(
+    pub fn add_observer<OBS: Observe<I> + 'static + Send>(
         mut self,
         observer: OBS,
         mode: ObserverMode,
@@ -340,7 +340,7 @@ where
     /// # }
     /// ```
     #[must_use]
-    pub fn checkpointing<C: 'static + Checkpoint<S, I>>(mut self, checkpoint: C) -> Self {
+    pub fn checkpointing<C: 'static + Checkpoint<S, I> + Send>(mut self, checkpoint: C) -> Self {
         self.checkpoint = Some(Box::new(checkpoint));
         self
     }

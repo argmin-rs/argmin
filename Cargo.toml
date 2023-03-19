@@ -3,6 +3,7 @@
 members = [
     "argmin",
     "argmin-math",
+    "argmin-py",
 ]
 
 exclude = [

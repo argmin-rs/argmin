@@ -188,7 +188,7 @@ pub trait Observe<I> {
     }
 }
 
-type ObserversVec<I> = Vec<(Arc<Mutex<dyn Observe<I>>>, ObserverMode)>;
+type ObserversVec<I> = Vec<(Arc<Mutex<dyn Observe<I> + Send>>, ObserverMode)>;
 
 /// Container for observers.
 ///
@@ -236,7 +236,7 @@ impl<I> Observers<I> {
     /// # #[cfg(feature = "slog-logger")]
     /// # assert!(!observers.is_empty());
     /// ```
-    pub fn push<OBS: Observe<I> + 'static>(
+    pub fn push<OBS: Observe<I> + 'static + Send>(
         &mut self,
         observer: OBS,
         mode: ObserverMode,
