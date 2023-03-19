@@ -402,6 +402,7 @@ where
         };
 
         // L-BFGS two-loop recursion
+        #[allow(clippy::redundant_clone)]
         let mut q = prev_grad.clone();
         let cur_m = self.s.len();
         let mut alpha: Vec<F> = vec![float!(0.0); cur_m];
