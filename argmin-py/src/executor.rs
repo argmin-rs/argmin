@@ -41,17 +41,24 @@ impl Executor {
     #[pyo3(signature = (**kwargs))]
     fn configure(&mut self, kwargs: Option<&PyDict>) -> PyResult<()> {
         if let Some(kwargs) = kwargs {
-            let new_self = self.take()?.configure(|mut state| {
-                if let Some(param) = kwargs.get_item("param") {
-                    let param: &PyArray1 = param.extract().unwrap();
+            let param = kwargs
+                .get_item("param")
+                .map(|x| x.extract::<&PyArray1>())
+                .map_or(Ok(None), |r| r.map(Some))?;
+            let max_iters = kwargs
+                .get_item("max_iters")
+                .map(|x| x.extract())
+                .map_or(Ok(None), |r| r.map(Some))?;
+
+            self.0 = Some(self.take()?.configure(|mut state| {
+                if let Some(param) = param {
                     state = state.param(param.to_owned_array());
                 }
-                if let Some(max_iters) = kwargs.get_item("max_iters") {
-                    state = state.max_iters(max_iters.extract().unwrap());
+                if let Some(max_iters) = max_iters {
+                    state = state.max_iters(max_iters);
                 }
                 state
-            });
-            self.0 = Some(new_self);
+            }));
         }
         Ok(())
     }
