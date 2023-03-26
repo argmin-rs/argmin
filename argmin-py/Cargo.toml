@@ -1,7 +1,17 @@
 [package]
 name = "argmin-py"
 version = "0.1.0"
+authors = ["Joris Bayer <joris.bayer@protonmail.com"]
 edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "argmin python bindings"
+homepage = "https://argmin-rs.org"
+repository = "https://github.com/argmin-rs/argmin"
+readme = "README.md"
+keywords = ["optimization", "math", "science"]
+categories = ["science"]
+exclude = []
+
 
 [lib]
 name = "argmin"
