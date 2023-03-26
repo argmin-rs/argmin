@@ -101,7 +101,7 @@ macro_rules! bulk {
                 "problem are still required to be `Send` and `Sync`. Those bounds are linked to ",
                 "the `rayon` feature. This method can be overwritten.",
             )]
-            fn [<bulk_ $method_name>]<'a, P>(&self, params: &'a [P]) -> Result<Vec<$output>, Error>
+            fn [<bulk_ $method_name>]<P>(&self, params: &[P]) -> Result<Vec<$output>, Error>
             where
                 P: std::borrow::Borrow<$input> + SyncAlias,
                 $output: SendAlias,
