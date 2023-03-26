@@ -591,7 +591,9 @@ mod tests {
             P: Clone,
             F: ArgminFloat,
         {
-            fn name(&self) -> &str { "OptimizationAlgorithm" }
+            fn name(&self) -> &str {
+                "OptimizationAlgorithm"
+            }
 
             // Only resets internal_state to 1
             fn init(
