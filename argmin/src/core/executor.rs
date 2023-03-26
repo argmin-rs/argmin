@@ -181,7 +181,7 @@ where
                 }
 
                 // Observe after init
-                self.observers.observe_init(S::NAME, &logs)?;
+                self.observers.observe_init(self.solver.name(), &logs)?;
             }
 
             state.func_counts(&self.problem);

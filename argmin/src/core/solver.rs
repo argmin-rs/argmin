@@ -117,4 +117,11 @@ pub trait Solver<O, I: State> {
     fn terminate(&mut self, _state: &I) -> TerminationStatus {
         TerminationStatus::NotTerminated
     }
+
+    /// Returns the name of the solver.
+    ///
+    /// Defaults to [`Self::NAME`], but can be overriden in implmentations.
+    fn name(&self) -> &str {
+        Self::NAME
+    }
 }

@@ -124,7 +124,7 @@ where
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "OptimizationResult:")?;
-        writeln!(f, "    Solver:        {}", S::NAME)?;
+        writeln!(f, "    Solver:        {}", self.solver().name())?;
         writeln!(
             f,
             "    param (best):  {}",

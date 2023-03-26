@@ -7,6 +7,8 @@
 
 // TODO: docs
 
+use std::path::Iter;
+
 use pyo3::prelude::*;
 
 use argmin::{core, solver};
@@ -38,6 +40,15 @@ impl From<Solver> for DynamicSolver {
 impl core::Solver<Problem, IterState> for DynamicSolver {
     // TODO: make this a trait method so we can return a dynamic
     const NAME: &'static str = "Dynamic Solver";
+
+    fn name(&self) -> &str {
+        match self {
+            DynamicSolver::Newton(inner) => {
+                <argmin::solver::newton::Newton<f64> as argmin::core::Solver<Problem, IterState>>
+                ::name(inner)
+            }
+        }
+    }
 
     fn next_iter(
         &mut self,
