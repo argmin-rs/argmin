@@ -122,7 +122,9 @@ where
         + ArgminDot<P, P>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Gauss-Newton method";
+    fn name(&self) -> &str {
+        "Gauss-Newton method"
+    }
 
     fn next_iter(
         &mut self,

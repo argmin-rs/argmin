@@ -591,7 +591,7 @@ mod tests {
             P: Clone,
             F: ArgminFloat,
         {
-            const NAME: &'static str = "OptimizationAlgorithm";
+            fn name(&self) -> &str { "OptimizationAlgorithm" }
 
             // Only resets internal_state to 1
             fn init(

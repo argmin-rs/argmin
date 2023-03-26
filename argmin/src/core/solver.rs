@@ -36,7 +36,7 @@ use crate::core::{Error, Problem, State, TerminationReason, TerminationStatus, K
 ///     P: Clone,
 ///     F: ArgminFloat
 /// {
-///     const NAME: &'static str = "OptimizationAlgorithm";
+///     fn name(&self) -> &str { "OptimizationAlgorithm" }
 ///
 ///     fn init(
 ///         &mut self,
@@ -67,7 +67,7 @@ use crate::core::{Error, Problem, State, TerminationReason, TerminationStatus, K
 /// ```
 pub trait Solver<O, I: State> {
     /// Name of the solver. Mainly used in [Observers](`crate::core::observers::Observe`).
-    const NAME: &'static str;
+    // const NAME: &'static str;
 
     /// Initializes the algorithm.
     ///
@@ -119,9 +119,5 @@ pub trait Solver<O, I: State> {
     }
 
     /// Returns the name of the solver.
-    ///
-    /// Defaults to [`Self::NAME`], but can be overriden in implmentations.
-    fn name(&self) -> &str {
-        Self::NAME
-    }
+    fn name(&self) -> &str;
 }

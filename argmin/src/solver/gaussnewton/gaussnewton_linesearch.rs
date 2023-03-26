@@ -98,7 +98,9 @@ where
     L: Clone + LineSearch<P, F> + Solver<LineSearchProblem<O, F>, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Gauss-Newton method with line search";
+    fn name(&self) -> &str {
+        "Gauss-Newton method with line search"
+    }
 
     fn next_iter(
         &mut self,

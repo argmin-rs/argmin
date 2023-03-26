@@ -172,7 +172,7 @@ where
     L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "SR1";
+    fn name(&self) -> &str { "SR1" }
 
     fn init(
         &mut self,

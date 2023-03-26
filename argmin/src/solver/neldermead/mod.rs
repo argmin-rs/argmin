@@ -322,7 +322,9 @@ where
     P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminAdd<P, P> + ArgminMul<F, P>,
     F: ArgminFloat + std::iter::Sum<F>,
 {
-    const NAME: &'static str = "Nelder-Mead method";
+    fn name(&self) -> &str {
+        "Nelder-Mead method"
+    }
 
     fn init(
         &mut self,

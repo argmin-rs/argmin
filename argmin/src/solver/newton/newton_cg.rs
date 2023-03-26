@@ -123,7 +123,9 @@ where
     L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
     F: ArgminFloat + ArgminL2Norm<F>,
 {
-    const NAME: &'static str = "Newton-CG";
+    fn name(&self) -> &str {
+        "Newton-CG"
+    }
 
     fn next_iter(
         &mut self,

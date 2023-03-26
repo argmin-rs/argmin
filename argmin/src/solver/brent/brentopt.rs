@@ -102,7 +102,9 @@ where
     O: CostFunction<Param = F, Output = F>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "BrentOpt";
+    fn name(&self) -> &str {
+        "BrentOpt"
+    }
 
     fn init(
         &mut self,

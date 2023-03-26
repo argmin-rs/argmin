@@ -139,7 +139,9 @@ where
     O: CostFunction<Param = F, Output = F>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Golden-section search";
+    fn name(&self) -> &str {
+        "Golden-section search"
+    }
 
     fn init(
         &mut self,

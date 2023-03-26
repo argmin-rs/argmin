@@ -58,7 +58,9 @@ where
     G: ArgminMul<F, P> + ArgminWeightedDot<G, F, H> + ArgminL2Norm<F>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Cauchy Point";
+    fn name(&self) -> &str {
+        "Cauchy Point"
+    }
 
     fn next_iter(
         &mut self,

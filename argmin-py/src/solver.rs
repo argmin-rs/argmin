@@ -7,16 +7,11 @@
 
 // TODO: docs
 
-use std::path::Iter;
-
 use pyo3::prelude::*;
 
 use argmin::{core, solver};
 
-use crate::{
-    problem::Problem,
-    types::{IterState, Scalar},
-};
+use crate::{problem::Problem, types::IterState};
 
 #[pyclass]
 #[derive(Clone)]
@@ -24,30 +19,21 @@ pub enum Solver {
     Newton,
 }
 
-pub enum DynamicSolver {
-    // NOTE: I tried using a Box<dyn Solver<> here, but Solver is not object safe.
-    Newton(solver::newton::Newton<Scalar>),
-}
+pub struct DynamicSolver(Box<dyn core::Solver<Problem, IterState> + Send>);
 
 impl From<Solver> for DynamicSolver {
-    fn from(solver: Solver) -> Self {
-        match solver {
-            Solver::Newton => Self::Newton(solver::newton::Newton::new()),
-        }
+    fn from(value: Solver) -> Self {
+        let inner = match value {
+            Solver::Newton => solver::newton::Newton::new(),
+        };
+        Self(Box::new(inner))
     }
 }
 
 impl core::Solver<Problem, IterState> for DynamicSolver {
     // TODO: make this a trait method so we can return a dynamic
-    const NAME: &'static str = "Dynamic Solver";
-
     fn name(&self) -> &str {
-        match self {
-            DynamicSolver::Newton(inner) => {
-                <argmin::solver::newton::Newton<f64> as argmin::core::Solver<Problem, IterState>>
-                ::name(inner)
-            }
-        }
+        self.0.name()
     }
 
     fn next_iter(
@@ -55,8 +41,6 @@ impl core::Solver<Problem, IterState> for DynamicSolver {
         problem: &mut core::Problem<Problem>,
         state: IterState,
     ) -> Result<(IterState, Option<core::KV>), core::Error> {
-        match self {
-            DynamicSolver::Newton(inner) => inner.next_iter(problem, state),
-        }
+        self.0.next_iter(problem, state)
     }
 }

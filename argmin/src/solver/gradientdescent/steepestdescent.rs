@@ -58,7 +58,9 @@ where
     L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Steepest Descent";
+    fn name(&self) -> &str {
+        "Steepest Descent"
+    }
 
     fn next_iter(
         &mut self,

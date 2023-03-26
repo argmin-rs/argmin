@@ -209,7 +209,9 @@ where
     R: Clone + TrustRegionRadius<F> + Solver<O, IterState<P, G, (), B, F>>,
     F: ArgminFloat + ArgminL2Norm<F>,
 {
-    const NAME: &'static str = "SR1 trust region";
+    fn name(&self) -> &str {
+        "SR1 trust region"
+    }
 
     fn init(
         &mut self,

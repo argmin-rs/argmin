@@ -182,7 +182,9 @@ where
     L: LineSearchCondition<P, G, F> + SerializeAlias,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Backtracking line search";
+    fn name(&self) -> &str {
+        "Backtracking line search"
+    }
 
     fn init(
         &mut self,

@@ -133,7 +133,9 @@ where
     B: NLCGBetaUpdate<G, P, F>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Nonlinear Conjugate Gradient";
+    fn name(&self) -> &str {
+        "Nonlinear Conjugate Gradient"
+    }
 
     fn init(
         &mut self,

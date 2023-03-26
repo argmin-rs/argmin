@@ -101,7 +101,9 @@ where
         + ArgminMul<F, P>,
     F: ArgminFloat + ArgminL2Norm<F>,
 {
-    const NAME: &'static str = "Conjugate Gradient";
+    fn name(&self) -> &str {
+        "Conjugate Gradient"
+    }
 
     fn init(
         &mut self,
