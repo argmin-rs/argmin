@@ -157,7 +157,7 @@ use std::fmt::Display;
 /// }
 /// # fn main() {}
 /// ```
-pub trait Checkpoint<S, I> {
+pub trait Checkpoint<S, I>: Send {
     /// Save a checkpoint
     ///
     /// Gets a reference to the current `solver` of type `S` and to the current `state` of type

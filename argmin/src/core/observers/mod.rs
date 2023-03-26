@@ -169,7 +169,7 @@ use std::sync::{Arc, Mutex};
 ///     }
 /// }
 /// ```
-pub trait Observe<I> {
+pub trait Observe<I>: Send {
     /// Called once after initialization of the solver.
     ///
     /// Has access to the name of the solver via `name` and to a key-value store `kv` with entries
@@ -188,7 +188,7 @@ pub trait Observe<I> {
     }
 }
 
-type ObserversVec<I> = Vec<(Arc<Mutex<dyn Observe<I> + Send>>, ObserverMode)>;
+type ObserversVec<I> = Vec<(Arc<Mutex<dyn Observe<I>>>, ObserverMode)>;
 
 /// Container for observers.
 ///
@@ -236,7 +236,7 @@ impl<I> Observers<I> {
     /// # #[cfg(feature = "slog-logger")]
     /// # assert!(!observers.is_empty());
     /// ```
-    pub fn push<OBS: Observe<I> + 'static + Send>(
+    pub fn push<OBS: Observe<I> + 'static>(
         &mut self,
         observer: OBS,
         mode: ObserverMode,
