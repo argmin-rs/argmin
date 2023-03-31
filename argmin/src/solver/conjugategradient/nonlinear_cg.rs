@@ -118,7 +118,7 @@ where
     }
 }
 
-impl<O, P, G, L, B, F> Solver<O, IterState<P, G, (), (), F>>
+impl<O, P, G, L, B, F> Solver<O, IterState<P, G, (), (), (), F>>
     for NonlinearConjugateGradient<P, L, B, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
@@ -129,7 +129,7 @@ where
         + ArgminMul<F, P>
         + ArgminDot<G, F>
         + ArgminL2Norm<F>,
-    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     B: NLCGBetaUpdate<G, P, F>,
     F: ArgminFloat,
 {
@@ -138,8 +138,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         let param = state.get_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -156,8 +156,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         let p = self.p.as_ref().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`NonlinearConjugateGradient`: Field `p` not set"

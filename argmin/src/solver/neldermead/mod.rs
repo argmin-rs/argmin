@@ -316,7 +316,7 @@ impl fmt::Display for Action {
     }
 }
 
-impl<O, P, F> Solver<O, IterState<P, (), (), (), F>> for NelderMead<P, F>
+impl<O, P, F> Solver<O, IterState<P, (), (), (), (), F>> for NelderMead<P, F>
 where
     O: CostFunction<Param = P, Output = F>,
     P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminAdd<P, P> + ArgminMul<F, P>,
@@ -327,8 +327,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<P, (), (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), (), F>, Option<KV>), Error> {
         self.params
             .iter_mut()
             .for_each(|(p, c)| *c = problem.cost(p).unwrap());
@@ -344,8 +344,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<P, (), (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), (), F>, Option<KV>), Error> {
         let num_param_vecs = self.params.len();
 
         let x0 = self.calculate_centroid();
@@ -413,7 +413,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationStatus {
+    fn terminate(&mut self, _state: &IterState<P, (), (), (), (), F>) -> TerminationStatus {
         let n = float!(self.params.len() as f64);
         let c0: F = self.params.iter().map(|(_, c)| *c).sum::<F>() / n;
         let s: F = (float!(1.0) / (n - float!(1.0))

@@ -157,7 +157,7 @@ where
     }
 }
 
-impl<O, R, F, P, G, H> Solver<O, IterState<P, G, (), H, F>> for TrustRegion<R, F>
+impl<O, R, F, P, G, H> Solver<O, IterState<P, G, (), H, (), F>> for TrustRegion<R, F>
 where
     O: CostFunction<Param = P, Output = F>
         + Gradient<Param = P, Gradient = G>
@@ -172,7 +172,7 @@ where
         + ArgminAdd<P, P>,
     G: Clone + SerializeAlias + DeserializeOwnedAlias,
     H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
-    R: Clone + TrustRegionRadius<F> + Solver<O, IterState<P, G, (), H, F>>,
+    R: Clone + TrustRegionRadius<F> + Solver<O, IterState<P, G, (), H, (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Trust region";
@@ -180,8 +180,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), H, (), F>,
+    ) -> Result<(IterState<P, G, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -221,8 +221,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), H, (), F>,
+    ) -> Result<(IterState<P, G, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`TrustRegion`: Parameter vector in state not set."
@@ -300,7 +300,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, _state: &IterState<P, G, (), H, F>) -> TerminationStatus {
+    fn terminate(&mut self, _state: &IterState<P, G, (), H, (), F>) -> TerminationStatus {
         TerminationStatus::NotTerminated
     }
 }

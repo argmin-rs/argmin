@@ -50,12 +50,12 @@ impl<L> SteepestDescent<L> {
     }
 }
 
-impl<O, L, P, G, F> Solver<O, IterState<P, G, (), (), F>> for SteepestDescent<L>
+impl<O, L, P, G, F> Solver<O, IterState<P, G, (), (), (), F>> for SteepestDescent<L>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone + SerializeAlias + DeserializeOwnedAlias,
     G: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminMul<F, G>,
-    L: Clone + LineSearch<G, F> + Solver<O, IterState<P, G, (), (), F>>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Steepest Descent";
@@ -63,8 +63,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         let param_new = state
             .get_param()
             .ok_or_else(argmin_error_closure!(

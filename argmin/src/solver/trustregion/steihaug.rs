@@ -178,7 +178,7 @@ where
     }
 }
 
-impl<P, O, F, H> Solver<O, IterState<P, P, (), H, F>> for Steihaug<P, F>
+impl<P, O, F, H> Solver<O, IterState<P, P, (), H, (), F>> for Steihaug<P, F>
 where
     P: Clone
         + SerializeAlias
@@ -195,8 +195,8 @@ where
     fn init(
         &mut self,
         _problem: &mut Problem<O>,
-        state: IterState<P, P, (), H, F>,
-    ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
+        state: IterState<P, P, (), H, (), F>,
+    ) -> Result<(IterState<P, P, (), H, (), F>, Option<KV>), Error> {
         let r = state
             .get_gradient()
             .ok_or_else(argmin_error_closure!(
@@ -232,8 +232,8 @@ where
     fn next_iter(
         &mut self,
         _problem: &mut Problem<O>,
-        mut state: IterState<P, P, (), H, F>,
-    ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, P, (), H, (), F>,
+    ) -> Result<(IterState<P, P, (), H, (), F>, Option<KV>), Error> {
         let grad = state.take_gradient().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`Steihaug`: Gradient in state not set."
@@ -298,7 +298,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, P, (), H, F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, P, (), H, (), F>) -> TerminationStatus {
         if self.r_0_norm < self.epsilon {
             return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }

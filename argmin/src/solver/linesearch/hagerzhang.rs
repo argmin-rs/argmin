@@ -495,7 +495,7 @@ impl<P, G, F> LineSearch<G, F> for HagerZhangLineSearch<P, G, F> {
     }
 }
 
-impl<P, G, O, F> Solver<O, IterState<P, G, (), (), F>> for HagerZhangLineSearch<P, G, F>
+impl<P, G, O, F> Solver<O, IterState<P, G, (), (), (), F>> for HagerZhangLineSearch<P, G, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<G, F, P>,
@@ -507,8 +507,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         check_param!(
             self.search_direction,
             concat!(
@@ -572,8 +572,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         // L1
         let aa = (self.a_x, self.a_f, self.a_g);
         let bb = (self.b_x, self.b_f, self.b_g);
@@ -622,7 +622,7 @@ where
         Ok((state.param(new_param).cost(self.best_f), None))
     }
 
-    fn terminate(&mut self, _state: &IterState<P, G, (), (), F>) -> TerminationStatus {
+    fn terminate(&mut self, _state: &IterState<P, G, (), (), (), F>) -> TerminationStatus {
         if self.best_f - self.finit <= self.delta * self.best_x * self.dginit
             && self.best_g >= self.sigma * self.dginit
         {

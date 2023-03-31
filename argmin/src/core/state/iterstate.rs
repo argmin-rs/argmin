@@ -35,7 +35,7 @@ use std::collections::HashMap;
 /// * termination status
 #[derive(Clone, Default, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct IterState<P, G, J, H, F> {
+pub struct IterState<P, G, J, H, R, F> {
     /// Current parameter vector
     pub param: Option<P>,
     /// Previous parameter vector
@@ -70,6 +70,8 @@ pub struct IterState<P, G, J, H, F> {
     pub jacobian: Option<J>,
     /// Previous Jacobian
     pub prev_jacobian: Option<J>,
+    /// Value of residuals from recent call to apply
+    pub residuals: Option<R>,
     /// Current iteration
     pub iter: u64,
     /// Iteration number of last best cost
@@ -84,7 +86,7 @@ pub struct IterState<P, G, J, H, F> {
     pub termination_status: TerminationStatus,
 }
 
-impl<P, G, J, H, F> IterState<P, G, J, H, F>
+impl<P, G, J, H, R, F> IterState<P, G, J, H, R, F>
 where
     Self: State<Float = F>,
     F: ArgminFloat,
@@ -96,7 +98,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State};
-    /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # let param_old = vec![1.0f64, 2.0f64];
     /// # let state = state.param(param_old);
     /// # assert!(state.prev_param.is_none());
@@ -122,7 +124,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State};
-    /// # let state: IterState<(), Vec<f64>, (), (), f64> = IterState::new();
+    /// # let state: IterState<(), Vec<f64>, (), (), f64, ()> = IterState::new();
     /// # let grad_old = vec![1.0f64, 2.0f64];
     /// # let state = state.gradient(grad_old);
     /// # assert!(state.prev_grad.is_none());
@@ -148,7 +150,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State};
-    /// # let state: IterState<(), (), (), Vec<f64>, f64> = IterState::new();
+    /// # let state: IterState<(), (), (), Vec<f64>, f64, ()> = IterState::new();
     /// # let hessian_old = vec![1.0f64, 2.0f64];
     /// # let state = state.hessian(hessian_old);
     /// # assert!(state.prev_hessian.is_none());
@@ -174,7 +176,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State};
-    /// # let state: IterState<(), (), (), Vec<f64>, f64> = IterState::new();
+    /// # let state: IterState<(), (), (), Vec<f64>, f64, ()>> = IterState::new();
     /// # let inv_hessian_old = vec![1.0f64, 2.0f64];
     /// # let state = state.inv_hessian(inv_hessian_old);
     /// # assert!(state.prev_inv_hessian.is_none());
@@ -200,7 +202,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State};
-    /// # let state: IterState<(), (), Vec<f64>, (), f64> = IterState::new();
+    /// # let state: IterState<(), (), Vec<f64>, (), f64, ()> = IterState::new();
     /// # let jacobian_old = vec![1.0f64, 2.0f64];
     /// # let state = state.jacobian(jacobian_old);
     /// # assert!(state.prev_jacobian.is_none());
@@ -227,7 +229,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State};
-    /// # let state: IterState<(), (), Vec<f64>, (), f64> = IterState::new();
+    /// # let state: IterState<(), (), Vec<f64>, (), f64, ()> = IterState::new();
     /// # let cost_old = 1.0f64;
     /// # let state = state.cost(cost_old);
     /// # assert_eq!(state.prev_cost.to_ne_bytes(), f64::INFINITY.to_ne_bytes());
@@ -253,7 +255,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # assert_eq!(state.target_cost.to_ne_bytes(), f64::NEG_INFINITY.to_ne_bytes());
     /// let state = state.target_cost(0.0);
     /// # assert_eq!(state.target_cost.to_ne_bytes(), 0.0f64.to_ne_bytes());
@@ -270,7 +272,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # assert_eq!(state.max_iters, std::u64::MAX);
     /// let state = state.max_iters(1000);
     /// # assert_eq!(state.max_iters, 1000);
@@ -287,7 +289,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # let state = state.cost(2.0);
     /// let cost = state.get_cost();
     /// # assert_eq!(cost.to_ne_bytes(), 2.0f64.to_ne_bytes());
@@ -302,7 +304,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # state.prev_cost = 2.0;
     /// let prev_cost = state.get_prev_cost();
     /// # assert_eq!(prev_cost.to_ne_bytes(), 2.0f64.to_ne_bytes());
@@ -317,7 +319,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # state.best_cost = 2.0;
     /// let best_cost = state.get_best_cost();
     /// # assert_eq!(best_cost.to_ne_bytes(), 2.0f64.to_ne_bytes());
@@ -332,7 +334,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # state.prev_best_cost = 2.0;
     /// let prev_best_cost = state.get_prev_best_cost();
     /// # assert_eq!(prev_best_cost.to_ne_bytes(), 2.0f64.to_ne_bytes());
@@ -347,7 +349,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # assert_eq!(state.target_cost.to_ne_bytes(), std::f64::NEG_INFINITY.to_ne_bytes());
     /// # state.target_cost = 0.0;
     /// let target_cost = state.get_target_cost();
@@ -363,7 +365,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # assert!(state.take_param().is_none());
     /// # let mut state = state.param(vec![1.0, 2.0]);
     /// # assert_eq!(state.param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -384,7 +386,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # assert!(state.prev_param.is_none());
     /// # state.prev_param = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -403,7 +405,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # assert!(state.take_prev_param().is_none());
     /// # state.prev_param = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -424,7 +426,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # assert!(state.prev_best_param.is_none());
     /// # state.prev_best_param = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_best_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -443,7 +445,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # assert!(state.take_best_param().is_none());
     /// # state.best_param = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.best_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -464,7 +466,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), f64, ()> = IterState::new();
     /// # assert!(state.take_prev_best_param().is_none());
     /// # state.prev_best_param = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_best_param.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -485,7 +487,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), Vec<f64>, (), (), f64> = IterState::new();
+    /// # let mut state: IterState<(), Vec<f64>, (), (), f64, ()> = IterState::new();
     /// # assert!(state.grad.is_none());
     /// # assert!(state.get_gradient().is_none());
     /// # state.grad = Some(vec![1.0, 2.0]);
@@ -505,7 +507,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), Vec<f64>, (), (), f64> = IterState::new();
+    /// # let mut state: IterState<(), Vec<f64>, (), (), f64, ()> = IterState::new();
     /// # assert!(state.take_gradient().is_none());
     /// # state.grad = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -526,7 +528,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), Vec<f64>, (), (), f64> = IterState::new();
+    /// # let mut state: IterState<(), Vec<f64>, (), (), f64, ()> = IterState::new();
     /// # assert!(state.prev_grad.is_none());
     /// # assert!(state.get_prev_gradient().is_none());
     /// # state.prev_grad = Some(vec![1.0, 2.0]);
@@ -546,7 +548,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), Vec<f64>, (), (), f64> = IterState::new();
+    /// # let mut state: IterState<(), Vec<f64>, (), (), f64, ()> = IterState::new();
     /// # assert!(state.take_prev_gradient().is_none());
     /// # state.prev_grad = Some(vec![1.0, 2.0]);
     /// # assert_eq!(state.prev_grad.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
@@ -567,7 +569,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64> = IterState::new();
+    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64, ()> = IterState::new();
     /// # assert!(state.hessian.is_none());
     /// # assert!(state.get_hessian().is_none());
     /// # state.hessian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -591,7 +593,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64> = IterState::new();
+    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64, ()> = IterState::new();
     /// # assert!(state.hessian.is_none());
     /// # assert!(state.take_hessian().is_none());
     /// # state.hessian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -617,7 +619,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64> = IterState::new();
+    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64, ()> = IterState::new();
     /// # assert!(state.prev_hessian.is_none());
     /// # assert!(state.get_prev_hessian().is_none());
     /// # state.prev_hessian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -641,7 +643,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64> = IterState::new();
+    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64, ()> = IterState::new();
     /// # assert!(state.prev_hessian.is_none());
     /// # assert!(state.take_prev_hessian().is_none());
     /// # state.prev_hessian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -667,7 +669,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64> = IterState::new();
+    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64, ()> = IterState::new();
     /// # assert!(state.inv_hessian.is_none());
     /// # assert!(state.get_inv_hessian().is_none());
     /// # state.inv_hessian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -691,7 +693,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64> = IterState::new();
+    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64, ()> = IterState::new();
     /// # assert!(state.inv_hessian.is_none());
     /// # assert!(state.take_inv_hessian().is_none());
     /// # state.inv_hessian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -717,7 +719,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64> = IterState::new();
+    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64, ()> = IterState::new();
     /// # assert!(state.prev_inv_hessian.is_none());
     /// # assert!(state.get_prev_inv_hessian().is_none());
     /// # state.prev_inv_hessian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -741,7 +743,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64> = IterState::new();
+    /// # let mut state: IterState<(), (), (), Vec<Vec<f64>>, f64, ()> = IterState::new();
     /// # assert!(state.prev_inv_hessian.is_none());
     /// # assert!(state.take_prev_inv_hessian().is_none());
     /// # state.prev_inv_hessian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -767,7 +769,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), Vec<Vec<f64>>, (), f64> = IterState::new();
+    /// # let mut state: IterState<(), (), Vec<Vec<f64>>, (), f64, ()> = IterState::new();
     /// # assert!(state.jacobian.is_none());
     /// # assert!(state.get_jacobian().is_none());
     /// # state.jacobian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -791,7 +793,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), Vec<Vec<f64>>, (), f64> = IterState::new();
+    /// # let mut state: IterState<(), (), Vec<Vec<f64>>, (), f64, ()> = IterState::new();
     /// # assert!(state.jacobian.is_none());
     /// # assert!(state.take_jacobian().is_none());
     /// # state.jacobian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -817,7 +819,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), Vec<Vec<f64>>, (), f64> = IterState::new();
+    /// # let mut state: IterState<(), (), Vec<Vec<f64>>, (), f64, ()> = IterState::new();
     /// # assert!(state.prev_jacobian.is_none());
     /// # assert!(state.get_prev_jacobian().is_none());
     /// # state.prev_jacobian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -841,7 +843,7 @@ where
     ///
     /// ```
     /// # use argmin::core::{IterState, State, ArgminFloat};
-    /// # let mut state: IterState<(), (), Vec<Vec<f64>>, (), f64> = IterState::new();
+    /// # let mut state: IterState<(), (), Vec<Vec<f64>>, (), f64, ()> = IterState::new();
     /// # assert!(state.prev_jacobian.is_none());
     /// # assert!(state.take_prev_jacobian().is_none());
     /// # state.prev_jacobian = Some(vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
@@ -860,9 +862,49 @@ where
     pub fn take_prev_jacobian(&mut self) -> Option<J> {
         self.prev_jacobian.take()
     }
+
+    /// Returns a reference to previous parameter vector
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{IterState, State, ArgminFloat};
+    /// # let mut state: IterState<(), (), (), (), f64, Vec<f64>> = IterState::new();
+    /// # assert!(state.residuals.is_none());
+    /// # state.residuals = Some(vec![1.0, 2.0]);
+    /// # assert_eq!(state.residuals.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(state.residuals.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+    /// let residuals = state.get_residuals();  // Option<&R>
+    /// # assert_eq!(residuals.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(residuals.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+    /// ```
+    pub fn get_residuals(&self) -> Option<&R> {
+        self.residuals.as_ref()
+    }
+
+    /// Moves the previous parameter vector out and replaces it internally with `None`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{IterState, State, ArgminFloat};
+    /// # let mut state: IterState<(), (), (), (), f64, Vec<f64>> = IterState::new();
+    /// # assert!(state.take_residuals().is_none());
+    /// # state.residuals = Some(vec![1.0, 2.0]);
+    /// # assert_eq!(state.residuals.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(state.residuals.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+    /// let residuals = state.take_residuals();  // Option<R>
+    /// # assert!(state.take_residuals().is_none());
+    /// # assert!(state.residuals.is_none());
+    /// # assert_eq!(residuals.as_ref().unwrap()[0].to_ne_bytes(), 1.0f64.to_ne_bytes());
+    /// # assert_eq!(residuals.as_ref().unwrap()[1].to_ne_bytes(), 2.0f64.to_ne_bytes());
+    /// ```
+    pub fn take_residuals(&mut self) -> Option<R> {
+        self.residuals.take()
+    }
 }
 
-impl<P, G, J, H, F> State for IterState<P, G, J, H, F>
+impl<P, G, J, H, R, F> State for IterState<P, G, J, H, R, F>
 where
     P: Clone,
     F: ArgminFloat,
@@ -924,6 +966,7 @@ where
             prev_inv_hessian: None,
             jacobian: None,
             prev_jacobian: None,
+            residuals: None,
             iter: 0,
             last_best_iter: 0,
             max_iters: std::u64::MAX,
