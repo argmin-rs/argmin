@@ -89,7 +89,7 @@ where
     }
 }
 
-impl<P, O, F> Solver<O, IterState<P, (), (), (), F>> for ConjugateGradient<P, F>
+impl<P, O, F> Solver<O, IterState<P, (), (), (), (), F>> for ConjugateGradient<P, F>
 where
     O: Operator<Param = P, Output = P>,
     P: Clone
@@ -106,8 +106,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<P, (), (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), (), F>, Option<KV>), Error> {
         let init_param = state.get_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -127,8 +127,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<P, (), (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), (), F>, Option<KV>), Error> {
         let p = self.p.take().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`ConjugateGradient`: Field `p` not set"

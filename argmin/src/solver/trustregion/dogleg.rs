@@ -53,7 +53,7 @@ where
     }
 }
 
-impl<O, F, P, H> Solver<O, IterState<P, P, (), H, F>> for Dogleg<F>
+impl<O, F, P, H> Solver<O, IterState<P, P, (), H, (), F>> for Dogleg<F>
 where
     O: Gradient<Param = P, Gradient = P> + Hessian<Param = P, Hessian = H>,
     P: Clone
@@ -70,8 +70,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, P, (), H, F>,
-    ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, P, (), H, (), F>,
+    ) -> Result<(IterState<P, P, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -136,7 +136,7 @@ where
         Ok((state.param(pstar).gradient(g).hessian(h), None))
     }
 
-    fn terminate(&mut self, state: &IterState<P, P, (), H, F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, P, (), H, (), F>) -> TerminationStatus {
         if state.get_iter() >= 1 {
             TerminationStatus::Terminated(TerminationReason::MaxItersReached)
         } else {

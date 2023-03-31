@@ -75,7 +75,7 @@ impl<F: ArgminFloat> BrentRoot<F> {
     }
 }
 
-impl<O, F> Solver<O, IterState<F, (), (), (), F>> for BrentRoot<F>
+impl<O, F> Solver<O, IterState<F, (), (), (), (), F>> for BrentRoot<F>
 where
     O: CostFunction<Param = F, Output = F>,
     F: ArgminFloat,
@@ -86,8 +86,8 @@ where
         &mut self,
         problem: &mut Problem<O>,
         // BrentRoot maintains its own state
-        state: IterState<F, (), (), (), F>,
-    ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<F, (), (), (), (), F>,
+    ) -> Result<(IterState<F, (), (), (), (), F>, Option<KV>), Error> {
         self.fa = problem.cost(&self.a)?;
         self.fb = problem.cost(&self.b)?;
         if self.fa * self.fb > float!(0.0) {
@@ -101,8 +101,8 @@ where
         &mut self,
         problem: &mut Problem<O>,
         // BrentRoot maintains its own state
-        state: IterState<F, (), (), (), F>,
-    ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<F, (), (), (), (), F>,
+    ) -> Result<(IterState<F, (), (), (), (), F>, Option<KV>), Error> {
         if (self.fb > float!(0.0) && self.fc > float!(0.0))
             || self.fb < float!(0.0) && self.fc < float!(0.0)
         {

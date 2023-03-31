@@ -180,7 +180,7 @@ where
     }
 }
 
-impl<O, R, P, G, B, F> Solver<O, IterState<P, G, (), B, F>> for SR1TrustRegion<R, F>
+impl<O, R, P, G, B, F> Solver<O, IterState<P, G, (), B, (), F>> for SR1TrustRegion<R, F>
 where
     O: CostFunction<Param = P, Output = F>
         + Gradient<Param = P, Gradient = G>
@@ -206,7 +206,7 @@ where
         + ArgminDot<P, P>
         + ArgminAdd<B, B>
         + ArgminMul<F, B>,
-    R: Clone + TrustRegionRadius<F> + Solver<O, IterState<P, G, (), B, F>>,
+    R: Clone + TrustRegionRadius<F> + Solver<O, IterState<P, G, (), B, (), F>>,
     F: ArgminFloat + ArgminL2Norm<F>,
 {
     const NAME: &'static str = "SR1 trust region";
@@ -214,8 +214,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), B, F>,
-    ) -> Result<(IterState<P, G, (), B, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), B, (), F>,
+    ) -> Result<(IterState<P, G, (), B, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -254,8 +254,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), B, F>,
-    ) -> Result<(IterState<P, G, (), B, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), B, (), F>,
+    ) -> Result<(IterState<P, G, (), B, (), F>, Option<KV>), Error> {
         let xk = state.take_param().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`SR1TrustRegion`: Parameter vector in state not set."
@@ -351,7 +351,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), B, F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, G, (), B, (), F>) -> TerminationStatus {
         if state.get_gradient().unwrap().l2_norm() < self.tol_grad {
             return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }

@@ -137,10 +137,11 @@ where
     fn backtracking_step<O>(
         &self,
         problem: &mut Problem<O>,
-        state: IterState<P, G, (), (), F>,
-    ) -> Result<IterState<P, G, (), (), F>, Error>
+        state: IterState<P, G, (), (), (), F>,
+    ) -> Result<IterState<P, G, (), (), (), F>, Error>
     where
         O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
+        IterState<P, G, (), (), (), F>: State<Float = F>,
     {
         let new_param = self
             .init_param
@@ -174,7 +175,7 @@ where
     }
 }
 
-impl<O, P, G, L, F> Solver<O, IterState<P, G, (), (), F>> for BacktrackingLineSearch<P, G, L, F>
+impl<O, P, G, L, F> Solver<O, IterState<P, G, (), (), (), F>> for BacktrackingLineSearch<P, G, L, F>
 where
     P: Clone + SerializeAlias + ArgminScaledAdd<G, F, P>,
     G: SerializeAlias + ArgminScaledAdd<G, F, G>,
@@ -187,8 +188,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         if self.search_direction.is_none() {
             return Err(argmin_error!(
                 NotInitialized,
@@ -226,14 +227,14 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         self.alpha = self.alpha * self.rho;
         let state = self.backtracking_step(problem, state)?;
         Ok((state, None))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), (), F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, G, (), (), (), F>) -> TerminationStatus {
         if self.condition.evaluate_condition(
             state.cost,
             state.get_gradient(),

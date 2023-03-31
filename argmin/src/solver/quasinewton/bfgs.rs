@@ -131,7 +131,7 @@ where
     }
 }
 
-impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, F>> for BFGS<L, F>
+impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, (), F>> for BFGS<L, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone
@@ -156,7 +156,7 @@ where
         + ArgminMul<F, H>
         + ArgminTranspose<H>
         + ArgminEye,
-    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "BFGS";
@@ -164,8 +164,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), H, (), F>,
+    ) -> Result<(IterState<P, G, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -207,8 +207,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), H, (), F>,
+    ) -> Result<(IterState<P, G, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`BFGS`: Parameter vector in state not set."
@@ -294,7 +294,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, (), F>) -> TerminationStatus {
         if state.get_gradient().unwrap().l2_norm() < self.tol_grad {
             return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }

@@ -435,7 +435,7 @@ where
     }
 }
 
-impl<O, P, F, R> Solver<O, IterState<P, (), (), (), F>> for SimulatedAnnealing<F, R>
+impl<O, P, F, R> Solver<O, IterState<P, (), (), (), (), F>> for SimulatedAnnealing<F, R>
 where
     O: CostFunction<Param = P, Output = F> + Anneal<Param = P, Output = P, Float = F>,
     P: Clone,
@@ -446,8 +446,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+        mut state: IterState<P, (), (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -480,8 +480,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+        mut state: IterState<P, (), (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), (), F>, Option<KV>), Error> {
         // Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up may lead to unexpected
         // behavior.
@@ -552,7 +552,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationStatus {
+    fn terminate(&mut self, _state: &IterState<P, (), (), (), (), F>) -> TerminationStatus {
         if self.stall_iter_accepted > self.stall_iter_accepted_limit {
             return TerminationStatus::Terminated(TerminationReason::SolverExit(
                 "AcceptedStallIterExceeded".to_string(),
