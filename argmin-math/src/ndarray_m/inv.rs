@@ -22,6 +22,14 @@ macro_rules! make_inv {
                 Ok(<Self as Inverse>::inv(&self)?)
             }
         }
+
+        // inverse for scalars (1d solvers)
+        impl ArgminInv<$t> for $t {
+            #[inline]
+            fn inv(&self) -> Result<$t, Error> {
+                Ok(1.0 / self)
+            }
+        }
     };
 }
 
@@ -58,6 +66,16 @@ mod tests {
                             assert!((((res[(i, j)] - target[(i, j)]) as f64).abs()) < 0.000001);
                         }
                     }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_inv_scalar_ $t>]() {
+                    let a = 2.0;
+                    let target = 0.5;
+                    let res = <$t as ArgminInv<$t>>::inv(&a).unwrap();
+                    assert!(((res - target) as f64).abs() < 0.000001);
                 }
             }
         };
