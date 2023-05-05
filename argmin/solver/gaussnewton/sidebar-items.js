@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["GaussNewton","Gauss-Newton method"],["GaussNewtonLS","Gauss-Newton method with line search"]]};
+window.SIDEBAR_ITEMS = {"struct":["GaussNewton","GaussNewtonLS"]};

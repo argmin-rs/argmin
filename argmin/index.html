@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="argmin is a numerical optimization library written entirely in Rust."><meta name="keywords" content="rust, rustlang, rust-lang, argmin"><title>argmin - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../argmin/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../argmin/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate argmin</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.8.1</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">argmin</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/argmin/lib.rs.html#8-124">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="argmin is a numerical optimization library written entirely in Rust."><title>argmin - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../static.files/ayu-be46fdc453a55015.css"><script src="../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../argmin/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../argmin/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate argmin</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.8.1</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">argmin</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/argmin/lib.rs.html#8-124">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin is a numerical optimization library written entirely in Rust.</p>
 <p>Its goal is to offer a wide range of optimization algorithms with a consistent interface.
 It is type-agnostic by design, meaning that any type and/or math backend, such as
 <code>nalgebra</code> or <code>ndarray</code> can be used – even your own.</p>
@@ -16,82 +16,82 @@ and Hessians is taken care of by the library.</p>
 <a href="https://www.argmin-rs.org/book/">book</a>.</p>
 <h2 id="highlights"><a href="#highlights">Highlights</a></h2>
 <ul>
-<li><a href="core/checkpointing/index.html">Checkpointing</a></li>
-<li><a href="core/observers/index.html">Observers</a></li>
+<li><a href="core/checkpointing/index.html" title="mod argmin::core::checkpointing">Checkpointing</a></li>
+<li><a href="core/observers/index.html" title="mod argmin::core::observers">Observers</a></li>
 </ul>
 <h2 id="algorithms"><a href="#algorithms">Algorithms</a></h2>
 <ul>
 <li>
-<p><a href="solver/linesearch/index.html">Line searches</a></p>
+<p><a href="solver/linesearch/index.html" title="mod argmin::solver::linesearch">Line searches</a></p>
 <ul>
-<li><a href="solver/linesearch/struct.BacktrackingLineSearch.html">Backtracking line search</a></li>
-<li><a href="solver/linesearch/struct.MoreThuenteLineSearch.html">More-Thuente line search</a></li>
-<li><a href="solver/linesearch/struct.HagerZhangLineSearch.html">Hager-Zhang line search</a></li>
+<li><a href="solver/linesearch/struct.BacktrackingLineSearch.html" title="struct argmin::solver::linesearch::BacktrackingLineSearch">Backtracking line search</a></li>
+<li><a href="solver/linesearch/struct.MoreThuenteLineSearch.html" title="struct argmin::solver::linesearch::MoreThuenteLineSearch">More-Thuente line search</a></li>
+<li><a href="solver/linesearch/struct.HagerZhangLineSearch.html" title="struct argmin::solver::linesearch::HagerZhangLineSearch">Hager-Zhang line search</a></li>
 </ul>
 </li>
 <li>
-<p><a href="solver/trustregion/struct.TrustRegion.html">Trust region method</a></p>
+<p><a href="solver/trustregion/struct.TrustRegion.html" title="struct argmin::solver::trustregion::TrustRegion">Trust region method</a></p>
 <ul>
-<li><a href="solver/trustregion/struct.CauchyPoint.html">Cauchy point method</a></li>
-<li><a href="solver/trustregion/struct.Dogleg.html">Dogleg method</a></li>
-<li><a href="solver/trustregion/struct.Steihaug.html">Steihaug method</a></li>
+<li><a href="solver/trustregion/struct.CauchyPoint.html" title="struct argmin::solver::trustregion::CauchyPoint">Cauchy point method</a></li>
+<li><a href="solver/trustregion/struct.Dogleg.html" title="struct argmin::solver::trustregion::Dogleg">Dogleg method</a></li>
+<li><a href="solver/trustregion/struct.Steihaug.html" title="struct argmin::solver::trustregion::Steihaug">Steihaug method</a></li>
 </ul>
 </li>
 <li>
-<p><a href="solver/gradientdescent/struct.SteepestDescent.html">Steepest descent</a></p>
+<p><a href="solver/gradientdescent/struct.SteepestDescent.html" title="struct argmin::solver::gradientdescent::SteepestDescent">Steepest descent</a></p>
 </li>
 <li>
-<p><a href="solver/conjugategradient/index.html">Conjugate gradient methods</a></p>
+<p><a href="solver/conjugategradient/index.html" title="mod argmin::solver::conjugategradient">Conjugate gradient methods</a></p>
 <ul>
-<li><a href="solver/conjugategradient/struct.ConjugateGradient.html">Conjugate gradient method</a></li>
-<li><a href="solver/conjugategradient/struct.NonlinearConjugateGradient.html">Nonlinear conjugate gradient method</a></li>
+<li><a href="solver/conjugategradient/struct.ConjugateGradient.html" title="struct argmin::solver::conjugategradient::ConjugateGradient">Conjugate gradient method</a></li>
+<li><a href="solver/conjugategradient/struct.NonlinearConjugateGradient.html" title="struct argmin::solver::conjugategradient::NonlinearConjugateGradient">Nonlinear conjugate gradient method</a></li>
 </ul>
 </li>
 <li>
-<p><a href="solver/newton/index.html">Newton methods</a></p>
+<p><a href="solver/newton/index.html" title="mod argmin::solver::newton">Newton methods</a></p>
 <ul>
-<li><a href="solver/newton/struct.Newton.html">Newton’s method</a></li>
+<li><a href="solver/newton/struct.Newton.html" title="struct argmin::solver::newton::Newton">Newton’s method</a></li>
 <li><a href="solver/newton/newton_cg/struct.NewtonCG.html">Newton-CG</a></li>
 </ul>
 </li>
 <li>
-<p><a href="solver/quasinewton/index.html">Quasi-Newton methods</a></p>
+<p><a href="solver/quasinewton/index.html" title="mod argmin::solver::quasinewton">Quasi-Newton methods</a></p>
 <ul>
-<li><a href="solver/quasinewton/struct.BFGS.html">BFGS</a></li>
-<li><a href="solver/quasinewton/struct.LBFGS.html">L-BFGS</a></li>
-<li><a href="solver/quasinewton/struct.DFP.html">DFP</a></li>
-<li><a href="solver/quasinewton/struct.SR1.html">SR1</a></li>
-<li><a href="solver/quasinewton/struct.SR1TrustRegion.html">SR1-TrustRegion</a></li>
+<li><a href="solver/quasinewton/struct.BFGS.html" title="struct argmin::solver::quasinewton::BFGS">BFGS</a></li>
+<li><a href="solver/quasinewton/struct.LBFGS.html" title="struct argmin::solver::quasinewton::LBFGS">L-BFGS</a></li>
+<li><a href="solver/quasinewton/struct.DFP.html" title="struct argmin::solver::quasinewton::DFP">DFP</a></li>
+<li><a href="solver/quasinewton/struct.SR1.html" title="struct argmin::solver::quasinewton::SR1">SR1</a></li>
+<li><a href="solver/quasinewton/struct.SR1TrustRegion.html" title="struct argmin::solver::quasinewton::SR1TrustRegion">SR1-TrustRegion</a></li>
 </ul>
 </li>
 <li>
-<p><a href="solver/gaussnewton/index.html">Gauss-Newton methods</a></p>
+<p><a href="solver/gaussnewton/index.html" title="mod argmin::solver::gaussnewton">Gauss-Newton methods</a></p>
 <ul>
-<li><a href="solver/gaussnewton/struct.GaussNewton.html">Gauss-Newton method</a></li>
-<li><a href="solver/gaussnewton/struct.GaussNewtonLS.html">Gauss-Newton method with linesearch</a></li>
+<li><a href="solver/gaussnewton/struct.GaussNewton.html" title="struct argmin::solver::gaussnewton::GaussNewton">Gauss-Newton method</a></li>
+<li><a href="solver/gaussnewton/struct.GaussNewtonLS.html" title="struct argmin::solver::gaussnewton::GaussNewtonLS">Gauss-Newton method with linesearch</a></li>
 </ul>
 </li>
 <li>
-<p><a href="solver/goldensectionsearch/struct.GoldenSectionSearch.html">Golden-section search</a></p>
+<p><a href="solver/goldensectionsearch/struct.GoldenSectionSearch.html" title="struct argmin::solver::goldensectionsearch::GoldenSectionSearch">Golden-section search</a></p>
 </li>
 <li>
-<p><a href="solver/landweber/struct.Landweber.html">Landweber iteration</a></p>
+<p><a href="solver/landweber/struct.Landweber.html" title="struct argmin::solver::landweber::Landweber">Landweber iteration</a></p>
 </li>
 <li>
-<p><a href="solver/brent/index.html">Brent’s methods</a></p>
+<p><a href="solver/brent/index.html" title="mod argmin::solver::brent">Brent’s methods</a></p>
 <ul>
-<li><a href="solver/brent/struct.BrentOpt.html">Brent’s minimization method</a></li>
-<li><a href="solver/brent/struct.BrentRoot.html">Brent’s root finding method</a></li>
+<li><a href="solver/brent/struct.BrentOpt.html" title="struct argmin::solver::brent::BrentOpt">Brent’s minimization method</a></li>
+<li><a href="solver/brent/struct.BrentRoot.html" title="struct argmin::solver::brent::BrentRoot">Brent’s root finding method</a></li>
 </ul>
 </li>
 <li>
-<p><a href="solver/neldermead/struct.NelderMead.html">Nelder-Mead method</a></p>
+<p><a href="solver/neldermead/struct.NelderMead.html" title="struct argmin::solver::neldermead::NelderMead">Nelder-Mead method</a></p>
 </li>
 <li>
-<p><a href="solver/simulatedannealing/struct.SimulatedAnnealing.html">Simulated Annealing</a></p>
+<p><a href="solver/simulatedannealing/struct.SimulatedAnnealing.html" title="struct argmin::solver::simulatedannealing::SimulatedAnnealing">Simulated Annealing</a></p>
 </li>
 <li>
-<p><a href="solver/particleswarm/struct.ParticleSwarm.html">Particle Swarm Optimization</a></p>
+<p><a href="solver/particleswarm/struct.ParticleSwarm.html" title="struct argmin::solver::particleswarm::ParticleSwarm">Particle Swarm Optimization</a></p>
 </li>
 </ul>
 <h3 id="external-solvers-compatible-with-argmin"><a href="#external-solvers-compatible-with-argmin">External solvers compatible with argmin</a></h3>
@@ -115,6 +115,6 @@ and as such can leverage features like checkpointing and observers.</p>
 <p>Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
 in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
 without any additional terms or conditions.</p>
-</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="core/index.html" title="argmin::core mod">core</a></div><div class="item-right docblock-short">argmin optimization toolbox core</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="solver/index.html" title="argmin::solver mod">solver</a></div><div class="item-right docblock-short">Solvers</div></div></div><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.argmin_error.html" title="argmin::argmin_error macro">argmin_error</a></div><div class="item-right docblock-short">Create an <code>ArgminError</code> with a provided message.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.argmin_error_closure.html" title="argmin::argmin_error_closure macro">argmin_error_closure</a></div><div class="item-right docblock-short">Create an <code>ArgminError</code> with a provided message wrapped in a closure for use in
-<code>.ok_or_else(...)</code> methods on <code>Option</code>s.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bulk.html" title="argmin::bulk macro">bulk</a></div><div class="item-right docblock-short">Creates the <code>bulk_X</code> methods.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.check_param.html" title="argmin::check_param macro">check_param</a></div><div class="item-right docblock-short">Release an <code>T</code> from an <code>Option&lt;T&gt;</code> if it is not <code>None</code>. If it is <code>None</code>, return an
-<code>ArgminError</code> with a provided message.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.float.html" title="argmin::float macro">float</a></div><div class="item-right docblock-short">Convert a constant to a float of given precision</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.kv.html" title="argmin::kv macro">kv</a></div><div class="item-right docblock-short">Creates an <code>KV</code> at compile time</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="core/index.html" title="mod argmin::core">core</a></div><div class="desc docblock-short">argmin optimization toolbox core</div></li><li><div class="item-name"><a class="mod" href="solver/index.html" title="mod argmin::solver">solver</a></div><div class="desc docblock-short">Solvers</div></li></ul><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2><ul class="item-table"><li><div class="item-name"><a class="macro" href="macro.argmin_error.html" title="macro argmin::argmin_error">argmin_error</a></div><div class="desc docblock-short">Create an <code>ArgminError</code> with a provided message.</div></li><li><div class="item-name"><a class="macro" href="macro.argmin_error_closure.html" title="macro argmin::argmin_error_closure">argmin_error_closure</a></div><div class="desc docblock-short">Create an <code>ArgminError</code> with a provided message wrapped in a closure for use in
+<code>.ok_or_else(...)</code> methods on <code>Option</code>s.</div></li><li><div class="item-name"><a class="macro" href="macro.bulk.html" title="macro argmin::bulk">bulk</a></div><div class="desc docblock-short">Creates the <code>bulk_X</code> methods.</div></li><li><div class="item-name"><a class="macro" href="macro.check_param.html" title="macro argmin::check_param">check_param</a></div><div class="desc docblock-short">Release an <code>T</code> from an <code>Option&lt;T&gt;</code> if it is not <code>None</code>. If it is <code>None</code>, return an
+<code>ArgminError</code> with a provided message.</div></li><li><div class="item-name"><a class="macro" href="macro.float.html" title="macro argmin::float">float</a></div><div class="desc docblock-short">Convert a constant to a float of given precision</div></li><li><div class="item-name"><a class="macro" href="macro.kv.html" title="macro argmin::kv">kv</a></div><div class="desc docblock-short">Creates an <code>KV</code> at compile time</div></li></ul></section></div></main><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0 (84c898d65 2023-04-16)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

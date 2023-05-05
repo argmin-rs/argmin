@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["NelderMead","Nelder-Mead method"]]};
+window.SIDEBAR_ITEMS = {"struct":["NelderMead"]};

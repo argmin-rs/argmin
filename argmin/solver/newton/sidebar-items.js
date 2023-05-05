@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Newton","Newton’s method"],["NewtonCG","Newton-Conjugate-Gradient (Newton-CG) method"]]};
+window.SIDEBAR_ITEMS = {"struct":["Newton","NewtonCG"]};
