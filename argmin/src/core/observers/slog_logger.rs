@@ -233,7 +233,7 @@ where
                     let param = state
                         .get_param()
                         .map_or("None".to_string(), |p| format!("{:?}", p));
-                    serializer.emit_str(Key::from(key), &param)?;
+                    serializer.emit_str(key, &param)?;
                 }
                 StateData::TargetCost => {
                     serializer.emit_str(key, &state.get_target_cost().to_string())?
