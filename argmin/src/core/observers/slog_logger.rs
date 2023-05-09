@@ -253,12 +253,6 @@ where
                 )?,
             }
         }
-        for (k, &v) in self.0.get_func_counts().iter() {
-            serializer.emit_u64(Key::from(k.clone()), v)?;
-        }
-        serializer.emit_str(Key::from("best_cost"), &self.0.get_best_cost().to_string())?;
-
-        serializer.emit_u64(Key::from("iter"), self.0.get_iter())?;
         Ok(())
     }
 }
