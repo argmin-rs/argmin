@@ -53,5 +53,5 @@ pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Oper
 pub use result::OptimizationResult;
 pub use serialization::{DeserializeOwnedAlias, SerializeAlias};
 pub use solver::Solver;
-pub use state::{IterState, LinearProgramState, PopulationState, State};
+pub use state::{IterState, LinearProgramState, PopulationState, State, StateData};
 pub use termination::{TerminationReason, TerminationStatus};
