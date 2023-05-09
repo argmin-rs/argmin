@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Solver, State, TerminationReason,
     TerminationStatus, TrustRegionRadius, KV,
@@ -57,6 +59,7 @@ impl<O, F, P, H> Solver<O, IterState<P, P, (), H, F>> for Dogleg<F>
 where
     O: Gradient<Param = P, Gradient = P> + Hessian<Param = P, Hessian = H>,
     P: Clone
+        + Debug
         + ArgminMul<F, P>
         + ArgminL2Norm<F>
         + ArgminDot<P, F>

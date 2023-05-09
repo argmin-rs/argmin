@@ -13,6 +13,7 @@
 //! See [`SlogLogger`] for details regarding usage.
 
 use crate::core::observers::Observe;
+use crate::core::state::StateData;
 use crate::core::{Error, State, KV};
 use slog;
 use slog::{info, o, Drain, Key, Record, Serializer};
@@ -31,9 +32,38 @@ use std::sync::Mutex;
 pub struct SlogLogger {
     /// the logger
     logger: slog::Logger,
+    /// Data to log. It is logged in order. Duplicates are not checked.
+    log_data: Vec<StateData>,
 }
 
 impl SlogLogger {
+    /// Specify the data to log. Data is logged in the order that it is specified
+    /// in the input `log_data` and duplicates are not removed.
+    ///
+    /// The available data is any value obtained via the methods defined in the
+    /// [`State`] trait.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use argmin::core::observers::SlogLogger;
+    /// use argmin::core::StateData;
+    ///
+    /// // Default is to log function counts, best cost, cost, and iter. Modify
+    /// // it to also log the current parameters.
+    /// let mut log_data = Vec::new();
+    /// log_data.push(StateData::FunctionCounts);
+    /// log_data.push(StateData::BestCost);
+    /// log_data.push(StateData::Cost);
+    /// log_data.push(StateData::Iter);
+    /// log_data.push(StateData::Param);
+    /// let terminal_logger = SlogLogger::term().data(log_data);
+    /// ```
+    pub fn data(&mut self, log_data: Vec<StateData>) -> &mut Self {
+        self.log_data = log_data;
+        self
+    }
+
     /// Log to the terminal.
     ///
     /// Will block execution when buffer is full.
@@ -75,8 +105,15 @@ impl SlogLogger {
             .overflow_strategy(overflow_strategy)
             .build()
             .fuse();
+        let log_data = vec![
+            StateData::FunctionCounts,
+            StateData::BestCost,
+            StateData::Cost,
+            StateData::Iter,
+        ];
         SlogLogger {
             logger: slog::Logger::root(drain, o!()),
+            log_data,
         }
     }
 
@@ -138,8 +175,15 @@ impl SlogLogger {
             .overflow_strategy(overflow_strategy)
             .build()
             .fuse();
+        let log_data = vec![
+            StateData::FunctionCounts,
+            StateData::BestCost,
+            StateData::Cost,
+            StateData::Iter,
+        ];
         Ok(SlogLogger {
             logger: slog::Logger::root(drain, o!()),
+            log_data,
         })
     }
 }
@@ -153,19 +197,62 @@ impl slog::KV for KV {
     }
 }
 
-struct LogState<I>(I);
+struct LogState<'a, I>(I, &'a [StateData]);
 
-impl<I> slog::KV for LogState<&'_ I>
+impl<'a, I> slog::KV for LogState<'a, &I>
 where
     I: State,
 {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
-        for (k, &v) in self.0.get_func_counts().iter() {
-            serializer.emit_u64(Key::from(k.clone()), v)?;
+        let state = self.0;
+        for data in self.1 {
+            let key = Key::from(data.to_string());
+            match data {
+                StateData::BestCost => {
+                    serializer.emit_str(key, &state.get_best_cost().to_string())?;
+                }
+                StateData::BestParam => {
+                    let param = state
+                        .get_best_param()
+                        .map_or("None".to_string(), |p| format!("{:?}", p));
+                    serializer.emit_str(key, &param)?;
+                }
+                StateData::Cost => {
+                    serializer.emit_str(key, &self.0.get_cost().to_string())?;
+                }
+                StateData::FunctionCounts => {
+                    for (k, &v) in state.get_func_counts().iter() {
+                        serializer.emit_u64(Key::from(k.clone()), v)?;
+                    }
+                }
+                StateData::IsBest => serializer.emit_bool(key, state.is_best())?,
+                StateData::Iter => serializer.emit_u64(key, state.get_iter())?,
+                StateData::LastBestIter => serializer.emit_u64(key, state.get_last_best_iter())?,
+                StateData::MaxIters => serializer.emit_u64(key, state.get_max_iters())?,
+                StateData::Param => {
+                    let param = state
+                        .get_param()
+                        .map_or("None".to_string(), |p| format!("{:?}", p));
+                    serializer.emit_str(key, &param)?;
+                }
+                StateData::TargetCost => {
+                    serializer.emit_str(key, &state.get_target_cost().to_string())?
+                }
+                StateData::TerminationReason => serializer.emit_str(
+                    key,
+                    state.get_termination_reason().map_or("None", |r| r.text()),
+                )?,
+                StateData::TerminationStatus => {
+                    serializer.emit_str(key, &state.get_termination_status().to_string())?
+                }
+                StateData::Time => serializer.emit_str(
+                    key,
+                    &state
+                        .get_time()
+                        .map_or("None".to_string(), |t| format!("{:?}", t)),
+                )?,
+            }
         }
-        serializer.emit_str(Key::from("best_cost"), &self.0.get_best_cost().to_string())?;
-        serializer.emit_str(Key::from("cost"), &self.0.get_cost().to_string())?;
-        serializer.emit_u64(Key::from("iter"), self.0.get_iter())?;
         Ok(())
     }
 }
@@ -182,7 +269,7 @@ where
 
     /// Logs information about the progress of the optimization after every iteration.
     fn observe_iter(&mut self, state: &I, kv: &KV) -> Result<(), Error> {
-        info!(self.logger, ""; LogState(state), kv);
+        info!(self.logger, ""; LogState(state, &self.log_data), kv);
         Ok(())
     }
 }

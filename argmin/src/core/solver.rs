@@ -20,6 +20,7 @@ use crate::core::{Error, Problem, State, TerminationReason, TerminationStatus, K
 /// # Example
 ///
 /// ```
+/// use std::fmt::Debug;
 /// use argmin::core::{
 ///     ArgminFloat, Solver, IterState, CostFunction, Error, KV, Problem, TerminationReason, TerminationStatus
 /// };
@@ -33,7 +34,7 @@ use crate::core::{Error, Problem, State, TerminationReason, TerminationStatus, K
 /// impl<O, P, G, J, H, F> Solver<O, IterState<P, G, J, H, F>> for OptimizationAlgorithm
 /// where
 ///     O: CostFunction<Param = P, Output = F>,
-///     P: Clone,
+///     P: Clone + Debug,
 ///     F: ArgminFloat
 /// {
 ///     const NAME: &'static str = "OptimizationAlgorithm";

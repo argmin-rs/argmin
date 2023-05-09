@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState, LineSearch,
     Operator, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason,
@@ -110,6 +112,7 @@ impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, F>> for NewtonCG<L, F>
 where
     O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
     P: Clone
+        + Debug
         + SerializeAlias
         + DeserializeOwnedAlias
         + ArgminSub<P, P>

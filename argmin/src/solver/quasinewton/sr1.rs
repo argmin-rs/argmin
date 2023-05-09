@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
     LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
@@ -149,6 +151,7 @@ impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, F>> for SR1<L, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone
+        + Debug
         + SerializeAlias
         + DeserializeOwnedAlias
         + ArgminSub<P, P>

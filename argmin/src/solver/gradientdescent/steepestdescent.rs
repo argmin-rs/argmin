@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
     LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, KV,
@@ -53,7 +55,7 @@ impl<L> SteepestDescent<L> {
 impl<O, L, P, G, F> Solver<O, IterState<P, G, (), (), F>> for SteepestDescent<L>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias,
+    P: Clone + Debug + SerializeAlias + DeserializeOwnedAlias,
     G: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminMul<F, P>,
     L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
     F: ArgminFloat,

@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
     Solver, TerminationReason, TerminationStatus, KV,
@@ -496,7 +498,7 @@ impl<P, G, F> LineSearch<P, F> for HagerZhangLineSearch<P, G, F> {
 impl<P, G, O, F> Solver<O, IterState<P, G, (), (), F>> for HagerZhangLineSearch<P, G, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    P: Clone + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<P, F, P>,
+    P: Clone + Debug + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<P, F, P>,
     G: Clone + SerializeAlias + ArgminDot<P, F>,
     F: ArgminFloat,
 {

@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
     Jacobian, LineSearch, Operator, OptimizationResult, Problem, SerializeAlias, Solver,
@@ -84,7 +86,7 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
 impl<O, L, F, P, G, J, U> Solver<O, IterState<P, G, J, (), F>> for GaussNewtonLS<L, F>
 where
     O: Operator<Param = P, Output = U> + Jacobian<Param = P, Jacobian = J>,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminMul<F, P>,
+    P: Clone + Debug + SerializeAlias + DeserializeOwnedAlias + ArgminMul<F, P>,
     G: Clone + SerializeAlias + DeserializeOwnedAlias,
     U: ArgminL2Norm<F>,
     J: Clone

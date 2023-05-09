@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
     Solver, State, TerminationReason, TerminationStatus, KV,
@@ -176,7 +178,7 @@ where
 
 impl<O, P, G, L, F> Solver<O, IterState<P, G, (), (), F>> for BacktrackingLineSearch<P, G, L, F>
 where
-    P: Clone + SerializeAlias + ArgminScaledAdd<P, F, P>,
+    P: Clone + Debug + SerializeAlias + ArgminScaledAdd<P, F, P>,
     G: SerializeAlias + ArgminScaledAdd<P, F, P>,
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     L: LineSearchCondition<P, G, F> + SerializeAlias,

@@ -18,6 +18,8 @@
 //! Science 13 May 1983, Vol. 220, Issue 4598, pp. 671-680
 //! DOI: 10.1126/science.220.4598.671
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
     TerminationReason, TerminationStatus, KV,
@@ -438,7 +440,7 @@ where
 impl<O, P, F, R> Solver<O, IterState<P, (), (), (), F>> for SimulatedAnnealing<F, R>
 where
     O: CostFunction<Param = P, Output = F> + Anneal<Param = P, Output = P, Float = F>,
-    P: Clone,
+    P: Clone + Debug,
     F: ArgminFloat,
     R: Rng + SerializeAlias,
 {

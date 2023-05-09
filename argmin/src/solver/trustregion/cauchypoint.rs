@@ -54,7 +54,7 @@ where
 impl<O, F, P, G, H> Solver<O, IterState<P, G, (), H, F>> for CauchyPoint<F>
 where
     O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
-    P: Clone + ArgminMul<F, P> + ArgminWeightedDot<P, F, H>,
+    P: Clone + Debug + ArgminMul<F, P> + ArgminWeightedDot<P, F, H>,
     G: ArgminMul<F, P> + ArgminWeightedDot<G, F, H> + ArgminL2Norm<F>,
     F: ArgminFloat,
 {

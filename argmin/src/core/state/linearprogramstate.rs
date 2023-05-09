@@ -9,7 +9,7 @@ use crate::core::{ArgminFloat, Problem, State, TerminationReason, TerminationSta
 use instant;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Debug};
 
 /// Maintains the state from iteration to iteration of a solver
 ///
@@ -155,7 +155,7 @@ impl<P, F> LinearProgramState<P, F> {
 
 impl<P, F> State for LinearProgramState<P, F>
 where
-    P: Clone,
+    P: Clone + Debug,
     F: ArgminFloat,
 {
     /// Type of parameter vector

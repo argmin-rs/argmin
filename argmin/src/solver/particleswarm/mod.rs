@@ -20,6 +20,8 @@
 //!
 //! \[1\] <https://en.wikipedia.org/wiki/Particle_swarm_optimization>
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, CostFunction, Error, PopulationState, Problem, SerializeAlias, Solver, SyncAlias,
     KV,
@@ -235,6 +237,7 @@ where
     O: CostFunction<Param = P, Output = F> + SyncAlias,
     P: SerializeAlias
         + Clone
+        + Debug
         + SyncAlias
         + ArgminAdd<P, P>
         + ArgminSub<P, P>
