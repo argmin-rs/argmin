@@ -61,6 +61,7 @@ Finally, the state is updated via `state.param(xkp1)` and returned by the functi
 ```rust
 # extern crate argmin;
 #
+use std::fmt::Debug;
 use argmin::core::{
     ArgminFloat, KV, Error, Gradient, IterState, Problem, Solver, State
 };
@@ -93,7 +94,7 @@ where
     O: Gradient<Param = P, Gradient = G>,
     // The parameter vector of type `P` needs to implement `ArgminScaledSub`
     // because of the update formula
-    P: Clone + ArgminScaledSub<G, F, P>,
+    P: Clone + Debug + ArgminScaledSub<G, F, P>,
     // `F` is the floating point type (`f32` or `f64`)
     F: ArgminFloat,
 {
