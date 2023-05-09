@@ -14,7 +14,46 @@ pub use linearprogramstate::LinearProgramState;
 pub use populationstate::PopulationState;
 
 use crate::core::{ArgminFloat, Problem, TerminationReason, TerminationStatus};
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt, fmt::Debug};
+
+/// A set of values that can be queried using the [`State`] trait. Useful to configure
+/// an observer.
+#[derive(Copy, Clone, Debug)]
+pub enum StateData {
+    Param,
+    BestParam,
+    MaxIters,
+    Iter,
+    Cost,
+    BestCost,
+    TargetCost,
+    FunctionCounts,
+    Time,
+    LastBestIter,
+    IsBest,
+    TerminationStatus,
+    TerminationReason,
+}
+
+impl fmt::Display for StateData {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            StateData::BestCost => write!(f, "best_cost"),
+            StateData::BestParam => write!(f, "best_param"),
+            StateData::Cost => write!(f, "cost"),
+            StateData::FunctionCounts => write!(f, "function_counts"),
+            StateData::IsBest => write!(f, "is_best"),
+            StateData::Iter => write!(f, "iter"),
+            StateData::LastBestIter => write!(f, "last_best_iter"),
+            StateData::MaxIters => write!(f, "max_iters"),
+            StateData::Param => write!(f, "param"),
+            StateData::TargetCost => write!(f, "target_cost"),
+            StateData::TerminationReason => write!(f, "termination_reason"),
+            StateData::TerminationStatus => write!(f, "termination_status"),
+            StateData::Time => write!(f, "time"),
+        }
+    }
+}
 
 /// Minimal interface which struct used for managing state in solvers have to implement.
 ///
@@ -44,7 +83,7 @@ use std::collections::HashMap;
 /// for this (so far f32 and f64).
 pub trait State {
     /// Type of parameter vector
-    type Param;
+    type Param: Debug;
     /// Floating point precision (f32 or f64)
     type Float: ArgminFloat;
 

@@ -9,7 +9,7 @@ use crate::core::{ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Sol
 use argmin_math::{ArgminDot, ArgminInv, ArgminScaledSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::default::Default;
+use std::{default::Default, fmt::Debug};
 
 /// # Newton's method
 ///
@@ -88,7 +88,7 @@ where
 impl<O, P, G, H, F> Solver<O, IterState<P, G, (), H, F>> for Newton<F>
 where
     O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
-    P: Clone + ArgminScaledSub<P, F, P>,
+    P: Clone + Debug + ArgminScaledSub<P, F, P>,
     H: ArgminInv<H> + ArgminDot<G, P>,
     F: ArgminFloat,
 {

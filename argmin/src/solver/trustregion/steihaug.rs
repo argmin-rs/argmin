@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, Error, IterState, Problem, SerializeAlias, Solver, State, TerminationReason,
     TerminationStatus, TrustRegionRadius, KV,
@@ -181,6 +183,7 @@ where
 impl<P, O, F, H> Solver<O, IterState<P, P, (), H, F>> for Steihaug<P, F>
 where
     P: Clone
+        + Debug
         + SerializeAlias
         + ArgminMul<F, P>
         + ArgminL2Norm<F>

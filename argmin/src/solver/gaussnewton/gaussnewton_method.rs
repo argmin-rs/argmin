@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, Error, IterState, Jacobian, Operator, Problem, Solver, State, TerminationReason,
     TerminationStatus, KV,
@@ -112,7 +114,7 @@ impl<F: ArgminFloat> Default for GaussNewton<F> {
 impl<O, F, P, J, U> Solver<O, IterState<P, (), J, (), F>> for GaussNewton<F>
 where
     O: Operator<Param = P, Output = U> + Jacobian<Param = P, Jacobian = J>,
-    P: Clone + ArgminSub<P, P> + ArgminMul<F, P>,
+    P: Clone + Debug + ArgminSub<P, P> + ArgminMul<F, P>,
     U: ArgminL2Norm<F>,
     J: Clone
         + ArgminTranspose<J>

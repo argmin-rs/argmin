@@ -25,7 +25,7 @@ use crate::core::{
 use argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::fmt;
+use std::fmt::{self, Debug};
 
 /// # Nelder-Mead method
 ///
@@ -319,7 +319,7 @@ impl fmt::Display for Action {
 impl<O, P, F> Solver<O, IterState<P, (), (), (), F>> for NelderMead<P, F>
 where
     O: CostFunction<Param = P, Output = F>,
-    P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminAdd<P, P> + ArgminMul<F, P>,
+    P: Clone + Debug + SerializeAlias + ArgminSub<P, P> + ArgminAdd<P, P> + ArgminMul<F, P>,
     F: ArgminFloat + std::iter::Sum<F>,
 {
     const NAME: &'static str = "Nelder-Mead method";

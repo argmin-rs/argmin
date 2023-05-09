@@ -572,6 +572,8 @@ mod tests {
     #[test]
     #[cfg(feature = "serde1")]
     fn test_checkpointing_solver_initialization() {
+        use std::fmt::Debug;
+
         use crate::core::checkpointing::{CheckpointingFrequency, FileCheckpoint};
         use crate::core::test_utils::TestProblem;
         use crate::core::{ArgminFloat, CostFunction};
@@ -588,7 +590,7 @@ mod tests {
         impl<O, P, F> Solver<O, IterState<P, (), (), (), F>> for OptimizationAlgorithm
         where
             O: CostFunction<Param = P, Output = F>,
-            P: Clone,
+            P: Clone + Debug,
             F: ArgminFloat,
         {
             const NAME: &'static str = "OptimizationAlgorithm";

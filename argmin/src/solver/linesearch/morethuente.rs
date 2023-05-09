@@ -16,7 +16,7 @@ use crate::core::{
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::default::Default;
+use std::{default::Default, fmt::Debug};
 
 /// # More-Thuente line search
 ///
@@ -299,7 +299,7 @@ where
 impl<P, G, O, F> Solver<O, IterState<P, G, (), (), F>> for MoreThuenteLineSearch<P, G, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    P: Clone + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<P, F, P>,
+    P: Clone + Debug + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<P, F, P>,
     G: Clone + SerializeAlias + ArgminDot<P, F>,
     F: ArgminFloat,
 {

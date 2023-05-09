@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, Error, IterState, Operator, Problem, SerializeAlias, Solver, State, KV,
 };
@@ -93,6 +95,7 @@ impl<P, O, F> Solver<O, IterState<P, (), (), (), F>> for ConjugateGradient<P, F>
 where
     O: Operator<Param = P, Output = P>,
     P: Clone
+        + Debug
         + SerializeAlias
         + ArgminDot<P, F>
         + ArgminSub<P, P>

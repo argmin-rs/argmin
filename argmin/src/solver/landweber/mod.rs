@@ -17,6 +17,8 @@
 //!
 //! <https://en.wikipedia.org/wiki/Landweber_iteration>
 
+use std::fmt::Debug;
+
 use crate::core::{ArgminFloat, Error, Gradient, IterState, Problem, Solver, KV};
 use argmin_math::ArgminScaledSub;
 #[cfg(feature = "serde1")]
@@ -66,7 +68,7 @@ impl<F> Landweber<F> {
 impl<O, F, P, G> Solver<O, IterState<P, G, (), (), F>> for Landweber<F>
 where
     O: Gradient<Param = P, Gradient = G>,
-    P: Clone + ArgminScaledSub<G, F, P>,
+    P: Clone + Debug + ArgminScaledSub<G, F, P>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Landweber";

@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use std::fmt::Debug;
+
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
     IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
@@ -186,6 +188,7 @@ where
         + Gradient<Param = P, Gradient = G>
         + Hessian<Param = P, Hessian = B>,
     P: Clone
+        + Debug
         + SerializeAlias
         + DeserializeOwnedAlias
         + ArgminSub<P, P>
