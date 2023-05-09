@@ -20,18 +20,31 @@ use std::{collections::HashMap, fmt, fmt::Debug};
 /// an observer.
 #[derive(Copy, Clone, Debug)]
 pub enum StateData {
+    /// The Param data
     Param,
+    /// The best param data
     BestParam,
+    /// The maximum number of iterations
     MaxIters,
+    /// The iteration number
     Iter,
+    /// The cost of the current iteration
     Cost,
+    /// The best cost so far
     BestCost,
+    /// The target cost
     TargetCost,
+    /// How many times each function within the solver has been called
     FunctionCounts,
+    /// The current time
     Time,
+    /// Which iteration the last best cost was found
     LastBestIter,
+    /// Boolean of if this iteration is the best
     IsBest,
+    /// Basic yes/no status of if the solver has terminated
     TerminationStatus,
+    /// If the solver has terminated, what was the reason
     TerminationReason,
 }
 
