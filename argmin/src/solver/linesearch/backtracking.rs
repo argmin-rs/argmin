@@ -39,7 +39,7 @@ pub struct BacktrackingLineSearch<P, G, L, F> {
     /// initial gradient
     init_grad: Option<G>,
     /// Search direction
-    search_direction: Option<P>,
+    search_direction: Option<G>,
     /// Contraction factor rho
     rho: F,
     /// Stopping condition
@@ -104,12 +104,12 @@ where
     }
 }
 
-impl<P, G, L, F> LineSearch<P, F> for BacktrackingLineSearch<P, G, L, F>
+impl<P, G, L, F> LineSearch<G, F> for BacktrackingLineSearch<P, G, L, F>
 where
     F: ArgminFloat,
 {
     /// Set search direction
-    fn search_direction(&mut self, search_direction: P) {
+    fn search_direction(&mut self, search_direction: G) {
         self.search_direction = Some(search_direction);
     }
 
@@ -128,8 +128,8 @@ where
 
 impl<P, G, L, F> BacktrackingLineSearch<P, G, L, F>
 where
-    P: ArgminScaledAdd<P, F, P>,
-    L: LineSearchCondition<P, G, F>,
+    P: ArgminScaledAdd<G, F, P>,
+    L: LineSearchCondition<G, G, F>,
     IterState<P, G, (), (), F>: State<Float = F>,
     F: ArgminFloat,
 {
@@ -176,10 +176,10 @@ where
 
 impl<O, P, G, L, F> Solver<O, IterState<P, G, (), (), F>> for BacktrackingLineSearch<P, G, L, F>
 where
-    P: Clone + SerializeAlias + ArgminScaledAdd<P, F, P>,
-    G: SerializeAlias + ArgminScaledAdd<P, F, P>,
+    P: Clone + SerializeAlias + ArgminScaledAdd<G, F, P>,
+    G: SerializeAlias + ArgminScaledAdd<G, F, G>,
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    L: LineSearchCondition<P, G, F> + SerializeAlias,
+    L: LineSearchCondition<G, G, F> + SerializeAlias,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Backtracking line search";

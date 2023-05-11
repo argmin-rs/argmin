@@ -84,14 +84,15 @@ pub struct HagerZhangLineSearch<P, G, F> {
     /// initial gradient (builder)
     init_grad: Option<G>,
     /// Search direction (builder)
-    search_direction: Option<P>,
+    search_direction: Option<G>,
     /// Search direction in 1D
     dginit: F,
 }
 
 impl<P, G, F> HagerZhangLineSearch<P, G, F>
 where
-    P: ArgminScaledAdd<P, F, P> + ArgminDot<G, F>,
+    P: ArgminScaledAdd<G, F, P>,
+    G: ArgminDot<G, F>,
     F: ArgminFloat,
 {
     /// Construct a new instance of [`HagerZhangLineSearch`]
@@ -472,7 +473,8 @@ where
 
 impl<P, G, F> Default for HagerZhangLineSearch<P, G, F>
 where
-    P: ArgminScaledAdd<P, F, P> + ArgminDot<G, F>,
+    P: ArgminScaledAdd<G, F, P>,
+    G: ArgminDot<G, F>,
     F: ArgminFloat,
 {
     fn default() -> Self {
@@ -480,9 +482,9 @@ where
     }
 }
 
-impl<P, G, F> LineSearch<P, F> for HagerZhangLineSearch<P, G, F> {
+impl<P, G, F> LineSearch<G, F> for HagerZhangLineSearch<P, G, F> {
     /// Set search direction
-    fn search_direction(&mut self, search_direction: P) {
+    fn search_direction(&mut self, search_direction: G) {
         self.search_direction = Some(search_direction);
     }
 
@@ -496,8 +498,8 @@ impl<P, G, F> LineSearch<P, F> for HagerZhangLineSearch<P, G, F> {
 impl<P, G, O, F> Solver<O, IterState<P, G, (), (), F>> for HagerZhangLineSearch<P, G, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    P: Clone + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<P, F, P>,
-    G: Clone + SerializeAlias + ArgminDot<P, F>,
+    P: Clone + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<G, F, P>,
+    G: Clone + SerializeAlias + ArgminDot<G, F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Hager-Zhang line search";

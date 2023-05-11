@@ -54,7 +54,7 @@ use std::default::Default;
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct MoreThuenteLineSearch<P, G, F> {
     /// Search direction
-    search_direction: Option<P>,
+    search_direction: Option<G>,
     /// initial parameter vector
     init_param: Option<P>,
     /// initial cost
@@ -274,12 +274,12 @@ where
     }
 }
 
-impl<P, G, F> LineSearch<P, F> for MoreThuenteLineSearch<P, G, F>
+impl<P, G, F> LineSearch<G, F> for MoreThuenteLineSearch<P, G, F>
 where
     F: ArgminFloat,
 {
     /// Set search direction
-    fn search_direction(&mut self, search_direction: P) {
+    fn search_direction(&mut self, search_direction: G) {
         self.search_direction = Some(search_direction);
     }
 
@@ -299,8 +299,8 @@ where
 impl<P, G, O, F> Solver<O, IterState<P, G, (), (), F>> for MoreThuenteLineSearch<P, G, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    P: Clone + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<P, F, P>,
-    G: Clone + SerializeAlias + ArgminDot<P, F>,
+    P: Clone + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<G, F, P>,
+    G: Clone + SerializeAlias + ArgminDot<G, F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "More-Thuente Line search";
