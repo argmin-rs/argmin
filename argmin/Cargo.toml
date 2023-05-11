@@ -45,6 +45,11 @@ ndarray = { version = "0.15", features = ["serde-1"] }
 ndarray-linalg = { version = "0.16", features = ["netlib"] }
 argmin-math = { path = "../argmin-math" }
 serde = { version = "1.0", features = ["derive", "rc"] }
+criterion = { version = "0.4", features = ["html_reports"] }
+
+[[bench]]
+name = "backtracking"
+harness = false
 
 [features]
 default = ["slog-logger", "serde1"]
