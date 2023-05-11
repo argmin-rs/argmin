@@ -178,6 +178,10 @@ name = "steepestdescent"
 required-features = ["slog-logger"]
 
 [[example]]
+name = "steepestdescent_manifold"
+required-features = ["slog-logger"]
+
+[[example]]
 name = "trustregion_nd"
 required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
