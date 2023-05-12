@@ -38,7 +38,7 @@ impl Gradient for Rosenbrock {
 }
 
 fn run() -> Result<(), Error> {
-    // Define cost function (must implement `ArgminOperator`)
+    // Define cost function (must implement `CostFunction` and `Gradient`)
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
     // Define initial parameter vector
