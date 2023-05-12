@@ -289,12 +289,7 @@ required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 [[bench]]
 name = "particleswarm"
 harness = false
-required-features = []
-
-[[bench]]
-name = "particleswarm_nalgebra"
-harness = false
-required-features = ["argmin-math/nalgebra_latest-serde"]
+required-features = ["argmin-math/ndarray_latest-serde", "argmin-math/nalgebra_latest-serde"]
 
 [[bench]]
 name = "simulatedannealing"
