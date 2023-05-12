@@ -55,16 +55,16 @@ pub use self::morethuente::MoreThuenteLineSearch;
 /// ```
 /// use argmin::solver::linesearch::LineSearch;
 ///
-/// struct MyLineSearch<P, F> {
-///     // `P` is the type of the search direction, typically the same as the parameter vector
-///     search_direction: P,
+/// struct MyLineSearch<D, F> {
+///     // `D` is the type of the search direction
+///     search_direction: D,
 ///     // `F` is a floating point value (f32 or f64)
 ///     init_step_length: F,
 ///     // ...
 /// }
 ///
-/// impl<P, F> LineSearch<P, F> for MyLineSearch<P, F> {
-///     fn search_direction(&mut self, direction: P) {
+/// impl<D, F> LineSearch<D, F> for MyLineSearch<D, F> {
+///     fn search_direction(&mut self, direction: D) {
 ///         self.search_direction = direction;
 ///     }
 ///
@@ -74,11 +74,11 @@ pub use self::morethuente::MoreThuenteLineSearch;
 ///     }
 /// }
 /// ```
-pub trait LineSearch<P, F> {
+pub trait LineSearch<D, F> {
     /// Set the search direction
     ///
     /// This is the direction in which the line search will be performed.
-    fn search_direction(&mut self, direction: P);
+    fn search_direction(&mut self, direction: D);
 
     /// Set the initial step length
     ///
