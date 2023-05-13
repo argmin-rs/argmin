@@ -101,7 +101,8 @@ fn run_vec(
     let cost = RosenbrockVec { a, b };
 
     // Define initial parameter vector
-    let init_param = (*init_param).clone();
+    let init_param = (*init_param).clone(); // This is here to account for the same clone on
+                                            // ndarray and ngalgebra
     // set up a line search
     let linesearch = MoreThuenteLineSearch::new().with_c(c1, c2)?;
     // Set up solver

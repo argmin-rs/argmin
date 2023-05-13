@@ -249,12 +249,7 @@ required-features = ["slog-logger"]
 [[bench]]
 name = "lbfgs"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
-
-[[bench]]
-name = "lbfgs_nalgebra"
-harness = false
-required-features = ["argmin-math/nalgebra_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "argmin-math/nalgebra_latest-serde", "slog-logger"]
 
 [[bench]]
 name = "morethuente"
