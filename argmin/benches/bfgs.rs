@@ -134,7 +134,7 @@ fn run_ndarray(
 fn criterion_benchmark(c: &mut Criterion) {
     let a = 1.0;
     let b = 100.0;
-    let init_param = vec![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0, 4.0, 10.0];
+    let init_param = vec![-1.2, 1.0, -10.0, 2.0, 3.0, 2.0];
     let c1 = 1e-4;
     let c2 = 0.9;
     let iterations: u64 = 60;
