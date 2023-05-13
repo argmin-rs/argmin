@@ -233,6 +233,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 black_box(m),
                 black_box(iterations),
             )
+            .expect("Benchmark should run without errors")
         })
     });
     group.bench_function("nalgebra", |bencher| {
@@ -246,6 +247,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 black_box(m),
                 black_box(iterations),
             )
+            .expect("Benchmark should run without errors")
         })
     });
     group.bench_function("ndarray", |bencher| {
@@ -259,6 +261,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 black_box(m),
                 black_box(iterations),
             )
+            .expect("Benchmark should run without errors")
         })
     });
     group.finish();

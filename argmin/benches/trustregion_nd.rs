@@ -76,11 +76,11 @@ fn run() -> Result<(), Error> {
     Ok(())
 }
 
-
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("TrustRegion_nd", |b| b.iter(|| run()));
+    c.bench_function("TrustRegion_nd", |b| {
+        b.iter(|| run().expect("Benchmark should run without errors"))
+    });
 }
 
 criterion_group!(benches, criterion_benchmark);
 criterion_main!(benches);
-

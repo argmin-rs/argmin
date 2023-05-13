@@ -141,18 +141,21 @@ fn criterion_benchmark(c: &mut Criterion) {
     let iterations: u64 = 60;
     let mut group = c.benchmark_group("BFGS");
     for i in 2..init_param.len() {
-        group.bench_with_input(BenchmarkId::new("Vec", i), &i, |bencher, i| {
-            bencher.iter(|| {
-                run_vec(
-                    black_box(a),
-                    black_box(b),
-                    black_box(&init_param[0..*i]),
-                    black_box(c1),
-                    black_box(c2),
-                    black_box(iterations),
-                )
-            })
-        });
+        // WARN: Vec version immediately fails with
+        // Condition violated: `MoreThuenteLineSearch`: Search direction must be a descent direction.
+        //
+        // group.bench_with_input(BenchmarkId::new("Vec", i), &i, |bencher, i| {
+        //     bencher.iter(|| {
+        //         run_vec(
+        //             black_box(a),
+        //             black_box(b),
+        //             black_box(&init_param[0..*i]),
+        //             black_box(c1),
+        //             black_box(c2),
+        //             black_box(iterations),
+        //         ).expect("Benchmark should run without errors")
+        //     })
+        // });
         group.bench_with_input(BenchmarkId::new("ndarray", i), &i, |bencher, i| {
             bencher.iter(|| {
                 run_ndarray(
@@ -163,6 +166,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                     black_box(c2),
                     black_box(iterations),
                 )
+                .expect("Benchmark should run without errors")
             })
         });
     }

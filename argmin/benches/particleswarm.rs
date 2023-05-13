@@ -90,13 +90,34 @@ fn criterion_benchmark(c: &mut Criterion) {
     let iterations = 100;
     let mut group = c.benchmark_group("ParticleSwarm");
     group.bench_function("ParticleSwarm_Vec", |b| {
-        b.iter(|| run_vec(black_box(bound), black_box(num_particles), black_box(iterations)))
+        b.iter(|| {
+            run_vec(
+                black_box(bound),
+                black_box(num_particles),
+                black_box(iterations),
+            )
+            .expect("Benchmark should run without errors")
+        })
     });
     group.bench_function("ParticleSwarm_ngalgebra", |b| {
-        b.iter(|| run_ngalgebra(black_box(bound), black_box(num_particles), black_box(iterations)))
+        b.iter(|| {
+            run_ngalgebra(
+                black_box(bound),
+                black_box(num_particles),
+                black_box(iterations),
+            )
+            .expect("Benchmark should run without errors")
+        })
     });
     group.bench_function("ParticleSwarm_ndarry", |b| {
-        b.iter(|| run_ndarray(black_box(bound), black_box(num_particles), black_box(iterations)))
+        b.iter(|| {
+            run_ndarray(
+                black_box(bound),
+                black_box(num_particles),
+                black_box(iterations),
+            )
+            .expect("Benchmark should run without errors")
+        })
     });
     group.finish();
 }

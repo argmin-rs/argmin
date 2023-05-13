@@ -135,6 +135,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                     black_box(m),
                     black_box(iterations),
                 )
+                .expect("Benchmark should run without errors")
             })
         });
         group.bench_with_input(BenchmarkId::new("ndarray", i), &i, |bencher, i| {
@@ -148,6 +149,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                     black_box(m),
                     black_box(iterations),
                 )
+                .expect("Benchmark should run without errors")
             })
         });
     }

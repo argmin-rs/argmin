@@ -129,29 +129,41 @@ fn run_ndarray(data: &Vec<(f64, f64)>, init_param: (f64,f64), iterations: u64) -
     Ok(())
 }
 
-
 fn criterion_benchmark(c: &mut Criterion) {
     let data = vec![
-            (0.038, 0.050),
-            (0.194, 0.127),
-            (0.425, 0.094),
-            (0.626, 0.2122),
-            (1.253, 0.2729),
-            (2.5, 0.2665),
-            (3.74, 0.3317),
-        ];
+        (0.038, 0.050),
+        (0.194, 0.127),
+        (0.425, 0.094),
+        (0.626, 0.2122),
+        (1.253, 0.2729),
+        (2.5, 0.2665),
+        (3.74, 0.3317),
+    ];
     let init_param = (0.9, 0.2);
     let iterations = 10;
     let mut group = c.benchmark_group("GaussNewton");
     group.bench_function("GaussNewton_ngalgebra", |b| {
-        b.iter(|| run_ngalgebra(black_box(&data), black_box(init_param), black_box(iterations)))
+        b.iter(|| {
+            run_ngalgebra(
+                black_box(&data),
+                black_box(init_param),
+                black_box(iterations),
+            )
+            .expect("Benchmark should run without errors")
+        })
     });
     group.bench_function("GaussNewton_ndarry", |b| {
-        b.iter(|| run_ndarray(black_box(&data), black_box(init_param), black_box(iterations)))
+        b.iter(|| {
+            run_ndarray(
+                black_box(&data),
+                black_box(init_param),
+                black_box(iterations),
+            )
+            .expect("Benchmark should run without errors")
+        })
     });
     group.finish();
 }
 
 criterion_group!(benches, criterion_benchmark);
 criterion_main!(benches);
-
