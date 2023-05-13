@@ -89,7 +89,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     let num_particles = 40;
     let iterations = 100;
     let mut group = c.benchmark_group("ParticleSwarm");
-    group.bench_function("ParticleSwarm_Vec", |b| {
+    group.bench_function("Vec", |b| {
         b.iter(|| {
             run_vec(
                 black_box(bound),
@@ -99,7 +99,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             .expect("Benchmark should run without errors")
         })
     });
-    group.bench_function("ParticleSwarm_ngalgebra", |b| {
+    group.bench_function("ngalgebra", |b| {
         b.iter(|| {
             run_ngalgebra(
                 black_box(bound),
@@ -109,7 +109,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             .expect("Benchmark should run without errors")
         })
     });
-    group.bench_function("ParticleSwarm_ndarray", |b| {
+    group.bench_function("ndarray", |b| {
         b.iter(|| {
             run_ndarray(
                 black_box(bound),
