@@ -19,7 +19,7 @@ struct RosenbrockVec {
     b: f64,
 }
 
-struct RosenbrockNd {
+struct RosenbrockNdarray {
     a: f64,
     b: f64,
 }
@@ -29,12 +29,12 @@ struct Rosenbrock2DVec {
     b: f64,
 }
 
-struct Rosenbrock2DNG {
+struct Rosenbrock2DNalgebra {
     a: f64,
     b: f64,
 }
 
-struct Rosenbrock2DNd {
+struct Rosenbrock2DNdarray {
     a: f64,
     b: f64,
 }
@@ -48,7 +48,7 @@ impl CostFunction for Rosenbrock2DVec {
     }
 }
 
-impl CostFunction for Rosenbrock2DNG {
+impl CostFunction for Rosenbrock2DNalgebra {
     type Param = DVector<f64>;
     type Output = f64;
 
@@ -57,7 +57,7 @@ impl CostFunction for Rosenbrock2DNG {
     }
 }
 
-impl CostFunction for Rosenbrock2DNd {
+impl CostFunction for Rosenbrock2DNdarray {
     type Param = Array1<f64>;
     type Output = f64;
 
@@ -75,7 +75,7 @@ impl Gradient for Rosenbrock2DVec {
     }
 }
 
-impl Gradient for Rosenbrock2DNG {
+impl Gradient for Rosenbrock2DNalgebra {
     type Param = DVector<f64>;
     type Gradient = DVector<f64>;
 
@@ -84,7 +84,7 @@ impl Gradient for Rosenbrock2DNG {
     }
 }
 
-impl Gradient for Rosenbrock2DNd {
+impl Gradient for Rosenbrock2DNdarray {
     type Param = Array1<f64>;
     type Gradient = Array1<f64>;
 
@@ -112,7 +112,7 @@ impl Gradient for RosenbrockVec {
     }
 }
 
-impl CostFunction for RosenbrockNd {
+impl CostFunction for RosenbrockNdarray {
     type Param = Array1<f64>;
     type Output = f64;
 
@@ -121,7 +121,7 @@ impl CostFunction for RosenbrockNd {
     }
 }
 
-impl Gradient for RosenbrockNd {
+impl Gradient for RosenbrockNdarray {
     type Param = Array1<f64>;
     type Gradient = Array1<f64>;
 
@@ -167,7 +167,7 @@ fn run_2d_ngalgebra(
     iterations: u64,
 ) -> Result<(), Error> {
     // Define cost function
-    let cost = Rosenbrock2DNG { a, b };
+    let cost = Rosenbrock2DNalgebra { a, b };
     // Define initial parameter vector
     let init_param: DVector<f64> = DVector::from((*init_param).clone());
     // set up a line search
@@ -192,7 +192,7 @@ fn run_2d_ndarray(
     iterations: u64,
 ) -> Result<(), Error> {
     // Define cost function
-    let cost = Rosenbrock2DNd { a, b };
+    let cost = Rosenbrock2DNdarray { a, b };
 
     // Define initial parameter vector
     let init_param: Array1<f64> = Array1::from_vec((*init_param).clone());

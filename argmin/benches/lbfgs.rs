@@ -19,7 +19,7 @@ struct RosenbrockVec {
     b: f64,
 }
 
-struct RosenbrockNd {
+struct RosenbrockNdarray {
     a: f64,
     b: f64,
 }
@@ -42,7 +42,7 @@ impl Gradient for RosenbrockVec {
     }
 }
 
-impl CostFunction for RosenbrockNd {
+impl CostFunction for RosenbrockNdarray {
     type Param = Array1<f64>;
     type Output = f64;
 
@@ -51,7 +51,7 @@ impl CostFunction for RosenbrockNd {
     }
 }
 
-impl Gradient for RosenbrockNd {
+impl Gradient for RosenbrockNdarray {
     type Param = Array1<f64>;
     type Gradient = Array1<f64>;
 
@@ -96,7 +96,7 @@ fn run_ndarray(
     iterations: u64,
 ) -> Result<(), Error> {
     // Define cost function
-    let cost = RosenbrockNd { a, b };
+    let cost = RosenbrockNdarray { a, b };
 
     // Define initial parameter vector
     let init_param: Array1<f64> = Array1::from_vec(Vec::from(init_param));

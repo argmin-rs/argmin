@@ -23,9 +23,9 @@ impl CostFunction for HimmelblauVec {
     }
 }
 
-struct HimmelblauNG {}
+struct HimmelblauNalgebra {}
 
-impl CostFunction for HimmelblauNG {
+impl CostFunction for HimmelblauNalgebra {
     type Param = DVector<f64>;
     type Output = f64;
 
@@ -57,7 +57,7 @@ fn run_vec(bound: f64, num_particles: usize, iterations: u64) -> Result<(), Erro
 }
 
 fn run_ngalgebra(bound: f64, num_particles: usize, iterations: u64) -> Result<(), Error> {
-    let cost_function = HimmelblauNG {};
+    let cost_function = HimmelblauNalgebra {};
 
     let solver = ParticleSwarm::new(
         (dvector![-bound, -bound], dvector![bound, bound]),
@@ -109,7 +109,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             .expect("Benchmark should run without errors")
         })
     });
-    group.bench_function("ParticleSwarm_ndarry", |b| {
+    group.bench_function("ParticleSwarm_ndarray", |b| {
         b.iter(|| {
             run_ndarray(
                 black_box(bound),
