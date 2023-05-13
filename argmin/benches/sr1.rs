@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{CostFunction, Error, Executor, Gradient};
 // use argmin::solver::linesearch::HagerZhangLineSearch;
 use argmin::solver::linesearch::MoreThuenteLineSearch;

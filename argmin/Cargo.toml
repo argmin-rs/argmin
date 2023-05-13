@@ -189,97 +189,97 @@ required-features = ["argmin-math/ndarray_latest-serde", "slog-logger", "serde1"
 [[bench]]
 name = "backtracking"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "bfgs"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[bench]]
 name = "brentroot"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "brentopt"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "conjugategradient"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "dfp"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[bench]]
 name = "gaussnewton"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde", "argmin-math/nalgebra_latest-serde"]
 
 [[bench]]
 name = "gaussnewton_linesearch"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
-
-[[bench]]
-name = "gaussnewton_nalgebra"
-harness = false
-required-features = ["_nalgebral", "argmin-math/nalgebra_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[bench]]
 name = "goldensectionsearch"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "hagerzhang"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "landweber"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "lbfgs"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "argmin-math/nalgebra_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
+
+[[bench]]
+name = "lbfgs2d"
+harness = false
+required-features = ["argmin-math/ndarray_latest-serde", "argmin-math/nalgebra_latest-serde"]
 
 [[bench]]
 name = "morethuente"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "neldermead"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[bench]]
 name = "newton"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[bench]]
 name = "newton_cg"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[bench]]
 name = "nonlinear_cg"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "owl_qn"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[bench]]
 name = "particleswarm"
@@ -289,24 +289,24 @@ required-features = ["argmin-math/ndarray_latest-serde", "argmin-math/nalgebra_l
 [[bench]]
 name = "simulatedannealing"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "sr1"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[bench]]
 name = "sr1_trustregion"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-loger"]
+required-features = ["argmin-math/ndarray_latest-serde"]
 
 [[bench]]
 name = "steepestdescent"
 harness = false
-required-features = ["slog-logger"]
+required-features = []
 
 [[bench]]
 name = "trustregion_nd"
 harness = false
-required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
+required-features = ["argmin-math/ndarray_latest-serde"]

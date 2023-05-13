@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{CostFunction, Error, Executor, Gradient, LineSearch};
 use argmin::solver::linesearch::MoreThuenteLineSearch;
 use argmin_testfunctions::{sphere, sphere_derivative};
@@ -47,7 +46,7 @@ fn run() -> Result<(), Error> {
     let init_grad = operator.gradient(&init_param)?;
 
     // Run solver
-    let res = Executor::new(operator, solver)
+    let _res = Executor::new(operator, solver)
         // .add_observer(SlogLogger::term(), ObserverMode::Always)
         // Gradient and cost are optional. If they are not provided, they will be computed
         .configure(|state| {
@@ -63,7 +62,7 @@ fn run() -> Result<(), Error> {
 
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("MoreThuenteLineSearch", |b| b.iter(|| run()));
+    c.bench_function("MoreThuenteLineSearch", |b| b.iter(run));
 }
 
 criterion_group!(benches, criterion_benchmark);

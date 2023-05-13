@@ -7,7 +7,6 @@
 
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{CostFunction, Error, Executor, Gradient, Hessian};
 #[allow(unused_imports)]
 use argmin::solver::trustregion::{CauchyPoint, Dogleg, Steihaug, TrustRegion};

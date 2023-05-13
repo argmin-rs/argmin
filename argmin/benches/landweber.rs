@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{Error, Executor, Gradient};
 use argmin::solver::landweber::Landweber;
 use argmin_testfunctions::rosenbrock_2d_derivative;
@@ -30,7 +29,7 @@ fn run() -> Result<(), Error> {
     let iters = 10;
     let solver = Landweber::new(0.001);
 
-    let res = Executor::new(operator, solver)
+    let _res = Executor::new(operator, solver)
         .configure(|state| state.param(init_param).max_iters(iters))
         // .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
@@ -38,7 +37,7 @@ fn run() -> Result<(), Error> {
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("Landweber", |b| b.iter(|| run()));
+    c.bench_function("Landweber", |b| b.iter(run));
 }
 
 criterion_group!(benches, criterion_benchmark);

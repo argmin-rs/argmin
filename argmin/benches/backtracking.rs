@@ -7,7 +7,6 @@
 
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{CostFunction, Error, Executor, Gradient, LineSearch};
 use argmin::solver::linesearch::{condition::ArmijoCondition, BacktrackingLineSearch};
 use argmin_testfunctions::{sphere, sphere_derivative};
@@ -65,7 +64,7 @@ fn run() -> Result<(), Error> {
 
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("Backtracking", |b| b.iter(|| run()));
+    c.bench_function("Backtracking", |b| b.iter(run));
 }
 
 criterion_group!(benches, criterion_benchmark);

@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{Error, Executor, Gradient, Hessian};
 use argmin::solver::newton::Newton;
 use argmin_testfunctions::{rosenbrock_2d_derivative, rosenbrock_2d_hessian};

@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{Error, Executor, Operator};
 use argmin::solver::conjugategradient::ConjugateGradient;
 
@@ -35,7 +34,7 @@ fn run() -> Result<(), Error> {
     let solver: ConjugateGradient<_, f64> = ConjugateGradient::new(b);
 
     // Run solver
-    let res = Executor::new(operator, solver)
+    let _res = Executor::new(operator, solver)
         .configure(|state| state.param(init_param).max_iters(2))
         // .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
@@ -44,7 +43,7 @@ fn run() -> Result<(), Error> {
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("ConjugateGradient", |b| b.iter(|| run()));
+    c.bench_function("ConjugateGradient", |b| b.iter(run));
 }
 
 criterion_group!(benches, criterion_benchmark);

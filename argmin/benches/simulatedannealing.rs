@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{CostFunction, Error, Executor};
 use argmin::solver::simulatedannealing::{Anneal, SATempFunc, SimulatedAnnealing};
 use argmin_testfunctions::rosenbrock;
@@ -121,7 +120,7 @@ fn run() -> Result<(), Error> {
     /////////////////////////
     // Run solver          //
     /////////////////////////
-    let res = Executor::new(operator, solver)
+    let _res = Executor::new(operator, solver)
         .configure(|state| {
             state
                 .param(init_param)
@@ -138,7 +137,7 @@ fn run() -> Result<(), Error> {
 
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("SimulatedAnnealing", |b| b.iter(|| run()));
+    c.bench_function("SimulatedAnnealing", |b| b.iter(run));
 }
 
 criterion_group!(benches, criterion_benchmark);

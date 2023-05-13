@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{Error, Executor, Jacobian, Operator};
 use argmin::solver::gaussnewton::GaussNewton;
 use ndarray::{Array1, Array2};

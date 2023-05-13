@@ -7,7 +7,6 @@
 
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{CostFunction, Error, Executor};
 use argmin::solver::brent::BrentOpt;
 
@@ -32,7 +31,7 @@ fn run() -> Result<(), Error> {
     let cost = TestFunc {};
     let solver = BrentOpt::new(-10., 10.);
 
-    let res = Executor::new(cost, solver)
+    let _res = Executor::new(cost, solver)
         .configure(|state| state.max_iters(100))
         // .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()
@@ -42,7 +41,7 @@ fn run() -> Result<(), Error> {
 
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("BrentOpt", |b| b.iter(|| run()));
+    c.bench_function("BrentOpt", |b| b.iter(run));
 }
 
 criterion_group!(benches, criterion_benchmark);
