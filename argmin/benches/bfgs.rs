@@ -30,7 +30,7 @@ impl CostFunction for RosenbrockVec {
     type Output = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock(&p.to_vec(), self.a, self.b))
+        Ok(rosenbrock(p, self.a, self.b))
     }
 }
 
