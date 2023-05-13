@@ -48,7 +48,7 @@ fn run() -> Result<(), Error> {
 
     // set up a line search
     let linesearch = MoreThuenteLineSearch::new().with_c(1e-4, 0.9)?;
-// Set up solver
+    // Set up solver
     let solver = DFP::new(linesearch);
 
     // Run solver

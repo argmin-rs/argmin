@@ -80,11 +80,7 @@ impl Gradient for Rosenbrock2DNG {
     type Gradient = DVector<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(rosenbrock_2d_derivative(
-            p.data.as_vec(),
-            self.a,
-            self.b,
-        ).into())
+        Ok(rosenbrock_2d_derivative(p.data.as_vec(), self.a, self.b).into())
     }
 }
 
@@ -149,7 +145,7 @@ fn run_2d_vec(
     // Define initial parameter vector
     let init_param = (*init_param).clone(); // This is here to account for the same clone on
                                             // ndarray and ngalgebra
-    // set up a line search
+                                            // set up a line search
     let linesearch = MoreThuenteLineSearch::new().with_c(c1, c2)?;
     // Set up solver
     let solver = LBFGS::new(linesearch, m);
@@ -269,4 +265,3 @@ fn criterion_benchmark(c: &mut Criterion) {
 
 criterion_group!(benches, criterion_benchmark);
 criterion_main!(benches);
-

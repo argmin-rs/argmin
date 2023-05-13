@@ -4,7 +4,7 @@
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 
 use argmin::core::{CostFunction, Error, Executor, Gradient};
 use argmin::solver::linesearch::MoreThuenteLineSearch;
@@ -85,7 +85,6 @@ fn run_vec(
         .run()?;
     Ok(())
 }
-
 
 fn run_ndarray(
     a: f64,

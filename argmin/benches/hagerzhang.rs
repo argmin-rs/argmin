@@ -42,7 +42,7 @@ fn run() -> Result<(), Error> {
 
     // Set search direction
     solver.search_direction(vec![-1.5, -0.5]);
-// Set initial step length
+    // Set initial step length
     solver.initial_step_length(10.0)?;
 
     let init_cost = operator.cost(&init_param)?;

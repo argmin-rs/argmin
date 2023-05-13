@@ -8,8 +8,8 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 use argmin::core::{Error, Executor, Jacobian, Operator};
 use argmin::solver::gaussnewton::GaussNewton;
+use nalgebra::{DMatrix, DVector};
 use ndarray::{Array1, Array2};
-use nalgebra::{DVector, DMatrix};
 
 type Rate = f64;
 type S = f64;
@@ -27,8 +27,6 @@ struct ProblemNG {
 struct ProblemNd {
     data: Vec<Measurement>,
 }
-
-
 
 impl Operator for ProblemNd {
     type Param = Array1<f64>;
@@ -57,7 +55,6 @@ impl Operator for ProblemNG {
     }
 }
 
-
 impl Jacobian for ProblemNd {
     type Param = Array1<f64>;
     type Jacobian = Array2<f64>;
@@ -72,7 +69,6 @@ impl Jacobian for ProblemNd {
         }))
     }
 }
-
 
 impl Jacobian for ProblemNG {
     type Param = DVector<f64>;
@@ -89,13 +85,14 @@ impl Jacobian for ProblemNG {
     }
 }
 
-
-fn run_ngalgebra(data: &Vec<(f64, f64)>, init_param: (f64,f64), iterations: u64) -> Result<(), Error> {
+fn run_ngalgebra(
+    data: &Vec<(f64, f64)>,
+    init_param: (f64, f64),
+    iterations: u64,
+) -> Result<(), Error> {
     // Define cost function
     // Example taken from Wikipedia: https://en.wikipedia.org/wiki/Gauss%E2%80%93Newton_algorithm
-    let cost = ProblemNG {
-        data: data.clone()
-    };
+    let cost = ProblemNG { data: data.clone() };
 
     // Define initial parameter vector
     let init_param: DVector<f64> = DVector::from_vec(vec![init_param.0, init_param.1]);
@@ -110,13 +107,14 @@ fn run_ngalgebra(data: &Vec<(f64, f64)>, init_param: (f64,f64), iterations: u64)
     Ok(())
 }
 
-
-fn run_ndarray(data: &Vec<(f64, f64)>, init_param: (f64,f64), iterations: u64) -> Result<(), Error> {
+fn run_ndarray(
+    data: &Vec<(f64, f64)>,
+    init_param: (f64, f64),
+    iterations: u64,
+) -> Result<(), Error> {
     // Define cost function
     // Example taken from Wikipedia: https://en.wikipedia.org/wiki/Gauss%E2%80%93Newton_algorithm
-    let cost = ProblemNd {
-        data: data.clone(),
-    };
+    let cost = ProblemNd { data: data.clone() };
     // Define initial parameter vector
     let init_param: Array1<f64> = Array1::from(vec![init_param.0, init_param.1]);
     // Set up solver

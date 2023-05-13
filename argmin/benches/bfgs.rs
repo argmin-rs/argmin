@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use criterion::{black_box, BenchmarkId, criterion_group, criterion_main, Criterion};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 
 use argmin::core::{CostFunction, Error, Executor, Gradient};
 use argmin::solver::linesearch::MoreThuenteLineSearch;
@@ -70,17 +70,16 @@ fn run_vec(
     iterations: u64,
 ) -> Result<(), Error> {
     // Define cost function
-    let cost = RosenbrockVec { a, b};
+    let cost = RosenbrockVec { a, b };
     // Define initial parameter vector
     let init_param: Vec<f64> = Vec::from(init_param);
     let mut init_hessian = Vec::<Vec<f64>>::new();
     for i in 0..init_hessian.len() {
         let mut row = Vec::new();
         for j in 0..init_hessian.len() {
-            if i==j {
+            if i == j {
                 row.push(1.0);
-            }
-            else {
+            } else {
                 row.push(0.0);
             }
         }
@@ -111,7 +110,7 @@ fn run_ndarray(
     iterations: u64,
 ) -> Result<(), Error> {
     // Define cost function
-    let cost = RosenbrockNd { a, b};
+    let cost = RosenbrockNd { a, b };
     // Define initial parameter vector
     let init_param: Array1<f64> = Array1::from_vec(Vec::from(init_param));
     let init_hessian: Array2<f64> = Array2::eye(init_param.len());
@@ -175,4 +174,3 @@ fn criterion_benchmark(c: &mut Criterion) {
 
 criterion_group!(benches, criterion_benchmark);
 criterion_main!(benches);
-
