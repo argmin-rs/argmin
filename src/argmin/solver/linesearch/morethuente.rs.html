@@ -981,7 +981,7 @@
 #[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub struct </span>MoreThuenteLineSearch&lt;P, G, F&gt; {
     <span class="doccomment">/// Search direction
-    </span>search_direction: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    </span>search_direction: <span class="prelude-ty">Option</span>&lt;G&gt;,
     <span class="doccomment">/// initial parameter vector
     </span>init_param: <span class="prelude-ty">Option</span>&lt;P&gt;,
     <span class="doccomment">/// initial cost
@@ -1201,12 +1201,12 @@
     }
 }
 
-<span class="kw">impl</span>&lt;P, G, F&gt; LineSearch&lt;P, F&gt; <span class="kw">for </span>MoreThuenteLineSearch&lt;P, G, F&gt;
+<span class="kw">impl</span>&lt;P, G, F&gt; LineSearch&lt;G, F&gt; <span class="kw">for </span>MoreThuenteLineSearch&lt;P, G, F&gt;
 <span class="kw">where
     </span>F: ArgminFloat,
 {
     <span class="doccomment">/// Set search direction
-    </span><span class="kw">fn </span>search_direction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, search_direction: P) {
+    </span><span class="kw">fn </span>search_direction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, search_direction: G) {
         <span class="self">self</span>.search_direction = <span class="prelude-val">Some</span>(search_direction);
     }
 
@@ -1226,8 +1226,8 @@
 <span class="kw">impl</span>&lt;P, G, O, F&gt; Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt; <span class="kw">for </span>MoreThuenteLineSearch&lt;P, G, F&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
-    P: Clone + SerializeAlias + ArgminDot&lt;G, F&gt; + ArgminScaledAdd&lt;P, F, P&gt;,
-    G: Clone + SerializeAlias + ArgminDot&lt;P, F&gt;,
+    P: Clone + SerializeAlias + ArgminDot&lt;G, F&gt; + ArgminScaledAdd&lt;G, F, P&gt;,
+    G: Clone + SerializeAlias + ArgminDot&lt;G, F&gt;,
     F: ArgminFloat,
 {
     <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;More-Thuente Line search&quot;</span>;

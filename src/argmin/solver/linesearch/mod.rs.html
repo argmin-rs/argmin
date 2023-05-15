@@ -142,16 +142,16 @@
 /// ```
 /// use argmin::solver::linesearch::LineSearch;
 ///
-/// struct MyLineSearch&lt;P, F&gt; {
-///     // `P` is the type of the search direction, typically the same as the parameter vector
-///     search_direction: P,
+/// struct MyLineSearch&lt;D, F&gt; {
+///     // `D` is the type of the search direction
+///     search_direction: D,
 ///     // `F` is a floating point value (f32 or f64)
 ///     init_step_length: F,
 ///     // ...
 /// }
 ///
-/// impl&lt;P, F&gt; LineSearch&lt;P, F&gt; for MyLineSearch&lt;P, F&gt; {
-///     fn search_direction(&amp;mut self, direction: P) {
+/// impl&lt;D, F&gt; LineSearch&lt;D, F&gt; for MyLineSearch&lt;D, F&gt; {
+///     fn search_direction(&amp;mut self, direction: D) {
 ///         self.search_direction = direction;
 ///     }
 ///
@@ -161,11 +161,11 @@
 ///     }
 /// }
 /// ```
-</span><span class="kw">pub trait </span>LineSearch&lt;P, F&gt; {
+</span><span class="kw">pub trait </span>LineSearch&lt;D, F&gt; {
     <span class="doccomment">/// Set the search direction
     ///
     /// This is the direction in which the line search will be performed.
-    </span><span class="kw">fn </span>search_direction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, direction: P);
+    </span><span class="kw">fn </span>search_direction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, direction: D);
 
     <span class="doccomment">/// Set the initial step length
     ///

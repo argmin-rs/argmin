@@ -750,7 +750,7 @@
     <span class="doccomment">/// initial gradient
     </span>init_grad: <span class="prelude-ty">Option</span>&lt;G&gt;,
     <span class="doccomment">/// Search direction
-    </span>search_direction: <span class="prelude-ty">Option</span>&lt;P&gt;,
+    </span>search_direction: <span class="prelude-ty">Option</span>&lt;G&gt;,
     <span class="doccomment">/// Contraction factor rho
     </span>rho: F,
     <span class="doccomment">/// Stopping condition
@@ -815,12 +815,12 @@
     }
 }
 
-<span class="kw">impl</span>&lt;P, G, L, F&gt; LineSearch&lt;P, F&gt; <span class="kw">for </span>BacktrackingLineSearch&lt;P, G, L, F&gt;
+<span class="kw">impl</span>&lt;P, G, L, F&gt; LineSearch&lt;G, F&gt; <span class="kw">for </span>BacktrackingLineSearch&lt;P, G, L, F&gt;
 <span class="kw">where
     </span>F: ArgminFloat,
 {
     <span class="doccomment">/// Set search direction
-    </span><span class="kw">fn </span>search_direction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, search_direction: P) {
+    </span><span class="kw">fn </span>search_direction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, search_direction: G) {
         <span class="self">self</span>.search_direction = <span class="prelude-val">Some</span>(search_direction);
     }
 
@@ -839,8 +839,8 @@
 
 <span class="kw">impl</span>&lt;P, G, L, F&gt; BacktrackingLineSearch&lt;P, G, L, F&gt;
 <span class="kw">where
-    </span>P: ArgminScaledAdd&lt;P, F, P&gt;,
-    L: LineSearchCondition&lt;P, G, F&gt;,
+    </span>P: ArgminScaledAdd&lt;G, F, P&gt;,
+    L: LineSearchCondition&lt;G, G, F&gt;,
     IterState&lt;P, G, (), (), F&gt;: State&lt;Float = F&gt;,
     F: ArgminFloat,
 {
@@ -887,10 +887,10 @@
 
 <span class="kw">impl</span>&lt;O, P, G, L, F&gt; Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt; <span class="kw">for </span>BacktrackingLineSearch&lt;P, G, L, F&gt;
 <span class="kw">where
-    </span>P: Clone + SerializeAlias + ArgminScaledAdd&lt;P, F, P&gt;,
-    G: SerializeAlias + ArgminScaledAdd&lt;P, F, P&gt;,
+    </span>P: Clone + SerializeAlias + ArgminScaledAdd&lt;G, F, P&gt;,
+    G: SerializeAlias + ArgminScaledAdd&lt;G, F, G&gt;,
     O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
-    L: LineSearchCondition&lt;P, G, F&gt; + SerializeAlias,
+    L: LineSearchCondition&lt;G, G, F&gt; + SerializeAlias,
     F: ArgminFloat,
 {
     <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Backtracking line search&quot;</span>;
