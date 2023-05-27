@@ -12,6 +12,9 @@
 //!
 //! See [`NelderMead`] for details.
 //!
+//! A simple example of usage can be found at
+//! <https://github.com/argmin-rs/argmin/blob/main/argmin/examples/neldermead-simple.rs>
+//!
 //! ## References
 //!
 //! <https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method>
