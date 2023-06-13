@@ -130,7 +130,7 @@ name = "morethuente"
 required-features = ["slog-logger"]
 
 [[example]]
-name = "neldermead-simple"
+name = "neldermead-cubic"
 required-features = ["slog-logger"]
 
 [[example]]

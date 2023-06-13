@@ -9,7 +9,7 @@
 //! cubic polynomial.
 //!
 //! You can run this example with:
-//! `cargo run --example neldermead-simple --features slog-logger`
+//! `cargo run --example neldermead-cubic --features slog-logger`
 
 use argmin::core::observers::{ObserverMode, SlogLogger};
 use argmin::core::{CostFunction, Error, Executor, State};
@@ -79,8 +79,6 @@ fn run() -> Result<(), Error> {
         std::thread::sleep(std::time::Duration::from_secs(1));
 
         // Print result
-        println!("{res}");
-        // Print our result in a custom way.
         println!(
             "Polynomial root: {}",
             res.state.get_best_param().expect("Found a root")
