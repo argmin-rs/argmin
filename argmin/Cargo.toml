@@ -130,6 +130,10 @@ name = "morethuente"
 required-features = ["slog-logger"]
 
 [[example]]
+name = "neldermead-cubic"
+required-features = ["slog-logger"]
+
+[[example]]
 name = "neldermead"
 required-features = ["argmin-math/ndarray_latest-serde", "slog-logger"]
 
