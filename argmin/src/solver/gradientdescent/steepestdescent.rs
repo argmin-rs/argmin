@@ -7,7 +7,7 @@
 
 use crate::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, KV,
+    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, State, KV,
 };
 use argmin_math::ArgminMul;
 #[cfg(feature = "serde1")]
@@ -63,15 +63,18 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), (), F>,
+        state: IterState<P, G, (), (), F>,
     ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
-        let param_new = state.take_param().ok_or_else(argmin_error_closure!(
-            NotInitialized,
-            concat!(
-                "`SteepestDescent` requires an initial parameter vector. ",
-                "Please provide an initial guess via `Executor`s `configure` method."
-            )
-        ))?;
+        let param_new = state
+            .get_param()
+            .ok_or_else(argmin_error_closure!(
+                NotInitialized,
+                concat!(
+                    "`SteepestDescent` requires an initial parameter vector. ",
+                    "Please provide an initial guess via `Executor`s `configure` method."
+                )
+            ))?
+            .clone();
         let new_cost = problem.cost(&param_new)?;
         let new_grad = problem.gradient(&param_new)?;
 
@@ -151,6 +154,20 @@ mod tests {
                 "Please provide an initial guess via `Executor`s `configure` method.\""
             )
         );
+    }
+
+    #[test]
+    fn test_next_iter_prev_param_not_erased() {
+        let linesearch: BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> =
+            BacktrackingLineSearch::new(ArmijoCondition::new(0.2).unwrap());
+        let mut sd = SteepestDescent::new(linesearch);
+        let (state, _kv) = sd
+            .next_iter(
+                &mut Problem::new(TestProblem::new()),
+                IterState::new().param(vec![1.0, 2.0]),
+            )
+            .unwrap();
+        state.prev_param.unwrap();
     }
 
     #[test]
