@@ -200,6 +200,23 @@
 <a href="#200" id="200">200</a>
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -209,7 +226,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
     ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, KV,
+    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, State, KV,
 };
 <span class="kw">use </span>argmin_math::ArgminMul;
 <span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
@@ -265,15 +282,18 @@
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), F&gt;,
+        state: IterState&lt;P, G, (), (), F&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
-        <span class="kw">let </span>param_new = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
-            NotInitialized,
-            <span class="macro">concat!</span>(
-                <span class="string">&quot;`SteepestDescent` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
-            </span>)
-        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>param_new = state
+            .get_param()
+            .ok_or_else(<span class="macro">argmin_error_closure!</span>(
+                NotInitialized,
+                <span class="macro">concat!</span>(
+                    <span class="string">&quot;`SteepestDescent` requires an initial parameter vector. &quot;</span>,
+                    <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+                </span>)
+            ))<span class="question-mark">?
+            </span>.clone();
         <span class="kw">let </span>new_cost = problem.cost(<span class="kw-2">&amp;</span>param_new)<span class="question-mark">?</span>;
         <span class="kw">let </span>new_grad = problem.gradient(<span class="kw-2">&amp;</span>param_new)<span class="question-mark">?</span>;
 
@@ -353,6 +373,20 @@
                 <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
             </span>)
         );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_next_iter_prev_param_not_erased() {
+        <span class="kw">let </span>linesearch: BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; =
+            BacktrackingLineSearch::new(ArmijoCondition::new(<span class="number">0.2</span>).unwrap());
+        <span class="kw">let </span><span class="kw-2">mut </span>sd = SteepestDescent::new(linesearch);
+        <span class="kw">let </span>(state, _kv) = sd
+            .next_iter(
+                <span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()),
+                IterState::new().param(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>]),
+            )
+            .unwrap();
+        state.prev_param.unwrap();
     }
 
     <span class="attr">#[test]
