@@ -39,78 +39,10 @@ make_eye!(u64);
 make_eye!(f32);
 make_eye!(f64);
 
+// The tests expect the name for the crate containing the tested functions to be argmin_math
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use ndarray::array;
-    use paste::item;
-
-    macro_rules! make_test {
-        ($t:ty) => {
-            item! {
-                #[test]
-                fn [<test_eye_ $t>]() {
-                    let e: Array2<$t> = <Array2<$t> as ArgminEye>::eye(3);
-                    let res = array![
-                        [1 as $t, 0 as $t, 0 as $t],
-                        [0 as $t, 1 as $t, 0 as $t],
-                        [0 as $t, 0 as $t, 1 as $t]
-                    ];
-                    for i in 0..3 {
-                        for j in 0..3 {
-                            assert!((((res[(i, j)] - e[(i, j)]) as f64).abs()) < std::f64::EPSILON);
-                        }
-                    }
-                }
-            }
-
-            item! {
-                #[test]
-                fn [<test_eye_like_ $t>]() {
-                    let a = array![
-                        [0 as $t, 2 as $t, 6 as $t],
-                        [3 as $t, 2 as $t, 7 as $t],
-                        [9 as $t, 8 as $t, 1 as $t]
-                    ];
-                    let e: Array2<$t> = a.eye_like();
-                    let res = array![
-                        [1 as $t, 0 as $t, 0 as $t],
-                        [0 as $t, 1 as $t, 0 as $t],
-                        [0 as $t, 0 as $t, 1 as $t]
-                    ];
-                    for i in 0..3 {
-                        for j in 0..3 {
-                            assert!((((res[(i, j)] - e[(i, j)]) as f64).abs()) < std::f64::EPSILON);
-                        }
-                    }
-                }
-            }
-
-            item! {
-                #[test]
-                #[should_panic]
-                #[allow(unused)]
-                fn [<test_eye_like_panic_ $t>]() {
-                    let a = array![
-                        [0 as $t, 2 as $t, 6 as $t],
-                        [3 as $t, 2 as $t, 7 as $t],
-                    ];
-                    let e: Array2<$t> = a.eye_like();
-                }
-            }
-        };
-    }
-
-    make_test!(isize);
-    make_test!(usize);
-    make_test!(i8);
-    make_test!(u8);
-    make_test!(i16);
-    make_test!(u16);
-    make_test!(i32);
-    make_test!(u32);
-    make_test!(i64);
-    make_test!(u64);
-    make_test!(f32);
-    make_test!(f64);
-}
+use crate as argmin_math;
+include!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/../argmin-math-ndarray-linalg-tests/src/eye.rs"
+));
