@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - win-netlib-fix
 
 env:
   CARGO_TERM_COLOR: always
