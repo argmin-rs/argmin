@@ -233,8 +233,9 @@ mod vec;
 #[allow(unused_imports)]
 pub use crate::vec::*;
 
-use anyhow::Error;
-use rand::Rng;
+// Re-export of types appearing in the api as recommended here: https://www.lurklurk.org/effective-rust/re-export.html
+pub use anyhow::Error;
+pub use rand::Rng;
 
 /// Dot/scalar product of `T` and `self`
 pub trait ArgminDot<T, U> {

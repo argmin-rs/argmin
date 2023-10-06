@@ -86,32 +86,32 @@ jobs:
       - name: argmin-math (ndarray_v0_13-nolinalg)
         run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13-nolinalg"
       # ndarray with linalg, without serde
-      - name: argmin-math (ndarray_latest,_dev_linalg_latest)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_latest,_dev_linalg_latest"
-      - name: argmin-math (ndarray_v0_15,_dev_linalg_0_16)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_15,_dev_linalg_0_16"
-      - name: argmin-math (ndarray_v0_14,_dev_linalg_0_13)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_14,_dev_linalg_0_13"
-      - name: argmin-math (ndarray_v0_13,_dev_linalg_0_12)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13,_dev_linalg_0_12"
+      - name: argmin-math (ndarray_latest)
+        run: cargo test --manifest-path ./argmin-math-ndarray-linalg-tests/ndarray_latest/Cargo.toml
+      - name: argmin-math (ndarray_v0_15)
+        run: cargo test --manifest-path ./argmin-math-ndarray-linalg-tests/ndarray_0_15/Cargo.toml
+      - name: argmin-math (ndarray_v0_14)
+        run: cargo test --manifest-path ./argmin-math-ndarray-linalg-tests/ndarray_0_14/Cargo.toml
+      - name: argmin-math (ndarray_v0_13)
+        run: cargo test --manifest-path ./argmin-math-ndarray-linalg-tests/ndarray_0_13/Cargo.toml
       # ndarray without linalg, with serde
-      - name: argmin-math (ndarray_latest-serde,_dev_linalg_latest)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_latest-serde,_dev_linalg_latest"
-      - name: argmin-math (ndarray_v0_15-serde,_dev_linalg_0_16)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_15-serde,_dev_linalg_0_16"
-      - name: argmin-math (ndarray_v0_14-serde,_dev_linalg_0_13)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_14-serde,_dev_linalg_0_13"
-      - name: argmin-math (ndarray_v0_13-serde,_dev_linalg_0_12)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13-serde,_dev_linalg_0_12"
+      - name: argmin-math (ndarray_latest-serde)
+        run: cargo test -p argmin-math --no-default-features --features "ndarray_latest-nolinalg-serde"
+      - name: argmin-math (ndarray_v0_15-serde)
+        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_15-nolinalg-serde"
+      - name: argmin-math (ndarray_v0_14-serde)
+        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_14-nolinalg-serde"
+      - name: argmin-math (ndarray_v0_13-serde)
+        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13-nolinalg-serde"
       # ndarray with linalg, with serde
-      - name: argmin-math (ndarray_latest-serde,_dev_linalg_latest)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_latest-serde,_dev_linalg_latest"
-      - name: argmin-math (ndarray_v0_15-serde,_dev_linalg_0_16)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_15-serde,_dev_linalg_0_16"
-      - name: argmin-math (ndarray_v0_14-serde,_dev_linalg_0_13)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_14-serde,_dev_linalg_0_13"
-      - name: argmin-math (ndarray_v0_13-serde,_dev_linalg_0_12)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13-serde,_dev_linalg_0_12"
+      - name: argmin-math (ndarray_latest)
+        run: cargo test --manifest-path ./argmin-math-ndarray-linalg-tests/ndarray_latest/Cargo.toml --features serde
+      - name: argmin-math (ndarray_v0_15)
+        run: cargo test --manifest-path ./argmin-math-ndarray-linalg-tests/ndarray_0_15/Cargo.toml --features serde
+      - name: argmin-math (ndarray_v0_14)
+        run: cargo test --manifest-path ./argmin-math-ndarray-linalg-tests/ndarray_0_14/Cargo.toml --features serde
+      - name: argmin-math (ndarray_v0_13)
+        run: cargo test --manifest-path ./argmin-math-ndarray-linalg-tests/ndarray_0_13/Cargo.toml --features serde
       # nalgebra without serde
       - name: argmin-math (nalgebra_latest)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_latest"

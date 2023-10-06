@@ -93,19 +93,6 @@ ndarray_v0_14-nolinalg-serde = ["ndarray_v0_14-nolinalg", "ndarray_0_14/serde-1"
 ndarray_v0_13-nolinalg = ["ndarray_0_13", "num-complex_0_2", "ndarray_all"]
 ndarray_v0_13-nolinalg-serde = ["ndarray_v0_13-nolinalg", "ndarray_0_13/serde-1"]
 
-# For development and running the tests a backend for `ndarray-linalg` must be chosen. Normally
-# one would add those as dev dependencies (the features would then be unified with the regular
-# dependencies). However, linking somehow fails when the non-dev `ndarra-linalg` dependency is
-# missing (which is the case for the `*-nolinalg*` features of the ndarray backend). To fix that,
-# the `_dev_linalg_*` features were introduced. When testing and developing with one of the
-# ndarray features with linalg support on, the appropriate `_dev_linalg_*` feature must be turned
-# on as well. Note that the version number in `_dev_linalg_*` is always one below the `ndarray`
-# version. For instance, for ndarray 0.15, one would use the `_dev_linalg_0_14` feature.
-_dev_linalg_latest = ["_dev_linalg_0_16"]
-_dev_linalg_0_16 = ["ndarray-linalg_0_16/netlib-static"]
-_dev_linalg_0_13 = ["ndarray-linalg_0_13/netlib-static"]
-_dev_linalg_0_12 = ["ndarray-linalg_0_12/netlib"]
-
 [badges]
 maintenance = { status = "actively-developed" }
 

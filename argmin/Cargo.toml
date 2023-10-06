@@ -47,7 +47,7 @@ argmin-observer-paramwriter = { path = "../observers/paramwriter" }
 default = ["serde1"]
 wasm-bindgen = ["instant/wasm-bindgen", "getrandom/js"]
 serde1 = ["serde", "rand/serde1", "bincode", "rand_xoshiro/serde1"]
-_ndarrayl = ["argmin-math/ndarray_latest-serde", "argmin-math/_dev_linalg_latest"]
+_ndarrayl = ["argmin-math/ndarray_latest-serde"]
 _nalgebral = ["argmin-math/nalgebra_latest-serde"]
 # When adding new features, please consider adding them to either `full` (for users)
 # or `_full_dev` (only for local development, testing and computing test coverage).
