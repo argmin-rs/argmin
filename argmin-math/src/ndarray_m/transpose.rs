@@ -48,5 +48,5 @@ make_add!(Complex<f64>);
 use crate as argmin_math;
 include!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../argmin-math-ndarray-linalg-tests/src/transpose.rs"
+    "/ndarray-tests-src/transpose.rs"
 ));

@@ -87,5 +87,5 @@ make_signum_complex!(Complex<f64>);
 use crate as argmin_math;
 include!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../argmin-math-ndarray-linalg-tests/src/signum.rs"
+    "/ndarray-tests-src/signum.rs"
 ));

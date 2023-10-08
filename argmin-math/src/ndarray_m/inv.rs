@@ -43,5 +43,5 @@ make_inv!(Complex<f64>);
 use crate as argmin_math;
 include!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../argmin-math-ndarray-linalg-tests/src/inv.rs"
+    "/ndarray-tests-src/inv.rs"
 ));

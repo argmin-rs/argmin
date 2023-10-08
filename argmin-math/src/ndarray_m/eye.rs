@@ -44,5 +44,5 @@ make_eye!(f64);
 use crate as argmin_math;
 include!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../argmin-math-ndarray-linalg-tests/src/eye.rs"
+    "/ndarray-tests-src/eye.rs"
 ));
