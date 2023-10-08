@@ -268,5 +268,5 @@ make_complex_integer_mul!(usize);
 use crate as argmin_math;
 include!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../argmin-math-ndarray-linalg-tests/src/mul.rs"
+    "/ndarray-tests-src/mul.rs"
 ));

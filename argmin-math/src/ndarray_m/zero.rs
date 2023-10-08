@@ -43,5 +43,5 @@ where
 use crate as argmin_math;
 include!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../argmin-math-ndarray-linalg-tests/src/zero.rs"
+    "/ndarray-tests-src/zero.rs"
 ));

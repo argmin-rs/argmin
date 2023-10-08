@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dev-dependencies]
-argmin-math = { path = "../../argmin-math", version = "0.3", features = [
+argmin-math = { path = "../../", version = "0.3", features = [
     "ndarray_v0_13",
 ] }
 ndarray = { version = "0.13", default-features = false }
@@ -20,3 +20,6 @@ rand = "*" # Should unify with whatever is currently used in argmin itself
 
 [features]
 serde = ["argmin-math/ndarray_v0_13-serde"]
+
+# To make it explicit that this package is not part of the overall argmin workspace for the purpose of dependency unification
+[workspace]

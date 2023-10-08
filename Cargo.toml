@@ -10,5 +10,4 @@ members = [
 
 exclude = [
     "media/book/tests",
-    "argmin-math-ndarray-linalg-tests",
 ]
