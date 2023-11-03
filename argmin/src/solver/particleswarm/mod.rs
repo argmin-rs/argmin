@@ -198,8 +198,8 @@ where
 
         let mut particles = positions
             .into_iter()
-            .zip(velocities.into_iter())
-            .zip(costs.into_iter())
+            .zip(velocities)
+            .zip(costs)
             .map(|((p, v), c)| Particle::new(p, c, v))
             .collect::<Vec<_>>();
 

@@ -544,7 +544,7 @@ fn cstep<F: ArgminFloat>(
         info = 1;
         bound = true;
         let theta = float!(3.0) * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
-        let tmp = vec![theta, stx.gx, stp.gx];
+        let tmp = [theta, stx.gx, stp.gx];
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
             return Err(argmin_error!(
@@ -578,7 +578,7 @@ fn cstep<F: ArgminFloat>(
         info = 2;
         bound = false;
         let theta = float!(3.0) * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
-        let tmp = vec![theta, stx.gx, stp.gx];
+        let tmp = [theta, stx.gx, stp.gx];
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
             return Err(argmin_error!(
@@ -612,7 +612,7 @@ fn cstep<F: ArgminFloat>(
         info = 3;
         bound = true;
         let theta = float!(3.0) * (stx.fx - stp.fx) / (stp.x - stx.x) + stx.gx + stp.gx;
-        let tmp = vec![theta, stx.gx, stp.gx];
+        let tmp = [theta, stx.gx, stp.gx];
         // Check for a NaN or Inf in tmp before sorting
         if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
             return Err(argmin_error!(
@@ -662,7 +662,7 @@ fn cstep<F: ArgminFloat>(
         bound = false;
         if brackt {
             let theta = float!(3.0) * (stp.fx - sty.fx) / (sty.x - stp.x) + sty.gx + stp.gx;
-            let tmp = vec![theta, sty.gx, stp.gx];
+            let tmp = [theta, sty.gx, stp.gx];
             // Check for a NaN or Inf in tmp before sorting
             if tmp.iter().any(|n| n.is_nan() || n.is_infinite()) {
                 return Err(argmin_error!(

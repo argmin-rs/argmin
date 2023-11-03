@@ -247,10 +247,10 @@ mod tests {
 
         assert_relative_eq!(b[0], 1.0, epsilon = f64::EPSILON);
         assert_relative_eq!(b[1], 2.0, epsilon = f64::EPSILON);
-        let r0 = vec![2.0f64, 2.0];
+        let r0 = [2.0f64, 2.0];
         assert_relative_eq!(r0[0], r.as_ref().unwrap()[0], epsilon = f64::EPSILON);
         assert_relative_eq!(r0[1], r.as_ref().unwrap()[1], epsilon = f64::EPSILON);
-        let pp = vec![-2.0f64, -2.0];
+        let pp = [-2.0f64, -2.0];
         assert_relative_eq!(pp[0], p.as_ref().unwrap()[0], epsilon = f64::EPSILON);
         assert_relative_eq!(pp[1], p.as_ref().unwrap()[1], epsilon = f64::EPSILON);
         assert_relative_eq!(rtr, 8.0, epsilon = f64::EPSILON);
