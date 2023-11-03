@@ -31,7 +31,7 @@ cargo test -p argmin-math
 Or the default features plus the latest `ndarray`/`nalgebra` backends:
 
 ```bash
-cargo test -p argmin-math --features "latest_all"
+cargo test -p argmin-math --features "latest_all,_dev_linalg_latest"
 ```
 
 Individual backends can be tested as well; however, care has to be taken to not add two different versions of the same backend, as that may not work.
