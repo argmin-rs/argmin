@@ -50,7 +50,7 @@ serde1 = ["serde", "rand/serde1", "bincode", "rand_xoshiro/serde1", "argmin-obse
 _ndarrayl = ["argmin-math/ndarray_latest-serde", "argmin-math/_dev_linalg_latest"]
 _nalgebral = ["argmin-math/nalgebra_latest-serde"]
 # When adding new features, please consider adding them to either `full` (for users)
-# or `_full_dev` (only for local development, tesing and computing test coverage).
+# or `_full_dev` (only for local development, testing and computing test coverage).
 full = ["default", "serde1", "ctrlc"]
 _full_dev = ["full", "_ndarrayl", "_nalgebral", "argmin-observer-slog/serde1"]
 
