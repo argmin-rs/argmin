@@ -12,15 +12,12 @@ use std::{
 
 use argmin::core::TerminationStatus;
 use eframe::{
-    egui::{
-        self,
-        plot::{Bar, BarChart, Legend, Line, Plot, PlotPoints},
-        CentralPanel, Id, LayerId, Ui, WidgetText,
-    },
+    egui::{self, CentralPanel, Id, LayerId, Ui, WidgetText},
     epaint::Color32,
 };
-use egui_dock::{DockArea, Node, Style, TabViewer, Tree};
+use egui_dock::{DockArea, DockState, Node, Style, TabViewer};
 use egui_extras::{Column, TableBuilder};
+use egui_plot::{Bar, BarChart, Legend, Line, Plot, PlotPoints};
 
 use crate::{
     connection::server,
@@ -44,7 +41,7 @@ struct MyContext {
 
 pub struct PlotterApp {
     context: MyContext,
-    tree: Arc<Mutex<Tree<String>>>,
+    dock_state: Arc<Mutex<DockState<String>>>,
 }
 
 impl PlotterApp {
@@ -53,7 +50,7 @@ impl PlotterApp {
         host: String,
         port: u16,
     ) -> Result<Self, anyhow::Error> {
-        let tree: Tree<String> = Tree::new(vec![]);
+        let dock_state: DockState<String> = DockState::new(vec![]);
         // tree.push_to_first_leaf("Blah".to_owned());
         // let [a, b] = tree.split_left(NodeIndex::root(), 0.3, vec!["Inspector".to_owned()]);
         // let [_, _] = tree.split_below(
@@ -65,7 +62,7 @@ impl PlotterApp {
 
         let mut open_tabs = HashSet::new();
 
-        for node in tree.iter() {
+        for node in dock_state.main_surface().iter() {
             if let Node::Leaf { tabs, .. } = node {
                 for tab in tabs {
                     open_tabs.insert(tab.clone());
@@ -73,7 +70,7 @@ impl PlotterApp {
             }
         }
 
-        let tree = Arc::new(Mutex::new(tree));
+        let dock_state = Arc::new(Mutex::new(dock_state));
 
         // NEEDS TO BE PART OF STORAGE
         // let selected = if let Some(storage) = cc.storage {
@@ -82,7 +79,7 @@ impl PlotterApp {
         //     HashMap::new()
         // };
 
-        let storage = Arc::new(Storage::new(Arc::clone(&tree)));
+        let storage = Arc::new(Storage::new(Arc::clone(&dock_state)));
         let db2 = Arc::clone(&storage);
         let egui_ctx = cc.egui_ctx.clone();
         std::thread::spawn(move || server(db2, egui_ctx, host, port));
@@ -93,7 +90,10 @@ impl PlotterApp {
             storage,
             views: HashMap::new(),
         };
-        Ok(Self { context, tree })
+        Ok(Self {
+            context,
+            dock_state,
+        })
     }
 }
 
@@ -381,15 +381,15 @@ impl eframe::App for PlotterApp {
             let id = Id::new("egui_dock::DockArea");
             let mut ui = Ui::new(ctx.clone(), layer_id, id, max_rect, clip_rect);
 
-            let mut style = self
+            let style = self
                 .context
                 .style
                 .get_or_insert(Style::from_egui(&ui.ctx().style()))
                 .clone();
-            style.show_close_buttons = true;
-            let mut tree = self.tree.lock().unwrap();
-            DockArea::new(&mut tree)
+            let mut dock_state = self.dock_state.lock().unwrap();
+            DockArea::new(&mut dock_state)
                 .style(style)
+                .show_close_buttons(true)
                 .show_inside(&mut ui, &mut self.context);
         });
     }

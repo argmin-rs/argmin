@@ -12,7 +12,7 @@ use std::{
 
 use argmin::core::TerminationStatus;
 use dashmap::DashMap;
-use egui_dock::Tree;
+use egui_dock::DockState;
 use itertools::Itertools;
 use time::Duration;
 
@@ -130,11 +130,11 @@ impl Run {
 
 pub struct Storage {
     pub runs: DashMap<RunName, Run>,
-    pub tree: Arc<Mutex<Tree<RunName>>>,
+    pub tree: Arc<Mutex<DockState<RunName>>>,
 }
 
 impl Storage {
-    pub fn new(tree: Arc<Mutex<Tree<String>>>) -> Self {
+    pub fn new(tree: Arc<Mutex<DockState<String>>>) -> Self {
         Storage {
             runs: DashMap::new(),
             tree,
