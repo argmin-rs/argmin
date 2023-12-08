@@ -16,7 +16,7 @@ argmin is designed to simplify the implementation of optimization algorithms and
 
 > **IMPORTANT NOTE**
 >
-> This book covers version 0.7 of argmin! Parts of this book may not apply to versions below 0.7.
+> This book covers version 0.8 of argmin! Parts of this book may not apply to versions below 0.8.
 
 
 ## The argmin ecosystem
