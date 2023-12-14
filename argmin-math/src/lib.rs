@@ -212,21 +212,25 @@ cfg_if::cfg_if! {
 #[cfg(feature = "primitives")]
 mod primitives;
 #[cfg(feature = "primitives")]
+#[allow(unused_imports)]
 pub use crate::primitives::*;
 
 #[cfg(feature = "ndarray_all")]
 mod ndarray_m;
 #[cfg(feature = "ndarray_all")]
+#[allow(unused_imports)]
 pub use crate::ndarray_m::*;
 
 #[cfg(feature = "nalgebra_all")]
 mod nalgebra_m;
 #[cfg(feature = "nalgebra_all")]
+#[allow(unused_imports)]
 pub use crate::nalgebra_m::*;
 
 #[cfg(feature = "vec")]
 mod vec;
 #[cfg(feature = "vec")]
+#[allow(unused_imports)]
 pub use crate::vec::*;
 
 use anyhow::Error;
