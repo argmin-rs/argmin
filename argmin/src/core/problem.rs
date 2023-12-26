@@ -605,7 +605,7 @@ impl<O: Operator> Problem<O> {
     /// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);
     /// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);
     /// ```
-    pub fn bulk_apply<P>(&mut self, params: &Vec<P>) -> Result<Vec<O::Output>, Error>
+    pub fn bulk_apply<P>(&mut self, params: &[P]) -> Result<Vec<O::Output>, Error>
     where
         P: std::borrow::Borrow<O::Param> + SyncAlias,
         O::Output: SendAlias,
@@ -686,7 +686,7 @@ impl<O: CostFunction> Problem<O> {
     /// # assert_eq!(res[0], 4.0f64);
     /// # assert_eq!(res[1], 4.0f64);
     /// ```
-    pub fn bulk_cost<P>(&mut self, params: &Vec<P>) -> Result<Vec<O::Output>, Error>
+    pub fn bulk_cost<P>(&mut self, params: &[P]) -> Result<Vec<O::Output>, Error>
     where
         P: std::borrow::Borrow<O::Param> + SyncAlias,
         O::Output: SendAlias,
@@ -767,7 +767,7 @@ impl<O: Gradient> Problem<O> {
     /// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);
     /// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);
     /// ```
-    pub fn bulk_gradient<P>(&mut self, params: &Vec<P>) -> Result<Vec<O::Gradient>, Error>
+    pub fn bulk_gradient<P>(&mut self, params: &[P]) -> Result<Vec<O::Gradient>, Error>
     where
         P: std::borrow::Borrow<O::Param> + SyncAlias,
         O::Gradient: SendAlias,
@@ -847,7 +847,7 @@ impl<O: Hessian> Problem<O> {
     /// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// ```
-    pub fn bulk_hessian<P>(&mut self, params: &Vec<P>) -> Result<Vec<O::Hessian>, Error>
+    pub fn bulk_hessian<P>(&mut self, params: &[P]) -> Result<Vec<O::Hessian>, Error>
     where
         P: std::borrow::Borrow<O::Param> + SyncAlias,
         O::Hessian: SendAlias,
@@ -926,7 +926,7 @@ impl<O: Jacobian> Problem<O> {
     /// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// ```
-    pub fn bulk_jacobian<P>(&mut self, params: &Vec<P>) -> Result<Vec<O::Jacobian>, Error>
+    pub fn bulk_jacobian<P>(&mut self, params: &[P]) -> Result<Vec<O::Jacobian>, Error>
     where
         P: std::borrow::Borrow<O::Param> + SyncAlias,
         O::Jacobian: SendAlias,
