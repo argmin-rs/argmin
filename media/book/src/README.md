@@ -49,6 +49,10 @@ For details on how to use `finitediff` for finite differentiation, please refer 
 
 The documentation of `modcholesky` can be found [here](https://docs.rs/argmin/latest/modcholesky).
 
+## Discord server
+
+Feel free to join the [argmin Discord](https://discord.gg/fYB8AwxxMW)!
+
 ## License
 
 Both the source code as well as the documentation are licensed under either of
