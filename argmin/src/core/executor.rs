@@ -152,14 +152,15 @@ where
                 let interp = interrupt.clone();
                 // This is currently a hack to allow checkpoints to be run again within the
                 // same program (usually not really a use case anyway). Unfortunately, this
-                // means that any subsequent run started afterwards will have not Ctrl-C
+                // means that any subsequent run started afterwards will not have Ctrl-C
                 // handling available... This should also be a problem in case one tries to run
                 // two consecutive optimizations. There is ongoing work in the ctrlc crate
                 // (channels and such) which may solve this problem. So far, we have to live
                 // with this.
-                match ctrlc::set_handler(move || {
+                let handler = move || {
                     interp.store(true, Ordering::SeqCst);
-                }) {
+                };
+                match ctrlc::set_handler(handler) {
                     Err(ctrlc::Error::MultipleHandlers) => Ok(()),
                     interp => interp,
                 }?;
