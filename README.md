@@ -66,10 +66,10 @@
     src="https://img.shields.io/crates/l/argmin?style=flat-square"
     alt="License"
   />
-  <a href="https://gitter.im/argmin-rs/community"
+  <a href="https://discord.gg/fYB8AwxxMW"
     ><img
-      src="https://img.shields.io/gitter/room/argmin-rs/argmin?style=flat-square"
-      alt="Gitter chat"
+      src="https://img.shields.io/discord/1189119565335109683?style=flat-square&label=argmin%20Discord"
+      alt="argmin Discord"
   /></a>
 </p>
 
