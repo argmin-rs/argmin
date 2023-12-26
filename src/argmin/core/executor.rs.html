@@ -670,6 +670,7 @@
 <a href="#670" id="670">670</a>
 <a href="#671" id="671">671</a>
 <a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -824,14 +825,15 @@
                 </span><span class="kw">let </span>interp = interrupt.clone();
                 <span class="comment">// This is currently a hack to allow checkpoints to be run again within the
                 // same program (usually not really a use case anyway). Unfortunately, this
-                // means that any subsequent run started afterwards will have not Ctrl-C
+                // means that any subsequent run started afterwards will not have Ctrl-C
                 // handling available... This should also be a problem in case one tries to run
                 // two consecutive optimizations. There is ongoing work in the ctrlc crate
                 // (channels and such) which may solve this problem. So far, we have to live
                 // with this.
-                </span><span class="kw">match </span>ctrlc::set_handler(<span class="kw">move </span>|| {
+                </span><span class="kw">let </span>handler = <span class="kw">move </span>|| {
                     interp.store(<span class="bool-val">true</span>, Ordering::SeqCst);
-                }) {
+                };
+                <span class="kw">match </span>ctrlc::set_handler(handler) {
                     <span class="prelude-val">Err</span>(ctrlc::Error::MultipleHandlers) =&gt; <span class="prelude-val">Ok</span>(()),
                     interp =&gt; interp,
                 }<span class="question-mark">?</span>;

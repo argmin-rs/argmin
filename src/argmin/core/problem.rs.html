@@ -1661,7 +1661,7 @@
     /// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);
     /// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);
     /// ```
-    </span><span class="kw">pub fn </span>bulk_apply&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Vec&lt;P&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Output&gt;, Error&gt;
+    </span><span class="kw">pub fn </span>bulk_apply&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[P]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Output&gt;, Error&gt;
     <span class="kw">where
         </span>P: std::borrow::Borrow&lt;O::Param&gt; + SyncAlias,
         O::Output: SendAlias,
@@ -1742,7 +1742,7 @@
     /// # assert_eq!(res[0], 4.0f64);
     /// # assert_eq!(res[1], 4.0f64);
     /// ```
-    </span><span class="kw">pub fn </span>bulk_cost&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Vec&lt;P&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Output&gt;, Error&gt;
+    </span><span class="kw">pub fn </span>bulk_cost&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[P]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Output&gt;, Error&gt;
     <span class="kw">where
         </span>P: std::borrow::Borrow&lt;O::Param&gt; + SyncAlias,
         O::Output: SendAlias,
@@ -1823,7 +1823,7 @@
     /// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);
     /// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);
     /// ```
-    </span><span class="kw">pub fn </span>bulk_gradient&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Vec&lt;P&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Gradient&gt;, Error&gt;
+    </span><span class="kw">pub fn </span>bulk_gradient&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[P]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Gradient&gt;, Error&gt;
     <span class="kw">where
         </span>P: std::borrow::Borrow&lt;O::Param&gt; + SyncAlias,
         O::Gradient: SendAlias,
@@ -1903,7 +1903,7 @@
     /// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// ```
-    </span><span class="kw">pub fn </span>bulk_hessian&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Vec&lt;P&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Hessian&gt;, Error&gt;
+    </span><span class="kw">pub fn </span>bulk_hessian&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[P]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Hessian&gt;, Error&gt;
     <span class="kw">where
         </span>P: std::borrow::Borrow&lt;O::Param&gt; + SyncAlias,
         O::Hessian: SendAlias,
@@ -1982,7 +1982,7 @@
     /// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// ```
-    </span><span class="kw">pub fn </span>bulk_jacobian&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Vec&lt;P&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Jacobian&gt;, Error&gt;
+    </span><span class="kw">pub fn </span>bulk_jacobian&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[P]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;O::Jacobian&gt;, Error&gt;
     <span class="kw">where
         </span>P: std::borrow::Borrow&lt;O::Param&gt; + SyncAlias,
         O::Jacobian: SendAlias,
