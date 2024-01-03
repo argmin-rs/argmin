@@ -38,6 +38,8 @@ make_inv!(f64);
 make_inv!(Complex<f32>);
 make_inv!(Complex<f64>);
 
+// All code that does not depend on a linked ndarray-linalg backend can still be tested as normal.
+// To avoid dublicating tests and to allow convenient testing of functionality that does not need ndarray-linalg the tests are still included here.
 // The tests expect the name for the crate containing the tested functions to be argmin_math
 #[cfg(test)]
 use crate as argmin_math;

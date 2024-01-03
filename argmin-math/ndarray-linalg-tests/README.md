@@ -1,3 +1,3 @@
 This folder contains tests for the argmin-math crate. 
-Separate projects are needed to test against multiple versions of dependencies because of the required additivity of features even when they are not active and because only one crate can specify a `links` flag in a given dependency graph. This is mainly necessary for the backend dependency of ndarray-linalg.
+Separate projects are needed to test against multiple versions of dependencies because of the required additivity of features, which is not possible for multiple separate versions of dependencies when they specify the `links` attribute with the same name but different versions. This additivity with regard to the `links` attribute is necessary even when all but one of the concerned dependencies are disabled behind a feature. This is necessary for the backend dependency of ndarray-linalg.
 Read more here: https://github.com/argmin-rs/argmin/issues/368#issue-1929115127
