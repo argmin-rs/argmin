@@ -230,6 +230,7 @@ mod vec;
 pub use crate::vec::*;
 
 use anyhow::Error;
+use rand::Rng;
 
 /// Dot/scalar product of `T` and `self`
 pub trait ArgminDot<T, U> {
@@ -336,7 +337,7 @@ pub trait ArgminInv<T> {
 /// Create a random number
 pub trait ArgminRandom {
     /// Get a random element between min and max,
-    fn rand_from_range(min: &Self, max: &Self) -> Self;
+    fn rand_from_range<G: Rng>(min: &Self, max: &Self, rng: &mut G) -> Self;
 }
 
 /// Minimum and Maximum of type `T`

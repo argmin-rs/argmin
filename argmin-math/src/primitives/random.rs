@@ -12,8 +12,8 @@ macro_rules! make_random {
     ($t:ty) => {
         impl ArgminRandom for $t {
             #[inline]
-            fn rand_from_range(min: &Self, max: &Self) -> $t {
-                rand::thread_rng().gen_range(*min..*max)
+            fn rand_from_range<G: Rng>(min: &Self, max: &Self, rng: &mut G) -> $t {
+                rng.gen_range(*min..*max)
             }
         }
     };
@@ -36,6 +36,7 @@ make_random!(usize);
 mod tests {
     use super::*;
     use paste::item;
+    use rand::SeedableRng;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -44,7 +45,8 @@ mod tests {
                 fn [<test_random_vec_ $t>]() {
                     let a = 1 as $t;
                     let b = 2 as $t;
-                    let random = $t::rand_from_range(&a, &b);
+                    let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+                    let random = $t::rand_from_range(&a, &b, &mut rng);
                     assert!(random >= a);
                     assert!(random <= b);
                 }

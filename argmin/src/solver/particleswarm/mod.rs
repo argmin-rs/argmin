@@ -25,6 +25,7 @@ use crate::core::{
     KV,
 };
 use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
+use rand::{Rng, SeedableRng};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -50,7 +51,7 @@ use serde::{Deserialize, Serialize};
 /// \[1\] <https://en.wikipedia.org/wiki/Particle_swarm_optimization>
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct ParticleSwarm<P, F> {
+pub struct ParticleSwarm<P, F, G> {
     /// Inertia weight
     weight_inertia: F,
     /// Cognitive acceleration coefficient
@@ -61,9 +62,11 @@ pub struct ParticleSwarm<P, F> {
     bounds: (P, P),
     /// Number of particles
     num_particles: usize,
+    /// Random number generator
+    rng_generator: G,
 }
 
-impl<P, F> ParticleSwarm<P, F>
+impl<P, F> ParticleSwarm<P, F, rand::rngs::StdRng>
 where
     P: Clone + SyncAlias + ArgminSub<P, P> + ArgminMul<F, P> + ArgminRandom + ArgminZeroLike,
     F: ArgminFloat,
@@ -91,7 +94,7 @@ where
     /// # use argmin::solver::particleswarm::ParticleSwarm;
     /// # let lower_bound: Vec<f64> = vec![-1.0, -1.0];
     /// # let upper_bound: Vec<f64> = vec![1.0, 1.0];
-    /// let pso: ParticleSwarm<_, f64> = ParticleSwarm::new((lower_bound, upper_bound), 40);
+    /// let pso: ParticleSwarm<_, f64, _> = ParticleSwarm::new((lower_bound, upper_bound), 40);
     /// ```
     pub fn new(bounds: (P, P), num_particles: usize) -> Self {
         ParticleSwarm {
@@ -100,9 +103,52 @@ where
             weight_social: float!(0.5 + 2.0f64.ln()),
             bounds,
             num_particles,
+            rng_generator: rand::rngs::StdRng::seed_from_u64(42),
         }
     }
+}
+impl<P, F, G0> ParticleSwarm<P, F, G0>
+where
+    P: Clone + SyncAlias + ArgminSub<P, P> + ArgminMul<F, P> + ArgminRandom + ArgminZeroLike,
+    F: ArgminFloat,
+    G0: Rng,
+{
+    /// Set the random number generator
+    ///
+    /// Defaults to `rand::rngs::StdRng::seed_from_u64(42)`
+    ///
+    /// # Example
+    /// ```
+    /// # use argmin::solver::particleswarm::ParticleSwarm;
+    /// # use argmin::core::Error;
+    /// # use rand::SeedableRng;
+    /// # fn main() -> Result<(), Error> {
+    /// # let lower_bound: Vec<f64> = vec![-1.0, -1.0];
+    /// # let upper_bound: Vec<f64> = vec![1.0, 1.0];
+    /// let pso: ParticleSwarm<_, f64, _> =
+    ///     ParticleSwarm::new((lower_bound, upper_bound), 40)
+    ///     .with_rng_generator(rand_xoshiro::Xoroshiro128Plus::seed_from_u64(1729));
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_rng_generator<G1: Rng>(self, generator: G1) -> ParticleSwarm<P, F, G1> {
+        ParticleSwarm {
+            weight_inertia: self.weight_inertia,
+            weight_cognitive: self.weight_cognitive,
+            weight_social: self.weight_social,
+            bounds: self.bounds,
+            num_particles: self.num_particles,
+            rng_generator: generator,
+        }
+    }
+}
 
+impl<P, F, G> ParticleSwarm<P, F, G>
+where
+    P: Clone + SyncAlias + ArgminSub<P, P> + ArgminMul<F, P> + ArgminRandom + ArgminZeroLike,
+    F: ArgminFloat,
+    G: Rng,
+{
     /// Set inertia factor on particle velocity
     ///
     /// Defaults to `1/(2 * ln(2))`.
@@ -115,7 +161,7 @@ where
     /// # fn main() -> Result<(), Error> {
     /// # let lower_bound: Vec<f64> = vec![-1.0, -1.0];
     /// # let upper_bound: Vec<f64> = vec![1.0, 1.0];
-    /// let pso: ParticleSwarm<_, f64> =
+    /// let pso: ParticleSwarm<_, f64, _> =
     ///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_inertia_factor(0.5)?;
     /// # Ok(())
     /// # }
@@ -143,7 +189,7 @@ where
     /// # fn main() -> Result<(), Error> {
     /// # let lower_bound: Vec<f64> = vec![-1.0, -1.0];
     /// # let upper_bound: Vec<f64> = vec![1.0, 1.0];
-    /// let pso: ParticleSwarm<_, f64> =
+    /// let pso: ParticleSwarm<_, f64, _> =
     ///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_cognitive_factor(1.1)?;
     /// # Ok(())
     /// # }
@@ -171,7 +217,7 @@ where
     /// # fn main() -> Result<(), Error> {
     /// # let lower_bound: Vec<f64> = vec![-1.0, -1.0];
     /// # let upper_bound: Vec<f64> = vec![1.0, 1.0];
-    /// let pso: ParticleSwarm<_, f64> =
+    /// let pso: ParticleSwarm<_, f64, _> =
     ///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_social_factor(1.1)?;
     /// # Ok(())
     /// # }
@@ -214,23 +260,23 @@ where
     }
 
     /// Initializes positions and velocities for all particles
-    fn initialize_positions_and_velocities(&self) -> (Vec<P>, Vec<P>) {
+    fn initialize_positions_and_velocities(&mut self) -> (Vec<P>, Vec<P>) {
         let (min, max) = &self.bounds;
         let delta = max.sub(min);
         let delta_neg = delta.mul(&float!(-1.0));
 
         (
             (0..self.num_particles)
-                .map(|_| P::rand_from_range(min, max))
+                .map(|_| P::rand_from_range(min, max, &mut self.rng_generator))
                 .collect(),
             (0..self.num_particles)
-                .map(|_| P::rand_from_range(&delta_neg, &delta))
+                .map(|_| P::rand_from_range(&delta_neg, &delta, &mut self.rng_generator))
                 .collect(),
         )
     }
 }
 
-impl<O, P, F> Solver<O, PopulationState<Particle<P, F>, F>> for ParticleSwarm<P, F>
+impl<O, P, F, G> Solver<O, PopulationState<Particle<P, F>, F>> for ParticleSwarm<P, F, G>
 where
     O: CostFunction<Param = P, Output = F> + SyncAlias,
     P: SerializeAlias
@@ -243,6 +289,7 @@ where
         + ArgminRandom
         + ArgminMinMax,
     F: ArgminFloat,
+    G: Rng,
 {
     const NAME: &'static str = "Particle Swarm Optimization";
 
@@ -315,13 +362,15 @@ where
 
                 // ad 2)
                 let to_optimum = p.best_position.sub(&p.position);
-                let pull_to_optimum = P::rand_from_range(&zero, &to_optimum);
+                let pull_to_optimum =
+                    P::rand_from_range(&zero, &to_optimum, &mut self.rng_generator);
                 let pull_to_optimum = pull_to_optimum.mul(&self.weight_cognitive);
 
                 // ad 3)
                 let to_global_optimum = best_particle.position.sub(&p.position);
                 let pull_to_global_optimum =
-                    P::rand_from_range(&zero, &to_global_optimum).mul(&self.weight_social);
+                    P::rand_from_range(&zero, &to_global_optimum, &mut self.rng_generator)
+                        .mul(&self.weight_social);
 
                 p.velocity = momentum.add(&pull_to_optimum).add(&pull_to_global_optimum);
                 let new_position = p.position.add(&p.velocity);
@@ -408,13 +457,16 @@ mod tests {
     use crate::test_trait_impl;
     use approx::assert_relative_eq;
 
-    test_trait_impl!(particleswarm, ParticleSwarm<Vec<f64>, f64>);
+    test_trait_impl!(
+        particleswarm,
+        ParticleSwarm<Vec<f64>, f64, rand::rngs::StdRng>
+    );
 
     #[test]
     fn test_new() {
         let lower_bound: Vec<f64> = vec![-1.0, -1.0];
         let upper_bound: Vec<f64> = vec![1.0, 1.0];
-        let pso: ParticleSwarm<_, f64> =
+        let pso: ParticleSwarm<_, f64, rand::rngs::StdRng> =
             ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), 40);
         let ParticleSwarm {
             weight_inertia,
@@ -422,6 +474,7 @@ mod tests {
             weight_social,
             bounds,
             num_particles,
+            ..
         } = pso;
 
         assert_relative_eq!(
@@ -538,7 +591,7 @@ mod tests {
         let lower_bound: Vec<f64> = vec![-1.0, -1.0];
         let upper_bound: Vec<f64> = vec![1.0, 1.0];
         let num_particles = 100;
-        let pso: ParticleSwarm<_, f64> =
+        let mut pso: ParticleSwarm<_, f64, _> =
             ParticleSwarm::new((lower_bound, upper_bound), num_particles);
 
         let (positions, velocities) = pso.initialize_positions_and_velocities();
@@ -565,7 +618,7 @@ mod tests {
         let lower_bound: Vec<f64> = vec![-1.0, -1.0];
         let upper_bound: Vec<f64> = vec![1.0, 1.0];
         let num_particles = 10;
-        let mut pso: ParticleSwarm<_, f64> =
+        let mut pso: ParticleSwarm<_, f64, _> =
             ParticleSwarm::new((lower_bound, upper_bound), num_particles);
 
         struct PsoProblem {
@@ -630,7 +683,7 @@ mod tests {
     fn test_init_provided_population_wrong_size() {
         let lower_bound: Vec<f64> = vec![-1.0, -1.0];
         let upper_bound: Vec<f64> = vec![1.0, 1.0];
-        let mut pso: ParticleSwarm<_, f64> = ParticleSwarm::new((lower_bound, upper_bound), 40);
+        let mut pso: ParticleSwarm<_, f64, _> = ParticleSwarm::new((lower_bound, upper_bound), 40);
         let state: PopulationState<Particle<Vec<f64>, f64>, f64> = PopulationState::new()
             .population(vec![Particle::new(vec![1.0, 2.0], 12.0, vec![0.1, 0.3])]);
         let res = pso.init(&mut Problem::new(TestProblem::new()), state);
@@ -650,7 +703,7 @@ mod tests {
         let upper_bound: Vec<f64> = vec![1.0, 1.0];
         let particle_a = Particle::new(vec![1.0, 2.0], 12.0, vec![0.1, 0.3]);
         let particle_b = Particle::new(vec![2.0, 3.0], 10.0, vec![0.2, 0.4]);
-        let mut pso: ParticleSwarm<_, f64> = ParticleSwarm::new((lower_bound, upper_bound), 2);
+        let mut pso: ParticleSwarm<_, f64, _> = ParticleSwarm::new((lower_bound, upper_bound), 2);
         let state: PopulationState<Particle<Vec<f64>, f64>, f64> =
             PopulationState::new().population(vec![particle_a.clone(), particle_b.clone()]);
         let res = pso.init(&mut Problem::new(TestProblem::new()), state);
@@ -668,7 +721,7 @@ mod tests {
     fn test_init_random_population() {
         let lower_bound: Vec<f64> = vec![-1.0, -1.0];
         let upper_bound: Vec<f64> = vec![1.0, 1.0];
-        let mut pso: ParticleSwarm<_, f64> = ParticleSwarm::new((lower_bound, upper_bound), 40);
+        let mut pso: ParticleSwarm<_, f64, _> = ParticleSwarm::new((lower_bound, upper_bound), 40);
         let state: PopulationState<Particle<Vec<f64>, f64>, f64> = PopulationState::new();
         let res = pso.init(&mut Problem::new(TestProblem::new()), state);
         assert!(res.is_ok());
@@ -707,7 +760,7 @@ mod tests {
         // setup
         let lower_bound: Vec<f64> = vec![-1.0, -1.0];
         let upper_bound: Vec<f64> = vec![1.0, 1.0];
-        let mut pso: ParticleSwarm<_, f64> = ParticleSwarm::new((lower_bound, upper_bound), 100);
+        let mut pso: ParticleSwarm<_, f64, _> = ParticleSwarm::new((lower_bound, upper_bound), 100);
         let state: PopulationState<Particle<Vec<f64>, f64>, f64> = PopulationState::new();
 
         // init

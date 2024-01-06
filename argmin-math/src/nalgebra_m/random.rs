@@ -22,11 +22,9 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn rand_from_range(min: &Self, max: &Self) -> OMatrix<N, R, C> {
+    fn rand_from_range<G: Rng>(min: &Self, max: &Self, rng: &mut G) -> OMatrix<N, R, C> {
         assert!(!min.is_empty());
         assert_eq!(min.shape(), max.shape());
-
-        let mut rng = rand::thread_rng();
 
         Self::from_iterator_generic(
             R::from_usize(min.nrows()),
@@ -53,6 +51,7 @@ mod tests {
     use super::*;
     use nalgebra::{Matrix2x3, Vector3};
     use paste::item;
+    use rand::SeedableRng;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -61,7 +60,8 @@ mod tests {
                 fn [<test_random_vec_ $t>]() {
                     let a = Vector3::new(1 as $t, 2 as $t, 3 as $t);
                     let b = Vector3::new(2 as $t, 3 as $t, 4 as $t);
-                    let random = Vector3::<$t>::rand_from_range(&a, &b);
+                    let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+                    let random = Vector3::<$t>::rand_from_range(&a, &b, &mut rng);
                     for i in 0..3 {
                         assert!(random[i] >= a[i]);
                         assert!(random[i] <= b[i]);
@@ -74,7 +74,8 @@ mod tests {
                 fn [<test_random_vec_equal $t>]() {
                     let a = Vector3::new(1 as $t, 2 as $t, 3 as $t);
                     let b = Vector3::new(1 as $t, 2 as $t, 3 as $t);
-                    let random = Vector3::<$t>::rand_from_range(&a, &b);
+                    let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+                    let random = Vector3::<$t>::rand_from_range(&a, &b, &mut rng);
                     for i in 0..3 {
                         assert!((random[i] as f64 - a[i] as f64).abs() < std::f64::EPSILON);
                         assert!((random[i] as f64 - b[i] as f64).abs() < std::f64::EPSILON);
@@ -87,7 +88,8 @@ mod tests {
                 fn [<test_random_vec_reverse_ $t>]() {
                     let b = Vector3::new(1 as $t, 2 as $t, 3 as $t);
                     let a = Vector3::new(2 as $t, 3 as $t, 4 as $t);
-                    let random = Vector3::<$t>::rand_from_range(&a, &b);
+                    let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+                    let random = Vector3::<$t>::rand_from_range(&a, &b, &mut rng);
                     for i in 0..3 {
                         assert!(random[i] >= b[i]);
                         assert!(random[i] <= a[i]);
@@ -106,7 +108,8 @@ mod tests {
                         2 as $t, 4 as $t, 6 as $t,
                         3 as $t, 5 as $t, 7 as $t
                     );
-                    let random = Matrix2x3::<$t>::rand_from_range(&a, &b);
+                    let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+                    let random = Matrix2x3::<$t>::rand_from_range(&a, &b, &mut rng);
                     for i in 0..3 {
                         for j in 0..2 {
                             assert!(random[(j, i)] >= a[(j, i)]);
