@@ -22,7 +22,7 @@ where
     DefaultAllocator: Allocator<N, R, C>,
 {
     #[inline]
-    fn rand_from_range<G: Rng>(min: &Self, max: &Self, rng: &mut G) -> OMatrix<N, R, C> {
+    fn rand_from_range<T: Rng>(min: &Self, max: &Self, rng: &mut T) -> OMatrix<N, R, C> {
         assert!(!min.is_empty());
         assert_eq!(min.shape(), max.shape());
 

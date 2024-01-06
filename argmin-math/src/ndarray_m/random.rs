@@ -12,7 +12,7 @@ use crate::ArgminRandom;
 macro_rules! make_random {
     ($t:ty) => {
         impl ArgminRandom for ndarray::Array1<$t> {
-            fn rand_from_range<G: Rng>(min: &Self, max: &Self, rng: &mut G) -> ndarray::Array1<$t> {
+            fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> ndarray::Array1<$t> {
                 assert!(!min.is_empty());
                 assert_eq!(min.len(), max.len());
 
@@ -33,7 +33,7 @@ macro_rules! make_random {
         }
 
         impl ArgminRandom for ndarray::Array2<$t> {
-            fn rand_from_range<G: Rng>(min: &Self, max: &Self, rng: &mut G) -> ndarray::Array2<$t> {
+            fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> ndarray::Array2<$t> {
                 assert!(!min.is_empty());
                 assert_eq!(min.raw_dim(), max.raw_dim());
 

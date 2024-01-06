@@ -51,7 +51,7 @@ use serde::{Deserialize, Serialize};
 /// \[1\] <https://en.wikipedia.org/wiki/Particle_swarm_optimization>
 #[derive(Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
-pub struct ParticleSwarm<P, F, G> {
+pub struct ParticleSwarm<P, F, R> {
     /// Inertia weight
     weight_inertia: F,
     /// Cognitive acceleration coefficient
@@ -63,7 +63,7 @@ pub struct ParticleSwarm<P, F, G> {
     /// Number of particles
     num_particles: usize,
     /// Random number generator
-    rng_generator: G,
+    rng_generator: R,
 }
 
 impl<P, F> ParticleSwarm<P, F, rand::rngs::StdRng>
@@ -103,15 +103,15 @@ where
             weight_social: float!(0.5 + 2.0f64.ln()),
             bounds,
             num_particles,
-            rng_generator: rand::rngs::StdRng::seed_from_u64(42),
+            rng_generator: rand::rngs::StdRng::from_entropy(),
         }
     }
 }
-impl<P, F, G0> ParticleSwarm<P, F, G0>
+impl<P, F, R0> ParticleSwarm<P, F, R0>
 where
     P: Clone + SyncAlias + ArgminSub<P, P> + ArgminMul<F, P> + ArgminRandom + ArgminZeroLike,
     F: ArgminFloat,
-    G0: Rng,
+    R0: Rng,
 {
     /// Set the random number generator
     ///
@@ -131,7 +131,7 @@ where
     /// # Ok(())
     /// # }
     /// ```
-    pub fn with_rng_generator<G1: Rng>(self, generator: G1) -> ParticleSwarm<P, F, G1> {
+    pub fn with_rng_generator<R1: Rng>(self, generator: R1) -> ParticleSwarm<P, F, R1> {
         ParticleSwarm {
             weight_inertia: self.weight_inertia,
             weight_cognitive: self.weight_cognitive,
@@ -143,11 +143,11 @@ where
     }
 }
 
-impl<P, F, G> ParticleSwarm<P, F, G>
+impl<P, F, R> ParticleSwarm<P, F, R>
 where
     P: Clone + SyncAlias + ArgminSub<P, P> + ArgminMul<F, P> + ArgminRandom + ArgminZeroLike,
     F: ArgminFloat,
-    G: Rng,
+    R: Rng,
 {
     /// Set inertia factor on particle velocity
     ///
@@ -276,7 +276,7 @@ where
     }
 }
 
-impl<O, P, F, G> Solver<O, PopulationState<Particle<P, F>, F>> for ParticleSwarm<P, F, G>
+impl<O, P, F, R> Solver<O, PopulationState<Particle<P, F>, F>> for ParticleSwarm<P, F, R>
 where
     O: CostFunction<Param = P, Output = F> + SyncAlias,
     P: SerializeAlias
@@ -289,7 +289,7 @@ where
         + ArgminRandom
         + ArgminMinMax,
     F: ArgminFloat,
-    G: Rng,
+    R: Rng,
 {
     const NAME: &'static str = "Particle Swarm Optimization";
 

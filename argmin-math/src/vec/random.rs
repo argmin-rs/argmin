@@ -11,7 +11,7 @@ use rand::Rng;
 macro_rules! make_random {
     ($t:ty) => {
         impl ArgminRandom for Vec<$t> {
-            fn rand_from_range<G: Rng>(min: &Self, max: &Self, rng: &mut G) -> Vec<$t> {
+            fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> Vec<$t> {
                 assert!(!min.is_empty());
                 assert_eq!(min.len(), max.len());
 
@@ -35,7 +35,7 @@ macro_rules! make_random {
         }
 
         impl ArgminRandom for Vec<Vec<$t>> {
-            fn rand_from_range<G: Rng>(min: &Self, max: &Self, rng: &mut G) -> Vec<Vec<$t>> {
+            fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> Vec<Vec<$t>> {
                 assert!(!min.is_empty());
                 assert_eq!(min.len(), max.len());
                 min.iter()
