@@ -115,7 +115,7 @@ where
 {
     /// Set the random number generator
     ///
-    /// Defaults to `rand::rngs::StdRng::seed_from_u64(42)`
+    /// Defaults to `rand::rngs::StdRng::from_entropy()`
     ///
     /// # Example
     /// ```
