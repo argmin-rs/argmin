@@ -118,6 +118,7 @@
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
 <a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -131,11 +132,9 @@
 <span class="macro">macro_rules! </span>make_random {
     (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
         <span class="kw">impl </span>ArgminRandom <span class="kw">for </span>Vec&lt;<span class="macro-nonterminal">$t</span>&gt; {
-            <span class="kw">fn </span>rand_from_range(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Vec&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="kw">fn </span>rand_from_range&lt;R: Rng&gt;(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>, rng: <span class="kw-2">&amp;mut </span>R) -&gt; Vec&lt;<span class="macro-nonterminal">$t</span>&gt; {
                 <span class="macro">assert!</span>(!min.is_empty());
                 <span class="macro">assert_eq!</span>(min.len(), max.len());
-
-                <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::thread_rng();
 
                 min.iter()
                     .zip(max.iter())
@@ -157,12 +156,12 @@
         }
 
         <span class="kw">impl </span>ArgminRandom <span class="kw">for </span>Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; {
-            <span class="kw">fn </span>rand_from_range(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; {
+            <span class="kw">fn </span>rand_from_range&lt;R: Rng&gt;(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>, rng: <span class="kw-2">&amp;mut </span>R) -&gt; Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; {
                 <span class="macro">assert!</span>(!min.is_empty());
                 <span class="macro">assert_eq!</span>(min.len(), max.len());
                 min.iter()
                     .zip(max.iter())
-                    .map(|(a, b)| Vec::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(a, b))
+                    .map(|(a, b)| Vec::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(a, b, rng))
                     .collect()
             }
         }
@@ -186,6 +185,7 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>paste::item;
+    <span class="kw">use </span>rand::SeedableRng;
 
     <span class="macro">macro_rules! </span>make_test {
         (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
@@ -194,7 +194,8 @@
                 </span><span class="kw">fn </span>[&lt;test_random_vec_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">let </span>b = <span class="macro">vec!</span>[<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">5 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
-                    <span class="kw">let </span>random = Vec::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
+                    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::StdRng::seed_from_u64(<span class="number">42</span>);
+                    <span class="kw">let </span>random = Vec::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;mut </span>rng);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3usize </span>{
                         <span class="macro">assert!</span>(random[i] &gt;= a[i]);
                         <span class="macro">assert!</span>(random[i] &lt;= b[i]);
@@ -213,7 +214,8 @@
                         <span class="macro">vec!</span>[<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">5 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>],
                         <span class="macro">vec!</span>[<span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">6 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>]
                     ];
-                    <span class="kw">let </span>random = Vec::&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
+                    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::StdRng::seed_from_u64(<span class="number">42</span>);
+                    <span class="kw">let </span>random = Vec::&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;mut </span>rng);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                             <span class="macro">assert!</span>(random[j][i] &gt;= a[j][i]);

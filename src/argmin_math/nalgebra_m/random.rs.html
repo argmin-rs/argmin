@@ -131,6 +131,9 @@
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -155,11 +158,9 @@
     DefaultAllocator: Allocator&lt;N, R, C&gt;,
 {
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>rand_from_range(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; OMatrix&lt;N, R, C&gt; {
+    </span><span class="kw">fn </span>rand_from_range&lt;T: Rng&gt;(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>, rng: <span class="kw-2">&amp;mut </span>T) -&gt; OMatrix&lt;N, R, C&gt; {
         <span class="macro">assert!</span>(!min.is_empty());
         <span class="macro">assert_eq!</span>(min.shape(), max.shape());
-
-        <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::thread_rng();
 
         <span class="self">Self</span>::from_iterator_generic(
             R::from_usize(min.nrows()),
@@ -186,6 +187,7 @@
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>nalgebra::{Matrix2x3, Vector3};
     <span class="kw">use </span>paste::item;
+    <span class="kw">use </span>rand::SeedableRng;
 
     <span class="macro">macro_rules! </span>make_test {
         (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
@@ -194,7 +196,8 @@
                 </span><span class="kw">fn </span>[&lt;test_random_vec_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = Vector3::new(<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">let </span>b = Vector3::new(<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
-                    <span class="kw">let </span>random = Vector3::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
+                    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::StdRng::seed_from_u64(<span class="number">42</span>);
+                    <span class="kw">let </span>random = Vector3::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;mut </span>rng);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="macro">assert!</span>(random[i] &gt;= a[i]);
                         <span class="macro">assert!</span>(random[i] &lt;= b[i]);
@@ -207,7 +210,8 @@
                 </span><span class="kw">fn </span>[&lt;test_random_vec_equal <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = Vector3::new(<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">let </span>b = Vector3::new(<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
-                    <span class="kw">let </span>random = Vector3::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
+                    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::StdRng::seed_from_u64(<span class="number">42</span>);
+                    <span class="kw">let </span>random = Vector3::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;mut </span>rng);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="macro">assert!</span>((random[i] <span class="kw">as </span>f64 - a[i] <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
                         <span class="macro">assert!</span>((random[i] <span class="kw">as </span>f64 - b[i] <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
@@ -220,7 +224,8 @@
                 </span><span class="kw">fn </span>[&lt;test_random_vec_reverse_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>b = Vector3::new(<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">let </span>a = Vector3::new(<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
-                    <span class="kw">let </span>random = Vector3::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
+                    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::StdRng::seed_from_u64(<span class="number">42</span>);
+                    <span class="kw">let </span>random = Vector3::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;mut </span>rng);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="macro">assert!</span>(random[i] &gt;= b[i]);
                         <span class="macro">assert!</span>(random[i] &lt;= a[i]);
@@ -239,7 +244,8 @@
                         <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">6 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>,
                         <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">5 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">7 </span><span class="kw">as </span><span class="macro-nonterminal">$t
                     </span>);
-                    <span class="kw">let </span>random = Matrix2x3::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
+                    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::StdRng::seed_from_u64(<span class="number">42</span>);
+                    <span class="kw">let </span>random = Matrix2x3::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;mut </span>rng);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                             <span class="macro">assert!</span>(random[(j, i)] &gt;= a[(j, i)]);

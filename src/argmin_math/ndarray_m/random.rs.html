@@ -129,7 +129,6 @@
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -137,18 +136,16 @@
 // http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-</span><span class="kw">use </span>rand::Rng;
+</span><span class="kw">use </span>rand::{Rng, SeedableRng};
 
 <span class="kw">use </span><span class="kw">crate</span>::ArgminRandom;
 
 <span class="macro">macro_rules! </span>make_random {
     (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
         <span class="kw">impl </span>ArgminRandom <span class="kw">for </span>ndarray::Array1&lt;<span class="macro-nonterminal">$t</span>&gt; {
-            <span class="kw">fn </span>rand_from_range(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; ndarray::Array1&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="kw">fn </span>rand_from_range&lt;R: Rng&gt;(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>, rng: <span class="kw-2">&amp;mut </span>R) -&gt; ndarray::Array1&lt;<span class="macro-nonterminal">$t</span>&gt; {
                 <span class="macro">assert!</span>(!min.is_empty());
                 <span class="macro">assert_eq!</span>(min.len(), max.len());
-
-                <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::thread_rng();
 
                 ndarray::Array1::from_iter(min.iter().zip(max.iter()).map(|(a, b)| {
                     <span class="comment">// Do not require a &lt; b:
@@ -167,11 +164,9 @@
         }
 
         <span class="kw">impl </span>ArgminRandom <span class="kw">for </span>ndarray::Array2&lt;<span class="macro-nonterminal">$t</span>&gt; {
-            <span class="kw">fn </span>rand_from_range(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; ndarray::Array2&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="kw">fn </span>rand_from_range&lt;R: Rng&gt;(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>, rng: <span class="kw-2">&amp;mut </span>R) -&gt; ndarray::Array2&lt;<span class="macro-nonterminal">$t</span>&gt; {
                 <span class="macro">assert!</span>(!min.is_empty());
                 <span class="macro">assert_eq!</span>(min.raw_dim(), max.raw_dim());
-
-                <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::thread_rng();
 
                 ndarray::Array2::from_shape_fn(min.raw_dim(), |(i, j)| {
                     <span class="kw">let </span>a = min.get((i, j)).unwrap();
@@ -210,6 +205,7 @@
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>ndarray::{array, Array1, Array2};
     <span class="kw">use </span>paste::item;
+    <span class="kw">use </span>rand::SeedableRng;
 
     <span class="macro">macro_rules! </span>make_test {
         (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
@@ -218,7 +214,8 @@
                 </span><span class="kw">fn </span>[&lt;test_random_vec_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">array!</span>[<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">let </span>b = <span class="macro">array!</span>[<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">5 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
-                    <span class="kw">let </span>random = Array1::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
+                    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::StdRng::seed_from_u64(<span class="number">42</span>);
+                    <span class="kw">let </span>random = Array1::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;mut </span>rng);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3usize </span>{
                         <span class="macro">assert!</span>(random[i] &gt;= a[i]);
                         <span class="macro">assert!</span>(random[i] &lt;= b[i]);
@@ -237,7 +234,8 @@
                         [<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">5 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>],
                         [<span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">6 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>]
                     ];
-                    <span class="kw">let </span>random = Array2::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
+                    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::StdRng::seed_from_u64(<span class="number">42</span>);
+                    <span class="kw">let </span>random = Array2::&lt;<span class="macro-nonterminal">$t</span>&gt;::rand_from_range(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;mut </span>rng);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                             <span class="macro">assert!</span>(random[(j, i)] &gt;= a[(j, i)]);

@@ -728,6 +728,59 @@
 <a href="#728" id="728">728</a>
 <a href="#729" id="729">729</a>
 <a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -755,6 +808,7 @@
     KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
+<span class="kw">use </span>rand::{Rng, SeedableRng};
 <span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
@@ -780,7 +834,7 @@
 /// \[1\] &lt;https://en.wikipedia.org/wiki/Particle_swarm_optimization&gt;
 </span><span class="attr">#[derive(Clone)]
 #[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
-</span><span class="kw">pub struct </span>ParticleSwarm&lt;P, F&gt; {
+</span><span class="kw">pub struct </span>ParticleSwarm&lt;P, F, R&gt; {
     <span class="doccomment">/// Inertia weight
     </span>weight_inertia: F,
     <span class="doccomment">/// Cognitive acceleration coefficient
@@ -791,9 +845,11 @@
     </span>bounds: (P, P),
     <span class="doccomment">/// Number of particles
     </span>num_particles: usize,
+    <span class="doccomment">/// Random number generator
+    </span>rng_generator: R,
 }
 
-<span class="kw">impl</span>&lt;P, F&gt; ParticleSwarm&lt;P, F&gt;
+<span class="kw">impl</span>&lt;P, F&gt; ParticleSwarm&lt;P, F, rand::rngs::StdRng&gt;
 <span class="kw">where
     </span>P: Clone + SyncAlias + ArgminSub&lt;P, P&gt; + ArgminMul&lt;F, P&gt; + ArgminRandom + ArgminZeroLike,
     F: ArgminFloat,
@@ -821,7 +877,7 @@
     /// # use argmin::solver::particleswarm::ParticleSwarm;
     /// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];
     /// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];
-    /// let pso: ParticleSwarm&lt;_, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), 40);
+    /// let pso: ParticleSwarm&lt;_, f64, _&gt; = ParticleSwarm::new((lower_bound, upper_bound), 40);
     /// ```
     </span><span class="kw">pub fn </span>new(bounds: (P, P), num_particles: usize) -&gt; <span class="self">Self </span>{
         ParticleSwarm {
@@ -830,9 +886,52 @@
             weight_social: <span class="macro">float!</span>(<span class="number">0.5 </span>+ <span class="number">2.0f64</span>.ln()),
             bounds,
             num_particles,
+            rng_generator: rand::rngs::StdRng::from_entropy(),
         }
     }
+}
+<span class="kw">impl</span>&lt;P, F, R0&gt; ParticleSwarm&lt;P, F, R0&gt;
+<span class="kw">where
+    </span>P: Clone + SyncAlias + ArgminSub&lt;P, P&gt; + ArgminMul&lt;F, P&gt; + ArgminRandom + ArgminZeroLike,
+    F: ArgminFloat,
+    R0: Rng,
+{
+    <span class="doccomment">/// Set the random number generator
+    ///
+    /// Defaults to `rand::rngs::StdRng::from_entropy()`
+    ///
+    /// # Example
+    /// ```
+    /// # use argmin::solver::particleswarm::ParticleSwarm;
+    /// # use argmin::core::Error;
+    /// # use rand::SeedableRng;
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];
+    /// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];
+    /// let pso: ParticleSwarm&lt;_, f64, _&gt; =
+    ///     ParticleSwarm::new((lower_bound, upper_bound), 40)
+    ///     .with_rng_generator(rand_xoshiro::Xoroshiro128Plus::seed_from_u64(1729));
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_rng_generator&lt;R1: Rng&gt;(<span class="self">self</span>, generator: R1) -&gt; ParticleSwarm&lt;P, F, R1&gt; {
+        ParticleSwarm {
+            weight_inertia: <span class="self">self</span>.weight_inertia,
+            weight_cognitive: <span class="self">self</span>.weight_cognitive,
+            weight_social: <span class="self">self</span>.weight_social,
+            bounds: <span class="self">self</span>.bounds,
+            num_particles: <span class="self">self</span>.num_particles,
+            rng_generator: generator,
+        }
+    }
+}
 
+<span class="kw">impl</span>&lt;P, F, R&gt; ParticleSwarm&lt;P, F, R&gt;
+<span class="kw">where
+    </span>P: Clone + SyncAlias + ArgminSub&lt;P, P&gt; + ArgminMul&lt;F, P&gt; + ArgminRandom + ArgminZeroLike,
+    F: ArgminFloat,
+    R: Rng,
+{
     <span class="doccomment">/// Set inertia factor on particle velocity
     ///
     /// Defaults to `1/(2 * ln(2))`.
@@ -845,7 +944,7 @@
     /// # fn main() -&gt; Result&lt;(), Error&gt; {
     /// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];
     /// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];
-    /// let pso: ParticleSwarm&lt;_, f64&gt; =
+    /// let pso: ParticleSwarm&lt;_, f64, _&gt; =
     ///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_inertia_factor(0.5)?;
     /// # Ok(())
     /// # }
@@ -873,7 +972,7 @@
     /// # fn main() -&gt; Result&lt;(), Error&gt; {
     /// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];
     /// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];
-    /// let pso: ParticleSwarm&lt;_, f64&gt; =
+    /// let pso: ParticleSwarm&lt;_, f64, _&gt; =
     ///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_cognitive_factor(1.1)?;
     /// # Ok(())
     /// # }
@@ -901,7 +1000,7 @@
     /// # fn main() -&gt; Result&lt;(), Error&gt; {
     /// # let lower_bound: Vec&lt;f64&gt; = vec![-1.0, -1.0];
     /// # let upper_bound: Vec&lt;f64&gt; = vec![1.0, 1.0];
-    /// let pso: ParticleSwarm&lt;_, f64&gt; =
+    /// let pso: ParticleSwarm&lt;_, f64, _&gt; =
     ///     ParticleSwarm::new((lower_bound, upper_bound), 40).with_social_factor(1.1)?;
     /// # Ok(())
     /// # }
@@ -944,23 +1043,23 @@
     }
 
     <span class="doccomment">/// Initializes positions and velocities for all particles
-    </span><span class="kw">fn </span>initialize_positions_and_velocities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;P&gt;, Vec&lt;P&gt;) {
+    </span><span class="kw">fn </span>initialize_positions_and_velocities(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; (Vec&lt;P&gt;, Vec&lt;P&gt;) {
         <span class="kw">let </span>(min, max) = <span class="kw-2">&amp;</span><span class="self">self</span>.bounds;
         <span class="kw">let </span>delta = max.sub(min);
         <span class="kw">let </span>delta_neg = delta.mul(<span class="kw-2">&amp;</span><span class="macro">float!</span>(-<span class="number">1.0</span>));
 
         (
             (<span class="number">0</span>..<span class="self">self</span>.num_particles)
-                .map(|<span class="kw">_</span>| P::rand_from_range(min, max))
+                .map(|<span class="kw">_</span>| P::rand_from_range(min, max, <span class="kw-2">&amp;mut </span><span class="self">self</span>.rng_generator))
                 .collect(),
             (<span class="number">0</span>..<span class="self">self</span>.num_particles)
-                .map(|<span class="kw">_</span>| P::rand_from_range(<span class="kw-2">&amp;</span>delta_neg, <span class="kw-2">&amp;</span>delta))
+                .map(|<span class="kw">_</span>| P::rand_from_range(<span class="kw-2">&amp;</span>delta_neg, <span class="kw-2">&amp;</span>delta, <span class="kw-2">&amp;mut </span><span class="self">self</span>.rng_generator))
                 .collect(),
         )
     }
 }
 
-<span class="kw">impl</span>&lt;O, P, F&gt; Solver&lt;O, PopulationState&lt;Particle&lt;P, F&gt;, F&gt;&gt; <span class="kw">for </span>ParticleSwarm&lt;P, F&gt;
+<span class="kw">impl</span>&lt;O, P, F, R&gt; Solver&lt;O, PopulationState&lt;Particle&lt;P, F&gt;, F&gt;&gt; <span class="kw">for </span>ParticleSwarm&lt;P, F, R&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt; + SyncAlias,
     P: SerializeAlias
@@ -973,6 +1072,7 @@
         + ArgminRandom
         + ArgminMinMax,
     F: ArgminFloat,
+    R: Rng,
 {
     <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Particle Swarm Optimization&quot;</span>;
 
@@ -1045,13 +1145,15 @@
 
                 <span class="comment">// ad 2)
                 </span><span class="kw">let </span>to_optimum = p.best_position.sub(<span class="kw-2">&amp;</span>p.position);
-                <span class="kw">let </span>pull_to_optimum = P::rand_from_range(<span class="kw-2">&amp;</span>zero, <span class="kw-2">&amp;</span>to_optimum);
+                <span class="kw">let </span>pull_to_optimum =
+                    P::rand_from_range(<span class="kw-2">&amp;</span>zero, <span class="kw-2">&amp;</span>to_optimum, <span class="kw-2">&amp;mut </span><span class="self">self</span>.rng_generator);
                 <span class="kw">let </span>pull_to_optimum = pull_to_optimum.mul(<span class="kw-2">&amp;</span><span class="self">self</span>.weight_cognitive);
 
                 <span class="comment">// ad 3)
                 </span><span class="kw">let </span>to_global_optimum = best_particle.position.sub(<span class="kw-2">&amp;</span>p.position);
                 <span class="kw">let </span>pull_to_global_optimum =
-                    P::rand_from_range(<span class="kw-2">&amp;</span>zero, <span class="kw-2">&amp;</span>to_global_optimum).mul(<span class="kw-2">&amp;</span><span class="self">self</span>.weight_social);
+                    P::rand_from_range(<span class="kw-2">&amp;</span>zero, <span class="kw-2">&amp;</span>to_global_optimum, <span class="kw-2">&amp;mut </span><span class="self">self</span>.rng_generator)
+                        .mul(<span class="kw-2">&amp;</span><span class="self">self</span>.weight_social);
 
                 p.velocity = momentum.add(<span class="kw-2">&amp;</span>pull_to_optimum).add(<span class="kw-2">&amp;</span>pull_to_global_optimum);
                 <span class="kw">let </span>new_position = p.position.add(<span class="kw-2">&amp;</span>p.velocity);
@@ -1138,13 +1240,16 @@
     <span class="kw">use </span><span class="kw">crate</span>::test_trait_impl;
     <span class="kw">use </span>approx::assert_relative_eq;
 
-    <span class="macro">test_trait_impl!</span>(particleswarm, ParticleSwarm&lt;Vec&lt;f64&gt;, f64&gt;);
+    <span class="macro">test_trait_impl!</span>(
+        particleswarm,
+        ParticleSwarm&lt;Vec&lt;f64&gt;, f64, rand::rngs::StdRng&gt;
+    );
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_new() {
         <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
         <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; =
+        <span class="kw">let </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64, rand::rngs::StdRng&gt; =
             ParticleSwarm::new((lower_bound.clone(), upper_bound.clone()), <span class="number">40</span>);
         <span class="kw">let </span>ParticleSwarm {
             weight_inertia,
@@ -1152,6 +1257,7 @@
             weight_social,
             bounds,
             num_particles,
+            ..
         } = pso;
 
         <span class="macro">assert_relative_eq!</span>(
@@ -1268,7 +1374,7 @@
         <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
         <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
         <span class="kw">let </span>num_particles = <span class="number">100</span>;
-        <span class="kw">let </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; =
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64, <span class="kw">_</span>&gt; =
             ParticleSwarm::new((lower_bound, upper_bound), num_particles);
 
         <span class="kw">let </span>(positions, velocities) = pso.initialize_positions_and_velocities();
@@ -1295,7 +1401,7 @@
         <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
         <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
         <span class="kw">let </span>num_particles = <span class="number">10</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; =
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64, <span class="kw">_</span>&gt; =
             ParticleSwarm::new((lower_bound, upper_bound), num_particles);
 
         <span class="kw">struct </span>PsoProblem {
@@ -1360,7 +1466,7 @@
     </span><span class="kw">fn </span>test_init_provided_population_wrong_size() {
         <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
         <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">40</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64, <span class="kw">_</span>&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">40</span>);
         <span class="kw">let </span>state: PopulationState&lt;Particle&lt;Vec&lt;f64&gt;, f64&gt;, f64&gt; = PopulationState::new()
             .population(<span class="macro">vec!</span>[Particle::new(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="number">12.0</span>, <span class="macro">vec!</span>[<span class="number">0.1</span>, <span class="number">0.3</span>])]);
         <span class="kw">let </span>res = pso.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
@@ -1380,7 +1486,7 @@
         <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
         <span class="kw">let </span>particle_a = Particle::new(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>], <span class="number">12.0</span>, <span class="macro">vec!</span>[<span class="number">0.1</span>, <span class="number">0.3</span>]);
         <span class="kw">let </span>particle_b = Particle::new(<span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">3.0</span>], <span class="number">10.0</span>, <span class="macro">vec!</span>[<span class="number">0.2</span>, <span class="number">0.4</span>]);
-        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">2</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64, <span class="kw">_</span>&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">2</span>);
         <span class="kw">let </span>state: PopulationState&lt;Particle&lt;Vec&lt;f64&gt;, f64&gt;, f64&gt; =
             PopulationState::new().population(<span class="macro">vec!</span>[particle_a.clone(), particle_b.clone()]);
         <span class="kw">let </span>res = pso.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
@@ -1398,7 +1504,7 @@
     </span><span class="kw">fn </span>test_init_random_population() {
         <span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
         <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">40</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64, <span class="kw">_</span>&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">40</span>);
         <span class="kw">let </span>state: PopulationState&lt;Particle&lt;Vec&lt;f64&gt;, f64&gt;, f64&gt; = PopulationState::new();
         <span class="kw">let </span>res = pso.init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
         <span class="macro">assert!</span>(res.is_ok());
@@ -1437,7 +1543,7 @@
         <span class="comment">// setup
         </span><span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0</span>];
         <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
-        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">100</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64, <span class="kw">_</span>&gt; = ParticleSwarm::new((lower_bound, upper_bound), <span class="number">100</span>);
         <span class="kw">let </span>state: PopulationState&lt;Particle&lt;Vec&lt;f64&gt;, f64&gt;, f64&gt; = PopulationState::new();
 
         <span class="comment">// init

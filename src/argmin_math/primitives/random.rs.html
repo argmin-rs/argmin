@@ -65,6 +65,8 @@
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -79,8 +81,8 @@
     (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
         <span class="kw">impl </span>ArgminRandom <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
             <span class="attr">#[inline]
-            </span><span class="kw">fn </span>rand_from_range(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="macro-nonterminal">$t </span>{
-                rand::thread_rng().gen_range(<span class="kw-2">*</span>min..<span class="kw-2">*</span>max)
+            </span><span class="kw">fn </span>rand_from_range&lt;R: Rng&gt;(min: <span class="kw-2">&amp;</span><span class="self">Self</span>, max: <span class="kw-2">&amp;</span><span class="self">Self</span>, rng: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="macro-nonterminal">$t </span>{
+                rng.gen_range(<span class="kw-2">*</span>min..<span class="kw-2">*</span>max)
             }
         }
     };
@@ -103,6 +105,7 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>paste::item;
+    <span class="kw">use </span>rand::SeedableRng;
 
     <span class="macro">macro_rules! </span>make_test {
         (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
@@ -111,7 +114,8 @@
                 </span><span class="kw">fn </span>[&lt;test_random_vec_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>;
                     <span class="kw">let </span>b = <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>;
-                    <span class="kw">let </span>random = <span class="macro-nonterminal">$t::rand_from_range</span>(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
+                    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::StdRng::seed_from_u64(<span class="number">42</span>);
+                    <span class="kw">let </span>random = <span class="macro-nonterminal">$t::rand_from_range</span>(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;mut </span>rng);
                     <span class="macro">assert!</span>(random &gt;= a);
                     <span class="macro">assert!</span>(random &lt;= b);
                 }
