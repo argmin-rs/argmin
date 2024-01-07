@@ -11,11 +11,9 @@ use rand::Rng;
 macro_rules! make_random {
     ($t:ty) => {
         impl ArgminRandom for Vec<$t> {
-            fn rand_from_range(min: &Self, max: &Self) -> Vec<$t> {
+            fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> Vec<$t> {
                 assert!(!min.is_empty());
                 assert_eq!(min.len(), max.len());
-
-                let mut rng = rand::thread_rng();
 
                 min.iter()
                     .zip(max.iter())
@@ -37,12 +35,12 @@ macro_rules! make_random {
         }
 
         impl ArgminRandom for Vec<Vec<$t>> {
-            fn rand_from_range(min: &Self, max: &Self) -> Vec<Vec<$t>> {
+            fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> Vec<Vec<$t>> {
                 assert!(!min.is_empty());
                 assert_eq!(min.len(), max.len());
                 min.iter()
                     .zip(max.iter())
-                    .map(|(a, b)| Vec::<$t>::rand_from_range(a, b))
+                    .map(|(a, b)| Vec::<$t>::rand_from_range(a, b, rng))
                     .collect()
             }
         }
@@ -66,6 +64,7 @@ make_random!(usize);
 mod tests {
     use super::*;
     use paste::item;
+    use rand::SeedableRng;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -74,7 +73,8 @@ mod tests {
                 fn [<test_random_vec_ $t>]() {
                     let a = vec![1 as $t, 2 as $t, 4 as $t];
                     let b = vec![2 as $t, 3 as $t, 5 as $t];
-                    let random = Vec::<$t>::rand_from_range(&a, &b);
+                    let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+                    let random = Vec::<$t>::rand_from_range(&a, &b, &mut rng);
                     for i in 0..3usize {
                         assert!(random[i] >= a[i]);
                         assert!(random[i] <= b[i]);
@@ -93,7 +93,8 @@ mod tests {
                         vec![2 as $t, 3 as $t, 5 as $t],
                         vec![3 as $t, 4 as $t, 6 as $t]
                     ];
-                    let random = Vec::<Vec<$t>>::rand_from_range(&a, &b);
+                    let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+                    let random = Vec::<Vec<$t>>::rand_from_range(&a, &b, &mut rng);
                     for i in 0..3 {
                         for j in 0..2 {
                             assert!(random[j][i] >= a[j][i]);

@@ -5,18 +5,16 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use rand::Rng;
+use rand::{Rng, SeedableRng};
 
 use crate::ArgminRandom;
 
 macro_rules! make_random {
     ($t:ty) => {
         impl ArgminRandom for ndarray::Array1<$t> {
-            fn rand_from_range(min: &Self, max: &Self) -> ndarray::Array1<$t> {
+            fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> ndarray::Array1<$t> {
                 assert!(!min.is_empty());
                 assert_eq!(min.len(), max.len());
-
-                let mut rng = rand::thread_rng();
 
                 ndarray::Array1::from_iter(min.iter().zip(max.iter()).map(|(a, b)| {
                     // Do not require a < b:
@@ -35,11 +33,9 @@ macro_rules! make_random {
         }
 
         impl ArgminRandom for ndarray::Array2<$t> {
-            fn rand_from_range(min: &Self, max: &Self) -> ndarray::Array2<$t> {
+            fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> ndarray::Array2<$t> {
                 assert!(!min.is_empty());
                 assert_eq!(min.raw_dim(), max.raw_dim());
-
-                let mut rng = rand::thread_rng();
 
                 ndarray::Array2::from_shape_fn(min.raw_dim(), |(i, j)| {
                     let a = min.get((i, j)).unwrap();
@@ -78,6 +74,7 @@ mod tests {
     use super::*;
     use ndarray::{array, Array1, Array2};
     use paste::item;
+    use rand::SeedableRng;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -86,7 +83,8 @@ mod tests {
                 fn [<test_random_vec_ $t>]() {
                     let a = array![1 as $t, 2 as $t, 4 as $t];
                     let b = array![2 as $t, 3 as $t, 5 as $t];
-                    let random = Array1::<$t>::rand_from_range(&a, &b);
+                    let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+                    let random = Array1::<$t>::rand_from_range(&a, &b, &mut rng);
                     for i in 0..3usize {
                         assert!(random[i] >= a[i]);
                         assert!(random[i] <= b[i]);
@@ -105,7 +103,8 @@ mod tests {
                         [2 as $t, 3 as $t, 5 as $t],
                         [3 as $t, 4 as $t, 6 as $t]
                     ];
-                    let random = Array2::<$t>::rand_from_range(&a, &b);
+                    let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+                    let random = Array2::<$t>::rand_from_range(&a, &b, &mut rng);
                     for i in 0..3 {
                         for j in 0..2 {
                             assert!(random[(j, i)] >= a[(j, i)]);
