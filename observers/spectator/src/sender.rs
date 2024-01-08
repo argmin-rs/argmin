@@ -5,8 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use argmin_plotter::Message;
 use futures::SinkExt;
+use spectator::Message;
 use tokio::net::TcpStream;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 
@@ -24,7 +24,7 @@ pub(crate) async fn sender(
             stream.send(msg).await?;
         }
     } else {
-        eprintln!("Can't connect to argmin-plotter on {host}:{port}");
+        eprintln!("Can't connect to spectator on {host}:{port}");
     }
     Ok(())
 }

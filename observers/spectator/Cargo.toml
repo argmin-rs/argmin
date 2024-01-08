@@ -1,10 +1,10 @@
 [package]
-name = "argmin-observer-plotter"
+name = "argmin-observer-spectator"
 version = "0.1.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
-description = "plotter observer for argmin"
+description = "Spectator observer for argmin"
 documentation = "https://docs.rs/argmin_observer_egui/"
 homepage = "https://argmin-rs.org"
 repository = "https://github.com/argmin-rs/argmin"
@@ -16,7 +16,7 @@ exclude = []
 [dependencies]
 anyhow = "1.0"
 argmin = { version = "0.9.0", path = "../../argmin", default-features = false, features = ["serde1"] }
-argmin-plotter = { version = "0.1", path = "../../tools/plotter", default-features = false }
+spectator = { version = "0.1", path = "../../tools/spectator", default-features = false }
 futures = { version = "0.3" }
 time = { version = "0.3" }
 tokio = { version = "1.25.0", features = ["rt", "net", "macros", "sync"] }

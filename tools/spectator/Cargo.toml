@@ -1,11 +1,11 @@
 [package]
-name = "argmin-plotter"
+name = "spectator"
 version = "0.1.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "Visualization tool for argmin"
-documentation = "https://docs.rs/argmin_plotter/"
+documentation = "https://docs.rs/spectator/"
 homepage = "https://argmin-rs.org"
 repository = "https://github.com/argmin-rs/argmin"
 readme = "README.md"
@@ -38,5 +38,5 @@ tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"], o
 uuid = { version = "1.3.0", features = ["v4"], optional = true }
 
 [features]
-default = ["plotter"]
-plotter = ["dashmap", "tracing", "tracing-bunyan-formatter", "tracing-log", "tracing-subscriber", "eframe", "egui_dock", "egui_extras", "egui_plot", "itertools", "tokio", "tokio-stream", "tokio-util", "uuid"]
+default = ["spectator"]
+spectator = ["dashmap", "tracing", "tracing-bunyan-formatter", "tracing-log", "tracing-subscriber", "eframe", "egui_dock", "egui_extras", "egui_plot", "itertools", "tokio", "tokio-stream", "tokio-util", "uuid"]

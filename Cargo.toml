@@ -5,7 +5,7 @@ members = [
     "argmin",
     "argmin-math",
     "observers/*",
-    "tools/plotter",
+    "tools/spectator",
 ]
 
 exclude = [

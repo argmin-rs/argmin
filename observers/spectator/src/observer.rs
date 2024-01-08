@@ -9,7 +9,7 @@ use std::collections::HashSet;
 
 use anyhow::Error;
 use argmin::core::{observers::Observe, ArgminFloat, State, KV};
-use argmin_plotter::{Message, DEFAULT_PORT};
+use spectator::{Message, DEFAULT_PORT};
 use time::Duration;
 use uuid::Uuid;
 
@@ -17,14 +17,14 @@ use crate::sender::sender;
 
 const DEFAULT_HOST: &str = "127.0.0.1";
 
-/// Builder for the Plotter observer
+/// Builder for the Spectator observer
 ///
 /// # Example
 ///
 /// ```
-/// use argmin_observer_plotter::PlotterBuilder;
+/// use argmin_observer_spectator::SpectatorBuilder;
 ///
-/// let plotter = PlotterBuilder::new()
+/// let spectator = SpectatorBuilder::new()
 ///     // Optional: Name the optimization run
 ///     // Default: random uuid.
 ///     .with_name("optimization_run_1")
@@ -35,10 +35,10 @@ const DEFAULT_HOST: &str = "127.0.0.1";
 ///     // Choose which metrics should automatically be selected.
 ///     // If omitted, all metrics will be selected.
 ///     .select(&["cost", "best_cost"])
-///     // Build Plotter observer
+///     // Build Spectator observer
 ///     .build();
 /// ```
-pub struct PlotterBuilder {
+pub struct SpectatorBuilder {
     name: String,
     selected: HashSet<String>,
     capacity: usize,
@@ -46,16 +46,16 @@ pub struct PlotterBuilder {
     port: u16,
 }
 
-impl Default for PlotterBuilder {
+impl Default for SpectatorBuilder {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl PlotterBuilder {
-    /// Creates a new `PlotterBuilder`
+impl SpectatorBuilder {
+    /// Creates a new `SpectatorBuilder`
     pub fn new() -> Self {
-        PlotterBuilder {
+        SpectatorBuilder {
             name: Uuid::new_v4().to_string(),
             selected: HashSet::new(),
             capacity: 10_000,
@@ -71,8 +71,8 @@ impl PlotterBuilder {
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
-    /// let builder = PlotterBuilder::new().with_name("optimization_run_1");
+    /// # use argmin_observer_spectator::SpectatorBuilder;
+    /// let builder = SpectatorBuilder::new().with_name("optimization_run_1");
     /// # assert_eq!(builder.name().clone(), "optimization_run_1".to_string());
     /// ```
     pub fn with_name<T: AsRef<str>>(mut self, name: T) -> Self {
@@ -80,15 +80,15 @@ impl PlotterBuilder {
         self
     }
 
-    /// Set the host argmin plotter is running on.
+    /// Set the host argmin spectator is running on.
     ///
     /// Defaults to 127.0.0.1.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
-    /// let builder = PlotterBuilder::new().with_host("192.168.0.1");
+    /// # use argmin_observer_spectator::SpectatorBuilder;
+    /// let builder = SpectatorBuilder::new().with_host("192.168.0.1");
     /// # assert_eq!(builder.host().clone(), "192.168.0.1".to_string());
     /// ```
     pub fn with_host<T: AsRef<str>>(mut self, host: T) -> Self {
@@ -96,15 +96,15 @@ impl PlotterBuilder {
         self
     }
 
-    /// Set the port argmin plotter is running on.
+    /// Set the port Spectator is running on.
     ///
     /// Defaults to 5498.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
-    /// let builder = PlotterBuilder::new().with_port(1234);
+    /// # use argmin_observer_spectator::SpectatorBuilder;
+    /// let builder = SpectatorBuilder::new().with_port(1234);
     /// # assert_eq!(builder.port(), 1234);
     /// ```
     pub fn with_port(mut self, port: u16) -> Self {
@@ -114,7 +114,7 @@ impl PlotterBuilder {
 
     /// Set the channel capacity
     ///
-    /// A channel is used to queue messages for sending to the argmin plotter. If the channel
+    /// A channel is used to queue messages for sending to Spectator. If the channel
     /// capacity is reached backpressure will be applied, effectively blocking the optimization.
     /// Defaults to 10000. Decrease this value in case memory consumption is too high and increase
     /// the value in case blocking causes negative effects.
@@ -122,8 +122,8 @@ impl PlotterBuilder {
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
-    /// let builder = PlotterBuilder::new().with_channel_capacity(1000);
+    /// # use argmin_observer_spectator::SpectatorBuilder;
+    /// let builder = SpectatorBuilder::new().with_channel_capacity(1000);
     /// # assert_eq!(builder.channel_capacity(), 1000);
     /// ```
     pub fn with_channel_capacity(mut self, capacity: usize) -> Self {
@@ -131,7 +131,7 @@ impl PlotterBuilder {
         self
     }
 
-    /// Define which metrics will be selected in argmin plotter by default
+    /// Define which metrics will be selected in Spectator by default
     ///
     /// If none are set, all metrics will be selected and shown. Providing zero or more metrics
     /// via `select` disables all apart from the provided ones. Note that all data will be sent, and
@@ -140,9 +140,9 @@ impl PlotterBuilder {
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// # use argmin_observer_spectator::SpectatorBuilder;
     /// # use std::collections::HashSet;
-    /// let builder = PlotterBuilder::new().select(&["cost", "best_cost"]);
+    /// let builder = SpectatorBuilder::new().select(&["cost", "best_cost"]);
     /// # assert_eq!(builder.selected(), &HashSet::from(["cost".to_string(), "best_cost".to_string()]));
     /// ```
     pub fn select<T: AsRef<str>>(mut self, metrics: &[T]) -> Self {
@@ -155,8 +155,8 @@ impl PlotterBuilder {
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
-    /// # let builder = PlotterBuilder::new().with_name("test");
+    /// # use argmin_observer_spectator::SpectatorBuilder;
+    /// # let builder = SpectatorBuilder::new().with_name("test");
     /// let name = builder.name();
     /// # assert_eq!(name, &"test".to_string());
     /// ```
@@ -169,8 +169,8 @@ impl PlotterBuilder {
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
-    /// # let builder = PlotterBuilder::new();
+    /// # use argmin_observer_spectator::SpectatorBuilder;
+    /// # let builder = SpectatorBuilder::new();
     /// let host = builder.host();
     /// # assert_eq!(host, &"127.0.0.1".to_string());
     /// ```
@@ -183,8 +183,8 @@ impl PlotterBuilder {
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
-    /// # let builder = PlotterBuilder::new();
+    /// # use argmin_observer_spectator::SpectatorBuilder;
+    /// # let builder = SpectatorBuilder::new();
     /// let port = builder.port();
     /// # assert_eq!(port, 5498);
     /// ```
@@ -197,8 +197,8 @@ impl PlotterBuilder {
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
-    /// # let builder = PlotterBuilder::new();
+    /// # use argmin_observer_spectator::SpectatorBuilder;
+    /// # let builder = SpectatorBuilder::new();
     /// let capacity = builder.channel_capacity();
     /// # assert_eq!(capacity, 10000);
     /// ```
@@ -211,9 +211,9 @@ impl PlotterBuilder {
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
+    /// # use argmin_observer_spectator::SpectatorBuilder;
     /// # use std::collections::HashSet;
-    /// # let builder = PlotterBuilder::new().select(&["cost", "best_cost"]);
+    /// # let builder = SpectatorBuilder::new().select(&["cost", "best_cost"]);
     /// let selected = builder.selected();
     /// # assert_eq!(selected, &HashSet::from(["cost".to_string(), "best_cost".to_string()]));
     /// ```
@@ -221,21 +221,21 @@ impl PlotterBuilder {
         &self.selected
     }
 
-    /// Build a Plotter instance from the builder
+    /// Build a Spectator instance from the builder
     ///
-    /// This initiates the connection to the plotter instance.
+    /// This initiates the connection to the Spectator instance.
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
-    /// let plotter = PlotterBuilder::new().build();
+    /// # use argmin_observer_spectator::SpectatorBuilder;
+    /// let spectator = SpectatorBuilder::new().build();
     /// ```
-    pub fn build(self) -> Plotter {
+    pub fn build(self) -> Spectator {
         let (tx, rx) = tokio::sync::mpsc::channel(self.capacity);
         std::thread::spawn(move || sender(rx, self.host, self.port));
 
-        Plotter {
+        Spectator {
             tx,
             name: self.name,
             sending: true,
@@ -244,36 +244,35 @@ impl PlotterBuilder {
     }
 }
 
-/// Observer which sends data to argmin-plotter
+/// Observer which sends data to Spectator
 // No #[derive(Clone)] on purpose: A clone will only overwrite information already present in the
-// Plotter since the name cannot be changed.
-pub struct Plotter {
+// Spectator since the name cannot be changed.
+pub struct Spectator {
     tx: tokio::sync::mpsc::Sender<Message>,
     name: String,
     sending: bool,
     selected: HashSet<String>,
 }
 
-impl Plotter {
+impl Spectator {
     /// Places a `Message` on the sending queue
     fn send_msg(&mut self, message: Message) {
         if self.sending {
             if let Err(e) = self.tx.blocking_send(message) {
-                eprintln!("Can't send to argmin-plotter: {e}. Will stop trying.");
+                eprintln!("Can't send to Spectator: {e}. Will stop trying.");
                 self.sending = false;
             }
         }
     }
 
-    /// Returns the name of the Plotter instance
+    /// Returns the name of the Spectator instance
     ///
     /// # Example
     ///
     /// ```
-    /// # use argmin_observer_plotter::PlotterBuilder;
-    ///
-    /// # let plotter = PlotterBuilder::new().with_name("flup").build();
-    /// let name = plotter.name();
+    /// # use argmin_observer_spectator::SpectatorBuilder;
+    /// # let spectator = SpectatorBuilder::new().with_name("flup").build();
+    /// let name = spectator.name();
     /// # assert_eq!(name, &"flup".to_string());
     /// ```
     pub fn name(&self) -> &String {
@@ -281,7 +280,7 @@ impl Plotter {
     }
 }
 
-impl<I> Observe<I> for Plotter
+impl<I> Observe<I> for Spectator
 where
     I: State,
     I::Param: IntoIterator<Item = I::Float> + Clone,

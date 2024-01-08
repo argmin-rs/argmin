@@ -5,16 +5,16 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Observer for argmin plotter
+//! # Observer for Spectator
 //!
-//! This observer sends metrics and parameter vectors to an argmin plotter instance.
+//! This observer sends metrics and parameter vectors to a Spectator instance.
 //!
 //! ## Example
 //!
 //! ```
-//! use argmin_observer_plotter::PlotterBuilder;
+//! use argmin_observer_spectator::SpectatorBuilder;
 //!
-//! let observer = PlotterBuilder::new()
+//! let observer = SpectatorBuilder::new()
 //!     // Optional: Name the optimization run
 //!     // Default: random uuid.
 //!     .with_name("optimization_run_1")
@@ -25,14 +25,14 @@
 //!     // Choose which metrics should automatically be selected.
 //!     // If omitted, all metrics will be selected.
 //!     .select(&["cost", "best_cost"])
-//!     // Build Plotter observer
+//!     // Build Spectator observer
 //!     .build();
 //! ```
 //!
-//! The `observer`, when passed to `add_observer` of `Executor` sends metrics to a argmin plotter
+//! The `observer`, when passed to `add_observer` of `Executor` sends metrics to a Spectator
 //! instance running on `127.0.0.1:5498`. For details on how to configure the observer the reader
-//! is referred to the documentation of [`PlotterBuilder`].
-//! Make sure an argmin plotter instance is running when calling `.build()` on [`PlotterBuilder`].
+//! is referred to the documentation of [`SpectatorBuilder`].
+//! Make sure a Spectator instance is running when calling `.build()` on [`SpectatorBuilder`].
 //!
 //! # Usage
 //!
@@ -40,7 +40,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!("argmin-observer-plotter = \"", env!("CARGO_PKG_VERSION"), "\"")]
+#![doc = concat!("argmin-observer-spectator = \"", env!("CARGO_PKG_VERSION"), "\"")]
 //! ```
 //!
 //! # License
@@ -64,4 +64,4 @@
 mod observer;
 mod sender;
 
-pub use observer::PlotterBuilder;
+pub use observer::SpectatorBuilder;
