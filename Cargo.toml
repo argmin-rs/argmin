@@ -9,3 +9,6 @@ members = [
 exclude = [
     "media/book/tests",
 ]
+
+[profile.bench]
+debug = true
