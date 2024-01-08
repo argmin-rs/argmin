@@ -13,7 +13,7 @@ use bytes::{Bytes, BytesMut};
 use serde::{Deserialize, Serialize};
 use time::Duration;
 
-/// Enum used to encode information sent to plotter.
+/// Enum used to encode information sent to spectator.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub enum Message {
     /// Register a new run

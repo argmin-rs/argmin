@@ -9,13 +9,12 @@ use argmin::{
     core::{observers::ObserverMode, CostFunction, Error, Executor},
     solver::simulatedannealing::{Anneal, SATempFunc, SimulatedAnnealing},
 };
-use argmin_observer_plotter::PlotterBuilder;
+use argmin_observer_spectator::SpectatorBuilder;
 use argmin_testfunctions::rosenbrock;
 use rand::{distributions::Uniform, prelude::*};
 use rand_xoshiro::Xoshiro256PlusPlus;
 use std::sync::{Arc, Mutex};
 
-#[derive(Clone)]
 struct Rosenbrock {
     /// Parameter a, usually 1.0
     a: f64,
@@ -49,6 +48,7 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+        // std::thread::sleep(std::time::Duration::from_millis(5));
         Ok(rosenbrock(param, self.a, self.b))
     }
 }
@@ -70,7 +70,7 @@ impl Anneal for Rosenbrock {
             let idx = rng.sample(distr);
 
             // Compute random number in [0.1, 0.1].
-            let val = rng.sample(Uniform::new_inclusive(-0.1, 0.1));
+            let val = rng.sample(Uniform::new_inclusive(-0.0001, 0.0001));
 
             // modify previous parameter value at random position `idx` by `val`
             param_n[idx] += val;
@@ -83,77 +83,62 @@ impl Anneal for Rosenbrock {
 }
 
 fn run() -> Result<(), Error> {
+    let num = 10;
     // Define bounds
-    // let lower_bound: Vec<f64> = vec![-50.0, -50.0];
-    // let upper_bound: Vec<f64> = vec![50.0, 50.0];
-    let lower_bound: Vec<f64> = vec![-50.0; 20];
-    let upper_bound: Vec<f64> = vec![50.0; 20];
+    let lower_bound: Vec<f64> = vec![-5.0; num];
+    let upper_bound: Vec<f64> = vec![5.0; num];
 
     // Define cost function
     let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
 
     // Define initial parameter vector
-    let init_param: Vec<f64> = vec![3.0; 20];
+    let init_param: Vec<f64> = vec![-0.9; num];
 
     // Define initial temperature
-    let temp = 1500.0;
+    // let temp = 0.0001;
+    let temp = 1000.0;
 
     // Set up simulated annealing solver
     // An alternative random number generator (RNG) can be provided to `new_with_rng`:
     // SimulatedAnnealing::new_with_rng(temp, Xoshiro256PlusPlus::from_entropy())?
     let solver = SimulatedAnnealing::new(temp)?
         // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
-        .with_temp_func(SATempFunc::Boltzmann)
-        /////////////////////////
-        // Stopping criteria   //
-        /////////////////////////
-        // Optional: stop if there was no new best solution after 1000 iterations
-        .with_stall_best(1000)
-        // Optional: stop if there was no accepted solution after 1000 iterations
-        .with_stall_accepted(1000)
-        /////////////////////////
-        // Reannealing         //
-        /////////////////////////
-        // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
-        .with_reannealing_fixed(1000)
-        // Optional: Reanneal after no accepted solution has been found for `iter` iterations
-        .with_reannealing_accepted(500)
-        // Optional: Start reannealing after no new best solution has been found for 800 iterations
-        .with_reannealing_best(800);
+        .with_temp_func(SATempFunc::Boltzmann);
+    /////////////////////////
+    // Stopping criteria   //
+    /////////////////////////
+    // Optional: stop if there was no new best solution after 1000 iterations
+    // .with_stall_best(1000)
+    // Optional: stop if there was no accepted solution after 1000 iterations
+    // .with_stall_accepted(1000)
+    /////////////////////////
+    // Reannealing         //
+    /////////////////////////
+    // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
+    // .with_reannealing_fixed(1000)
+    // Optional: Reanneal after no accepted solution has been found for `iter` iterations
+    // .with_reannealing_accepted(1000)
+    // Optional: Start reannealing after no new best solution has been found for 800 iterations
+    // .with_reannealing_best(1000);
+
+    let spectator = SpectatorBuilder::new()
+        // .with_name("something")
+        .select(&["cost", "best_cost", "t"])
+        .build();
 
     /////////////////////////
     // Run solver          //
     /////////////////////////
-    let observer = PlotterBuilder::new().build();
-    let res = Executor::new(operator.clone(), solver.clone())
-        .configure(|state| {
-            state
-                .param(init_param.clone())
-                // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-                .max_iters(10_000)
-                // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
-                .target_cost(0.0)
-        })
-        .add_observer(observer, ObserverMode::Always)
-        .run()?;
-
-    // Wait a second (lets the logger flush everything before printing again)
-    std::thread::sleep(std::time::Duration::from_secs(1));
-
-    // Print result
-    println!("{res}");
-
-    let observer = PlotterBuilder::new().build();
     let res = Executor::new(operator, solver)
         .configure(|state| {
             state
                 .param(init_param)
                 // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-                .max_iters(10_000)
+                .max_iters(1_000_000)
                 // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
                 .target_cost(0.0)
         })
-        .add_observer(observer, ObserverMode::Always)
+        .add_observer(spectator, ObserverMode::Always)
         .run()?;
 
     // Wait a second (lets the logger flush everything before printing again)

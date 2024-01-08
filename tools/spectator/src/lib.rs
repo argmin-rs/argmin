@@ -5,21 +5,21 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # argmin plotter
+//! # spectator
 //!
-//! The argmin plotter is a dedicated GUI program which displays the progress of an optimization
-//! run. The data is fed to the plotter by the `argmin-observer-plotter`.
+//! Spectator is a dedicated GUI program which displays the progress of an optimization run.
+//! The data is fed to spectator by the `argmin-observer-spectator`.
 //!
 //! ## Installation
 //!
 //! ```bash
-//! cargo install argmin-plotter
+//! cargo install spectator
 //! ```
 //!
 //! ## Library
 //!
 //! This crate can also be used as a library and exposes the [`Message`] type used to encode data
-//! sent to the plotter and [`DEFAULT_PORT`] which defines the default port used by the plotter.
+//! sent to specator and [`DEFAULT_PORT`] which defines the default port used by spectator.
 //!
 //! # License
 //!
@@ -45,5 +45,5 @@ mod message;
 
 pub use message::Message;
 
-/// Default port used by plotter
+/// Default port used by spectator
 pub const DEFAULT_PORT: u16 = 5498;

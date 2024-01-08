@@ -5,22 +5,22 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+mod app;
 mod connection;
 mod data;
 mod message;
-mod plotter;
 mod telemetry;
 
 use anyhow::Error;
 use uuid::Uuid;
 
+use app::PlotterApp;
 use clap::Parser;
-use plotter::PlotterApp;
 use telemetry::{get_subscriber, init_subscriber};
 
-use argmin_plotter::DEFAULT_PORT;
+use spectator::DEFAULT_PORT;
 
-const NAME: &str = "argmin-plotter";
+const NAME: &str = "spectator";
 const DEFAULT_HOST: &str = "0.0.0.0";
 
 #[derive(Parser, Debug)]
