@@ -191,8 +191,7 @@ impl MyContext {
                             .allow_zoom(false)
                             .allow_boxed_zoom(false)
                             .allow_drag(false)
-                            .auto_bounds_x()
-                            .auto_bounds_y()
+                            .auto_bounds([true, true].into())
                             .set_margin_fraction([0.1, 0.3].into())
                             .reset()
                             .show(ui, |plot_ui| plot_ui.bar_chart(chart));
@@ -219,8 +218,7 @@ impl MyContext {
                             .allow_zoom(false)
                             .allow_boxed_zoom(false)
                             .allow_drag(false)
-                            .auto_bounds_x()
-                            .auto_bounds_y()
+                            .auto_bounds([true, true].into())
                             .set_margin_fraction([0.1, 0.3].into())
                             .reset()
                             .show(ui, |plot_ui| plot_ui.bar_chart(chart));
@@ -247,8 +245,7 @@ impl MyContext {
                             .allow_zoom(false)
                             .allow_boxed_zoom(false)
                             .allow_drag(false)
-                            .auto_bounds_x()
-                            .auto_bounds_y()
+                            .auto_bounds([true, true].into())
                             .set_margin_fraction([0.1, 0.3].into())
                             .reset()
                             .show(ui, |plot_ui| plot_ui.bar_chart(chart));
