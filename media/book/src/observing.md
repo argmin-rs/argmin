@@ -97,3 +97,121 @@ let res = Executor::new(cost, solver)
 #     }
 # }
 ```
+
+## Using Spectator
+
+[Spectator](https://crates.io/crates/spectator)  is a graphical visualization tool for showing the progress of optimization runs.
+It is a dedicated program which receives metrics from the observer [argmin-observer-spectator](https://crates.io/crates/argmin-observer-spectator). 
+
+In order to install spectator, run
+
+```shell
+cargo install spectator --locked
+```
+
+To start spectator, run
+
+```shell
+spectator
+```
+
+This will start a server which binds to `0.0.0.0:5498`. To change this, provide `--host` and `--port`:
+
+```shell
+spectator --host 127.0.0.1 --port 1234
+```
+
+Once spectator started, it will wait for data on the provided address. 
+All that needs to be done now is to add the observer to the optimization:
+
+```rust
+# #![allow(unused_imports)]
+# extern crate argmin;
+# extern crate argmin_testfunctions;
+# use argmin::core::{Error, Executor, CostFunction, Gradient};
+use argmin::core::observers::ObserverMode;
+use argmin_observer_spectator::SpectatorBuilder;
+# use argmin::solver::gradientdescent::SteepestDescent;
+# use argmin::solver::linesearch::MoreThuenteLineSearch;
+# use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+#
+# struct Rosenbrock {
+#     a: f64,
+#     b: f64,
+# }
+#
+# /// Implement `CostFunction` for `Rosenbrock`
+# impl CostFunction for Rosenbrock {
+#     /// Type of the parameter vector
+#     type Param = Vec<f64>;
+#     /// Type of the return value computed by the cost function
+#     type Output = f64;
+#
+#     /// Apply the cost function to a parameter `p`
+#     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+#         Ok(rosenbrock_2d(p, 1.0, 100.0))
+#     }
+# }
+#
+# /// Implement `Gradient` for `Rosenbrock`
+# impl Gradient for Rosenbrock {
+#     /// Type of the parameter vector
+#     type Param = Vec<f64>;
+#     /// Type of the return value computed by the cost function
+#     type Gradient = Vec<f64>;
+#
+#     /// Compute the gradient at parameter `p`.
+#     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
+#         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+#     }
+# }
+#
+# fn run() -> Result<(), Error> {
+# 
+# // Define cost function (must implement `CostFunction` and `Gradient`)
+# let cost = Rosenbrock { a: 1.0, b: 100.0 };
+#  
+# // Define initial parameter vector
+# let init_param: Vec<f64> = vec![-1.2, 1.0];
+#  
+# // Set up line search
+# let linesearch = MoreThuenteLineSearch::new();
+#  
+# // Set up solver
+# let solver = SteepestDescent::new(linesearch);
+
+// [...]
+
+let spectator = SpectatorBuilder::new()
+    // Optional: Defaults to 0.0.0.0
+    .with_host("127.0.0.1")
+    // Optional: Defaults to 5498
+    .with_port(1234)
+    // Optionally give optimization a name.
+    // If not provided a random UUID will be used
+    .with_name("something")
+    // Optionally select a subset of the available metrics.
+    // If omitted, all metrics will be selected.
+    // Note that still all metrics are sent to spectator,
+    // however; only those selected will be shown.
+    // Spectator allows to select metrics in the GUI as well.
+    .select(&["cost", "best_cost", "t"])
+    .build();
+
+
+let res = Executor::new(cost, solver)
+    .configure(|state| state.param(init_param).max_iters(10))
+    .add_observer(spectator, ObserverMode::Always)
+    .run()?;
+#
+# println!("{}", res);
+#     Ok(())
+# }
+#
+# fn main() {
+#     if let Err(ref e) = run() {
+#         println!("{}", e);
+#         std::process::exit(1);
+#     }
+# }
+```
