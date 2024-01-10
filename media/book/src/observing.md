@@ -1,23 +1,25 @@
 # Observing progress
 
 Argmin offers an interface to observe the state of the solver at initialization as well as after every iteration.
-This includes the parameter vector, gradient, Jacobian, Hessian, iteration number, cost values and many more as well as solver-specific metrics.
+This includes the parameter vector, gradient, Jacobian, Hessian, iteration number, cost values and many more general as well as solver-specific metrics.
 This interface can be used to implement loggers, send the information to a storage or to plot metrics.
 
-The observer [`WriteToFile`](https://docs.rs/argmin/latest/argmin/core/observers/file/struct.WriteToFile.html) saves the parameter vector to disk and as such requires the parameter vector to be serializable.
-Hence this feature is only available with the `serde1` feature.
+The observer [`ParamWriter`](https://docs.rs/argmin-observer-paramwriter/latest/argmin_observer_paramwriter/struct.ParamWriter.html) saves the parameter vector
+to disk and as such requires the parameter vector to be serializable.
+This observer is available in the [`argmin-observer-paramwriter`](https://crates.io/crates/argmin-observer-paramwriter) crate.
 
 The observer [`SlogLogger`](https://docs.rs/argmin-observer-slog/latest/argmin_observer_slog/struct.SlogLogger.html) logs the progress of the optimization to screen or to disk.
-This can be found in the `argmin-observer-slog` crate.
-Writing to disk requires the `serde1` feature to be enabled in said crate.
+This can be found in the [`argmin-observer-slog`](https://crates.io/crates/argmin-observer-slog) crate.
+Writing to disk requires the `serde1` feature to be enabled in `argmin-observer-slog`.
 
-For each observer it can be defined how often it will observe the progress of the solver.
-This is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest` (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.
+The rate at which the progress of the solver is observed can be set via `ObserverMode`,
+which can be either `Always`, `Never`, `NewBest` (whenever a new best solution is found) or `Every(i)` which means every `i`th iteration.
 
-Custom observers can be used as well by implementing the [`Observe`](https://docs.rs/argmin/latest/argmin/core/observers/trait.Observe.html) trait (see the chapter on [implementing an observer](./implementing_observer.md) for details).
+Custom observers can be used as well by implementing the [`Observe`](https://docs.rs/argmin/latest/argmin/core/observers/trait.Observe.html) trait
+(see the chapter on [implementing an observer](./implementing_observer.md) for details).
 
 The following example shows how to add an observer to an `Executor` which logs progress to the terminal.
-The observer is configured via `ObserverMode::Always` such that it will log every iteration to screen.
+The mode `ObserverMode::Always` ensures that every iteration is printed to screen.
 Multiple observers can be added to a single `Executor`.
 
 ```rust

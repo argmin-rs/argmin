@@ -8,8 +8,8 @@
 //! # Loggers based on the `slog` crate
 //!
 //! These loggers write general information about the optimization and information about the
-//! progress of the optimization for each iteration of the algorithm to screen or into a file as
-//! JSON.
+//! progress of the optimization for each iteration of the algorithm to screen or into a file in
+//! JSON format.
 //! See [`SlogLogger`] for details regarding usage.
 
 use argmin::core::observers::Observe;
@@ -182,7 +182,5 @@ where
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
-
-    // send_sync_test!(argmin_slog_loggerv, SlogLogger);
+    // TODO
 }

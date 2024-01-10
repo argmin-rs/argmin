@@ -33,7 +33,6 @@
 //! # extern crate argmin_testfunctions;
 //! # use argmin::core::{Error, Executor, CostFunction, Gradient, observers::ObserverMode};
 //! # use argmin_observer_slog::SlogLogger;
-//! # #[cfg(feature = "serde1")]
 //! # use argmin_observer_paramwriter::{ParamWriter, ParamWriterFormat};
 //! # use argmin::solver::gradientdescent::SteepestDescent;
 //! # use argmin::solver::linesearch::MoreThuenteLineSearch;
@@ -92,11 +91,6 @@
 //! # let res = res
 //!     // Add an observer which will log all iterations to the terminal (without blocking)
 //!     .add_observer(SlogLogger::term_noblock(), ObserverMode::Always)
-//! # ;
-//! # #[cfg(feature = "serde1")]
-//! # let res = res
-//!     // Log to file whenever a new best solution is found
-//!     .add_observer(SlogLogger::file("solver.log", false)?, ObserverMode::NewBest)
 //!     // Write parameter vector to `params/param.arg` every 20th iteration
 //!     .add_observer(
 //!         ParamWriter::new("params", "param", ParamWriterFormat::JSON),

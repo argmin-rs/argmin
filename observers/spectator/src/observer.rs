@@ -26,7 +26,7 @@ const DEFAULT_HOST: &str = "127.0.0.1";
 ///
 /// let spectator = SpectatorBuilder::new()
 ///     // Optional: Name the optimization run
-///     // Default: random uuid.
+///     // Default: random UUID.
 ///     .with_name("optimization_run_1")
 ///     // Optional, defaults to 127.0.0.1
 ///     .with_host("127.0.0.1")
@@ -134,8 +134,9 @@ impl SpectatorBuilder {
     /// Define which metrics will be selected in Spectator by default
     ///
     /// If none are set, all metrics will be selected and shown. Providing zero or more metrics
-    /// via `select` disables all apart from the provided ones. Note that all data will be sent, and
-    /// metrics can be selected and deselected using the GUI.
+    /// via `select` disables all apart from the provided ones. Note that independent of this
+    /// setting, all data will be sent, and metrics can be selected and deselected via the
+    /// Spectator GUI.
     ///
     /// # Example
     ///
