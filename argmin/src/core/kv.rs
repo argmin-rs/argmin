@@ -88,10 +88,10 @@ impl KvValue {
     ///
     /// Returns `Some(<float>)` if `KvValue` is of kind `Float`.
     ///
-    /// For `KvValue::Int` and `KvValue::Uint`integer values are first cast to their 32bit
-    /// representations and then converted into `f64`.
+    /// **Note:** For `KvValue::Int` and `KvValue::Uint`integer values are cast to f64, therefore
+    /// this operation may be lossy!
     ///
-    /// `KvValue::Bool` is turned into `1.0` if true and `0.0` if false.
+    /// `KvValue::Bool` is turned into `1.0f64` if true and `0.0f64` if false.
     ///
     /// # Example
     ///
@@ -106,8 +106,8 @@ impl KvValue {
     pub fn get_float(&self) -> Option<f64> {
         match self {
             KvValue::Float(x) => Some(*x),
-            KvValue::Int(x) => Some(f64::from(*x as i32)),
-            KvValue::Uint(x) => Some(f64::from(*x as u32)),
+            KvValue::Int(x) => Some(*x as f64),
+            KvValue::Uint(x) => Some(*x as f64),
             KvValue::Bool(true) => Some(1.0),
             KvValue::Bool(false) => Some(0.0),
             _ => None,
