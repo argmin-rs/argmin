@@ -20,9 +20,9 @@ use std::path::PathBuf;
 /// Write parameter vectors to a file during optimization.
 ///
 /// This observer requires a directory to save the files to and a file prefix. Files will be
-/// written to disk as `<directory>/<file_prefix>_<iteration_number>.arp`. For serialization
-/// either `JSON` or [`bincode`](https://crates.io/crates/bincode) can be chosen via the enum
-/// [`ParamWriterFormat`].
+/// written to disk as `<directory>/<file_prefix>_<iteration_number>.<extension>`. For
+/// serialization either `JSON` or `Binary` (via [bincode](https://crates.io/crates/bincode))
+/// can be chosen via the enum [`ParamWriterFormat`].
 ///
 /// # Example
 ///
@@ -84,7 +84,12 @@ where
                 std::fs::create_dir_all(&self.dir)?
             }
 
-            let fname = self.dir.join(format!("{}_{}.arp", self.prefix, iter));
+            let fname = self.dir.join(format!(
+                "{}_{}.{}",
+                self.prefix,
+                iter,
+                self.serializer.extension()
+            ));
             let f = BufWriter::new(File::create(fname)?);
 
             match self.serializer {
@@ -102,6 +107,11 @@ where
 
 /// Available serializers for [`ParamWriter`].
 ///
+/// # Extensions
+///
+/// * JSON: `.json`
+/// * Binary: `.bin`
+///
 /// # Example
 ///
 /// ```
@@ -117,6 +127,15 @@ pub enum ParamWriterFormat {
     Binary,
     /// Use [`serde_json`](https://crates.io/crates/serde_json) for creating JSON files
     JSON,
+}
+
+impl ParamWriterFormat {
+    pub fn extension(&self) -> &str {
+        match *self {
+            ParamWriterFormat::Binary => "bin",
+            ParamWriterFormat::JSON => "json",
+        }
+    }
 }
 
 #[cfg(test)]
