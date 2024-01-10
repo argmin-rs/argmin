@@ -51,14 +51,6 @@ impl PlotterApp {
         port: u16,
     ) -> Result<Self, anyhow::Error> {
         let dock_state: DockState<String> = DockState::new(vec![]);
-        // tree.push_to_first_leaf("Blah".to_owned());
-        // let [a, b] = tree.split_left(NodeIndex::root(), 0.3, vec!["Inspector".to_owned()]);
-        // let [_, _] = tree.split_below(
-        //     a,
-        //     0.7,
-        //     vec!["File Browser".to_owned(), "Asset Manager".to_owned()],
-        // );
-        // let [_, _] = tree.split_below(b, 0.5, vec!["Hierarchy".to_owned()]);
 
         let mut open_tabs = HashSet::new();
 
@@ -346,30 +338,6 @@ impl eframe::App for PlotterApp {
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.set_pixels_per_point(1.0);
-
-        // TopBottomPanel::top("egui_dock::MenuBar").show(ctx, |ui| {
-        //     egui::menu::bar(ui, |ui| {
-        //         ui.menu_button("View", |ui| {
-        //             // allow certain tabs to be toggled
-        //             for tab in self.context.open_tabs.iter() {
-        //                 if ui
-        //                     .selectable_label(self.context.open_tabs.contains(tab), tab)
-        //                     .clicked()
-        //                 {
-        //                     let mut tree = self.tree.lock().unwrap();
-        //                     if let Some(index) = tree.find_tab(&tab) {
-        //                         tree.remove_tab(index);
-        //                         // self.context.open_tabs.remove(&tab);
-        //                     } else {
-        //                         tree.push_to_focused_leaf(tab.to_string());
-        //                     }
-
-        //                     ui.close_menu();
-        //                 }
-        //             }
-        //         });
-        //     })
-        // });
 
         CentralPanel::default().show(ctx, |_ui| {
             let layer_id = LayerId::background();
