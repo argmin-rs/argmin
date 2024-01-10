@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ObserverMode"],"mod":["file","slog_logger"],"struct":["Observers"],"trait":["Observe"]};
+window.SIDEBAR_ITEMS = {"enum":["ObserverMode"],"struct":["Observers"],"trait":["Observe"]};

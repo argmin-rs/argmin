@@ -239,7 +239,7 @@
 </span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>kv {
     ($(<span class="macro-nonterminal">$k</span>:expr =&gt;  <span class="macro-nonterminal">$v</span>:expr;)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$crate::core::KV </span>{ kv: std::collections::HashMap::from([ $((<span class="macro-nonterminal">$k</span>, <span class="macro-nonterminal">$v</span>.into())),* ]) }
+        <span class="macro-nonterminal">$crate::core::KV </span>{ kv: std::collections::HashMap::from([ $((<span class="macro-nonterminal">$k</span>.into(), <span class="macro-nonterminal">$v</span>.into())),* ]) }
     };
 }
 

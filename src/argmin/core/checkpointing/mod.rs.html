@@ -226,7 +226,6 @@
 <a href="#226" id="226">226</a>
 <a href="#227" id="227">227</a>
 <a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -259,8 +258,7 @@
 //! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
 //! # #[cfg(feature = &quot;serde1&quot;)]
 //! # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
-//! # #[cfg(feature = &quot;slog-logger&quot;)]
-//! # use argmin::core::observers::SlogLogger;
+//! # use argmin_observer_slog::SlogLogger;
 //! # use argmin::solver::landweber::Landweber;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 //! #

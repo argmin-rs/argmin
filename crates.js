@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["argmin","argmin_math"];
+window.ALL_CRATES = ["argmin","argmin_math","argmin_observer_paramwriter","argmin_observer_slog","argmin_observer_spectator","spectator"];

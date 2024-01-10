@@ -446,13 +446,6 @@
 <a href="#446" id="446">446</a>
 <a href="#447" id="447">447</a>
 <a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a>
-<a href="#450" id="450">450</a>
-<a href="#451" id="451">451</a>
-<a href="#452" id="452">452</a>
-<a href="#453" id="453">453</a>
-<a href="#454" id="454">454</a>
-<a href="#455" id="455">455</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -467,13 +460,11 @@
 //! iteration number, cost values and many more as well as solver-specific metrics. This interface
 //! can be used to implement loggers, send the information to a storage or to plot metrics.
 //!
-//! The observer [`WriteToFile`](`crate::core::observers::WriteToFile`) saves the parameter vector
-//! to disk and as such requires the parameter vector to be serializable. Hence this feature is
-//! only available with the `serde1` feature.
+//! The observer `ParamWriter` saves the parameter vector to disk. It is distributed via the
+//! `argmin-observer-paramwriter` crate.
 //!
-//! The observer [`SlogLogger`](`crate::core::observers::SlogLogger`) logs the progress of the
-//! optimization to screen or to disk. This requires the `slog-logger` feature. Writing to disk
-//! in addition requires the `serde1` feature.
+//! The observer `SlogLogger` logs the progress of the optimization to screen or to disk.
+//! It can be found in the `argmin-observer-slog` crate.
 //!
 //! For each observer it can be defined how often it will observe the progress of the solver. This
 //! is indicated via the enum `ObserverMode` which can be either `Always`, `Never`, `NewBest`
@@ -489,10 +480,8 @@
 //! # extern crate argmin;
 //! # extern crate argmin_testfunctions;
 //! # use argmin::core::{Error, Executor, CostFunction, Gradient, observers::ObserverMode};
-//! # #[cfg(feature = &quot;slog-logger&quot;)]
-//! # use argmin::core::observers::SlogLogger;
-//! # #[cfg(feature = &quot;serde1&quot;)]
-//! # use argmin::core::observers::{WriteToFile, WriteToFileSerializer};
+//! # use argmin_observer_slog::SlogLogger;
+//! # use argmin_observer_paramwriter::{ParamWriter, ParamWriterFormat};
 //! # use argmin::solver::gradientdescent::SteepestDescent;
 //! # use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -547,19 +536,12 @@
 //! let res = Executor::new(problem, solver)
 //!     .configure(|config| config.param(init_param).max_iters(2))
 //! # ;
-//! # #[cfg(feature = &quot;slog-logger&quot;)]
 //! # let res = res
 //!     // Add an observer which will log all iterations to the terminal (without blocking)
 //!     .add_observer(SlogLogger::term_noblock(), ObserverMode::Always)
-//! # ;
-//! # #[cfg(feature = &quot;serde1&quot;)]
-//! # #[cfg(feature = &quot;slog-logger&quot;)]
-//! # let res = res
-//!     // Log to file whenever a new best solution is found
-//!     .add_observer(SlogLogger::file(&quot;solver.log&quot;, false)?, ObserverMode::NewBest)
 //!     // Write parameter vector to `params/param.arg` every 20th iteration
 //!     .add_observer(
-//!         WriteToFile::new(&quot;params&quot;, &quot;param&quot;, WriteToFileSerializer::JSON),
+//!         ParamWriter::new(&quot;params&quot;, &quot;param&quot;, ParamWriterFormat::JSON),
 //!         ObserverMode::Every(20)
 //!     )
 //! # ;
@@ -580,16 +562,7 @@
 //! ```
 
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
-</span><span class="kw">pub mod </span>file;
-<span class="attr">#[cfg(feature = <span class="string">&quot;slog-logger&quot;</span>)]
-</span><span class="kw">pub mod </span>slog_logger;
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
-</span><span class="kw">pub use </span>file::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
-<span class="attr">#[cfg(feature = <span class="string">&quot;slog-logger&quot;</span>)]
-</span><span class="kw">pub use </span>slog_logger::<span class="kw-2">*</span>;
 
 <span class="kw">use </span><span class="kw">crate</span>::core::{Error, State, KV};
 <span class="kw">use </span>std::default::Default;
@@ -611,7 +584,7 @@
 ///     // implement, offers a range of methods which can be useful.
 ///     I: State,
 /// {
-///     fn observe_init(&amp;mut self, name: &amp;str, kv: &amp;KV) -&gt; Result&lt;(), Error&gt; {
+///     fn observe_init(&amp;mut self, name: &amp;str, state: &amp;I, kv: &amp;KV) -&gt; Result&lt;(), Error&gt; {
 ///         // Do something with `name` and/or `kv`
 ///         // Is executed after initialization of a solver
 ///         Ok(())
@@ -627,9 +600,9 @@
 </span><span class="kw">pub trait </span>Observe&lt;I&gt; {
     <span class="doccomment">/// Called once after initialization of the solver.
     ///
-    /// Has access to the name of the solver via `name` and to a key-value store `kv` with entries
-    /// specific for each solver.
-    </span><span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _name: <span class="kw-2">&amp;</span>str, _kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    /// Has access to the name of the solver via `name`, the initial `state` and to a key-value
+    /// store `kv` with settings of the solver.
+    </span><span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _name: <span class="kw-2">&amp;</span>str, _state: <span class="kw-2">&amp;</span>I, _kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -639,6 +612,14 @@
     /// [`State`](`crate::core::State`)) and to a key-value store `kv` with entries specific for
     /// each solver.
     </span><span class="kw">fn </span>observe_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>I, _kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Called at the end of a solver run
+    ///
+    /// Has access to the final `state` of the solver (which always implements
+    /// [`State`](`crate::core::State`)).
+    </span><span class="kw">fn </span>observe_final(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>I) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="prelude-val">Ok</span>(())
     }
 }
@@ -678,17 +659,13 @@
     ///
     /// ```
     /// use argmin::core::observers::{Observers, ObserverMode};
-    /// # #[cfg(feature = &quot;slog-logger&quot;)]
-    /// use argmin::core::observers::SlogLogger;
+    /// use argmin_observer_slog::SlogLogger;
     /// use argmin::core::IterState;
     ///
     /// let mut observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; = Observers::new();
     ///
-    /// # #[cfg(feature = &quot;slog-logger&quot;)]
     /// let logger = SlogLogger::term();
-    /// # #[cfg(feature = &quot;slog-logger&quot;)]
     /// observers.push(logger, ObserverMode::Always);
-    /// # #[cfg(feature = &quot;slog-logger&quot;)]
     /// # assert!(!observers.is_empty());
     /// ```
     </span><span class="kw">pub fn </span>push&lt;OBS: Observe&lt;I&gt; + <span class="lifetime">&#39;static</span>&gt;(
@@ -721,9 +698,9 @@
 /// are met and calls the actual observers if required.
 </span><span class="kw">impl</span>&lt;I: State&gt; Observe&lt;I&gt; <span class="kw">for </span>Observers&lt;I&gt; {
     <span class="doccomment">/// After initialization of the solver, this loops over all stored observers and calls them.
-    </span><span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    </span><span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, state: <span class="kw-2">&amp;</span>I, kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="kw">for </span>l <span class="kw">in </span><span class="self">self</span>.observers.iter() {
-            l.<span class="number">0</span>.lock().unwrap().observe_init(name, kv)<span class="question-mark">?
+            l.<span class="number">0</span>.lock().unwrap().observe_init(name, state, kv)<span class="question-mark">?
         </span>}
         <span class="prelude-val">Ok</span>(())
     }
@@ -742,6 +719,14 @@
                 ObserverMode::NewBest <span class="kw">if </span>state.is_best() =&gt; observer.observe_iter(state, kv),
                 ObserverMode::Never | ObserverMode::Every(<span class="kw">_</span>) | ObserverMode::NewBest =&gt; <span class="prelude-val">Ok</span>(()),
             }<span class="question-mark">?
+        </span>}
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Called at the end of a solver run. Loops over all stored observers and calls `observe_final`
+    </span><span class="kw">fn </span>observe_final(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>I) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">for </span>l <span class="kw">in </span><span class="self">self</span>.observers.iter() {
+            l.<span class="number">0</span>.lock().unwrap().observe_final(state)<span class="question-mark">?
         </span>}
         <span class="prelude-val">Ok</span>(())
     }
@@ -804,7 +789,7 @@
         }
 
         <span class="kw">impl</span>&lt;I&gt; Observe&lt;I&gt; <span class="kw">for </span>TestObs {
-            <span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, _kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+            <span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, _state: <span class="kw-2">&amp;</span>I, _kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
                 <span class="self">self</span>.data.lock().unwrap().solver_name = name.into();
                 <span class="self">self</span>.data.lock().unwrap().init_called += <span class="number">1</span>;
                 <span class="prelude-val">Ok</span>(())
@@ -846,7 +831,9 @@
             .push(test_obs_3, ObserverMode::Every(<span class="number">3</span>))
             .push(test_obs_4, ObserverMode::NewBest);
 
-        obs.observe_init(<span class="string">&quot;test_solver&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>state: TState = IterState::new();
+
+        obs.observe_init(<span class="string">&quot;test_solver&quot;</span>, <span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).unwrap();
 
         <span class="comment">// all `init_called` should be 1, all `iter_called` 0
         </span><span class="kw">for </span>s <span class="kw">in </span>storages.iter() {
@@ -856,7 +843,6 @@
             <span class="macro">assert_eq!</span>(observer.iter_called, <span class="number">0</span>);
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>state: TState = IterState::new();
         obs.observe_iter(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;</span><span class="macro">kv!</span>()).unwrap();
 
         <span class="macro">assert_eq!</span>(storages[<span class="number">0</span>].lock().unwrap().init_called, <span class="number">1</span>);

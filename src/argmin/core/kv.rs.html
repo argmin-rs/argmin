@@ -412,6 +412,41 @@
 <a href="#412" id="412">412</a>
 <a href="#413" id="413">413</a>
 <a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -422,6 +457,9 @@
 </span><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::fmt::{Debug, Display};
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="doccomment">/// Types available for use in [`KV`](KV).
 ///
@@ -458,6 +496,7 @@
 /// assert_eq!(x, KvValue::Str(&quot;a String&quot;.to_string()));
 /// ```
 </span><span class="attr">#[derive(Clone, PartialEq, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub enum </span>KvValue {
     <span class="doccomment">/// Floating point values
     </span>Float(f64),
@@ -496,24 +535,32 @@
 
     <span class="doccomment">/// Extract float from `KvValue`
     ///
-    /// Returns `Some(&lt;float&gt;)` if `KvValue` is of kind `Float` and `None` otherwise.
+    /// Returns `Some(&lt;float&gt;)` if `KvValue` is of kind `Float`.
+    ///
+    /// **Note:** For `KvValue::Int` and `KvValue::Uint`integer values are cast to f64, therefore
+    /// this operation may be lossy!
+    ///
+    /// `KvValue::Bool` is turned into `1.0f64` if true and `0.0f64` if false.
     ///
     /// # Example
     ///
     /// ```
     /// # use argmin::core::KvValue;
     /// assert_eq!(KvValue::Float(1.0).get_float(), Some(1.0));
-    /// assert_eq!(KvValue::Int(1).get_float(), None);
-    /// assert_eq!(KvValue::Uint(1).get_float(), None);
-    /// assert_eq!(KvValue::Bool(true).get_float(), None);
-    /// assert_eq!(KvValue::Str(&quot;not a float&quot;.to_string()).get_float(), None);
+    /// assert_eq!(KvValue::Int(1).get_float(), Some(1.0));
+    /// assert_eq!(KvValue::Uint(1).get_float(), Some(1.0));
+    /// assert_eq!(KvValue::Bool(true).get_float(), Some(1.0));
+    /// assert_eq!(KvValue::Str(&quot;not a number&quot;.to_string()).get_float(), None);
     /// ```
     </span><span class="kw">pub fn </span>get_float(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
-        <span class="kw">if let </span>KvValue::Float(x) = <span class="kw-2">*</span><span class="self">self </span>{
-            <span class="prelude-val">Some</span>(x)
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>}
+        <span class="kw">match </span><span class="self">self </span>{
+            KvValue::Float(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x),
+            KvValue::Int(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x <span class="kw">as </span>f64),
+            KvValue::Uint(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x <span class="kw">as </span>f64),
+            KvValue::Bool(<span class="bool-val">true</span>) =&gt; <span class="prelude-val">Some</span>(<span class="number">1.0</span>),
+            KvValue::Bool(<span class="bool-val">false</span>) =&gt; <span class="prelude-val">Some</span>(<span class="number">0.0</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
     }
 
     <span class="doccomment">/// Extract int from `KvValue`
@@ -602,6 +649,28 @@
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
+    }
+
+    <span class="doccomment">/// Get String representation of `KvValue`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::KvValue;
+    /// assert_eq!(KvValue::Str(&quot;a string&quot;.to_string()).as_string(), &quot;a string&quot;.to_string());
+    /// assert_eq!(KvValue::Float(1.0).as_string(), &quot;1&quot;.to_string());
+    /// assert_eq!(KvValue::Int(1).as_string(), &quot;1&quot;.to_string());
+    /// assert_eq!(KvValue::Uint(1).as_string(), &quot;1&quot;.to_string());
+    /// assert_eq!(KvValue::Bool(true).as_string(), &quot;true&quot;.to_string());
+    /// ```
+    </span><span class="kw">pub fn </span>as_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            KvValue::Str(x) =&gt; x.clone(),
+            KvValue::Float(x) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{x}&quot;</span>),
+            KvValue::Bool(x) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{x}&quot;</span>),
+            KvValue::Int(x) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{x}&quot;</span>),
+            KvValue::Uint(x) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{x}&quot;</span>),
+        }
     }
 }
 
@@ -694,9 +763,10 @@
 /// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key3&quot;).unwrap()), &quot;1234&quot;);
 /// ```
 </span><span class="attr">#[derive(Clone, Default, PartialEq)]
+#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub struct </span>KV {
     <span class="doccomment">/// The actual key value storage
-    </span><span class="kw">pub </span>kv: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KvValue&gt;,
+    </span><span class="kw">pub </span>kv: HashMap&lt;String, KvValue&gt;,
 }
 
 <span class="kw">impl </span>Debug <span class="kw">for </span>KV {
@@ -743,8 +813,8 @@
     /// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key1&quot;).unwrap()), &quot;value&quot;);
     /// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key2&quot;).unwrap()), &quot;1234&quot;);
     /// ```
-    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, val: KvValue) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.kv.insert(key, val);
+    </span><span class="kw">pub fn </span>insert&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: T, val: KvValue) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.kv.insert(key.as_ref().into(), val);
         <span class="self">self
     </span>}
 
@@ -762,8 +832,8 @@
     /// assert_eq!(kv1.get(&quot;key1&quot;), Some(&amp;KvValue::Float(12.0)));
     /// assert_eq!(kv1.get(&quot;non_existing&quot;), None);
     /// ```
-    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>KvValue&gt; {
-        <span class="self">self</span>.kv.get(key)
+    </span><span class="kw">pub fn </span>get&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>KvValue&gt; {
+        <span class="self">self</span>.kv.get(key.as_ref())
     }
 
     <span class="doccomment">/// Returns all available keys and their `KvValue` kind
@@ -775,10 +845,10 @@
     /// let mut kv1 = KV::new();
     /// kv1.insert(&quot;key1&quot;, KvValue::Str(&quot;value1&quot;.to_string()));
     ///
-    /// assert_eq!(kv1.keys(), vec![(&quot;key1&quot;, &quot;Str&quot;)]);
+    /// assert_eq!(kv1.keys(), vec![(&quot;key1&quot;.to_string(), &quot;Str&quot;)]);
     /// ```
-    </span><span class="kw">pub fn </span>keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str)&gt; {
-        <span class="self">self</span>.kv.iter().map(|(<span class="kw-2">&amp;</span>k, v)| (k, v.kind())).collect()
+    </span><span class="kw">pub fn </span>keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(String, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str)&gt; {
+        <span class="self">self</span>.kv.iter().map(|(k, v)| (k.clone(), v.kind())).collect()
     }
 
     <span class="doccomment">/// Merge with another `KV`
