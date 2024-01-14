@@ -357,6 +357,7 @@
 <a href="#357" id="357">357</a>
 <a href="#358" id="358">358</a>
 <a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -592,8 +593,9 @@
 #[allow(unused_imports)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::vec::<span class="kw-2">*</span>;
 
-<span class="kw">use </span>anyhow::Error;
-<span class="kw">use </span>rand::Rng;
+<span class="comment">// Re-export of types appearing in the api as recommended here: https://www.lurklurk.org/effective-rust/re-export.html
+</span><span class="kw">pub use </span>anyhow::Error;
+<span class="kw">pub use </span>rand::Rng;
 
 <span class="doccomment">/// Dot/scalar product of `T` and `self`
 </span><span class="kw">pub trait </span>ArgminDot&lt;T, U&gt; {
