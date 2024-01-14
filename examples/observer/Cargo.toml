@@ -1,0 +1,13 @@
+[package]
+name = "example-observer"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+argmin = { version = "*", path = "../../argmin" }
+argmin-math = { version = "*", features = ["vec"], path = "../../argmin-math" }
+argmin_testfunctions = "*"
+gnuplot = "0.0.39"
+instant = "0.1.12"

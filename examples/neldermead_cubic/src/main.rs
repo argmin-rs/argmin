@@ -11,9 +11,10 @@
 //! You can run this example with:
 //! `cargo run --example neldermead-cubic --features slog-logger`
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
+use argmin::core::observers::ObserverMode;
 use argmin::core::{CostFunction, Error, Executor, State};
 use argmin::solver::neldermead::NelderMead;
+use argmin_observer_slog::SlogLogger;
 
 /// Coefficients describing a cubic `f(x) = ax^3 + bx^2 + cx + d`
 #[derive(Clone, Copy)]

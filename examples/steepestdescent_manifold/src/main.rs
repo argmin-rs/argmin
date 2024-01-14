@@ -7,12 +7,13 @@
 
 #![allow(unused_imports)]
 
-use argmin::core::observers::{ObserverMode, SlogLogger};
+use argmin::core::observers::ObserverMode;
 use argmin::core::{CostFunction, Error, Executor, Gradient};
 use argmin::solver::gradientdescent::SteepestDescent;
 use argmin::solver::linesearch::condition::{ArmijoCondition, LineSearchCondition};
 use argmin::solver::linesearch::BacktrackingLineSearch;
 use argmin_math::ArgminScaledAdd;
+use argmin_observer_slog::SlogLogger;
 
 use serde::{Deserialize, Serialize};
 
