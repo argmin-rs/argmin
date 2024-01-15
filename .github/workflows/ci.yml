@@ -76,7 +76,7 @@ jobs:
         run: cargo test -p argmin-math --no-default-features --features "primitives"
       - name: argmin-math (vec)
         run: cargo test -p argmin-math --no-default-features --features "vec"
-      # ndarray without linalg, without serde
+      # ndarray without linalg
       - name: argmin-math (ndarray_latest-nolinalg)
         run: cargo test -p argmin-math --no-default-features --features "ndarray_latest-nolinalg"
       - name: argmin-math (ndarray_v0_15-nolinalg)
@@ -85,7 +85,7 @@ jobs:
         run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_14-nolinalg"
       - name: argmin-math (ndarray_v0_13-nolinalg)
         run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13-nolinalg"
-      # ndarray with linalg, without serde
+      # ndarray with linalg
       - name: argmin-math (ndarray_latest)
         run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_latest/Cargo.toml
       - name: argmin-math (ndarray_v0_15)
@@ -94,25 +94,7 @@ jobs:
         run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_14/Cargo.toml
       - name: argmin-math (ndarray_v0_13)
         run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_13/Cargo.toml
-      # ndarray without linalg, with serde
-      - name: argmin-math (ndarray_latest-nolinalg-serde)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_latest-nolinalg-serde"
-      - name: argmin-math (ndarray_v0_15-serde)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_15-nolinalg-serde"
-      - name: argmin-math (ndarray_v0_14-serde)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_14-nolinalg-serde"
-      - name: argmin-math (ndarray_v0_13-serde)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13-nolinalg-serde"
-      # ndarray with linalg, with serde
-      - name: argmin-math (ndarray_latest-serde)
-        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_latest/Cargo.toml --features serde
-      - name: argmin-math (ndarray_v0_15)
-        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_15/Cargo.toml --features serde
-      - name: argmin-math (ndarray_v0_14)
-        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_14/Cargo.toml --features serde
-      - name: argmin-math (ndarray_v0_13)
-        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_13/Cargo.toml --features serde
-      # nalgebra without serde
+      # nalgebra
       - name: argmin-math (nalgebra_latest)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_latest"
       - name: argmin-math (nalgebra_v0_32)
@@ -123,17 +105,6 @@ jobs:
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_30"
       - name: argmin-math (nalgebra_v0_29)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_29"
-      # nalgebra with serde
-      - name: argmin-math (nalgebra_latest-serde)
-        run: cargo test -p argmin-math --no-default-features --features "nalgebra_latest-serde"
-      - name: argmin-math (nalgebra_v0_32-serde)
-        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_32-serde"
-      - name: argmin-math (nalgebra_v0_31-serde)
-        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_31-serde"
-      - name: argmin-math (nalgebra_v0_30-serde)
-        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_30-serde"
-      - name: argmin-math (nalgebra_v0_29-serde)
-        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_29-serde"
 
   clippy:
     runs-on: ubuntu-latest
@@ -144,7 +115,7 @@ jobs:
         with:
           components: clippy
       - name: Clippy (argmin-math)
-        run: cargo clippy -p argmin-math --all-targets --features "primitives,vec,nalgebra_latest-serde,ndarray_latest-serde" -- -D warnings
+        run: cargo clippy -p argmin-math --all-targets --features "primitives,vec,nalgebra_latest,ndarray_latest" -- -D warnings
       - name: Clippy (argmin) without default features
         run: cargo clippy -p argmin --all-targets --no-default-features -- -D warnings
       - name: Clippy (argmin) with default features
