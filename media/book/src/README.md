@@ -36,7 +36,7 @@ argmin comes with a number of line searches (Backtracking, More-Thuente, Hager-Z
 
 For a complete and up-to-date list of all algorithms please visit the [API documentation](https://docs.rs/argmin/latest/argmin/).
 
-> Examples for each algorithm can be found on [Github](https://github.com/argmin-rs/argmin/tree/main/argmin/examples). Make sure to choose the tag matching the argmin version you are using.
+> Examples for each algorithm can be found on [Github](https://github.com/argmin-rs/argmin/tree/main/examples). Make sure to choose the tag matching the argmin version you are using.
 
 ## Documentation
 

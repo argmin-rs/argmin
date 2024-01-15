@@ -19,7 +19,7 @@
   |
   <a href="https://github.com/argmin-rs/argmin/tree/argmin-v0.9.0/argmin/examples">Examples (latest release)</a>
   |
-  <a href="https://github.com/argmin-rs/argmin/tree/main/argmin/examples">Examples (main branch)</a>
+  <a href="https://github.com/argmin-rs/argmin/tree/main/examples">Examples (main branch)</a>
 </p>
 
 <p align="center">
