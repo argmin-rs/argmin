@@ -28,7 +28,7 @@ Feel free to reach out via [Github](https://github.com/argmin-rs/argmin) or the 
 * Line search now correctly searches over gradient instead of parameter vector ([@DevonMorris](https://github.com/DevonMorris)) (**Breaking change**)
 * SteepestDescent now correctly keeps track of prev_param ([@DevonMorris](https://github.com/DevonMorris))
 * `ArgminInv` is now also implemented for 1D matrices ([@sdrap](https://github.com/sdrap))
-* [@cjordan](https://github.com/cjordan) added another [example](https://github.com/argmin-rs/argmin/blob/main/argmin/examples/neldermead-cubic.rs) of how to use Nelder-Mead
+* [@cjordan](https://github.com/cjordan) added another [example](https://github.com/argmin-rs/argmin/tree/argmin-v0.9.0/argmin/examples/neldermead-cubic.rs) of how to use Nelder-Mead
 * Fixed a couple of typos and mistakes in the documentation ([@itrumper](https://github.com/itrumper), [@imeckler](https://github.com/imeckler), [@stefan-k](https://github.com/stefan-k))
 
 ## argmin 0.8.1
