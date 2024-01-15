@@ -10,4 +10,4 @@ argmin = { version = "*", path = "../../argmin" }
 argmin-math = { version = "*", features = ["nalgebra_latest"], path = "../../argmin-math" }
 argmin-observer-slog = { version = "*", path = "../../observers/slog/" }
 argmin_testfunctions = "0.1.1"
-nalgebra = "0.32.3"
+nalgebra = { version = "0.32.3", features = ["serde-serialize"] }
