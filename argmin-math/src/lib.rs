@@ -43,20 +43,12 @@
 //! |---------------------------------|---------|--------------------------------------------------------------------|
 //! | `ndarray_latest`                | no      | latest supported version                                           |
 //! | `ndarray_latest-nolinalg`       | no      | latest supported version without `ndarray-linalg`                  |
-//! | `ndarray_latest-serde`          | no      | latest supported version + serde support                           |
-//! | `ndarray_latest-nolinalg-serde` | no      | latest supported version without `ndarray-linalg` + serde support  |
 //! | `ndarray_v0_15`                 | no      | version 0.15 with ndarray-linalg 0.16                              |
 //! | `ndarray_v0_15-nolinalg`        | no      | version 0.15 without `ndarray-linalg`                              |
-//! | `ndarray_v0_15-serde`           | no      | version 0.15 with ndarray-linalg 0.16 + serde support              |
-//! | `ndarray_v0_15-nolinalg-serde`  | no      | version 0.15 without `ndarray-linalg` + serde support              |
 //! | `ndarray_v0_14`                 | no      | version 0.14 with ndarray-linalg 0.13                              |
 //! | `ndarray_v0_14-nolinalg`        | no      | version 0.14 without `ndarray-linalg`                              |
-//! | `ndarray_v0_14-serde`           | no      | version 0.14 with ndarray-linalg 0.13 + serde support              |
-//! | `ndarray_v0_14-nolinalg-serde`  | no      | version 0.14 without `ndarray-linalg` + serde support              |
 //! | `ndarray_v0_13`                 | no      | version 0.13 with ndarray-linalg 0.12                              |
 //! | `ndarray_v0_13-nolinalg`        | no      | version 0.13 without `ndarray-linalg`                              |
-//! | `ndarray_v0_13-serde`           | no      | version 0.13 with ndarray-linalg 0.12 + serde support              |
-//! | `ndarray_v0_13-nolinalg-serde`  | no      | version 0.13 without `ndarray-linalg` + serde support              |
 //!
 //! Note that the `*-nolinalg*` features do NOT pull in `ndarray-linalg` as a dependency. This
 //! avoids linking against a BLAS library. This will however disable the implementation of
@@ -78,15 +70,10 @@
 //! | Feature                | Default | Comment                                  |
 //! |------------------------|---------|------------------------------------------|
 //! | `nalgebra_latest`      | no      | latest supported version                 |
-//! | `nalgebra_latest-serde`| no      | latest supported version + serde support |
 //! | `nalgebra_v0_32`       | no      | version 0.32                             |
-//! | `nalgebra_v0_32-serde` | no      | version 0.32 + serde support             |
 //! | `nalgebra_v0_31`       | no      | version 0.31                             |
-//! | `nalgebra_v0_31-serde` | no      | version 0.31 + serde support             |
 //! | `nalgebra_v0_30`       | no      | version 0.30                             |
-//! | `nalgebra_v0_30-serde` | no      | version 0.30 + serde support             |
 //! | `nalgebra_v0_29`       | no      | version 0.29                             |
-//! | `nalgebra_v0_29-serde` | no      | version 0.29 + serde support             |
 //!
 //!
 //! ## Choosing a backend
@@ -96,10 +83,6 @@
 //! The features labeled `*latest*` are an alias for the most recent supported version of the
 //! respective backend. It is however recommended to explicitly specify the desired version instead
 //! of using any of the `*latest*` features (see section about semantic versioning below).
-//!
-//! Note that `argmin` by default compiles with `serde` support. Therefore, unless `serde` is
-//! deliberately turned off in `argmin`, it is necessary to activate the `serde` support in
-//! `argmin-math` as well.
 //!
 //! The default features `primitives` and `vec` can be turned off in order to only compile the
 //! trait definitions. If another backend is chosen, `primitives` will automatically be turned on
@@ -111,7 +94,7 @@
 //!
 //! ```toml
 //! [dependencies]
-#![doc = concat!("argmin-math = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ndarray_latest-serde\"] }")]
+#![doc = concat!("argmin-math = { version = \"", env!("CARGO_PKG_VERSION"), "\", features = [\"ndarray_latest\"] }")]
 //! ```
 //!
 //! # Semantic versioning
