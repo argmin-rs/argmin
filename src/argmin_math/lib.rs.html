@@ -341,23 +341,6 @@
 <a href="#341" id="341">341</a>
 <a href="#342" id="342">342</a>
 <a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -403,20 +386,12 @@
 //! |---------------------------------|---------|--------------------------------------------------------------------|
 //! | `ndarray_latest`                | no      | latest supported version                                           |
 //! | `ndarray_latest-nolinalg`       | no      | latest supported version without `ndarray-linalg`                  |
-//! | `ndarray_latest-serde`          | no      | latest supported version + serde support                           |
-//! | `ndarray_latest-nolinalg-serde` | no      | latest supported version without `ndarray-linalg` + serde support  |
 //! | `ndarray_v0_15`                 | no      | version 0.15 with ndarray-linalg 0.16                              |
 //! | `ndarray_v0_15-nolinalg`        | no      | version 0.15 without `ndarray-linalg`                              |
-//! | `ndarray_v0_15-serde`           | no      | version 0.15 with ndarray-linalg 0.16 + serde support              |
-//! | `ndarray_v0_15-nolinalg-serde`  | no      | version 0.15 without `ndarray-linalg` + serde support              |
 //! | `ndarray_v0_14`                 | no      | version 0.14 with ndarray-linalg 0.13                              |
 //! | `ndarray_v0_14-nolinalg`        | no      | version 0.14 without `ndarray-linalg`                              |
-//! | `ndarray_v0_14-serde`           | no      | version 0.14 with ndarray-linalg 0.13 + serde support              |
-//! | `ndarray_v0_14-nolinalg-serde`  | no      | version 0.14 without `ndarray-linalg` + serde support              |
 //! | `ndarray_v0_13`                 | no      | version 0.13 with ndarray-linalg 0.12                              |
 //! | `ndarray_v0_13-nolinalg`        | no      | version 0.13 without `ndarray-linalg`                              |
-//! | `ndarray_v0_13-serde`           | no      | version 0.13 with ndarray-linalg 0.12 + serde support              |
-//! | `ndarray_v0_13-nolinalg-serde`  | no      | version 0.13 without `ndarray-linalg` + serde support              |
 //!
 //! Note that the `*-nolinalg*` features do NOT pull in `ndarray-linalg` as a dependency. This
 //! avoids linking against a BLAS library. This will however disable the implementation of
@@ -438,15 +413,10 @@
 //! | Feature                | Default | Comment                                  |
 //! |------------------------|---------|------------------------------------------|
 //! | `nalgebra_latest`      | no      | latest supported version                 |
-//! | `nalgebra_latest-serde`| no      | latest supported version + serde support |
 //! | `nalgebra_v0_32`       | no      | version 0.32                             |
-//! | `nalgebra_v0_32-serde` | no      | version 0.32 + serde support             |
 //! | `nalgebra_v0_31`       | no      | version 0.31                             |
-//! | `nalgebra_v0_31-serde` | no      | version 0.31 + serde support             |
 //! | `nalgebra_v0_30`       | no      | version 0.30                             |
-//! | `nalgebra_v0_30-serde` | no      | version 0.30 + serde support             |
 //! | `nalgebra_v0_29`       | no      | version 0.29                             |
-//! | `nalgebra_v0_29-serde` | no      | version 0.29 + serde support             |
 //!
 //!
 //! ## Choosing a backend
@@ -456,10 +426,6 @@
 //! The features labeled `*latest*` are an alias for the most recent supported version of the
 //! respective backend. It is however recommended to explicitly specify the desired version instead
 //! of using any of the `*latest*` features (see section about semantic versioning below).
-//!
-//! Note that `argmin` by default compiles with `serde` support. Therefore, unless `serde` is
-//! deliberately turned off in `argmin`, it is necessary to activate the `serde` support in
-//! `argmin-math` as well.
 //!
 //! The default features `primitives` and `vec` can be turned off in order to only compile the
 //! trait definitions. If another backend is chosen, `primitives` will automatically be turned on
@@ -471,7 +437,7 @@
 //!
 //! ```toml
 //! [dependencies]
-</span><span class="attr">#![doc = <span class="macro">concat!</span>(<span class="string">&quot;argmin-math = { version = \&quot;&quot;</span>, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>), <span class="string">&quot;\&quot;, features = [\&quot;ndarray_latest-serde\&quot;] }&quot;</span>)]
+</span><span class="attr">#![doc = <span class="macro">concat!</span>(<span class="string">&quot;argmin-math = { version = \&quot;&quot;</span>, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>), <span class="string">&quot;\&quot;, features = [\&quot;ndarray_latest\&quot;] }&quot;</span>)]
 </span><span class="doccomment">//! ```
 //!
 //! # Semantic versioning

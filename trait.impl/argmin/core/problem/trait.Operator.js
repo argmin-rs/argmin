@@ -1,3 +1,7 @@
 (function() {var implementors = {
-"argmin":[]
+"argmin":[],
+"example_conjugategradient":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Operator.html\" title=\"trait argmin::core::problem::Operator\">Operator</a> for <a class=\"struct\" href=\"example_conjugategradient/struct.MyProblem.html\" title=\"struct example_conjugategradient::MyProblem\">MyProblem</a>"]],
+"example_gaussnewton":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Operator.html\" title=\"trait argmin::core::problem::Operator\">Operator</a> for <a class=\"struct\" href=\"example_gaussnewton/struct.Problem.html\" title=\"struct example_gaussnewton::Problem\">Problem</a>"]],
+"example_gaussnewton_linesearch":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Operator.html\" title=\"trait argmin::core::problem::Operator\">Operator</a> for <a class=\"struct\" href=\"example_gaussnewton_linesearch/struct.Problem.html\" title=\"struct example_gaussnewton_linesearch::Problem\">Problem</a>"]],
+"example_gaussnewton_nalgebra":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Operator.html\" title=\"trait argmin::core::problem::Operator\">Operator</a> for <a class=\"struct\" href=\"example_gaussnewton_nalgebra/struct.Problem.html\" title=\"struct example_gaussnewton_nalgebra::Problem\">Problem</a>"]]
 };if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

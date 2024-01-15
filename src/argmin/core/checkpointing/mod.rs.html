@@ -226,6 +226,7 @@
 <a href="#226" id="226">226</a>
 <a href="#227" id="227">227</a>
 <a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -347,9 +348,9 @@
 /// # Example
 ///
 /// ```
-/// # extern crate serde;
 /// use argmin::core::Error;
 /// use argmin::core::checkpointing::{Checkpoint, CheckpointingFrequency};
+/// # #[cfg(feature = &quot;serde1&quot;)]
 /// use serde::{Serialize, de::DeserializeOwned};
 ///
 /// struct MyCheckpoint {
@@ -357,6 +358,7 @@
 ///    // ..
 /// }
 ///
+/// # #[cfg(feature = &quot;serde1&quot;)]
 /// impl&lt;S, I&gt; Checkpoint&lt;S, I&gt; for MyCheckpoint
 /// where
 ///     // Both `solver` (`S`) and `state` (`I`) (probably) need to be (de)serializable

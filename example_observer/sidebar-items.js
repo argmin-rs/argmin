@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["main","run"],"struct":["Himmelblau","Surface","Visualizer3d"]};

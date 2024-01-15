@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="argmin-math provides mathematics related abstractions needed in argmin. It supports implementations of these abstractions for basic `Vec`s and for `ndarray` and `nalgebra`. The traits can of course also be implemented for your own types to make them compatible with argmin."><title>argmin_math - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="argmin_math" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../argmin_math/index.html">argmin_math</a><span class="version">0.3.0</span></h2></div><div class="sidebar-elems"><ul class="block">
-            <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">argmin_math</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/argmin_math/lib.rs.html#8-360">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin-math provides mathematics related abstractions needed in argmin. It supports
+            <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">argmin_math</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/argmin_math/lib.rs.html#8-343">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin-math provides mathematics related abstractions needed in argmin. It supports
 implementations of these abstractions for basic <code>Vec</code>s and for <code>ndarray</code> and <code>nalgebra</code>.
 The traits can of course also be implemented for your own types to make them compatible with
 argmin.</p>
@@ -22,20 +22,12 @@ carefully to the end before choosing a backend.</p>
 </div><h4 id="ndarray"><a href="#ndarray"><code>ndarray</code></a></h4><div><table><thead><tr><th>Feature</th><th>Default</th><th>Comment</th></tr></thead><tbody>
 <tr><td><code>ndarray_latest</code></td><td>no</td><td>latest supported version</td></tr>
 <tr><td><code>ndarray_latest-nolinalg</code></td><td>no</td><td>latest supported version without <code>ndarray-linalg</code></td></tr>
-<tr><td><code>ndarray_latest-serde</code></td><td>no</td><td>latest supported version + serde support</td></tr>
-<tr><td><code>ndarray_latest-nolinalg-serde</code></td><td>no</td><td>latest supported version without <code>ndarray-linalg</code> + serde support</td></tr>
 <tr><td><code>ndarray_v0_15</code></td><td>no</td><td>version 0.15 with ndarray-linalg 0.16</td></tr>
 <tr><td><code>ndarray_v0_15-nolinalg</code></td><td>no</td><td>version 0.15 without <code>ndarray-linalg</code></td></tr>
-<tr><td><code>ndarray_v0_15-serde</code></td><td>no</td><td>version 0.15 with ndarray-linalg 0.16 + serde support</td></tr>
-<tr><td><code>ndarray_v0_15-nolinalg-serde</code></td><td>no</td><td>version 0.15 without <code>ndarray-linalg</code> + serde support</td></tr>
 <tr><td><code>ndarray_v0_14</code></td><td>no</td><td>version 0.14 with ndarray-linalg 0.13</td></tr>
 <tr><td><code>ndarray_v0_14-nolinalg</code></td><td>no</td><td>version 0.14 without <code>ndarray-linalg</code></td></tr>
-<tr><td><code>ndarray_v0_14-serde</code></td><td>no</td><td>version 0.14 with ndarray-linalg 0.13 + serde support</td></tr>
-<tr><td><code>ndarray_v0_14-nolinalg-serde</code></td><td>no</td><td>version 0.14 without <code>ndarray-linalg</code> + serde support</td></tr>
 <tr><td><code>ndarray_v0_13</code></td><td>no</td><td>version 0.13 with ndarray-linalg 0.12</td></tr>
 <tr><td><code>ndarray_v0_13-nolinalg</code></td><td>no</td><td>version 0.13 without <code>ndarray-linalg</code></td></tr>
-<tr><td><code>ndarray_v0_13-serde</code></td><td>no</td><td>version 0.13 with ndarray-linalg 0.12 + serde support</td></tr>
-<tr><td><code>ndarray_v0_13-nolinalg-serde</code></td><td>no</td><td>version 0.13 without <code>ndarray-linalg</code> + serde support</td></tr>
 </tbody></table>
 </div>
 <p>Note that the <code>*-nolinalg*</code> features do NOT pull in <code>ndarray-linalg</code> as a dependency. This
@@ -50,31 +42,23 @@ for details</a>):</p>
 <div class="example-wrap"><pre class="language-toml"><code>ndarray-linalg = { version = &quot;&lt;appropriate_version&gt;&quot;, features = [&quot;&lt;linalg_backend&gt;&quot;] }
 </code></pre></div><h4 id="nalgebra"><a href="#nalgebra"><code>nalgebra</code></a></h4><div><table><thead><tr><th>Feature</th><th>Default</th><th>Comment</th></tr></thead><tbody>
 <tr><td><code>nalgebra_latest</code></td><td>no</td><td>latest supported version</td></tr>
-<tr><td><code>nalgebra_latest-serde</code></td><td>no</td><td>latest supported version + serde support</td></tr>
 <tr><td><code>nalgebra_v0_32</code></td><td>no</td><td>version 0.32</td></tr>
-<tr><td><code>nalgebra_v0_32-serde</code></td><td>no</td><td>version 0.32 + serde support</td></tr>
 <tr><td><code>nalgebra_v0_31</code></td><td>no</td><td>version 0.31</td></tr>
-<tr><td><code>nalgebra_v0_31-serde</code></td><td>no</td><td>version 0.31 + serde support</td></tr>
 <tr><td><code>nalgebra_v0_30</code></td><td>no</td><td>version 0.30</td></tr>
-<tr><td><code>nalgebra_v0_30-serde</code></td><td>no</td><td>version 0.30 + serde support</td></tr>
 <tr><td><code>nalgebra_v0_29</code></td><td>no</td><td>version 0.29</td></tr>
-<tr><td><code>nalgebra_v0_29-serde</code></td><td>no</td><td>version 0.29 + serde support</td></tr>
 </tbody></table>
 </div><h3 id="choosing-a-backend"><a href="#choosing-a-backend">Choosing a backend</a></h3>
 <p>It is not possible to activate two versions of the same backend.</p>
 <p>The features labeled <code>*latest*</code> are an alias for the most recent supported version of the
 respective backend. It is however recommended to explicitly specify the desired version instead
 of using any of the <code>*latest*</code> features (see section about semantic versioning below).</p>
-<p>Note that <code>argmin</code> by default compiles with <code>serde</code> support. Therefore, unless <code>serde</code> is
-deliberately turned off in <code>argmin</code>, it is necessary to activate the <code>serde</code> support in
-<code>argmin-math</code> as well.</p>
 <p>The default features <code>primitives</code> and <code>vec</code> can be turned off in order to only compile the
 trait definitions. If another backend is chosen, <code>primitives</code> will automatically be turned on
 again.</p>
 <h4 id="example"><a href="#example">Example</a></h4>
 <p>Activate support for the latest supported <code>ndarray</code> version:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
-argmin-math = { version = &quot;0.3.0&quot;, features = [&quot;ndarray_latest-serde&quot;] }
+argmin-math = { version = &quot;0.3.0&quot;, features = [&quot;ndarray_latest&quot;] }
 </code></pre></div><h2 id="semantic-versioning"><a href="#semantic-versioning">Semantic versioning</a></h2>
 <p>This crate follows semantic versioning. Adding a new backend or a new version of a backend is
 not considered a breaking change. However, your code may still break if you use any of the
