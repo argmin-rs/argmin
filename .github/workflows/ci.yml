@@ -190,11 +190,11 @@ jobs:
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh 
       - name: Build target wasm32-unknown-unknown
-        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --target wasm32-unknown-unknown --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --target wasm32-unknown-unknown --features wasm-bindgen
       - name: Build target wasm32-wasi with feature wasm-bindgen
-        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --target wasm32-wasi --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --target wasm32-wasi --features wasm-bindgen
       - name: Build target wasm32-unknown-emscripten
-        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --target wasm32-unknown-emscripten --no-default-features --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --target wasm32-unknown-emscripten --no-default-features --features wasm-bindgen
 
   cargo-deny:
     runs-on: ubuntu-latest
