@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 
 
-//this is the thing you gotta fix
 use crate::ArgminMinMax;
 use num_complex::Complex;
 
@@ -52,10 +51,9 @@ make_minmax!(Complex<usize>);
 
 // TODO: tests!!!
 #[cfg(test)]
-mod tests{
+mod tests {
     use super::*;
     use paste::item;
-
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -69,12 +67,8 @@ mod tests{
                 }
             }
         }
-     }
-     
-    
+    }
 
+    make_test!(f32);
+    make_test!(f64);
 }
-
-
-make_test!(f32);
-make_test!(f64);
