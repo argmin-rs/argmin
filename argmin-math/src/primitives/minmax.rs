@@ -51,3 +51,30 @@ make_minmax!(Complex<isize>);
 make_minmax!(Complex<usize>);
 
 // TODO: tests!!!
+#[cfg(test)]
+mod tests{
+    use super::*;
+    use paste::item;
+
+
+    macro_rules! make_test {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_minmax_ $t>]() {
+                    let x = 5 as $t;
+                    let y = 10 as $t;
+                    assert_eq!(<$t as ArgminMinMax>::min(&x, &y), x);
+                    assert_eq!(<$t as ArgminMinMax>::max(&x, &y), y);
+                }
+            }
+        }
+     }
+     
+    
+
+}
+
+
+make_test!(f32);
+make_test!(f64);
