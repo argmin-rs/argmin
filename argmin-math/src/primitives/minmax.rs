@@ -64,6 +64,8 @@ mod tests {
                     let y = 10 as $t;
                     assert_eq!(<$t as ArgminMinMax>::min(&x, &y), x);
                     assert_eq!(<$t as ArgminMinMax>::max(&x, &y), y);
+                    assert_eq!(<$t as ArgminMinMax>::min(&y, &x), x);
+                    assert_eq!(<$t as ArgminMinMax>::max(&y, &x), y);
                 }
             }
         }
