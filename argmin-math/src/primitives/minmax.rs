@@ -48,7 +48,6 @@ make_minmax!(Complex<u64>);
 make_minmax!(Complex<isize>);
 make_minmax!(Complex<usize>);
 
-// TODO: tests!!!
 #[cfg(test)]
 mod tests {
     use super::*;
