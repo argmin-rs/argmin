@@ -380,6 +380,8 @@
 <a href="#380" id="380">380</a>
 <a href="#381" id="381">381</a>
 <a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -491,16 +493,16 @@
     }
 }
 
-<span class="kw">impl</span>&lt;O, F, P, J, U&gt; Solver&lt;O, IterState&lt;P, (), J, (), F&gt;&gt; <span class="kw">for </span>GaussNewton&lt;F&gt;
+<span class="kw">impl</span>&lt;O, P, J, R, F&gt; Solver&lt;O, IterState&lt;P, (), J, (), R, F&gt;&gt; <span class="kw">for </span>GaussNewton&lt;F&gt;
 <span class="kw">where
-    </span>O: Operator&lt;Param = P, Output = U&gt; + Jacobian&lt;Param = P, Jacobian = J&gt;,
+    </span>O: Operator&lt;Param = P, Output = R&gt; + Jacobian&lt;Param = P, Jacobian = J&gt;,
     P: Clone + ArgminSub&lt;P, P&gt; + ArgminMul&lt;F, P&gt;,
-    U: ArgminL2Norm&lt;F&gt;,
+    R: ArgminL2Norm&lt;F&gt;,
     J: Clone
         + ArgminTranspose&lt;J&gt;
         + ArgminInv&lt;J&gt;
         + ArgminDot&lt;J, J&gt;
-        + ArgminDot&lt;U, P&gt;
+        + ArgminDot&lt;R, P&gt;
         + ArgminDot&lt;P, P&gt;,
     F: ArgminFloat,
 {
@@ -509,8 +511,8 @@
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        state: IterState&lt;P, (), J, (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), J, (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        state: IterState&lt;P, (), J, (), R, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), J, (), R, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>param = state.get_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             NotInitialized,
             <span class="macro">concat!</span>(
@@ -530,10 +532,12 @@
 
         <span class="kw">let </span>new_param = param.sub(<span class="kw-2">&amp;</span>p.mul(<span class="kw-2">&amp;</span><span class="self">self</span>.gamma));
 
-        <span class="prelude-val">Ok</span>((state.param(new_param).cost(residuals.l2_norm()), <span class="prelude-val">None</span>))
+        <span class="kw">let </span>cost = residuals.l2_norm();
+
+        <span class="prelude-val">Ok</span>((state.param(new_param).residuals(residuals).cost(cost), <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, (), J, (), F&gt;) -&gt; TerminationStatus {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, (), J, (), R, F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span>(state.get_prev_cost() - state.get_cost()).abs() &lt; <span class="self">self</span>.tol {
             <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }

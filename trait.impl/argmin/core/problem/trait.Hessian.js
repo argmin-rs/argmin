@@ -1,6 +1,6 @@
 (function() {var implementors = {
 "argmin":[],
-"example_newton":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Hessian.html\" title=\"trait argmin::core::problem::Hessian\">Hessian</a> for <a class=\"struct\" href=\"example_newton/struct.Rosenbrock.html\" title=\"struct example_newton::Rosenbrock\">Rosenbrock</a>"]],
+"example_newton":[["impl Hessian for <a class=\"struct\" href=\"example_newton/struct.Rosenbrock.html\" title=\"struct example_newton::Rosenbrock\">Rosenbrock</a>"]],
 "example_newton_cg":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Hessian.html\" title=\"trait argmin::core::problem::Hessian\">Hessian</a> for <a class=\"struct\" href=\"example_newton_cg/struct.Rosenbrock.html\" title=\"struct example_newton_cg::Rosenbrock\">Rosenbrock</a>"]],
 "example_sr1_trustregion":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Hessian.html\" title=\"trait argmin::core::problem::Hessian\">Hessian</a> for <a class=\"struct\" href=\"example_sr1_trustregion/struct.Rosenbrock.html\" title=\"struct example_sr1_trustregion::Rosenbrock\">Rosenbrock</a>"]],
 "example_trustregion":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Hessian.html\" title=\"trait argmin::core::problem::Hessian\">Hessian</a> for <a class=\"struct\" href=\"example_trustregion/struct.Rosenbrock.html\" title=\"struct example_trustregion::Rosenbrock\">Rosenbrock</a>"]]

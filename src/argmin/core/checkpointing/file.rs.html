@@ -189,6 +189,7 @@
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -372,11 +373,12 @@
     #[allow(clippy::type_complexity)]
     </span><span class="kw">fn </span>test_save() {
         <span class="kw">let </span>solver = TestSolver::new();
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new().param(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">0.0</span>]);
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; =
+            IterState::new().param(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">0.0</span>]);
         <span class="kw">let </span>check = FileCheckpoint::new(<span class="string">&quot;checkpoints&quot;</span>, <span class="string">&quot;solver&quot;</span>, CheckpointingFrequency::Always);
         check.save_cond(<span class="kw-2">&amp;</span>solver, <span class="kw-2">&amp;</span>state, <span class="number">20</span>).unwrap();
 
-        <span class="kw">let </span>_loaded: <span class="prelude-ty">Option</span>&lt;(TestSolver, IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;)&gt; =
+        <span class="kw">let </span>_loaded: <span class="prelude-ty">Option</span>&lt;(TestSolver, IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;)&gt; =
             check.load().unwrap();
     }
 }

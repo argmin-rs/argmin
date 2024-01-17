@@ -669,6 +669,8 @@
 <a href="#669" id="669">669</a>
 <a href="#670" id="670">670</a>
 <a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -1079,8 +1081,9 @@
         <span class="kw">let </span>problem = TestProblem::new();
         <span class="kw">let </span>solver = TestSolver::new();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>executor = Executor::new(problem, solver)
-            .configure(|config: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;| config.param(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]));
+        <span class="kw">let </span><span class="kw-2">mut </span>executor = Executor::new(problem, solver).configure(
+            |config: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;| config.param(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]),
+        );
 
         <span class="comment">// 1) Parameter vector changes, but not cost (continues to be `Inf`)
         </span><span class="kw">let </span>new_param = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
@@ -1163,8 +1166,9 @@
 
         <span class="comment">// 4) `-Inf` is better than `Inf`
         </span><span class="kw">let </span>solver = TestSolver {};
-        <span class="kw">let </span><span class="kw-2">mut </span>executor = Executor::new(problem, solver)
-            .configure(|config: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;| config.param(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]));
+        <span class="kw">let </span><span class="kw-2">mut </span>executor = Executor::new(problem, solver).configure(
+            |config: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;| config.param(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]),
+        );
 
         <span class="kw">let </span>new_param = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">1.0</span>];
         <span class="kw">let </span>new_cost = std::f64::NEG_INFINITY;
@@ -1255,7 +1259,7 @@
         }
 
         <span class="comment">// Implement Solver for OptimizationAlgorithm
-        </span><span class="kw">impl</span>&lt;O, P, F&gt; Solver&lt;O, IterState&lt;P, (), (), (), F&gt;&gt; <span class="kw">for </span>OptimizationAlgorithm
+        </span><span class="kw">impl</span>&lt;O, P, F&gt; Solver&lt;O, IterState&lt;P, (), (), (), (), F&gt;&gt; <span class="kw">for </span>OptimizationAlgorithm
         <span class="kw">where
             </span>O: CostFunction&lt;Param = P, Output = F&gt;,
             P: Clone,
@@ -1267,8 +1271,8 @@
             </span><span class="kw">fn </span>init(
                 <span class="kw-2">&amp;mut </span><span class="self">self</span>,
                 _problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-                state: IterState&lt;P, (), (), (), F&gt;,
-            ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+                state: IterState&lt;P, (), (), (), (), F&gt;,
+            ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
                 <span class="self">self</span>.internal_state = <span class="number">1</span>;
                 <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
             }
@@ -1277,21 +1281,21 @@
             </span><span class="kw">fn </span>next_iter(
                 <span class="kw-2">&amp;mut </span><span class="self">self</span>,
                 _problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-                state: IterState&lt;P, (), (), (), F&gt;,
-            ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+                state: IterState&lt;P, (), (), (), (), F&gt;,
+            ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
                 <span class="self">self</span>.internal_state += <span class="number">1</span>;
                 <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
             }
 
             <span class="comment">// Avoid terminating early because param does not change
-            </span><span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationStatus {
+            </span><span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), (), F&gt;) -&gt; TerminationStatus {
                 TerminationStatus::NotTerminated
             }
 
             <span class="comment">// Avoid terminating early because param does not change
             </span><span class="kw">fn </span>terminate_internal(
                 <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-                state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;,
+                state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), (), F&gt;,
             ) -&gt; TerminationStatus {
                 <span class="kw">if </span>state.get_iter() &gt;= state.get_max_iters() {
                     TerminationStatus::Terminated(TerminationReason::MaxItersReached)

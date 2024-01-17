@@ -709,6 +709,7 @@
 <a href="#709" id="709">709</a>
 <a href="#710" id="710">710</a>
 <a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -841,17 +842,18 @@
 <span class="kw">where
     </span>P: ArgminScaledAdd&lt;G, F, P&gt;,
     L: LineSearchCondition&lt;G, G, F&gt;,
-    IterState&lt;P, G, (), (), F&gt;: State&lt;Float = F&gt;,
+    IterState&lt;P, G, (), (), (), F&gt;: State&lt;Float = F&gt;,
     F: ArgminFloat,
 {
     <span class="doccomment">/// Perform a single backtracking step
     </span><span class="kw">fn </span>backtracking_step&lt;O&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        state: IterState&lt;P, G, (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;IterState&lt;P, G, (), (), F&gt;, Error&gt;
+        state: IterState&lt;P, G, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;IterState&lt;P, G, (), (), (), F&gt;, Error&gt;
     <span class="kw">where
         </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
+        IterState&lt;P, G, (), (), (), F&gt;: State&lt;Float = F&gt;,
     {
         <span class="kw">let </span>new_param = <span class="self">self
             </span>.init_param
@@ -885,7 +887,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;O, P, G, L, F&gt; Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt; <span class="kw">for </span>BacktrackingLineSearch&lt;P, G, L, F&gt;
+<span class="kw">impl</span>&lt;O, P, G, L, F&gt; Solver&lt;O, IterState&lt;P, G, (), (), (), F&gt;&gt; <span class="kw">for </span>BacktrackingLineSearch&lt;P, G, L, F&gt;
 <span class="kw">where
     </span>P: Clone + SerializeAlias + ArgminScaledAdd&lt;G, F, P&gt;,
     G: SerializeAlias + ArgminScaledAdd&lt;G, F, G&gt;,
@@ -898,8 +900,8 @@
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">if </span><span class="self">self</span>.search_direction.is_none() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 NotInitialized,
@@ -937,14 +939,14 @@
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        state: IterState&lt;P, G, (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        state: IterState&lt;P, G, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="self">self</span>.alpha = <span class="self">self</span>.alpha * <span class="self">self</span>.rho;
         <span class="kw">let </span>state = <span class="self">self</span>.backtracking_step(problem, state)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), (), F&gt;) -&gt; TerminationStatus {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), (), (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span><span class="self">self</span>.condition.evaluate_condition(
             state.cost,
             state.get_gradient(),
@@ -1301,10 +1303,10 @@
         <span class="macro">assert_eq!</span>(
             &lt;BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; <span class="kw">as </span>Solver&lt;
                 TestProblem,
-                IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;,
+                IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), (), f64&gt;,
             &gt;&gt;::terminate(
                 <span class="kw-2">&amp;mut </span>ls,
-                <span class="kw-2">&amp;</span>IterState::&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;::new().param(init_param)
+                <span class="kw-2">&amp;</span>IterState::&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), (), f64&gt;::new().param(init_param)
             ),
             TerminationStatus::Terminated(TerminationReason::SolverConverged)
         );
@@ -1315,10 +1317,10 @@
         <span class="macro">assert_eq!</span>(
             &lt;BacktrackingLineSearch&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, ArmijoCondition&lt;f64&gt;, f64&gt; <span class="kw">as </span>Solver&lt;
                 TestProblem,
-                IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;,
+                IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), (), f64&gt;,
             &gt;&gt;::terminate(
                 <span class="kw-2">&amp;mut </span>ls,
-                <span class="kw-2">&amp;</span>IterState::&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt;::new().param(init_param)
+                <span class="kw-2">&amp;</span>IterState::&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), (), f64&gt;::new().param(init_param)
             ),
             TerminationStatus::NotTerminated
         );

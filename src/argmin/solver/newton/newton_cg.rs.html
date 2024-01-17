@@ -343,6 +343,7 @@
 <a href="#343" id="343">343</a>
 <a href="#344" id="344">344</a>
 <a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -451,7 +452,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;O, L, P, G, H, F&gt; Solver&lt;O, IterState&lt;P, G, (), H, F&gt;&gt; <span class="kw">for </span>NewtonCG&lt;L, F&gt;
+<span class="kw">impl</span>&lt;O, L, P, G, H, F&gt; Solver&lt;O, IterState&lt;P, G, (), H, (), F&gt;&gt; <span class="kw">for </span>NewtonCG&lt;L, F&gt;
 <span class="kw">where
     </span>O: Gradient&lt;Param = P, Gradient = G&gt; + Hessian&lt;Param = P, Hessian = H&gt;,
     P: Clone
@@ -465,7 +466,7 @@
         + ArgminZeroLike,
     G: SerializeAlias + DeserializeOwnedAlias + ArgminL2Norm&lt;F&gt; + ArgminMul&lt;F, P&gt;,
     H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot&lt;P, P&gt;,
-    L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt;,
+    L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), (), F&gt;&gt;,
     F: ArgminFloat + ArgminL2Norm&lt;F&gt;,
 {
     <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Newton-CG&quot;</span>;
@@ -473,8 +474,8 @@
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             NotInitialized,
             <span class="macro">concat!</span>(
@@ -498,7 +499,8 @@
         <span class="kw">let </span><span class="kw-2">mut </span>x = param.zero_like();
         <span class="kw">let </span><span class="kw-2">mut </span>cg = ConjugateGradient::new(grad.mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(-<span class="number">1.0</span>))));
 
-        <span class="kw">let </span>(<span class="kw-2">mut </span>cg_state, <span class="kw">_</span>) = cg.init(<span class="kw-2">&amp;mut </span>cg_problem, IterState::new().param(x_p.clone()))<span class="question-mark">?</span>;
+        <span class="kw">let </span>(<span class="kw-2">mut </span>cg_state, <span class="kw">_</span>): (IterState&lt;<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;, <span class="kw">_</span>) =
+            cg.init(<span class="kw-2">&amp;mut </span>cg_problem, IterState::new().param(x_p.clone()))<span class="question-mark">?</span>;
 
         <span class="kw">let </span>grad_norm_factor = <span class="macro">float!</span>(<span class="number">0.5</span>).min(grad.l2_norm().sqrt()) * grad.l2_norm();
 
@@ -554,7 +556,7 @@
         ))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationStatus {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span>(state.get_cost() - state.get_prev_cost()).abs() &lt; <span class="self">self</span>.tol {
             TerminationStatus::Terminated(TerminationReason::SolverConverged)
         } <span class="kw">else </span>{

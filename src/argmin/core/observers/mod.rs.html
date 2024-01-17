@@ -646,7 +646,7 @@
     /// use argmin::core::observers::Observers;
     /// use argmin::core::IterState;
     ///
-    /// let observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; = Observers::new();
+    /// let observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;&gt; = Observers::new();
     /// # assert!(observers.is_empty());
     /// ```
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
@@ -662,7 +662,7 @@
     /// use argmin_observer_slog::SlogLogger;
     /// use argmin::core::IterState;
     ///
-    /// let mut observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; = Observers::new();
+    /// let mut observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;&gt; = Observers::new();
     ///
     /// let logger = SlogLogger::term();
     /// observers.push(logger, ObserverMode::Always);
@@ -685,7 +685,7 @@
     /// use argmin::core::observers::Observers;
     /// use argmin::core::IterState;
     ///
-    /// let observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; = Observers::new();
+    /// let observers: Observers&lt;IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;&gt; = Observers::new();
     /// assert!(observers.is_empty());
     /// ```
     </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -823,7 +823,7 @@
 
         <span class="kw">let </span>storages = [test_stor_1, test_stor_2, test_stor_3, test_stor_4];
 
-        <span class="kw">type </span>TState = IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;;
+        <span class="kw">type </span>TState = IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;;
 
         <span class="kw">let </span><span class="kw-2">mut </span>obs: Observers&lt;TState&gt; = Observers::new();
         obs.push(test_obs_1, ObserverMode::Never)

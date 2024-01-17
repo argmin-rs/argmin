@@ -380,7 +380,7 @@
     </span>}
 }
 
-<span class="kw">impl</span>&lt;O, F&gt; Solver&lt;O, IterState&lt;F, (), (), (), F&gt;&gt; <span class="kw">for </span>BrentOpt&lt;F&gt;
+<span class="kw">impl</span>&lt;O, F&gt; Solver&lt;O, IterState&lt;F, (), (), (), (), F&gt;&gt; <span class="kw">for </span>BrentOpt&lt;F&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = F, Output = F&gt;,
     F: ArgminFloat,
@@ -391,8 +391,8 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
         <span class="comment">// BrentOpt maintains its own state
-        </span>state: IterState&lt;F, (), (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;F, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        </span>state: IterState&lt;F, (), (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;F, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>u = <span class="self">self</span>.a + <span class="self">self</span>.c * (<span class="self">self</span>.b - <span class="self">self</span>.a);
         <span class="self">self</span>.v = u;
         <span class="self">self</span>.w = u;
@@ -408,8 +408,8 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
         <span class="comment">// BrentOpt maintains its own state
-        </span>state: IterState&lt;F, (), (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;F, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        </span>state: IterState&lt;F, (), (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;F, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>two = <span class="macro">float!</span>(<span class="number">2f64</span>);
         <span class="kw">let </span>tol = <span class="self">self</span>.eps * <span class="self">self</span>.x.abs() + <span class="self">self</span>.t;
         <span class="kw">let </span>m = (<span class="self">self</span>.a + <span class="self">self</span>.b) / two;

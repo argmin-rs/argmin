@@ -1025,8 +1025,8 @@
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationReason};
-    /// # let mut state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};
+    /// # let mut state: LinearProgramState&lt;Vec&lt;f64&gt;, f64&gt; = LinearProgramState::new();
     /// let termination_reason = state.get_termination_reason();
     /// # assert_eq!(termination_reason, None);
     /// ```

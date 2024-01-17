@@ -245,7 +245,7 @@
     /// # struct SomeSolver {}
     /// #
     /// let rosenbrock = Rosenbrock::new();
-    /// let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+    /// let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new();
     /// let solver = SomeSolver {};
     ///
     /// let result = OptimizationResult::new(Problem::new(rosenbrock), solver, state);
@@ -271,7 +271,7 @@
     /// # struct Rosenbrock {}
     /// # let solver = ();
     /// #
-    /// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+    /// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new();
     /// #
     /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
     /// #
@@ -291,7 +291,7 @@
     /// # struct Rosenbrock {}
     /// # let solver = ();
     /// #
-    /// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+    /// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new();
     /// #
     /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
     /// #
@@ -311,11 +311,11 @@
     /// # struct Rosenbrock {}
     /// # let solver = ();
     /// #
-    /// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+    /// # let state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new();
     /// #
     /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
     /// #
-    /// let state: &amp;IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = result.state();
+    /// let state: &amp;IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = result.state();
     /// ```
     </span><span class="kw">pub fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>I {
         <span class="kw-2">&amp;</span><span class="self">self</span>.state
@@ -405,7 +405,7 @@
 
     <span class="macro">send_sync_test!</span>(
         optimizationresult,
-        OptimizationResult&lt;TestProblem, TestSolver, IterState&lt;(), (), (), (), f64&gt;&gt;
+        OptimizationResult&lt;TestProblem, TestSolver, IterState&lt;(), (), (), (), (), f64&gt;&gt;
     );
 
     <span class="comment">// TODO: More tests, in particular the checking that the output is as intended.

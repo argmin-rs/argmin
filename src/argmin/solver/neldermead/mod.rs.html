@@ -1186,7 +1186,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;O, P, F&gt; Solver&lt;O, IterState&lt;P, (), (), (), F&gt;&gt; <span class="kw">for </span>NelderMead&lt;P, F&gt;
+<span class="kw">impl</span>&lt;O, P, F&gt; Solver&lt;O, IterState&lt;P, (), (), (), (), F&gt;&gt; <span class="kw">for </span>NelderMead&lt;P, F&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt;,
     P: Clone + SerializeAlias + ArgminSub&lt;P, P&gt; + ArgminAdd&lt;P, P&gt; + ArgminMul&lt;F, P&gt;,
@@ -1197,8 +1197,8 @@
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        state: IterState&lt;P, (), (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        state: IterState&lt;P, (), (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="self">self</span>.params
             .iter_mut()
             .for_each(|(p, c)| <span class="kw-2">*</span>c = problem.cost(p).unwrap());
@@ -1214,8 +1214,8 @@
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        state: IterState&lt;P, (), (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        state: IterState&lt;P, (), (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>num_param_vecs = <span class="self">self</span>.params.len();
 
         <span class="kw">let </span>x0 = <span class="self">self</span>.calculate_centroid();
@@ -1283,7 +1283,7 @@
         ))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationStatus {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">let </span>n = <span class="macro">float!</span>(<span class="self">self</span>.params.len() <span class="kw">as </span>f64);
         <span class="kw">let </span>c0: F = <span class="self">self</span>.params.iter().map(|(<span class="kw">_</span>, c)| <span class="kw-2">*</span>c).sum::&lt;F&gt;() / n;
         <span class="kw">let </span>s: F = (<span class="macro">float!</span>(<span class="number">1.0</span>) / (n - <span class="macro">float!</span>(<span class="number">1.0</span>))
@@ -1560,7 +1560,7 @@
             (<span class="macro">vec!</span>[-<span class="number">0.5</span>, <span class="number">2.0</span>], <span class="number">0.5f64</span>.powi(<span class="number">2</span>) + <span class="number">2.0f64</span>.powi(<span class="number">2</span>)),
         ];
         <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new();
         <span class="kw">let </span>problem = MwProblem {};
         <span class="kw">let </span>(state_out, kv) = nm.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
@@ -1591,7 +1591,7 @@
     </span><span class="kw">fn </span>test_next_iter_reflection() {
         <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[-<span class="number">0.1</span>, <span class="number">0.65</span>], <span class="macro">vec!</span>[-<span class="number">0.1</span>, -<span class="number">0.95</span>]];
         <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new();
         <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(MwProblem {});
         <span class="kw">let </span>(state, <span class="kw">_</span>) = nm.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
@@ -1634,7 +1634,7 @@
             </span><span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0 </span>- f64::EPSILON],
         ];
         <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new();
         <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(MwProblem {});
         <span class="kw">let </span>(state, <span class="kw">_</span>) = nm.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
@@ -1670,7 +1670,7 @@
     </span><span class="kw">fn </span>test_next_iter_contraction_outside() {
         <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[-<span class="number">1.1</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[-<span class="number">0.1</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[-<span class="number">0.1</span>, -<span class="number">0.5</span>]];
         <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new();
         <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(MwProblem {});
         <span class="kw">let </span>(state, <span class="kw">_</span>) = nm.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
@@ -1706,7 +1706,7 @@
     </span><span class="kw">fn </span>test_next_iter_contraction_inside() {
         <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">0.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>], <span class="macro">vec!</span>[<span class="number">0.0</span>, -<span class="number">0.5</span>]];
         <span class="kw">let </span><span class="kw-2">mut </span>nm: NelderMead&lt;<span class="kw">_</span>, f64&gt; = NelderMead::new(params);
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new();
         <span class="kw">let </span><span class="kw-2">mut </span>problem = Problem::new(MwProblem {});
         <span class="kw">let </span>(state, <span class="kw">_</span>) = nm.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 

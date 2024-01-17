@@ -122,6 +122,8 @@
 <a href="#122" id="122">122</a>
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -236,6 +238,8 @@
 </span><span class="comment">// Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,
 // this is just to make sure that it will always stay this way.)
 </span><span class="attr">#![deny(clippy::float_cmp)]
+</span><span class="comment">// Some types just are complex
+</span><span class="attr">#![allow(clippy::type_complexity)]
 
 #[macro_use]
 </span><span class="kw">pub mod </span>core;

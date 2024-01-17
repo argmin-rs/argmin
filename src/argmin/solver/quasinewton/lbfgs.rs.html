@@ -734,6 +734,8 @@
 <a href="#734" id="734">734</a>
 <a href="#735" id="735">735</a>
 <a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -1038,7 +1040,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;O, L, P, G, F&gt; Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt; <span class="kw">for </span>LBFGS&lt;L, P, G, F&gt;
+<span class="kw">impl</span>&lt;O, L, P, G, F&gt; Solver&lt;O, IterState&lt;P, G, (), (), (), F&gt;&gt; <span class="kw">for </span>LBFGS&lt;L, P, G, F&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
     P: Clone
@@ -1071,7 +1073,9 @@
         + ArgminMul&lt;F, P&gt;
         + ArgminZeroLike
         + ArgminMinMax,
-    L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;LineSearchProblem&lt;O, P, G, F&gt;, IterState&lt;P, G, (), (), F&gt;&gt;,
+    L: Clone
+        + LineSearch&lt;P, F&gt;
+        + Solver&lt;LineSearchProblem&lt;O, P, G, F&gt;, IterState&lt;P, G, (), (), (), F&gt;&gt;,
     F: ArgminFloat,
 {
     <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;L-BFGS&quot;</span>;
@@ -1079,8 +1083,8 @@
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             NotInitialized,
             <span class="macro">concat!</span>(
@@ -1111,8 +1115,8 @@
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             PotentialBug,
             <span class="string">&quot;`L-BFGS`: Parameter vector in state not set.&quot;
@@ -1229,7 +1233,7 @@
         ))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), (), F&gt;) -&gt; TerminationStatus {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), (), (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span>state.get_gradient().unwrap().l2_norm() &lt; <span class="self">self</span>.tol_grad {
             <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
@@ -1345,7 +1349,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>lbfgs: LBFGS&lt;<span class="kw">_</span>, Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = LBFGS::new(linesearch, <span class="number">3</span>);
 
         <span class="comment">// Forgot to initialize the parameter vector
-        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt; = IterState::new();
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
         <span class="kw">let </span>problem = TestProblem::new();
         <span class="kw">let </span>res = lbfgs.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
         <span class="macro">assert_error!</span>(
@@ -1358,7 +1362,7 @@
         );
 
         <span class="comment">// All good.
-        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt; =
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), (), f64&gt; =
             IterState::new().param(param.clone());
         <span class="kw">let </span>problem = TestProblem::new();
         <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = lbfgs.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
@@ -1388,7 +1392,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>lbfgs: LBFGS&lt;<span class="kw">_</span>, Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = LBFGS::new(linesearch, <span class="number">3</span>);
 
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt; =
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), (), f64&gt; =
             IterState::new().param(param).cost(<span class="number">1234.0</span>);
 
         <span class="kw">let </span>problem = TestProblem::new();
@@ -1408,7 +1412,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>lbfgs: LBFGS&lt;<span class="kw">_</span>, Vec&lt;f64&gt;, Vec&lt;f64&gt;, f64&gt; = LBFGS::new(linesearch, <span class="number">3</span>);
 
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), f64&gt; =
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), (), (), f64&gt; =
             IterState::new().param(param).gradient(gradient.clone());
 
         <span class="kw">let </span>problem = TestProblem::new();

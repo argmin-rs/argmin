@@ -665,14 +665,14 @@
     }
 }
 
-<span class="kw">impl</span>&lt;O&gt; Solver&lt;O, IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;&gt; <span class="kw">for </span>TestSolver {
+<span class="kw">impl</span>&lt;O&gt; Solver&lt;O, IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;&gt; <span class="kw">for </span>TestSolver {
     <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;TestSolver&quot;</span>;
 
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         _problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
     }
 }

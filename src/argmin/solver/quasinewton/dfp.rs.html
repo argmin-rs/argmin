@@ -524,7 +524,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;O, L, P, G, H, F&gt; Solver&lt;O, IterState&lt;P, G, (), H, F&gt;&gt; <span class="kw">for </span>DFP&lt;L, F&gt;
+<span class="kw">impl</span>&lt;O, L, P, G, H, F&gt; Solver&lt;O, IterState&lt;P, G, (), H, (), F&gt;&gt; <span class="kw">for </span>DFP&lt;L, F&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
     P: Clone
@@ -547,7 +547,7 @@
         + ArgminDot&lt;G, P&gt;
         + ArgminAdd&lt;H, H&gt;
         + ArgminMul&lt;F, H&gt;,
-    L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), F&gt;&gt;,
+    L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), (), F&gt;&gt;,
     F: ArgminFloat,
 {
     <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;DFP&quot;</span>;
@@ -555,8 +555,8 @@
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             NotInitialized,
             <span class="macro">concat!</span>(
@@ -598,8 +598,8 @@
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             PotentialBug,
             <span class="string">&quot;`DFP`: Parameter vector in state not set.&quot;
@@ -672,7 +672,7 @@
         ))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationStatus {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span>state.get_gradient().unwrap().l2_norm() &lt; <span class="self">self</span>.tol_grad {
             <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
@@ -744,7 +744,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>dfp: DFP&lt;<span class="kw">_</span>, f64&gt; = DFP::new(linesearch);
 
         <span class="comment">// Forgot to initialize the parameter vector
-        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new();
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, (), f64&gt; = IterState::new();
         <span class="kw">let </span>problem = TestProblem::new();
         <span class="kw">let </span>res = dfp.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
         <span class="macro">assert_error!</span>(
@@ -757,7 +757,7 @@
         );
 
         <span class="comment">// Forgot initial inverse Hessian guess
-        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; =
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, (), f64&gt; =
             IterState::new().param(param.clone());
         <span class="kw">let </span>problem = TestProblem::new();
         <span class="kw">let </span>res = dfp.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
@@ -772,7 +772,7 @@
         );
 
         <span class="comment">// All good.
-        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new()
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, (), f64&gt; = IterState::new()
             .param(param.clone())
             .inv_hessian(inv_hessian.clone());
         <span class="kw">let </span>problem = TestProblem::new();
@@ -814,7 +814,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>dfp: DFP&lt;<span class="kw">_</span>, f64&gt; = DFP::new(linesearch);
 
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new()
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, (), f64&gt; = IterState::new()
             .param(param)
             .inv_hessian(inv_hessian)
             .cost(<span class="number">1234.0</span>);
@@ -837,7 +837,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>dfp: DFP&lt;<span class="kw">_</span>, f64&gt; = DFP::new(linesearch);
 
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new()
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, (), f64&gt; = IterState::new()
             .param(param)
             .inv_hessian(inv_hessian)
             .gradient(gradient.clone());

@@ -262,7 +262,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;O, F&gt; Solver&lt;O, IterState&lt;F, (), (), (), F&gt;&gt; <span class="kw">for </span>BrentRoot&lt;F&gt;
+<span class="kw">impl</span>&lt;O, F&gt; Solver&lt;O, IterState&lt;F, (), (), (), (), F&gt;&gt; <span class="kw">for </span>BrentRoot&lt;F&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = F, Output = F&gt;,
     F: ArgminFloat,
@@ -273,8 +273,8 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
         <span class="comment">// BrentRoot maintains its own state
-        </span>state: IterState&lt;F, (), (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;F, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        </span>state: IterState&lt;F, (), (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;F, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="self">self</span>.fa = problem.cost(<span class="kw-2">&amp;</span><span class="self">self</span>.a)<span class="question-mark">?</span>;
         <span class="self">self</span>.fb = problem.cost(<span class="kw-2">&amp;</span><span class="self">self</span>.b)<span class="question-mark">?</span>;
         <span class="kw">if </span><span class="self">self</span>.fa * <span class="self">self</span>.fb &gt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
@@ -288,8 +288,8 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
         <span class="comment">// BrentRoot maintains its own state
-        </span>state: IterState&lt;F, (), (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;F, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        </span>state: IterState&lt;F, (), (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;F, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">if </span>(<span class="self">self</span>.fb &gt; <span class="macro">float!</span>(<span class="number">0.0</span>) &amp;&amp; <span class="self">self</span>.fc &gt; <span class="macro">float!</span>(<span class="number">0.0</span>))
             || <span class="self">self</span>.fb &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) &amp;&amp; <span class="self">self</span>.fc &lt; <span class="macro">float!</span>(<span class="number">0.0</span>)
         {

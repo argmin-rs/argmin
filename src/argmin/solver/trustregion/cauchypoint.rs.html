@@ -232,7 +232,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;O, F, P, G, H&gt; Solver&lt;O, IterState&lt;P, G, (), H, F&gt;&gt; <span class="kw">for </span>CauchyPoint&lt;F&gt;
+<span class="kw">impl</span>&lt;O, F, P, G, H&gt; Solver&lt;O, IterState&lt;P, G, (), H, (), F&gt;&gt; <span class="kw">for </span>CauchyPoint&lt;F&gt;
 <span class="kw">where
     </span>O: Gradient&lt;Param = P, Gradient = G&gt; + Hessian&lt;Param = P, Hessian = H&gt;,
     P: Clone + ArgminMul&lt;F, P&gt; + ArgminWeightedDot&lt;P, F, H&gt;,
@@ -244,8 +244,8 @@
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw-2">mut </span>state: IterState&lt;P, G, (), H, (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, G, (), H, (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             NotInitialized,
             <span class="macro">concat!</span>(
@@ -278,7 +278,7 @@
         <span class="prelude-val">Ok</span>((state.param(new_param), <span class="prelude-val">None</span>))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, F&gt;) -&gt; TerminationStatus {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>IterState&lt;P, G, (), H, (), F&gt;) -&gt; TerminationStatus {
         <span class="comment">// Not an iterative algorithm
         </span><span class="kw">if </span>state.get_iter() &gt;= <span class="number">1 </span>{
             TerminationStatus::Terminated(TerminationReason::MaxItersReached)
@@ -334,7 +334,7 @@
         cp.set_radius(<span class="number">1.0</span>);
 
         <span class="comment">// Forgot to initialize the parameter vector
-        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; = IterState::new();
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, (), f64&gt; = IterState::new();
         <span class="kw">let </span>problem = TestProblem::new();
         <span class="kw">let </span>res = cp.next_iter(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
         <span class="macro">assert_error!</span>(
@@ -347,7 +347,7 @@
         );
 
         <span class="comment">// All good.
-        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, f64&gt; =
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, Vec&lt;f64&gt;, (), Vec&lt;Vec&lt;f64&gt;&gt;, (), f64&gt; =
             IterState::new().param(param);
         <span class="kw">let </span>problem = TestProblem::new();
         <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = cp.next_iter(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();

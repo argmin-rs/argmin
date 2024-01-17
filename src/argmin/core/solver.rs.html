@@ -150,7 +150,7 @@
 /// #[cfg_attr(feature = &quot;serde1&quot;, derive(Serialize, Deserialize))]
 /// struct OptimizationAlgorithm {}
 ///
-/// impl&lt;O, P, G, J, H, F&gt; Solver&lt;O, IterState&lt;P, G, J, H, F&gt;&gt; for OptimizationAlgorithm
+/// impl&lt;O, P, G, J, H, R, F&gt; Solver&lt;O, IterState&lt;P, G, J, H, R, F&gt;&gt; for OptimizationAlgorithm
 /// where
 ///     O: CostFunction&lt;Param = P, Output = F&gt;,
 ///     P: Clone,
@@ -161,8 +161,8 @@
 ///     fn init(
 ///         &amp;mut self,
 ///         problem: &amp;mut Problem&lt;O&gt;,
-///         state: IterState&lt;P, G, J, H, F&gt;,
-///     ) -&gt; Result&lt;(IterState&lt;P, G, J, H, F&gt;, Option&lt;KV&gt;), Error&gt; {
+///         state: IterState&lt;P, G, J, H, R, F&gt;,
+///     ) -&gt; Result&lt;(IterState&lt;P, G, J, H, R, F&gt;, Option&lt;KV&gt;), Error&gt; {
 ///         // Initialize algorithm, update `state`.
 ///         // Implementing this method is optional.
 ///         Ok((state, None))
@@ -171,14 +171,14 @@
 ///     fn next_iter(
 ///         &amp;mut self,
 ///         problem: &amp;mut Problem&lt;O&gt;,
-///         state: IterState&lt;P, G, J, H, F&gt;,
-///     ) -&gt; Result&lt;(IterState&lt;P, G, J, H, F&gt;, Option&lt;KV&gt;), Error&gt; {
+///         state: IterState&lt;P, G, J, H, R, F&gt;,
+///     ) -&gt; Result&lt;(IterState&lt;P, G, J, H, R, F&gt;, Option&lt;KV&gt;), Error&gt; {
 ///         // Compute single iteration of algorithm, update `state`.
 ///         // Implementing this method is required.
 ///         Ok((state, None))
 ///     }
 ///     
-///     fn terminate(&amp;mut self, state: &amp;IterState&lt;P, G, J, H, F&gt;) -&gt; TerminationStatus {
+///     fn terminate(&amp;mut self, state: &amp;IterState&lt;P, G, J, H, R, F&gt;) -&gt; TerminationStatus {
 ///         // Check if stopping criteria are met.
 ///         // Implementing this method is optional.
 ///         TerminationStatus::NotTerminated

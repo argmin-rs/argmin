@@ -1317,7 +1317,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;O, P, F, R&gt; Solver&lt;O, IterState&lt;P, (), (), (), F&gt;&gt; <span class="kw">for </span>SimulatedAnnealing&lt;F, R&gt;
+<span class="kw">impl</span>&lt;O, P, F, R&gt; Solver&lt;O, IterState&lt;P, (), (), (), (), F&gt;&gt; <span class="kw">for </span>SimulatedAnnealing&lt;F, R&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt; + Anneal&lt;Param = P, Output = P, Float = F&gt;,
     P: Clone,
@@ -1328,8 +1328,8 @@
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        <span class="kw-2">mut </span>state: IterState&lt;P, (), (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw-2">mut </span>state: IterState&lt;P, (), (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             NotInitialized,
             <span class="macro">concat!</span>(
@@ -1362,8 +1362,8 @@
     </span><span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        <span class="kw-2">mut </span>state: IterState&lt;P, (), (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw-2">mut </span>state: IterState&lt;P, (), (), (), (), F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="comment">// Careful: The order in here is *very* important, even if it may not seem so. Everything
         // is linked to the iteration number, and getting things mixed up may lead to unexpected
         // behavior.
@@ -1434,7 +1434,7 @@
         ))
     }
 
-    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), F&gt;) -&gt; TerminationStatus {
+    <span class="kw">fn </span>terminate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>IterState&lt;P, (), (), (), (), F&gt;) -&gt; TerminationStatus {
         <span class="kw">if </span><span class="self">self</span>.stall_iter_accepted &gt; <span class="self">self</span>.stall_iter_accepted_limit {
             <span class="kw">return </span>TerminationStatus::Terminated(TerminationReason::SolverExit(
                 <span class="string">&quot;AcceptedStallIterExceeded&quot;</span>.to_string(),
@@ -1725,7 +1725,7 @@
             .with_reannealing_best(reanneal_best);
 
         <span class="comment">// Forgot to initialize the parameter vector
-        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new();
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new();
         <span class="kw">let </span>problem = TestProblem::new();
         <span class="kw">let </span>res = sa.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state);
         <span class="macro">assert_error!</span>(
@@ -1738,7 +1738,7 @@
         );
 
         <span class="comment">// All good.
-        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), f64&gt; = IterState::new().param(param.clone());
+        </span><span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; = IterState::new().param(param.clone());
         <span class="kw">let </span>problem = TestProblem::new();
         <span class="kw">let </span>(<span class="kw-2">mut </span>state_out, kv) = sa.init(<span class="kw-2">&amp;mut </span>Problem::new(problem), state).unwrap();
 
