@@ -9,5 +9,5 @@ publish = false
 argmin = { version = "*", path = "../../argmin" }
 argmin-math = { version = "*", features = ["vec"], path = "../../argmin-math" }
 argmin_testfunctions = "*"
-gnuplot = "0.0.39"
+gnuplot = "0.0.40"
 instant = "0.1.12"
