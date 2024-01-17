@@ -404,7 +404,7 @@ mod tests {
         sh.set_radius(1.0);
 
         // Forgot to initialize gradient
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new();
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new();
         let problem = TestProblem::new();
         let res = sh.init(&mut Problem::new(problem), state);
         assert_error!(
@@ -417,7 +417,7 @@ mod tests {
         );
 
         // Forgot to initialize Hessian
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().gradient(grad.clone());
         let problem = TestProblem::new();
         let res = sh.init(&mut Problem::new(problem), state);
@@ -431,7 +431,7 @@ mod tests {
         );
 
         // All good.
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().gradient(grad.clone()).hessian(hessian);
         let problem = TestProblem::new();
         let (mut state_out, kv) = sh.init(&mut Problem::new(problem), state).unwrap();

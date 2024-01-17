@@ -130,7 +130,7 @@ impl<P, G, L, F> BacktrackingLineSearch<P, G, L, F>
 where
     P: ArgminScaledAdd<G, F, P>,
     L: LineSearchCondition<G, G, F>,
-    IterState<P, G, (), (), F>: State<Float = F>,
+    IterState<P, G, (), (), (), F>: State<Float = F>,
     F: ArgminFloat,
 {
     /// Perform a single backtracking step
@@ -591,10 +591,10 @@ mod tests {
         assert_eq!(
             <BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> as Solver<
                 TestProblem,
-                IterState<Vec<f64>, Vec<f64>, (), (), f64>,
+                IterState<Vec<f64>, Vec<f64>, (), (), (), f64>,
             >>::terminate(
                 &mut ls,
-                &IterState::<Vec<f64>, Vec<f64>, (), (), f64>::new().param(init_param)
+                &IterState::<Vec<f64>, Vec<f64>, (), (), (), f64>::new().param(init_param)
             ),
             TerminationStatus::Terminated(TerminationReason::SolverConverged)
         );
@@ -605,10 +605,10 @@ mod tests {
         assert_eq!(
             <BacktrackingLineSearch<Vec<f64>, Vec<f64>, ArmijoCondition<f64>, f64> as Solver<
                 TestProblem,
-                IterState<Vec<f64>, Vec<f64>, (), (), f64>,
+                IterState<Vec<f64>, Vec<f64>, (), (), (), f64>,
             >>::terminate(
                 &mut ls,
-                &IterState::<Vec<f64>, Vec<f64>, (), (), f64>::new().param(init_param)
+                &IterState::<Vec<f64>, Vec<f64>, (), (), (), f64>::new().param(init_param)
             ),
             TerminationStatus::NotTerminated
         );

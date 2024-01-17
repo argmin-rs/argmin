@@ -55,7 +55,7 @@ where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone + SerializeAlias + DeserializeOwnedAlias,
     G: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminMul<F, G>,
-    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
+    L: Clone + LineSearch<G, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Steepest Descent";

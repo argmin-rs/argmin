@@ -843,7 +843,7 @@ mod tests {
             .with_reannealing_best(reanneal_best);
 
         // Forgot to initialize the parameter vector
-        let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+        let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
         let problem = TestProblem::new();
         let res = sa.init(&mut Problem::new(problem), state);
         assert_error!(
@@ -856,7 +856,7 @@ mod tests {
         );
 
         // All good.
-        let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new().param(param.clone());
+        let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new().param(param.clone());
         let problem = TestProblem::new();
         let (mut state_out, kv) = sa.init(&mut Problem::new(problem), state).unwrap();
 

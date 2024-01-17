@@ -85,7 +85,7 @@ where
     }
 }
 
-impl<O, P, G, H, R, F> Solver<O, IterState<P, G, (), H, R, F>> for Newton<F>
+impl<O, P, G, H, F> Solver<O, IterState<P, G, (), H, (), F>> for Newton<F>
 where
     O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
     P: Clone + ArgminScaledSub<P, F, P>,
@@ -97,8 +97,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), H, R, F>,
-    ) -> Result<(IterState<P, G, (), H, R, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), H, (), F>,
+    ) -> Result<(IterState<P, G, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(

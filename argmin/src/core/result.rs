@@ -39,7 +39,7 @@ impl<O, S, I> OptimizationResult<O, S, I> {
     /// # struct SomeSolver {}
     /// #
     /// let rosenbrock = Rosenbrock::new();
-    /// let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
     /// let solver = SomeSolver {};
     ///
     /// let result = OptimizationResult::new(Problem::new(rosenbrock), solver, state);
@@ -65,7 +65,7 @@ impl<O, S, I> OptimizationResult<O, S, I> {
     /// # struct Rosenbrock {}
     /// # let solver = ();
     /// #
-    /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
     /// #
     /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
     /// #
@@ -85,7 +85,7 @@ impl<O, S, I> OptimizationResult<O, S, I> {
     /// # struct Rosenbrock {}
     /// # let solver = ();
     /// #
-    /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
     /// #
     /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
     /// #
@@ -105,11 +105,11 @@ impl<O, S, I> OptimizationResult<O, S, I> {
     /// # struct Rosenbrock {}
     /// # let solver = ();
     /// #
-    /// # let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
     /// #
     /// # let result = OptimizationResult::new(Problem::new(Rosenbrock {}), solver, state);
     /// #
-    /// let state: &IterState<Vec<f64>, (), (), (), f64> = result.state();
+    /// let state: &IterState<Vec<f64>, (), (), (), (), f64> = result.state();
     /// ```
     pub fn state(&self) -> &I {
         &self.state
@@ -199,7 +199,7 @@ mod tests {
 
     send_sync_test!(
         optimizationresult,
-        OptimizationResult<TestProblem, TestSolver, IterState<(), (), (), (), f64>>
+        OptimizationResult<TestProblem, TestSolver, IterState<(), (), (), (), (), f64>>
     );
 
     // TODO: More tests, in particular the checking that the output is as intended.
