@@ -316,7 +316,7 @@ impl fmt::Display for Action {
     }
 }
 
-impl<O, P, F> Solver<O, IterState<P, (), (), (), F>> for NelderMead<P, F>
+impl<O, P, F> Solver<O, IterState<P, (), (), (), (), F>> for NelderMead<P, F>
 where
     O: CostFunction<Param = P, Output = F>,
     P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminAdd<P, P> + ArgminMul<F, P>,
@@ -327,8 +327,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<P, (), (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), (), F>, Option<KV>), Error> {
         self.params
             .iter_mut()
             .for_each(|(p, c)| *c = problem.cost(p).unwrap());
@@ -344,8 +344,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, (), (), (), F>,
-    ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<P, (), (), (), (), F>,
+    ) -> Result<(IterState<P, (), (), (), (), F>, Option<KV>), Error> {
         let num_param_vecs = self.params.len();
 
         let x0 = self.calculate_centroid();
@@ -413,7 +413,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationStatus {
+    fn terminate(&mut self, _state: &IterState<P, (), (), (), (), F>) -> TerminationStatus {
         let n = float!(self.params.len() as f64);
         let c0: F = self.params.iter().map(|(_, c)| *c).sum::<F>() / n;
         let s: F = (float!(1.0) / (n - float!(1.0))
@@ -690,7 +690,7 @@ mod tests {
             (vec![-0.5, 2.0], 0.5f64.powi(2) + 2.0f64.powi(2)),
         ];
         let mut nm: NelderMead<_, f64> = NelderMead::new(params);
-        let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+        let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
         let problem = MwProblem {};
         let (state_out, kv) = nm.init(&mut Problem::new(problem), state).unwrap();
 
@@ -721,7 +721,7 @@ mod tests {
     fn test_next_iter_reflection() {
         let params: Vec<Vec<f64>> = vec![vec![-1.0, 0.0], vec![-0.1, 0.65], vec![-0.1, -0.95]];
         let mut nm: NelderMead<_, f64> = NelderMead::new(params);
-        let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+        let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
         let mut problem = Problem::new(MwProblem {});
         let (state, _) = nm.init(&mut problem, state).unwrap();
 
@@ -764,7 +764,7 @@ mod tests {
             vec![-1.0, -1.0 - f64::EPSILON],
         ];
         let mut nm: NelderMead<_, f64> = NelderMead::new(params);
-        let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+        let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
         let mut problem = Problem::new(MwProblem {});
         let (state, _) = nm.init(&mut problem, state).unwrap();
 
@@ -800,7 +800,7 @@ mod tests {
     fn test_next_iter_contraction_outside() {
         let params: Vec<Vec<f64>> = vec![vec![-1.1, 0.0], vec![-0.1, 1.0], vec![-0.1, -0.5]];
         let mut nm: NelderMead<_, f64> = NelderMead::new(params);
-        let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+        let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
         let mut problem = Problem::new(MwProblem {});
         let (state, _) = nm.init(&mut problem, state).unwrap();
 
@@ -836,7 +836,7 @@ mod tests {
     fn test_next_iter_contraction_inside() {
         let params: Vec<Vec<f64>> = vec![vec![-1.0, 0.0], vec![0.0, 1.0], vec![0.0, -0.5]];
         let mut nm: NelderMead<_, f64> = NelderMead::new(params);
-        let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+        let state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
         let mut problem = Problem::new(MwProblem {});
         let (state, _) = nm.init(&mut problem, state).unwrap();
 

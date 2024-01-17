@@ -178,7 +178,7 @@ where
     }
 }
 
-impl<P, O, F, H> Solver<O, IterState<P, P, (), H, F>> for Steihaug<P, F>
+impl<P, O, F, H> Solver<O, IterState<P, P, (), H, (), F>> for Steihaug<P, F>
 where
     P: Clone
         + SerializeAlias
@@ -195,8 +195,8 @@ where
     fn init(
         &mut self,
         _problem: &mut Problem<O>,
-        state: IterState<P, P, (), H, F>,
-    ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
+        state: IterState<P, P, (), H, (), F>,
+    ) -> Result<(IterState<P, P, (), H, (), F>, Option<KV>), Error> {
         let r = state
             .get_gradient()
             .ok_or_else(argmin_error_closure!(
@@ -232,8 +232,8 @@ where
     fn next_iter(
         &mut self,
         _problem: &mut Problem<O>,
-        mut state: IterState<P, P, (), H, F>,
-    ) -> Result<(IterState<P, P, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, P, (), H, (), F>,
+    ) -> Result<(IterState<P, P, (), H, (), F>, Option<KV>), Error> {
         let grad = state.take_gradient().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`Steihaug`: Gradient in state not set."
@@ -298,7 +298,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, P, (), H, F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, P, (), H, (), F>) -> TerminationStatus {
         if self.r_0_norm < self.epsilon {
             return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
@@ -404,7 +404,7 @@ mod tests {
         sh.set_radius(1.0);
 
         // Forgot to initialize gradient
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new();
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new();
         let problem = TestProblem::new();
         let res = sh.init(&mut Problem::new(problem), state);
         assert_error!(
@@ -417,7 +417,7 @@ mod tests {
         );
 
         // Forgot to initialize Hessian
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().gradient(grad.clone());
         let problem = TestProblem::new();
         let res = sh.init(&mut Problem::new(problem), state);
@@ -431,7 +431,7 @@ mod tests {
         );
 
         // All good.
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().gradient(grad.clone()).hessian(hessian);
         let problem = TestProblem::new();
         let (mut state_out, kv) = sh.init(&mut Problem::new(problem), state).unwrap();

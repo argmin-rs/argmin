@@ -97,7 +97,7 @@ impl<F: ArgminFloat> BrentOpt<F> {
     }
 }
 
-impl<O, F> Solver<O, IterState<F, (), (), (), F>> for BrentOpt<F>
+impl<O, F> Solver<O, IterState<F, (), (), (), (), F>> for BrentOpt<F>
 where
     O: CostFunction<Param = F, Output = F>,
     F: ArgminFloat,
@@ -108,8 +108,8 @@ where
         &mut self,
         problem: &mut Problem<O>,
         // BrentOpt maintains its own state
-        state: IterState<F, (), (), (), F>,
-    ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<F, (), (), (), (), F>,
+    ) -> Result<(IterState<F, (), (), (), (), F>, Option<KV>), Error> {
         let u = self.a + self.c * (self.b - self.a);
         self.v = u;
         self.w = u;
@@ -125,8 +125,8 @@ where
         &mut self,
         problem: &mut Problem<O>,
         // BrentOpt maintains its own state
-        state: IterState<F, (), (), (), F>,
-    ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<F, (), (), (), (), F>,
+    ) -> Result<(IterState<F, (), (), (), (), F>, Option<KV>), Error> {
         let two = float!(2f64);
         let tol = self.eps * self.x.abs() + self.t;
         let m = (self.a + self.b) / two;

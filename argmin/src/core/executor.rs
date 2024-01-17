@@ -408,8 +408,9 @@ mod tests {
         let problem = TestProblem::new();
         let solver = TestSolver::new();
 
-        let mut executor = Executor::new(problem, solver)
-            .configure(|config: IterState<Vec<f64>, (), (), (), f64>| config.param(vec![0.0, 0.0]));
+        let mut executor = Executor::new(problem, solver).configure(
+            |config: IterState<Vec<f64>, (), (), (), (), f64>| config.param(vec![0.0, 0.0]),
+        );
 
         // 1) Parameter vector changes, but not cost (continues to be `Inf`)
         let new_param = vec![1.0, 1.0];
@@ -492,8 +493,9 @@ mod tests {
 
         // 4) `-Inf` is better than `Inf`
         let solver = TestSolver {};
-        let mut executor = Executor::new(problem, solver)
-            .configure(|config: IterState<Vec<f64>, (), (), (), f64>| config.param(vec![0.0, 0.0]));
+        let mut executor = Executor::new(problem, solver).configure(
+            |config: IterState<Vec<f64>, (), (), (), (), f64>| config.param(vec![0.0, 0.0]),
+        );
 
         let new_param = vec![1.0, 1.0];
         let new_cost = std::f64::NEG_INFINITY;
@@ -584,7 +586,7 @@ mod tests {
         }
 
         // Implement Solver for OptimizationAlgorithm
-        impl<O, P, F> Solver<O, IterState<P, (), (), (), F>> for OptimizationAlgorithm
+        impl<O, P, F> Solver<O, IterState<P, (), (), (), (), F>> for OptimizationAlgorithm
         where
             O: CostFunction<Param = P, Output = F>,
             P: Clone,
@@ -596,8 +598,8 @@ mod tests {
             fn init(
                 &mut self,
                 _problem: &mut Problem<O>,
-                state: IterState<P, (), (), (), F>,
-            ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+                state: IterState<P, (), (), (), (), F>,
+            ) -> Result<(IterState<P, (), (), (), (), F>, Option<KV>), Error> {
                 self.internal_state = 1;
                 Ok((state, None))
             }
@@ -606,21 +608,21 @@ mod tests {
             fn next_iter(
                 &mut self,
                 _problem: &mut Problem<O>,
-                state: IterState<P, (), (), (), F>,
-            ) -> Result<(IterState<P, (), (), (), F>, Option<KV>), Error> {
+                state: IterState<P, (), (), (), (), F>,
+            ) -> Result<(IterState<P, (), (), (), (), F>, Option<KV>), Error> {
                 self.internal_state += 1;
                 Ok((state, None))
             }
 
             // Avoid terminating early because param does not change
-            fn terminate(&mut self, _state: &IterState<P, (), (), (), F>) -> TerminationStatus {
+            fn terminate(&mut self, _state: &IterState<P, (), (), (), (), F>) -> TerminationStatus {
                 TerminationStatus::NotTerminated
             }
 
             // Avoid terminating early because param does not change
             fn terminate_internal(
                 &mut self,
-                state: &IterState<P, (), (), (), F>,
+                state: &IterState<P, (), (), (), (), F>,
             ) -> TerminationStatus {
                 if state.get_iter() >= state.get_max_iters() {
                     TerminationStatus::Terminated(TerminationReason::MaxItersReached)

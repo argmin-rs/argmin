@@ -106,7 +106,7 @@ where
     }
 }
 
-impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, F>> for NewtonCG<L, F>
+impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, (), F>> for NewtonCG<L, F>
 where
     O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
     P: Clone
@@ -120,7 +120,7 @@ where
         + ArgminZeroLike,
     G: SerializeAlias + DeserializeOwnedAlias + ArgminL2Norm<F> + ArgminMul<F, P>,
     H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
-    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat + ArgminL2Norm<F>,
 {
     const NAME: &'static str = "Newton-CG";
@@ -128,8 +128,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), H, (), F>,
+    ) -> Result<(IterState<P, G, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -153,7 +153,8 @@ where
         let mut x = param.zero_like();
         let mut cg = ConjugateGradient::new(grad.mul(&(float!(-1.0))));
 
-        let (mut cg_state, _) = cg.init(&mut cg_problem, IterState::new().param(x_p.clone()))?;
+        let (mut cg_state, _): (IterState<_, _, _, _, _, _>, _) =
+            cg.init(&mut cg_problem, IterState::new().param(x_p.clone()))?;
 
         let grad_norm_factor = float!(0.5).min(grad.l2_norm().sqrt()) * grad.l2_norm();
 
@@ -209,7 +210,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, (), F>) -> TerminationStatus {
         if (state.get_cost() - state.get_prev_cost()).abs() < self.tol {
             TerminationStatus::Terminated(TerminationReason::SolverConverged)
         } else {

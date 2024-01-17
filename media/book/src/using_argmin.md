@@ -5,7 +5,7 @@ In order to use argmin, one needs to add both `argmin` and `argmin-math` to `Car
 ```toml
 [dependencies]
 argmin = { version = "0.9" }
-argmin-math = { version = "0.3", features = ["ndarray_latest-serde", "nalgebra_latest-serde"] }
+argmin-math = { version = "0.3", features = ["ndarray_latest", "nalgebra_latest"] }
 ```
 
 or, for the current development version:
@@ -13,11 +13,11 @@ or, for the current development version:
 ```toml
 [dependencies]
 argmin = { git = "https://github.com/argmin-rs/argmin" }
-argmin-math = { git = "https://github.com/argmin-rs/argmin", features = ["ndarray_latest-serde", "nalgebra_latest-serde"] }
+argmin-math = { git = "https://github.com/argmin-rs/argmin", features = ["ndarray_latest", "nalgebra_latest"] }
 ```
 
-Via adding `argmin-math` one can choose which math backend should be available (and whether `serde`-support is enabled or not).
-The examples above use both the `ndarray_latest-serde` and `nalgebra_latest-serde` features of `argmin-math`.
+Via adding `argmin-math` one can choose which math backend should be available.
+The examples above use both the `ndarray_latest` and `nalgebra_latest` features of `argmin-math`.
 For details on which options are available in `argmin-math`, please refer to the [documentation](https://docs.rs/argmin-math/latest/argmin_math/).
 
 
@@ -25,12 +25,10 @@ For details on which options are available in `argmin-math`, please refer to the
 
 argmin offers a number of features which can be enabled or disabled depending on your needs.
 
-### Default
-
-- `serde1`: Support for `serde`. Needed for checkpointing and writing parameters to disk as well as logging to disk. Deactivating this feature leads to fewer dependencies and can lower compilation time, but it will also disable checkpointing and logging to disk.
 
 ### Optional 
 
+- `serde1`: Support for `serde`. Needed for checkpointing. Deactivating this feature leads to fewer dependencies and can lower compilation time, but it will also disable checkpointing.
 - `ctrlc`: This feature uses the `ctrlc` crate to properly stop the optimization (and return the current best result) after pressing `Ctrl+C` during an optimization run.
 - `rayon`: This feature adds `rayon` as a depenceny and allows for parallel computation of cost functions, operators, gradients, Jacobians and Hessians. Note that only solvers that operate on multiple parameter vectors per iteration benefit from this feature (e.g. Particle Swarm Optimization).
 - `full`: Enables all default and optional features.

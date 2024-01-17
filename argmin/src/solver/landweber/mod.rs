@@ -63,7 +63,7 @@ impl<F> Landweber<F> {
     }
 }
 
-impl<O, F, P, G> Solver<O, IterState<P, G, (), (), F>> for Landweber<F>
+impl<O, F, P, G> Solver<O, IterState<P, G, (), (), (), F>> for Landweber<F>
 where
     O: Gradient<Param = P, Gradient = G>,
     P: Clone + ArgminScaledSub<G, F, P>,
@@ -74,8 +74,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(

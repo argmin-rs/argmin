@@ -109,16 +109,16 @@ impl<F: ArgminFloat> Default for GaussNewton<F> {
     }
 }
 
-impl<O, F, P, J, U> Solver<O, IterState<P, (), J, (), F>> for GaussNewton<F>
+impl<O, P, J, R, F> Solver<O, IterState<P, (), J, (), R, F>> for GaussNewton<F>
 where
-    O: Operator<Param = P, Output = U> + Jacobian<Param = P, Jacobian = J>,
+    O: Operator<Param = P, Output = R> + Jacobian<Param = P, Jacobian = J>,
     P: Clone + ArgminSub<P, P> + ArgminMul<F, P>,
-    U: ArgminL2Norm<F>,
+    R: ArgminL2Norm<F>,
     J: Clone
         + ArgminTranspose<J>
         + ArgminInv<J>
         + ArgminDot<J, J>
-        + ArgminDot<U, P>
+        + ArgminDot<R, P>
         + ArgminDot<P, P>,
     F: ArgminFloat,
 {
@@ -127,8 +127,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, (), J, (), F>,
-    ) -> Result<(IterState<P, (), J, (), F>, Option<KV>), Error> {
+        state: IterState<P, (), J, (), R, F>,
+    ) -> Result<(IterState<P, (), J, (), R, F>, Option<KV>), Error> {
         let param = state.get_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -148,10 +148,12 @@ where
 
         let new_param = param.sub(&p.mul(&self.gamma));
 
-        Ok((state.param(new_param).cost(residuals.l2_norm()), None))
+        let cost = residuals.l2_norm();
+
+        Ok((state.param(new_param).residuals(residuals).cost(cost), None))
     }
 
-    fn terminate(&mut self, state: &IterState<P, (), J, (), F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, (), J, (), R, F>) -> TerminationStatus {
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
             return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
