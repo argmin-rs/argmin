@@ -1,6 +1,3 @@
-<<<<<<< dev
-this is just an explanation of the code and how stuff is connectedme
-=======
 <p align="center">
   <img
     width="400"
