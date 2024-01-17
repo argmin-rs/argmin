@@ -456,8 +456,8 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationReason};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};
+    /// # let mut state: LinearProgramState<Vec<f64>, f64> = LinearProgramState::new();
     /// let termination_reason = state.get_termination_reason();
     /// # assert_eq!(termination_reason, None);
     /// ```

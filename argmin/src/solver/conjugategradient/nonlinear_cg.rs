@@ -334,7 +334,7 @@ mod tests {
         let beta_method = PolakRibiere::new();
         let mut nlcg: NonlinearConjugateGradient<Vec<f64>, _, _, f64> =
             NonlinearConjugateGradient::new(linesearch, beta_method);
-        let state: IterState<Vec<f64>, Vec<f64>, (), (), f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), (), (), f64> =
             IterState::new().param(vec![3.0, 4.0]);
         let (state_out, kv) = nlcg
             .init(&mut Problem::new(TestProblem::new()), state.clone())

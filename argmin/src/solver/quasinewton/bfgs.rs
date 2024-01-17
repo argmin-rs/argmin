@@ -398,7 +398,7 @@ mod tests {
         let mut bfgs: BFGS<_, f64> = BFGS::new(linesearch);
 
         // Forgot to initialize the parameter vector
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new();
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new();
         let problem = TestProblem::new();
         let res = bfgs.init(&mut Problem::new(problem), state);
         assert_error!(
@@ -411,7 +411,7 @@ mod tests {
         );
 
         // Forgot initial inverse Hessian guess
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().param(param.clone());
         let problem = TestProblem::new();
         let res = bfgs.init(&mut Problem::new(problem), state);
@@ -426,7 +426,7 @@ mod tests {
         );
 
         // All good.
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new()
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new()
             .param(param.clone())
             .inv_hessian(inv_hessian.clone());
         let problem = TestProblem::new();
@@ -468,7 +468,7 @@ mod tests {
 
         let mut bfgs: BFGS<_, f64> = BFGS::new(linesearch);
 
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new()
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new()
             .param(param)
             .inv_hessian(inv_hessian)
             .cost(1234.0);
@@ -491,7 +491,7 @@ mod tests {
 
         let mut bfgs: BFGS<_, f64> = BFGS::new(linesearch);
 
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new()
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new()
             .param(param)
             .inv_hessian(inv_hessian)
             .gradient(gradient.clone());

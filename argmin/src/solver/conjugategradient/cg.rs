@@ -229,7 +229,8 @@ mod tests {
     #[test]
     fn test_init() {
         let mut cg: ConjugateGradient<_, f64> = ConjugateGradient::new(vec![1.0f64, 2.0]);
-        let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new().param(vec![3.0, 4.0]);
+        let state: IterState<Vec<f64>, (), (), (), (), f64> =
+            IterState::new().param(vec![3.0, 4.0]);
         let (state_out, kv) = cg
             .init(&mut Problem::new(TestProblem::new()), state.clone())
             .unwrap();

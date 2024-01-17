@@ -30,7 +30,7 @@ use crate::core::{Error, Problem, State, TerminationReason, TerminationStatus, K
 /// #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 /// struct OptimizationAlgorithm {}
 ///
-/// impl<O, P, G, J, H, F> Solver<O, IterState<P, G, J, H, F>> for OptimizationAlgorithm
+/// impl<O, P, G, J, H, R, F> Solver<O, IterState<P, G, J, H, R, F>> for OptimizationAlgorithm
 /// where
 ///     O: CostFunction<Param = P, Output = F>,
 ///     P: Clone,
@@ -41,8 +41,8 @@ use crate::core::{Error, Problem, State, TerminationReason, TerminationStatus, K
 ///     fn init(
 ///         &mut self,
 ///         problem: &mut Problem<O>,
-///         state: IterState<P, G, J, H, F>,
-///     ) -> Result<(IterState<P, G, J, H, F>, Option<KV>), Error> {
+///         state: IterState<P, G, J, H, R, F>,
+///     ) -> Result<(IterState<P, G, J, H, R, F>, Option<KV>), Error> {
 ///         // Initialize algorithm, update `state`.
 ///         // Implementing this method is optional.
 ///         Ok((state, None))
@@ -51,14 +51,14 @@ use crate::core::{Error, Problem, State, TerminationReason, TerminationStatus, K
 ///     fn next_iter(
 ///         &mut self,
 ///         problem: &mut Problem<O>,
-///         state: IterState<P, G, J, H, F>,
-///     ) -> Result<(IterState<P, G, J, H, F>, Option<KV>), Error> {
+///         state: IterState<P, G, J, H, R, F>,
+///     ) -> Result<(IterState<P, G, J, H, R, F>, Option<KV>), Error> {
 ///         // Compute single iteration of algorithm, update `state`.
 ///         // Implementing this method is required.
 ///         Ok((state, None))
 ///     }
 ///     
-///     fn terminate(&mut self, state: &IterState<P, G, J, H, F>) -> TerminationStatus {
+///     fn terminate(&mut self, state: &IterState<P, G, J, H, R, F>) -> TerminationStatus {
 ///         // Check if stopping criteria are met.
 ///         // Implementing this method is optional.
 ///         TerminationStatus::NotTerminated

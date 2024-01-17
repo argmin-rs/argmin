@@ -106,7 +106,7 @@ where
     }
 }
 
-impl<O, L, P, G, H, R, F> Solver<O, IterState<P, G, (), H, R, F>> for NewtonCG<L, F>
+impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, (), F>> for NewtonCG<L, F>
 where
     O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
     P: Clone
@@ -120,17 +120,16 @@ where
         + ArgminZeroLike,
     G: SerializeAlias + DeserializeOwnedAlias + ArgminL2Norm<F> + ArgminMul<F, P>,
     H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
-    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), R, F>>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat + ArgminL2Norm<F>,
-    R: Clone + SerializeAlias + DeserializeOwnedAlias,
 {
     const NAME: &'static str = "Newton-CG";
 
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), H, R, F>,
-    ) -> Result<(IterState<P, G, (), H, R, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), H, (), F>,
+    ) -> Result<(IterState<P, G, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -211,7 +210,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), H, R, F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, (), F>) -> TerminationStatus {
         if (state.get_cost() - state.get_prev_cost()).abs() < self.tol {
             TerminationStatus::Terminated(TerminationReason::SolverConverged)
         } else {

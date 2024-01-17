@@ -109,16 +109,16 @@ impl<F: ArgminFloat> Default for GaussNewton<F> {
     }
 }
 
-impl<O, F, P, J, U, R> Solver<O, IterState<P, (), J, (), R, F>> for GaussNewton<F>
+impl<O, P, J, R, F> Solver<O, IterState<P, (), J, (), R, F>> for GaussNewton<F>
 where
-    O: Operator<Param = P, Output = U> + Jacobian<Param = P, Jacobian = J>,
+    O: Operator<Param = P, Output = R> + Jacobian<Param = P, Jacobian = J>,
     P: Clone + ArgminSub<P, P> + ArgminMul<F, P>,
-    U: ArgminL2Norm<F>,
+    R: ArgminL2Norm<F>,
     J: Clone
         + ArgminTranspose<J>
         + ArgminInv<J>
         + ArgminDot<J, J>
-        + ArgminDot<U, P>
+        + ArgminDot<R, P>
         + ArgminDot<P, P>,
     F: ArgminFloat,
 {
@@ -148,7 +148,9 @@ where
 
         let new_param = param.sub(&p.mul(&self.gamma));
 
-        Ok((state.param(new_param).cost(residuals.l2_norm()), None))
+        let cost = residuals.l2_norm();
+
+        Ok((state.param(new_param).residuals(residuals).cost(cost), None))
     }
 
     fn terminate(&mut self, state: &IterState<P, (), J, (), R, F>) -> TerminationStatus {

@@ -181,11 +181,12 @@ mod tests {
     #[allow(clippy::type_complexity)]
     fn test_save() {
         let solver = TestSolver::new();
-        let state: IterState<Vec<f64>, (), (), (), f64> = IterState::new().param(vec![1.0f64, 0.0]);
+        let state: IterState<Vec<f64>, (), (), (), (), f64> =
+            IterState::new().param(vec![1.0f64, 0.0]);
         let check = FileCheckpoint::new("checkpoints", "solver", CheckpointingFrequency::Always);
         check.save_cond(&solver, &state, 20).unwrap();
 
-        let _loaded: Option<(TestSolver, IterState<Vec<f64>, (), (), (), f64>)> =
+        let _loaded: Option<(TestSolver, IterState<Vec<f64>, (), (), (), (), f64>)> =
             check.load().unwrap();
     }
 }

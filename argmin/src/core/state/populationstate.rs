@@ -735,8 +735,8 @@ where
     /// # Example
     ///
     /// ```
-    /// # use argmin::core::{IterState, State, ArgminFloat, TerminationReason};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), f64> = IterState::new();
+    /// # use argmin::core::{PopulationState, State, ArgminFloat, TerminationReason};
+    /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
     /// let termination_reason = state.get_termination_reason();
     /// # assert_eq!(termination_reason, None);
     /// ```

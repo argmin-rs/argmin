@@ -212,7 +212,7 @@ mod tests {
         dl.set_radius(1.0);
 
         // Forgot to initialize the parameter vector
-        let state: IterState<Array1<f64>, Array1<f64>, (), Array2<f64>, f64> = IterState::new();
+        let state: IterState<Array1<f64>, Array1<f64>, (), Array2<f64>, (), f64> = IterState::new();
         let problem = TestProblem {};
         let res = dl.next_iter(&mut Problem::new(problem), state);
         assert_error!(
@@ -225,7 +225,7 @@ mod tests {
         );
 
         // All good.
-        let state: IterState<Array1<f64>, Array1<f64>, (), Array2<f64>, f64> =
+        let state: IterState<Array1<f64>, Array1<f64>, (), Array2<f64>, (), f64> =
             IterState::new().param(param);
         let problem = TestProblem {};
         let (mut state_out, kv) = dl.next_iter(&mut Problem::new(problem), state).unwrap();

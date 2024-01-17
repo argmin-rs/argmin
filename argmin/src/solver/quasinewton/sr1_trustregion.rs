@@ -452,7 +452,7 @@ mod tests {
         let mut sr1: SR1TrustRegion<_, f64> = SR1TrustRegion::new(subproblem);
 
         // Forgot to initialize the parameter vector
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new();
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new();
         let problem = TestProblem::new();
         let res = sr1.init(&mut Problem::new(problem), state);
         assert_error!(
@@ -465,7 +465,7 @@ mod tests {
         );
 
         // All good.
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().param(param.clone());
         let problem = TestProblem::new();
         let (mut state_out, kv) = sr1.init(&mut Problem::new(problem), state).unwrap();
@@ -495,7 +495,7 @@ mod tests {
 
         let mut sr1: SR1TrustRegion<_, f64> = SR1TrustRegion::new(subproblem);
 
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().param(param).cost(1234.0);
 
         let problem = TestProblem::new();
@@ -515,7 +515,7 @@ mod tests {
 
         let mut sr1: SR1TrustRegion<_, f64> = SR1TrustRegion::new(subproblem);
 
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().param(param).gradient(gradient.clone());
 
         let problem = TestProblem::new();
@@ -540,7 +540,7 @@ mod tests {
 
         let mut sr1: SR1TrustRegion<_, f64> = SR1TrustRegion::new(subproblem);
 
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new()
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new()
             .param(param)
             .gradient(gradient)
             .hessian(hessian.clone());

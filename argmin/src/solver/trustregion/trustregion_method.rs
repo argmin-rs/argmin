@@ -402,7 +402,7 @@ mod tests {
         let mut tr: TrustRegion<_, f64> = TrustRegion::new(cp);
 
         // Forgot to initialize parameter vector
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new();
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new();
         let problem = TestProblem::new();
         let res = tr.init(&mut Problem::new(problem), state);
         assert_error!(
@@ -415,7 +415,7 @@ mod tests {
         );
 
         // All good.
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().param(param.clone());
         let problem = TestProblem::new();
         let (mut state_out, kv) = tr.init(&mut Problem::new(problem), state).unwrap();

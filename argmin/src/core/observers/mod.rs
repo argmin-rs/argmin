@@ -198,7 +198,7 @@ impl<I> Observers<I> {
     /// use argmin::core::observers::Observers;
     /// use argmin::core::IterState;
     ///
-    /// let observers: Observers<IterState<Vec<f64>, (), (), (), f64>> = Observers::new();
+    /// let observers: Observers<IterState<Vec<f64>, (), (), (), (), f64>> = Observers::new();
     /// # assert!(observers.is_empty());
     /// ```
     pub fn new() -> Self {
@@ -214,7 +214,7 @@ impl<I> Observers<I> {
     /// use argmin_observer_slog::SlogLogger;
     /// use argmin::core::IterState;
     ///
-    /// let mut observers: Observers<IterState<Vec<f64>, (), (), (), f64>> = Observers::new();
+    /// let mut observers: Observers<IterState<Vec<f64>, (), (), (), (), f64>> = Observers::new();
     ///
     /// let logger = SlogLogger::term();
     /// observers.push(logger, ObserverMode::Always);
@@ -237,7 +237,7 @@ impl<I> Observers<I> {
     /// use argmin::core::observers::Observers;
     /// use argmin::core::IterState;
     ///
-    /// let observers: Observers<IterState<Vec<f64>, (), (), (), f64>> = Observers::new();
+    /// let observers: Observers<IterState<Vec<f64>, (), (), (), (), f64>> = Observers::new();
     /// assert!(observers.is_empty());
     /// ```
     pub fn is_empty(&self) -> bool {
@@ -375,7 +375,7 @@ mod tests {
 
         let storages = [test_stor_1, test_stor_2, test_stor_3, test_stor_4];
 
-        type TState = IterState<Vec<f64>, (), (), (), f64>;
+        type TState = IterState<Vec<f64>, (), (), (), (), f64>;
 
         let mut obs: Observers<TState> = Observers::new();
         obs.push(test_obs_1, ObserverMode::Never)
