@@ -112,6 +112,8 @@
 // Explicitly disallow EQ comparison of floats. (This clippy lint is denied by default; however,
 // this is just to make sure that it will always stay this way.)
 #![deny(clippy::float_cmp)]
+// Some types just are complex
+#![allow(clippy::type_complexity)]
 
 #[macro_use]
 pub mod core;
