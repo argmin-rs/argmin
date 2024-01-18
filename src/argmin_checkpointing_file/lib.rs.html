@@ -191,8 +191,6 @@
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -227,7 +225,7 @@
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::FileCheckpoint;
+    /// use argmin_checkpointing_file::FileCheckpoint;
     /// # use argmin::core::checkpointing::CheckpointingFrequency;
     /// # use std::path::PathBuf;
     ///
@@ -251,8 +249,7 @@
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::CheckpointingFrequency;
-    /// use argmin_checkpointing_file::FileCheckpoint;
+    /// use argmin_checkpointing_file::{FileCheckpoint, CheckpointingFrequency};
     /// # use std::path::PathBuf;
     ///
     /// let directory = &quot;checkpoints&quot;;
@@ -288,8 +285,7 @@
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::CheckpointingFrequency;
-    /// use argmin_checkpointing_file::FileCheckpoint;
+    /// use argmin_checkpointing_file::{FileCheckpoint, CheckpointingFrequency, Checkpoint};
     ///
     /// # use std::fs::File;
     /// # use std::io::BufReader;
@@ -324,13 +320,13 @@
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::CheckpointingFrequency;
-    /// use argmin_checkpointing_file::FileCheckpoint
+    /// use argmin_checkpointing_file::{FileCheckpoint, CheckpointingFrequency, Checkpoint};
     /// # use argmin::core::Error;
     ///
     /// # use std::fs::File;
     /// # use std::io::BufWriter;
     /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # std::fs::DirBuilder::new().recursive(true).create(&quot;.checkpoints&quot;).unwrap();
     /// # let f = BufWriter::new(File::create(&quot;.checkpoints/load_test.arg&quot;)?);
     /// # let f_solver: u64 = 12;
     /// # let f_state: u64 = 21;
