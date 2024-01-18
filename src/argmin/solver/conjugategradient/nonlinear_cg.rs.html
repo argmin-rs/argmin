@@ -484,11 +484,6 @@
 <a href="#484" id="484">484</a>
 <a href="#485" id="485">485</a>
 <a href="#486" id="486">486</a>
-<a href="#487" id="487">487</a>
-<a href="#488" id="488">488</a>
-<a href="#489" id="489">489</a>
-<a href="#490" id="490">490</a>
-<a href="#491" id="491">491</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -497,8 +492,8 @@
 // copied, modified, or distributed except according to those terms.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
-    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, NLCGBetaUpdate, OptimizationResult, Problem, SerializeAlias, Solver, State, KV,
+    ArgminFloat, CostFunction, Error, Executor, Gradient, IterState, LineSearch, NLCGBetaUpdate,
+    OptimizationResult, Problem, Solver, State, KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul};
 <span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
@@ -613,13 +608,8 @@
     <span class="kw">for </span>NonlinearConjugateGradient&lt;P, L, B, F&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminAdd&lt;P, P&gt; + ArgminMul&lt;F, P&gt;,
-    G: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminMul&lt;F, P&gt;
-        + ArgminDot&lt;G, F&gt;
-        + ArgminL2Norm&lt;F&gt;,
+    P: Clone + ArgminAdd&lt;P, P&gt; + ArgminMul&lt;F, P&gt;,
+    G: Clone + ArgminMul&lt;F, P&gt; + ArgminDot&lt;G, F&gt; + ArgminL2Norm&lt;F&gt;,
     L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), (), F&gt;&gt;,
     B: NLCGBetaUpdate&lt;G, P, F&gt;,
     F: ArgminFloat,

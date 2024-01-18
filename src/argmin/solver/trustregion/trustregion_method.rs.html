@@ -435,14 +435,6 @@
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
 <a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -451,9 +443,8 @@
 // copied, modified, or distributed except according to those terms.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
-    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
-    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationStatus,
-    TrustRegionRadius, KV,
+    ArgminFloat, CostFunction, Error, Executor, Gradient, Hessian, IterState, OptimizationResult,
+    Problem, Solver, TerminationStatus, TrustRegionRadius, KV,
 };
 <span class="kw">use </span><span class="kw">crate</span>::solver::trustregion::reduction_ratio;
 <span class="kw">use </span>argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminWeightedDot};
@@ -607,16 +598,9 @@
     </span>O: CostFunction&lt;Param = P, Output = F&gt;
         + Gradient&lt;Param = P, Gradient = G&gt;
         + Hessian&lt;Param = P, Hessian = H&gt;,
-    P: Clone
-        + std::fmt::Debug
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminL2Norm&lt;F&gt;
-        + ArgminDot&lt;P, F&gt;
-        + ArgminDot&lt;G, F&gt;
-        + ArgminAdd&lt;P, P&gt;,
-    G: Clone + SerializeAlias + DeserializeOwnedAlias,
-    H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot&lt;P, P&gt;,
+    P: Clone + ArgminL2Norm&lt;F&gt; + ArgminDot&lt;P, F&gt; + ArgminDot&lt;G, F&gt; + ArgminAdd&lt;P, P&gt;,
+    G: Clone,
+    H: Clone + ArgminDot&lt;P, P&gt;,
     R: Clone + TrustRegionRadius&lt;F&gt; + Solver&lt;O, IterState&lt;P, G, (), H, (), F&gt;&gt;,
     F: ArgminFloat,
 {

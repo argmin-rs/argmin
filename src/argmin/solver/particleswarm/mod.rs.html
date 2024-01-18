@@ -779,8 +779,6 @@
 <a href="#779" id="779">779</a>
 <a href="#780" id="780">780</a>
 <a href="#781" id="781">781</a>
-<a href="#782" id="782">782</a>
-<a href="#783" id="783">783</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -804,8 +802,7 @@
 //! \[1\] &lt;https://en.wikipedia.org/wiki/Particle_swarm_optimization&gt;
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
-    ArgminFloat, CostFunction, Error, PopulationState, Problem, SerializeAlias, Solver, SyncAlias,
-    KV,
+    ArgminFloat, CostFunction, Error, PopulationState, Problem, Solver, SyncAlias, KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
 <span class="kw">use </span>rand::{Rng, SeedableRng};
@@ -1062,8 +1059,7 @@
 <span class="kw">impl</span>&lt;O, P, F, R&gt; Solver&lt;O, PopulationState&lt;Particle&lt;P, F&gt;, F&gt;&gt; <span class="kw">for </span>ParticleSwarm&lt;P, F, R&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt; + SyncAlias,
-    P: SerializeAlias
-        + Clone
+    P: Clone
         + SyncAlias
         + ArgminAdd&lt;P, P&gt;
         + ArgminSub&lt;P, P&gt;

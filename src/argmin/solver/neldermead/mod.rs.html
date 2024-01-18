@@ -889,8 +889,8 @@
 //! &lt;http://www.scholarpedia.org/article/Nelder-Mead_algorithm#Simplex_transformation_algorithm&gt;
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
-    ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
-    TerminationReason, TerminationStatus, KV,
+    ArgminFloat, CostFunction, Error, IterState, Problem, Solver, TerminationReason,
+    TerminationStatus, KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
 <span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
@@ -1189,7 +1189,7 @@
 <span class="kw">impl</span>&lt;O, P, F&gt; Solver&lt;O, IterState&lt;P, (), (), (), (), F&gt;&gt; <span class="kw">for </span>NelderMead&lt;P, F&gt;
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt;,
-    P: Clone + SerializeAlias + ArgminSub&lt;P, P&gt; + ArgminAdd&lt;P, P&gt; + ArgminMul&lt;F, P&gt;,
+    P: Clone + ArgminSub&lt;P, P&gt; + ArgminAdd&lt;P, P&gt; + ArgminMul&lt;F, P&gt;,
     F: ArgminFloat + std::iter::Sum&lt;F&gt;,
 {
     <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Nelder-Mead method&quot;</span>;

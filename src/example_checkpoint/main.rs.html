@@ -77,12 +77,12 @@
 
 </span><span class="kw">use </span>argmin::{
     core::{
-        checkpointing::{CheckpointingFrequency, FileCheckpoint},
-        observers::ObserverMode,
-        CostFunction, Error, Executor, Gradient,
+        checkpointing::CheckpointingFrequency, observers::ObserverMode, CostFunction, Error,
+        Executor, Gradient,
     },
     solver::landweber::Landweber,
 };
+<span class="kw">use </span>argmin_checkpointing_file::FileCheckpoint;
 <span class="kw">use </span>argmin_observer_slog::SlogLogger;
 <span class="kw">use </span>argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 

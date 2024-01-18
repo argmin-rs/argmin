@@ -281,7 +281,7 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, SerializeAlias};
+</span><span class="kw">use </span><span class="kw">crate</span>::core::ArgminFloat;
 <span class="kw">use </span>argmin_math::{ArgminDot, ArgminL2Norm, ArgminSub};
 <span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -308,7 +308,7 @@
 ///     }
 /// }
 /// ```
-</span><span class="kw">pub trait </span>NLCGBetaUpdate&lt;G, P, F&gt;: SerializeAlias {
+</span><span class="kw">pub trait </span>NLCGBetaUpdate&lt;G, P, F&gt; {
     <span class="doccomment">/// Update beta.
     ///
     /// # Parameters

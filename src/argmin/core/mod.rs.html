@@ -52,9 +52,6 @@
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
-<a href="#55" id="55">55</a>
-<a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -86,8 +83,6 @@
 </span><span class="kw">mod </span>problem;
 <span class="doccomment">/// Definition of the return type of the solvers
 </span><span class="kw">mod </span>result;
-<span class="doccomment">/// Trait alias for `serde`s `Serialize` and `DeserializeOwned`
-</span><span class="kw">mod </span>serialization;
 <span class="doccomment">/// `Solver` trait
 </span><span class="kw">mod </span>solver;
 <span class="doccomment">/// iteration state
@@ -108,7 +103,6 @@
 <span class="kw">pub use </span>parallelization::{SendAlias, SyncAlias};
 <span class="kw">pub use </span>problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator, Problem};
 <span class="kw">pub use </span>result::OptimizationResult;
-<span class="kw">pub use </span>serialization::{DeserializeOwnedAlias, SerializeAlias};
 <span class="kw">pub use </span>solver::Solver;
 <span class="kw">pub use </span>state::{IterState, LinearProgramState, PopulationState, State};
 <span class="kw">pub use </span>termination::{TerminationReason, TerminationStatus};

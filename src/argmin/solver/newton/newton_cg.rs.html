@@ -341,9 +341,6 @@
 <a href="#341" id="341">341</a>
 <a href="#342" id="342">342</a>
 <a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -352,9 +349,8 @@
 // copied, modified, or distributed except according to those terms.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
-    ArgminFloat, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState, LineSearch,
-    Operator, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason,
-    TerminationStatus, KV,
+    ArgminFloat, Error, Executor, Gradient, Hessian, IterState, LineSearch, Operator,
+    OptimizationResult, Problem, Solver, State, TerminationReason, TerminationStatus, KV,
 };
 <span class="kw">use </span><span class="kw">crate</span>::solver::conjugategradient::ConjugateGradient;
 <span class="kw">use </span>argmin_math::{
@@ -456,16 +452,14 @@
 <span class="kw">where
     </span>O: Gradient&lt;Param = P, Gradient = G&gt; + Hessian&lt;Param = P, Hessian = H&gt;,
     P: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
         + ArgminSub&lt;P, P&gt;
         + ArgminDot&lt;P, F&gt;
         + ArgminScaledAdd&lt;P, F, P&gt;
         + ArgminMul&lt;F, P&gt;
         + ArgminConj
         + ArgminZeroLike,
-    G: SerializeAlias + DeserializeOwnedAlias + ArgminL2Norm&lt;F&gt; + ArgminMul&lt;F, P&gt;,
-    H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot&lt;P, P&gt;,
+    G: ArgminL2Norm&lt;F&gt; + ArgminMul&lt;F, P&gt;,
+    H: Clone + ArgminDot&lt;P, P&gt;,
     L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), (), F&gt;&gt;,
     F: ArgminFloat + ArgminL2Norm&lt;F&gt;,
 {

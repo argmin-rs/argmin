@@ -341,9 +341,6 @@
 <a href="#341" id="341">341</a>
 <a href="#342" id="342">342</a>
 <a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -351,9 +348,7 @@
 // http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::core::{
-    ArgminFloat, Error, IterState, Operator, Problem, SerializeAlias, Solver, State, KV,
-};
+</span><span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Error, IterState, Operator, Problem, Solver, State, KV};
 <span class="kw">use </span>argmin_math::{ArgminConj, ArgminDot, ArgminL2Norm, ArgminMul, ArgminScaledAdd, ArgminSub};
 <span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -439,7 +434,6 @@
 <span class="kw">where
     </span>O: Operator&lt;Param = P, Output = P&gt;,
     P: Clone
-        + SerializeAlias
         + ArgminDot&lt;P, F&gt;
         + ArgminSub&lt;P, P&gt;
         + ArgminScaledAdd&lt;P, F, P&gt;

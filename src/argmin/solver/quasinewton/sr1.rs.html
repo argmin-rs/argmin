@@ -521,19 +521,6 @@
 <a href="#521" id="521">521</a>
 <a href="#522" id="522">522</a>
 <a href="#523" id="523">523</a>
-<a href="#524" id="524">524</a>
-<a href="#525" id="525">525</a>
-<a href="#526" id="526">526</a>
-<a href="#527" id="527">527</a>
-<a href="#528" id="528">528</a>
-<a href="#529" id="529">529</a>
-<a href="#530" id="530">530</a>
-<a href="#531" id="531">531</a>
-<a href="#532" id="532">532</a>
-<a href="#533" id="533">533</a>
-<a href="#534" id="534">534</a>
-<a href="#535" id="535">535</a>
-<a href="#536" id="536">536</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2019-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -542,9 +529,8 @@
 // copied, modified, or distributed except according to those terms.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
-    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
-    TerminationStatus, KV,
+    ArgminFloat, CostFunction, Error, Executor, Gradient, IterState, LineSearch,
+    OptimizationResult, Problem, Solver, TerminationReason, TerminationStatus, KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminSub};
 <span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
@@ -685,26 +671,14 @@
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
     P: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
         + ArgminSub&lt;P, P&gt;
         + ArgminDot&lt;G, F&gt;
         + ArgminDot&lt;P, F&gt;
         + ArgminDot&lt;P, H&gt;
         + ArgminL2Norm&lt;F&gt;
         + ArgminMul&lt;F, P&gt;,
-    G: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminSub&lt;P, P&gt;
-        + ArgminL2Norm&lt;F&gt;
-        + ArgminSub&lt;G, G&gt;,
-    H: SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminDot&lt;G, P&gt;
-        + ArgminDot&lt;P, P&gt;
-        + ArgminAdd&lt;H, H&gt;
-        + ArgminMul&lt;F, H&gt;,
+    G: Clone + ArgminSub&lt;P, P&gt; + ArgminL2Norm&lt;F&gt; + ArgminSub&lt;G, G&gt;,
+    H: ArgminDot&lt;G, P&gt; + ArgminDot&lt;P, P&gt; + ArgminAdd&lt;H, H&gt; + ArgminMul&lt;F, H&gt;,
     L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), (), F&gt;&gt;,
     F: ArgminFloat,
 {

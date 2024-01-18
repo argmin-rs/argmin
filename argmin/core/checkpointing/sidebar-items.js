@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["CheckpointingFrequency"],"struct":["FileCheckpoint"],"trait":["Checkpoint"]};
+window.SIDEBAR_ITEMS = {"enum":["CheckpointingFrequency"],"trait":["Checkpoint"]};

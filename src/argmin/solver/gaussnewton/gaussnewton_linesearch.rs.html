@@ -466,9 +466,6 @@
 <a href="#466" id="466">466</a>
 <a href="#467" id="467">467</a>
 <a href="#468" id="468">468</a>
-<a href="#469" id="469">469</a>
-<a href="#470" id="470">470</a>
-<a href="#471" id="471">471</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2022 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -477,9 +474,8 @@
 // copied, modified, or distributed except according to those terms.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{
-    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    Jacobian, LineSearch, Operator, OptimizationResult, Problem, SerializeAlias, Solver,
-    TerminationReason, TerminationStatus, KV,
+    ArgminFloat, CostFunction, Error, Executor, Gradient, IterState, Jacobian, LineSearch,
+    Operator, OptimizationResult, Problem, Solver, TerminationReason, TerminationStatus, KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminDot, ArgminInv, ArgminL2Norm, ArgminMul, ArgminTranspose};
 <span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
@@ -555,12 +551,10 @@
 <span class="kw">impl</span>&lt;O, L, F, P, G, J, U, R&gt; Solver&lt;O, IterState&lt;P, G, J, (), R, F&gt;&gt; <span class="kw">for </span>GaussNewtonLS&lt;L, F&gt;
 <span class="kw">where
     </span>O: Operator&lt;Param = P, Output = U&gt; + Jacobian&lt;Param = P, Jacobian = J&gt;,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminMul&lt;F, P&gt;,
-    G: Clone + SerializeAlias + DeserializeOwnedAlias,
+    P: Clone + ArgminMul&lt;F, P&gt;,
+    G: Clone,
     U: ArgminL2Norm&lt;F&gt;,
     J: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
         + ArgminTranspose&lt;J&gt;
         + ArgminInv&lt;J&gt;
         + ArgminDot&lt;J, J&gt;
@@ -568,7 +562,7 @@
         + ArgminDot&lt;U, G&gt;,
     L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;LineSearchProblem&lt;O, F&gt;, IterState&lt;P, G, (), (), R, F&gt;&gt;,
     F: ArgminFloat,
-    R: Clone + SerializeAlias + DeserializeOwnedAlias,
+    R: Clone,
 {
     <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Gauss-Newton method with line search&quot;</span>;
 
@@ -667,7 +661,7 @@
 <span class="kw">impl</span>&lt;O, P, F&gt; CostFunction <span class="kw">for </span>LineSearchProblem&lt;O, F&gt;
 <span class="kw">where
     </span>O: Operator&lt;Param = P, Output = P&gt;,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminL2Norm&lt;F&gt;,
+    P: Clone + ArgminL2Norm&lt;F&gt;,
     F: ArgminFloat,
 {
     <span class="kw">type </span>Param = P;
@@ -681,7 +675,7 @@
 <span class="kw">impl</span>&lt;O, P, J, F&gt; Gradient <span class="kw">for </span>LineSearchProblem&lt;O, F&gt;
 <span class="kw">where
     </span>O: Operator&lt;Param = P, Output = P&gt; + Jacobian&lt;Param = P, Jacobian = J&gt;,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias,
+    P: Clone,
     J: ArgminTranspose&lt;J&gt; + ArgminDot&lt;P, P&gt;,
 {
     <span class="kw">type </span>Param = P;
