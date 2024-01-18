@@ -71,4 +71,14 @@ mod tests {
 
     make_test!(f32);
     make_test!(f64);
+    make_test!(isize);
+    make_test!(usize);
+    make_test!(i8);
+    make_test!(u8);
+    make_test!(i16);
+    make_test!(u16);
+    make_test!(i32);
+    make_test!(u32);
+    make_test!(i64);
+    make_test!(u64);
 }
