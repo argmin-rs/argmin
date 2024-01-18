@@ -51,7 +51,7 @@ where
     }
 }
 
-impl<O, F, P, G, H> Solver<O, IterState<P, G, (), H, F>> for CauchyPoint<F>
+impl<O, F, P, G, H> Solver<O, IterState<P, G, (), H, (), F>> for CauchyPoint<F>
 where
     O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
     P: Clone + ArgminMul<F, P> + ArgminWeightedDot<P, F, H>,
@@ -63,8 +63,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), H, (), F>,
+    ) -> Result<(IterState<P, G, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -97,7 +97,7 @@ where
         Ok((state.param(new_param), None))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, (), F>) -> TerminationStatus {
         // Not an iterative algorithm
         if state.get_iter() >= 1 {
             TerminationStatus::Terminated(TerminationReason::MaxItersReached)
@@ -153,7 +153,7 @@ mod tests {
         cp.set_radius(1.0);
 
         // Forgot to initialize the parameter vector
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new();
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new();
         let problem = TestProblem::new();
         let res = cp.next_iter(&mut Problem::new(problem), state);
         assert_error!(
@@ -166,7 +166,7 @@ mod tests {
         );
 
         // All good.
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().param(param);
         let problem = TestProblem::new();
         let (mut state_out, kv) = cp.next_iter(&mut Problem::new(problem), state).unwrap();

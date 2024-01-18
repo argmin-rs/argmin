@@ -6,6 +6,8 @@ members = [
     "argmin-math",
     "observers/*",
     "tools/spectator",
+
+    "examples/*",
 ]
 
 exclude = [

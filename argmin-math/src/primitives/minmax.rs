@@ -5,7 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-
 use crate::ArgminMinMax;
 use num_complex::Complex;
 
@@ -49,7 +48,6 @@ make_minmax!(Complex<u64>);
 make_minmax!(Complex<isize>);
 make_minmax!(Complex<usize>);
 
-// TODO: tests!!!
 #[cfg(test)]
 mod tests {
     use super::*;

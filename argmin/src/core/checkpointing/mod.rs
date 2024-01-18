@@ -119,9 +119,9 @@ use std::fmt::Display;
 /// # Example
 ///
 /// ```
-/// # extern crate serde;
 /// use argmin::core::Error;
 /// use argmin::core::checkpointing::{Checkpoint, CheckpointingFrequency};
+/// # #[cfg(feature = "serde1")]
 /// use serde::{Serialize, de::DeserializeOwned};
 ///
 /// struct MyCheckpoint {
@@ -129,6 +129,7 @@ use std::fmt::Display;
 ///    // ..
 /// }
 ///
+/// # #[cfg(feature = "serde1")]
 /// impl<S, I> Checkpoint<S, I> for MyCheckpoint
 /// where
 ///     // Both `solver` (`S`) and `state` (`I`) (probably) need to be (de)serializable

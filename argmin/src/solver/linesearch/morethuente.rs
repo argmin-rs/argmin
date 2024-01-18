@@ -296,7 +296,7 @@ where
     }
 }
 
-impl<P, G, O, F> Solver<O, IterState<P, G, (), (), F>> for MoreThuenteLineSearch<P, G, F>
+impl<P, G, O, F> Solver<O, IterState<P, G, (), (), (), F>> for MoreThuenteLineSearch<P, G, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone + SerializeAlias + ArgminDot<G, F> + ArgminScaledAdd<G, F, P>,
@@ -308,8 +308,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         check_param!(
             self.search_direction,
             concat!(
@@ -372,8 +372,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         // set the minimum and maximum steps to correspond to the present interval of uncertainty
         let mut info = 0;
         let (stmin, stmax) = if self.brackt {

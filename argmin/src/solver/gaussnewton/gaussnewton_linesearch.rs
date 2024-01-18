@@ -81,7 +81,7 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
     }
 }
 
-impl<O, L, F, P, G, J, U> Solver<O, IterState<P, G, J, (), F>> for GaussNewtonLS<L, F>
+impl<O, L, F, P, G, J, U, R> Solver<O, IterState<P, G, J, (), R, F>> for GaussNewtonLS<L, F>
 where
     O: Operator<Param = P, Output = U> + Jacobian<Param = P, Jacobian = J>,
     P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminMul<F, P>,
@@ -95,16 +95,17 @@ where
         + ArgminDot<J, J>
         + ArgminDot<G, P>
         + ArgminDot<U, G>,
-    L: Clone + LineSearch<P, F> + Solver<LineSearchProblem<O, F>, IterState<P, G, (), (), F>>,
+    L: Clone + LineSearch<P, F> + Solver<LineSearchProblem<O, F>, IterState<P, G, (), (), R, F>>,
     F: ArgminFloat,
+    R: Clone + SerializeAlias + DeserializeOwnedAlias,
 {
     const NAME: &'static str = "Gauss-Newton method with line search";
 
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, J, (), F>,
-    ) -> Result<(IterState<P, G, J, (), F>, Option<KV>), Error> {
+        mut state: IterState<P, G, J, (), R, F>,
+    ) -> Result<(IterState<P, G, J, (), R, F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -166,7 +167,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, J, (), F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, G, J, (), R, F>) -> TerminationStatus {
         if (state.get_prev_cost() - state.get_cost()).abs() < self.tol {
             return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }

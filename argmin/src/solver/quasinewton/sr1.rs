@@ -145,7 +145,7 @@ where
     }
 }
 
-impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, F>> for SR1<L, F>
+impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, (), F>> for SR1<L, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone
@@ -169,7 +169,7 @@ where
         + ArgminDot<P, P>
         + ArgminAdd<H, H>
         + ArgminMul<F, H>,
-    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), F>>,
+    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "SR1";
@@ -177,8 +177,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), H, (), F>,
+    ) -> Result<(IterState<P, G, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -219,8 +219,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<P, G, (), H, F>,
-    ) -> Result<(IterState<P, G, (), H, F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), H, (), F>,
+    ) -> Result<(IterState<P, G, (), H, (), F>, Option<KV>), Error> {
         let param = state.take_param().ok_or_else(argmin_error_closure!(
             PotentialBug,
             "`SR1`: Parameter vector in state not set."
@@ -291,7 +291,7 @@ where
         ))
     }
 
-    fn terminate(&mut self, state: &IterState<P, G, (), H, F>) -> TerminationStatus {
+    fn terminate(&mut self, state: &IterState<P, G, (), H, (), F>) -> TerminationStatus {
         if state.get_gradient().unwrap().l2_norm() < self.tol_grad {
             return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
@@ -424,7 +424,7 @@ mod tests {
         let mut sr1: SR1<_, f64> = SR1::new(linesearch);
 
         // Forgot to initialize the parameter vector
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new();
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new();
         let problem = TestProblem::new();
         let res = sr1.init(&mut Problem::new(problem), state);
         assert_error!(
@@ -437,7 +437,7 @@ mod tests {
         );
 
         // Forgot initial inverse Hessian guess
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> =
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> =
             IterState::new().param(param.clone());
         let problem = TestProblem::new();
         let res = sr1.init(&mut Problem::new(problem), state);
@@ -452,7 +452,7 @@ mod tests {
         );
 
         // All good.
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new()
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new()
             .param(param.clone())
             .inv_hessian(inv_hessian.clone());
         let problem = TestProblem::new();
@@ -494,7 +494,7 @@ mod tests {
 
         let mut sr1: SR1<_, f64> = SR1::new(linesearch);
 
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new()
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new()
             .param(param)
             .inv_hessian(inv_hessian)
             .cost(1234.0);
@@ -517,7 +517,7 @@ mod tests {
 
         let mut sr1: SR1<_, f64> = SR1::new(linesearch);
 
-        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, f64> = IterState::new()
+        let state: IterState<Vec<f64>, Vec<f64>, (), Vec<Vec<f64>>, (), f64> = IterState::new()
             .param(param)
             .inv_hessian(inv_hessian)
             .gradient(gradient.clone());

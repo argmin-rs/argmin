@@ -13,7 +13,7 @@ jobs:
       CARGO_TERM_COLOR: always
     steps:
       - name: Checkout repository,
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@nightly

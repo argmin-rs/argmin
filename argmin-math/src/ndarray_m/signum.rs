@@ -82,121 +82,12 @@ make_signum_complex!(Complex<i64>);
 make_signum_complex!(Complex<f32>);
 make_signum_complex!(Complex<f64>);
 
+// All code that does not depend on a linked ndarray-linalg backend can still be tested as normal.
+// To avoid dublicating tests and to allow convenient testing of functionality that does not need ndarray-linalg the tests are still included here.
+// The tests expect the name for the crate containing the tested functions to be argmin_math
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use ndarray::array;
-    use paste::item;
-
-    macro_rules! make_test {
-        ($t:ty) => {
-            item! {
-                #[test]
-                fn [<test_signum_complex_array1_ $t>]() {
-                    let x = Array1::from(vec![
-                        Complex::new(1 as $t, 2 as $t),
-                        Complex::new(4 as $t, -3 as $t),
-                        Complex::new(-8 as $t, 4 as $t),
-                        Complex::new(-8 as $t, -1 as $t),
-                    ]);
-                    let y = Array1::from(vec![
-                        Complex::new(1 as $t, 1 as $t),
-                        Complex::new(1 as $t, -1 as $t),
-                        Complex::new(-1 as $t, 1 as $t),
-                        Complex::new(-1 as $t, -1 as $t),
-                    ]);
-                    let res = <Array1<Complex<$t>> as ArgminSignum>::signum(x);
-                    for i in 0..4 {
-                        let tmp = y[i] - res[i];
-                        let norm = ((tmp.re * tmp.re + tmp.im * tmp.im) as f64).sqrt();
-                        assert!(norm < std::f64::EPSILON);
-                    }
-                }
-            }
-
-            item! {
-                #[test]
-                fn [<test_signum_array1_ $t>]() {
-                    let x = Array1::from(vec![1 as $t, -4 as $t, 8 as $t]);
-                    let y = Array1::from(vec![1 as $t, -1 as $t, 1 as $t]);
-                    let res = <Array1<$t> as ArgminSignum>::signum(x);
-                    for i in 0..3 {
-                        let diff = (y[i] - res[i]).abs() as f64;
-                        assert!(diff < std::f64::EPSILON);
-                    }
-                }
-            }
-
-            item! {
-                #[test]
-                fn [<test_signum_complex_array2_ $t>]() {
-                    let x = array![
-                        [
-                            Complex::new(1 as $t, 2 as $t),
-                            Complex::new(4 as $t, -3 as $t),
-                            Complex::new(-8 as $t, 4 as $t),
-                            Complex::new(-8 as $t, -1 as $t),
-                        ],
-                        [
-                            Complex::new(-1 as $t, -2 as $t),
-                            Complex::new(4 as $t, 3 as $t),
-                            Complex::new(-8 as $t, -4 as $t),
-                            Complex::new(8 as $t, -1 as $t),
-                        ]
-                    ];
-                    let y = array![
-                        [
-                            Complex::new(1 as $t, 1 as $t),
-                            Complex::new(1 as $t, -1 as $t),
-                            Complex::new(-1 as $t, 1 as $t),
-                            Complex::new(-1 as $t, -1 as $t),
-                        ],
-                        [
-                            Complex::new(-1 as $t, -1 as $t),
-                            Complex::new(1 as $t, 1 as $t),
-                            Complex::new(-1 as $t, -1 as $t),
-                            Complex::new(1 as $t, -1 as $t),
-                        ]
-                    ];
-                    let res = <Array2<Complex<$t>> as ArgminSignum>::signum(x);
-                    for j in 0..2 {
-                        for i in 0..4 {
-                            let tmp = y[(j, i)] - res[(j, i)];
-                            let norm = ((tmp.re * tmp.re + tmp.im * tmp.im) as f64).sqrt();
-                            assert!(norm < std::f64::EPSILON);
-                        }
-                    }
-                }
-            }
-
-            item! {
-                #[test]
-                fn [<test_signum_array2_ $t>]() {
-                    let x = array![
-                        [1 as $t, -4 as $t, 8 as $t],
-                        [-2 as $t, 2 as $t, -8 as $t]
-                    ];
-                    let y = array![
-                        [1 as $t, -1 as $t, 1 as $t],
-                        [-1 as $t, 1 as $t, -1 as $t]
-                    ];
-                    let res = <Array2<$t> as ArgminSignum>::signum(x);
-                    for j in 0..2 {
-                        for i in 0..3 {
-                            let diff = (y[(j, i)] - res[(j, i)]).abs() as f64;
-                            assert!(diff < std::f64::EPSILON);
-                        }
-                    }
-                }
-            }
-        };
-    }
-
-    make_test!(isize);
-    make_test!(i8);
-    make_test!(i16);
-    make_test!(i32);
-    make_test!(i64);
-    make_test!(f32);
-    make_test!(f64);
-}
+use crate as argmin_math;
+include!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/ndarray-tests-src/signum.rs"
+));

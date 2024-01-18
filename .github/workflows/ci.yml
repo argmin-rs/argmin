@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - win-netlib-fix
 
 env:
   CARGO_TERM_COLOR: always
@@ -13,7 +14,7 @@ jobs:
   tests-argmin:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Test (default features)
         run: cargo test -p argmin
@@ -23,7 +24,7 @@ jobs:
   tests-argmin-serde1-feature:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: Test (no default features)
@@ -34,7 +35,7 @@ jobs:
   tests-argmin-observer-slog:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: Test without default features
@@ -45,7 +46,7 @@ jobs:
   tests-argmin-observer-paramwriter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: Test 
@@ -54,7 +55,7 @@ jobs:
   tests-argmin-observer-spectator:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: Test (spectator observer)
@@ -65,7 +66,7 @@ jobs:
   tests-argmin-math:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       # NOTE: These are in series on purpose, in the hope that not everything
@@ -75,7 +76,7 @@ jobs:
         run: cargo test -p argmin-math --no-default-features --features "primitives"
       - name: argmin-math (vec)
         run: cargo test -p argmin-math --no-default-features --features "vec"
-      # ndarray without linalg, without serde
+      # ndarray without linalg
       - name: argmin-math (ndarray_latest-nolinalg)
         run: cargo test -p argmin-math --no-default-features --features "ndarray_latest-nolinalg"
       - name: argmin-math (ndarray_v0_15-nolinalg)
@@ -84,34 +85,16 @@ jobs:
         run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_14-nolinalg"
       - name: argmin-math (ndarray_v0_13-nolinalg)
         run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13-nolinalg"
-      # ndarray with linalg, without serde
-      - name: argmin-math (ndarray_latest,_dev_linalg_latest)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_latest,_dev_linalg_latest"
-      - name: argmin-math (ndarray_v0_15,_dev_linalg_0_16)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_15,_dev_linalg_0_16"
-      - name: argmin-math (ndarray_v0_14,_dev_linalg_0_13)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_14,_dev_linalg_0_13"
-      - name: argmin-math (ndarray_v0_13,_dev_linalg_0_12)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13,_dev_linalg_0_12"
-      # ndarray without linalg, with serde
-      - name: argmin-math (ndarray_latest-serde,_dev_linalg_latest)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_latest-serde,_dev_linalg_latest"
-      - name: argmin-math (ndarray_v0_15-serde,_dev_linalg_0_16)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_15-serde,_dev_linalg_0_16"
-      - name: argmin-math (ndarray_v0_14-serde,_dev_linalg_0_13)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_14-serde,_dev_linalg_0_13"
-      - name: argmin-math (ndarray_v0_13-serde,_dev_linalg_0_12)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13-serde,_dev_linalg_0_12"
-      # ndarray with linalg, with serde
-      - name: argmin-math (ndarray_latest-serde,_dev_linalg_latest)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_latest-serde,_dev_linalg_latest"
-      - name: argmin-math (ndarray_v0_15-serde,_dev_linalg_0_16)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_15-serde,_dev_linalg_0_16"
-      - name: argmin-math (ndarray_v0_14-serde,_dev_linalg_0_13)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_14-serde,_dev_linalg_0_13"
-      - name: argmin-math (ndarray_v0_13-serde,_dev_linalg_0_12)
-        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13-serde,_dev_linalg_0_12"
-      # nalgebra without serde
+      # ndarray with linalg
+      - name: argmin-math (ndarray_latest)
+        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_latest/Cargo.toml
+      - name: argmin-math (ndarray_v0_15)
+        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_15/Cargo.toml
+      - name: argmin-math (ndarray_v0_14)
+        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_14/Cargo.toml
+      - name: argmin-math (ndarray_v0_13)
+        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_13/Cargo.toml
+      # nalgebra
       - name: argmin-math (nalgebra_latest)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_latest"
       - name: argmin-math (nalgebra_v0_32)
@@ -122,28 +105,17 @@ jobs:
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_30"
       - name: argmin-math (nalgebra_v0_29)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_29"
-      # nalgebra with serde
-      - name: argmin-math (nalgebra_latest-serde)
-        run: cargo test -p argmin-math --no-default-features --features "nalgebra_latest-serde"
-      - name: argmin-math (nalgebra_v0_32-serde)
-        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_32-serde"
-      - name: argmin-math (nalgebra_v0_31-serde)
-        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_31-serde"
-      - name: argmin-math (nalgebra_v0_30-serde)
-        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_30-serde"
-      - name: argmin-math (nalgebra_v0_29-serde)
-        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_29-serde"
 
   clippy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@beta
         with:
           components: clippy
       - name: Clippy (argmin-math)
-        run: cargo clippy -p argmin-math --all-targets --features "primitives,vec,nalgebra_latest-serde,ndarray_latest-serde" -- -D warnings
+        run: cargo clippy -p argmin-math --all-targets --features "primitives,vec,nalgebra_latest,ndarray_latest" -- -D warnings
       - name: Clippy (argmin) without default features
         run: cargo clippy -p argmin --all-targets --no-default-features -- -D warnings
       - name: Clippy (argmin) with default features
@@ -160,7 +132,7 @@ jobs:
   rustfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@beta
         with:
@@ -170,7 +142,7 @@ jobs:
   docs-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
       - name: argmin docs
@@ -181,7 +153,7 @@ jobs:
   wasm-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -189,11 +161,11 @@ jobs:
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh 
       - name: Build target wasm32-unknown-unknown
-        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --target wasm32-unknown-unknown --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --target wasm32-unknown-unknown --features wasm-bindgen
       - name: Build target wasm32-wasi with feature wasm-bindgen
-        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --target wasm32-wasi --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --target wasm32-wasi --features wasm-bindgen
       - name: Build target wasm32-unknown-emscripten
-        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --target wasm32-unknown-emscripten --no-default-features --features wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --target wasm32-unknown-emscripten --no-default-features --features wasm-bindgen
 
   cargo-deny:
     runs-on: ubuntu-latest
@@ -207,7 +179,7 @@ jobs:
     continue-on-error: ${{ matrix.checks == 'advisories' }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: EmbarkStudios/cargo-deny-action@v1
       with:
         command: check ${{ matrix.checks }}

@@ -134,7 +134,7 @@ where
     }
 }
 
-impl<O, F> Solver<O, IterState<F, (), (), (), F>> for GoldenSectionSearch<F>
+impl<O, F> Solver<O, IterState<F, (), (), (), (), F>> for GoldenSectionSearch<F>
 where
     O: CostFunction<Param = F, Output = F>,
     F: ArgminFloat,
@@ -144,8 +144,8 @@ where
     fn init(
         &mut self,
         problem: &mut Problem<O>,
-        mut state: IterState<F, (), (), (), F>,
-    ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
+        mut state: IterState<F, (), (), (), (), F>,
+    ) -> Result<(IterState<F, (), (), (), (), F>, Option<KV>), Error> {
         let init_estimate = state.take_param().ok_or_else(argmin_error_closure!(
             NotInitialized,
             concat!(
@@ -181,8 +181,8 @@ where
     fn next_iter(
         &mut self,
         problem: &mut Problem<O>,
-        state: IterState<F, (), (), (), F>,
-    ) -> Result<(IterState<F, (), (), (), F>, Option<KV>), Error> {
+        state: IterState<F, (), (), (), (), F>,
+    ) -> Result<(IterState<F, (), (), (), (), F>, Option<KV>), Error> {
         if self.f2 < self.f1 {
             self.x0 = self.x1;
             self.x1 = self.x2;
@@ -203,7 +203,7 @@ where
         }
     }
 
-    fn terminate(&mut self, _state: &IterState<F, (), (), (), F>) -> TerminationStatus {
+    fn terminate(&mut self, _state: &IterState<F, (), (), (), (), F>) -> TerminationStatus {
         if self.tolerance * (self.x1.abs() + self.x2.abs()) >= (self.x3 - self.x0).abs() {
             return TerminationStatus::Terminated(TerminationReason::SolverConverged);
         }
