@@ -6,9 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    Jacobian, LineSearch, Operator, OptimizationResult, Problem, SerializeAlias, Solver,
-    TerminationReason, TerminationStatus, KV,
+    ArgminFloat, CostFunction, Error, Executor, Gradient, IterState, Jacobian, LineSearch,
+    Operator, OptimizationResult, Problem, Solver, TerminationReason, TerminationStatus, KV,
 };
 use argmin_math::{ArgminDot, ArgminInv, ArgminL2Norm, ArgminMul, ArgminTranspose};
 #[cfg(feature = "serde1")]
@@ -84,12 +83,10 @@ impl<L, F: ArgminFloat> GaussNewtonLS<L, F> {
 impl<O, L, F, P, G, J, U, R> Solver<O, IterState<P, G, J, (), R, F>> for GaussNewtonLS<L, F>
 where
     O: Operator<Param = P, Output = U> + Jacobian<Param = P, Jacobian = J>,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminMul<F, P>,
-    G: Clone + SerializeAlias + DeserializeOwnedAlias,
+    P: Clone + ArgminMul<F, P>,
+    G: Clone,
     U: ArgminL2Norm<F>,
     J: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
         + ArgminTranspose<J>
         + ArgminInv<J>
         + ArgminDot<J, J>
@@ -97,7 +94,7 @@ where
         + ArgminDot<U, G>,
     L: Clone + LineSearch<P, F> + Solver<LineSearchProblem<O, F>, IterState<P, G, (), (), R, F>>,
     F: ArgminFloat,
-    R: Clone + SerializeAlias + DeserializeOwnedAlias,
+    R: Clone,
 {
     const NAME: &'static str = "Gauss-Newton method with line search";
 
@@ -196,7 +193,7 @@ impl<O, F> LineSearchProblem<O, F> {
 impl<O, P, F> CostFunction for LineSearchProblem<O, F>
 where
     O: Operator<Param = P, Output = P>,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminL2Norm<F>,
+    P: Clone + ArgminL2Norm<F>,
     F: ArgminFloat,
 {
     type Param = P;
@@ -210,7 +207,7 @@ where
 impl<O, P, J, F> Gradient for LineSearchProblem<O, F>
 where
     O: Operator<Param = P, Output = P> + Jacobian<Param = P, Jacobian = J>,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias,
+    P: Clone,
     J: ArgminTranspose<J> + ArgminDot<P, P>,
 {
     type Param = P;

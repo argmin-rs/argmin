@@ -29,8 +29,6 @@ mod parallelization;
 mod problem;
 /// Definition of the return type of the solvers
 mod result;
-/// Trait alias for `serde`s `Serialize` and `DeserializeOwned`
-mod serialization;
 /// `Solver` trait
 mod solver;
 /// iteration state
@@ -51,7 +49,6 @@ pub use kv::{KvValue, KV};
 pub use parallelization::{SendAlias, SyncAlias};
 pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator, Problem};
 pub use result::OptimizationResult;
-pub use serialization::{DeserializeOwnedAlias, SerializeAlias};
 pub use solver::Solver;
 pub use state::{IterState, LinearProgramState, PopulationState, State};
 pub use termination::{TerminationReason, TerminationStatus};

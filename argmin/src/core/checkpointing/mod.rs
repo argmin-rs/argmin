@@ -12,7 +12,8 @@
 //! with a user-chosen frequency. Optimizations can then be resumed from a given checkpoint after a
 //! crash.
 //!
-//! For saving checkpoints to disk, `FileCheckpoint` is provided.
+//! For saving checkpoints to disk, `FileCheckpoint` is provided in the `argmin-checkpointing-file`
+//! crate.
 //! Via the `Checkpoint` trait other checkpointing approaches can be implemented.
 //!
 //! The `CheckpointingFrequency` defines how often checkpoints are saved and can be chosen to be
@@ -29,7 +30,9 @@
 //! # extern crate argmin_testfunctions;
 //! # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
 //! # #[cfg(feature = "serde1")]
-//! # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
+//! use argmin::core::checkpointing::CheckpointingFrequency;
+//! # #[cfg(feature = "serde1")]
+//! use argmin_checkpointing_file::FileCheckpoint;
 //! # use argmin_observer_slog::SlogLogger;
 //! # use argmin::solver::landweber::Landweber;
 //! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
@@ -70,6 +73,7 @@
 //! #
 //! #     let iters = 35;
 //! #     let solver = Landweber::new(0.001);
+//!
 //! // [...]
 //!
 //! # #[cfg(feature = "serde1")]
@@ -97,12 +101,6 @@
 //! #     }
 //! # }
 //! ```
-
-#[cfg(feature = "serde1")]
-mod file;
-
-#[cfg(feature = "serde1")]
-pub use crate::core::checkpointing::file::FileCheckpoint;
 
 use crate::core::Error;
 use std::default::Default;

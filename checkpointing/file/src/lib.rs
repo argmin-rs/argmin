@@ -5,8 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::core::checkpointing::{Checkpoint, CheckpointingFrequency};
-use crate::core::{DeserializeOwnedAlias, Error, SerializeAlias};
+pub use argmin::core::checkpointing::{Checkpoint, CheckpointingFrequency};
+use argmin::core::Error;
+use serde::{de::DeserializeOwned, Serialize};
 use std::default::Default;
 use std::fs::File;
 use std::io::{BufReader, BufWriter};
@@ -55,7 +56,8 @@ impl FileCheckpoint {
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
+    /// use argmin::core::checkpointing::CheckpointingFrequency;
+    /// use argmin_checkpointing_file::FileCheckpoint;
     /// # use std::path::PathBuf;
     ///
     /// let directory = "checkpoints";
@@ -79,8 +81,8 @@ impl FileCheckpoint {
 
 impl<S, I> Checkpoint<S, I> for FileCheckpoint
 where
-    S: SerializeAlias + DeserializeOwnedAlias,
-    I: SerializeAlias + DeserializeOwnedAlias,
+    S: Serialize + DeserializeOwned,
+    I: Serialize + DeserializeOwned,
 {
     /// Writes checkpoint to disk.
     ///
@@ -91,7 +93,8 @@ where
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency, Checkpoint};
+    /// use argmin::core::checkpointing::CheckpointingFrequency;
+    /// use argmin_checkpointing_file::FileCheckpoint;
     ///
     /// # use std::fs::File;
     /// # use std::io::BufReader;
@@ -126,7 +129,8 @@ where
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency, Checkpoint};
+    /// use argmin::core::checkpointing::CheckpointingFrequency;
+    /// use argmin_checkpointing_file::FileCheckpoint
     /// # use argmin::core::Error;
     ///
     /// # use std::fs::File;
@@ -164,18 +168,17 @@ where
 
     /// Returns the how often a checkpoint is to be saved.
     ///
-    /// Used internally by [`save_cond`](`crate::core::checkpointing::Checkpoint::save_cond`).
+    /// Used internally by [`save_cond`](`argmin::core::checkpointing::Checkpoint::save_cond`).
     fn frequency(&self) -> CheckpointingFrequency {
         self.frequency
     }
 }
 
 #[cfg(test)]
-#[cfg(feature = "serde1")]
 mod tests {
     use super::*;
-    use crate::core::test_utils::TestSolver;
-    use crate::core::{IterState, State};
+    use argmin::core::test_utils::TestSolver;
+    use argmin::core::{IterState, State};
 
     #[test]
     #[allow(clippy::type_complexity)]

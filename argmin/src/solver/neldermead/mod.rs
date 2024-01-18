@@ -19,8 +19,8 @@
 //! <http://www.scholarpedia.org/article/Nelder-Mead_algorithm#Simplex_transformation_algorithm>
 
 use crate::core::{
-    ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
-    TerminationReason, TerminationStatus, KV,
+    ArgminFloat, CostFunction, Error, IterState, Problem, Solver, TerminationReason,
+    TerminationStatus, KV,
 };
 use argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -319,7 +319,7 @@ impl fmt::Display for Action {
 impl<O, P, F> Solver<O, IterState<P, (), (), (), (), F>> for NelderMead<P, F>
 where
     O: CostFunction<Param = P, Output = F>,
-    P: Clone + SerializeAlias + ArgminSub<P, P> + ArgminAdd<P, P> + ArgminMul<F, P>,
+    P: Clone + ArgminSub<P, P> + ArgminAdd<P, P> + ArgminMul<F, P>,
     F: ArgminFloat + std::iter::Sum<F>,
 {
     const NAME: &'static str = "Nelder-Mead method";

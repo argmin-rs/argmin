@@ -6,9 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
-    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationStatus,
-    TrustRegionRadius, KV,
+    ArgminFloat, CostFunction, Error, Executor, Gradient, Hessian, IterState, OptimizationResult,
+    Problem, Solver, TerminationStatus, TrustRegionRadius, KV,
 };
 use crate::solver::trustregion::reduction_ratio;
 use argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminWeightedDot};
@@ -162,16 +161,9 @@ where
     O: CostFunction<Param = P, Output = F>
         + Gradient<Param = P, Gradient = G>
         + Hessian<Param = P, Hessian = H>,
-    P: Clone
-        + std::fmt::Debug
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminL2Norm<F>
-        + ArgminDot<P, F>
-        + ArgminDot<G, F>
-        + ArgminAdd<P, P>,
-    G: Clone + SerializeAlias + DeserializeOwnedAlias,
-    H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
+    P: Clone + ArgminL2Norm<F> + ArgminDot<P, F> + ArgminDot<G, F> + ArgminAdd<P, P>,
+    G: Clone,
+    H: Clone + ArgminDot<P, P>,
     R: Clone + TrustRegionRadius<F> + Solver<O, IterState<P, G, (), H, (), F>>,
     F: ArgminFloat,
 {

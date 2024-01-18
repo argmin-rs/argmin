@@ -6,9 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
-    TerminationStatus, KV,
+    ArgminFloat, CostFunction, Error, Executor, Gradient, IterState, LineSearch,
+    OptimizationResult, Problem, Solver, TerminationReason, TerminationStatus, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminSub};
 #[cfg(feature = "serde1")]
@@ -149,26 +148,14 @@ impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, (), F>> for SR1<L, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
         + ArgminSub<P, P>
         + ArgminDot<G, F>
         + ArgminDot<P, F>
         + ArgminDot<P, H>
         + ArgminL2Norm<F>
         + ArgminMul<F, P>,
-    G: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminSub<P, P>
-        + ArgminL2Norm<F>
-        + ArgminSub<G, G>,
-    H: SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminDot<G, P>
-        + ArgminDot<P, P>
-        + ArgminAdd<H, H>
-        + ArgminMul<F, H>,
+    G: Clone + ArgminSub<P, P> + ArgminL2Norm<F> + ArgminSub<G, G>,
+    H: ArgminDot<G, P> + ArgminDot<P, P> + ArgminAdd<H, H> + ArgminMul<F, H>,
     L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat,
 {

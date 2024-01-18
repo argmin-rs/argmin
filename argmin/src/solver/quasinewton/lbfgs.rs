@@ -6,9 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason,
-    TerminationStatus, KV,
+    ArgminFloat, CostFunction, Error, Executor, Gradient, IterState, LineSearch,
+    OptimizationResult, Problem, Solver, State, TerminationReason, TerminationStatus, KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminL1Norm, ArgminL2Norm, ArgminMinMax, ArgminMul, ArgminSignum,
@@ -306,9 +305,6 @@ impl<O, L, P, G, F> Solver<O, IterState<P, G, (), (), (), F>> for LBFGS<L, P, G,
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone
-        + std::fmt::Debug
-        + SerializeAlias
-        + DeserializeOwnedAlias
         + ArgminSub<P, P>
         + ArgminSub<F, P>
         + ArgminAdd<P, P>
@@ -322,9 +318,6 @@ where
         + ArgminZeroLike
         + ArgminMinMax,
     G: Clone
-        + std::fmt::Debug
-        + SerializeAlias
-        + DeserializeOwnedAlias
         + ArgminL2Norm<F>
         + ArgminSub<G, G>
         + ArgminAdd<G, G>

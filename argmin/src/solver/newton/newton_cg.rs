@@ -6,9 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminFloat, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian, IterState, LineSearch,
-    Operator, OptimizationResult, Problem, SerializeAlias, Solver, State, TerminationReason,
-    TerminationStatus, KV,
+    ArgminFloat, Error, Executor, Gradient, Hessian, IterState, LineSearch, Operator,
+    OptimizationResult, Problem, Solver, State, TerminationReason, TerminationStatus, KV,
 };
 use crate::solver::conjugategradient::ConjugateGradient;
 use argmin_math::{
@@ -110,16 +109,14 @@ impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, (), F>> for NewtonCG<L, 
 where
     O: Gradient<Param = P, Gradient = G> + Hessian<Param = P, Hessian = H>,
     P: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
         + ArgminSub<P, P>
         + ArgminDot<P, F>
         + ArgminScaledAdd<P, F, P>
         + ArgminMul<F, P>
         + ArgminConj
         + ArgminZeroLike,
-    G: SerializeAlias + DeserializeOwnedAlias + ArgminL2Norm<F> + ArgminMul<F, P>,
-    H: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminDot<P, P>,
+    G: ArgminL2Norm<F> + ArgminMul<F, P>,
+    H: Clone + ArgminDot<P, P>,
     L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat + ArgminL2Norm<F>,
 {

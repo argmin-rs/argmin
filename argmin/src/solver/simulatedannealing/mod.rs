@@ -19,8 +19,8 @@
 //! DOI: 10.1126/science.220.4598.671
 
 use crate::core::{
-    ArgminFloat, CostFunction, Error, IterState, Problem, SerializeAlias, Solver,
-    TerminationReason, TerminationStatus, KV,
+    ArgminFloat, CostFunction, Error, IterState, Problem, Solver, TerminationReason,
+    TerminationStatus, KV,
 };
 use rand::prelude::*;
 use rand_xoshiro::Xoshiro256PlusPlus;
@@ -440,7 +440,7 @@ where
     O: CostFunction<Param = P, Output = F> + Anneal<Param = P, Output = P, Float = F>,
     P: Clone,
     F: ArgminFloat,
-    R: Rng + SerializeAlias,
+    R: Rng,
 {
     const NAME: &'static str = "Simulated Annealing";
     fn init(

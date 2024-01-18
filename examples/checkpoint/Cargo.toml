@@ -7,6 +7,7 @@ publish = false
 
 [dependencies]
 argmin = { version = "*", path = "../../argmin", features = ["serde1"] }
+argmin-checkpointing-file = { version = "*", path = "../../checkpointing/file" }
 argmin-math = { version = "*", features = ["vec"], path = "../../argmin-math" }
 argmin-observer-slog = { version = "*", path = "../../observers/slog/" }
 argmin_testfunctions = "*"

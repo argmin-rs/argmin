@@ -6,8 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminFloat, Error, IterState, Problem, SerializeAlias, Solver, State, TerminationReason,
-    TerminationStatus, TrustRegionRadius, KV,
+    ArgminFloat, Error, IterState, Problem, Solver, State, TerminationReason, TerminationStatus,
+    TrustRegionRadius, KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminWeightedDot, ArgminZeroLike,
@@ -181,7 +181,6 @@ where
 impl<P, O, F, H> Solver<O, IterState<P, P, (), H, (), F>> for Steihaug<P, F>
 where
     P: Clone
-        + SerializeAlias
         + ArgminMul<F, P>
         + ArgminL2Norm<F>
         + ArgminDot<P, F>
