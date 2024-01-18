@@ -8,8 +8,7 @@
 use crate::core::checkpointing::Checkpoint;
 use crate::core::observers::{Observe, ObserverMode, Observers};
 use crate::core::{
-    DeserializeOwnedAlias, Error, OptimizationResult, Problem, SerializeAlias, Solver, State,
-    TerminationReason, TerminationStatus, KV,
+    Error, OptimizationResult, Problem, Solver, State, TerminationReason, TerminationStatus, KV,
 };
 use instant;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -36,7 +35,7 @@ pub struct Executor<O, S, I> {
 impl<O, S, I> Executor<O, S, I>
 where
     S: Solver<O, I>,
-    I: State + SerializeAlias + DeserializeOwnedAlias,
+    I: State,
 {
     /// Constructs an `Executor` from a user defined problem and a solver.
     ///
@@ -313,7 +312,8 @@ where
     /// ```
     /// # use argmin::core::{Error, Executor};
     /// # #[cfg(feature = "serde1")]
-    /// # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
+    /// # use argmin::core::checkpointing::CheckpointingFrequency;
+    /// # use argmin_checkpointing_file::FileCheckpoint;
     /// # use argmin::core::test_utils::{TestSolver, TestProblem};
     /// #
     /// # fn main() -> Result<(), Error> {
@@ -570,17 +570,63 @@ mod tests {
 
     /// The solver's `init` should not be called when started from a checkpoint.
     /// See https://github.com/argmin-rs/argmin/issues/199.
+    // #[cfg(feature = "serde1")]
     #[test]
     #[cfg(feature = "serde1")]
     fn test_checkpointing_solver_initialization() {
-        use crate::core::checkpointing::{CheckpointingFrequency, FileCheckpoint};
-        use crate::core::test_utils::TestProblem;
-        use crate::core::{ArgminFloat, CostFunction};
+        use std::cell::RefCell;
+
+        use crate::core::{
+            checkpointing::CheckpointingFrequency, test_utils::TestProblem, ArgminFloat,
+            CostFunction,
+        };
         use serde::{Deserialize, Serialize};
 
-        // Fake optimization algorithm which holds internal state which changes over time
         #[derive(Clone)]
-        #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+        pub struct FakeCheckpoint {
+            pub frequency: CheckpointingFrequency,
+            pub solver: RefCell<Option<OptimizationAlgorithm>>,
+            pub state: RefCell<Option<IterState<Vec<f64>, (), (), (), (), f64>>>,
+        }
+
+        impl Checkpoint<OptimizationAlgorithm, IterState<Vec<f64>, (), (), (), (), f64>>
+            for FakeCheckpoint
+        {
+            fn save(
+                &self,
+                solver: &OptimizationAlgorithm,
+                state: &IterState<Vec<f64>, (), (), (), (), f64>,
+            ) -> Result<(), Error> {
+                *self.solver.borrow_mut() = Some(solver.clone());
+                *self.state.borrow_mut() = Some(state.clone());
+                Ok(())
+            }
+
+            fn load(
+                &self,
+            ) -> Result<
+                Option<(
+                    OptimizationAlgorithm,
+                    IterState<Vec<f64>, (), (), (), (), f64>,
+                )>,
+                Error,
+            > {
+                if self.solver.borrow().is_none() {
+                    return Ok(None);
+                }
+                Ok(Some((
+                    self.solver.borrow().clone().unwrap(),
+                    self.state.borrow().clone().unwrap(),
+                )))
+            }
+
+            fn frequency(&self) -> CheckpointingFrequency {
+                self.frequency
+            }
+        }
+
+        // Fake optimization algorithm which holds internal state which changes over time
+        #[derive(Clone, Serialize, Deserialize)]
         struct OptimizationAlgorithm {
             pub internal_state: u64,
         }
@@ -638,12 +684,12 @@ mod tests {
         // solver instance
         let solver = OptimizationAlgorithm { internal_state: 0 };
 
-        // Delete old checkpointing file
-        let _ = std::fs::remove_file(".checkpoints/init_test.arg");
-
         // Create a checkpoint
-        let checkpoint =
-            FileCheckpoint::new(".checkpoints", "init_test", CheckpointingFrequency::Always);
+        let checkpoint = FakeCheckpoint {
+            frequency: CheckpointingFrequency::Always,
+            solver: RefCell::new(None),
+            state: RefCell::new(None),
+        };
 
         // Create and run executor
         let executor = Executor::new(problem, solver)

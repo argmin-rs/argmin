@@ -6,9 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, Hessian,
-    IterState, OptimizationResult, Problem, SerializeAlias, Solver, TerminationReason,
-    TerminationStatus, TrustRegionRadius, KV,
+    ArgminFloat, CostFunction, Error, Executor, Gradient, Hessian, IterState, OptimizationResult,
+    Problem, Solver, TerminationReason, TerminationStatus, TrustRegionRadius, KV,
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminSub, ArgminWeightedDot, ArgminZeroLike,
@@ -186,26 +185,14 @@ where
         + Gradient<Param = P, Gradient = G>
         + Hessian<Param = P, Hessian = B>,
     P: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
         + ArgminSub<P, P>
         + ArgminAdd<P, P>
         + ArgminDot<P, F>
         + ArgminDot<P, B>
         + ArgminL2Norm<F>
         + ArgminZeroLike,
-    G: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminL2Norm<F>
-        + ArgminDot<P, F>
-        + ArgminSub<G, P>,
-    B: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminDot<P, P>
-        + ArgminAdd<B, B>
-        + ArgminMul<F, B>,
+    G: Clone + ArgminL2Norm<F> + ArgminDot<P, F> + ArgminSub<G, P>,
+    B: Clone + ArgminDot<P, P> + ArgminAdd<B, B> + ArgminMul<F, B>,
     R: Clone + TrustRegionRadius<F> + Solver<O, IterState<P, G, (), B, (), F>>,
     F: ArgminFloat + ArgminL2Norm<F>,
 {

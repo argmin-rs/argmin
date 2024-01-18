@@ -1,0 +1,19 @@
+[package]
+name = "argmin-checkpointing-file"
+version = "0.1.0"
+authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Checkpointing to a file for argmin"
+documentation = "https://docs.rs/argmin-checkpointing-file/"
+homepage = "https://argmin-rs.org"
+repository = "https://github.com/argmin-rs/argmin"
+readme = "README.md"
+keywords = ["optimization", "math", "science"]
+categories = ["science"]
+exclude = []
+
+[dependencies]
+argmin = { version = "0.9.0", path = "../../argmin", default-features = false }
+bincode = "1.3.3"
+serde = "1.0.195"

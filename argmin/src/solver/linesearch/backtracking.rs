@@ -6,8 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, SerializeAlias,
-    Solver, State, TerminationReason, TerminationStatus, KV,
+    ArgminFloat, CostFunction, Error, Gradient, IterState, LineSearch, Problem, Solver, State,
+    TerminationReason, TerminationStatus, KV,
 };
 use crate::solver::linesearch::condition::*;
 use argmin_math::ArgminScaledAdd;
@@ -177,10 +177,10 @@ where
 
 impl<O, P, G, L, F> Solver<O, IterState<P, G, (), (), (), F>> for BacktrackingLineSearch<P, G, L, F>
 where
-    P: Clone + SerializeAlias + ArgminScaledAdd<G, F, P>,
-    G: SerializeAlias + ArgminScaledAdd<G, F, G>,
+    P: Clone + ArgminScaledAdd<G, F, P>,
+    G: ArgminScaledAdd<G, F, G>,
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    L: LineSearchCondition<G, G, F> + SerializeAlias,
+    L: LineSearchCondition<G, G, F>,
     F: ArgminFloat,
 {
     const NAME: &'static str = "Backtracking line search";

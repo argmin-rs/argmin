@@ -6,8 +6,8 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{
-    ArgminFloat, CostFunction, DeserializeOwnedAlias, Error, Executor, Gradient, IterState,
-    LineSearch, NLCGBetaUpdate, OptimizationResult, Problem, SerializeAlias, Solver, State, KV,
+    ArgminFloat, CostFunction, Error, Executor, Gradient, IterState, LineSearch, NLCGBetaUpdate,
+    OptimizationResult, Problem, Solver, State, KV,
 };
 use argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul};
 #[cfg(feature = "serde1")]
@@ -122,13 +122,8 @@ impl<O, P, G, L, B, F> Solver<O, IterState<P, G, (), (), (), F>>
     for NonlinearConjugateGradient<P, L, B, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    P: Clone + SerializeAlias + DeserializeOwnedAlias + ArgminAdd<P, P> + ArgminMul<F, P>,
-    G: Clone
-        + SerializeAlias
-        + DeserializeOwnedAlias
-        + ArgminMul<F, P>
-        + ArgminDot<G, F>
-        + ArgminL2Norm<F>,
+    P: Clone + ArgminAdd<P, P> + ArgminMul<F, P>,
+    G: Clone + ArgminMul<F, P> + ArgminDot<G, F> + ArgminL2Norm<F>,
     L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     B: NLCGBetaUpdate<G, P, F>,
     F: ArgminFloat,

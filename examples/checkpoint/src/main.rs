@@ -7,12 +7,12 @@
 
 use argmin::{
     core::{
-        checkpointing::{CheckpointingFrequency, FileCheckpoint},
-        observers::ObserverMode,
-        CostFunction, Error, Executor, Gradient,
+        checkpointing::CheckpointingFrequency, observers::ObserverMode, CostFunction, Error,
+        Executor, Gradient,
     },
     solver::landweber::Landweber,
 };
+use argmin_checkpointing_file::FileCheckpoint;
 use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
 

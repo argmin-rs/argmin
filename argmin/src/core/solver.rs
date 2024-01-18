@@ -15,7 +15,7 @@ use crate::core::{Error, Problem, State, TerminationReason, TerminationStatus, K
 /// ([`terminate`](`Solver::terminate`) and [`terminate_internal`](`Solver::terminate_internal`)).
 /// Only `next_iter` is mandatory to implement, all others provide default implementations.
 ///
-/// A `Solver` needs to be serializable.
+/// A `Solver` should be (de)serializable in order to work with checkpointing.
 ///
 /// # Example
 ///

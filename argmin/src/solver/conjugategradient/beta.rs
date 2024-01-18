@@ -17,7 +17,7 @@
 //! \[0\] Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 //! Springer. ISBN 0-387-30303-0.
 
-use crate::core::{ArgminFloat, SerializeAlias};
+use crate::core::ArgminFloat;
 use argmin_math::{ArgminDot, ArgminL2Norm, ArgminSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -44,7 +44,7 @@ use serde::{Deserialize, Serialize};
 ///     }
 /// }
 /// ```
-pub trait NLCGBetaUpdate<G, P, F>: SerializeAlias {
+pub trait NLCGBetaUpdate<G, P, F> {
     /// Update beta.
     ///
     /// # Parameters

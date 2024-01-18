@@ -21,8 +21,7 @@
 //! \[1\] <https://en.wikipedia.org/wiki/Particle_swarm_optimization>
 
 use crate::core::{
-    ArgminFloat, CostFunction, Error, PopulationState, Problem, SerializeAlias, Solver, SyncAlias,
-    KV,
+    ArgminFloat, CostFunction, Error, PopulationState, Problem, Solver, SyncAlias, KV,
 };
 use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
 use rand::{Rng, SeedableRng};
@@ -279,8 +278,7 @@ where
 impl<O, P, F, R> Solver<O, PopulationState<Particle<P, F>, F>> for ParticleSwarm<P, F, R>
 where
     O: CostFunction<Param = P, Output = F> + SyncAlias,
-    P: SerializeAlias
-        + Clone
+    P: Clone
         + SyncAlias
         + ArgminAdd<P, P>
         + ArgminSub<P, P>
