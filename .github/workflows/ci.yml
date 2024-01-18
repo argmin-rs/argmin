@@ -52,6 +52,15 @@ jobs:
       - name: Test 
         run: cargo test -p argmin-observer-paramwriter
 
+  tests-argmin-checkpointing-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test 
+        run: cargo test -p argmin-checkpointing-file
+
   tests-argmin-observer-spectator:
     runs-on: ubuntu-latest
     steps:

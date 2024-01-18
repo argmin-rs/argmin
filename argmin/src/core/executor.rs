@@ -570,7 +570,6 @@ mod tests {
 
     /// The solver's `init` should not be called when started from a checkpoint.
     /// See https://github.com/argmin-rs/argmin/issues/199.
-    // #[cfg(feature = "serde1")]
     #[test]
     #[cfg(feature = "serde1")]
     fn test_checkpointing_solver_initialization() {

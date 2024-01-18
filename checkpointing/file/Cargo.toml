@@ -17,3 +17,6 @@ exclude = []
 argmin = { version = "0.9.0", path = "../../argmin", default-features = false }
 bincode = "1.3.3"
 serde = "1.0.195"
+
+[dev-dependencies]
+argmin = { version = "0.9.0", path = "../../argmin", features = ["serde1"] }
