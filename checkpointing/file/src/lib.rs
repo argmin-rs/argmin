@@ -32,7 +32,7 @@ impl Default for FileCheckpoint {
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::FileCheckpoint;
+    /// use argmin_checkpointing_file::FileCheckpoint;
     /// # use argmin::core::checkpointing::CheckpointingFrequency;
     /// # use std::path::PathBuf;
     ///
@@ -56,8 +56,7 @@ impl FileCheckpoint {
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::CheckpointingFrequency;
-    /// use argmin_checkpointing_file::FileCheckpoint;
+    /// use argmin_checkpointing_file::{FileCheckpoint, CheckpointingFrequency};
     /// # use std::path::PathBuf;
     ///
     /// let directory = "checkpoints";
@@ -93,8 +92,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::CheckpointingFrequency;
-    /// use argmin_checkpointing_file::FileCheckpoint;
+    /// use argmin_checkpointing_file::{FileCheckpoint, CheckpointingFrequency, Checkpoint};
     ///
     /// # use std::fs::File;
     /// # use std::io::BufReader;
@@ -129,13 +127,13 @@ where
     /// # Example
     ///
     /// ```
-    /// use argmin::core::checkpointing::CheckpointingFrequency;
-    /// use argmin_checkpointing_file::FileCheckpoint
+    /// use argmin_checkpointing_file::{FileCheckpoint, CheckpointingFrequency, Checkpoint};
     /// # use argmin::core::Error;
     ///
     /// # use std::fs::File;
     /// # use std::io::BufWriter;
     /// # fn main() -> Result<(), Error> {
+    /// # std::fs::DirBuilder::new().recursive(true).create(".checkpoints").unwrap();
     /// # let f = BufWriter::new(File::create(".checkpoints/load_test.arg")?);
     /// # let f_solver: u64 = 12;
     /// # let f_state: u64 = 21;
