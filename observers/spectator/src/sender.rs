@@ -20,8 +20,10 @@ pub(crate) async fn sender(
     if let Ok(stream) = TcpStream::connect(format!("{host}:{port}")).await {
         let mut stream = Framed::new(stream, codec);
         while let Some(msg) = rx.recv().await {
-            let msg = msg.pack()?;
-            stream.send(msg).await?;
+            stream.send(msg.pack()?).await?;
+            if let Message::Termination { .. } = msg {
+                return Ok(());
+            }
         }
     } else {
         eprintln!("Can't connect to spectator on {host}:{port}");

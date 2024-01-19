@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use std::collections::HashSet;
+use std::{collections::HashSet, thread::JoinHandle};
 
 use anyhow::Error;
 use argmin::core::{observers::Observe, ArgminFloat, State, KV};
@@ -234,13 +234,14 @@ impl SpectatorBuilder {
     /// ```
     pub fn build(self) -> Spectator {
         let (tx, rx) = tokio::sync::mpsc::channel(self.capacity);
-        std::thread::spawn(move || sender(rx, self.host, self.port));
+        let thread_handle = std::thread::spawn(move || sender(rx, self.host, self.port));
 
         Spectator {
             tx,
             name: self.name,
             sending: true,
             selected: self.selected,
+            thread_handle: Some(thread_handle),
         }
     }
 }
@@ -253,6 +254,7 @@ pub struct Spectator {
     name: String,
     sending: bool,
     selected: HashSet<String>,
+    thread_handle: Option<JoinHandle<Result<(), Error>>>,
 }
 
 impl Spectator {
@@ -376,6 +378,7 @@ where
         Ok(())
     }
 
+    /// Forwards termination reason to spectator
     fn observe_final(&mut self, state: &I) -> Result<(), Error> {
         let message = Message::Termination {
             name: self.name.clone(),
@@ -383,5 +386,16 @@ where
         };
         self.send_msg(message);
         Ok(())
+    }
+}
+
+impl Drop for Spectator {
+    fn drop(&mut self) {
+        self.thread_handle
+            .take()
+            .map(JoinHandle::join)
+            .unwrap()
+            .unwrap()
+            .unwrap();
     }
 }
