@@ -174,7 +174,7 @@
     </span>lower_bound: Vec&lt;f64&gt;,
     <span class="doccomment">/// upper bound
     </span>upper_bound: Vec&lt;f64&gt;,
-    <span class="doccomment">/// Random number generator. We use a `Arc&lt;Mutex&lt;_&gt;&gt;` here because `ArgminOperator` requires
+    <span class="doccomment">/// Random number generator. We use a `Arc&lt;Mutex&lt;_&gt;&gt;` here because `Anneal` requires
     /// `self` to be passed as an immutable reference. This gives us thread safe interior
     /// mutability.
     </span>rng: Arc&lt;Mutex&lt;Xoshiro256PlusPlus&gt;&gt;,

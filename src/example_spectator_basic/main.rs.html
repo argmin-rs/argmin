@@ -120,41 +120,6 @@
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -181,7 +146,7 @@
     </span>lower_bound: Vec&lt;f64&gt;,
     <span class="doccomment">/// upper bound
     </span>upper_bound: Vec&lt;f64&gt;,
-    <span class="doccomment">/// Random number generator. We use a `Arc&lt;Mutex&lt;_&gt;&gt;` here because `ArgminOperator` requires
+    <span class="doccomment">/// Random number generator. We use a `Arc&lt;Mutex&lt;_&gt;&gt;` here because `Anneal` requires
     /// `self` to be passed as an immutable reference. This gives us thread safe interior
     /// mutability.
     </span>rng: Arc&lt;Mutex&lt;Xoshiro256PlusPlus&gt;&gt;,
@@ -205,8 +170,7 @@
     <span class="kw">type </span>Output = f64;
 
     <span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
-        <span class="comment">// std::thread::sleep(std::time::Duration::from_millis(5));
-        </span><span class="prelude-val">Ok</span>(rosenbrock(param, <span class="self">self</span>.a, <span class="self">self</span>.b))
+        <span class="prelude-val">Ok</span>(rosenbrock(param, <span class="self">self</span>.a, <span class="self">self</span>.b))
     }
 }
 
@@ -220,20 +184,11 @@
         <span class="kw">let </span><span class="kw-2">mut </span>param_n = param.clone();
         <span class="kw">let </span><span class="kw-2">mut </span>rng = <span class="self">self</span>.rng.lock().unwrap();
         <span class="kw">let </span>distr = Uniform::from(<span class="number">0</span>..param.len());
-        <span class="comment">// Perform modifications to a degree proportional to the current temperature `temp`.
-        </span><span class="kw">for _ in </span><span class="number">0</span>..(temp.floor() <span class="kw">as </span>u64 + <span class="number">1</span>) {
-            <span class="comment">// Compute random index of the parameter vector using the supplied random number
-            // generator.
-            </span><span class="kw">let </span>idx = rng.sample(distr);
-
-            <span class="comment">// Compute random number in [0.1, 0.1].
-            </span><span class="kw">let </span>val = rng.sample(Uniform::new_inclusive(-<span class="number">0.0001</span>, <span class="number">0.0001</span>));
-
-            <span class="comment">// modify previous parameter value at random position `idx` by `val`
-            </span>param_n[idx] += val;
-
-            <span class="comment">// check if bounds are violated. If yes, project onto bound.
-            </span>param_n[idx] = param_n[idx].clamp(<span class="self">self</span>.lower_bound[idx], <span class="self">self</span>.upper_bound[idx]);
+        <span class="kw">for _ in </span><span class="number">0</span>..(temp.floor() <span class="kw">as </span>u64 + <span class="number">1</span>) {
+            <span class="kw">let </span>idx = rng.sample(distr);
+            <span class="kw">let </span>val = rng.sample(Uniform::new_inclusive(-<span class="number">0.0001</span>, <span class="number">0.0001</span>));
+            param_n[idx] += val;
+            param_n[idx] = param_n[idx].clamp(<span class="self">self</span>.lower_bound[idx], <span class="self">self</span>.upper_bound[idx]);
         }
         <span class="prelude-val">Ok</span>(param_n)
     }
@@ -252,34 +207,13 @@
     </span><span class="kw">let </span>init_param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">0.9</span>; num];
 
     <span class="comment">// Define initial temperature
-    // let temp = 0.0001;
     </span><span class="kw">let </span>temp = <span class="number">1000.0</span>;
 
     <span class="comment">// Set up simulated annealing solver
-    // An alternative random number generator (RNG) can be provided to `new_with_rng`:
-    // SimulatedAnnealing::new_with_rng(temp, Xoshiro256PlusPlus::from_entropy())?
-    </span><span class="kw">let </span>solver = SimulatedAnnealing::new(temp)<span class="question-mark">?
-        </span><span class="comment">// Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
-        </span>.with_temp_func(SATempFunc::Boltzmann);
-    <span class="comment">/////////////////////////
-    // Stopping criteria   //
-    /////////////////////////
-    // Optional: stop if there was no new best solution after 1000 iterations
-    // .with_stall_best(1000)
-    // Optional: stop if there was no accepted solution after 1000 iterations
-    // .with_stall_accepted(1000)
-    /////////////////////////
-    // Reannealing         //
-    /////////////////////////
-    // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
-    // .with_reannealing_fixed(1000)
-    // Optional: Reanneal after no accepted solution has been found for `iter` iterations
-    // .with_reannealing_accepted(1000)
-    // Optional: Start reannealing after no new best solution has been found for 800 iterations
-    // .with_reannealing_best(1000);
+    </span><span class="kw">let </span>solver = SimulatedAnnealing::new(temp)<span class="question-mark">?</span>.with_temp_func(SATempFunc::Boltzmann);
 
-    </span><span class="kw">let </span>spectator = SpectatorBuilder::new()
-        <span class="comment">// .with_name(&quot;something&quot;)
+    <span class="kw">let </span>spectator = SpectatorBuilder::new()
+        <span class="comment">// .with_name(&quot;name_your_run&quot;)
         </span>.select(<span class="kw-2">&amp;</span>[<span class="string">&quot;cost&quot;</span>, <span class="string">&quot;best_cost&quot;</span>, <span class="string">&quot;t&quot;</span>])
         .build();
 
@@ -290,16 +224,12 @@
         .configure(|state| {
             state
                 .param(init_param)
-                <span class="comment">// Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-                </span>.max_iters(<span class="number">1_000_000</span>)
-                <span class="comment">// Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
-                </span>.target_cost(<span class="number">0.0</span>)
+                .max_iters(<span class="number">1_000_000</span>)
+                .target_cost(<span class="number">0.0</span>)
         })
-        .add_observer(spectator, ObserverMode::Always)
+        <span class="comment">// Add spectator observer
+        </span>.add_observer(spectator, ObserverMode::Always)
         .run()<span class="question-mark">?</span>;
-
-    <span class="comment">// Wait a second (lets the logger flush everything before printing again)
-    </span>std::thread::sleep(std::time::Duration::from_secs(<span class="number">1</span>));
 
     <span class="comment">// Print result
     </span><span class="macro">println!</span>(<span class="string">&quot;{res}&quot;</span>);

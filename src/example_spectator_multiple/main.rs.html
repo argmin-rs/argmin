@@ -159,17 +159,6 @@
 <a href="#159" id="159">159</a>
 <a href="#160" id="160">160</a>
 <a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -197,7 +186,7 @@
     </span>lower_bound: Vec&lt;f64&gt;,
     <span class="doccomment">/// upper bound
     </span>upper_bound: Vec&lt;f64&gt;,
-    <span class="doccomment">/// Random number generator. We use a `Arc&lt;Mutex&lt;_&gt;&gt;` here because `ArgminOperator` requires
+    <span class="doccomment">/// Random number generator. We use a `Arc&lt;Mutex&lt;_&gt;&gt;` here because `Anneal` requires
     /// `self` to be passed as an immutable reference. This gives us thread safe interior
     /// mutability.
     </span>rng: Arc&lt;Mutex&lt;Xoshiro256PlusPlus&gt;&gt;,
@@ -221,6 +210,8 @@
     <span class="kw">type </span>Output = f64;
 
     <span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
+        <span class="comment">// Artificially slow down computation of cost function
+        </span>std::thread::sleep(std::time::Duration::from_millis(<span class="number">1</span>));
         <span class="prelude-val">Ok</span>(rosenbrock(param, <span class="self">self</span>.a, <span class="self">self</span>.b))
     }
 }
@@ -235,104 +226,91 @@
         <span class="kw">let </span><span class="kw-2">mut </span>param_n = param.clone();
         <span class="kw">let </span><span class="kw-2">mut </span>rng = <span class="self">self</span>.rng.lock().unwrap();
         <span class="kw">let </span>distr = Uniform::from(<span class="number">0</span>..param.len());
-        <span class="comment">// Perform modifications to a degree proportional to the current temperature `temp`.
-        </span><span class="kw">for _ in </span><span class="number">0</span>..(temp.floor() <span class="kw">as </span>u64 + <span class="number">1</span>) {
-            <span class="comment">// Compute random index of the parameter vector using the supplied random number
-            // generator.
-            </span><span class="kw">let </span>idx = rng.sample(distr);
-
-            <span class="comment">// Compute random number in [0.1, 0.1].
-            </span><span class="kw">let </span>val = rng.sample(Uniform::new_inclusive(-<span class="number">0.1</span>, <span class="number">0.1</span>));
-
-            <span class="comment">// modify previous parameter value at random position `idx` by `val`
-            </span>param_n[idx] += val;
-
-            <span class="comment">// check if bounds are violated. If yes, project onto bound.
-            </span>param_n[idx] = param_n[idx].clamp(<span class="self">self</span>.lower_bound[idx], <span class="self">self</span>.upper_bound[idx]);
+        <span class="kw">for _ in </span><span class="number">0</span>..(temp.floor() <span class="kw">as </span>u64 + <span class="number">1</span>) {
+            <span class="kw">let </span>idx = rng.sample(distr);
+            <span class="kw">let </span>val = rng.sample(Uniform::new_inclusive(-<span class="number">0.1</span>, <span class="number">0.1</span>));
+            param_n[idx] += val;
+            param_n[idx] = param_n[idx].clamp(<span class="self">self</span>.lower_bound[idx], <span class="self">self</span>.upper_bound[idx]);
         }
         <span class="prelude-val">Ok</span>(param_n)
     }
 }
 
 <span class="kw">fn </span>run() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
-    <span class="comment">// Define bounds
-    // let lower_bound: Vec&lt;f64&gt; = vec![-50.0, -50.0];
-    // let upper_bound: Vec&lt;f64&gt; = vec![50.0, 50.0];
-    </span><span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">50.0</span>; <span class="number">20</span>];
-    <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">50.0</span>; <span class="number">20</span>];
+    std::thread::scope(<span class="kw">move </span>|s| {
+        s.spawn(<span class="kw">move </span>|| {
+            <span class="comment">/////////////////////////
+            // Run solver 1        //
+            /////////////////////////
 
-    <span class="comment">// Define cost function
-    </span><span class="kw">let </span>operator = Rosenbrock::new(<span class="number">1.0</span>, <span class="number">100.0</span>, lower_bound, upper_bound);
+            </span><span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">50.0</span>; <span class="number">5</span>];
+            <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">50.0</span>; <span class="number">5</span>];
 
-    <span class="comment">// Define initial parameter vector
-    </span><span class="kw">let </span>init_param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">3.0</span>; <span class="number">20</span>];
+            <span class="kw">let </span>cost = Rosenbrock::new(<span class="number">1.0</span>, <span class="number">100.0</span>, lower_bound, upper_bound);
 
-    <span class="comment">// Define initial temperature
-    </span><span class="kw">let </span>temp = <span class="number">1500.0</span>;
+            <span class="comment">// Define initial parameter vector
+            </span><span class="kw">let </span>init_param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">3.0</span>; <span class="number">5</span>];
 
-    <span class="comment">// Set up simulated annealing solver
-    // An alternative random number generator (RNG) can be provided to `new_with_rng`:
-    // SimulatedAnnealing::new_with_rng(temp, Xoshiro256PlusPlus::from_entropy())?
-    </span><span class="kw">let </span>solver = SimulatedAnnealing::new(temp)<span class="question-mark">?
-        </span><span class="comment">// Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
-        </span>.with_temp_func(SATempFunc::Boltzmann)
-        <span class="comment">/////////////////////////
-        // Stopping criteria   //
-        /////////////////////////
-        // Optional: stop if there was no new best solution after 1000 iterations
-        </span>.with_stall_best(<span class="number">1000</span>)
-        <span class="comment">// Optional: stop if there was no accepted solution after 1000 iterations
-        </span>.with_stall_accepted(<span class="number">1000</span>)
-        <span class="comment">/////////////////////////
-        // Reannealing         //
-        /////////////////////////
-        // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
-        </span>.with_reannealing_fixed(<span class="number">1000</span>)
-        <span class="comment">// Optional: Reanneal after no accepted solution has been found for `iter` iterations
-        </span>.with_reannealing_accepted(<span class="number">500</span>)
-        <span class="comment">// Optional: Start reannealing after no new best solution has been found for 800 iterations
-        </span>.with_reannealing_best(<span class="number">800</span>);
+            <span class="comment">// Define initial temperature
+            </span><span class="kw">let </span>temp = <span class="number">20.0</span>;
 
-    <span class="comment">/////////////////////////
-    // Run solver          //
-    /////////////////////////
-    </span><span class="kw">let </span>observer = SpectatorBuilder::new().build();
-    <span class="kw">let </span>res = Executor::new(operator.clone(), solver.clone())
-        .configure(|state| {
-            state
-                .param(init_param.clone())
-                <span class="comment">// Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-                </span>.max_iters(<span class="number">10_000</span>)
-                <span class="comment">// Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
-                </span>.target_cost(<span class="number">0.0</span>)
-        })
-        .add_observer(observer, ObserverMode::Always)
-        .run()<span class="question-mark">?</span>;
+            <span class="comment">// Set up simulated annealing solver
+            </span><span class="kw">let </span>solver = SimulatedAnnealing::new(temp)
+                .unwrap()
+                .with_temp_func(SATempFunc::Boltzmann);
 
-    <span class="comment">// Wait a second (lets the logger flush everything before printing again)
-    </span>std::thread::sleep(std::time::Duration::from_secs(<span class="number">1</span>));
+            <span class="kw">let </span>observer = SpectatorBuilder::new().build();
+            <span class="kw">let </span>res = Executor::new(cost, solver)
+                .configure(|state| {
+                    state
+                        .param(init_param.clone())
+                        .max_iters(<span class="number">100_000</span>)
+                        .target_cost(<span class="number">0.0</span>)
+                })
+                .add_observer(observer, ObserverMode::Always)
+                .run()
+                .unwrap();
 
-    <span class="comment">// Print result
-    </span><span class="macro">println!</span>(<span class="string">&quot;{res}&quot;</span>);
+            <span class="comment">// Print result
+            </span><span class="macro">println!</span>(<span class="string">&quot;{res}&quot;</span>);
+        });
 
-    <span class="kw">let </span>observer = SpectatorBuilder::new().build();
-    <span class="kw">let </span>res = Executor::new(operator, solver)
-        .configure(|state| {
-            state
-                .param(init_param)
-                <span class="comment">// Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-                </span>.max_iters(<span class="number">10_000</span>)
-                <span class="comment">// Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
-                </span>.target_cost(<span class="number">0.0</span>)
-        })
-        .add_observer(observer, ObserverMode::Always)
-        .run()<span class="question-mark">?</span>;
+        s.spawn(|| {
+            <span class="comment">/////////////////////////
+            // Run solver 2        //
+            /////////////////////////
+            </span><span class="kw">let </span>lower_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[-<span class="number">50.0</span>; <span class="number">5</span>];
+            <span class="kw">let </span>upper_bound: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">50.0</span>; <span class="number">5</span>];
 
-    <span class="comment">// Wait a second (lets the logger flush everything before printing again)
-    </span>std::thread::sleep(std::time::Duration::from_secs(<span class="number">1</span>));
+            <span class="kw">let </span>cost = Rosenbrock::new(<span class="number">1.0</span>, <span class="number">100.0</span>, lower_bound, upper_bound);
 
-    <span class="comment">// Print result
-    </span><span class="macro">println!</span>(<span class="string">&quot;{res}&quot;</span>);
+            <span class="comment">// Define initial parameter vector
+            </span><span class="kw">let </span>init_param: Vec&lt;f64&gt; = <span class="macro">vec!</span>[<span class="number">3.0</span>; <span class="number">5</span>];
+
+            <span class="comment">// Define initial temperature
+            </span><span class="kw">let </span>temp = <span class="number">2.0</span>;
+
+            <span class="comment">// Set up simulated annealing solver
+            </span><span class="kw">let </span>solver = SimulatedAnnealing::new(temp)
+                .unwrap()
+                .with_temp_func(SATempFunc::Boltzmann);
+
+            <span class="kw">let </span>observer = SpectatorBuilder::new().build();
+            <span class="kw">let </span>res = Executor::new(cost, solver)
+                .configure(|state| {
+                    state
+                        .param(init_param.clone())
+                        .max_iters(<span class="number">100_000</span>)
+                        .target_cost(<span class="number">0.0</span>)
+                })
+                .add_observer(observer, ObserverMode::Always)
+                .run()
+                .unwrap();
+
+            <span class="comment">// Print result
+            </span><span class="macro">println!</span>(<span class="string">&quot;{res}&quot;</span>);
+        });
+    });
     <span class="prelude-val">Ok</span>(())
 }
 
