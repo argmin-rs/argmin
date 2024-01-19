@@ -31,6 +31,8 @@ var srcIndex = JSON.parse('{\
 "example_particleswarm":["",[],["main.rs"]],\
 "example_particlswarm_nalgebra":["",[],["main.rs"]],\
 "example_simulatedannealing":["",[],["main.rs"]],\
+"example_spectator_basic":["",[],["main.rs"]],\
+"example_spectator_multiple":["",[],["main.rs"]],\
 "example_sr1":["",[],["main.rs"]],\
 "example_sr1_trustregion":["",[],["main.rs"]],\
 "example_steepestdescent":["",[],["main.rs"]],\
