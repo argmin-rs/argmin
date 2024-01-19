@@ -25,7 +25,7 @@ struct Rosenbrock {
     lower_bound: Vec<f64>,
     /// upper bound
     upper_bound: Vec<f64>,
-    /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
+    /// Random number generator. We use a `Arc<Mutex<_>>` here because `Anneal` requires
     /// `self` to be passed as an immutable reference. This gives us thread safe interior
     /// mutability.
     rng: Arc<Mutex<Xoshiro256PlusPlus>>,
@@ -49,6 +49,8 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+        // Artificially slow down computation of cost function
+        std::thread::sleep(std::time::Duration::from_millis(1));
         Ok(rosenbrock(param, self.a, self.b))
     }
 }
@@ -63,19 +65,10 @@ impl Anneal for Rosenbrock {
         let mut param_n = param.clone();
         let mut rng = self.rng.lock().unwrap();
         let distr = Uniform::from(0..param.len());
-        // Perform modifications to a degree proportional to the current temperature `temp`.
         for _ in 0..(temp.floor() as u64 + 1) {
-            // Compute random index of the parameter vector using the supplied random number
-            // generator.
             let idx = rng.sample(distr);
-
-            // Compute random number in [0.1, 0.1].
             let val = rng.sample(Uniform::new_inclusive(-0.1, 0.1));
-
-            // modify previous parameter value at random position `idx` by `val`
             param_n[idx] += val;
-
-            // check if bounds are violated. If yes, project onto bound.
             param_n[idx] = param_n[idx].clamp(self.lower_bound[idx], self.upper_bound[idx]);
         }
         Ok(param_n)
@@ -83,84 +76,80 @@ impl Anneal for Rosenbrock {
 }
 
 fn run() -> Result<(), Error> {
-    // Define bounds
-    // let lower_bound: Vec<f64> = vec![-50.0, -50.0];
-    // let upper_bound: Vec<f64> = vec![50.0, 50.0];
-    let lower_bound: Vec<f64> = vec![-50.0; 20];
-    let upper_bound: Vec<f64> = vec![50.0; 20];
+    std::thread::scope(move |s| {
+        s.spawn(move || {
+            /////////////////////////
+            // Run solver 1        //
+            /////////////////////////
 
-    // Define cost function
-    let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
+            let lower_bound: Vec<f64> = vec![-50.0; 5];
+            let upper_bound: Vec<f64> = vec![50.0; 5];
 
-    // Define initial parameter vector
-    let init_param: Vec<f64> = vec![3.0; 20];
+            let cost = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
 
-    // Define initial temperature
-    let temp = 1500.0;
+            // Define initial parameter vector
+            let init_param: Vec<f64> = vec![3.0; 5];
 
-    // Set up simulated annealing solver
-    // An alternative random number generator (RNG) can be provided to `new_with_rng`:
-    // SimulatedAnnealing::new_with_rng(temp, Xoshiro256PlusPlus::from_entropy())?
-    let solver = SimulatedAnnealing::new(temp)?
-        // Optional: Define temperature function (defaults to `SATempFunc::TemperatureFast`)
-        .with_temp_func(SATempFunc::Boltzmann)
-        /////////////////////////
-        // Stopping criteria   //
-        /////////////////////////
-        // Optional: stop if there was no new best solution after 1000 iterations
-        .with_stall_best(1000)
-        // Optional: stop if there was no accepted solution after 1000 iterations
-        .with_stall_accepted(1000)
-        /////////////////////////
-        // Reannealing         //
-        /////////////////////////
-        // Optional: Reanneal after 1000 iterations (resets temperature to initial temperature)
-        .with_reannealing_fixed(1000)
-        // Optional: Reanneal after no accepted solution has been found for `iter` iterations
-        .with_reannealing_accepted(500)
-        // Optional: Start reannealing after no new best solution has been found for 800 iterations
-        .with_reannealing_best(800);
+            // Define initial temperature
+            let temp = 20.0;
 
-    /////////////////////////
-    // Run solver          //
-    /////////////////////////
-    let observer = SpectatorBuilder::new().build();
-    let res = Executor::new(operator.clone(), solver.clone())
-        .configure(|state| {
-            state
-                .param(init_param.clone())
-                // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-                .max_iters(10_000)
-                // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
-                .target_cost(0.0)
-        })
-        .add_observer(observer, ObserverMode::Always)
-        .run()?;
+            // Set up simulated annealing solver
+            let solver = SimulatedAnnealing::new(temp)
+                .unwrap()
+                .with_temp_func(SATempFunc::Boltzmann);
 
-    // Wait a second (lets the logger flush everything before printing again)
-    std::thread::sleep(std::time::Duration::from_secs(1));
+            let observer = SpectatorBuilder::new().build();
+            let res = Executor::new(cost, solver)
+                .configure(|state| {
+                    state
+                        .param(init_param.clone())
+                        .max_iters(100_000)
+                        .target_cost(0.0)
+                })
+                .add_observer(observer, ObserverMode::Always)
+                .run()
+                .unwrap();
 
-    // Print result
-    println!("{res}");
+            // Print result
+            println!("{res}");
+        });
 
-    let observer = SpectatorBuilder::new().build();
-    let res = Executor::new(operator, solver)
-        .configure(|state| {
-            state
-                .param(init_param)
-                // Optional: Set maximum number of iterations (defaults to `std::u64::MAX`)
-                .max_iters(10_000)
-                // Optional: Set target cost function value (defaults to `std::f64::NEG_INFINITY`)
-                .target_cost(0.0)
-        })
-        .add_observer(observer, ObserverMode::Always)
-        .run()?;
+        s.spawn(|| {
+            /////////////////////////
+            // Run solver 2        //
+            /////////////////////////
+            let lower_bound: Vec<f64> = vec![-50.0; 5];
+            let upper_bound: Vec<f64> = vec![50.0; 5];
 
-    // Wait a second (lets the logger flush everything before printing again)
-    std::thread::sleep(std::time::Duration::from_secs(1));
+            let cost = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
 
-    // Print result
-    println!("{res}");
+            // Define initial parameter vector
+            let init_param: Vec<f64> = vec![3.0; 5];
+
+            // Define initial temperature
+            let temp = 2.0;
+
+            // Set up simulated annealing solver
+            let solver = SimulatedAnnealing::new(temp)
+                .unwrap()
+                .with_temp_func(SATempFunc::Boltzmann);
+
+            let observer = SpectatorBuilder::new().build();
+            let res = Executor::new(cost, solver)
+                .configure(|state| {
+                    state
+                        .param(init_param.clone())
+                        .max_iters(100_000)
+                        .target_cost(0.0)
+                })
+                .add_observer(observer, ObserverMode::Always)
+                .run()
+                .unwrap();
+
+            // Print result
+            println!("{res}");
+        });
+    });
     Ok(())
 }
 

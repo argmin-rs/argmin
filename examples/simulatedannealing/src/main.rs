@@ -24,7 +24,7 @@ struct Rosenbrock {
     lower_bound: Vec<f64>,
     /// upper bound
     upper_bound: Vec<f64>,
-    /// Random number generator. We use a `Arc<Mutex<_>>` here because `ArgminOperator` requires
+    /// Random number generator. We use a `Arc<Mutex<_>>` here because `Anneal` requires
     /// `self` to be passed as an immutable reference. This gives us thread safe interior
     /// mutability.
     rng: Arc<Mutex<Xoshiro256PlusPlus>>,
