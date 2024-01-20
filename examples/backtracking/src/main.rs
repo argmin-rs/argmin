@@ -70,9 +70,6 @@ fn run() -> Result<(), Error> {
         })
         .run()?;
 
-    // Wait a second (lets the logger flush everything before printing again)
-    std::thread::sleep(std::time::Duration::from_secs(1));
-
     // Print result
     println!("{res}");
     Ok(())

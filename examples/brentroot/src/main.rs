@@ -41,8 +41,5 @@ fn main() {
         .run()
         .unwrap();
 
-    // Wait a second (lets the logger flush everything before printing again)
-    std::thread::sleep(std::time::Duration::from_secs(1));
-
     println!("Result of brent:\n{res}");
 }

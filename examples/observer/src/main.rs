@@ -241,9 +241,6 @@ fn run() -> Result<(), Error> {
 
         let res = executor.run()?;
 
-        // Wait a second (lets the logger flush everything before printing again)
-        std::thread::sleep(std::time::Duration::from_secs(1));
-
         // Print Result
         println!("{res}");
     }
