@@ -62,9 +62,6 @@ fn run() -> Result<(), Error> {
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 
-    // Wait a second (lets the logger flush everything first)
-    std::thread::sleep(std::time::Duration::from_secs(1));
-
     // print result
     println!("{res}");
     Ok(())
