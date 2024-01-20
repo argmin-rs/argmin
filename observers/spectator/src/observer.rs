@@ -8,7 +8,9 @@
 use std::{collections::HashSet, thread::JoinHandle};
 
 use anyhow::Error;
-use argmin::core::{observers::Observe, ArgminFloat, State, KV};
+use argmin::core::{
+    observers::Observe, ArgminFloat, State, TerminationReason, TerminationStatus, KV,
+};
 use spectator::{Message, DEFAULT_PORT};
 use time::Duration;
 use uuid::Uuid;
@@ -391,6 +393,15 @@ where
 
 impl Drop for Spectator {
     fn drop(&mut self) {
+        // This allows the observer to finish sending message to spectator, while making sure that
+        // it doesn't get stuck when the solver terminates unexpectedly.
+        let message = Message::Termination {
+            name: self.name.clone(),
+            termination_status: TerminationStatus::Terminated(TerminationReason::SolverExit(
+                "Aborted".into(),
+            )),
+        };
+        self.send_msg(message);
         self.thread_handle
             .take()
             .map(JoinHandle::join)
