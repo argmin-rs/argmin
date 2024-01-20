@@ -75,9 +75,6 @@
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -143,9 +140,6 @@
         })
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()<span class="question-mark">?</span>;
-
-    <span class="comment">// Wait a second (lets the observer flush everything before printing again)
-    </span>std::thread::sleep(std::time::Duration::from_secs(<span class="number">1</span>));
 
     <span class="comment">// Print result
     </span><span class="macro">println!</span>(<span class="string">&quot;{res}&quot;</span>);

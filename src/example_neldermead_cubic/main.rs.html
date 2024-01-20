@@ -123,9 +123,6 @@
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -204,9 +201,6 @@
             .add_observer(SlogLogger::term(), ObserverMode::Always)
             .run()<span class="question-mark">?</span>;
 
-        <span class="comment">// Wait a second (lets the logger flush everything before printing again)
-        </span>std::thread::sleep(std::time::Duration::from_secs(<span class="number">1</span>));
-
         <span class="comment">// Print result
         </span><span class="macro">println!</span>(
             <span class="string">&quot;Polynomial root: {}&quot;</span>,
@@ -221,7 +215,7 @@
             .configure(|state| state.max_iters(<span class="number">100</span>))
             .add_observer(SlogLogger::term(), ObserverMode::Always)
             .run()<span class="question-mark">?</span>;
-        std::thread::sleep(std::time::Duration::from_secs(<span class="number">1</span>));
+
         <span class="macro">println!</span>(<span class="string">&quot;{res}&quot;</span>);
         <span class="macro">println!</span>(
             <span class="string">&quot;Polynomial root: {}&quot;</span>,
@@ -237,7 +231,7 @@
             .configure(|state| state.max_iters(<span class="number">100</span>))
             .add_observer(SlogLogger::term(), ObserverMode::Always)
             .run()<span class="question-mark">?</span>;
-        std::thread::sleep(std::time::Duration::from_secs(<span class="number">1</span>));
+
         <span class="macro">println!</span>(<span class="string">&quot;{res}&quot;</span>);
         <span class="macro">println!</span>(
             <span class="string">&quot;Polynomial root: {}&quot;</span>,
