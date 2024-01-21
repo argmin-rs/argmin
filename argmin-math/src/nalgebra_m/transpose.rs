@@ -32,6 +32,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use nalgebra::{Matrix2, Matrix2x3, Matrix3x2, RowVector2, Vector2};
     use paste::item;
 
@@ -44,7 +45,7 @@ mod tests {
                     let target = RowVector2::new(1 as $t, 4 as $t);
                     let res = <Vector2<$t> as ArgminTranspose<RowVector2<$t>>>::t(a);
                     for i in 0..2 {
-                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -63,7 +64,7 @@ mod tests {
                     let res = <Matrix2<$t> as ArgminTranspose<Matrix2<$t>>>::t(a);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((target[(i, j)] - res[(i, j)]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(target[(i, j)] as f64, res[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -84,7 +85,7 @@ mod tests {
                     let res = <Matrix3x2<$t> as ArgminTranspose<Matrix2x3<$t>>>::t(a);
                     for i in 0..2 {
                         for j in 0..3 {
-                            assert!(((target[(i, j)] - res[(i, j)]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(target[(i, j)] as f64, res[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

@@ -28,6 +28,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use nalgebra::{Matrix2x3, Vector3};
     use paste::item;
 
@@ -40,8 +41,7 @@ mod tests {
                     let b = Vector3::new(1 as $t, -1 as $t, -1 as $t);
                     let res = <Vector3<$t> as ArgminSignum>::signum(a);
                     for i in 0..3 {
-                        let diff = (b[i] as f64 - res[i] as f64).abs();
-                        assert!(diff  < std::f64::EPSILON);
+                        assert_relative_eq!(b[i], res[i], epsilon = std::$t::EPSILON);
                     }
                 }
             }
@@ -60,7 +60,7 @@ mod tests {
                     let res = b.signum();
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert!(((target[(j, i)] - res[(j, i)]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(target[(j, i)], res[(j, i)], epsilon = std::$t::EPSILON);
                         }
                     }
                 }

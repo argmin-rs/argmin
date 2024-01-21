@@ -36,6 +36,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use nalgebra::{Matrix2x3, Matrix3};
     use paste::item;
 
@@ -52,7 +53,7 @@ mod tests {
                     );
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[(i, j)] - e[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, e[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -74,7 +75,7 @@ mod tests {
                     );
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[(i, j)] - e[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, e[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

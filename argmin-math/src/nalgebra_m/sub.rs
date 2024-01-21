@@ -59,6 +59,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use nalgebra::{Matrix2x3, Vector3};
     use paste::item;
 
@@ -72,7 +73,7 @@ mod tests {
                     let target = Vector3::new(35 as $t, 38 as $t, 42 as $t);
                     let res = <Vector3<$t> as ArgminSub<$t, Vector3<$t>>>::sub(&a, &b);
                     for i in 0..3 {
-                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -85,7 +86,7 @@ mod tests {
                     let target = Vector3::new(33 as $t, 30 as $t, 26 as $t);
                     let res = <$t as ArgminSub<Vector3<$t>, Vector3<$t>>>::sub(&b, &a);
                     for i in 0..3 {
-                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -98,7 +99,7 @@ mod tests {
                     let target =Vector3::new(40 as $t, 34 as $t, 26 as $t);
                     let res = <Vector3<$t> as ArgminSub<Vector3<$t>, Vector3<$t>>>::sub(&a, &b);
                     for i in 0..3 {
-                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -121,7 +122,7 @@ mod tests {
                     let res = <Matrix2x3<$t> as ArgminSub<Matrix2x3<$t>, Matrix2x3<$t>>>::sub(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert!(((target[(j, i)] - res[(j, i)]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -142,7 +143,7 @@ mod tests {
                     let res = <Matrix2x3<$t> as ArgminSub<$t, Matrix2x3<$t>>>::sub(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert!(((target[(j, i)] - res[(j, i)]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
