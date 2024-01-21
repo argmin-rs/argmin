@@ -716,6 +716,77 @@
 <a href="#716" id="716">716</a>
 <a href="#717" id="717">717</a>
 <a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -744,6 +815,8 @@
     </span>observers: Observers&lt;I&gt;,
     <span class="doccomment">/// Checkpoint
     </span>checkpoint: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Checkpoint&lt;S, I&gt;&gt;&gt;,
+    <span class="doccomment">/// Timeout
+    </span>timeout: <span class="prelude-ty">Option</span>&lt;std::time::Duration&gt;,
     <span class="doccomment">/// Indicates whether Ctrl-C functionality should be active or not
     </span>ctrlc: bool,
     <span class="doccomment">/// Indicates whether to time execution or not
@@ -784,6 +857,7 @@
             state,
             observers: Observers::new(),
             checkpoint: <span class="prelude-val">None</span>,
+            timeout: <span class="prelude-val">None</span>,
             ctrlc: <span class="bool-val">true</span>,
             timer: <span class="bool-val">true</span>,
         }
@@ -968,10 +1042,18 @@
             }
 
             <span class="kw">if </span><span class="self">self</span>.timer {
-                total_time.map(|total_time| state.time(<span class="prelude-val">Some</span>(total_time.elapsed())));
+                <span class="comment">// Increase accumulated total_time
+                </span>total_time.map(|total_time| state.time(<span class="prelude-val">Some</span>(total_time.elapsed())));
+
+                <span class="comment">// If a timeout is set, check if timeout is reached
+                </span><span class="kw">if let </span>(<span class="prelude-val">Some</span>(timeout), <span class="prelude-val">Some</span>(total_time)) = (<span class="self">self</span>.timeout, total_time) {
+                    <span class="kw">if </span>total_time.elapsed() &gt; timeout {
+                        state = state.terminate_with(TerminationReason::Timeout);
+                    }
+                }
             }
 
-            <span class="comment">// Check if termination occurred inside next_iter()
+            <span class="comment">// Check if termination occurred in the meantime
             </span><span class="kw">if </span>state.terminated() {
                 <span class="kw">break</span>;
             }
@@ -1092,6 +1174,8 @@
 
     <span class="doccomment">/// Enables or disables timing of individual iterations (default: enabled).
     ///
+    /// Setting this to false will silently be ignored in case a timeout is set.
+    ///
     /// # Example
     ///
     /// ```
@@ -1109,7 +1193,38 @@
     /// ```
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>timer(<span class="kw-2">mut </span><span class="self">self</span>, timer: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.timer = timer;
+        <span class="kw">if </span><span class="self">self</span>.timeout.is_none() {
+            <span class="self">self</span>.timer = timer;
+        }
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets a timeout for the run.
+    ///
+    /// The optimization run is stopped once the timeout is exceeded. Note that the check is
+    /// performed after each iteration, therefore the actual runtime can exceed the the set
+    /// duration.
+    /// This also enables time measurements.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Error, Executor};
+    /// # use argmin::core::test_utils::{TestSolver, TestProblem};
+    /// #
+    /// # fn main() -&gt; Result&lt;(), Error&gt; {
+    /// # let solver = TestSolver::new();
+    /// # let problem = TestProblem::new();
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let executor = Executor::new(problem, solver).timeout(std::time::Duration::from_secs(30));
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>timeout(<span class="kw-2">mut </span><span class="self">self</span>, timeout: std::time::Duration) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.timer = <span class="bool-val">true</span>;
+        <span class="self">self</span>.timeout = <span class="prelude-val">Some</span>(timeout);
         <span class="self">self
     </span>}
 }
@@ -1432,6 +1547,33 @@
 
         <span class="comment">// Delete old checkpointing file
         </span><span class="kw">let _ </span>= std::fs::remove_file(<span class="string">&quot;.checkpoints/init_test.arg&quot;</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_timeout() {
+        <span class="kw">let </span>solver = TestSolver::new();
+        <span class="kw">let </span>problem = TestProblem::new();
+        <span class="kw">let </span>timeout = std::time::Duration::from_secs(<span class="number">2</span>);
+
+        <span class="kw">let </span>executor = Executor::new(problem, solver);
+        <span class="macro">assert!</span>(executor.timer);
+        <span class="macro">assert!</span>(executor.timeout.is_none());
+
+        <span class="kw">let </span>executor = Executor::new(problem, solver).timer(<span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(!executor.timer);
+        <span class="macro">assert!</span>(executor.timeout.is_none());
+
+        <span class="kw">let </span>executor = Executor::new(problem, solver).timeout(timeout);
+        <span class="macro">assert!</span>(executor.timer);
+        <span class="macro">assert_eq!</span>(executor.timeout, <span class="prelude-val">Some</span>(timeout));
+
+        <span class="kw">let </span>executor = Executor::new(problem, solver).timeout(timeout).timer(<span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(executor.timer);
+        <span class="macro">assert_eq!</span>(executor.timeout, <span class="prelude-val">Some</span>(timeout));
+
+        <span class="kw">let </span>executor = Executor::new(problem, solver).timer(<span class="bool-val">false</span>).timeout(timeout);
+        <span class="macro">assert!</span>(executor.timer);
+        <span class="macro">assert_eq!</span>(executor.timeout, <span class="prelude-val">Some</span>(timeout));
     }
 }
 </code></pre></div></section></main></body></html>

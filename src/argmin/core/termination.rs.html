@@ -121,6 +121,14 @@
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
 <a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -154,6 +162,7 @@
     /// assert!(TerminationStatus::Terminated(TerminationReason::TargetCostReached).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::SolverConverged).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::KeyboardInterrupt).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::Timeout).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::SolverExit(&quot;Exit reason&quot;.to_string())).terminated());
     /// ```
     </span><span class="kw">pub fn </span>terminated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -182,6 +191,8 @@
     </span>KeyboardInterrupt,
     <span class="doccomment">/// Converged
     </span>SolverConverged,
+    <span class="doccomment">/// Timeout reached
+    </span>Timeout,
     <span class="doccomment">/// Solver exit with given reason
     </span>SolverExit(String),
 }
@@ -211,6 +222,10 @@
     ///     &quot;Solver converged&quot;
     /// );
     /// assert_eq!(
+    ///     TerminationReason::Timeout.text(),
+    ///     &quot;Timeout reached&quot;
+    /// );
+    /// assert_eq!(
     ///     TerminationReason::SolverExit(&quot;Aborted&quot;.to_string()).text(),
     ///     &quot;Aborted&quot;
     /// );
@@ -221,6 +236,7 @@
             TerminationReason::TargetCostReached =&gt; <span class="string">&quot;Target cost value reached&quot;</span>,
             TerminationReason::KeyboardInterrupt =&gt; <span class="string">&quot;Keyboard interrupt&quot;</span>,
             TerminationReason::SolverConverged =&gt; <span class="string">&quot;Solver converged&quot;</span>,
+            TerminationReason::Timeout =&gt; <span class="string">&quot;Timeout reached&quot;</span>,
             TerminationReason::SolverExit(reason) =&gt; reason.as_ref(),
         }
     }

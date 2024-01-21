@@ -37,6 +37,7 @@ var srcIndex = JSON.parse('{\
 "example_sr1_trustregion":["",[],["main.rs"]],\
 "example_steepestdescent":["",[],["main.rs"]],\
 "example_steepestdescent_manifold":["",[],["main.rs"]],\
+"example_timeout":["",[],["main.rs"]],\
 "example_trustregion":["",[],["main.rs"]],\
 "spectator":["",[],["lib.rs","message.rs"]]\
 }');
