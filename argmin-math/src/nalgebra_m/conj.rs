@@ -28,6 +28,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use nalgebra::Vector3;
     use num_complex::Complex;
     use paste::item;
@@ -49,9 +50,8 @@ mod tests {
                     );
                     let res = <Vector3<Complex<$t>> as ArgminConj>::conj(&a);
                     for i in 0..3 {
-                        let tmp = b[i] - res[i];
-                        let norm = ((tmp.re * tmp.re + tmp.im * tmp.im) as f64).sqrt();
-                        assert!(norm  < std::f64::EPSILON);
+                        assert_relative_eq!(b[i].re, res[i].re, epsilon = std::$t::EPSILON);
+                        assert_relative_eq!(b[i].im, res[i].im, epsilon = std::$t::EPSILON);
                     }
                 }
             }
@@ -63,8 +63,7 @@ mod tests {
                     let b = Vector3::new(1 as $t, 4 as $t, 8 as $t);
                     let res = <Vector3<$t> as ArgminConj>::conj(&a);
                     for i in 0..3 {
-                        let diff = (b[i] as f64 - res[i] as f64).abs();
-                        assert!(diff  < std::f64::EPSILON);
+                        assert_relative_eq!(b[i], res[i], epsilon = std::$t::EPSILON);
                     }
                 }
             }

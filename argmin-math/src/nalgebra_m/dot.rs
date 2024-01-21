@@ -88,6 +88,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use nalgebra::{Matrix3, RowVector3, Vector3};
     use paste::item;
 
@@ -99,7 +100,7 @@ mod tests {
                     let a = Vector3::new(1 as $t, 2 as $t, 3 as $t);
                     let b = Vector3::new(4 as $t, 5 as $t, 6 as $t);
                     let res: $t = <Vector3<$t> as ArgminDot<Vector3<$t>, $t>>::dot(&a, &b);
-                    assert!((((res - 32 as $t) as f64).abs()) < std::f64::EPSILON);
+                    assert_relative_eq!(res as f64, 32 as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -112,7 +113,7 @@ mod tests {
                         <Vector3<$t> as ArgminDot<$t, Vector3<$t>>>::dot(&a, &b);
                     let res = Vector3::new(2 as $t, 4 as $t, 6 as $t);
                     for i in 0..3 {
-                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -126,7 +127,7 @@ mod tests {
                         <$t as ArgminDot<Vector3<$t>, Vector3<$t>>>::dot(&b, &a);
                     let res = Vector3::new(2 as $t, 4 as $t, 6 as $t);
                     for i in 0..3 {
-                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -145,7 +146,7 @@ mod tests {
                         <Vector3<$t> as ArgminDot<RowVector3<$t>, Matrix3<$t>>>::dot(&a, &b);
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -164,7 +165,7 @@ mod tests {
                     let product: Vector3<$t> =
                         <Matrix3<$t> as ArgminDot<Vector3<$t>, Vector3<$t>>>::dot(&a, &b);
                     for i in 0..3 {
-                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -191,7 +192,7 @@ mod tests {
                         <Matrix3<$t> as ArgminDot<Matrix3<$t>, Matrix3<$t>>>::dot(&a, &b);
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -214,7 +215,7 @@ mod tests {
                         <Matrix3<$t> as ArgminDot<$t, Matrix3<$t>>>::dot(&a, &(2 as $t));
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -237,7 +238,7 @@ mod tests {
                         <$t as ArgminDot<Matrix3<$t>, Matrix3<$t>>>::dot(&(2 as $t), &a);
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
