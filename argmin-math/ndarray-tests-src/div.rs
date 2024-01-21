@@ -5,16 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-
-
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use approx::assert_relative_eq;
     use argmin_math::ArgminDiv;
-    use ndarray::{Array1, Array2};
-    
     use ndarray::array;
+    use ndarray::{Array1, Array2};
     use paste::item;
 
     macro_rules! make_test {
@@ -27,7 +25,7 @@ mod tests {
                     let target = array![2 as $t, 8 as $t, 4 as $t];
                     let res = <Array1<$t> as ArgminDiv<$t, Array1<$t>>>::div(&a, &b);
                     for i in 0..3 {
-                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -40,7 +38,7 @@ mod tests {
                     let target = array![16 as $t, 8 as $t, 4 as $t];
                     let res = <$t as ArgminDiv<Array1<$t>, Array1<$t>>>::div(&b, &a);
                     for i in 0..3 {
-                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -53,7 +51,7 @@ mod tests {
                     let target = array![2 as $t, 3 as $t, 2 as $t];
                     let res = <Array1<$t> as ArgminDiv<Array1<$t>, Array1<$t>>>::div(&a, &b);
                     for i in 0..3 {
-                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -106,7 +104,7 @@ mod tests {
                     let res = <Array2<$t> as ArgminDiv<Array2<$t>, Array2<$t>>>::div(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                        assert!(((target[(j, i)] - res[(j, i)]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -152,5 +150,4 @@ mod tests {
     make_test!(u64);
     make_test!(f32);
     make_test!(f64);
-
 }

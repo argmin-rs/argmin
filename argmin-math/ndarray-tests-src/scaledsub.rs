@@ -9,6 +9,7 @@
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use approx::assert_relative_eq;
     use argmin_math::ArgminScaledSub;
     use ndarray::{array, Array1, Array2};
     use paste::item;
@@ -24,7 +25,7 @@ mod tests {
                     let res = <Array1<$t> as ArgminScaledSub<Array1<$t>, $t, Array1<$t>>>::scaled_sub(&a, &b, &c);
                     let target = array![2 as $t, 10 as $t, 18 as $t];
                     for i in 0..3 {
-                        assert!((((res[i] - target[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, target[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -60,7 +61,7 @@ mod tests {
                     let res = <Array1<$t> as ArgminScaledSub<Array1<$t>, Array1<$t>, Array1<$t>>>::scaled_sub(&a, &b, &c);
                     let target = array![8 as $t, 10 as $t, 24 as $t];
                     for i in 0..3 {
-                        assert!((((res[i] - target[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, target[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -120,7 +121,7 @@ mod tests {
                     ];
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!((((res[(i, j)] - target[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, target[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -145,7 +146,7 @@ mod tests {
                     ];
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!((((res[(i, j)] - target[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, target[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

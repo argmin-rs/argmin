@@ -9,8 +9,8 @@
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use approx::assert_relative_eq;
     use argmin_math::ArgminL2Norm;
-
     use ndarray::{array, Array1};
     use num_complex::Complex;
     use num_integer::Roots;
@@ -24,7 +24,7 @@ mod tests {
                     let a = array![4 as $t, 3 as $t];
                     let res = <Array1<$t> as ArgminL2Norm<$t>>::l2_norm(&a);
                     let target = 5 as $t;
-                    assert!(((target - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -34,7 +34,7 @@ mod tests {
                     let a = array![Complex::new(4 as $t, 2 as $t), Complex::new(3 as $t, 4 as $t)];
                     let res = <Array1<Complex<$t>> as ArgminL2Norm<$t>>::l2_norm(&a);
                     let target = (a[0].norm_sqr() + a[1].norm_sqr()).sqrt();
-                    assert!(((target - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
@@ -48,7 +48,7 @@ mod tests {
                     let a = array![-4 as $t, -3 as $t];
                     let res = <Array1<$t> as ArgminL2Norm<$t>>::l2_norm(&a);
                     let target = 5 as $t;
-                    assert!(((target - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -58,7 +58,7 @@ mod tests {
                     let a = array![Complex::new(-4 as $t, -2 as $t), Complex::new(-3 as $t, -4 as $t)];
                     let res = <Array1<Complex<$t>> as ArgminL2Norm<$t>>::l2_norm(&a);
                     let target = (a[0].norm_sqr() + a[1].norm_sqr()).sqrt();
-                    assert!(((target - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

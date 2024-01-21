@@ -5,14 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use approx::assert_relative_eq;
     use argmin_math::ArgminMinMax;
+    use ndarray::array;
     use ndarray::{Array1, Array2};
-       use ndarray::array;
     use paste::item;
 
     macro_rules! make_test {
@@ -27,8 +27,8 @@ mod tests {
                     let res_max = <Array1<$t> as ArgminMinMax>::max(&a, &b);
                     let res_min = <Array1<$t> as ArgminMinMax>::min(&a, &b);
                     for i in 0..3 {
-                        assert!(((target_max[i] - res_max[i]) as f64).abs() < std::f64::EPSILON);
-                        assert!(((target_min[i] - res_min[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(target_max[i] as f64, res_max[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target_min[i] as f64, res_min[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -56,8 +56,8 @@ mod tests {
                     let res_min = <Array2<$t> as ArgminMinMax>::min(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                        assert!(((target_max[(j, i)] - res_max[(j, i)]) as f64).abs() < std::f64::EPSILON);
-                        assert!(((target_min[(j, i)] - res_min[(j, i)]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(target_max[(j, i)] as f64, res_max[(j, i)] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target_min[(j, i)] as f64, res_min[(j, i)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

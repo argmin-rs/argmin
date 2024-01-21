@@ -5,15 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
     use argmin_math::ArgminSignum;
+    use ndarray::array;
     use ndarray::{Array1, Array2};
     use num_complex::Complex;
-       use ndarray::array;
     use paste::item;
 
     macro_rules! make_test {

@@ -9,6 +9,7 @@
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use approx::assert_relative_eq;
     use argmin_math::ArgminL1Norm;
     use ndarray::{array, Array1};
     use num_complex::Complex;
@@ -22,7 +23,7 @@ mod tests {
                     let a = array![4 as $t, 3 as $t];
                     let res = <Array1<$t> as ArgminL1Norm<$t>>::l1_norm(&a);
                     let target = 7 as $t;
-                    assert!(((target - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -32,7 +33,7 @@ mod tests {
                     let a = array![Complex::new(4 as $t, 2 as $t), Complex::new(3 as $t, 4 as $t)];
                     let res = <Array1<Complex<$t>> as ArgminL1Norm<$t>>::l1_norm(&a);
                     let target = a[0].l1_norm() + a[1].l1_norm();
-                    assert!(((target - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };
@@ -46,7 +47,7 @@ mod tests {
                     let a = array![-4 as $t, -3 as $t];
                     let res = <Array1<$t> as ArgminL1Norm<$t>>::l1_norm(&a);
                     let target = 7 as $t;
-                    assert!(((target - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -56,7 +57,7 @@ mod tests {
                     let a = array![Complex::new(-4 as $t, -2 as $t), Complex::new(-3 as $t, -4 as $t)];
                     let res = <Array1<Complex<$t>> as ArgminL1Norm<$t>>::l1_norm(&a);
                     let target = a[0].l1_norm() + a[1].l1_norm();
-                    assert!(((target - res) as f64).abs() < std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

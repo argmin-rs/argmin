@@ -5,14 +5,13 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
-    use argmin_math::{ArgminZeroLike};
-    
-       use ndarray::{array, Array1, Array2};
+    use approx::assert_relative_eq;
+    use argmin_math::ArgminZeroLike;
+    use ndarray::{array, Array1, Array2};
     use paste::item;
 
     macro_rules! make_test {
@@ -40,7 +39,7 @@ mod tests {
                 fn [<test_zero_like_2_ $t>]() {
                     let a = (array![42 as $t, 42 as $t, 42 as $t, 42 as $t]).zero_like();
                     for i in 0..4 {
-                        assert!(((0 as $t - a[i]) as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(0.0 as f64, a[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -69,7 +68,7 @@ mod tests {
                     let a = (array![[42 as $t, 42 as $t], [42 as $t, 42 as $t]]).zero_like();
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((0 as $t - a[(i, j)]) as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(0.0 as f64, a[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

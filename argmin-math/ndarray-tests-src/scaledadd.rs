@@ -9,6 +9,7 @@
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use approx::assert_relative_eq;
     use argmin_math::ArgminScaledAdd;
     use ndarray::{array, Array1, Array2};
     use paste::item;
@@ -24,7 +25,7 @@ mod tests {
                     let res = <Array1<$t> as ArgminScaledAdd<Array1<$t>, $t, Array1<$t>>>::scaled_add(&a, &b, &c);
                     let target = array![9 as $t, 12 as $t, 15 as $t];
                     for i in 0..3 {
-                        assert!((((res[i] - target[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, target[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -60,7 +61,7 @@ mod tests {
                     let res = <Array1<$t> as ArgminScaledAdd<Array1<$t>, Array1<$t>, Array1<$t>>>::scaled_add(&a, &b, &c);
                     let target = array![13 as $t, 12 as $t, 9 as $t];
                     for i in 0..3 {
-                        assert!((((res[i] - target[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, target[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -120,7 +121,7 @@ mod tests {
                     ];
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!((((res[(i, j)] - target[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, target[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -145,7 +146,7 @@ mod tests {
                     ];
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!((((res[(i, j)] - target[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, target[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -153,8 +154,6 @@ mod tests {
         };
     }
 
-    // make_test!(isize);
-    // make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);

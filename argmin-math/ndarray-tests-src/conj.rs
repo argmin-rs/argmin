@@ -5,16 +5,15 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-
-
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use approx::assert_relative_eq;
     use argmin_math::ArgminConj;
+    use ndarray::array;
     use ndarray::{Array1, Array2};
     use num_complex::Complex;
-    use ndarray::array;
     use paste::item;
 
     macro_rules! make_test {
@@ -57,8 +56,8 @@ mod tests {
                     let res = <Array2<Complex<$t>> as ArgminConj>::conj(&a);
                     for i in 0..2 {
                         for j in 0..3 {
-                            assert!((b[(j, i)].re as f64 - res[(j, i)].re as f64).abs() < std::f64::EPSILON);
-                            assert!((b[(j, i)].im as f64 - res[(j, i)].im as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(b[(j, i)].re as f64, res[(j, i)].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(b[(j, i)].im as f64, res[(j, i)].im as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -70,7 +69,7 @@ mod tests {
                     let a = Array1::from(vec![1 as $t, 4 as $t, 8 as $t]);
                     let res = <Array1<$t> as ArgminConj>::conj(&a);
                     for i in 0..3 {
-                        assert!((a[i] as f64 - res[i] as f64).abs() < std::f64::EPSILON);
+                        assert_relative_eq!(a[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -85,7 +84,7 @@ mod tests {
                     let res = <Array2<$t> as ArgminConj>::conj(&a);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert!((a[(j, i)] as f64 - res[(j, i)] as f64).abs() < std::f64::EPSILON);
+                            assert_relative_eq!(a[(j, i)] as f64, res[(j, i)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -100,5 +99,4 @@ mod tests {
     make_test!(i64);
     make_test!(f32);
     make_test!(f64);
-
 }
