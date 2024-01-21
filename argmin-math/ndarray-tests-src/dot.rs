@@ -5,15 +5,15 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use approx::assert_relative_eq;
     use argmin_math::ArgminDot;
+    use ndarray::array;
     use ndarray::{Array1, Array2};
     use num_complex::Complex;
-    use ndarray::array;
     use paste::item;
 
     macro_rules! make_test {
@@ -24,7 +24,7 @@ mod tests {
                     let a = array![1 as $t, 2 as $t, 3 as $t];
                     let b = array![4 as $t, 5 as $t, 6 as $t];
                     let res: $t = <Array1<$t> as ArgminDot<Array1<$t>, $t>>::dot(&a, &b);
-                    assert!((((res - 32 as $t) as f64).abs()) < std::f64::EPSILON);
+                    assert_relative_eq!(res as f64, 32 as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -37,7 +37,7 @@ mod tests {
                         <Array1<$t> as ArgminDot<$t, Array1<$t>>>::dot(&a, &b);
                     let res = array![2 as $t, 4 as $t, 6 as $t];
                     for i in 0..3 {
-                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -51,7 +51,7 @@ mod tests {
                         <$t as ArgminDot<Array1<$t>, Array1<$t>>>::dot(&b, &a);
                     let res = array![2 as $t, 4 as $t, 6 as $t];
                     for i in 0..3 {
-                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -70,7 +70,7 @@ mod tests {
                         <Array1<$t> as ArgminDot<Array1<$t>, Array2<$t>>>::dot(&a, &b);
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -89,7 +89,7 @@ mod tests {
                     let product: Array1<$t> =
                         <Array2<$t> as ArgminDot<Array1<$t>, Array1<$t>>>::dot(&a, &b);
                     for i in 0..3 {
-                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -116,7 +116,7 @@ mod tests {
                         <Array2<$t> as ArgminDot<Array2<$t>, Array2<$t>>>::dot(&a, &b);
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -139,7 +139,7 @@ mod tests {
                         <Array2<$t> as ArgminDot<$t, Array2<$t>>>::dot(&a, &(2 as $t));
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -162,7 +162,7 @@ mod tests {
                         <$t as ArgminDot<Array2<$t>, Array2<$t>>>::dot(&(2 as $t), &a);
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -183,8 +183,8 @@ mod tests {
                     ];
                     let res: Complex<$t> = <Array1<Complex<$t>> as ArgminDot<Array1<Complex<$t>>, Complex<$t>>>::dot(&a, &b);
                     let target = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-                    assert!((((res - target).re as f64).abs()) < std::f64::EPSILON);
-                    assert!((((res - target).im as f64).abs()) < std::f64::EPSILON);
+                    assert_relative_eq!(res.re as f64, target.re as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(res.im as f64, target.im as f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -201,8 +201,8 @@ mod tests {
                         <Array1<Complex<$t>> as ArgminDot<Complex<$t>, Array1<Complex<$t>>>>::dot(&a, &b);
                     let res = array![a[0]*b, a[1]*b, a[2]*b];
                     for i in 0..3 {
-                        assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
-                        assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i].re as f64, product[i].re as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(res[i].im as f64, product[i].im as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -220,8 +220,8 @@ mod tests {
                         <Complex<$t> as ArgminDot<Array1<Complex<$t>>, Array1<Complex<$t>>>>::dot(&b, &a);
                     let res = array![a[0]*b, a[1]*b, a[2]*b];
                     for i in 0..3 {
-                        assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
-                        assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i].re as f64, product[i].re as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(res[i].im as f64, product[i].im as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -245,8 +245,8 @@ mod tests {
                         <Array1<Complex<$t>> as ArgminDot<Array1<Complex<$t>>, Array2<Complex<$t>>>>::dot(&a, &b);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((res[(i, j)].re as f64 - product[(i, j)].re as f64).abs()) < std::f64::EPSILON);
-                            assert!(((res[(i, j)].im as f64 - product[(i, j)].im as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)].re as f64, product[(i, j)].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)].im as f64, product[(i, j)].im as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -270,8 +270,8 @@ mod tests {
                     let product: Array1<Complex<$t>> =
                         <Array2<Complex<$t>> as ArgminDot<Array1<Complex<$t>>, Array1<Complex<$t>>>>::dot(&a, &b);
                     for i in 0..2 {
-                            assert!(((res[i].re as f64 - product[i].re as f64).abs()) < std::f64::EPSILON);
-                            assert!(((res[i].im as f64 - product[i].im as f64).abs()) < std::f64::EPSILON);
+                        assert_relative_eq!(res[i].re as f64, product[i].re as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(res[i].im as f64, product[i].im as f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -301,8 +301,8 @@ mod tests {
                         <Array2<Complex<$t>> as ArgminDot<Array2<Complex<$t>>, Array2<Complex<$t>>>>::dot(&a, &b);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((res[(i, j)].re as f64 - product[(i, j)].re as f64).abs()) < std::f64::EPSILON);
-                            assert!(((res[(i, j)].im as f64 - product[(i, j)].im as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)].re as f64, product[(i, j)].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)].im as f64, product[(i, j)].im as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -324,8 +324,8 @@ mod tests {
                         <Array2<Complex<$t>> as ArgminDot<Complex<$t>, Array2<Complex<$t>>>>::dot(&a, &b);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((res[(i, j)].re as f64 - product[(i, j)].re as f64).abs()) < std::f64::EPSILON);
-                            assert!(((res[(i, j)].im as f64 - product[(i, j)].im as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)].re as f64, product[(i, j)].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)].im as f64, product[(i, j)].im as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -347,8 +347,8 @@ mod tests {
                         <Complex<$t> as ArgminDot<Array2<Complex<$t>>, Array2<Complex<$t>>>>::dot(&b, &a);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((res[(i, j)].re as f64 - product[(i, j)].re as f64).abs()) < std::f64::EPSILON);
-                            assert!(((res[(i, j)].im as f64 - product[(i, j)].im as f64).abs()) < std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)].re as f64, product[(i, j)].re as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)].im as f64, product[(i, j)].im as f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -368,5 +368,4 @@ mod tests {
     make_test!(usize);
     make_test!(f32);
     make_test!(f64);
-
 }

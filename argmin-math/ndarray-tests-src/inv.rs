@@ -9,12 +9,10 @@
 mod tests {
     #[allow(unused_imports)]
     use super::*;
+    use approx::assert_relative_eq;
     use argmin_math::ArgminInv;
-    
     use ndarray::array;
     use ndarray::Array2;
-    
-    
     use paste::item;
 
     macro_rules! make_test {
@@ -33,10 +31,7 @@ mod tests {
                     let res = <Array2<$t> as ArgminInv<Array2<$t>>>::inv(&a).unwrap();
                     for i in 0..2 {
                         for j in 0..2 {
-                            // TODO: before ndarray 0.14 / ndarray-linalg 0.13, comparison with
-                            // EPSILON worked, now errors are larger (and dependent on the BLAS
-                            // backend)
-                            assert!((((res[(i, j)] - target[(i, j)]) as f64).abs()) < 0.000001);
+                            assert_relative_eq!(res[(i, j)], target[(i, j)], epsilon = std::$t::EPSILON.sqrt());
                         }
                     }
                 }
@@ -48,7 +43,7 @@ mod tests {
                     let a = 2.0;
                     let target = 0.5;
                     let res = <$t as ArgminInv<$t>>::inv(&a).unwrap();
-                    assert!(((res - target) as f64).abs() < 0.000001);
+                    assert_relative_eq!(res as f64, target as f64, epsilon = std::f64::EPSILON);
                 }
             }
         };

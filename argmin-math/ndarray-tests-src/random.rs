@@ -5,16 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
-    
     use argmin_math::ArgminRandom;
     use ndarray::{array, Array1, Array2};
-    use rand::SeedableRng;
     use paste::item;
+    use rand::SeedableRng;
 
     macro_rules! make_test {
         ($t:ty) => {
