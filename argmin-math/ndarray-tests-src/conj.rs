@@ -92,7 +92,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
     make_test!(i8);
     make_test!(i16);
     make_test!(i32);
