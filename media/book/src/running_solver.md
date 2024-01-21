@@ -134,3 +134,6 @@ let function_evaluation_counts = res.state().get_func_counts();
 # }
 ```
 
+Optionally, `Executor` allows one to terminate a run after a given timeout, which can be set with the `timeout` method of `Executor`. 
+The check whether the overall runtime exceeds the timeout is performed after every iteration, therefore the actual runtime can be longer than the set timeout.
+In case of timeout, the run terminates with `TerminationReason::Timeout`.

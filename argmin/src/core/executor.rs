@@ -26,6 +26,8 @@ pub struct Executor<O, S, I> {
     observers: Observers<I>,
     /// Checkpoint
     checkpoint: Option<Box<dyn Checkpoint<S, I>>>,
+    /// Timeout
+    timeout: Option<std::time::Duration>,
     /// Indicates whether Ctrl-C functionality should be active or not
     ctrlc: bool,
     /// Indicates whether to time execution or not
@@ -66,6 +68,7 @@ where
             state,
             observers: Observers::new(),
             checkpoint: None,
+            timeout: None,
             ctrlc: true,
             timer: true,
         }
@@ -250,10 +253,18 @@ where
             }
 
             if self.timer {
+                // Increase accumulated total_time
                 total_time.map(|total_time| state.time(Some(total_time.elapsed())));
+
+                // If a timeout is set, check if timeout is reached
+                if let (Some(timeout), Some(total_time)) = (self.timeout, total_time) {
+                    if total_time.elapsed() > timeout {
+                        state = state.terminate_with(TerminationReason::Timeout);
+                    }
+                }
             }
 
-            // Check if termination occurred inside next_iter()
+            // Check if termination occurred in the meantime
             if state.terminated() {
                 break;
             }
@@ -374,6 +385,8 @@ where
 
     /// Enables or disables timing of individual iterations (default: enabled).
     ///
+    /// Setting this to false will silently be ignored in case a timeout is set.
+    ///
     /// # Example
     ///
     /// ```
@@ -391,7 +404,38 @@ where
     /// ```
     #[must_use]
     pub fn timer(mut self, timer: bool) -> Self {
-        self.timer = timer;
+        if self.timeout.is_none() {
+            self.timer = timer;
+        }
+        self
+    }
+
+    /// Sets a timeout for the run.
+    ///
+    /// The optimization run is stopped once the timeout is exceeded. Note that the check is
+    /// performed after each iteration, therefore the actual runtime can exceed the the set
+    /// duration.
+    /// This also enables time measurements.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use argmin::core::{Error, Executor};
+    /// # use argmin::core::test_utils::{TestSolver, TestProblem};
+    /// #
+    /// # fn main() -> Result<(), Error> {
+    /// # let solver = TestSolver::new();
+    /// # let problem = TestProblem::new();
+    /// #
+    /// // Create instance of `Executor` with `problem` and `solver`
+    /// let executor = Executor::new(problem, solver).timeout(std::time::Duration::from_secs(30));
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[must_use]
+    pub fn timeout(mut self, timeout: std::time::Duration) -> Self {
+        self.timer = true;
+        self.timeout = Some(timeout);
         self
     }
 }
@@ -714,5 +758,32 @@ mod tests {
 
         // Delete old checkpointing file
         let _ = std::fs::remove_file(".checkpoints/init_test.arg");
+    }
+
+    #[test]
+    fn test_timeout() {
+        let solver = TestSolver::new();
+        let problem = TestProblem::new();
+        let timeout = std::time::Duration::from_secs(2);
+
+        let executor = Executor::new(problem, solver);
+        assert!(executor.timer);
+        assert!(executor.timeout.is_none());
+
+        let executor = Executor::new(problem, solver).timer(false);
+        assert!(!executor.timer);
+        assert!(executor.timeout.is_none());
+
+        let executor = Executor::new(problem, solver).timeout(timeout);
+        assert!(executor.timer);
+        assert_eq!(executor.timeout, Some(timeout));
+
+        let executor = Executor::new(problem, solver).timeout(timeout).timer(false);
+        assert!(executor.timer);
+        assert_eq!(executor.timeout, Some(timeout));
+
+        let executor = Executor::new(problem, solver).timer(false).timeout(timeout);
+        assert!(executor.timer);
+        assert_eq!(executor.timeout, Some(timeout));
     }
 }
