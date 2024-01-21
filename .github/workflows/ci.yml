@@ -133,8 +133,12 @@ jobs:
         run: cargo clippy -p argmin --all-targets --all-features -- -D warnings
       - name: Clippy (argmin-observer-slog)
         run: cargo clippy -p argmin-observer-slog --all-targets --features "serde1" -- -D warnings
+      - name: Clippy (argmin-observer-paramwriter)
+        run: cargo clippy -p argmin-observer-paramwriter --all-targets -- -D warnings
       - name: Clippy (argmin-observer-spectator)
         run: cargo clippy -p argmin-observer-spectator --all-targets -- -D warnings
+      - name: Clippy (argmin-checkpointing-file)
+        run: cargo clippy -p argmin-checkpointing-file --all-targets -- -D warnings
       - name: Clippy (spectator)
         run: cargo clippy -p spectator --all-targets -- -D warnings
 
