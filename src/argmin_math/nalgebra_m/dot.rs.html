@@ -256,6 +256,7 @@
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
 <a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -346,6 +347,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>nalgebra::{Matrix3, RowVector3, Vector3};
     <span class="kw">use </span>paste::item;
 
@@ -357,7 +359,7 @@
                     <span class="kw">let </span>a = Vector3::new(<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">let </span>b = Vector3::new(<span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">5 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">6 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">let </span>res: <span class="macro-nonterminal">$t </span>= &lt;Vector3&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminDot&lt;Vector3&lt;<span class="macro-nonterminal">$t</span>&gt;, <span class="macro-nonterminal">$t</span>&gt;&gt;::dot(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
-                    <span class="macro">assert!</span>((((res - <span class="number">32 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(res <span class="kw">as </span>f64, <span class="number">32 </span><span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                 }
             }
 
@@ -370,7 +372,7 @@
                         &lt;Vector3&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminDot&lt;<span class="macro-nonterminal">$t</span>, Vector3&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::dot(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">let </span>res = Vector3::new(<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">6 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert!</span>((((res[i] - product[i]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, product[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -384,7 +386,7 @@
                         &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span>ArgminDot&lt;Vector3&lt;<span class="macro-nonterminal">$t</span>&gt;, Vector3&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::dot(<span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;</span>a);
                     <span class="kw">let </span>res = Vector3::new(<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">6 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert!</span>((((res[i] - product[i]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, product[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -403,7 +405,7 @@
                         &lt;Vector3&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminDot&lt;RowVector3&lt;<span class="macro-nonterminal">$t</span>&gt;, Matrix3&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::dot(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert!</span>((((res[(i, j)] - product[(i, j)]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[(i, j)] <span class="kw">as </span>f64, product[(i, j)] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -422,7 +424,7 @@
                     <span class="kw">let </span>product: Vector3&lt;<span class="macro-nonterminal">$t</span>&gt; =
                         &lt;Matrix3&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminDot&lt;Vector3&lt;<span class="macro-nonterminal">$t</span>&gt;, Vector3&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::dot(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert!</span>((((res[i] - product[i]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, product[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -449,7 +451,7 @@
                         &lt;Matrix3&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminDot&lt;Matrix3&lt;<span class="macro-nonterminal">$t</span>&gt;, Matrix3&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::dot(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert!</span>((((res[(i, j)] - product[(i, j)]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[(i, j)] <span class="kw">as </span>f64, product[(i, j)] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -472,7 +474,7 @@
                         &lt;Matrix3&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminDot&lt;<span class="macro-nonterminal">$t</span>, Matrix3&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::dot(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>(<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>));
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert!</span>((((res[(i, j)] - product[(i, j)]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[(i, j)] <span class="kw">as </span>f64, product[(i, j)] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -495,7 +497,7 @@
                         &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span>ArgminDot&lt;Matrix3&lt;<span class="macro-nonterminal">$t</span>&gt;, Matrix3&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::dot(<span class="kw-2">&amp;</span>(<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>), <span class="kw-2">&amp;</span>a);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert!</span>((((res[(i, j)] - product[(i, j)]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[(i, j)] <span class="kw">as </span>f64, product[(i, j)] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

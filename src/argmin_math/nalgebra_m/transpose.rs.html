@@ -103,6 +103,7 @@
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -137,6 +138,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>nalgebra::{Matrix2, Matrix2x3, Matrix3x2, RowVector2, Vector2};
     <span class="kw">use </span>paste::item;
 
@@ -149,7 +151,7 @@
                     <span class="kw">let </span>target = RowVector2::new(<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">let </span>res = &lt;Vector2&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminTranspose&lt;RowVector2&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::t(a);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                        <span class="macro">assert!</span>(((target[i] - res[i]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target[i] <span class="kw">as </span>f64, res[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -168,7 +170,7 @@
                     <span class="kw">let </span>res = &lt;Matrix2&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminTranspose&lt;Matrix2&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::t(a);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                            <span class="macro">assert!</span>(((target[(i, j)] - res[(i, j)]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[(i, j)] <span class="kw">as </span>f64, res[(i, j)] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
@@ -189,7 +191,7 @@
                     <span class="kw">let </span>res = &lt;Matrix3x2&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminTranspose&lt;Matrix2x3&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt;::t(a);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert!</span>(((target[(i, j)] - res[(i, j)]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[(i, j)] <span class="kw">as </span>f64, res[(i, j)] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }

@@ -98,8 +98,6 @@
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -135,6 +133,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>nalgebra::{Matrix2x3, Vector3};
     <span class="kw">use </span>paste::item;
 
@@ -150,8 +149,8 @@
                     <span class="kw">let </span>res_max = &lt;Vector3&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminMinMax&gt;::max(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">let </span>res_min = &lt;Vector3&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminMinMax&gt;::min(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert!</span>(((target_max[i] - res_max[i]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
-                        <span class="macro">assert!</span>(((target_min[i] - res_min[i]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target_max[i] <span class="kw">as </span>f64, res_max[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(target_min[i] <span class="kw">as </span>f64, res_min[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                     }
                 }
             }
@@ -179,13 +178,12 @@
                     <span class="kw">let </span>res_min = &lt;Matrix2x3&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminMinMax&gt;::min(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                        <span class="macro">assert!</span>(((target_max[(j, i)] - res_max[(j, i)]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
-                        <span class="macro">assert!</span>(((target_min[(j, i)] - res_min[(j, i)]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target_max[(j, i)] <span class="kw">as </span>f64, res_max[(j, i)] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target_min[(j, i)] <span class="kw">as </span>f64, res_min[(j, i)] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
                         }
                     }
                 }
             }
-
         };
     }
 
@@ -197,8 +195,6 @@
     <span class="macro">make_test!</span>(u32);
     <span class="macro">make_test!</span>(i64);
     <span class="macro">make_test!</span>(u64);
-    <span class="macro">make_test!</span>(isize);
-    <span class="macro">make_test!</span>(usize);
     <span class="macro">make_test!</span>(f32);
     <span class="macro">make_test!</span>(f64);
 }

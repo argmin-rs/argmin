@@ -101,6 +101,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>nalgebra::{Matrix2x3, Vector3};
     <span class="kw">use </span>paste::item;
 
@@ -113,8 +114,7 @@
                     <span class="kw">let </span>b = Vector3::new(<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, -<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, -<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>);
                     <span class="kw">let </span>res = &lt;Vector3&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">as </span>ArgminSignum&gt;::signum(a);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="kw">let </span>diff = (b[i] <span class="kw">as </span>f64 - res[i] <span class="kw">as </span>f64).abs();
-                        <span class="macro">assert!</span>(diff  &lt; std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(b[i], res[i], epsilon = std::<span class="macro-nonterminal">$t::EPSILON</span>);
                     }
                 }
             }
@@ -133,7 +133,7 @@
                     <span class="kw">let </span>res = b.signum();
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                            <span class="macro">assert!</span>(((target[(j, i)] - res[(j, i)]) <span class="kw">as </span>f64).abs() &lt; std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(target[(j, i)], res[(j, i)], epsilon = std::<span class="macro-nonterminal">$t::EPSILON</span>);
                         }
                     }
                 }
