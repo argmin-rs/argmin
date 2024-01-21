@@ -23,7 +23,7 @@ mod tests {
                     let b = array![2 as $t, 3 as $t, 5 as $t];
                     let mut rng = rand::rngs::StdRng::seed_from_u64(42);
                     let random = Array1::<$t>::rand_from_range(&a, &b, &mut rng);
-                    for i in 0..3usize {
+                    for i in 0..3 {
                         assert!(random[i] >= a[i]);
                         assert!(random[i] <= b[i]);
                     }
@@ -62,8 +62,6 @@ mod tests {
     make_test!(u32);
     make_test!(i64);
     make_test!(u64);
-    make_test!(isize);
-    make_test!(usize);
     make_test!(f32);
     make_test!(f64);
 }

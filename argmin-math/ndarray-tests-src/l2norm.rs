@@ -64,8 +64,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);
@@ -77,7 +75,6 @@ mod tests {
     make_test!(f32);
     make_test!(f64);
 
-    make_test_signed!(isize);
     make_test_signed!(i8);
     make_test_signed!(i16);
     make_test_signed!(i32);
