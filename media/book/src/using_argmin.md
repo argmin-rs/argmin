@@ -45,3 +45,9 @@ For performance reasons, the latter two should be preferred. Which one to use is
 
 `Vec`s on the other hand do not have very efficient implementations for the different mathematical operations and therefore are not well suited for solvers which heavily rely on matrix operations.
 However, `Vec`s are suitable for solvers such as Simulated Annealing and Particle Swarm Optimization, which mainly operate on the parameter vectors themselves. 
+
+## Examples
+
+Every solver and most features of argmin are showcased in the [examples directory](https://github.com/argmin-rs/argmin/tree/main/examples).
+Each example is a dedicated Rust crate with a corresponding `Cargo.toml`, which includes all relevant dependencies to run it.
+Make sure that the examples you are looking at match the argmin version you are using be choosing the appropriate Git version tag on Github.
